@@ -2,7 +2,7 @@
     "name": "pc-nrfconnect-npm",
     "version": "0.0.1",
     "description": "EXPERIMENTAL: NEUTRINO PC App​",
-    "displayName": "NPM App",
+    "displayName": "nPM App",
     "repository": {
         "type": "git",
         "url": "https://github.com/NordicSemiconductor/pc-nrfconnect-cellularmonitor.git"
