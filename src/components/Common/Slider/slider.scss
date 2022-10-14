@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2021 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
+ */
+
+@import "./variables";
+
+.slider {
+    height: 2*$handle-radius-selected;
+
+    position: relative;
+    margin: 0 $handle-radius;
+}
