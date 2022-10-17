@@ -20,6 +20,7 @@ interface DropdownItem {
 interface DropdownProps {
     label?: string;
     items: DropdownItem[];
+    fixedHeight?: string;
     onSelect: (item: DropdownItem) => void;
     disabled?: boolean;
     defaultIndex?: number;
@@ -31,6 +32,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     onSelect,
     disabled = false,
     defaultIndex = 0,
+    fixedHeight = ''
 }) => {
     const [selected, setSelected] = useState(items[defaultIndex]);
     const [isActive, setIsActive] = useState(false);
@@ -69,6 +71,8 @@ const Dropdown: React.FC<DropdownProps> = ({
                 <img className={styles.image} src={chevron} alt="" />
             </button>
             <div
+                style={ {maxHeight: fixedHeight} } 
+                data-height={fixedHeight.length > 0}
                 className={`${styles.content} ${
                     isActive ? styles.itemsActive : styles.itemsInactive
                 }`}

@@ -41,22 +41,24 @@
     padding: 0;
     border-top: solid 2px $gray-600;
     z-index: 2;  // Fix issue with toggel on top of dropdown Options
-    max-height: 300px; // Make Scroll Fixed Height
-    overflow-y: scroll; // Make Scroll Fixed Height Scrolable
+    
+    &[data-height=true] {
+        overflow-y: scroll; // Make Scroll Fixed Height Scrolable
 
-    /* Works on Chrome, Edge, and Safari */
-    &::-webkit-scrollbar {
-        width: 12px;
-    }
-    
-    &::-webkit-scrollbar-track {
-        background: $gray-700;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-        background-color: $gray-600;
-        border-radius: 20px;
-        border: 3px solid  $gray-700;
+        /* Works on Chrome, Edge, and Safari */
+        &::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            background: $gray-700;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            background-color: $gray-600;
+            border-radius: 20px;
+            border: 3px solid  $gray-700;
+        }
     }
 }
 
