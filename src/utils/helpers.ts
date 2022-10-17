@@ -11,12 +11,15 @@ export interface RangeType {
     step: number;
 }
 
+import lodashRange from 'lodash.range';
+
 export const getRange = (ranges: RangeType[]): number[] => {
     let out:number[] = [];
 
     ranges.forEach((range) => {
-        const steps =  ((range.max - range.min) / range.step) + 1; 
-        out = [...out, ...Array.from({length: steps}, (_, index) => range.min + (range.step * index))];
+        lodashRange(range.min, range.max + range.step, range.step).map( (value, index) => {
+            out.push(range.min + (index*range.step));
+        })
     })
 
     return out;
