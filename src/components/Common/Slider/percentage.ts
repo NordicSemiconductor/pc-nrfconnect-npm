@@ -20,6 +20,7 @@ export const toPercentage = (
 } 
 
 export const fromPercentage = (
+    lastValue: number,
     value: number,
     { min, max, decimals = 0, step = null, explicitRange = []}: RangeProp,
     directionForward: boolean = false
@@ -27,32 +28,18 @@ export const fromPercentage = (
 
     if (explicitRange.length > 0) {
         const noOfIndexes = explicitRange.length - 1;
-
         const computedValue = Number(((value * (max - min)) / 100 + min).toFixed(decimals as number));
         
-        const closestPrev = [...explicitRange].filter((v) => computedValue > v).pop();
-        const closestNext =  [...explicitRange].filter((v) => computedValue < v)[0];
+        const lastValueIndex = explicitRange.indexOf(lastValue);
+        const closestPrevIndex = lastValueIndex === 0? 0 : lastValueIndex - 1;
+        const closestNextIndex = lastValueIndex === noOfIndexes? noOfIndexes : lastValueIndex + 1;
 
-        let closestPrevIndex = 0;
-        let closestNextIndex = noOfIndexes;
-
-        if (typeof closestPrev !== 'undefined') {
-            closestPrevIndex = explicitRange.indexOf(closestPrev);
-        }
-
-        if (typeof closestNext !== 'undefined') {
-            closestNextIndex = explicitRange.indexOf(closestNext);
-        }
-
-        const deltaMax = explicitRange[closestNextIndex] - explicitRange[closestPrevIndex];
-        const precentDelta = (explicitRange[closestNextIndex] - computedValue) / deltaMax
-        
         let closestIndex = -1;
 
         if (directionForward) {
-            closestIndex = (precentDelta + 0.5) <= 0.5 ? closestNextIndex : closestPrevIndex;
+            closestIndex =  explicitRange[closestNextIndex] > computedValue ? lastValueIndex: closestNextIndex;
         } else {
-            closestIndex = (precentDelta - 0.5) >= 0.5 ? closestPrevIndex : closestNextIndex;
+            closestIndex =  explicitRange[closestPrevIndex] < computedValue ? lastValueIndex: closestPrevIndex;
         }
 
 
