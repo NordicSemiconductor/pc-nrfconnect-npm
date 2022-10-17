@@ -36,7 +36,7 @@ export const isFactor = (dividend: number, divisor: number): boolean => {
     }
 
     divisor = Number(divisor.toFixed(0));
-    dividend *=  10 ** exp;
+    dividend =  Number((dividend * (10 ** exp)).toFixed(0));
 
     return dividend % divisor === 0;
 }
