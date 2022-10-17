@@ -42,7 +42,6 @@ export const fromPercentage = (
             closestIndex =  explicitRange[closestPrevIndex] < computedValue ? lastValueIndex: closestPrevIndex;
         }
 
-
         return Number((explicitRange[closestIndex]).toFixed(decimals as number));
     } else if (step != null) {
         const noOfSteps = (max - min) / step;
