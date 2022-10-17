@@ -29,8 +29,8 @@ interface Props {
 }
 
 export const isFactor = (dividend: number, divisor: number): boolean => {
-    let exp = 1;
-    while (divisor != Number(divisor.toFixed(0))) {
+    let exp = 0;
+    while (divisor !== Number(divisor.toFixed(0))) {
         exp++,
         divisor *= 10;
     }
