@@ -30,12 +30,10 @@
         "nordic-publish": "nordic-publish"
     },
     "devDependencies": {
-        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#v6.6.1"
+        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#extend-slider-and-inlineinput"
     },
-    "dependencies": {
-    },
-    "bundledDependencies": [
-    ],
+    "dependencies": {},
+    "bundledDependencies": [],
     "eslintConfig": {
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
     },
