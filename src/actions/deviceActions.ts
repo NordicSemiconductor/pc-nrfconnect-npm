@@ -6,7 +6,7 @@
 
 import { Device, logger } from 'pc-nrfconnect-shared';
 
-import { TAction } from '../reducers/types';
+import { TAction } from '../thunk';
 
 export const closeDevice = (): TAction => dispatch => {
     logger.info('Closing device');

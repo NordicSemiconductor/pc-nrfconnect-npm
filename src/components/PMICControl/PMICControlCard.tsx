@@ -9,6 +9,7 @@ import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, NumberInlineInput, Slider, Toggle } from 'pc-nrfconnect-shared';
 
+import { RootState } from '../../appReducer';
 import {
     getEnableBuck1,
     getEnableBuck2,
@@ -32,8 +33,7 @@ import {
     npmVOut1Changed,
     npmVOut2Changed,
     npmVTermChanged,
-} from '../../reducers/settingsReducer';
-import { RootState } from '../../reducers/types';
+} from '../../features/PMICControl/pmicControlSlice';
 import vTermValues from '../../utils/vTermValues';
 
 const PowerCard = () => {

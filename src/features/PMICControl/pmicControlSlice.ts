@@ -6,9 +6,23 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 
-import { RootState, SettingsState } from './types';
+import type { RootState } from '../../appReducer';
 
-const initialState: SettingsState = {
+interface pmicControleState {
+    vTerm: number;
+    iCHG: number;
+    enableCharging: boolean;
+    vOut1: number;
+    enableV1Set: boolean;
+    enableBuck1: boolean;
+    vOut2: number;
+    enableV2Set: boolean;
+    enableBuck2: boolean;
+    enableLoadSw1: boolean;
+    enableLoadSw2: boolean;
+}
+
+const initialState: pmicControleState = {
     vTerm: 3.5,
     iCHG: 32,
     enableCharging: false,
@@ -22,8 +36,8 @@ const initialState: SettingsState = {
     enableLoadSw2: false,
 };
 
-const settingsSlice = createSlice({
-    name: 'settings',
+const pmicControlSlice = createSlice({
+    name: 'pmicControle',
     initialState,
     reducers: {
         npmVTermChanged(state, action) {
@@ -62,8 +76,6 @@ const settingsSlice = createSlice({
     },
 });
 
-export default settingsSlice.reducer;
-
 const {
     npmVTermChanged,
     npmICHGChanged,
@@ -76,20 +88,26 @@ const {
     npmEnableBuck2Changed,
     npmEnableLoadSw1Changed,
     npmEnableLoadSw2Changed,
-} = settingsSlice.actions;
+} = pmicControlSlice.actions;
 
-const getVTerm = (state: RootState) => state.app.settings.vTerm;
-const getICHG = (state: RootState) => state.app.settings.iCHG;
-const getEnableCharging = (state: RootState) =>
-    state.app.settings.enableCharging;
-const getVOut1 = (state: RootState) => state.app.settings.vOut1;
-const getEnableV1Set = (state: RootState) => state.app.settings.enableV1Set;
-const getEnableBuck1 = (state: RootState) => state.app.settings.enableBuck1;
-const getVOut2 = (state: RootState) => state.app.settings.vOut2;
-const getEnableV2Set = (state: RootState) => state.app.settings.enableV2Set;
-const getEnableBuck2 = (state: RootState) => state.app.settings.enableBuck2;
-const getEnableLoadSw1 = (state: RootState) => state.app.settings.enableLoadSw1;
-const getEnableLoadSw2 = (state: RootState) => state.app.settings.enableLoadSw2;
+export const getVTerm = (state: RootState) => state.app.pmicControl.vTerm;
+export const getICHG = (state: RootState) => state.app.pmicControl.iCHG;
+export const getEnableCharging = (state: RootState) =>
+    state.app.pmicControl.enableCharging;
+export const getVOut1 = (state: RootState) => state.app.pmicControl.vOut1;
+export const getEnableV1Set = (state: RootState) =>
+    state.app.pmicControl.enableV1Set;
+export const getEnableBuck1 = (state: RootState) =>
+    state.app.pmicControl.enableBuck1;
+export const getVOut2 = (state: RootState) => state.app.pmicControl.vOut2;
+export const getEnableV2Set = (state: RootState) =>
+    state.app.pmicControl.enableV2Set;
+export const getEnableBuck2 = (state: RootState) =>
+    state.app.pmicControl.enableBuck2;
+export const getEnableLoadSw1 = (state: RootState) =>
+    state.app.pmicControl.enableLoadSw1;
+export const getEnableLoadSw2 = (state: RootState) =>
+    state.app.pmicControl.enableLoadSw2;
 
 export {
     npmVTermChanged,
@@ -103,15 +121,6 @@ export {
     npmEnableBuck2Changed,
     npmEnableLoadSw1Changed,
     npmEnableLoadSw2Changed,
-    getVTerm,
-    getICHG,
-    getEnableCharging,
-    getVOut1,
-    getEnableV1Set,
-    getEnableBuck1,
-    getVOut2,
-    getEnableV2Set,
-    getEnableBuck2,
-    getEnableLoadSw1,
-    getEnableLoadSw2,
 };
+
+export default pmicControlSlice.reducer;

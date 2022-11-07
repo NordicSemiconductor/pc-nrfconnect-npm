@@ -14,7 +14,6 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { closeDevice, openDevice } from '../actions/deviceActions';
-import { TDispatch } from '../reducers/types';
 
 /**
  * Configures which device types to show in the device selector.

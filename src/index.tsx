@@ -14,7 +14,7 @@ import Graph from './components/Graph/Graph';
 import PMICControl from './components/PMICControl/PMICControl';
 import Regulators from './components/Regulators/Regulators';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
-import appReducer from './reducers';
+import appReducer from './appReducer';
 
 // import logLibVersions from './utils/logLibVersions';
 import './index.scss';
