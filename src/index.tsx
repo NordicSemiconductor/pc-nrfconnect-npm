@@ -27,12 +27,11 @@ export default () => (
         reportUsageData
         appReducer={appReducer}
         deviceSelect={<DeviceSelector />}
-        sidePanel={<div />}
+        sidePanel={<SidePanel />}
         panes={[
             {
                 name: 'PMIC Control',
                 Main: PMICControl,
-                SidePanel,
             },
             {
                 name: 'Charger',
