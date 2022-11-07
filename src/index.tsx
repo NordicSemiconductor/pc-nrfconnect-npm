@@ -14,6 +14,7 @@ import DocumentationSections from './components/DocumentationSection';
 import Graph from './components/Graph/Graph';
 import PMICControl from './components/PMICControl/PMICControl';
 import Regulators from './components/Regulators/Regulators';
+import SidePanel from './components/SidePanel';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
 
 // import logLibVersions from './utils/logLibVersions';
@@ -31,6 +32,7 @@ export default () => (
             {
                 name: 'PMIC Control',
                 Main: PMICControl,
+                SidePanel,
             },
             {
                 name: 'Charger',

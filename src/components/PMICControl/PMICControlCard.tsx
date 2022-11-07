@@ -33,7 +33,7 @@ import {
     npmVOut1Changed,
     npmVOut2Changed,
     npmVTermChanged,
-} from '../../features/PMICControl/pmicControlSlice';
+} from '../../features/pmicControl/pmicControlSlice';
 import vTermValues from '../../utils/vTermValues';
 
 const PowerCard = () => {

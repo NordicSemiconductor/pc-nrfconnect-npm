@@ -31,7 +31,8 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#extend-slider-and-inlineinput"
+        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#extend-slider-and-inlineinput",
+        "serialport": "^9.0.6"
     },
     "dependencies": {},
     "bundledDependencies": [],

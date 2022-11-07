@@ -7,7 +7,8 @@
 import { NrfConnectState } from 'pc-nrfconnect-shared';
 import { combineReducers } from 'redux';
 
-import pmicControlReducer from './features/PMICControl/pmicControlSlice';
+import modemReducer from './features/modem/modemSlice';
+import pmicControlReducer from './features/pmicControl/pmicControlSlice';
 
 type AppState = ReturnType<typeof appReducer>;
 
@@ -15,6 +16,7 @@ export type RootState = NrfConnectState<AppState>;
 
 const appReducer = combineReducers({
     pmicControl: pmicControlReducer,
+    modem: modemReducer,
 });
 
 export default appReducer;
