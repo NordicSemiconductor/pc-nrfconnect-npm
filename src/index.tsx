@@ -7,6 +7,7 @@
 import React from 'react';
 import { App } from 'pc-nrfconnect-shared';
 
+import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
 import DeviceSelector from './components/DeviceSelector';
 import DocumentationSections from './components/DocumentationSection';
@@ -14,7 +15,6 @@ import Graph from './components/Graph/Graph';
 import PMICControl from './components/PMICControl/PMICControl';
 import Regulators from './components/Regulators/Regulators';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
-import appReducer from './appReducer';
 
 // import logLibVersions from './utils/logLibVersions';
 import './index.scss';
