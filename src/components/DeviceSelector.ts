@@ -13,7 +13,9 @@ import {
     logger,
 } from 'pc-nrfconnect-shared';
 
-import { TDispatch } from '../thunk';
+import { closeDevice, openDevice } from '../actions/deviceActions';
+import { TDispatch } from '../reducers/types';
+
 /**
  * Configures which device types to show in the device selector.
  * The config format is described on
@@ -56,7 +58,7 @@ const mapState = () => ({
 const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
     onDeviceSelected: (device: Device) => {
         logger.info(`Selected device with s/n ${device.serialNumber}`);
-        //dispatch(openDevice(device));
+        dispatch(openDevice(device));
     },
     // releaseCurrentDevice: () => {
     //     logger.info('Will set up selected device');
@@ -66,7 +68,7 @@ const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
     // },
     onDeviceDeselected: () => {
         logger.info('Deselected device');
-        //dispatch(closeDevice());
+        dispatch(closeDevice());
     },
 });
 

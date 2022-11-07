@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2022 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
+ */
 
 import React from 'react';
 import { Alert } from 'pc-nrfconnect-shared';
 
-import './pmicControl.scss';
 import PMICControlCard from './PMICControlCard';
+
+import './pmicControl.scss';
 
 export default () => (
     <div className="pmicControl-container">
@@ -14,7 +20,7 @@ export default () => (
             </Alert>
 
             <div className="pmicControl-cards">
-                 <PMICControlCard />
+                <PMICControlCard />
             </div>
         </div>
     </div>

@@ -6,10 +6,17 @@
 
 import React, { FC } from 'react';
 import FormLabel from 'react-bootstrap/FormLabel';
+import { useDispatch, useSelector } from 'react-redux';
 import { Card, NumberInlineInput, Slider, Toggle } from 'pc-nrfconnect-shared';
 
-import { useDispatch, useSelector } from 'react-redux';
 import {
+    getEnableBuck1,
+    getEnableBuck2,
+    getEnableCharging,
+    getEnableLoadSw1,
+    getEnableLoadSw2,
+    getEnableV1Set,
+    getEnableV2Set,
     getICHG,
     getVOut1,
     getVOut2,
@@ -19,22 +26,15 @@ import {
     npmEnableChargingChanged,
     npmEnableLoadSw1Changed,
     npmEnableLoadSw2Changed,
+    npmEnableV1SetChanged,
+    npmEnableV2SetChanged,
     npmICHGChanged,
     npmVOut1Changed,
     npmVOut2Changed,
     npmVTermChanged,
-    npmEnableV1SetChanged,
-    npmEnableV2SetChanged,
-    getEnableBuck1,
-    getEnableV1Set,
-    getEnableBuck2,
-    getEnableV2Set,
-    getEnableLoadSw1,
-    getEnableLoadSw2,
-    getEnableCharging,
 } from '../../reducers/settingsReducer';
-import vTermValues from '../../utils/vTermValues';
 import { RootState } from '../../reducers/types';
+import vTermValues from '../../utils/vTermValues';
 
 const PowerCard = () => {
     const initVTerm = useSelector(getVTerm);
@@ -63,7 +63,7 @@ const PowerCard = () => {
                             disabled={false}
                             onChange={value => dispatch(npmVTermChanged(value))}
                         />
-                        <span>{'V'}</span>
+                        <span>V</span>
                     </div>
                 </FormLabel>
                 <Slider
@@ -96,7 +96,7 @@ const PowerCard = () => {
                             disabled={false}
                             onChange={value => dispatch(npmICHGChanged(value))}
                         />
-                        <span>{'mA'}</span>
+                        <span>mA</span>
                     </div>
                 </FormLabel>
                 <Slider
@@ -115,7 +115,7 @@ const PowerCard = () => {
                 label="Enable Charging"
                 isToggled={initEnableCharging}
                 onToggle={value => dispatch(npmEnableChargingChanged(value))}
-            ></Toggle>
+            />
         </Card>
     );
 };
@@ -162,7 +162,7 @@ const BuckCard: FC<buckProps> = ({
                             disabled={false}
                             onChange={value => onVOutChange(value)}
                         />
-                        <span>{'V'}</span>
+                        <span>V</span>
                     </div>
                 </FormLabel>
                 <Slider
@@ -189,14 +189,14 @@ const BuckCard: FC<buckProps> = ({
 
                         onVSetToggle(value);
                     }}
-                ></Toggle>
+                />
             </div>
             <Toggle
                 label="BUCK"
                 isToggled={initBuck}
                 disabled={initVSet}
                 onToggle={value => onBuckToggle(value)}
-            ></Toggle>
+            />
         </Card>
     );
 };
@@ -243,7 +243,7 @@ export default () => {
                         onToggle={value =>
                             dispatch(npmEnableLoadSw1Changed(value))
                         }
-                    ></Toggle>
+                    />
                 </Card>
                 <Card title="Load SW 2">
                     <Toggle
@@ -252,7 +252,7 @@ export default () => {
                         onToggle={value =>
                             dispatch(npmEnableLoadSw2Changed(value))
                         }
-                    ></Toggle>
+                    />
                 </Card>
             </div>
         </div>

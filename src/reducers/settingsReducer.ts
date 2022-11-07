@@ -5,10 +5,11 @@
  */
 
 import { createSlice } from '@reduxjs/toolkit';
-import { SettingsState, RootState} from './types'
+
+import { RootState, SettingsState } from './types';
 
 const initialState: SettingsState = {
-    vTerm: 3.50,
+    vTerm: 3.5,
     iCHG: 32,
     enableCharging: false,
     vOut1: 1,
@@ -18,48 +19,48 @@ const initialState: SettingsState = {
     enableV2Set: false,
     enableBuck2: false,
     enableLoadSw1: false,
-    enableLoadSw2: false
-}
+    enableLoadSw2: false,
+};
 
 const settingsSlice = createSlice({
     name: 'settings',
-    initialState, 
+    initialState,
     reducers: {
         npmVTermChanged(state, action) {
-            state.vTerm = action.payload
+            state.vTerm = action.payload;
         },
         npmICHGChanged(state, action) {
-            state.iCHG = action.payload
+            state.iCHG = action.payload;
         },
         npmEnableChargingChanged(state, action) {
-            state.enableCharging = action.payload
+            state.enableCharging = action.payload;
         },
         npmVOut1Changed(state, action) {
-            state.vOut1 = action.payload
+            state.vOut1 = action.payload;
         },
         npmEnableV1SetChanged(state, action) {
-            state.enableV1Set = action.payload
+            state.enableV1Set = action.payload;
         },
         npmEnableBuck1Changed(state, action) {
-            state.enableBuck1 = action.payload
+            state.enableBuck1 = action.payload;
         },
         npmVOut2Changed(state, action) {
-            state.vOut2 = action.payload
+            state.vOut2 = action.payload;
         },
         npmEnableV2SetChanged(state, action) {
-            state.enableV2Set = action.payload
+            state.enableV2Set = action.payload;
         },
         npmEnableBuck2Changed(state, action) {
-            state.enableBuck2 = action.payload
+            state.enableBuck2 = action.payload;
         },
         npmEnableLoadSw1Changed(state, action) {
-            state.enableLoadSw1 = action.payload
+            state.enableLoadSw1 = action.payload;
         },
         npmEnableLoadSw2Changed(state, action) {
-            state.enableLoadSw2 = action.payload
+            state.enableLoadSw2 = action.payload;
         },
-    }
-})
+    },
+});
 
 export default settingsSlice.reducer;
 
@@ -74,12 +75,13 @@ const {
     npmEnableV2SetChanged,
     npmEnableBuck2Changed,
     npmEnableLoadSw1Changed,
-    npmEnableLoadSw2Changed
-} = settingsSlice.actions
+    npmEnableLoadSw2Changed,
+} = settingsSlice.actions;
 
 const getVTerm = (state: RootState) => state.app.settings.vTerm;
 const getICHG = (state: RootState) => state.app.settings.iCHG;
-const getEnableCharging = (state: RootState) => state.app.settings.enableCharging;
+const getEnableCharging = (state: RootState) =>
+    state.app.settings.enableCharging;
 const getVOut1 = (state: RootState) => state.app.settings.vOut1;
 const getEnableV1Set = (state: RootState) => state.app.settings.enableV1Set;
 const getEnableBuck1 = (state: RootState) => state.app.settings.enableBuck1;
@@ -101,7 +103,6 @@ export {
     npmEnableBuck2Changed,
     npmEnableLoadSw1Changed,
     npmEnableLoadSw2Changed,
-
     getVTerm,
     getICHG,
     getEnableCharging,
@@ -112,5 +113,5 @@ export {
     getEnableV2Set,
     getEnableBuck2,
     getEnableLoadSw1,
-    getEnableLoadSw2
-}
+    getEnableLoadSw2,
+};
