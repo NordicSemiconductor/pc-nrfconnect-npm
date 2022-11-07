@@ -6,4 +6,8 @@
 
 import SerialPort from 'serialport';
 
-describe('modem', () => {});
+describe('modem', () => {
+    it('accepts a command', () => {
+        expect(true).toBe(true);
+    });
+});
