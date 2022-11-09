@@ -8,6 +8,7 @@ import { Device, logger } from 'pc-nrfconnect-shared';
 
 import {
     setAvailableSerialPorts,
+    setModem,
     setSelectedSerialport,
     setShellParser,
 } from '../features/modem/modemSlice';
@@ -17,6 +18,7 @@ export const closeDevice = (): TAction => dispatch => {
     logger.info('Closing device');
     dispatch(setAvailableSerialPorts([]));
     dispatch(setSelectedSerialport(undefined));
+    dispatch(setModem(undefined));
     dispatch(setShellParser(undefined));
 };
 
