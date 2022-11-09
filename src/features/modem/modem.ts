@@ -8,9 +8,18 @@ import EventEmitter from 'events';
 import { logger } from 'pc-nrfconnect-shared';
 import SerialPort from 'serialport';
 
-export type Modem = ReturnType<typeof createModem>;
+export interface Modem {
+    onResponse: (
+        handler: (data: Buffer[], error?: string) => void
+    ) => () => void;
+    onOpen: (handler: (error?: string) => void) => () => void;
+    close: (callback?: (error?: Error | null) => void) => void;
+    write: (command: string) => boolean;
+    isOpen: () => boolean;
+    getpath: () => string;
+}
 
-export const createModem = (serialPortPath: string) => {
+export const createModem = (serialPortPath: string): Modem => {
     const eventEmitter = new EventEmitter();
 
     logger.info(`Opening: '${serialPortPath}'`);
