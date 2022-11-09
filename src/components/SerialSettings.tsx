@@ -54,7 +54,6 @@ const SerialSettings = () => {
 
             modem ? modem?.close(action) : action();
         } else {
-            modem?.close();
             setModem(undefined);
         }
 
