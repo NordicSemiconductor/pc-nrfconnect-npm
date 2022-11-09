@@ -13,7 +13,7 @@ import {
     getShellParser,
     setShellParser,
 } from '../features/modem/modemSlice';
-import { hookModemToParser } from '../hooks/commandParser';
+import { hookModemToShellParser } from '../hooks/commandParser';
 import SerialSettings from './SerialSettings';
 
 const TerminalSidePanel = () => {
@@ -28,7 +28,7 @@ const TerminalSidePanel = () => {
 
         if (modem) {
             console.log('Open Shell Parser');
-            const shellParser = hookModemToParser(modem);
+            const shellParser = hookModemToShellParser(modem);
             dispatch(setShellParser(shellParser));
             return shellParser.unregister;
         }
@@ -42,30 +42,13 @@ const TerminalSidePanel = () => {
 
             shellParserO?.enqueueRequest(
                 'version',
-                response => {
-                    console.log(`version 1: ${response}`);
-                },
-                error => {
-                    console.error(`version 1: ${error}`);
-                }
+                response => console.log(`version 1: ${response}`),
+                error => console.error(`version 1: ${error}`)
             );
             shellParserO?.enqueueRequest(
                 'date get',
-                response => {
-                    console.log(`date get response: ${response}`);
-                },
-                error => {
-                    console.error(`date get error: ${error}`);
-                }
-            );
-            shellParserO?.enqueueRequest(
-                'version',
-                response => {
-                    console.log(`version 2: ${response}`);
-                },
-                error => {
-                    console.error(`version 2: ${error}`);
-                }
+                response => console.log(`date get response: ${response}`),
+                error => console.error(`date get error: ${error}`)
             );
         }, 1000);
         return () => clearInterval(timer);
