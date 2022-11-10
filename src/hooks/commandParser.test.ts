@@ -5,7 +5,7 @@
  */
 
 import { Modem } from '../features/modem/modem';
-import { hookModemToShellParser } from './commandParser';
+import { hookModemToShellParser, ShellParserSettings } from './commandParser';
 
 // NOTE: hookModemToShellParser depends internaly on ansi.ts. If ansi.tests.ts fail expect errors here
 // Consider improving tests and decopiling them from createAnsiDataProcessor by mocking that module
@@ -30,8 +30,17 @@ describe('shell command parser', () => {
     const mockIsOpen = jest.fn(() => true);
     const mockGetpath = jest.fn(() => '');
 
+    const mockOnShellLogging = jest.fn(() => '');
+    const mockOnUnknown = jest.fn(() => '');
+
     const mockOnSuccess = jest.fn(() => '');
     const mockOnError = jest.fn(() => '');
+
+    const settings: ShellParserSettings = {
+        shellPromptUart: 'uart:~$',
+        logRegex: '<inf> ',
+        errorRegex: 'error: ',
+    };
 
     const mock = jest.fn<Modem, []>(() => ({
         onResponse: mockOnResponse,
@@ -42,33 +51,41 @@ describe('shell command parser', () => {
         getpath: mockGetpath,
     }));
 
+    test('Verify that no callback is called untill we get a responce', () => {
+        mockIsOpen.mockReturnValueOnce(false);
+
+        const ansiProsesser = hookModemToShellParser(mock());
+        ansiProsesser.enqueueRequest('Test Command');
+
+        expect(mockClose).toBeCalledTimes(0);
+        expect(mockWrite).toBeCalledTimes(0);
+
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnError).toBeCalledTimes(0);
+    });
+
     test('Verify that enqueued command is sent if modem is open', () => {
         const ansiProsesser = hookModemToShellParser(mock());
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            () => {},
-            () => {}
-        );
+        ansiProsesser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(1);
         expect(mockWrite).toBeCalledWith('Test Command\r\n');
     });
 
     test('Verify that enqueued not sent if modem is closed', () => {
-        mockIsOpen.mockReturnValue(false);
+        mockIsOpen.mockReturnValueOnce(false);
 
         const ansiProsesser = hookModemToShellParser(mock());
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            () => {},
-            () => {}
-        );
+        ansiProsesser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(0);
     });
 
     test('Verify that enqueued command is sent on modem opened', () => {
-        mockIsOpen.mockReturnValue(false);
+        mockIsOpen.mockReturnValueOnce(false);
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onOpenCallback = (_error?: string) => {};
@@ -79,14 +96,10 @@ describe('shell command parser', () => {
         });
 
         const ansiProsesser = hookModemToShellParser(mock());
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            () => {},
-            () => {}
-        );
+        ansiProsesser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(0);
-        mockIsOpen.mockReturnValue(true);
+        mockIsOpen.mockReturnValueOnce(true);
 
         onOpenCallback();
         expect(mockWrite).toBeCalledTimes(1);
@@ -104,7 +117,12 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(mock(), 'uart:~$');
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
         ansiProsesser.enqueueRequest(
             'Test Command',
             mockOnSuccess,
@@ -134,7 +152,12 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(mock(), 'uart:~$');
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
         ansiProsesser.enqueueRequest(
             'Test Command',
             mockOnSuccess,
@@ -168,7 +191,12 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(mock(), 'uart:~$');
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
         ansiProsesser.enqueueRequest(
             'Test Command',
             mockOnSuccess,
@@ -178,11 +206,11 @@ describe('shell command parser', () => {
         expect(mockOnError).toBeCalledTimes(0);
 
         onResponseCallback([
-            Buffer.from('Wrong Command\r\nResponse Value\r\nuart:~$'),
+            Buffer.from('Test Command\r\nerror: Response Value\r\nuart:~$'),
         ]);
 
         expect(mockOnError).toBeCalledTimes(1);
-        expect(mockOnError).toBeCalledWith('Wrong Command\r\nResponse Value');
+        expect(mockOnError).toBeCalledWith('error: Response Value');
 
         expect(mockOnSuccess).toBeCalledTimes(0);
     });
@@ -198,7 +226,12 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(mock(), 'uart:~$');
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
         ansiProsesser.enqueueRequest(
             'Test Command',
             mockOnSuccess,
@@ -207,7 +240,7 @@ describe('shell command parser', () => {
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        onResponseCallback([Buffer.from('Wrong Command\r\nRe')]);
+        onResponseCallback([Buffer.from('Test Command\r\nerror: Re')]);
 
         onResponseCallback([Buffer.from('sponse Value\r\nuart')]);
 
@@ -216,7 +249,7 @@ describe('shell command parser', () => {
         onResponseCallback([Buffer.from(':~$')]);
 
         expect(mockOnError).toBeCalledTimes(1);
-        expect(mockOnError).toBeCalledWith('Wrong Command\r\nResponse Value');
+        expect(mockOnError).toBeCalledWith('error: Response Value');
 
         expect(mockOnSuccess).toBeCalledTimes(0);
     });
@@ -232,7 +265,12 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(mock(), 'uart:~$');
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
         ansiProsesser.enqueueRequest(
             'Test Command 1',
             mockOnSuccess,
@@ -278,7 +316,12 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(mock(), 'uart:~$');
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
         ansiProsesser.enqueueRequest(
             'Test Command 1',
             mockOnSuccess1,
@@ -319,7 +362,12 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(mock(), 'uart:~$');
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
         ansiProsesser.enqueueRequest(
             'Test Command 1',
             mockOnSuccess,
@@ -336,14 +384,12 @@ describe('shell command parser', () => {
 
         onResponseCallback([
             Buffer.from(
-                'Wrong Command 1\r\nResponse Value 1\r\nuart:~$Test Command 2\r\nResponse Value 2\r\nuart:~$'
+                'Test Command 1\r\nerror: Response Value 1\r\nuart:~$Test Command 2\r\nResponse Value 2\r\nuart:~$'
             ),
         ]);
 
         expect(mockOnError).toBeCalledTimes(1);
-        expect(mockOnError).toBeCalledWith(
-            'Wrong Command 1\r\nResponse Value 1'
-        );
+        expect(mockOnError).toBeCalledWith('error: Response Value 1');
 
         expect(mockOnSuccess).toBeCalledTimes(1);
         expect(mockOnSuccess).toBeCalledWith('Response Value 2');

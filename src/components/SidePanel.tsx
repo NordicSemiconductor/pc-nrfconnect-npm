@@ -28,7 +28,20 @@ const TerminalSidePanel = () => {
 
         if (modem) {
             console.log('Open Shell Parser');
-            const shellParser = hookModemToShellParser(modem);
+            const shellParser = hookModemToShellParser(
+                modem,
+                data => {
+                    console.log(`Stream Log:\r\n${data}`);
+                },
+                data => {
+                    console.warn(`Unkown Command:\r\n${data}`);
+                },
+                {
+                    shellPromptUart: 'shell:~$ ',
+                    logRegex: '^<inf> ',
+                    errorRegex: '^error: ',
+                }
+            );
             dispatch(setShellParser(shellParser));
             return shellParser.unregister;
         }
@@ -37,20 +50,32 @@ const TerminalSidePanel = () => {
 
     // init data getters
     useEffect(() => {
+        shellParserO?.registerCommandCallback(
+            'test_version',
+            response => console.log(`version 1:\r\n${response}`),
+            error => console.error(`version error:\r\n${error}`)
+        );
+        shellParserO?.registerCommandCallback(
+            'test_meas_read',
+            response => console.log(`Measurment:\r\n${response}`),
+            error => console.error(`Measurment error:\r\n${error}`)
+        );
+        shellParserO?.enqueueRequest('test_stream stop');
+
+        let ledState = false;
+
         const timer = setInterval(() => {
             if (!modem?.isOpen()) return;
 
             shellParserO?.enqueueRequest(
-                'version',
-                response => console.log(`version 1: ${response}`),
-                error => console.error(`version 1: ${error}`)
+                'test_version',
+                response => console.log(`version one time:\r\n${response}`),
+                error => console.error(`version error one time:\r\n${error}`)
             );
-            shellParserO?.enqueueRequest(
-                'date get',
-                response => console.log(`date get response: ${response}`),
-                error => console.error(`date get error: ${error}`)
-            );
-        }, 1000);
+            shellParserO?.enqueueRequest('test_meas_read');
+            shellParserO?.enqueueRequest(`test_led ${ledState ? 'on' : 'off'}`);
+            ledState = !ledState;
+        }, 2500);
         return () => clearInterval(timer);
     }, [shellParserO, modem]);
 
