@@ -106,7 +106,7 @@ describe('shell command parser', () => {
         expect(mockWrite).toBeCalledWith('Test Command\r\n');
     });
 
-    test('Verify onSuccess callback is called when we have a response in one stream', () => {
+    test('Verify one time onSuccess callback is called when we have a response in one stream', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -138,10 +138,12 @@ describe('shell command parser', () => {
         expect(mockOnSuccess).toBeCalledTimes(1);
         expect(mockOnSuccess).toBeCalledWith('Response Value');
 
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
         expect(mockOnError).toBeCalledTimes(0);
     });
 
-    test('Verify onSuccess callback is called when we have a response in multiple streams', () => {
+    test('Verify one time onSuccess callback is called when we have a response in multiple streams', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -177,10 +179,12 @@ describe('shell command parser', () => {
         expect(mockOnSuccess).toBeCalledTimes(1);
         expect(mockOnSuccess).toBeCalledWith('Response Value');
 
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
         expect(mockOnError).toBeCalledTimes(0);
     });
 
-    test('Verify onFail callback is called when we have a response in one stream', () => {
+    test('Verify one time onFail callback is called when we have a response in one stream', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -213,9 +217,11 @@ describe('shell command parser', () => {
         expect(mockOnError).toBeCalledWith('error: Response Value');
 
         expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify onFail callback is called when we have a response in multiple streams', () => {
+    test('Verify one time onFail callback is called when we have a response in multiple streams', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -252,6 +258,8 @@ describe('shell command parser', () => {
         expect(mockOnError).toBeCalledWith('error: Response Value');
 
         expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
     test('Verify that only one command is send at a time untill we get a response', () => {
@@ -300,9 +308,11 @@ describe('shell command parser', () => {
         expect(mockOnSuccess).toBeCalledWith('Response Value 2');
 
         expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify on succsess is called for the appropriate responces', () => {
+    test('Verify that onSuccess is called for the appropriate responces', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -349,9 +359,11 @@ describe('shell command parser', () => {
         expect(mockOnSuccess2).toBeCalledWith('Response Value 2');
 
         expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify on error and succsess is called for the appropriate responces', () => {
+    test('Verify onError and onSuccess is called for the appropriate responces', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -393,6 +405,404 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess).toBeCalledTimes(1);
         expect(mockOnSuccess).toBeCalledWith('Response Value 2');
+
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify perminent onSuccess callback is called when we have a response in one stream', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+
+        ansiProsesser.enqueueRequest('Test Command');
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnSuccess).toBeCalledTimes(1);
+        expect(mockOnSuccess).toBeCalledWith('Response Value');
+
+        ansiProsesser.enqueueRequest('Test Command');
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnSuccess).toBeCalledTimes(2);
+        expect(mockOnSuccess).toBeCalledWith('Response Value');
+
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify perminent onSuccess callback is called when we have a response in multiple streams', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+        ansiProsesser.enqueueRequest('Test Command');
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+
+        onResponseCallback([Buffer.from('Test Com')]);
+
+        onResponseCallback([Buffer.from('mand\r\nResponse Val')]);
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+
+        onResponseCallback([Buffer.from('ue\r\nuart:~$')]);
+
+        expect(mockOnSuccess).toBeCalledTimes(1);
+        expect(mockOnSuccess).toBeCalledWith('Response Value');
+
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify perminent onFail callback is called when we have a response in one stream', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+        ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+        ansiProsesser.enqueueRequest('Test Command');
+
+        expect(mockOnError).toBeCalledTimes(0);
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nerror: Response Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnError).toBeCalledTimes(1);
+        expect(mockOnError).toBeCalledWith('error: Response Value');
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nerror: Response Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnError).toBeCalledTimes(2);
+        expect(mockOnError).toBeCalledWith('error: Response Value');
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify one time onFail callback is called when we have a response in multiple streams', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+        ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+        ansiProsesser.enqueueRequest('Test Command');
+
+        expect(mockOnError).toBeCalledTimes(0);
+
+        onResponseCallback([Buffer.from('Test Command\r\nerror: Re')]);
+
+        onResponseCallback([Buffer.from('sponse Value\r\nuart')]);
+
+        expect(mockOnError).toBeCalledTimes(0);
+
+        onResponseCallback([Buffer.from(':~$')]);
+
+        expect(mockOnError).toBeCalledTimes(1);
+        expect(mockOnError).toBeCalledWith('error: Response Value');
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify perminent and one time onSuccess both callback is called when we have a response', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+
+        ansiProsesser.enqueueRequest(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnSuccess).toBeCalledTimes(2);
+        expect(mockOnSuccess).toBeCalledWith('Response Value');
+
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+        expect(mockOnError).toBeCalledTimes(0);
+    });
+
+    test('Verify perminent and one time onFail callback is called when we have a response', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+        ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+        ansiProsesser.enqueueRequest(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+
+        expect(mockOnError).toBeCalledTimes(0);
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nerror: Response Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnError).toBeCalledTimes(2);
+        expect(mockOnError).toBeCalledWith('error: Response Value');
+
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify onShellLogging callback is called when we have a response logging shell in one stream', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        onResponseCallback([
+            Buffer.from('<inf> main: v=3.595881,i=0.176776\r\nuart:~$'),
+        ]);
+
+        expect(mockOnShellLogging).toBeCalledTimes(1);
+        expect(mockOnShellLogging).toBeCalledWith(
+            '<inf> main: v=3.595881,i=0.176776'
+        );
+
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify onShellLogging callback is called when we have a response logging shell in multiple streams', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        onResponseCallback([Buffer.from('<inf> main: v=3.595881,i=0')]);
+
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+
+        onResponseCallback([Buffer.from('.176776\r\nuart:~$')]);
+
+        expect(mockOnShellLogging).toBeCalledTimes(1);
+        expect(mockOnShellLogging).toBeCalledWith(
+            '<inf> main: v=3.595881,i=0.176776'
+        );
+
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify onUnknown callback is called when we have a response that is not logging nor is it a registred command one strem', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnUnknown).toBeCalledTimes(1);
+        expect(mockOnUnknown).toBeCalledWith('Test Command\r\nResponse Value');
+
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+    });
+
+    test('Verify onUnknown callback is called when we have a response that is not logging nor is it a registred command multiple streams', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        onResponseCallback([Buffer.from('Test Command\r\nRespons')]);
+
+        expect(mockOnUnknown).toBeCalledTimes(0);
+
+        onResponseCallback([Buffer.from('e Value\r\nuart:~$')]);
+
+        expect(mockOnUnknown).toBeCalledTimes(1);
+        expect(mockOnUnknown).toBeCalledWith('Test Command\r\nResponse Value');
+
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
     });
 });
 
