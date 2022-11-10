@@ -804,6 +804,142 @@ describe('shell command parser', () => {
         expect(mockOnSuccess).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
     });
+
+    test('Verify perminent callback unregister removes the callback', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        const unregister = ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
+
+        ansiProsesser.enqueueRequest('Test Command');
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnSuccess).toBeCalledTimes(1);
+        expect(mockOnSuccess).toBeCalledWith('Response Value');
+
+        unregister();
+
+        ansiProsesser.enqueueRequest('Test Command');
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnSuccess).toBeCalledTimes(1);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+    });
+
+    test('Verify perminent callback unregister removes the right callback', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const mockOnSuccess1 = jest.fn(() => '');
+        const mockOnSuccess2 = jest.fn(() => '');
+        const mockOnSuccess3 = jest.fn(() => '');
+
+        let onResponseCallback = (data: Buffer[], _error?: string) => {};
+
+        mockOnResponse.mockImplementation(
+            (handler: (data: Buffer[], error?: string) => void) => {
+                onResponseCallback = handler;
+                return () => {};
+            }
+        );
+
+        const ansiProsesser = hookModemToShellParser(
+            mock(),
+            mockOnShellLogging,
+            mockOnUnknown,
+            settings
+        );
+
+        ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess1,
+            mockOnError
+        );
+
+        const unregister2 = ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess2,
+            mockOnError
+        );
+
+        const unregister3 = ansiProsesser.registerCommandCallback(
+            'Test Command',
+            mockOnSuccess3,
+            mockOnError
+        );
+
+        ansiProsesser.enqueueRequest('Test Command');
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnSuccess1).toBeCalledTimes(1);
+        expect(mockOnSuccess1).toBeCalledWith('Response Value');
+
+        expect(mockOnSuccess2).toBeCalledTimes(1);
+        expect(mockOnSuccess2).toBeCalledWith('Response Value');
+
+        expect(mockOnSuccess3).toBeCalledTimes(1);
+        expect(mockOnSuccess3).toBeCalledWith('Response Value');
+
+        unregister2();
+
+        ansiProsesser.enqueueRequest('Test Command');
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnSuccess1).toBeCalledTimes(2);
+        expect(mockOnSuccess1).toBeCalledWith('Response Value');
+
+        expect(mockOnSuccess2).toBeCalledTimes(1);
+
+        expect(mockOnSuccess3).toBeCalledTimes(2);
+        expect(mockOnSuccess3).toBeCalledWith('Response Value');
+
+        unregister3();
+
+        ansiProsesser.enqueueRequest('Test Command');
+
+        onResponseCallback([
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
+        ]);
+
+        expect(mockOnSuccess1).toBeCalledTimes(3);
+        expect(mockOnSuccess1).toBeCalledWith('Response Value');
+        expect(mockOnSuccess2).toBeCalledTimes(1);
+        expect(mockOnSuccess3).toBeCalledTimes(2);
+
+        expect(mockOnUnknown).toBeCalledTimes(0);
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnShellLogging).toBeCalledTimes(0);
+    });
 });
 
 export {};
