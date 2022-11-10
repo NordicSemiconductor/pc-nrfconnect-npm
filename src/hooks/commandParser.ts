@@ -188,7 +188,6 @@ export const hookModemToShellParser = (
             onError: (error: string) => void
         ) => {
             // Add Callbacks to the queue for future responces
-            console.log('responce', command);
             const callbacks = { onSuccess, onError };
             const existingCallbacks = commandQueueCallbacks.get(command);
             if (typeof existingCallbacks !== 'undefined') {
@@ -202,11 +201,8 @@ export const hookModemToShellParser = (
 
             return () => {
                 const cb = commandQueueCallbacks.get(command);
-                console.log(command);
 
                 if (typeof cb === 'undefined') return;
-
-                console.log(cb.length);
 
                 if (cb.length === 1) {
                     commandQueueCallbacks.delete(command);
