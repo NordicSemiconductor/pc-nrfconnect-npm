@@ -853,11 +853,11 @@ describe('shell command parser', () => {
     });
 
     test('Verify perminent callback unregister removes the right callback', () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const mockOnSuccess1 = jest.fn(() => '');
         const mockOnSuccess2 = jest.fn(() => '');
         const mockOnSuccess3 = jest.fn(() => '');
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
         mockOnResponse.mockImplementation(
