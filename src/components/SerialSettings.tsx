@@ -52,8 +52,10 @@ const SerialSettings = () => {
             const action = () =>
                 dispatch(setModem(createModem(portPath as string)));
 
-            modem ? modem?.close(action) : action();
+            if (modem?.isOpen()) modem.close(action);
+            else action();
         } else {
+            modem?.close();
             setModem(undefined);
         }
 
