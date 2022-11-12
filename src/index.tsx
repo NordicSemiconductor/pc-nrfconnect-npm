@@ -16,6 +16,7 @@ import PMICControl from './components/PMICControl/PMICControl';
 import Regulators from './components/Regulators/Regulators';
 import SidePanel from './components/SidePanel';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
+import Terminal from './components/Terminal/Main';
 
 // import logLibVersions from './utils/logLibVersions';
 import './index.scss';
@@ -48,6 +49,10 @@ export default () => (
             {
                 name: 'Graph',
                 Main: Graph,
+            },
+            {
+                name: 'Terminal',
+                Main: Terminal,
             },
         ]}
         documentation={DocumentationSections}
