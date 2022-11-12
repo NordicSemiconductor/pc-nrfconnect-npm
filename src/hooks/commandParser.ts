@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { Terminal } from 'xterm-headless';
+
 import { Modem } from '../features/modem/modem';
-import { createAnsiDataProcessor } from './ansi';
 
 interface ICallbacks {
     onSuccess: (data: string) => void;
@@ -24,32 +25,66 @@ type CommandEnque = {
 };
 
 export type ShellParser = ReturnType<typeof hookModemToShellParser>;
+export type XTerminalShellParser = ReturnType<
+    typeof xTerminalShellParserWrapper
+>;
+
+export const xTerminalShellParserWrapper = (terminal: Terminal) => ({
+    getTerminalData: () => {
+        let out = '';
+        for (let i = 0; i <= terminal.buffer.active.cursorY; i += 1) {
+            const line = terminal.buffer.active.getLine(i);
+            if (typeof line !== 'undefined') {
+                out += `\r\n${line.translateToString()}`;
+            }
+        }
+
+        return out.trim();
+    },
+    clear: () => terminal.clear(),
+    getLastLine: () => {
+        const lastLine = terminal.buffer.active.getLine(
+            terminal.buffer.active.cursorY
+        );
+        if (typeof lastLine === 'undefined') {
+            return '';
+        }
+
+        return lastLine.translateToString().trim();
+    },
+    write: (data: string, callback: () => void | undefined) =>
+        terminal.write(data, callback),
+});
 
 export const hookModemToShellParser = (
     modem: Modem,
+    xTerminalShellParser: XTerminalShellParser,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     shellLoggingCallback = (_log: string) => {},
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     unknowCommandCallback = (data: string) => {},
     settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$ ',
-        logRegex: '<inf> ',
+        logRegex: '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
         errorRegex: 'error: ',
     }
 ) => {
-    let commandBuffer = Buffer.from([]);
+    let commandBuffer = '';
     let commandQueueCallbacks = new Map<string, ICallbacks[]>();
     let commandQueue: CommandEnque[] = [];
     let dataSendingStarted = false;
 
     const reset = () => {
-        commandBuffer = Buffer.from([]);
+        commandBuffer = '';
         commandQueueCallbacks = new Map();
         commandQueue = [];
         dataSendingStarted = false;
+        xTerminalShellParser.clear();
     };
 
     const initDataSend = () => {
+        if (isPaused()) return; // user is typing
+
         if (dataSendingStarted) return;
 
         if (commandQueue.length > 0 && modem.isOpen()) {
@@ -58,45 +93,37 @@ export const hookModemToShellParser = (
         }
     };
 
-    const unregisterOnOpen = modem.onOpen(() => initDataSend());
-
-    const parseShellCommands = (
-        data: Buffer,
-        endToken: string,
-        callback: (data: string) => void
-    ) => {
-        const tmp = new Uint8Array(commandBuffer.byteLength + data.byteLength);
-        tmp.set(new Uint8Array(commandBuffer), 0);
-        tmp.set(new Uint8Array(data), commandBuffer.byteLength);
-
-        commandBuffer = Buffer.from(tmp);
-
-        const commandsString = commandBuffer.toString();
-
+    const parseShellCommands = (data: string, endToken: string) => {
         // Buffer does not have the end token hence we have to consider the responce
         // to still have pending bytes hence we need to wait more.
-        if (commandsString.indexOf(endToken) !== -1) {
-            const commands = commandsString.split(endToken);
-            commands.forEach(command => {
+        if (data.indexOf(endToken.trim()) !== -1) {
+            const commands = data.split(endToken.trim());
+            commands.forEach((command, index) => {
+                if (index === commands.length - 1) return;
+
                 const cleanCommand = command.trim();
+
                 if (cleanCommand.length === 0) return;
-                callback(cleanCommand);
+
+                responseCallback(cleanCommand);
             });
 
             // Incomplete command leave it for future processing
             const remainingCommandPart = commands.pop();
             if (remainingCommandPart && remainingCommandPart.length > 0) {
-                commandBuffer = Buffer.from(remainingCommandPart);
-            } else {
-                commandBuffer = Buffer.from([]);
+                return remainingCommandPart;
             }
-        } else {
-            commandBuffer = Buffer.from(commandsString);
+
+            return '';
         }
+
+        return data;
     };
 
     const responseCallback = (responce: string) => {
         let callbackFound = false;
+
+        responce = responce.trim();
 
         // Trigger one time callbacks
         if (
@@ -115,7 +142,7 @@ export const hookModemToShellParser = (
 
             commandQueue.shift();
 
-            if (commandQueue.length > 0 && modem.isOpen()) {
+            if (commandQueue.length > 0 && modem.isOpen() && !isPaused()) {
                 modem.write(`${commandQueue[0].command}\r\n`);
             } else {
                 dataSendingStarted = false;
@@ -147,23 +174,38 @@ export const hookModemToShellParser = (
         }
     };
 
-    const ansiProcessor = createAnsiDataProcessor();
+    const consumeTerminalData = () => {
+        if (
+            xTerminalShellParser.getLastLine() !==
+            settings.shellPromptUart.trim()
+        ) {
+            return;
+        }
+
+        commandBuffer = `${commandBuffer}\r\n${xTerminalShellParser.getTerminalData()}`;
+        commandBuffer = parseShellCommands(
+            commandBuffer,
+            settings.shellPromptUart
+        );
+        xTerminalShellParser.clear();
+    };
+
+    const unregisterOnOpen = modem.onOpen(() => initDataSend());
 
     // Hook to listen to all modem data
     const unregisterOnResponse = modem.onResponse(data =>
-        data.forEach(dd =>
-            ansiProcessor.processAnsiData(
-                dd,
-                () => {}, // TODO Pop from buffer if ANSI Command to do backspace?
-                d =>
-                    parseShellCommands(
-                        d,
-                        settings.shellPromptUart,
-                        responseCallback
-                    )
-            )
-        )
+        data.forEach(dd => {
+            dd.forEach(byte => {
+                xTerminalShellParser.write(
+                    String.fromCharCode(byte),
+                    consumeTerminalData
+                );
+            });
+        })
     );
+
+    const isPaused = () =>
+        xTerminalShellParser.getLastLine() !== settings.shellPromptUart.trim();
 
     return {
         enqueueRequest: (
@@ -218,5 +260,6 @@ export const hookModemToShellParser = (
             unregisterOnResponse();
             reset();
         },
+        isPaused,
     };
 };

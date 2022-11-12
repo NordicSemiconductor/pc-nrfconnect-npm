@@ -5,16 +5,18 @@
  */
 
 import { Modem } from '../features/modem/modem';
-import { hookModemToShellParser, ShellParserSettings } from './commandParser';
-
-// NOTE: hookModemToShellParser depends internaly on ansi.ts. If ansi.tests.ts fail expect errors here
-// Consider improving tests and decopiling them from createAnsiDataProcessor by mocking that module
+import {
+    hookModemToShellParser,
+    ShellParserSettings,
+    XTerminalShellParser,
+} from './commandParser';
 
 jest.mock('../features/modem/modem');
 
 describe('shell command parser', () => {
-    afterEach(() => {
+    beforeEach(() => {
         jest.clearAllMocks();
+        termnalBuffer = settings.shellPromptUart;
     });
 
     const mockOnResponse = jest.fn(
@@ -42,7 +44,7 @@ describe('shell command parser', () => {
         errorRegex: 'error: ',
     };
 
-    const mock = jest.fn<Modem, []>(() => ({
+    const mockModem = jest.fn<Modem, []>(() => ({
         onResponse: mockOnResponse,
         onOpen: mockOnOpen,
         close: mockClose,
@@ -51,10 +53,36 @@ describe('shell command parser', () => {
         getpath: mockGetpath,
     }));
 
+    let termnalBuffer = '';
+
+    const mockGetTerminalData = jest.fn(() => termnalBuffer);
+    const mockClear = jest.fn(() => {
+        termnalBuffer = '';
+    });
+    const mockGetLastLine = jest.fn(
+        () => termnalBuffer.split('\r\n').pop() as string
+    );
+    const mockTerminalWrite = jest.fn(
+        (data: string, callback: () => void | undefined) => {
+            termnalBuffer += data;
+            callback();
+        }
+    );
+
+    const mockTerminal = jest.fn<XTerminalShellParser, []>(() => ({
+        getTerminalData: mockGetTerminalData,
+        clear: mockClear,
+        getLastLine: mockGetLastLine,
+        write: mockTerminalWrite,
+    }));
+
     test('Verify that no callback is called untill we get a responce', () => {
         mockIsOpen.mockReturnValueOnce(false);
 
-        const ansiProsesser = hookModemToShellParser(mock());
+        const ansiProsesser = hookModemToShellParser(
+            mockModem(),
+            mockTerminal()
+        );
         ansiProsesser.enqueueRequest('Test Command');
 
         expect(mockClose).toBeCalledTimes(0);
@@ -68,7 +96,10 @@ describe('shell command parser', () => {
     });
 
     test('Verify that enqueued command is sent if modem is open', () => {
-        const ansiProsesser = hookModemToShellParser(mock());
+        const ansiProsesser = hookModemToShellParser(
+            mockModem(),
+            mockTerminal()
+        );
         ansiProsesser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(1);
@@ -78,7 +109,10 @@ describe('shell command parser', () => {
     test('Verify that enqueued not sent if modem is closed', () => {
         mockIsOpen.mockReturnValueOnce(false);
 
-        const ansiProsesser = hookModemToShellParser(mock());
+        const ansiProsesser = hookModemToShellParser(
+            mockModem(),
+            mockTerminal()
+        );
         ansiProsesser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(0);
@@ -95,7 +129,10 @@ describe('shell command parser', () => {
             return () => {};
         });
 
-        const ansiProsesser = hookModemToShellParser(mock());
+        const ansiProsesser = hookModemToShellParser(
+            mockModem(),
+            mockTerminal()
+        );
         ansiProsesser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(0);
@@ -118,7 +155,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -155,7 +193,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -196,7 +235,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -233,7 +273,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -274,7 +315,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -327,7 +369,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -375,7 +418,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -422,7 +466,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -471,7 +516,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -514,7 +560,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -561,7 +608,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -603,7 +651,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -647,7 +696,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -689,7 +739,8 @@ describe('shell command parser', () => {
         );
 
         hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -721,7 +772,8 @@ describe('shell command parser', () => {
         );
 
         hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -755,7 +807,8 @@ describe('shell command parser', () => {
         );
 
         hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -785,7 +838,8 @@ describe('shell command parser', () => {
         );
 
         hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -817,7 +871,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings
@@ -868,7 +923,8 @@ describe('shell command parser', () => {
         );
 
         const ansiProsesser = hookModemToShellParser(
-            mock(),
+            mockModem(),
+            mockTerminal(),
             mockOnShellLogging,
             mockOnUnknown,
             settings

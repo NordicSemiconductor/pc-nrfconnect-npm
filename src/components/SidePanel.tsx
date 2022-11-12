@@ -7,13 +7,17 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SidePanel } from 'pc-nrfconnect-shared';
+import { Terminal } from 'xterm-headless';
 
 import {
     getModem,
     getShellParser,
     setShellParser,
 } from '../features/modem/modemSlice';
-import { hookModemToShellParser } from '../hooks/commandParser';
+import {
+    hookModemToShellParser,
+    xTerminalShellParserWrapper,
+} from '../hooks/commandParser';
 import SerialSettings from './SerialSettings';
 
 const TerminalSidePanel = () => {
@@ -30,6 +34,9 @@ const TerminalSidePanel = () => {
             console.log('Open Shell Parser');
             const shellParser = hookModemToShellParser(
                 modem,
+                xTerminalShellParserWrapper(
+                    new Terminal({ allowProposedApi: true })
+                ),
                 data => {
                     console.log(`Stream Log:\r\n${data}`);
                 },
@@ -38,7 +45,8 @@ const TerminalSidePanel = () => {
                 },
                 {
                     shellPromptUart: 'shell:~$ ',
-                    logRegex: '^<inf> ',
+                    logRegex:
+                        '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
                     errorRegex: '^error: ',
                 }
             );
@@ -60,12 +68,12 @@ const TerminalSidePanel = () => {
             response => console.log(`Measurment:\r\n${response}`),
             error => console.error(`Measurment error:\r\n${error}`)
         );
-        shellParserO?.enqueueRequest('test_stream stop');
+        shellParserO?.enqueueRequest('test_stream start 5');
 
         let ledState = false;
 
         const timer = setInterval(() => {
-            if (!modem?.isOpen()) return;
+            if (!modem?.isOpen() || shellParserO?.isPaused()) return;
 
             shellParserO?.enqueueRequest(
                 'test_version',
