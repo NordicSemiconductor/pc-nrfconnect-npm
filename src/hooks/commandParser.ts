@@ -186,10 +186,7 @@ export const hookModemToShellParser = (
     };
 
     const processBuffer = () => {
-        if (
-            xTerminalShellParser.getLastLine() !==
-            settings.shellPromptUart.trim()
-        ) {
+        if (isPaused()) {
             return;
         }
 
