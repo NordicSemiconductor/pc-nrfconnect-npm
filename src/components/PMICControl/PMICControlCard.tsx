@@ -4,10 +4,16 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card, NumberInlineInput, Slider, Toggle } from 'pc-nrfconnect-shared';
+import {
+    Card,
+    NumberInlineInput,
+    Slider,
+    StateSelector,
+    Toggle,
+} from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import {
@@ -126,6 +132,7 @@ interface buckProps {
     buckSelector: (state: RootState) => boolean;
     vSetSelector: (state: RootState) => boolean;
     onVOutChange: (value: number) => void;
+    onVOutChangeComplete: () => void;
     onVSetToggle: (value: boolean) => void;
     onBuckToggle: (value: boolean) => void;
 }
@@ -136,6 +143,7 @@ const BuckCard: FC<buckProps> = ({
     buckSelector,
     vSetSelector,
     onVOutChange,
+    onVOutChangeComplete,
     onVSetToggle,
     onBuckToggle,
 }) => {
@@ -143,8 +151,16 @@ const BuckCard: FC<buckProps> = ({
     const initBuck = useSelector(buckSelector);
     const initVSet = useSelector(vSetSelector);
 
+    const vSetItems = ['Software', 'Vset'];
+
     return (
         <Card title={cardLabel}>
+            <StateSelector
+                items={vSetItems}
+                defaultIndex={0}
+                onSelect={index => onVSetToggle(index === 1)}
+                selectedItem={initVSet ? vSetItems[1] : vSetItems[0]}
+            />
             <div className="slider-container">
                 <FormLabel className="flex-row">
                     <div>
@@ -156,11 +172,15 @@ const BuckCard: FC<buckProps> = ({
                             value={initVOut}
                             range={{
                                 min: 1,
-                                max: 3,
+                                max: 3.3,
                                 decimals: 1,
                             }}
                             disabled={false}
                             onChange={value => onVOutChange(value)}
+                            onChangeComplete={() => {
+                                onVOutChangeComplete();
+                                onVSetToggle(false);
+                            }}
                         />
                         <span>V</span>
                     </div>
@@ -170,31 +190,20 @@ const BuckCard: FC<buckProps> = ({
                     disabled={false}
                     ticks={false}
                     onChange={[value => onVOutChange(value)]}
+                    onChangeComplete={() => {
+                        onVOutChangeComplete();
+                        onVSetToggle(false);
+                    }}
                     range={{
                         min: 1.0,
-                        max: 3.0,
+                        max: 3.3,
                         decimals: 1,
                     }}
                 />
             </div>
-            <div className="flex-row">
-                <div>
-                    <span>V</span>
-                    <span className="subscript">SET</span>
-                </div>
-                <Toggle
-                    isToggled={initVSet}
-                    onToggle={value => {
-                        if (value) onBuckToggle(false);
-
-                        onVSetToggle(value);
-                    }}
-                />
-            </div>
             <Toggle
-                label="BUCK"
+                label="Enable BUCK"
                 isToggled={initBuck}
-                disabled={initVSet}
                 onToggle={value => onBuckToggle(value)}
             />
         </Card>
@@ -205,6 +214,24 @@ export default () => {
     const dispatch = useDispatch();
     const initLoadSW1 = useSelector(getEnableLoadSw1);
     const initLoadSW2 = useSelector(getEnableLoadSw2);
+
+    const vOut1 = useSelector(getVOut1);
+    const enableBuck1 = useSelector(getEnableBuck1);
+    const enableV1Set = useSelector(getEnableV1Set);
+
+    useEffect(() => {
+        console.log(`Vset1: npmx buck vout select set 0 ${enableV1Set}`);
+    }, [enableV1Set]);
+
+    useEffect(() => {
+        console.log(
+            `EnableBuck1: npmx buck enable, disable 0 ${
+                enableBuck1
+                    ? 'NPMX_BUCK_TASK_ENABLE'
+                    : ' NPMX_BUCK_TASK_DISABLE'
+            }`
+        );
+    }, [enableBuck1]);
 
     return (
         <div className="pmic-control">
@@ -218,10 +245,17 @@ export default () => {
                     onVSetToggle={value =>
                         dispatch(npmEnableV1SetChanged(value))
                     }
+                    onVOutChangeComplete={() => {
+                        console.log(
+                            `Vout1: npmx buck voltage normal set 0 ${vOut1}`
+                        );
+                    }}
                     onBuckToggle={value =>
                         dispatch(npmEnableBuck1Changed(value))
                     }
-                    onVOutChange={value => dispatch(npmVOut1Changed(value))}
+                    onVOutChange={value => {
+                        dispatch(npmVOut1Changed(value));
+                    }}
                 />
                 <BuckCard
                     cardLabel="BUCK 2"
@@ -231,6 +265,7 @@ export default () => {
                     onVSetToggle={value =>
                         dispatch(npmEnableV2SetChanged(value))
                     }
+                    onVOutChangeComplete={() => {}}
                     onBuckToggle={value =>
                         dispatch(npmEnableBuck2Changed(value))
                     }
