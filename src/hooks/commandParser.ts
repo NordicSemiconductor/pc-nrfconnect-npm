@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import EventEmitter from 'events';
 import { Terminal } from 'xterm-headless';
 
 import { Modem } from '../features/modem/modem';
@@ -69,12 +70,15 @@ export const hookModemToShellParser = (
         errorRegex: 'error: ',
     }
 ) => {
+    const eventEmitter = new EventEmitter();
+
     let commandBuffer = '';
     let commandQueueCallbacks = new Map<string, ICallbacks[]>();
     let commandQueue: CommandEnque[] = [];
     let dataSendingStarted = false;
     let cr = false;
     let crnl = false;
+    let oldPausedState = false;
 
     const reset = () => {
         commandBuffer = '';
@@ -217,10 +221,23 @@ export const hookModemToShellParser = (
         })
     );
 
-    const isPaused = () =>
-        xTerminalShellParser.getLastLine() !== settings.shellPromptUart.trim();
+    const isPaused = () => {
+        const newPausedState =
+            xTerminalShellParser.getLastLine() !==
+            settings.shellPromptUart.trim();
+
+        if (oldPausedState !== newPausedState) {
+            oldPausedState = newPausedState;
+            eventEmitter.emit('pausedChanged', newPausedState);
+        }
+        return newPausedState;
+    };
 
     return {
+        onPausedChange: (handler: (state: boolean) => void) => {
+            eventEmitter.on('pausedChanged', handler);
+            return () => eventEmitter.removeListener('pausedChanged', handler);
+        },
         enqueueRequest: (
             command: string,
             onSuccess: (data: string) => void = () => {},

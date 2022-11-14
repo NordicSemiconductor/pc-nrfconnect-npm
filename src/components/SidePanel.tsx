@@ -14,6 +14,7 @@ import {
     getShellParser,
     setShellParser,
 } from '../features/modem/modemSlice';
+import { setIsPaused } from '../features/shell/shellSlice';
 import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
@@ -55,6 +56,14 @@ const TerminalSidePanel = () => {
         }
         return () => {};
     }, [dispatch, modem]);
+
+    useEffect(() => {
+        shellParserO?.onPausedChange(state => {
+            if (state) console.warn('Shell is busy');
+            else console.warn('Shell is free');
+            dispatch(setIsPaused(state));
+        });
+    }, [dispatch, shellParserO]);
 
     // init data getters
     useEffect(() => {

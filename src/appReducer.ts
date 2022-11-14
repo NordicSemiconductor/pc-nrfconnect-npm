@@ -9,6 +9,7 @@ import { combineReducers } from 'redux';
 
 import modemReducer from './features/modem/modemSlice';
 import pmicControlReducer from './features/pmicControl/pmicControlSlice';
+import shelllReducer from './features/shell/shellSlice';
 
 type AppState = ReturnType<typeof appReducer>;
 
@@ -17,6 +18,7 @@ export type RootState = NrfConnectState<AppState>;
 const appReducer = combineReducers({
     pmicControl: pmicControlReducer,
     modem: modemReducer,
+    shell: shelllReducer,
 });
 
 export default appReducer;
