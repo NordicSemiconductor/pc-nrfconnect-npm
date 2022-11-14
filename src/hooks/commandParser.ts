@@ -212,9 +212,7 @@ export const hookModemToShellParser = (
                 crnl = cr && byte === 10;
 
                 const callback = crnl
-                    ? () => {
-                          loadToBuffer(true);
-                      }
+                    ? () => loadToBuffer(true)
                     : processBuffer;
 
                 xTerminalShellParser.write(String.fromCharCode(byte), callback);
