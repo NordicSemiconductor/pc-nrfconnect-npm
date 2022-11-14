@@ -73,6 +73,8 @@ export const hookModemToShellParser = (
     let commandQueueCallbacks = new Map<string, ICallbacks[]>();
     let commandQueue: CommandEnque[] = [];
     let dataSendingStarted = false;
+    let cr = false;
+    let crnl = false;
 
     const reset = () => {
         commandBuffer = '';
@@ -80,6 +82,8 @@ export const hookModemToShellParser = (
         commandQueue = [];
         dataSendingStarted = false;
         xTerminalShellParser.clear();
+        cr = false;
+        crnl = false;
     };
 
     const initDataSend = () => {
@@ -174,7 +178,14 @@ export const hookModemToShellParser = (
         }
     };
 
-    const consumeTerminalData = () => {
+    const loadToBuffer = (newline: boolean) => {
+        commandBuffer = `${commandBuffer}${xTerminalShellParser.getTerminalData()}${
+            newline ? '\r\n' : ''
+        }`;
+        xTerminalShellParser.clear();
+    };
+
+    const processBuffer = () => {
         if (
             xTerminalShellParser.getLastLine() !==
             settings.shellPromptUart.trim()
@@ -182,7 +193,8 @@ export const hookModemToShellParser = (
             return;
         }
 
-        commandBuffer = `${commandBuffer}\r\n${xTerminalShellParser.getTerminalData()}`;
+        loadToBuffer(false);
+
         commandBuffer = parseShellCommands(
             commandBuffer,
             settings.shellPromptUart
@@ -196,10 +208,16 @@ export const hookModemToShellParser = (
     const unregisterOnResponse = modem.onResponse(data =>
         data.forEach(dd => {
             dd.forEach(byte => {
-                xTerminalShellParser.write(
-                    String.fromCharCode(byte),
-                    consumeTerminalData
-                );
+                cr = byte === 13 || (cr && byte === 10);
+                crnl = cr && byte === 10;
+
+                const callback = crnl
+                    ? () => {
+                          loadToBuffer(true);
+                      }
+                    : processBuffer;
+
+                xTerminalShellParser.write(String.fromCharCode(byte), callback);
             });
         })
     );

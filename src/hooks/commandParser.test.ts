@@ -64,7 +64,9 @@ describe('shell command parser', () => {
     );
     const mockTerminalWrite = jest.fn(
         (data: string, callback: () => void | undefined) => {
-            termnalBuffer += data;
+            if (data !== '\r' && data !== '\n') {
+                termnalBuffer += data;
+            }
             callback();
         }
     );
@@ -795,7 +797,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify onUnknown callback is called when we have a response that is not logging nor is it a registred command one strem', () => {
+    test('Verify onUnknown callback is called when we have a response that is not logging nor is it a registred command one stream', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
