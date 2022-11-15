@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { FC, useEffect } from 'react';
+import React, { FC, useState } from 'react';
 import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -43,9 +43,11 @@ import {
 import vTermValues from '../../utils/vTermValues';
 
 const PowerCard = () => {
-    const initVTerm = useSelector(getVTerm);
-    const initICHG = useSelector(getICHG);
-    const initEnableCharging = useSelector(getEnableCharging);
+    const vTerm = useSelector(getVTerm);
+    const [internalVTerm, setInternaVTerm] = useState(vTerm);
+    const iCHG = useSelector(getICHG);
+    const [internalICHG, setInternaICHG] = useState(iCHG);
+    const enableCharging = useSelector(getEnableCharging);
     const dispatch = useDispatch();
 
     return (
@@ -58,7 +60,7 @@ const PowerCard = () => {
                     </div>
                     <div className="flex-row">
                         <NumberInlineInput
-                            value={initVTerm}
+                            value={internalVTerm}
                             range={{
                                 min: 3.5,
                                 max: 4.45,
@@ -67,17 +69,21 @@ const PowerCard = () => {
                                 explicitRange: vTermValues,
                             }}
                             disabled={false}
-                            onChange={value => dispatch(npmVTermChanged(value))}
+                            onChange={value => setInternaVTerm(value)}
+                            onChangeComplete={() =>
+                                dispatch(npmVTermChanged(internalVTerm))
+                            }
                         />
                         <span>V</span>
                     </div>
                 </FormLabel>
                 <Slider
-                    values={[vTermValues.indexOf(initVTerm)]}
+                    values={[vTermValues.indexOf(internalVTerm)]}
                     disabled={false}
-                    onChange={[
-                        index => dispatch(npmVTermChanged(vTermValues[index])),
-                    ]}
+                    onChange={[index => setInternaVTerm(vTermValues[index])]}
+                    onChangeComplete={() =>
+                        dispatch(npmVTermChanged(internalVTerm))
+                    }
                     range={{
                         min: 0,
                         max: vTermValues.length - 1,
@@ -92,7 +98,7 @@ const PowerCard = () => {
                     </div>
                     <div className="flex-row">
                         <NumberInlineInput
-                            value={initICHG}
+                            value={internalICHG}
                             range={{
                                 min: 32,
                                 max: 800,
@@ -100,15 +106,23 @@ const PowerCard = () => {
                                 step: 2,
                             }}
                             disabled={false}
-                            onChange={value => dispatch(npmICHGChanged(value))}
+                            onChange={value => setInternaICHG(value)}
+                            onChangeComplete={() => {
+                                dispatch(npmEnableChargingChanged(false));
+                                dispatch(npmICHGChanged(internalICHG));
+                            }}
                         />
                         <span>mA</span>
                     </div>
                 </FormLabel>
                 <Slider
-                    values={[initICHG]}
+                    values={[internalICHG]}
                     disabled={false}
-                    onChange={[value => dispatch(npmICHGChanged(value))]}
+                    onChange={[value => setInternaICHG(value)]}
+                    onChangeComplete={() => {
+                        dispatch(npmEnableChargingChanged(false));
+                        dispatch(npmICHGChanged(internalICHG));
+                    }}
                     range={{
                         min: 32,
                         max: 800,
@@ -119,7 +133,7 @@ const PowerCard = () => {
             </div>
             <Toggle
                 label="Enable Charging"
-                isToggled={initEnableCharging}
+                isToggled={enableCharging}
                 onToggle={value => dispatch(npmEnableChargingChanged(value))}
             />
         </Card>
@@ -128,7 +142,7 @@ const PowerCard = () => {
 
 interface buckProps {
     cardLabel: string;
-    vOutSelector: (state: RootState) => number;
+    vOut: number;
     buckSelector: (state: RootState) => boolean;
     vSetSelector: (state: RootState) => boolean;
     onVOutChange: (value: number) => void;
@@ -139,7 +153,7 @@ interface buckProps {
 
 const BuckCard: FC<buckProps> = ({
     cardLabel,
-    vOutSelector,
+    vOut,
     buckSelector,
     vSetSelector,
     onVOutChange,
@@ -147,7 +161,6 @@ const BuckCard: FC<buckProps> = ({
     onVSetToggle,
     onBuckToggle,
 }) => {
-    const initVOut = useSelector(vOutSelector);
     const initBuck = useSelector(buckSelector);
     const initVSet = useSelector(vSetSelector);
 
@@ -169,7 +182,7 @@ const BuckCard: FC<buckProps> = ({
                     </div>
                     <div className="flex-row">
                         <NumberInlineInput
-                            value={initVOut}
+                            value={vOut}
                             range={{
                                 min: 1,
                                 max: 3.3,
@@ -186,7 +199,7 @@ const BuckCard: FC<buckProps> = ({
                     </div>
                 </FormLabel>
                 <Slider
-                    values={[initVOut]}
+                    values={[vOut]}
                     disabled={false}
                     ticks={false}
                     onChange={[value => onVOutChange(value)]}
@@ -212,26 +225,15 @@ const BuckCard: FC<buckProps> = ({
 
 export default () => {
     const dispatch = useDispatch();
-    const initLoadSW1 = useSelector(getEnableLoadSw1);
-    const initLoadSW2 = useSelector(getEnableLoadSw2);
 
     const vOut1 = useSelector(getVOut1);
-    const enableBuck1 = useSelector(getEnableBuck1);
-    const enableV1Set = useSelector(getEnableV1Set);
+    const [internalVout1, setInternalVOut1] = useState(vOut1);
 
-    useEffect(() => {
-        console.log(`Vset1: npmx buck vout select set 0 ${enableV1Set}`);
-    }, [enableV1Set]);
+    const vOut2 = useSelector(getVOut2);
+    const [internalVout2, setInternalVOut2] = useState(vOut2);
 
-    useEffect(() => {
-        console.log(
-            `EnableBuck1: npmx buck enable, disable 0 ${
-                enableBuck1
-                    ? 'NPMX_BUCK_TASK_ENABLE'
-                    : ' NPMX_BUCK_TASK_DISABLE'
-            }`
-        );
-    }, [enableBuck1]);
+    const loadSW1 = useSelector(getEnableLoadSw1);
+    const loadSW2 = useSelector(getEnableLoadSw2);
 
     return (
         <div className="pmic-control">
@@ -239,42 +241,40 @@ export default () => {
                 <PowerCard />
                 <BuckCard
                     cardLabel="BUCK 1"
-                    vOutSelector={getVOut1}
+                    vOut={internalVout1}
                     buckSelector={getEnableBuck1}
                     vSetSelector={getEnableV1Set}
                     onVSetToggle={value =>
                         dispatch(npmEnableV1SetChanged(value))
                     }
-                    onVOutChangeComplete={() => {
-                        console.log(
-                            `Vout1: npmx buck voltage normal set 0 ${vOut1}`
-                        );
-                    }}
+                    onVOutChange={value => setInternalVOut1(value)}
+                    onVOutChangeComplete={() =>
+                        dispatch(npmVOut1Changed(internalVout1))
+                    }
                     onBuckToggle={value =>
                         dispatch(npmEnableBuck1Changed(value))
                     }
-                    onVOutChange={value => {
-                        dispatch(npmVOut1Changed(value));
-                    }}
                 />
                 <BuckCard
                     cardLabel="BUCK 2"
-                    vOutSelector={getVOut2}
+                    vOut={internalVout2}
                     buckSelector={getEnableBuck2}
                     vSetSelector={getEnableV2Set}
                     onVSetToggle={value =>
                         dispatch(npmEnableV2SetChanged(value))
                     }
-                    onVOutChangeComplete={() => {}}
+                    onVOutChange={value => setInternalVOut2(value)}
+                    onVOutChangeComplete={() =>
+                        dispatch(npmVOut2Changed(internalVout2))
+                    }
                     onBuckToggle={value =>
                         dispatch(npmEnableBuck2Changed(value))
                     }
-                    onVOutChange={value => dispatch(npmVOut2Changed(value))}
                 />
                 <Card title="Load SW 1">
                     <Toggle
                         label="Enable"
-                        isToggled={initLoadSW1}
+                        isToggled={loadSW1}
                         onToggle={value =>
                             dispatch(npmEnableLoadSw1Changed(value))
                         }
@@ -283,7 +283,7 @@ export default () => {
                 <Card title="Load SW 2">
                     <Toggle
                         label="Enable"
-                        isToggled={initLoadSW2}
+                        isToggled={loadSW2}
                         onToggle={value =>
                             dispatch(npmEnableLoadSw2Changed(value))
                         }

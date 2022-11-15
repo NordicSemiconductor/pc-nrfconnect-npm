@@ -15,6 +15,7 @@ import {
     setShellParser,
 } from '../features/modem/modemSlice';
 import { setIsPaused } from '../features/shell/shellSlice';
+import useShellEffects from '../features/shell/useShellEffects';
 import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
@@ -26,6 +27,7 @@ const TerminalSidePanel = () => {
     const shellParserO = useSelector(getShellParser);
 
     const dispatch = useDispatch();
+    useShellEffects();
 
     // init shell parser
     useEffect(() => {
