@@ -12,7 +12,7 @@ import './regulators.scss';
 export default () => (
     <div className="regulators-container">
         <div className="graph">
-            <Alert variant="info" label="nPM Studio 0.1​ - Preview release! ">
+            <Alert variant="info" label="nPM powerUP 0.1​ - Preview release! ">
                 This is an unsupported, experimental preview and it is subject
                 to major redesigns in the future.
             </Alert>
