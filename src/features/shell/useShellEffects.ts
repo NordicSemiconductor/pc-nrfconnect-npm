@@ -11,11 +11,15 @@ import {
     getEnableBuck1,
     getEnableBuck2,
     getEnableCharging,
+    getEnableLdo1,
+    getEnableLdo2,
     getEnableLoadSw1,
     getEnableLoadSw2,
     getEnableV1Set,
     getEnableV2Set,
     getICHG,
+    getVLdo1,
+    getVLdo2,
     getVOut1,
     getVOut2,
     getVTerm,
@@ -34,12 +38,14 @@ export default () => {
     const enableBuck2 = useSelector(getEnableBuck2);
     const enableV2Set = useSelector(getEnableV2Set);
 
+    const vLdo1 = useSelector(getVLdo1);
+    const enableLdo1 = useSelector(getEnableLdo1);
     const loadSW1 = useSelector(getEnableLoadSw1);
+
+    const vLdo2 = useSelector(getVLdo2);
+    const enableLdo2 = useSelector(getEnableLdo2);
     const loadSW2 = useSelector(getEnableLoadSw2);
 
-    // TODO move shell related user effects into some generic 'shell' component
-
-    // << ----------------------- START SHELL EFFECTS --------------------- >>
     useEffect(() => {
         console.log(
             `vTerm SET: npmx charger termination_voltage normal set ${vTerm}`
@@ -101,10 +107,26 @@ export default () => {
     }, [enableBuck2]);
 
     useEffect(() => {
+        console.log(`vLdo1 SET: No NPMX Command avalable`);
+    }, [vLdo1]);
+
+    useEffect(() => {
+        console.log(`Enable Ldo1 SET: No NPMX Command avalable`);
+    }, [enableLdo1]);
+
+    useEffect(() => {
         console.log(
             `EnableBuck2 SET: npmx ldsw ${loadSW1 ? 'enable' : 'disable'} 0`
         );
     }, [loadSW1]);
+
+    useEffect(() => {
+        console.log(`vLdo2 SET: No NPMX Command avalable`);
+    }, [vLdo2]);
+
+    useEffect(() => {
+        console.log(`Enable Ldo2 SET: No NPMX Command avalable`);
+    }, [enableLdo2]);
 
     useEffect(() => {
         console.log(

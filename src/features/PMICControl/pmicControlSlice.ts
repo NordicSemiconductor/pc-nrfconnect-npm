@@ -18,7 +18,11 @@ interface pmicControleState {
     vOut2: number;
     enableV2Set: boolean;
     enableBuck2: boolean;
+    vLdo1: number;
+    enableLdo1: boolean;
     enableLoadSw1: boolean;
+    vLdo2: number;
+    enableLdo2: boolean;
     enableLoadSw2: boolean;
 }
 
@@ -32,7 +36,11 @@ const initialState: pmicControleState = {
     vOut2: 1,
     enableV2Set: true,
     enableBuck2: false,
+    vLdo1: 1.2,
+    enableLdo1: false,
     enableLoadSw1: false,
+    vLdo2: 1.2,
+    enableLdo2: false,
     enableLoadSw2: false,
 };
 
@@ -67,8 +75,20 @@ const pmicControlSlice = createSlice({
         npmEnableBuck2Changed(state, action) {
             state.enableBuck2 = action.payload;
         },
+        npmVLdo1Change(state, action) {
+            state.vLdo1 = action.payload;
+        },
+        npmEnableLdo1Change(state, action) {
+            state.enableLdo1 = action.payload;
+        },
         npmEnableLoadSw1Changed(state, action) {
             state.enableLoadSw1 = action.payload;
+        },
+        npmVLdo2Change(state, action) {
+            state.vLdo2 = action.payload;
+        },
+        npmEnableLdo2Change(state, action) {
+            state.enableLdo2 = action.payload;
         },
         npmEnableLoadSw2Changed(state, action) {
             state.enableLoadSw2 = action.payload;
@@ -86,7 +106,11 @@ const {
     npmVOut2Changed,
     npmEnableV2SetChanged,
     npmEnableBuck2Changed,
+    npmVLdo1Change,
+    npmEnableLdo1Change,
     npmEnableLoadSw1Changed,
+    npmVLdo2Change,
+    npmEnableLdo2Change,
     npmEnableLoadSw2Changed,
 } = pmicControlSlice.actions;
 
@@ -104,8 +128,14 @@ export const getEnableV2Set = (state: RootState) =>
     state.app.pmicControl.enableV2Set;
 export const getEnableBuck2 = (state: RootState) =>
     state.app.pmicControl.enableBuck2;
+export const getVLdo1 = (state: RootState) => state.app.pmicControl.vLdo1;
+export const getEnableLdo1 = (state: RootState) =>
+    state.app.pmicControl.enableLdo1;
 export const getEnableLoadSw1 = (state: RootState) =>
     state.app.pmicControl.enableLoadSw1;
+export const getVLdo2 = (state: RootState) => state.app.pmicControl.vLdo2;
+export const getEnableLdo2 = (state: RootState) =>
+    state.app.pmicControl.enableLdo2;
 export const getEnableLoadSw2 = (state: RootState) =>
     state.app.pmicControl.enableLoadSw2;
 
@@ -119,7 +149,11 @@ export {
     npmVOut2Changed,
     npmEnableV2SetChanged,
     npmEnableBuck2Changed,
+    npmVLdo1Change,
+    npmEnableLdo1Change,
     npmEnableLoadSw1Changed,
+    npmVLdo2Change,
+    npmEnableLdo2Change,
     npmEnableLoadSw2Changed,
 };
 

@@ -20,22 +20,30 @@ import {
     getEnableBuck1,
     getEnableBuck2,
     getEnableCharging,
+    getEnableLdo1,
+    getEnableLdo2,
     getEnableLoadSw1,
     getEnableLoadSw2,
     getEnableV1Set,
     getEnableV2Set,
     getICHG,
+    getVLdo1,
+    getVLdo2,
     getVOut1,
     getVOut2,
     getVTerm,
     npmEnableBuck1Changed,
     npmEnableBuck2Changed,
     npmEnableChargingChanged,
+    npmEnableLdo1Change,
+    npmEnableLdo2Change,
     npmEnableLoadSw1Changed,
     npmEnableLoadSw2Changed,
     npmEnableV1SetChanged,
     npmEnableV2SetChanged,
     npmICHGChanged,
+    npmVLdo1Change,
+    npmVLdo2Change,
     npmVOut1Changed,
     npmVOut2Changed,
     npmVTermChanged,
@@ -68,7 +76,6 @@ const PowerCard = () => {
                                 step: 0.05,
                                 explicitRange: vTermValues,
                             }}
-                            disabled={false}
                             onChange={value => setInternaVTerm(value)}
                             onChangeComplete={() =>
                                 dispatch(npmVTermChanged(internalVTerm))
@@ -79,7 +86,6 @@ const PowerCard = () => {
                 </FormLabel>
                 <Slider
                     values={[vTermValues.indexOf(internalVTerm)]}
-                    disabled={false}
                     onChange={[index => setInternaVTerm(vTermValues[index])]}
                     onChangeComplete={() =>
                         dispatch(npmVTermChanged(internalVTerm))
@@ -105,7 +111,6 @@ const PowerCard = () => {
                                 decimals: 0,
                                 step: 2,
                             }}
-                            disabled={false}
                             onChange={value => setInternaICHG(value)}
                             onChangeComplete={() => {
                                 dispatch(npmEnableChargingChanged(false));
@@ -117,7 +122,6 @@ const PowerCard = () => {
                 </FormLabel>
                 <Slider
                     values={[internalICHG]}
-                    disabled={false}
                     onChange={[value => setInternaICHG(value)]}
                     onChangeComplete={() => {
                         dispatch(npmEnableChargingChanged(false));
@@ -188,7 +192,6 @@ const BuckCard: FC<buckProps> = ({
                                 max: 3.3,
                                 decimals: 1,
                             }}
-                            disabled={false}
                             onChange={value => onVOutChange(value)}
                             onChangeComplete={() => {
                                 onVOutChangeComplete();
@@ -200,8 +203,6 @@ const BuckCard: FC<buckProps> = ({
                 </FormLabel>
                 <Slider
                     values={[vOut]}
-                    disabled={false}
-                    ticks={false}
                     onChange={[value => onVOutChange(value)]}
                     onChangeComplete={() => {
                         onVOutChangeComplete();
@@ -223,6 +224,79 @@ const BuckCard: FC<buckProps> = ({
     );
 };
 
+interface ldoProps {
+    cardLabel: string;
+    vLdoSelector: (state: RootState) => number;
+    ldoSelector: (state: RootState) => boolean;
+    ldoSwitchSelector: (state: RootState) => boolean;
+    onLdoToggle: (value: boolean) => void;
+    onVLdoChange: (value: number) => void;
+    onLdoSwitchToggle: (value: boolean) => void;
+}
+
+const LDO: FC<ldoProps> = ({
+    cardLabel,
+    vLdoSelector,
+    ldoSelector,
+    ldoSwitchSelector,
+    onLdoToggle,
+    onVLdoChange,
+    onLdoSwitchToggle,
+}) => {
+    const enableLdo = useSelector(ldoSelector);
+    const enableSwitchLdo = useSelector(ldoSwitchSelector);
+    const vLdo = useSelector(vLdoSelector);
+    const [internalVLdo, setInternaVLdo] = useState(vLdo);
+
+    return (
+        <Card title={cardLabel}>
+            <div className="slider-container">
+                <FormLabel className="flex-row">
+                    <div>
+                        <span>V</span>
+                        <span className="subscript">LDO</span>
+                    </div>
+                    <div className="flex-row">
+                        <NumberInlineInput
+                            value={internalVLdo}
+                            range={{
+                                min: 1,
+                                max: 3.3,
+                                decimals: 1,
+                                step: 0.1,
+                            }}
+                            onChange={value => setInternaVLdo(value)}
+                            onChangeComplete={() => onVLdoChange(internalVLdo)}
+                        />
+                        <span>V</span>
+                    </div>
+                </FormLabel>
+                <Slider
+                    values={[internalVLdo]}
+                    onChange={[value => setInternaVLdo(value)]}
+                    onChangeComplete={() => onVLdoChange(internalVLdo)}
+                    range={{
+                        min: 1.0,
+                        max: 3.3,
+                        decimals: 1,
+                        step: 0.1,
+                    }}
+                />
+            </div>
+            <Toggle
+                label="LDO Switch"
+                isToggled={enableSwitchLdo}
+                onToggle={value => onLdoSwitchToggle(value)}
+            />
+            <Toggle
+                label="Enable LDO"
+                isToggled={enableLdo}
+                onToggle={value => onLdoToggle(value)}
+            />
+        </Card>
+    );
+};
+
 export default () => {
     const dispatch = useDispatch();
 
@@ -231,9 +305,6 @@ export default () => {
 
     const vOut2 = useSelector(getVOut2);
     const [internalVout2, setInternalVOut2] = useState(vOut2);
-
-    const loadSW1 = useSelector(getEnableLoadSw1);
-    const loadSW2 = useSelector(getEnableLoadSw2);
 
     return (
         <div className="pmic-control">
@@ -271,24 +342,28 @@ export default () => {
                         dispatch(npmEnableBuck2Changed(value))
                     }
                 />
-                <Card title="Load SW 1">
-                    <Toggle
-                        label="Enable"
-                        isToggled={loadSW1}
-                        onToggle={value =>
-                            dispatch(npmEnableLoadSw1Changed(value))
-                        }
-                    />
-                </Card>
-                <Card title="Load SW 2">
-                    <Toggle
-                        label="Enable"
-                        isToggled={loadSW2}
-                        onToggle={value =>
-                            dispatch(npmEnableLoadSw2Changed(value))
-                        }
-                    />
-                </Card>
+                <LDO
+                    cardLabel="LDO 1"
+                    ldoSelector={getEnableLdo1}
+                    vLdoSelector={getVLdo1}
+                    onLdoToggle={value => dispatch(npmEnableLdo1Change(value))}
+                    onVLdoChange={value => dispatch(npmVLdo1Change(value))}
+                    ldoSwitchSelector={getEnableLoadSw1}
+                    onLdoSwitchToggle={value =>
+                        dispatch(npmEnableLoadSw1Changed(value))
+                    }
+                />
+                <LDO
+                    cardLabel="LDO 2"
+                    ldoSelector={getEnableLdo2}
+                    vLdoSelector={getVLdo2}
+                    onLdoToggle={value => dispatch(npmEnableLdo2Change(value))}
+                    onVLdoChange={value => dispatch(npmVLdo2Change(value))}
+                    ldoSwitchSelector={getEnableLoadSw2}
+                    onLdoSwitchToggle={value =>
+                        dispatch(npmEnableLoadSw2Changed(value))
+                    }
+                />
             </div>
         </div>
     );
