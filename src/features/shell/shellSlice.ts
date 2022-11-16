@@ -16,7 +16,7 @@ const initialState: shellState = {
     isPaused: false,
 };
 
-const modemSlice = createSlice({
+const shellSlice = createSlice({
     name: 'shell',
     initialState,
     reducers: {
@@ -28,5 +28,5 @@ const modemSlice = createSlice({
 
 export const isPaused = (state: RootState) => state.app.shell.isPaused;
 
-export const { setIsPaused } = modemSlice.actions;
-export default modemSlice.reducer;
+export const { setIsPaused } = shellSlice.actions;
+export default shellSlice.reducer;
