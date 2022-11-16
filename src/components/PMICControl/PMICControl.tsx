@@ -12,6 +12,7 @@ import PMICControlCard from './PMICControlCard';
 import './pmicControl.scss';
 
 const PMICControl = ({ active }: PaneProps) => (
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
         {active && (
             <div className="pmicControl-container">
