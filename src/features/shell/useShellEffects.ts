@@ -5,8 +5,9 @@
  */
 
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { getModem } from '../modem/modemSlice';
 import {
     getEnableBuck1,
     getEnableBuck2,
@@ -26,6 +27,10 @@ import {
 } from '../pmicControl/pmicControlSlice';
 
 export default () => {
+    // const shellParser = useSelector(getShellParser);
+    const dispatch = useDispatch();
+    const modem = useSelector(getModem);
+
     const vTerm = useSelector(getVTerm);
     const iCHG = useSelector(getICHG);
     const enableCharging = useSelector(getEnableCharging);
@@ -46,25 +51,59 @@ export default () => {
     const enableLdo2 = useSelector(getEnableLdo2);
     const loadSW2 = useSelector(getEnableLoadSw2);
 
+    // Poll on open
+    useEffect(
+        () =>
+            modem?.onOpen(() => {
+                console.log(
+                    `vTerm GET: npmx charger termination_voltage normal get`
+                );
+                console.log(`iCHG GET: npmx charger charging_current get`);
+                console.log(`Enable Charging GET: No NPMX Command avalable`);
+                console.log(`Vout1 GET: npmx buck voltage normal get 0`);
+                console.log(`Vset1 GET: npmx buck vout select get 0`);
+                console.log(`EnableBuck1 GET:  No NPMX Command avalable`);
+                console.log(`Vout2 GET: npmx buck voltage normal get 1`);
+                console.log(`Vset2 GET: npmx buck vout select get 1`);
+                console.log(`EnableBuck2 GET:  No NPMX Command avalable`);
+                console.log(`vLdo1 GET: No NPMX Command avalable`);
+                console.log(`Enable Ldo1 GET: No NPMX Command avalable`);
+                console.log(`LoadSW1 GET: No NPMX Command avalable`);
+                console.log(`vLdo2 GET: No NPMX Command avalable`);
+                console.log(`Enable Ldo2 GET: No NPMX Command avalable`);
+                console.log(`LoadSW2 GET: No NPMX Command avalable`);
+            }),
+        [dispatch, modem]
+    );
+
+    //  ----- Trigger Set Commands Start -------
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(
             `vTerm SET: npmx charger termination_voltage normal set ${vTerm}`
         );
-    }, [vTerm]);
+    }, [modem, vTerm]);
 
     useEffect(() => {
-        console.log(`iCHG SET: npmx charger charging_current get ${iCHG}`);
-    }, [iCHG]);
+        if (!modem?.isOpen()) return;
+
+        console.log(`iCHG SET: npmx charger charging_current set ${iCHG}`);
+    }, [modem, iCHG]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(
             `Enable Charging SET: npmx charger module charger ${
                 enableCharging ? 'enable' : 'disable'
             }`
         );
-    }, [enableCharging]);
+    }, [modem, enableCharging]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         if (vOut1 <= 1.2) {
             console.log(`Show dialog with warning message. OK, CANCEL`);
 
@@ -78,59 +117,85 @@ export default () => {
         } else {
             console.log(`Vout1 SET: npmx buck voltage normal set 0 ${vOut1}`);
         }
-    }, [vOut1]);
+    }, [modem, vOut1]);
 
     useEffect(() => {
-        console.log(`Vset1 SET: npmx buck vout select set 0 ${enableV1Set}`);
+        if (!modem?.isOpen()) return;
+
+        console.log(
+            `Vset1 SET: npmx buck vout select set 0 ${enableV1Set}????`
+        );
         console.log(`Vout1 GET: npmx buck voltage normal get 0`);
-    }, [enableV1Set]);
+    }, [modem, enableV1Set]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(
             `EnableBuck1 SET: npmx buck ${enableBuck1 ? 'enable' : 'disable'} 0`
         );
-    }, [enableBuck1]);
+    }, [modem, enableBuck1]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(`Vout2 SET: npmx buck voltage normal set 1 ${vOut2}`);
-    }, [vOut2]);
+    }, [modem, vOut2]);
 
     useEffect(() => {
-        console.log(`Vset2 SET: npmx buck vout select set 1 ${enableV2Set}`);
+        if (!modem?.isOpen()) return;
+
+        console.log(
+            `Vset2 SET: npmx buck vout select set 1 ${enableV2Set}?????`
+        );
         console.log(`Vout2 GET: npmx buck voltage normal get 1`);
-    }, [enableV2Set]);
+    }, [modem, enableV2Set]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(
-            `EnableBuck1 SET: npmx buck ${enableBuck2 ? 'enable' : 'disable'} 1`
+            `EnableBuck2 SET: npmx buck ${enableBuck2 ? 'enable' : 'disable'} 1`
         );
-    }, [enableBuck2]);
+    }, [modem, enableBuck2]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(`vLdo1 SET: No NPMX Command avalable`);
-    }, [vLdo1]);
+    }, [modem, vLdo1]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(`Enable Ldo1 SET: No NPMX Command avalable`);
-    }, [enableLdo1]);
+    }, [modem, enableLdo1]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(
-            `EnableBuck2 SET: npmx ldsw ${loadSW1 ? 'enable' : 'disable'} 0`
+            `LoadSW1 SET: npmx ldsw ${loadSW1 ? 'enable' : 'disable'} 0`
         );
-    }, [loadSW1]);
+    }, [modem, loadSW1]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(`vLdo2 SET: No NPMX Command avalable`);
-    }, [vLdo2]);
+    }, [modem, vLdo2]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(`Enable Ldo2 SET: No NPMX Command avalable`);
-    }, [enableLdo2]);
+    }, [modem, enableLdo2]);
 
     useEffect(() => {
+        if (!modem?.isOpen()) return;
+
         console.log(
-            `EnableBuck2 SET: npmx ldsw ${loadSW2 ? 'enable' : 'disable'} 1`
+            `LoadSW2 SET: npmx ldsw ${loadSW2 ? 'enable' : 'disable'} 1`
         );
-    }, [loadSW2]);
+    }, [modem, loadSW2]);
 };
