@@ -229,6 +229,8 @@ export const hookModemToShellParser = (
         if (oldPausedState !== newPausedState) {
             oldPausedState = newPausedState;
             eventEmitter.emit('pausedChanged', newPausedState);
+            // init sending of commands
+            initDataSend();
         }
         return newPausedState;
     };
