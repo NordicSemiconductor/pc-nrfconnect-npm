@@ -80,6 +80,9 @@ export const hookModemToShellParser = (
     let crnl = false;
     let oldPausedState = false;
 
+    // init shell mode
+    if (modem.isOpen()) modem.write(String.fromCharCode(12));
+
     const reset = () => {
         commandBuffer = '';
         commandQueueCallbacks = new Map();
@@ -203,7 +206,10 @@ export const hookModemToShellParser = (
         xTerminalShellParser.clear();
     };
 
-    const unregisterOnOpen = modem.onOpen(() => initDataSend());
+    const unregisterOnOpen = modem.onOpen(() => {
+        modem.write(String.fromCharCode(12));
+        return initDataSend();
+    });
 
     // Hook to listen to all modem data
     const unregisterOnResponse = modem.onResponse(data =>

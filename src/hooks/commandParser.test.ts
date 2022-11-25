@@ -17,6 +17,7 @@ describe('shell command parser', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         termnalBuffer = settings.shellPromptUart;
+        mockIsOpen.mockReturnValue(true);
     });
 
     const mockOnResponse = jest.fn(
@@ -78,8 +79,39 @@ describe('shell command parser', () => {
         write: mockTerminalWrite,
     }));
 
+    test('Verify that shell init char is sent on open', () => {
+        mockIsOpen.mockReturnValue(true);
+
+        hookModemToShellParser(mockModem(), mockTerminal());
+
+        expect(mockWrite).toBeCalledTimes(1);
+        expect(mockWrite).toBeCalledWith(String.fromCharCode(12).toString());
+    });
+
+    test('Verify that shell init char is sent on open', () => {
+        mockIsOpen.mockReturnValue(false);
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let onOpenCallback = (_error?: string) => {};
+
+        mockOnOpen.mockImplementation((handler: (error?: string) => void) => {
+            onOpenCallback = handler;
+            return () => {};
+        });
+
+        hookModemToShellParser(mockModem(), mockTerminal());
+
+        expect(mockWrite).toBeCalledTimes(0);
+
+        mockIsOpen.mockReturnValue(true);
+        onOpenCallback();
+
+        expect(mockWrite).toBeCalledTimes(1);
+        expect(mockWrite).toBeCalledWith(String.fromCharCode(12).toString());
+    });
+
     test('Verify that no callback is called untill we get a responce', () => {
-        mockIsOpen.mockReturnValueOnce(false);
+        mockIsOpen.mockReturnValue(false);
 
         const ansiProsesser = hookModemToShellParser(
             mockModem(),
@@ -104,12 +136,12 @@ describe('shell command parser', () => {
         );
         ansiProsesser.enqueueRequest('Test Command');
 
-        expect(mockWrite).toBeCalledTimes(1);
-        expect(mockWrite).toBeCalledWith('Test Command\r\n');
+        expect(mockWrite).toBeCalledTimes(2);
+        expect(mockWrite).lastCalledWith('Test Command\r\n');
     });
 
     test('Verify that enqueued not sent if modem is closed', () => {
-        mockIsOpen.mockReturnValueOnce(false);
+        mockIsOpen.mockReturnValue(false);
 
         const ansiProsesser = hookModemToShellParser(
             mockModem(),
@@ -121,7 +153,7 @@ describe('shell command parser', () => {
     });
 
     test('Verify that enqueued command is sent on modem opened', () => {
-        mockIsOpen.mockReturnValueOnce(false);
+        mockIsOpen.mockReturnValue(false);
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onOpenCallback = (_error?: string) => {};
@@ -138,11 +170,11 @@ describe('shell command parser', () => {
         ansiProsesser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(0);
-        mockIsOpen.mockReturnValueOnce(true);
+        mockIsOpen.mockReturnValue(true);
 
         onOpenCallback();
-        expect(mockWrite).toBeCalledTimes(1);
-        expect(mockWrite).toBeCalledWith('Test Command\r\n');
+        expect(mockWrite).toBeCalledTimes(2);
+        expect(mockWrite).lastCalledWith('Test Command\r\n');
     });
 
     test('Verify one time onSuccess callback is called when we have a response in one stream', () => {
