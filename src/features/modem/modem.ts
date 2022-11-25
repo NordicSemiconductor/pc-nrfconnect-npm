@@ -6,7 +6,7 @@
 
 import EventEmitter from 'events';
 import { logger } from 'pc-nrfconnect-shared';
-import SerialPort from 'serialport';
+import { SerialPort } from 'serialport/dist/serialport';
 
 export interface Modem {
     onResponse: (
@@ -24,15 +24,10 @@ export const createModem = (serialPortPath: string): Modem => {
 
     logger.info(`Opening: '${serialPortPath}'`);
 
-    const serialPort = new SerialPort(
-        serialPortPath,
-        { baudRate: 115200 },
-        e => {
-            if (e) {
-                logger.error(e);
-            }
-        }
-    );
+    const serialPort = new SerialPort({
+        path: serialPortPath,
+        baudRate: 115200,
+    });
 
     serialPort.on('open', () => {
         eventEmitter.emit('open');
