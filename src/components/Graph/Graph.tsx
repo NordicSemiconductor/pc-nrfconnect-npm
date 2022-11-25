@@ -164,26 +164,22 @@ export default ({ active }: PaneProps) => {
     const datasetIbat = useSelector(getIbatDataset);
 
     useEffect(() => {
-        if (!chart) return;
-        if (
-            datasetVbat.data.length === 0 &&
-            datasetTbat.data.length === 0 &&
-            datasetIbat.data.length === 0
-        ) {
-            return;
+        if (chart) {
+            chart.data.datasets[0].data = [...datasetVbat.data];
+            chart.data.datasets[1].data = [...datasetTbat.data];
+            chart.data.datasets[2].data = [...datasetIbat.data];
         }
+    }, [chart, datasetIbat.data, datasetTbat.data, datasetVbat.data]);
 
-        chart.data.datasets[0].data = [...datasetVbat.data];
-        chart.data.datasets[1].data = [...datasetTbat.data];
-        chart.data.datasets[2].data = [...datasetIbat.data];
+    useEffect(() => {
+        const t = setInterval(() => {
+            chart?.update('none');
+        }, 250);
 
-        chart.update('none');
-        return () => {};
-    }, [datasetIbat, datasetVbat, datasetTbat, chart]);
+        return () => clearInterval(t);
+    }, [chart]);
 
     logger;
-
-    // TODO disble Plugin ???
 
     return (
         // eslint-disable-next-line react/jsx-no-useless-fragment
