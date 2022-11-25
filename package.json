@@ -31,15 +31,15 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "ansi-escapes": "^6.0.0",
+        "ansi-escapes": "^4.3.2",
+        "chart.js": "^3.9.1",
+        "chartjs-adapter-date-fns": "^2.0.1",
         "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#extend-slider-and-inlineinput",
+        "react-chartjs-2": "4.3.1",
         "serialport": "^9.0.6",
         "xterm-addon-fit": "^0.5.0",
         "xterm-for-react": "^1.0.4",
-        "xterm-headless": "^5.0.0",
-        "react-chartjs-2": "4.3.1",
-        "chart.js": "^3.9.1",
-        "chartjs-adapter-date-fns": "^2.0.1"
+        "xterm-headless": "^5.0.0"
     },
     "dependencies": {
         "esbuild": "^0.14.50",
