@@ -6,7 +6,7 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
-import { cursorTo, eraseLine } from 'ansi-escapes';
+import ansiEscapes from 'ansi-escapes';
 import { XTerm } from 'xterm-for-react';
 
 import useFitAddon from '../../hooks/useFitAddon';
@@ -51,7 +51,9 @@ const Terminal: React.FC<Props> = ({
     );
 
     const clearTermial = () => {
-        xtermRef.current?.terminal.write(eraseLine + cursorTo(0));
+        xtermRef.current?.terminal.write(
+            ansiEscapes.eraseLine + ansiEscapes.cursorTo(0)
+        );
         xtermRef.current?.terminal.clear();
     };
 

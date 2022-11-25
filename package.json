@@ -31,7 +31,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "ansi-escapes": "^4.2.1",
+        "ansi-escapes": "^6.0.0",
         "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#extend-slider-and-inlineinput",
         "serialport": "^9.0.6",
         "xterm-addon-fit": "^0.5.0",
