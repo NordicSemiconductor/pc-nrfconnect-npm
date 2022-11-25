@@ -7,6 +7,7 @@
 import { NrfConnectState } from 'pc-nrfconnect-shared';
 import { combineReducers } from 'redux';
 
+import graphReducer from './features/graph/graphSlice';
 import modemReducer from './features/modem/modemSlice';
 import pmicControlReducer from './features/pmicControl/pmicControlSlice';
 import shelllReducer from './features/shell/shellSlice';
@@ -19,6 +20,7 @@ const appReducer = combineReducers({
     pmicControl: pmicControlReducer,
     modem: modemReducer,
     shell: shelllReducer,
+    graph: graphReducer,
 });
 
 export default appReducer;

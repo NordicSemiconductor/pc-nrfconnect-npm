@@ -36,7 +36,10 @@
         "serialport": "^9.0.6",
         "xterm-addon-fit": "^0.5.0",
         "xterm-for-react": "^1.0.4",
-        "xterm-headless": "^5.0.0"
+        "xterm-headless": "^5.0.0",
+        "react-chartjs-2": "4.3.1",
+        "chart.js": "^3.9.1",
+        "chartjs-adapter-date-fns": "^2.0.1"
     },
     "dependencies": {
         "esbuild": "^0.14.50",

@@ -7,6 +7,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { resetDataset } from '../graph/graphSlice';
 import { getModem } from '../modem/modemSlice';
 import {
     getEnableBuck1,
@@ -55,6 +56,7 @@ export default () => {
     useEffect(
         () =>
             modem?.onOpen(() => {
+                dispatch(resetDataset());
                 console.log(
                     `vTerm GET: npmx charger termination_voltage normal get`
                 );
