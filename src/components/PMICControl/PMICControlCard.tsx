@@ -250,6 +250,11 @@ const LDO: FC<ldoProps> = ({
 
     return (
         <Card title={cardLabel}>
+            <StateSelector
+                items={['Load Switch', 'LDO']}
+                defaultIndex={0}
+                onSelect={() => {}}
+            />
             <div className="slider-container">
                 <FormLabel className="flex-row">
                     <div>
@@ -284,12 +289,7 @@ const LDO: FC<ldoProps> = ({
                 />
             </div>
             <Toggle
-                label="LDO Switch"
-                isToggled={enableSwitchLdo}
-                onToggle={value => onLdoSwitchToggle(value)}
-            />
-            <Toggle
-                label="Enable LDO"
+                label="Enable"
                 isToggled={enableLdo}
                 onToggle={value => onLdoToggle(value)}
             />
@@ -343,7 +343,7 @@ export default () => {
                     }
                 />
                 <LDO
-                    cardLabel="LDO 1"
+                    cardLabel="LDO/Load Switch 1"
                     ldoSelector={getEnableLdo1}
                     vLdoSelector={getVLdo1}
                     onLdoToggle={value => dispatch(npmEnableLdo1Change(value))}
@@ -354,7 +354,7 @@ export default () => {
                     }
                 />
                 <LDO
-                    cardLabel="LDO 2"
+                    cardLabel="LDO/Load Switch 2"
                     ldoSelector={getEnableLdo2}
                     vLdoSelector={getVLdo2}
                     onLdoToggle={value => dispatch(npmEnableLdo2Change(value))}
