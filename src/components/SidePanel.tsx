@@ -41,6 +41,15 @@ const TerminalSidePanel = () => {
                 xTerminalShellParserWrapper(
                     new Terminal({ allowProposedApi: true })
                 ),
+                {
+                    shellPromptUart: 'shell:~$ ',
+                    logRegex:
+                        '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
+                    errorRegex: '^error: ',
+                }
+            );
+
+            const relaseShellLoggingEvent = shellParser.onShellLoggingEvent(
                 data => {
                     const splitData = data.split(' <inf> main:');
 
@@ -78,19 +87,19 @@ const TerminalSidePanel = () => {
                             },
                         })
                     );
-                },
-                data => {
-                    console.warn(`Unkown Command:\r\n${data}`);
-                },
-                {
-                    shellPromptUart: 'shell:~$ ',
-                    logRegex:
-                        '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
-                    errorRegex: '^error: ',
                 }
             );
+
+            const relaseOnUnknowCommand = shellParser.onUnknowCommand(data => {
+                console.warn(`Unkown Command:\r\n${data}`);
+            });
+
             dispatch(setShellParser(shellParser));
-            return shellParser.unregister;
+            return () => {
+                relaseShellLoggingEvent();
+                relaseOnUnknowCommand();
+                shellParser.unregister();
+            };
         }
         return () => {};
     }, [dispatch, modem]);

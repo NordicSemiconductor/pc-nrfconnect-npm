@@ -113,11 +113,12 @@ describe('shell command parser', () => {
     test('Verify that no callback is called untill we get a responce', () => {
         mockIsOpen.mockReturnValue(false);
 
-        const ansiProsesser = hookModemToShellParser(
-            mockModem(),
-            mockTerminal()
-        );
-        ansiProsesser.enqueueRequest('Test Command');
+        const shellParser = hookModemToShellParser(mockModem(), mockTerminal());
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest('Test Command');
 
         expect(mockClose).toBeCalledTimes(0);
         expect(mockWrite).toBeCalledTimes(0);
@@ -130,11 +131,8 @@ describe('shell command parser', () => {
     });
 
     test('Verify that enqueued command is sent if modem is open', () => {
-        const ansiProsesser = hookModemToShellParser(
-            mockModem(),
-            mockTerminal()
-        );
-        ansiProsesser.enqueueRequest('Test Command');
+        const shellParser = hookModemToShellParser(mockModem(), mockTerminal());
+        shellParser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(2);
         expect(mockWrite).lastCalledWith('Test Command\r\n');
@@ -143,11 +141,8 @@ describe('shell command parser', () => {
     test('Verify that enqueued not sent if modem is closed', () => {
         mockIsOpen.mockReturnValue(false);
 
-        const ansiProsesser = hookModemToShellParser(
-            mockModem(),
-            mockTerminal()
-        );
-        ansiProsesser.enqueueRequest('Test Command');
+        const shellParser = hookModemToShellParser(mockModem(), mockTerminal());
+        shellParser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(0);
     });
@@ -163,11 +158,8 @@ describe('shell command parser', () => {
             return () => {};
         });
 
-        const ansiProsesser = hookModemToShellParser(
-            mockModem(),
-            mockTerminal()
-        );
-        ansiProsesser.enqueueRequest('Test Command');
+        const shellParser = hookModemToShellParser(mockModem(), mockTerminal());
+        shellParser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(0);
         mockIsOpen.mockReturnValue(true);
@@ -188,18 +180,16 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest('Test Command', mockOnSuccess, mockOnError);
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -226,18 +216,16 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest('Test Command', mockOnSuccess, mockOnError);
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -268,18 +256,16 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest('Test Command', mockOnSuccess, mockOnError);
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -306,18 +292,16 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest('Test Command', mockOnSuccess, mockOnError);
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -348,20 +332,22 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.enqueueRequest(
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest(
             'Test Command 1',
             mockOnSuccess,
             mockOnError
         );
 
-        ansiProsesser.enqueueRequest(
+        shellParser.enqueueRequest(
             'Test Command 2',
             mockOnSuccess,
             mockOnError
@@ -402,20 +388,22 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.enqueueRequest(
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest(
             'Test Command 1',
             mockOnSuccess1,
             mockOnError
         );
 
-        ansiProsesser.enqueueRequest(
+        shellParser.enqueueRequest(
             'Test Command 2',
             mockOnSuccess2,
             mockOnError
@@ -451,20 +439,22 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.enqueueRequest(
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest(
             'Test Command 1',
             mockOnSuccess,
             mockOnError
         );
 
-        ansiProsesser.enqueueRequest(
+        shellParser.enqueueRequest(
             'Test Command 2',
             mockOnSuccess,
             mockOnError
@@ -499,21 +489,22 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
 
-        ansiProsesser.registerCommandCallback(
+        shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess,
             mockOnError
         );
 
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.enqueueRequest('Test Command');
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -524,7 +515,7 @@ describe('shell command parser', () => {
         expect(mockOnSuccess).toBeCalledTimes(1);
         expect(mockOnSuccess).toBeCalledWith('Response Value');
 
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         onResponseCallback([
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
@@ -549,20 +540,21 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
 
-        ansiProsesser.registerCommandCallback(
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess,
             mockOnError
         );
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -593,19 +585,21 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.registerCommandCallback(
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess,
             mockOnError
         );
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -641,19 +635,21 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.registerCommandCallback(
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess,
             mockOnError
         );
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -684,25 +680,22 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
 
-        ansiProsesser.registerCommandCallback(
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess,
             mockOnError
         );
 
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+        shellParser.enqueueRequest('Test Command', mockOnSuccess, mockOnError);
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -729,23 +722,21 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
-        ansiProsesser.registerCommandCallback(
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess,
             mockOnError
         );
-        ansiProsesser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+        shellParser.enqueueRequest('Test Command', mockOnSuccess, mockOnError);
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -772,13 +763,14 @@ describe('shell command parser', () => {
             }
         );
 
-        hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
 
         onResponseCallback([
             Buffer.from('<inf> main: v=3.595881,i=0.176776\r\nuart:~$'),
@@ -805,13 +797,14 @@ describe('shell command parser', () => {
             }
         );
 
-        hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
 
         onResponseCallback([Buffer.from('<inf> main: v=3.595881,i=0')]);
 
@@ -840,13 +833,14 @@ describe('shell command parser', () => {
             }
         );
 
-        hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
 
         onResponseCallback([
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
@@ -871,13 +865,14 @@ describe('shell command parser', () => {
             }
         );
 
-        hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
 
         onResponseCallback([Buffer.from('Test Command\r\nRespons')]);
 
@@ -904,21 +899,22 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
 
-        const unregister = ansiProsesser.registerCommandCallback(
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        const unregister = shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess,
             mockOnError
         );
 
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         onResponseCallback([
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
@@ -929,7 +925,7 @@ describe('shell command parser', () => {
 
         unregister();
 
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         onResponseCallback([
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
@@ -956,33 +952,34 @@ describe('shell command parser', () => {
             }
         );
 
-        const ansiProsesser = hookModemToShellParser(
+        const shellParser = hookModemToShellParser(
             mockModem(),
             mockTerminal(),
-            mockOnShellLogging,
-            mockOnUnknown,
             settings
         );
 
-        ansiProsesser.registerCommandCallback(
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknowCommand(mockOnUnknown);
+
+        shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess1,
             mockOnError
         );
 
-        const unregister2 = ansiProsesser.registerCommandCallback(
+        const unregister2 = shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess2,
             mockOnError
         );
 
-        const unregister3 = ansiProsesser.registerCommandCallback(
+        const unregister3 = shellParser.registerCommandCallback(
             'Test Command',
             mockOnSuccess3,
             mockOnError
         );
 
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         onResponseCallback([
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
@@ -999,7 +996,7 @@ describe('shell command parser', () => {
 
         unregister2();
 
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         onResponseCallback([
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
@@ -1015,7 +1012,7 @@ describe('shell command parser', () => {
 
         unregister3();
 
-        ansiProsesser.enqueueRequest('Test Command');
+        shellParser.enqueueRequest('Test Command');
 
         onResponseCallback([
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),

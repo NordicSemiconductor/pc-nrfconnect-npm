@@ -60,10 +60,6 @@ export const xTerminalShellParserWrapper = (terminal: Terminal) => ({
 export const hookModemToShellParser = (
     modem: Modem,
     xTerminalShellParser: XTerminalShellParser,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    shellLoggingCallback = (_log: string) => {},
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    unknowCommandCallback = (data: string) => {},
     settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$ ',
         logRegex: '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
@@ -179,9 +175,9 @@ export const hookModemToShellParser = (
         });
 
         if (responce.match(settings.logRegex)) {
-            shellLoggingCallback(responce);
+            eventEmitter.emit('shellLogging', responce);
         } else if (!callbackFound) {
-            unknowCommandCallback(responce);
+            eventEmitter.emit('unknownCommand', responce);
         }
     };
 
@@ -245,6 +241,14 @@ export const hookModemToShellParser = (
         onPausedChange: (handler: (state: boolean) => void) => {
             eventEmitter.on('pausedChanged', handler);
             return () => eventEmitter.removeListener('pausedChanged', handler);
+        },
+        onShellLoggingEvent: (handler: (state: string) => void) => {
+            eventEmitter.on('shellLogging', handler);
+            return () => eventEmitter.removeListener('shellLogging', handler);
+        },
+        onUnknowCommand: (handler: (state: string) => void) => {
+            eventEmitter.on('unknownCommand', handler);
+            return () => eventEmitter.removeListener('unknownCommand', handler);
         },
         enqueueRequest: (
             command: string,
