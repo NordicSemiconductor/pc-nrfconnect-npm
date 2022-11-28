@@ -16,16 +16,14 @@ steps:
           npm run test
           npm run build
           npm pack
-    - task: CopyFiles@2
-      inputs:
-          contents: |
-              *.tgz
-              Changelog.md
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      displayName: 'Copying artifact to artifact staging directory'
+      displayName: 'Build and pack'
+    - bash: |
+          set -o errexit -o pipefail
+          cp *.tgz "$(Build.ArtifactStagingDirectory)"
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+      displayName: 'Copy artifacts'
     - task: PublishPipelineArtifact@1
       inputs:
           targetPath: $(Build.ArtifactStagingDirectory)
           publishLocation: 'pipeline'
-      condition: ne(variables['Build.Reason'], 'PullRequest')
-      displayName: 'Publishing artifacts to artifact storage'
+      displayName: 'Publish artifacts to artifact storage'
