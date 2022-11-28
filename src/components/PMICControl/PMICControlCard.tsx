@@ -241,9 +241,11 @@ const LDO: FC<ldoProps> = ({
     ldoSwitchSelector,
     onLdoToggle,
     onVLdoChange,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onLdoSwitchToggle,
 }) => {
     const enableLdo = useSelector(ldoSelector);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const enableSwitchLdo = useSelector(ldoSwitchSelector);
     const vLdo = useSelector(vLdoSelector);
     const [internalVLdo, setInternaVLdo] = useState(vLdo);
