@@ -1,14 +1,76 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "Debug: App",
+            "name": "Build Launcher",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${env:LauncherWorkspace}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script", "build:dev"
+            ]
+        },
+        {
+            "name": "Build:dev",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script", "build:dev"
+            ]
+        },
+        {
+            "name": "Watch App",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script", "watch"
+            ]
+        },
+        {
+            "name": "Open Launcher",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${env:LauncherWorkspace}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script", "app:debug"
+            ]
+        },
+        {
+            "name": "Open App",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${env:LauncherWorkspace}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script", "app:debug",  "--", "--open-local-app", "${workspaceFolderBasename}"
+            ]
+        },
+        {
+            "name": "Attach",
             "type": "chrome",
             "request": "attach",
             "port": 9223,
             "webRoot": "${workspaceFolder}",
-            "timeout": 3000
+            "timeout": 20000,
         }
     ],
+    "compounds": [
+        {
+          "name": "Build All",
+          "configurations": ["Build Launcher", "Build:dev"]
+        },
+        {
+            "name": "Watch, Open and Attach",
+            "configurations": ["Watch App", "Open App", "Attach"]
+        },
+      ]
+    
 
   }
