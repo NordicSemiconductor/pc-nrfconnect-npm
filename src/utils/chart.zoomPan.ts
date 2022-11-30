@@ -14,7 +14,6 @@ import type {
     ScatterDataPoint,
 } from 'chart.js';
 
-let currentRange: Range;
 let shouldMutate = false;
 
 type CustomCharDataset = ChartDataset & {
@@ -33,7 +32,7 @@ const isNullOrUndef = (data: unknown) =>
 
 const initRange = (datasets: ChartDataset[], options: PanPluginOptions) => {
     if (datasets.length === 0) {
-        currentRange = { xMax: 0, xMin: 0 };
+        options.currentRange = { xMax: 0, xMin: 0 };
         return;
     }
 
@@ -43,11 +42,11 @@ const initRange = (datasets: ChartDataset[], options: PanPluginOptions) => {
     });
 
     if (!hasData) {
-        currentRange = { xMax: 0, xMin: 0 };
+        options.currentRange = { xMax: 0, xMin: 0 };
         return;
     }
 
-    currentRange = getRange(datasets, options);
+    options.currentRange = getRange(datasets, options);
 };
 
 const initData = (datasets: CustomCharDataset[]) => {
@@ -195,14 +194,13 @@ const updateRange = (
     }
 
     if (
-        currentRange &&
-        currentRange.xMax === range.xMax &&
-        currentRange.xMin === range.xMin
+        options.currentRange.xMax === range.xMax &&
+        options.currentRange.xMin === range.xMin
     )
         return;
 
     shouldMutate = true;
-    currentRange = { ...range };
+    options.currentRange = { ...range };
 };
 
 const cleanBackedDatasets = (datasets: CustomCharDataset[]) => {
@@ -227,6 +225,7 @@ export interface PanPluginOptions {
     resolution: number;
     minResolution: number;
     zoomFactor: number;
+    currentRange: Range;
 }
 
 export default {
@@ -237,6 +236,7 @@ export default {
         resolution: 20000,
         minResolution: 1000,
         zoomFactor: 1.1,
+        currentRange: { xMin: 0, xMax: 20000 },
     },
     afterInit(chart, _args, options) {
         initData(chart.data.datasets);
@@ -283,15 +283,15 @@ export default {
             lastX = newX;
 
             const nextRange = {
-                xMax: currentRange.xMax + delta,
-                xMin: currentRange.xMax - options.resolution + delta,
+                xMax: options.currentRange.xMax + delta,
+                xMin: options.currentRange.xMax - options.resolution + delta,
             };
 
             updateRange(chart.data.datasets, nextRange, options);
             (chart.scales.xAxis.options as CartesianScaleOptions).min =
-                currentRange.xMin;
+                options.currentRange.xMin;
             (chart.scales.xAxis.options as CartesianScaleOptions).max =
-                currentRange.xMax;
+                options.currentRange.xMax;
             chart.update('none');
         });
 
@@ -327,20 +327,20 @@ export default {
             const deltaMax = resolutonDelta - deltaMin;
 
             const nextRange = {
-                xMin: currentRange.xMin - deltaMin,
-                xMax: currentRange.xMax + deltaMax,
+                xMin: options.currentRange.xMin - deltaMin,
+                xMax: options.currentRange.xMax + deltaMax,
             };
 
             updateRange(chart.data.datasets, nextRange, options);
             (chart.scales.xAxis.options as CartesianScaleOptions).min =
-                currentRange.xMin;
+                options.currentRange.xMin;
             (chart.scales.xAxis.options as CartesianScaleOptions).max =
-                currentRange.xMax;
+                options.currentRange.xMax;
             chart.update('none');
         });
     },
     beforeElementsUpdate(chart, _args, options) {
-        let nextRange = { ...currentRange };
+        let nextRange = { ...options.currentRange };
         if (options.live) {
             nextRange = getRange(chart.data.datasets, options);
         }
@@ -353,9 +353,9 @@ export default {
         }
 
         (chart.scales.xAxis.options as CartesianScaleOptions).min =
-            currentRange.xMin;
+            options.currentRange.xMin;
         (chart.scales.xAxis.options as CartesianScaleOptions).max =
-            currentRange.xMax;
+            options.currentRange.xMax;
 
         if (!shouldMutate) {
             return;
@@ -368,7 +368,7 @@ export default {
             // Point the chart to the decimated data
             dataset._simplified = mutateData(
                 data as ScatterDataPoint[],
-                currentRange
+                options.currentRange
             );
         });
     },
