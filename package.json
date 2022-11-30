@@ -20,7 +20,7 @@
     ],
     "scripts": {
         "watch": "run-p --silent --continue-on-error watch:*",
-        "watch:build": "run-esbuild --watch --sourcemap",
+        "watch:build": "run-esbuild --watch",
         "watch:types": "tsc --noEmit --pretty --watch --preserveWatchOutput",
         "build:dev": "run-esbuild",
         "build:prod": "run-esbuild --prod",

@@ -1,7 +1,6 @@
 {
     "version": "0.2.0",
     "configurations": [
-
         {
             "name": "Build Launcher",
             "type": "node",
@@ -59,7 +58,19 @@
             "port": 9223,
             "webRoot": "${workspaceFolder}",
             "timeout": 20000,
-        }
+            "preLaunchTask": "build:dev",
+        },
+        {
+            "name": "Build and Open App",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${env:LauncherWorkspace}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script", "app:debug",  "--", "--open-local-app", "${workspaceFolderBasename}"
+            ],
+            "preLaunchTask": "build:dev"
+        },
     ],
     "compounds": [
         {
@@ -67,10 +78,9 @@
           "configurations": ["Build Launcher", "Build:dev"]
         },
         {
-            "name": "Watch, Open and Attach",
-            "configurations": ["Watch App", "Open App", "Attach"]
+            "name": "Build, Open and Attach",
+            "configurations": ["Open App", "Attach"],
+            "preLaunchTask": "build:dev"
         },
-      ]
-    
-
+      ],
   }
