@@ -174,7 +174,6 @@ const BuckCard: FC<buckProps> = ({
         <Card title={cardLabel}>
             <StateSelector
                 items={vSetItems}
-                defaultIndex={0}
                 onSelect={index => onVSetToggle(index === 1)}
                 selectedItem={initVSet ? vSetItems[1] : vSetItems[0]}
             />
@@ -213,6 +212,7 @@ const BuckCard: FC<buckProps> = ({
                         max: 3.3,
                         decimals: 1,
                     }}
+                    ticks
                 />
             </div>
             <Toggle
@@ -254,8 +254,8 @@ const LDO: FC<ldoProps> = ({
         <Card title={cardLabel}>
             <StateSelector
                 items={['Load Switch', 'LDO']}
-                defaultIndex={0}
                 onSelect={() => {}}
+                selectedItem="Load Switch"
             />
             <div className="slider-container">
                 <FormLabel className="flex-row">
