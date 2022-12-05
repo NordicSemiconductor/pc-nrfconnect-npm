@@ -162,10 +162,10 @@ const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
     // line going out of the graph on both sides
 
     startIndex = Math.max(startIndex, 0);
-    endIndex = Math.min(
-        (endIndex === -1 ? data.length : endIndex) + 10,
-        data.length - 1
-    );
+    endIndex =
+        endIndex === -1
+            ? data.length - 1
+            : Math.min(endIndex + 10, data.length - 1);
 
     shouldMutate = false;
     return data.slice(startIndex, endIndex);
@@ -178,9 +178,6 @@ const autoUpdateIsLive = (
 ) => {
     const xMax = getMaxX(datasets);
 
-    range.xMax = Math.round(range.xMax);
-    range.xMin = Math.round(range.xMin);
-
     options.live = xMax <= range.xMax;
     if (options.live) {
         range = getRange(datasets, options);
@@ -192,9 +189,6 @@ const updateRange = (
     range: XAxisRange,
     options: PanPluginOptions
 ) => {
-    range.xMax = Math.round(range.xMax);
-    range.xMin = Math.round(range.xMin);
-
     const { valid } = isRangeValid(datasets, range, options);
     if (!valid) {
         range = getRange(datasets, options);
@@ -204,10 +198,11 @@ const updateRange = (
         options.currentRange.xMax === range.xMax &&
         options.currentRange.xMin === range.xMin
     )
-        return;
+        return false;
 
     shouldMutate = true;
     options.currentRange = { ...range };
+    return true;
 };
 
 const cleanBackedDatasets = (datasets: CustomCharDataset[]) => {
@@ -242,7 +237,7 @@ export default {
             const resolutonDelta = resolution - options.resolution;
             options.resolution = resolution;
 
-            const deltaMin = Math.ceil(resolutonDelta * offset);
+            const deltaMin = resolutonDelta * offset;
             const deltaMax = resolutonDelta - deltaMin;
 
             const nextRange = {
@@ -250,7 +245,11 @@ export default {
                 xMax: options.currentRange.xMax + deltaMax,
             };
 
-            updateRange(chart.data.datasets, nextRange, options);
+            if (!updateRange(chart.data.datasets, nextRange, options)) {
+                autoUpdateIsLive(chart.data.datasets, nextRange, options);
+                return;
+            }
+
             autoUpdateIsLive(chart.data.datasets, nextRange, options);
 
             (chart.scales.xAxis.options as CartesianScaleOptions).min =
@@ -300,19 +299,32 @@ export default {
 
             const scaleDiff = lastX - newX;
 
-            if (scaleDiff === 0) return;
+            if (Math.abs(scaleDiff) < 1) return;
 
             const scaleDiffPercent = scaleDiff / chart.chartArea.width;
             const delta = options.resolution * scaleDiffPercent;
-
-            lastX = newX;
 
             const nextRange = {
                 xMax: options.currentRange.xMax + delta,
                 xMin: options.currentRange.xMax - options.resolution + delta,
             };
 
-            updateRange(chart.data.datasets, nextRange, options);
+            const { valid } = isRangeValid(
+                chart.data.datasets,
+                nextRange,
+                options
+            );
+
+            if (
+                !valid ||
+                !updateRange(chart.data.datasets, nextRange, options)
+            ) {
+                autoUpdateIsLive(chart.data.datasets, nextRange, options);
+                return;
+            }
+
+            lastX = newX;
+
             autoUpdateIsLive(chart.data.datasets, nextRange, options);
 
             (chart.scales.xAxis.options as CartesianScaleOptions).min =
@@ -344,8 +356,6 @@ export default {
                 )
             );
 
-            options.resolution = newResolution;
-
             // Zoom where the mouse pointer is
             const offset =
                 (event.offsetX - chart.chartArea.left) / chart.chartArea.width;
@@ -353,7 +363,7 @@ export default {
             actions.zoom(newResolution, offset);
         });
     },
-    beforeElementsUpdate(chart) {
+    beforeUpdate(chart) {
         const options = getState(chart).options;
         let nextRange = { ...options.currentRange };
 
