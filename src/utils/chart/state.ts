@@ -19,8 +19,13 @@ export interface PanPluginOptions {
     currentRange: XAxisRange;
 }
 
+export interface ChartActions {
+    zoom: (resolution: number, centerOffset: number) => void;
+}
+
 interface ChartState {
     options: PanPluginOptions;
+    actions: ChartActions;
 }
 
 const chartStates = new WeakMap<Chart, ChartState>();
@@ -36,6 +41,7 @@ export const getState = (chart: Chart) => {
                 zoomFactor: 1.1,
                 currentRange: { xMin: 0, xMax: 20000 },
             },
+            actions: { zoom: () => {} },
         };
         chartStates.set(chart, state);
     }

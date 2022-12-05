@@ -238,11 +238,34 @@ export default {
     start(chart, _args, options) {
         const state = getState(chart);
         state.options = options;
+        state.actions.zoom = (resolution, offset) => {
+            const resolutonDelta = resolution - options.resolution;
+            options.resolution = resolution;
+
+            const deltaMin = Math.ceil(resolutonDelta * offset);
+            const deltaMax = resolutonDelta - deltaMin;
+
+            const nextRange = {
+                xMin: options.currentRange.xMin - deltaMin,
+                xMax: options.currentRange.xMax + deltaMax,
+            };
+
+            updateRange(chart.data.datasets, nextRange, options);
+            autoUpdateIsLive(chart.data.datasets, nextRange, options);
+
+            (chart.scales.xAxis.options as CartesianScaleOptions).min =
+                options.currentRange.xMin;
+            (chart.scales.xAxis.options as CartesianScaleOptions).max =
+                options.currentRange.xMax;
+
+            chart.update('none');
+        };
     },
     afterInit(chart) {
         initData(chart.data.datasets);
         initRange(chart);
 
+        const actions = getState(chart).actions;
         const options = getState(chart).options;
         const { canvas } = chart.ctx;
 
@@ -321,30 +344,13 @@ export default {
                 )
             );
 
-            const resolutonDelta = newResolution - options.resolution;
             options.resolution = newResolution;
 
             // Zoom where the mouse pointer is
             const offset =
                 (event.offsetX - chart.chartArea.left) / chart.chartArea.width;
 
-            const deltaMin = Math.ceil(resolutonDelta * offset);
-            const deltaMax = resolutonDelta - deltaMin;
-
-            const nextRange = {
-                xMin: options.currentRange.xMin - deltaMin,
-                xMax: options.currentRange.xMax + deltaMax,
-            };
-
-            updateRange(chart.data.datasets, nextRange, options);
-            autoUpdateIsLive(chart.data.datasets, nextRange, options);
-
-            (chart.scales.xAxis.options as CartesianScaleOptions).min =
-                options.currentRange.xMin;
-            (chart.scales.xAxis.options as CartesianScaleOptions).max =
-                options.currentRange.xMax;
-
-            chart.update('none');
+            actions.zoom(newResolution, offset);
         });
     },
     beforeElementsUpdate(chart) {

@@ -23,7 +23,7 @@ import {
     Title,
     Tooltip,
 } from 'chart.js';
-import { Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
+import { Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
 import {
     getIbatDataset,
@@ -156,7 +156,9 @@ export default ({ active }: PaneProps) => {
     const datasetIbat = useSelector(getIbatDataset);
     const [isLive, setLive] = useState(true);
 
-    const chartOptions = chart ? getState(chart).options : undefined;
+    const chartStates = chart ? getState(chart) : undefined;
+    const chartActons = chartStates?.actions;
+    const chartOptions = chartStates?.options;
 
     useEffect(() => {
         if (chart) {
@@ -189,17 +191,80 @@ export default ({ active }: PaneProps) => {
         }
     }, [chart, active]);
 
+    const zoom = (resolution: number) => {
+        if (chartActons?.zoom)
+            chartActons?.zoom(resolution, chartOptions?.live ? 1 : 0.5);
+    };
+
     return (
         <div className="graph-container">
             <div className="graph">
                 <div className="graph-cards">
                     <Card title="Discharge Graph">
-                        <div style={{ float: 'right' }}>
-                            <Toggle
-                                label="Live"
-                                isToggled={isLive}
-                                onToggle={value => setLive(value)}
-                            />
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                            }}
+                        >
+                            <div>
+                                <Toggle
+                                    label="Lock Y-Axis"
+                                    isToggled={false}
+                                    onToggle={() => {}}
+                                />
+                            </div>
+                            <div
+                                className="range-buttons"
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(10)}
+                                >
+                                    10ms
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(100)}
+                                >
+                                    100ms
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(1000)}
+                                >
+                                    1s
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(3000)}
+                                >
+                                    3s
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(10000)}
+                                >
+                                    10s
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(60000)}
+                                >
+                                    1min
+                                </Button>
+                            </div>
+                            <div>
+                                <Toggle
+                                    label="Live"
+                                    isToggled={isLive}
+                                    onToggle={value => setLive(value)}
+                                />
+                            </div>
                         </div>
                         <div>
                             <Line

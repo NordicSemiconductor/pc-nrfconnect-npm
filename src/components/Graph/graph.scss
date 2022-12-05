@@ -3,3 +3,10 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
+
+ .range-buttons {
+    & button {
+        min-width: 70px;
+        margin: 0 2px
+    }
+ }
