@@ -212,7 +212,6 @@ const BuckCard: FC<buckProps> = ({
                         max: 3.3,
                         decimals: 1,
                     }}
-                    ticks
                 />
             </div>
             <Toggle
