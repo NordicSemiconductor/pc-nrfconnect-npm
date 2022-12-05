@@ -163,16 +163,19 @@ export default ({ active }: PaneProps) => {
             chart.data.datasets[0].data = [...datasetVbat.data];
             chart.data.datasets[1].data = [...datasetTbat.data];
             chart.data.datasets[2].data = [...datasetIbat.data];
-            chart?.update('none');
+
+            if (active) {
+                chart?.update('none');
+            }
         }
-    }, [chart, datasetIbat.data, datasetTbat.data, datasetVbat.data]);
+    }, [chart, datasetIbat.data, datasetTbat.data, datasetVbat.data, active]);
 
     useEffect(() => {
-        if (chartOptions) {
+        if (chartOptions && active) {
             chartOptions.live = isLive;
             chart?.update('none');
         }
-    }, [chart, chartOptions, isLive]);
+    }, [chart, chartOptions, isLive, active]);
 
     useEffect(() => {
         if (chartOptions) {
@@ -180,33 +183,34 @@ export default ({ active }: PaneProps) => {
         }
     }, [chartOptions, chartOptions?.live]);
 
+    useEffect(() => {
+        if (active && chart) {
+            chart?.update('none');
+        }
+    }, [chart, active]);
+
     return (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
-        <>
-            {active && (
-                <div className="graph-container">
-                    <div className="graph">
-                        <div className="graph-cards">
-                            <Card title="Discharge Graph">
-                                <div style={{ float: 'right' }}>
-                                    <Toggle
-                                        label="Live"
-                                        isToggled={isLive}
-                                        onToggle={value => setLive(value)}
-                                    />
-                                </div>
-                                <div>
-                                    <Line
-                                        options={options}
-                                        data={chartData}
-                                        ref={ref}
-                                    />
-                                </div>
-                            </Card>
+        <div className="graph-container">
+            <div className="graph">
+                <div className="graph-cards">
+                    <Card title="Discharge Graph">
+                        <div style={{ float: 'right' }}>
+                            <Toggle
+                                label="Live"
+                                isToggled={isLive}
+                                onToggle={value => setLive(value)}
+                            />
                         </div>
-                    </div>
+                        <div>
+                            <Line
+                                options={options}
+                                data={chartData}
+                                ref={ref}
+                            />
+                        </div>
+                    </Card>
                 </div>
-            )}
-        </>
+            </div>
+        </div>
     );
 };
