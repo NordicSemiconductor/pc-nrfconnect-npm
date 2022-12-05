@@ -106,8 +106,6 @@ const TerminalSidePanel = () => {
 
     useEffect(() => {
         shellParserO?.onPausedChange(state => {
-            if (state) console.warn('Shell is busy');
-            else console.warn('Shell is free');
             dispatch(setIsPaused(state));
         });
     }, [dispatch, shellParserO]);
