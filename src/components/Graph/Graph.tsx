@@ -30,7 +30,7 @@ import {
     getTbatDataset,
     getVbatDataset,
 } from '../../features/graph/graphSlice';
-import zoomPanPlugin from '../../utils/chart/chart.zoomPan.ts';
+import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
 import { getState } from '../../utils/chart/state';
 
 import './graph.scss';
