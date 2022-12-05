@@ -6,7 +6,7 @@
 
 import 'chartjs-adapter-date-fns';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
@@ -15,7 +15,6 @@ import {
     Chart as ChartJS,
     ChartData,
     ChartOptions,
-    Decimation,
     Legend,
     LinearScale,
     LineElement,
@@ -24,14 +23,15 @@ import {
     Title,
     Tooltip,
 } from 'chart.js';
-import { Card, logger, PaneProps } from 'pc-nrfconnect-shared';
+import { Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
 import {
     getIbatDataset,
     getTbatDataset,
     getVbatDataset,
 } from '../../features/graph/graphSlice';
-import zoomPanPlugin from '../../utils/chart.zoomPan';
+import zoomPanPlugin from '../../utils/chart/chart.zoomPan.ts';
+import { getState } from '../../utils/chart/state';
 
 import './graph.scss';
 
@@ -44,25 +44,17 @@ ChartJS.register(
     Tooltip,
     Legend,
     TimeScale,
-    Decimation,
     zoomPanPlugin
 );
 
-export const options: ChartOptions<'line'> = {
+const options: ChartOptions<'line'> = {
     parsing: false,
     animation: false,
     responsive: true,
-    maintainAspectRatio: false,
     plugins: {
         legend: {
             position: 'top' as const,
         },
-        // decimation: {
-        //     algorithm: 'lttb',
-        //     enabled: true,
-        //     samples: 100,
-        //     threshold: 40,
-        // },
     },
     scales: {
         xAxis: {
@@ -121,7 +113,7 @@ export const options: ChartOptions<'line'> = {
     },
 };
 
-export const chartData: ChartData<'line'> = {
+const chartData: ChartData<'line'> = {
     datasets: [
         {
             label: 'Vbat',
@@ -162,24 +154,31 @@ export default ({ active }: PaneProps) => {
     const datasetVbat = useSelector(getVbatDataset);
     const datasetTbat = useSelector(getTbatDataset);
     const datasetIbat = useSelector(getIbatDataset);
+    const [isLive, setLive] = useState(true);
+
+    const chartOptions = chart ? getState(chart).options : undefined;
 
     useEffect(() => {
         if (chart) {
             chart.data.datasets[0].data = [...datasetVbat.data];
             chart.data.datasets[1].data = [...datasetTbat.data];
             chart.data.datasets[2].data = [...datasetIbat.data];
+            chart?.update('none');
         }
     }, [chart, datasetIbat.data, datasetTbat.data, datasetVbat.data]);
 
     useEffect(() => {
-        const t = setInterval(() => {
+        if (chartOptions) {
+            chartOptions.live = isLive;
             chart?.update('none');
-        }, 250);
+        }
+    }, [chart, chartOptions, isLive]);
 
-        return () => clearInterval(t);
-    }, [chart]);
-
-    logger;
+    useEffect(() => {
+        if (chartOptions) {
+            setLive(chartOptions.live);
+        }
+    }, [chartOptions, chartOptions?.live]);
 
     return (
         // eslint-disable-next-line react/jsx-no-useless-fragment
@@ -189,12 +188,20 @@ export default ({ active }: PaneProps) => {
                     <div className="graph">
                         <div className="graph-cards">
                             <Card title="Discharge Graph">
-                                <Line
-                                    height={600}
-                                    options={options}
-                                    data={chartData}
-                                    ref={ref}
-                                />
+                                <div style={{ float: 'right' }}>
+                                    <Toggle
+                                        label="Live"
+                                        isToggled={isLive}
+                                        onToggle={value => setLive(value)}
+                                    />
+                                </div>
+                                <div>
+                                    <Line
+                                        options={options}
+                                        data={chartData}
+                                        ref={ref}
+                                    />
+                                </div>
                             </Card>
                         </div>
                     </div>

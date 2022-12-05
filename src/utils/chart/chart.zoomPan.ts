@@ -14,6 +14,8 @@ import type {
     ScatterDataPoint,
 } from 'chart.js';
 
+import { getState, PanPluginOptions, removeState, XAxisRange } from './state';
+
 let shouldMutate = false;
 
 type CustomCharDataset = ChartDataset & {
@@ -22,22 +24,18 @@ type CustomCharDataset = ChartDataset & {
     _rawData?: ChartDataset['data'];
 };
 
-interface Range {
-    xMin: number;
-    xMax: number;
-}
-
 const isNullOrUndef = (data: unknown) =>
     typeof data === 'undefined' || data === null;
 
-const initRange = (datasets: ChartDataset[], options: PanPluginOptions) => {
-    if (datasets.length === 0) {
+const initRange = (chart: Chart) => {
+    const options = getState(chart).options;
+    if (chart.data.datasets.length === 0) {
         options.currentRange = { xMax: 0, xMin: 0 };
         return;
     }
 
     let hasData = true;
-    datasets.forEach((dataset: CustomCharDataset) => {
+    chart.data.datasets.forEach((dataset: CustomCharDataset) => {
         if (hasData && dataset._rawData?.length === 0) hasData = false;
     });
 
@@ -46,7 +44,7 @@ const initRange = (datasets: ChartDataset[], options: PanPluginOptions) => {
         return;
     }
 
-    options.currentRange = getRange(datasets, options);
+    options.currentRange = getRange(chart.data.datasets, options);
 };
 
 const initData = (datasets: CustomCharDataset[]) => {
@@ -134,7 +132,7 @@ const getRange = (datasets: ChartDataset[], options: PanPluginOptions) => {
 // Calulate if range is valid from when checked against the data backup
 const isRangeValid = (
     datasets: ChartDataset[],
-    rangeToCheck: Range,
+    rangeToCheck: XAxisRange,
     options: PanPluginOptions
 ) => {
     const xMax = getMaxX(datasets);
@@ -152,7 +150,7 @@ const isRangeValid = (
 };
 
 // We expact the raw data to be the in the dataset.data at this call
-const mutateData = (data: ScatterDataPoint[], range: Range) => {
+const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
     let startIndex =
         data.findIndex((element: ScatterDataPoint) => element.x > range.xMin) -
         10;
@@ -173,9 +171,9 @@ const mutateData = (data: ScatterDataPoint[], range: Range) => {
     return data.slice(startIndex, endIndex);
 };
 
-const updateRange = (
+const autoUpdateIsLive = (
     datasets: ChartDataset[],
-    range: Range,
+    range: XAxisRange,
     options: PanPluginOptions
 ) => {
     const xMax = getMaxX(datasets);
@@ -186,11 +184,20 @@ const updateRange = (
     options.live = xMax <= range.xMax;
     if (options.live) {
         range = getRange(datasets, options);
-    } else {
-        const { valid } = isRangeValid(datasets, range, options);
-        if (!valid) {
-            range = getRange(datasets, options);
-        }
+    }
+};
+
+const updateRange = (
+    datasets: ChartDataset[],
+    range: XAxisRange,
+    options: PanPluginOptions
+) => {
+    range.xMax = Math.round(range.xMax);
+    range.xMin = Math.round(range.xMin);
+
+    const { valid } = isRangeValid(datasets, range, options);
+    if (!valid) {
+        range = getRange(datasets, options);
     }
 
     if (
@@ -219,29 +226,24 @@ const isInChartArea = (chart: Chart, x: number, y: number) => {
     return x >= ca.left && x <= ca.right && y >= ca.top && y <= ca.bottom;
 };
 
-export interface PanPluginOptions {
-    live: boolean;
-    enabled: boolean;
-    resolution: number;
-    minResolution: number;
-    zoomFactor: number;
-    currentRange: Range;
-}
-
 export default {
     id: 'pan',
     defaults: {
         live: true,
-        enabled: true,
         resolution: 20000,
         minResolution: 1000,
         zoomFactor: 1.1,
         currentRange: { xMin: 0, xMax: 20000 },
     },
-    afterInit(chart, _args, options) {
+    start(chart, _args, options) {
+        const state = getState(chart);
+        state.options = options;
+    },
+    afterInit(chart) {
         initData(chart.data.datasets);
-        initRange(chart.data.datasets, options);
+        initRange(chart);
 
+        const options = getState(chart).options;
         const { canvas } = chart.ctx;
 
         let lastX = 0;
@@ -288,10 +290,13 @@ export default {
             };
 
             updateRange(chart.data.datasets, nextRange, options);
+            autoUpdateIsLive(chart.data.datasets, nextRange, options);
+
             (chart.scales.xAxis.options as CartesianScaleOptions).min =
                 options.currentRange.xMin;
             (chart.scales.xAxis.options as CartesianScaleOptions).max =
                 options.currentRange.xMax;
+
             chart.update('none');
         });
 
@@ -332,25 +337,25 @@ export default {
             };
 
             updateRange(chart.data.datasets, nextRange, options);
+            autoUpdateIsLive(chart.data.datasets, nextRange, options);
+
             (chart.scales.xAxis.options as CartesianScaleOptions).min =
                 options.currentRange.xMin;
             (chart.scales.xAxis.options as CartesianScaleOptions).max =
                 options.currentRange.xMax;
+
             chart.update('none');
         });
     },
-    beforeElementsUpdate(chart, _args, options) {
+    beforeElementsUpdate(chart) {
+        const options = getState(chart).options;
         let nextRange = { ...options.currentRange };
+
         if (options.live) {
             nextRange = getRange(chart.data.datasets, options);
         }
 
         updateRange(chart.data.datasets, nextRange, options);
-
-        if (!options.enabled) {
-            cleanBackedDatasets(chart.data.datasets);
-            return;
-        }
 
         (chart.scales.xAxis.options as CartesianScaleOptions).min =
             options.currentRange.xMin;
@@ -374,5 +379,8 @@ export default {
     },
     beforeDestroy(chart) {
         cleanBackedDatasets(chart.data.datasets);
+    },
+    stop(chart) {
+        removeState(chart);
     },
 } as Plugin<'scatter', PanPluginOptions>;
