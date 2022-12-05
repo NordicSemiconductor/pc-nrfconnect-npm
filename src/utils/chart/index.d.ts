@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChartType, Plugin } from 'chart.js';
 
 declare module 'chart.js' {
