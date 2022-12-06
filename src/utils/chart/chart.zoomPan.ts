@@ -124,9 +124,7 @@ const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
 
     startIndex = Math.max(startIndex, 0);
     endIndex =
-        endIndex === -1
-            ? data.length - 1
-            : Math.min(endIndex + 10, data.length - 1);
+        endIndex === -1 ? data.length : Math.min(endIndex + 10, data.length);
 
     return data.slice(startIndex, endIndex);
 };
