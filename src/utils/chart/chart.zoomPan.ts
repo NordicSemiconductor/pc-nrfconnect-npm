@@ -222,6 +222,10 @@ export default {
 
             chart.update('none');
         };
+        state.actions.clearData = () => {
+            state.data.forEach(d => d.splice(0));
+            chart.update('none');
+        };
         state.actions.addData = (data: ScatterDataPoint[][]) => {
             data.splice(state.data.length);
             state.data.forEach((d, index) => d.push(...data[index]));

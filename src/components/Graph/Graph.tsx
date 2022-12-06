@@ -155,6 +155,8 @@ export default ({ active }: PaneProps) => {
 
         const chartStates = chart ? getState(chart) : undefined;
 
+        chartStates?.actions.clearData();
+
         const relaseShellLoggingEvent = shellParser.onShellLoggingEvent(
             data => {
                 const splitData = data.split(' <inf> main:');

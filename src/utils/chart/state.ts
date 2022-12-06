@@ -22,6 +22,7 @@ export interface PanPluginOptions {
 export interface ChartActions {
     zoom: (resolution: number, centerOffset: number) => void;
     addData: (data: ScatterDataPoint[][]) => void;
+    clearData: () => void;
     onLiveChange?: (live: boolean) => void;
 }
 
@@ -44,7 +45,7 @@ export const getState = (chart: Chart) => {
                 zoomFactor: 1.1,
                 currentRange: { xMin: 0, xMax: 20000 },
             },
-            actions: { zoom: () => {}, addData: () => {} },
+            actions: { zoom: () => {}, addData: () => {}, clearData: () => {} },
             data: [],
         };
         chartStates.set(chart, state);
