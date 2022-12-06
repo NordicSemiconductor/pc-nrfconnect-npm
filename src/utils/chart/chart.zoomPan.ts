@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-/* eslint-disable no-underscore-dangle */
-
 import type {
     CartesianScaleOptions,
     Chart,
@@ -16,27 +14,17 @@ import type {
 
 import { getState, PanPluginOptions, removeState, XAxisRange } from './state';
 
-let shouldMutate = false;
-
-type CustomCharDataset = ChartDataset & {
-    _simplified?: ChartDataset['data'];
-} & {
-    _rawData?: ChartDataset['data'];
-};
-
-const isNullOrUndef = (data: unknown) =>
-    typeof data === 'undefined' || data === null;
-
 const initRange = (chart: Chart) => {
     const options = getState(chart).options;
-    if (chart.data.datasets.length === 0) {
+    const chartState = getState(chart);
+    if (chartState.data.length === 0) {
         options.currentRange = { xMax: 0, xMin: 0 };
         return;
     }
 
     let hasData = true;
-    chart.data.datasets.forEach((dataset: CustomCharDataset) => {
-        if (hasData && dataset._rawData?.length === 0) hasData = false;
+    chartState.data.forEach((data: ScatterDataPoint[]) => {
+        if (hasData && data.length === 0) hasData = false;
     });
 
     if (!hasData) {
@@ -44,42 +32,17 @@ const initRange = (chart: Chart) => {
         return;
     }
 
-    options.currentRange = getRange(chart.data.datasets, options);
-};
-
-const initData = (datasets: CustomCharDataset[]) => {
-    datasets.forEach((dataset: Partial<CustomCharDataset>) => {
-        const { _rawData } = dataset;
-        const data = _rawData || dataset.data;
-
-        if (isNullOrUndef(_rawData)) {
-            // First time we are seeing this dataset
-            // We override the 'data' property with a setter that stores the
-            // raw data in _rawData, but reads the decimated data from _simplified
-            dataset._rawData = data;
-            delete dataset.data;
-            Object.defineProperty(dataset, 'data', {
-                configurable: true,
-                enumerable: true,
-                get() {
-                    return this._simplified;
-                },
-                set(d) {
-                    this._rawData = d;
-                },
-            });
-        }
-    });
+    options.currentRange = getRange(chartState.data, options);
 };
 
 const getX = (
-    datasets: ChartDataset[],
-    getValue: (dataset: ChartDataset) => number
+    data: ScatterDataPoint[][],
+    getValue: (d: ScatterDataPoint[]) => number
 ) => {
     const selection: number[] = [];
 
-    datasets.forEach((dataset: ChartDataset) => {
-        selection.push(getValue(dataset));
+    data.forEach((d: ScatterDataPoint[]) => {
+        selection.push(getValue(d));
     });
 
     selection.sort((a, b) => a - b);
@@ -88,37 +51,35 @@ const getX = (
 };
 
 // Calulate Min from Data Backup
-const getMinX = (datasets: CustomCharDataset[]) =>
-    getX(datasets, (dataset: CustomCharDataset) => {
-        if (dataset._rawData && dataset._rawData.length >= 0) {
-            const data = dataset._rawData[0];
-            if (data) {
-                return (data as ScatterDataPoint).x;
-            }
+const getMinX = (data: ScatterDataPoint[][]) =>
+    getX(data, (d: ScatterDataPoint[]) => {
+        if (d.length > 0) {
+            return (d[0] as ScatterDataPoint).x;
         }
 
         return 0;
     });
 
 // Calulate Max from Data Backup
-const getMaxX = (datasets: CustomCharDataset[]) =>
-    getX(datasets, (dataset: CustomCharDataset) => {
-        if (dataset._rawData && dataset._rawData.length >= 0) {
-            const data = dataset._rawData[dataset._rawData.length - 1];
-            if (data) {
-                return (data as ScatterDataPoint).x;
-            }
+const getMaxX = (data: ScatterDataPoint[][]) =>
+    getX(data, (d: ScatterDataPoint[]) => {
+        if (d.length > 0) {
+            return (d[d.length - 1] as ScatterDataPoint).x;
         }
 
         return 0;
     });
 
 // Calulate Range from Data Backup
-const getRange = (datasets: ChartDataset[], options: PanPluginOptions) => {
-    const max = getMaxX(datasets);
-    const min = getMinX(datasets);
+const getRange = (
+    data: ScatterDataPoint[][],
+    options: PanPluginOptions,
+    live = options.live
+) => {
+    const max = getMaxX(data);
+    const min = getMinX(data);
 
-    if (options.live) {
+    if (live) {
         const xMax = max;
         const xMin = Math.max(min, max - options.resolution);
         return { xMin, xMax };
@@ -131,12 +92,12 @@ const getRange = (datasets: ChartDataset[], options: PanPluginOptions) => {
 
 // Calulate if range is valid from when checked against the data backup
 const isRangeValid = (
-    datasets: ChartDataset[],
+    data: ScatterDataPoint[][],
     rangeToCheck: XAxisRange,
     options: PanPluginOptions
 ) => {
-    const xMax = getMaxX(datasets);
-    const xMin = getMinX(datasets);
+    const xMax = getMaxX(data);
+    const xMin = getMinX(data);
 
     const startValid = rangeToCheck.xMin >= xMin;
     const endValid = rangeToCheck.xMax <= xMax;
@@ -167,31 +128,47 @@ const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
             ? data.length - 1
             : Math.min(endIndex + 10, data.length - 1);
 
-    shouldMutate = false;
     return data.slice(startIndex, endIndex);
 };
 
 const autoUpdateIsLive = (
-    datasets: ChartDataset[],
+    data: ScatterDataPoint[][],
     range: XAxisRange,
-    options: PanPluginOptions
+    options: PanPluginOptions,
+    onLiveChange?: (live: boolean) => void
 ) => {
-    const xMax = getMaxX(datasets);
+    const xMax = getMaxX(data);
+
+    const old = options.live;
 
     options.live = xMax <= range.xMax;
+
+    if (old !== options.live && onLiveChange) {
+        onLiveChange(options.live);
+    }
+
     if (options.live) {
-        range = getRange(datasets, options);
+        range = getRange(data, options);
     }
 };
 
 const updateRange = (
-    datasets: ChartDataset[],
+    chart: Chart,
     range: XAxisRange,
     options: PanPluginOptions
 ) => {
-    const { valid } = isRangeValid(datasets, range, options);
+    const chartState = getState(chart);
+
+    autoUpdateIsLive(
+        chartState.data,
+        range,
+        options,
+        chartState.actions.onLiveChange
+    );
+
+    const { valid } = isRangeValid(chartState.data, range, options);
     if (!valid) {
-        range = getRange(datasets, options);
+        range = getRange(chartState.data, options);
     }
 
     if (
@@ -200,20 +177,14 @@ const updateRange = (
     )
         return false;
 
-    shouldMutate = true;
     options.currentRange = { ...range };
-    return true;
-};
 
-const cleanBackedDatasets = (datasets: CustomCharDataset[]) => {
-    datasets.forEach(dataset => {
-        if (dataset._simplified) {
-            const data = dataset._rawData;
-            delete dataset._simplified;
-            delete dataset._rawData;
-            Object.defineProperty(dataset, 'data', { value: data });
-        }
-    });
+    (chart.scales.xAxis.options as CartesianScaleOptions).min =
+        chartState.options.currentRange.xMin;
+    (chart.scales.xAxis.options as CartesianScaleOptions).max =
+        chartState.options.currentRange.xMax;
+
+    return true;
 };
 
 const isInChartArea = (chart: Chart, x: number, y: number) => {
@@ -245,23 +216,24 @@ export default {
                 xMax: options.currentRange.xMax + deltaMax,
             };
 
-            if (!updateRange(chart.data.datasets, nextRange, options)) {
-                autoUpdateIsLive(chart.data.datasets, nextRange, options);
+            if (!updateRange(chart, nextRange, options)) {
                 return;
             }
 
-            autoUpdateIsLive(chart.data.datasets, nextRange, options);
-
-            (chart.scales.xAxis.options as CartesianScaleOptions).min =
-                options.currentRange.xMin;
-            (chart.scales.xAxis.options as CartesianScaleOptions).max =
-                options.currentRange.xMax;
-
             chart.update('none');
         };
+        state.actions.addData = (data: ScatterDataPoint[][]) => {
+            data.splice(state.data.length);
+            state.data.forEach((d, index) => d.push(...data[index]));
+            chart.update('none');
+        };
+
+        state.data = [];
+        chart.data.datasets.forEach((dataset: ChartDataset) => {
+            state.data.push([...(dataset.data as ScatterDataPoint[])]);
+        });
     },
     afterInit(chart) {
-        initData(chart.data.datasets);
         initRange(chart);
 
         const actions = getState(chart).actions;
@@ -304,33 +276,25 @@ export default {
             const scaleDiffPercent = scaleDiff / chart.chartArea.width;
             const delta = options.resolution * scaleDiffPercent;
 
-            const nextRange = {
+            let nextRange = {
                 xMax: options.currentRange.xMax + delta,
                 xMin: options.currentRange.xMax - options.resolution + delta,
             };
 
-            const { valid } = isRangeValid(
-                chart.data.datasets,
-                nextRange,
-                options
-            );
+            const data = getState(chart).data;
 
-            if (
-                !valid ||
-                !updateRange(chart.data.datasets, nextRange, options)
-            ) {
-                autoUpdateIsLive(chart.data.datasets, nextRange, options);
+            const { valid, end } = isRangeValid(data, nextRange, options);
+
+            if (!valid) {
+                nextRange = getRange(data, options, !end);
+                lastX = newX;
+            }
+
+            if (!updateRange(chart, nextRange, options)) {
                 return;
             }
 
             lastX = newX;
-
-            autoUpdateIsLive(chart.data.datasets, nextRange, options);
-
-            (chart.scales.xAxis.options as CartesianScaleOptions).min =
-                options.currentRange.xMin;
-            (chart.scales.xAxis.options as CartesianScaleOptions).max =
-                options.currentRange.xMax;
 
             chart.update('none');
         });
@@ -344,8 +308,10 @@ export default {
                     ? options.resolution / options.zoomFactor // Zoom In
                     : options.resolution * options.zoomFactor; // Zoom out
 
-            const xMax = getMaxX(chart.data.datasets);
-            const xMin = getMinX(chart.data.datasets);
+            const data = getState(chart).data;
+
+            const xMax = getMaxX(data);
+            const xMin = getMinX(data);
 
             const fullResolution = xMax - xMin;
 
@@ -363,38 +329,24 @@ export default {
             actions.zoom(newResolution, offset);
         });
     },
-    beforeUpdate(chart) {
-        const options = getState(chart).options;
-        let nextRange = { ...options.currentRange };
+    beforeElementsUpdate(chart) {
+        const chartState = getState(chart);
 
-        if (options.live) {
-            nextRange = getRange(chart.data.datasets, options);
+        let nextRange = { ...chartState.options.currentRange };
+
+        if (chartState.options.live) {
+            nextRange = getRange(chartState.data, chartState.options);
         }
 
-        updateRange(chart.data.datasets, nextRange, options);
+        updateRange(chart, nextRange, chartState.options);
 
-        (chart.scales.xAxis.options as CartesianScaleOptions).min =
-            options.currentRange.xMin;
-        (chart.scales.xAxis.options as CartesianScaleOptions).max =
-            options.currentRange.xMax;
-
-        if (!shouldMutate) {
-            return;
-        }
-
-        chart.data.datasets.forEach((dataset: CustomCharDataset) => {
-            const { _rawData } = dataset;
-            const data = _rawData || dataset.data;
-
+        chartState.data.forEach((data: ScatterDataPoint[], index: number) => {
             // Point the chart to the decimated data
-            dataset._simplified = mutateData(
-                data as ScatterDataPoint[],
-                options.currentRange
+            chart.data.datasets[index].data = mutateData(
+                data,
+                chartState.options.currentRange
             );
         });
-    },
-    beforeDestroy(chart) {
-        cleanBackedDatasets(chart.data.datasets);
     },
     stop(chart) {
         removeState(chart);

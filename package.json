@@ -35,7 +35,7 @@
     },
     "devDependencies": {
         "ansi-escapes": "^4.3.2",
-        "chart.js": "^3.9.1",
+        "chart.js": "^4.0.1",
         "chartjs-adapter-date-fns": "^2.0.1",
         "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#v6.12.1",
         "react-chartjs-2": "4.3.1",

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Chart } from 'chart.js';
+import { Chart, ScatterDataPoint } from 'chart.js';
 
 export interface XAxisRange {
     xMin: number;
@@ -21,11 +21,14 @@ export interface PanPluginOptions {
 
 export interface ChartActions {
     zoom: (resolution: number, centerOffset: number) => void;
+    addData: (data: ScatterDataPoint[][]) => void;
+    onLiveChange?: (live: boolean) => void;
 }
 
 interface ChartState {
     options: PanPluginOptions;
     actions: ChartActions;
+    data: ScatterDataPoint[][];
 }
 
 const chartStates = new WeakMap<Chart, ChartState>();
@@ -41,7 +44,8 @@ export const getState = (chart: Chart) => {
                 zoomFactor: 1.1,
                 currentRange: { xMin: 0, xMax: 20000 },
             },
-            actions: { zoom: () => {} },
+            actions: { zoom: () => {}, addData: () => {} },
+            data: [],
         };
         chartStates.set(chart, state);
     }

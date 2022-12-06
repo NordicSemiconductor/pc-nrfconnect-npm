@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SidePanel } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
-import { addData } from '../features/graph/graphSlice';
 import {
     getModem,
     getShellParser,
@@ -49,54 +48,12 @@ const TerminalSidePanel = () => {
                 }
             );
 
-            const relaseShellLoggingEvent = shellParser.onShellLoggingEvent(
-                data => {
-                    const splitData = data.split(' <inf> main:');
-
-                    const variables = splitData[1].trim().split(',');
-                    const time = splitData[0]
-                        .trim()
-                        .replace('[', '')
-                        .replace(']', '')
-                        .split(',')[0]
-                        .replace('.', ':')
-                        .split(':');
-
-                    const v = Number(variables[0].split('=')[1]);
-                    const i = Number(variables[1].split('=')[1]);
-
-                    const timestamp =
-                        Number(time[3]) +
-                        Number(time[2]) * 1000 +
-                        Number(time[1]) * 1000 * 60 +
-                        Number(time[0]) * 1000 * 60 * 60;
-
-                    dispatch(
-                        addData({
-                            iBat: {
-                                timestamp,
-                                value: i,
-                            },
-                            tBat: {
-                                timestamp,
-                                value: 50,
-                            },
-                            vBat: {
-                                timestamp,
-                                value: v,
-                            },
-                        })
-                    );
-                }
-            );
-
             const relaseOnUnknowCommand = shellParser.onUnknowCommand(data => {
                 console.warn(`Unkown Command:\r\n${data}`);
             });
 
             dispatch(setShellParser(shellParser));
             return () => {
-                relaseShellLoggingEvent();
                 relaseOnUnknowCommand();
                 shellParser.unregister();
             };

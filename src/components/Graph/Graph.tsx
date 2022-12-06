@@ -25,11 +25,7 @@ import {
 } from 'chart.js';
 import { Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
-import {
-    getIbatDataset,
-    getTbatDataset,
-    getVbatDataset,
-} from '../../features/graph/graphSlice';
+import { getShellParser } from '../../features/modem/modemSlice';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
 import { getState } from '../../utils/chart/state';
 
@@ -151,39 +147,66 @@ const chartData: ChartData<'line'> = {
 export default ({ active }: PaneProps) => {
     const ref = useRef<ChartJSOrUndefined<'line'>>();
     const chart = ref.current;
-    const datasetVbat = useSelector(getVbatDataset);
-    const datasetTbat = useSelector(getTbatDataset);
-    const datasetIbat = useSelector(getIbatDataset);
+    const shellParser = useSelector(getShellParser);
     const [isLive, setLive] = useState(true);
 
-    const chartStates = chart ? getState(chart) : undefined;
-    const chartActons = chartStates?.actions;
-    const chartOptions = chartStates?.options;
-
     useEffect(() => {
-        if (chart) {
-            chart.data.datasets[0].data = [...datasetVbat.data];
-            chart.data.datasets[1].data = [...datasetTbat.data];
-            chart.data.datasets[2].data = [...datasetIbat.data];
+        if (!shellParser) return () => {};
 
-            if (active) {
-                chart?.update('none');
+        const chartStates = chart ? getState(chart) : undefined;
+
+        const relaseShellLoggingEvent = shellParser.onShellLoggingEvent(
+            data => {
+                const splitData = data.split(' <inf> main:');
+
+                const variables = splitData[1].trim().split(',');
+                const time = splitData[0]
+                    .trim()
+                    .replace('[', '')
+                    .replace(']', '')
+                    .split(',')[0]
+                    .replace('.', ':')
+                    .split(':');
+
+                const v = Number(variables[0].split('=')[1]);
+                const i = Number(variables[1].split('=')[1]);
+
+                const timestamp =
+                    Number(time[3]) +
+                    Number(time[2]) * 1000 +
+                    Number(time[1]) * 1000 * 60 +
+                    Number(time[0]) * 1000 * 60 * 60;
+
+                if (chart && chartStates) {
+                    chartStates.actions.addData([
+                        [{ x: timestamp, y: v }],
+                        [{ x: timestamp, y: 50 }],
+                        [{ x: timestamp, y: i }],
+                    ]);
+                }
             }
-        }
-    }, [chart, datasetIbat.data, datasetTbat.data, datasetVbat.data, active]);
+        );
+
+        return relaseShellLoggingEvent;
+    }, [chart, active, shellParser]);
 
     useEffect(() => {
+        const chartStates = chart ? getState(chart) : undefined;
+        const chartOptions = chartStates?.options;
+
         if (chartOptions && active) {
             chartOptions.live = isLive;
             chart?.update('none');
         }
-    }, [chart, chartOptions, isLive, active]);
+    }, [chart, isLive, active]);
 
     useEffect(() => {
-        if (chartOptions) {
-            setLive(chartOptions.live);
+        const chartStates = chart ? getState(chart) : undefined;
+
+        if (chart && chartStates) {
+            chartStates.actions.onLiveChange = setLive;
         }
-    }, [chartOptions, chartOptions?.live]);
+    }, [chart]);
 
     useEffect(() => {
         if (active && chart) {
@@ -192,8 +215,13 @@ export default ({ active }: PaneProps) => {
     }, [chart, active]);
 
     const zoom = (resolution: number) => {
-        if (chartActons?.zoom)
+        const chartStates = chart ? getState(chart) : undefined;
+        const chartActons = chartStates?.actions;
+
+        if (chartActons?.zoom) {
+            const chartOptions = chartStates?.options;
             chartActons?.zoom(resolution, chartOptions?.live ? 1 : 0.5);
+        }
     };
 
     return (
