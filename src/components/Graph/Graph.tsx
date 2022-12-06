@@ -15,7 +15,6 @@ import {
     Chart as ChartJS,
     ChartData,
     ChartOptions,
-    Legend,
     LinearScale,
     LineElement,
     PointElement,
@@ -28,6 +27,7 @@ import { Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 import { getShellParser } from '../../features/modem/modemSlice';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
 import { getState } from '../../utils/chart/state';
+import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 
 import './graph.scss';
 
@@ -38,7 +38,6 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend,
     TimeScale,
     zoomPanPlugin
 );
@@ -55,19 +54,15 @@ const options: ChartOptions<'line'> = {
     scales: {
         xAxis: {
             type: 'time',
-            time: {
-                unit: 'second',
-                displayFormats: {
-                    millisecond: 'HH:mm:ss',
-                    second: 'HH:mm:ss',
-                    minute: 'HH:mm',
-                    hour: 'HH:mm',
-                    day: 'HH:ss',
-                },
-            },
+            display: true,
             ticks: {
-                source: 'auto',
-                autoSkip: true,
+                autoSkip: false,
+                maxTicksLimit: 5,
+                display: false,
+            },
+            grid: {
+                display: true,
+                drawOnChartArea: true,
             },
         },
         yVbat: {
@@ -78,6 +73,10 @@ const options: ChartOptions<'line'> = {
                 callback(value) {
                     return `${Number(value).toFixed(2)} V`;
                 },
+                maxTicksLimit: 5,
+            },
+            grid: {
+                drawOnChartArea: true,
             },
             suggestedMin: 3,
             suggestedMax: 5,
@@ -90,6 +89,10 @@ const options: ChartOptions<'line'> = {
                 callback(value) {
                     return `${Number(value).toFixed(2)} mA`;
                 },
+                maxTicksLimit: 5,
+            },
+            grid: {
+                drawOnChartArea: true,
             },
             suggestedMin: 0,
             suggestedMax: 1,
@@ -149,6 +152,7 @@ export default ({ active }: PaneProps) => {
     const chart = ref.current;
     const shellParser = useSelector(getShellParser);
     const [isLive, setLive] = useState(true);
+    const [range, setRange] = useState({ xMin: 0, xMax: 0 });
 
     useEffect(() => {
         if (!shellParser) return () => {};
@@ -207,6 +211,7 @@ export default ({ active }: PaneProps) => {
 
         if (chart && chartStates) {
             chartStates.actions.onLiveChange = setLive;
+            chartStates.actions.onRangeChanged = setRange;
         }
     }, [chart]);
 
@@ -302,6 +307,7 @@ export default ({ active }: PaneProps) => {
                                 data={chartData}
                                 ref={ref}
                             />
+                            <TimeSpanDeltaLine range={range} />
                         </div>
                     </Card>
                 </div>

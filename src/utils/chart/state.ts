@@ -24,6 +24,7 @@ export interface ChartActions {
     addData: (data: ScatterDataPoint[][]) => void;
     clearData: () => void;
     onLiveChange?: (live: boolean) => void;
+    onRangeChanged?: (range: XAxisRange) => void;
 }
 
 interface ChartState {

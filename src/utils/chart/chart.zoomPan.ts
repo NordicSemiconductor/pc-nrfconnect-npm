@@ -175,6 +175,9 @@ const updateRange = (
     )
         return false;
 
+    if (chartState.actions.onRangeChanged) {
+        chartState.actions.onRangeChanged(range);
+    }
     options.currentRange = { ...range };
 
     (chart.scales.xAxis.options as CartesianScaleOptions).min =
