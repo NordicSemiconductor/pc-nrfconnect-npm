@@ -164,11 +164,13 @@ export default ({ active }: PaneProps) => {
     };
 
     useEffect(() => {
-        const chartStates = chart ? getState(chart) : undefined;
-        chartStates?.actions.clearData();
-        setHoursOverflowCounter(0);
-        setLastHour(0);
-        setInitUptime(null);
+        if (shellParser) {
+            const chartStates = chart ? getState(chart) : undefined;
+            chartStates?.actions.clearData();
+            setHoursOverflowCounter(0);
+            setLastHour(0);
+            setInitUptime(null);
+        }
     }, [chart, shellParser]);
 
     useEffect(() => {
