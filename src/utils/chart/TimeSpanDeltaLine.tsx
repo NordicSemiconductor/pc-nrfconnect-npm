@@ -32,9 +32,13 @@ const TimeSpanDeltaLine: FC<TimeSpanLineProps> = ({ range, chartArea }) => {
             }}
         >
             <div className="content">
-                <div className="start">{formatDuration(range.xMin * 1000)}</div>
+                <div className="start">
+                    {formatDuration(Math.round(range.xMin) * 1000)}
+                </div>
                 <div className="delta">{label}</div>
-                <div className="end">{formatDuration(range.xMax * 1000)}</div>
+                <div className="end">
+                    {formatDuration(Math.round(range.xMax) * 1000)}
+                </div>
             </div>
         </div>
     );
