@@ -49,6 +49,8 @@ export default ({ active }: PaneProps) => {
     const shellParser = useSelector(getShellParser);
     const [isLive, setLive] = useState(true);
     const [range, setRange] = useState({ xMin: 0, xMax: 0 });
+    const [hoursOverflowCounter, setHoursOverflowCounter] = useState(0);
+    const [lastHour, setLastHour] = useState(0);
 
     const [chartArea, setChartCanvas] = useState(chart?.chartArea);
 
@@ -183,11 +185,26 @@ export default ({ active }: PaneProps) => {
                 const v = Number(variables[0].split('=')[1]);
                 const i = Number(variables[1].split('=')[1]);
 
-                const timestamp =
-                    Number(time[3]) +
-                    Number(time[2]) * 1000 +
-                    Number(time[1]) * 1000 * 60 +
-                    Number(time[0]) * 1000 * 60 * 60;
+                const msec = Number(time[3]);
+                const sec = Number(time[2]) * 1000;
+                const min = Number(time[1]) * 1000 * 60;
+                let hr =
+                    (Number(time[0]) + hoursOverflowCounter * 99) *
+                    1000 *
+                    60 *
+                    60;
+
+                // We have wrapped 99 hours incriment counter
+                if (hr < lastHour) {
+                    setHoursOverflowCounter(hoursOverflowCounter + 1);
+                    hr += 99;
+                }
+
+                if (hr !== lastHour) {
+                    setLastHour(hr);
+                }
+
+                const timestamp = msec + sec + min + hr;
 
                 if (chart && chartStates) {
                     chartStates.actions.addData([
@@ -200,7 +217,7 @@ export default ({ active }: PaneProps) => {
         );
 
         return relaseShellLoggingEvent;
-    }, [chart, active, shellParser]);
+    }, [chart, active, shellParser, hoursOverflowCounter, lastHour]);
 
     useEffect(() => {
         const chartStates = chart ? getState(chart) : undefined;
