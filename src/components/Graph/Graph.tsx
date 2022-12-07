@@ -31,6 +31,7 @@ import { getState } from '../../utils/chart/state';
 import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 
 import './graph.scss';
+import styles from './Graph.module.scss';
 
 ChartJS.register(
     CategoryScale,
@@ -50,6 +51,53 @@ const options: ChartOptions<'line'> = {
     plugins: {
         legend: {
             position: 'top' as const,
+        },
+        tooltip: {
+            callbacks: {
+                title: context => {
+                    let label = 'Uptime: ';
+
+                    if (context[0]?.parsed.x !== null) {
+                        let uptimeMiliseconds = context[0].parsed.x;
+
+                        const ms = uptimeMiliseconds % 1000;
+
+                        uptimeMiliseconds = Math.max(
+                            (uptimeMiliseconds - ms) / 1000,
+                            0
+                        );
+                        const secs = uptimeMiliseconds % 60;
+
+                        uptimeMiliseconds = Math.max(
+                            (uptimeMiliseconds - secs) / 60,
+                            0
+                        );
+                        const mins = uptimeMiliseconds % 60;
+
+                        uptimeMiliseconds = Math.max(
+                            (uptimeMiliseconds - mins) / 60,
+                            0
+                        );
+                        const hrs = uptimeMiliseconds % 60;
+
+                        uptimeMiliseconds = Math.max(
+                            (uptimeMiliseconds - hrs) / 60,
+                            0
+                        );
+                        const days = uptimeMiliseconds % 24;
+
+                        label += days !== 0 ? `${days} days ` : '';
+                        label += `${hrs.toString().padStart(2, '0')}:${mins
+                            .toString()
+                            .padStart(2, '0')}:${secs
+                            .toString()
+                            .padStart(2, '0')}.${ms
+                            .toString()
+                            .padStart(3, '0')} `;
+                    }
+                    return label;
+                },
+            },
         },
     },
     scales: {
@@ -118,8 +166,8 @@ const chartData: ChartData<'line'> = {
         {
             label: 'Vbat',
             data: [],
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: styles.indigo,
+            backgroundColor: styles.indigo,
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
@@ -128,8 +176,8 @@ const chartData: ChartData<'line'> = {
         {
             label: 'Tbat',
             data: [],
-            borderColor: 'rgb(54, 162, 235)',
-            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: styles.red,
+            backgroundColor: styles.red,
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
@@ -138,8 +186,8 @@ const chartData: ChartData<'line'> = {
         {
             label: 'Ibat',
             data: [],
-            borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            borderColor: styles.amber,
+            backgroundColor: styles.amber,
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
