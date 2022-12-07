@@ -51,6 +51,7 @@ export default ({ active }: PaneProps) => {
     const [range, setRange] = useState({ xMin: 0, xMax: 0 });
     const [hoursOverflowCounter, setHoursOverflowCounter] = useState(0);
     const [lastHour, setLastHour] = useState(0);
+    const [initUptime, setInitUptime] = useState<number | null>(null);
 
     const [chartArea, setChartCanvas] = useState(chart?.chartArea);
 
@@ -163,14 +164,18 @@ export default ({ active }: PaneProps) => {
     };
 
     useEffect(() => {
-        if (!shellParser) return () => {};
-
         const chartStates = chart ? getState(chart) : undefined;
-
         chartStates?.actions.clearData();
+        setHoursOverflowCounter(0);
+        setLastHour(0);
+        setInitUptime(null);
+    }, [chart, shellParser]);
 
+    useEffect(() => {
+        if (!shellParser) return () => {};
         const relaseShellLoggingEvent = shellParser.onShellLoggingEvent(
             data => {
+                const chartStates = chart ? getState(chart) : undefined;
                 const splitData = data.split(' <inf> main:');
 
                 const variables = splitData[1].trim().split(',');
@@ -204,7 +209,14 @@ export default ({ active }: PaneProps) => {
                     setLastHour(hr);
                 }
 
-                const timestamp = msec + sec + min + hr;
+                let timestamp = msec + sec + min + hr;
+
+                if (initUptime === null) {
+                    setInitUptime(timestamp);
+                    timestamp = 0;
+                } else {
+                    timestamp -= initUptime;
+                }
 
                 if (chart && chartStates) {
                     chartStates.actions.addData([
@@ -217,7 +229,14 @@ export default ({ active }: PaneProps) => {
         );
 
         return relaseShellLoggingEvent;
-    }, [chart, active, shellParser, hoursOverflowCounter, lastHour]);
+    }, [
+        chart,
+        active,
+        shellParser,
+        hoursOverflowCounter,
+        lastHour,
+        initUptime,
+    ]);
 
     useEffect(() => {
         const chartStates = chart ? getState(chart) : undefined;
