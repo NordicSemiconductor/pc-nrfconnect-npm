@@ -43,6 +43,111 @@ ChartJS.register(
     zoomPanPlugin
 );
 
+const options: ChartOptions<'line'> = {
+    parsing: false,
+    animation: false,
+    responsive: true,
+    plugins: {
+        legend: {
+            position: 'top' as const,
+        },
+    },
+    scales: {
+        xAxis: {
+            type: 'time',
+            display: true,
+            ticks: {
+                autoSkip: false,
+                maxTicksLimit: 5,
+                display: false,
+            },
+            grid: {
+                display: true,
+                drawOnChartArea: true,
+            },
+        },
+        yVbat: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            ticks: {
+                callback(value) {
+                    return `${Number(value).toFixed(2)} V`;
+                },
+                maxTicksLimit: 5,
+            },
+            grid: {
+                drawOnChartArea: true,
+            },
+            suggestedMin: 3,
+            suggestedMax: 5,
+        },
+        yIbat: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            ticks: {
+                callback(value) {
+                    return `${Number(value).toFixed(2)} mA`;
+                },
+                maxTicksLimit: 5,
+            },
+            grid: {
+                drawOnChartArea: true,
+            },
+            suggestedMin: 0,
+            suggestedMax: 1,
+        },
+        yTbat: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            ticks: {
+                callback(value) {
+                    return `${value} °C`;
+                },
+            },
+            suggestedMin: 0,
+            suggestedMax: 150,
+        },
+    },
+};
+
+const chartData: ChartData<'line'> = {
+    datasets: [
+        {
+            label: 'Vbat',
+            data: [],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            yAxisID: 'yVbat',
+        },
+        {
+            label: 'Tbat',
+            data: [],
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            yAxisID: 'yTbat',
+        },
+        {
+            label: 'Ibat',
+            data: [],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            yAxisID: 'yIbat',
+        },
+    ],
+};
+
 export default ({ active }: PaneProps) => {
     const ref = useRef<ChartJSOrUndefined<'line'>>();
     const chart = ref.current;
@@ -55,112 +160,8 @@ export default ({ active }: PaneProps) => {
 
     const [chartArea, setChartCanvas] = useState(chart?.chartArea);
 
-    const options: ChartOptions<'line'> = {
-        parsing: false,
-        animation: false,
-        responsive: true,
-        onResize: (c: Chart) => {
-            setTimeout(() => setChartCanvas(c.chartArea));
-        },
-        plugins: {
-            legend: {
-                position: 'top' as const,
-            },
-        },
-        scales: {
-            xAxis: {
-                type: 'time',
-                display: true,
-                ticks: {
-                    autoSkip: false,
-                    maxTicksLimit: 5,
-                    display: false,
-                },
-                grid: {
-                    display: true,
-                    drawOnChartArea: true,
-                },
-            },
-            yVbat: {
-                type: 'linear',
-                display: true,
-                position: 'left',
-                ticks: {
-                    callback(value) {
-                        return `${Number(value).toFixed(2)} V`;
-                    },
-                    maxTicksLimit: 5,
-                },
-                grid: {
-                    drawOnChartArea: true,
-                },
-                suggestedMin: 3,
-                suggestedMax: 5,
-            },
-            yIbat: {
-                type: 'linear',
-                display: true,
-                position: 'left',
-                ticks: {
-                    callback(value) {
-                        return `${Number(value).toFixed(2)} mA`;
-                    },
-                    maxTicksLimit: 5,
-                },
-                grid: {
-                    drawOnChartArea: true,
-                },
-                suggestedMin: 0,
-                suggestedMax: 1,
-            },
-            yTbat: {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                ticks: {
-                    callback(value) {
-                        return `${value} °C`;
-                    },
-                },
-                suggestedMin: 0,
-                suggestedMax: 150,
-            },
-        },
-    };
-
-    const chartData: ChartData<'line'> = {
-        datasets: [
-            {
-                label: 'Vbat',
-                data: [],
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                fill: false,
-                cubicInterpolationMode: 'monotone',
-                tension: 0.4,
-                yAxisID: 'yVbat',
-            },
-            {
-                label: 'Tbat',
-                data: [],
-                borderColor: 'rgb(54, 162, 235)',
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                fill: false,
-                cubicInterpolationMode: 'monotone',
-                tension: 0.4,
-                yAxisID: 'yTbat',
-            },
-            {
-                label: 'Ibat',
-                data: [],
-                borderColor: 'rgb(75, 192, 192)',
-                backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                fill: false,
-                cubicInterpolationMode: 'monotone',
-                tension: 0.4,
-                yAxisID: 'yIbat',
-            },
-        ],
+    options.onResize = (c: Chart) => {
+        setTimeout(() => setChartCanvas(c.chartArea));
     };
 
     useEffect(() => {
