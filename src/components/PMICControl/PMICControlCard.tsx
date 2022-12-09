@@ -69,13 +69,7 @@ const PowerCard = () => {
                     <div className="flex-row">
                         <NumberInlineInput
                             value={internalVTerm}
-                            range={{
-                                min: 3.5,
-                                max: 4.45,
-                                decimals: 2,
-                                step: 0.05,
-                                explicitRange: vTermValues,
-                            }}
+                            range={vTermValues}
                             onChange={value => setInternaVTerm(value)}
                             onChangeComplete={() =>
                                 dispatch(npmVTermChanged(internalVTerm))
