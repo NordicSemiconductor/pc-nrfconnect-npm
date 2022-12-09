@@ -69,13 +69,7 @@ const PowerCard = () => {
                     <div className="flex-row">
                         <NumberInlineInput
                             value={internalVTerm}
-                            range={{
-                                min: 3.5,
-                                max: 4.45,
-                                decimals: 2,
-                                step: 0.05,
-                                explicitRange: vTermValues,
-                            }}
+                            range={vTermValues}
                             onChange={value => setInternaVTerm(value)}
                             onChangeComplete={() =>
                                 dispatch(npmVTermChanged(internalVTerm))
@@ -174,7 +168,6 @@ const BuckCard: FC<buckProps> = ({
         <Card title={cardLabel}>
             <StateSelector
                 items={vSetItems}
-                defaultIndex={0}
                 onSelect={index => onVSetToggle(index === 1)}
                 selectedItem={initVSet ? vSetItems[1] : vSetItems[0]}
             />
@@ -254,8 +247,8 @@ const LDO: FC<ldoProps> = ({
         <Card title={cardLabel}>
             <StateSelector
                 items={['Load Switch', 'LDO']}
-                defaultIndex={0}
                 onSelect={() => {}}
+                selectedItem="Load Switch"
             />
             <div className="slider-container">
                 <FormLabel className="flex-row">

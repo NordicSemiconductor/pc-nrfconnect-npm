@@ -3,37 +3,35 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
-
 import 'chartjs-adapter-date-fns';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+// eslint-disable-next-line import/no-unresolved
 import { Line } from 'react-chartjs-2';
 import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
 import {
     CategoryScale,
+    Chart,
     Chart as ChartJS,
     ChartData,
     ChartOptions,
-    Decimation,
-    Legend,
     LinearScale,
     LineElement,
     PointElement,
-    TimeScale,
+    TimeSeriesScale,
     Title,
     Tooltip,
 } from 'chart.js';
-import { Card, logger, PaneProps } from 'pc-nrfconnect-shared';
+import { Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
-import {
-    getIbatDataset,
-    getTbatDataset,
-    getVbatDataset,
-} from '../../features/graph/graphSlice';
-import zoomPanPlugin from '../../utils/chart.zoomPan';
+import { getShellParser } from '../../features/modem/modemSlice';
+import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
+import { getState } from '../../utils/chart/state';
+import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 
 import './graph.scss';
+import styles from './Graph.module.scss';
 
 ChartJS.register(
     CategoryScale,
@@ -42,44 +40,78 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend,
-    TimeScale,
-    Decimation,
+    TimeSeriesScale,
     zoomPanPlugin
 );
 
-export const options: ChartOptions<'line'> = {
+const options: ChartOptions<'line'> = {
     parsing: false,
     animation: false,
     responsive: true,
-    maintainAspectRatio: false,
     plugins: {
         legend: {
             position: 'top' as const,
         },
-        // decimation: {
-        //     algorithm: 'lttb',
-        //     enabled: true,
-        //     samples: 100,
-        //     threshold: 40,
-        // },
+        tooltip: {
+            callbacks: {
+                title: context => {
+                    let label = 'Uptime: ';
+
+                    if (context[0]?.parsed.x !== null) {
+                        let uptimeMiliseconds = context[0].parsed.x;
+
+                        const ms = uptimeMiliseconds % 1000;
+
+                        uptimeMiliseconds = Math.max(
+                            (uptimeMiliseconds - ms) / 1000,
+                            0
+                        );
+                        const secs = uptimeMiliseconds % 60;
+
+                        uptimeMiliseconds = Math.max(
+                            (uptimeMiliseconds - secs) / 60,
+                            0
+                        );
+                        const mins = uptimeMiliseconds % 60;
+
+                        uptimeMiliseconds = Math.max(
+                            (uptimeMiliseconds - mins) / 60,
+                            0
+                        );
+                        const hrs = uptimeMiliseconds % 60;
+
+                        uptimeMiliseconds = Math.max(
+                            (uptimeMiliseconds - hrs) / 60,
+                            0
+                        );
+                        const days = uptimeMiliseconds % 24;
+
+                        label += days !== 0 ? `${days} days ` : '';
+                        label += `${hrs.toString().padStart(2, '0')}:${mins
+                            .toString()
+                            .padStart(2, '0')}:${secs
+                            .toString()
+                            .padStart(2, '0')}.${ms
+                            .toString()
+                            .padStart(3, '0')} `;
+                    }
+                    return label;
+                },
+            },
+        },
     },
     scales: {
         xAxis: {
-            type: 'time',
-            time: {
-                unit: 'second',
-                displayFormats: {
-                    millisecond: 'HH:mm:ss',
-                    second: 'HH:mm:ss',
-                    minute: 'HH:mm',
-                    hour: 'HH:mm',
-                    day: 'HH:ss',
-                },
-            },
+            type: 'timeseries',
+            display: true,
             ticks: {
-                source: 'auto',
-                autoSkip: true,
+                autoSkip: false,
+                maxTicksLimit: 5,
+                display: false,
+            },
+            grid: {
+                display: true,
+                drawOnChartArea: true,
             },
         },
         yVbat: {
@@ -90,6 +122,10 @@ export const options: ChartOptions<'line'> = {
                 callback(value) {
                     return `${Number(value).toFixed(2)} V`;
                 },
+                maxTicksLimit: 5,
+            },
+            grid: {
+                drawOnChartArea: true,
             },
             suggestedMin: 3,
             suggestedMax: 5,
@@ -102,6 +138,10 @@ export const options: ChartOptions<'line'> = {
                 callback(value) {
                     return `${Number(value).toFixed(2)} mA`;
                 },
+                maxTicksLimit: 5,
+            },
+            grid: {
+                drawOnChartArea: true,
             },
             suggestedMin: 0,
             suggestedMax: 1,
@@ -121,13 +161,13 @@ export const options: ChartOptions<'line'> = {
     },
 };
 
-export const chartData: ChartData<'line'> = {
+const chartData: ChartData<'line'> = {
     datasets: [
         {
             label: 'Vbat',
             data: [],
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: styles.indigo,
+            backgroundColor: styles.indigo,
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
@@ -136,8 +176,8 @@ export const chartData: ChartData<'line'> = {
         {
             label: 'Tbat',
             data: [],
-            borderColor: 'rgb(54, 162, 235)',
-            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: styles.red,
+            backgroundColor: styles.red,
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
@@ -146,8 +186,8 @@ export const chartData: ChartData<'line'> = {
         {
             label: 'Ibat',
             data: [],
-            borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            borderColor: styles.amber,
+            backgroundColor: styles.amber,
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
@@ -159,47 +199,208 @@ export const chartData: ChartData<'line'> = {
 export default ({ active }: PaneProps) => {
     const ref = useRef<ChartJSOrUndefined<'line'>>();
     const chart = ref.current;
-    const datasetVbat = useSelector(getVbatDataset);
-    const datasetTbat = useSelector(getTbatDataset);
-    const datasetIbat = useSelector(getIbatDataset);
+    const shellParser = useSelector(getShellParser);
+    const [isLive, setLive] = useState(true);
+    const [range, setRange] = useState({ xMin: 0, xMax: 0 });
+    const [hoursOverflowCounter, setHoursOverflowCounter] = useState(0);
+    const [lastHour, setLastHour] = useState(0);
+    const [initUptime, setInitUptime] = useState<number | null>(null);
+
+    const [chartArea, setChartCanvas] = useState(chart?.chartArea);
+
+    options.onResize = (c: Chart) => {
+        setTimeout(() => setChartCanvas(c.chartArea));
+    };
 
     useEffect(() => {
-        if (chart) {
-            chart.data.datasets[0].data = [...datasetVbat.data];
-            chart.data.datasets[1].data = [...datasetTbat.data];
-            chart.data.datasets[2].data = [...datasetIbat.data];
+        if (shellParser) {
+            const chartStates = chart ? getState(chart) : undefined;
+            chartStates?.actions.clearData();
+            setHoursOverflowCounter(0);
+            setLastHour(0);
+            setInitUptime(null);
         }
-    }, [chart, datasetIbat.data, datasetTbat.data, datasetVbat.data]);
+    }, [chart, shellParser]);
 
     useEffect(() => {
-        const t = setInterval(() => {
-            chart?.update('none');
-        }, 250);
+        if (!shellParser) return () => {};
+        const relaseShellLoggingEvent = shellParser.onShellLoggingEvent(
+            data => {
+                const chartStates = chart ? getState(chart) : undefined;
+                const splitData = data.split(' <inf> main:');
 
-        return () => clearInterval(t);
+                const variables = splitData[1].trim().split(',');
+                const time = splitData[0]
+                    .trim()
+                    .replace('[', '')
+                    .replace(']', '')
+                    .split(',')[0]
+                    .replace('.', ':')
+                    .split(':');
+
+                const v = Number(variables[0].split('=')[1]);
+                const i = Number(variables[1].split('=')[1]);
+
+                const msec = Number(time[3]);
+                const sec = Number(time[2]) * 1000;
+                const min = Number(time[1]) * 1000 * 60;
+                let hr =
+                    (Number(time[0]) + hoursOverflowCounter * 99) *
+                    1000 *
+                    60 *
+                    60;
+
+                // We have wrapped 99 hours incriment counter
+                if (hr < lastHour) {
+                    setHoursOverflowCounter(hoursOverflowCounter + 1);
+                    hr += 99;
+                }
+
+                if (hr !== lastHour) {
+                    setLastHour(hr);
+                }
+
+                let timestamp = msec + sec + min + hr;
+
+                if (initUptime === null) {
+                    setInitUptime(timestamp);
+                    timestamp = 0;
+                } else {
+                    timestamp -= initUptime;
+                }
+
+                if (chart && chartStates) {
+                    chartStates.actions.addData([
+                        [{ x: timestamp, y: v }],
+                        [{ x: timestamp, y: 50 }],
+                        [{ x: timestamp, y: i }],
+                    ]);
+                }
+            }
+        );
+
+        return relaseShellLoggingEvent;
+    }, [
+        chart,
+        active,
+        shellParser,
+        hoursOverflowCounter,
+        lastHour,
+        initUptime,
+    ]);
+
+    useEffect(() => {
+        const chartStates = chart ? getState(chart) : undefined;
+        const chartOptions = chartStates?.options;
+
+        if (chartOptions && active) {
+            chartOptions.live = isLive;
+            chart?.update('none');
+        }
+    }, [chart, isLive, active]);
+
+    useEffect(() => {
+        const chartStates = chart ? getState(chart) : undefined;
+
+        if (chart && chartStates) {
+            chartStates.actions.onLiveChange = setLive;
+            chartStates.actions.onRangeChanged = setRange;
+        }
     }, [chart]);
 
-    logger;
+    useEffect(() => {
+        if (active && chart) {
+            chart?.update('none');
+        }
+    }, [chart, active]);
+
+    const zoom = (resolution: number) => {
+        const chartStates = chart ? getState(chart) : undefined;
+        const chartActons = chartStates?.actions;
+
+        if (chartActons?.zoom) {
+            const chartOptions = chartStates?.options;
+            chartActons?.zoom(resolution, chartOptions?.live ? 1 : 0.5);
+        }
+    };
 
     return (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
-        <>
-            {active && (
-                <div className="graph-container">
-                    <div className="graph">
-                        <div className="graph-cards">
-                            <Card title="Discharge Graph">
-                                <Line
-                                    height={600}
-                                    options={options}
-                                    data={chartData}
-                                    ref={ref}
+        <div className="graph-container">
+            <div className="graph">
+                <div className="graph-cards">
+                    <Card title="Discharge Graph">
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                marginBottom: '30px',
+                            }}
+                        >
+                            <div />
+                            <div
+                                className="range-buttons"
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(10)}
+                                >
+                                    10ms
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(100)}
+                                >
+                                    100ms
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(1000)}
+                                >
+                                    1s
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(3000)}
+                                >
+                                    3s
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(10000)}
+                                >
+                                    10s
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(60000)}
+                                >
+                                    1min
+                                </Button>
+                            </div>
+                            <div>
+                                <Toggle
+                                    label="Live"
+                                    isToggled={isLive}
+                                    onToggle={value => setLive(value)}
                                 />
-                            </Card>
+                            </div>
                         </div>
-                    </div>
+                        <TimeSpanDeltaLine
+                            range={range}
+                            chartArea={chartArea}
+                        />
+                        <Line options={options} data={chartData} ref={ref} />
+                        <TimeSpanDeltaLine
+                            range={range}
+                            chartArea={chartArea}
+                        />
+                    </Card>
                 </div>
-            )}
-        </>
+            </div>
+        </div>
     );
 };
