@@ -3,10 +3,10 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
-
 import 'chartjs-adapter-date-fns';
 
 import React, { useEffect, useRef, useState } from 'react';
+// eslint-disable-next-line import/no-unresolved
 import { Line } from 'react-chartjs-2';
 import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
@@ -19,7 +19,7 @@ import {
     LinearScale,
     LineElement,
     PointElement,
-    TimeScale,
+    TimeSeriesScale,
     Title,
     Tooltip,
 } from 'chart.js';
@@ -40,7 +40,7 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    TimeScale,
+    TimeSeriesScale,
     zoomPanPlugin
 );
 
@@ -102,7 +102,7 @@ const options: ChartOptions<'line'> = {
     },
     scales: {
         xAxis: {
-            type: 'time',
+            type: 'timeseries',
             display: true,
             ticks: {
                 autoSkip: false,
