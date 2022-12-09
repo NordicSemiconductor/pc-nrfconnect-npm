@@ -59,7 +59,20 @@ const PowerCard = () => {
     const dispatch = useDispatch();
 
     return (
-        <Card title="Charger">
+        <Card
+            title={
+                <div className="d-flex justify-content-between">
+                    <span>Charging</span>
+                    <Toggle
+                        label="Enable"
+                        isToggled={enableCharging}
+                        onToggle={value =>
+                            dispatch(npmEnableChargingChanged(value))
+                        }
+                    />
+                </div>
+            }
+        >
             <div className="slider-container">
                 <FormLabel className="flex-row">
                     <div>
@@ -129,11 +142,6 @@ const PowerCard = () => {
                     }}
                 />
             </div>
-            <Toggle
-                label="Enable Charging"
-                isToggled={enableCharging}
-                onToggle={value => dispatch(npmEnableChargingChanged(value))}
-            />
         </Card>
     );
 };
@@ -165,7 +173,18 @@ const BuckCard: FC<buckProps> = ({
     const vSetItems = ['Software', 'Vset'];
 
     return (
-        <Card title={cardLabel}>
+        <Card
+            title={
+                <div className="d-flex justify-content-between">
+                    <span>{cardLabel}</span>
+                    <Toggle
+                        label="Enable"
+                        isToggled={initBuck}
+                        onToggle={value => onBuckToggle(value)}
+                    />
+                </div>
+            }
+        >
             <StateSelector
                 items={vSetItems}
                 onSelect={index => onVSetToggle(index === 1)}
@@ -208,11 +227,6 @@ const BuckCard: FC<buckProps> = ({
                     }}
                 />
             </div>
-            <Toggle
-                label="Enable BUCK"
-                isToggled={initBuck}
-                onToggle={value => onBuckToggle(value)}
-            />
         </Card>
     );
 };
@@ -244,7 +258,18 @@ const LDO: FC<ldoProps> = ({
     const [internalVLdo, setInternaVLdo] = useState(vLdo);
 
     return (
-        <Card title={cardLabel}>
+        <Card
+            title={
+                <div className="d-flex justify-content-between">
+                    <span>{cardLabel}</span>
+                    <Toggle
+                        label="Enable"
+                        isToggled={enableLdo}
+                        onToggle={value => onLdoToggle(value)}
+                    />
+                </div>
+            }
+        >
             <StateSelector
                 items={['Load Switch', 'LDO']}
                 onSelect={() => {}}
@@ -283,11 +308,6 @@ const LDO: FC<ldoProps> = ({
                     }}
                 />
             </div>
-            <Toggle
-                label="Enable"
-                isToggled={enableLdo}
-                onToggle={value => onLdoToggle(value)}
-            />
         </Card>
     );
 };
