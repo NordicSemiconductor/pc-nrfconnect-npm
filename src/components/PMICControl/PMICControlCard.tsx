@@ -6,7 +6,6 @@
 
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card } from 'pc-nrfconnect-shared';
 
 import {
     getEnableBuck1,
@@ -40,7 +39,7 @@ import {
     npmVOut2Changed,
     npmVTermChanged,
 } from '../../features/pmicControl/pmicControlSlice';
-import Battery from '../Battery/Battery';
+import BatteryCard from '../cards/Battery/BatteryCard';
 import BuckCard from '../cards/Buck/BuckCard';
 import LDOCard from '../cards/LDO/LDOCard';
 import PowerCard from '../cards/Power/PowerCard';
@@ -57,9 +56,7 @@ export default () => {
     return (
         <div className="pmic-control">
             <div className="pmic-control-inner">
-                <Card title="Fuel Guage">
-                    <Battery percent={80} state={undefined} />
-                </Card>
+                <BatteryCard percent={80} state={undefined} />
                 <PowerCard
                     cardLabel="Charging"
                     vTermSelector={getVTerm}

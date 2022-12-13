@@ -16,7 +16,7 @@ import Icon from '@mdi/react';
 import './battery.scss';
 import styles from './Battery.module.scss';
 
-interface batteryProps {
+export interface batteryProps {
     percent: number;
     state?: 'missing' | 'charging' | 'discharging' | 'updating' | 'unavailable';
 }
