@@ -227,6 +227,17 @@ export default {
             state.data.forEach(d => d.splice(0));
             chart.update('none');
         };
+
+        state.actions.setLive = live => {
+            const chartState = getState(chart);
+            chartState.options.live = live;
+
+            const nextRange = getRange(chartState.data, chartState.options);
+            if (updateRange(chart, nextRange, chartState.options)) {
+                chart.update('none');
+            }
+        };
+
         state.actions.addData = (data: ScatterDataPoint[][]) => {
             data.splice(state.data.length);
             state.data.forEach((d, index) => d.push(...data[index]));
@@ -342,11 +353,6 @@ export default {
     },
     beforeElementsUpdate(chart) {
         const chartState = getState(chart);
-
-        if (chartState.options.live) {
-            const nextRange = getRange(chartState.data, chartState.options);
-            updateRange(chart, nextRange, chartState.options);
-        }
 
         chartState.data.forEach((data: ScatterDataPoint[], index: number) => {
             // Point the chart to the decimated data

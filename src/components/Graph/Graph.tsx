@@ -296,8 +296,7 @@ export default ({ active }: PaneProps) => {
         const chartOptions = chartStates?.options;
 
         if (chartOptions && active) {
-            chartOptions.live = isLive;
-            chart?.update('none');
+            chartStates.actions.setLive(isLive);
         }
     }, [chart, isLive, active]);
 

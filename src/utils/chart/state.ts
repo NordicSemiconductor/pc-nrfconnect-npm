@@ -23,6 +23,7 @@ export interface ChartActions {
     zoom: (resolution: number, centerOffset: number) => void;
     addData: (data: ScatterDataPoint[][]) => void;
     clearData: () => void;
+    setLive: (live: boolean) => void;
     onLiveChange?: (live: boolean) => void;
     onRangeChanged?: (range: XAxisRange) => void;
 }
@@ -46,7 +47,12 @@ export const getState = (chart: Chart) => {
                 zoomFactor: 1.1,
                 currentRange: { xMin: 0, xMax: 20000 },
             },
-            actions: { zoom: () => {}, addData: () => {}, clearData: () => {} },
+            actions: {
+                zoom: () => {},
+                addData: () => {},
+                clearData: () => {},
+                setLive: () => {},
+            },
             data: [],
         };
         chartStates.set(chart, state);
