@@ -4,18 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { FC, useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    Card,
-    NumberInlineInput,
-    Slider,
-    StateSelector,
-    Toggle,
-} from 'pc-nrfconnect-shared';
+import { Card } from 'pc-nrfconnect-shared';
 
-import { RootState } from '../../appReducer';
 import {
     getEnableBuck1,
     getEnableBuck2,
@@ -48,270 +40,10 @@ import {
     npmVOut2Changed,
     npmVTermChanged,
 } from '../../features/pmicControl/pmicControlSlice';
-import vTermValues from '../../utils/vTermValues';
 import Battery from '../Battery/Battery';
-
-const PowerCard = () => {
-    const vTerm = useSelector(getVTerm);
-    const [internalVTerm, setInternaVTerm] = useState(vTerm);
-    const iCHG = useSelector(getICHG);
-    const [internalICHG, setInternaICHG] = useState(iCHG);
-    const enableCharging = useSelector(getEnableCharging);
-    const dispatch = useDispatch();
-
-    return (
-        <Card
-            title={
-                <div className="d-flex justify-content-between">
-                    <span>Charging</span>
-                    <Toggle
-                        label="Enable"
-                        isToggled={enableCharging}
-                        onToggle={value =>
-                            dispatch(npmEnableChargingChanged(value))
-                        }
-                    />
-                </div>
-            }
-        >
-            <div className="slider-container">
-                <FormLabel className="flex-row">
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">TERM</span>
-                    </div>
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={internalVTerm}
-                            range={vTermValues}
-                            onChange={value => setInternaVTerm(value)}
-                            onChangeComplete={() =>
-                                dispatch(npmVTermChanged(internalVTerm))
-                            }
-                        />
-                        <span>V</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[vTermValues.indexOf(internalVTerm)]}
-                    onChange={[index => setInternaVTerm(vTermValues[index])]}
-                    onChangeComplete={() =>
-                        dispatch(npmVTermChanged(internalVTerm))
-                    }
-                    range={{
-                        min: 0,
-                        max: vTermValues.length - 1,
-                    }}
-                />
-            </div>
-            <div className="slider-container">
-                <FormLabel className="flex-row">
-                    <div>
-                        <span>I</span>
-                        <span className="subscript">CHG</span>
-                    </div>
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={internalICHG}
-                            range={{
-                                min: 32,
-                                max: 800,
-                                decimals: 0,
-                                step: 2,
-                            }}
-                            onChange={value => setInternaICHG(value)}
-                            onChangeComplete={() => {
-                                dispatch(npmEnableChargingChanged(false));
-                                dispatch(npmICHGChanged(internalICHG));
-                            }}
-                        />
-                        <span>mA</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[internalICHG]}
-                    onChange={[value => setInternaICHG(value)]}
-                    onChangeComplete={() => {
-                        dispatch(npmEnableChargingChanged(false));
-                        dispatch(npmICHGChanged(internalICHG));
-                    }}
-                    range={{
-                        min: 32,
-                        max: 800,
-                        decimals: 0,
-                        step: 2,
-                    }}
-                />
-            </div>
-        </Card>
-    );
-};
-
-interface buckProps {
-    cardLabel: string;
-    vOut: number;
-    buckSelector: (state: RootState) => boolean;
-    vSetSelector: (state: RootState) => boolean;
-    onVOutChange: (value: number) => void;
-    onVOutChangeComplete: () => void;
-    onVSetToggle: (value: boolean) => void;
-    onBuckToggle: (value: boolean) => void;
-}
-
-const BuckCard: FC<buckProps> = ({
-    cardLabel,
-    vOut,
-    buckSelector,
-    vSetSelector,
-    onVOutChange,
-    onVOutChangeComplete,
-    onVSetToggle,
-    onBuckToggle,
-}) => {
-    const initBuck = useSelector(buckSelector);
-    const initVSet = useSelector(vSetSelector);
-
-    const vSetItems = ['Software', 'Vset'];
-
-    return (
-        <Card
-            title={
-                <div className="d-flex justify-content-between">
-                    <span>{cardLabel}</span>
-                    <Toggle
-                        label="Enable"
-                        isToggled={initBuck}
-                        onToggle={value => onBuckToggle(value)}
-                    />
-                </div>
-            }
-        >
-            <StateSelector
-                items={vSetItems}
-                onSelect={index => onVSetToggle(index === 1)}
-                selectedItem={initVSet ? vSetItems[1] : vSetItems[0]}
-            />
-            <div className="slider-container">
-                <FormLabel className="flex-row">
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">OUT</span>
-                    </div>
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={vOut}
-                            range={{
-                                min: 1,
-                                max: 3.3,
-                                decimals: 1,
-                            }}
-                            onChange={value => onVOutChange(value)}
-                            onChangeComplete={() => {
-                                onVOutChangeComplete();
-                                onVSetToggle(false);
-                            }}
-                        />
-                        <span>V</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[vOut]}
-                    onChange={[value => onVOutChange(value)]}
-                    onChangeComplete={() => {
-                        onVOutChangeComplete();
-                        onVSetToggle(false);
-                    }}
-                    range={{
-                        min: 1.0,
-                        max: 3.3,
-                        decimals: 1,
-                    }}
-                />
-            </div>
-        </Card>
-    );
-};
-
-interface ldoProps {
-    cardLabel: string;
-    vLdoSelector: (state: RootState) => number;
-    ldoSelector: (state: RootState) => boolean;
-    ldoSwitchSelector: (state: RootState) => boolean;
-    onLdoToggle: (value: boolean) => void;
-    onVLdoChange: (value: number) => void;
-    onLdoSwitchToggle: (value: boolean) => void;
-}
-
-const LDO: FC<ldoProps> = ({
-    cardLabel,
-    vLdoSelector,
-    ldoSelector,
-    ldoSwitchSelector,
-    onLdoToggle,
-    onVLdoChange,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    onLdoSwitchToggle,
-}) => {
-    const enableLdo = useSelector(ldoSelector);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const enableSwitchLdo = useSelector(ldoSwitchSelector);
-    const vLdo = useSelector(vLdoSelector);
-    const [internalVLdo, setInternaVLdo] = useState(vLdo);
-
-    return (
-        <Card
-            title={
-                <div className="d-flex justify-content-between">
-                    <span>{cardLabel}</span>
-                    <Toggle
-                        label="Enable"
-                        isToggled={enableLdo}
-                        onToggle={value => onLdoToggle(value)}
-                    />
-                </div>
-            }
-        >
-            <StateSelector
-                items={['Load Switch', 'LDO']}
-                onSelect={() => {}}
-                selectedItem="Load Switch"
-            />
-            <div className="slider-container">
-                <FormLabel className="flex-row">
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">LDO</span>
-                    </div>
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={internalVLdo}
-                            range={{
-                                min: 1,
-                                max: 3.3,
-                                decimals: 1,
-                                step: 0.1,
-                            }}
-                            onChange={value => setInternaVLdo(value)}
-                            onChangeComplete={() => onVLdoChange(internalVLdo)}
-                        />
-                        <span>V</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[internalVLdo]}
-                    onChange={[value => setInternaVLdo(value)]}
-                    onChangeComplete={() => onVLdoChange(internalVLdo)}
-                    range={{
-                        min: 1.0,
-                        max: 3.3,
-                        decimals: 1,
-                        step: 0.1,
-                    }}
-                />
-            </div>
-        </Card>
-    );
-};
+import BuckCard from '../cards/Buck/BuckCard';
+import LDOCard from '../cards/LDO/LDOCard';
+import PowerCard from '../cards/Power/PowerCard';
 
 export default () => {
     const dispatch = useDispatch();
@@ -328,7 +60,17 @@ export default () => {
                 <Card title="Fuel Guage">
                     <Battery percent={80} state={undefined} />
                 </Card>
-                <PowerCard />
+                <PowerCard
+                    cardLabel="Charging"
+                    vTermSelector={getVTerm}
+                    iCHGSelector={getICHG}
+                    enableChargingSelector={getEnableCharging}
+                    onVTermChange={value => dispatch(npmVTermChanged(value))}
+                    onEnableChargingToggle={value =>
+                        dispatch(npmEnableChargingChanged(value))
+                    }
+                    onICHGChange={value => dispatch(npmICHGChanged(value))}
+                />
                 <BuckCard
                     cardLabel="BUCK 1"
                     vOut={internalVout1}
@@ -361,7 +103,7 @@ export default () => {
                         dispatch(npmEnableBuck2Changed(value))
                     }
                 />
-                <LDO
+                <LDOCard
                     cardLabel="LDO/Load Switch 1"
                     ldoSelector={getEnableLdo1}
                     vLdoSelector={getVLdo1}
@@ -372,7 +114,7 @@ export default () => {
                         dispatch(npmEnableLoadSw1Changed(value))
                     }
                 />
-                <LDO
+                <LDOCard
                     cardLabel="LDO/Load Switch 2"
                     ldoSelector={getEnableLdo2}
                     vLdoSelector={getVLdo2}
