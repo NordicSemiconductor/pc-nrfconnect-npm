@@ -330,21 +330,9 @@ export default ({ active }: PaneProps) => {
             <div className="graph">
                 <div className="graph-cards">
                     <Card title="Discharge Graph">
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                marginBottom: '30px',
-                            }}
-                        >
+                        <div className="graph-top-bar-wrapper">
                             <div />
-                            <div
-                                className="range-buttons"
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                }}
-                            >
+                            <div className="range-buttons">
                                 <Button
                                     className="btn-primary w-100 h-100"
                                     onClick={() => zoom(10)}
