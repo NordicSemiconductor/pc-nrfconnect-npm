@@ -16,6 +16,7 @@ import {
     Chart as ChartJS,
     ChartData,
     ChartOptions,
+    Legend,
     LinearScale,
     LineElement,
     PointElement,
@@ -40,6 +41,7 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
+    Legend,
     TimeSeriesScale,
     zoomPanPlugin
 );
@@ -389,10 +391,6 @@ export default ({ active }: PaneProps) => {
                                 />
                             </div>
                         </div>
-                        <TimeSpanDeltaLine
-                            range={range}
-                            chartArea={chartArea}
-                        />
                         <Line options={options} data={chartData} ref={ref} />
                         <TimeSpanDeltaLine
                             range={range}
