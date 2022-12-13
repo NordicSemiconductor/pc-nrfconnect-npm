@@ -49,6 +49,7 @@ import {
     npmVTermChanged,
 } from '../../features/pmicControl/pmicControlSlice';
 import vTermValues from '../../utils/vTermValues';
+import Battery from '../Battery/Battery';
 
 const PowerCard = () => {
     const vTerm = useSelector(getVTerm);
@@ -324,6 +325,9 @@ export default () => {
     return (
         <div className="pmic-control">
             <div className="pmic-control-inner">
+                <Card title="Fuel Guage">
+                    <Battery percent={80} state={undefined} />
+                </Card>
                 <PowerCard />
                 <BuckCard
                     cardLabel="BUCK 1"
