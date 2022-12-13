@@ -20,7 +20,7 @@ import {
     LinearScale,
     LineElement,
     PointElement,
-    TimeSeriesScale,
+    TimeScale,
     Title,
     Tooltip,
 } from 'chart.js';
@@ -42,7 +42,7 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    TimeSeriesScale,
+    TimeScale,
     zoomPanPlugin
 );
 
@@ -104,7 +104,7 @@ const options: ChartOptions<'line'> = {
     },
     scales: {
         xAxis: {
-            type: 'timeseries',
+            type: 'time',
             display: true,
             ticks: {
                 autoSkip: false,
