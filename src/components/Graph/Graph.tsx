@@ -378,7 +378,12 @@ export default ({ active }: PaneProps) => {
                                 />
                             </div>
                         </div>
-                        <Line options={options} data={chartData} ref={ref} />
+                        <Line
+                            height="100vh"
+                            options={options}
+                            data={chartData}
+                            ref={ref}
+                        />
                         <TimeSpanDeltaLine
                             range={range}
                             chartArea={chartArea}
