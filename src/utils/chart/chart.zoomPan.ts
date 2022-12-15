@@ -114,7 +114,7 @@ const isRangeValid = (
 const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
     let startIndex =
         data.findIndex((element: ScatterDataPoint) => element.x > range.xMin) -
-        1;
+        10;
     let endIndex = data.findIndex(
         (element: ScatterDataPoint) => element.x > range.xMax
     );
@@ -224,7 +224,15 @@ export default {
             chart.update('none');
         };
         state.actions.clearData = () => {
-            state.data.forEach(d => d.splice(0));
+            const chartState = getState(chart);
+            chartState.data.forEach(d => d.splice(0));
+
+            chartState.options.live = options.live;
+            chartState.options.resolution = options.resolution;
+            chartState.options.minResolution = options.minResolution;
+            chartState.options.zoomFactor = options.zoomFactor;
+            chartState.options.currentRange = options.currentRange;
+
             chart.update('none');
         };
 
@@ -267,7 +275,7 @@ export default {
         let paning = false;
 
         // Running avarage to smoth Scroll
-        const alpha = 0.3;
+        const alpha = 1;
 
         canvas.addEventListener('pointerdown', (event: PointerEvent) => {
             if (!isInChartArea(chart, event.offsetX, event.offsetY)) return;
