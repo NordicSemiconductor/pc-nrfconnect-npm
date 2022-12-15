@@ -180,9 +180,9 @@ const updateRange = (
     }
     options.currentRange = { ...range };
 
-    (chart.scales.xAxis.options as CartesianScaleOptions).min =
+    (chart.scales.x.options as CartesianScaleOptions).min =
         chartState.options.currentRange.xMin;
-    (chart.scales.xAxis.options as CartesianScaleOptions).max =
+    (chart.scales.x.options as CartesianScaleOptions).max =
         chartState.options.currentRange.xMax;
 
     return true;

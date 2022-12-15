@@ -105,7 +105,7 @@ const options: ChartOptions<'line'> = {
         },
     },
     scales: {
-        xAxis: {
+        x: {
             type: 'time',
             display: true,
             ticks: {
