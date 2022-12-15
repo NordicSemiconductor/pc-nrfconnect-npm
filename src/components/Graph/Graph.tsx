@@ -28,6 +28,7 @@ import { Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
 import { getShellParser } from '../../features/modem/modemSlice';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
+import highlightAxis from '../../utils/chart/highlightAxis';
 import { getState } from '../../utils/chart/state';
 import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 
@@ -43,7 +44,8 @@ ChartJS.register(
     Tooltip,
     Legend,
     TimeScale,
-    zoomPanPlugin
+    zoomPanPlugin,
+    highlightAxis
 );
 
 const options: ChartOptions<'line'> = {
@@ -111,10 +113,6 @@ const options: ChartOptions<'line'> = {
                 maxTicksLimit: 5,
                 display: false,
             },
-            grid: {
-                display: true,
-                drawOnChartArea: true,
-            },
         },
         yVbat: {
             type: 'linear',
@@ -122,12 +120,9 @@ const options: ChartOptions<'line'> = {
             position: 'left',
             ticks: {
                 callback(value) {
-                    return `${Number(value).toFixed(2)} V`;
+                    return ` ${Number(value).toFixed(2)} V`;
                 },
                 maxTicksLimit: 5,
-            },
-            grid: {
-                drawOnChartArea: true,
             },
             suggestedMin: 3,
             suggestedMax: 5,
@@ -138,12 +133,9 @@ const options: ChartOptions<'line'> = {
             position: 'left',
             ticks: {
                 callback(value) {
-                    return `${Number(value).toFixed(2)} mA`;
+                    return ` ${Number(value).toFixed(2)} mA`;
                 },
                 maxTicksLimit: 5,
-            },
-            grid: {
-                drawOnChartArea: true,
             },
             suggestedMin: 0,
             suggestedMax: 1,
@@ -154,7 +146,7 @@ const options: ChartOptions<'line'> = {
             position: 'right',
             ticks: {
                 callback(value) {
-                    return `${value} °C`;
+                    return ` ${value} °C`;
                 },
             },
             suggestedMin: 0,
