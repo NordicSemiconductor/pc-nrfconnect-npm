@@ -114,7 +114,7 @@ const isRangeValid = (
 const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
     let startIndex =
         data.findIndex((element: ScatterDataPoint) => element.x > range.xMin) -
-        10;
+        1;
     let endIndex = data.findIndex(
         (element: ScatterDataPoint) => element.x > range.xMax
     );
