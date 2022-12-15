@@ -144,10 +144,6 @@ const autoUpdateIsLive = (
     if (old !== options.live && onLiveChange) {
         onLiveChange(options.live);
     }
-
-    if (options.live) {
-        range = getRange(data, options);
-    }
 };
 
 const updateRange = (
@@ -206,18 +202,18 @@ export default {
         const state = getState(chart);
         state.options = options;
         state.actions.zoom = (resolution, offset) => {
-            const resolutonDelta = resolution - options.resolution;
-            options.resolution = resolution;
+            const resolutonDelta = resolution - state.options.resolution;
+            state.options.resolution = resolution;
 
             const deltaMin = resolutonDelta * offset;
             const deltaMax = resolutonDelta - deltaMin;
 
             const nextRange = {
-                xMin: options.currentRange.xMin - deltaMin,
-                xMax: options.currentRange.xMax + deltaMax,
+                xMin: state.options.currentRange.xMin - deltaMin,
+                xMax: state.options.currentRange.xMax + deltaMax,
             };
 
-            if (!updateRange(chart, nextRange, options)) {
+            if (!updateRange(chart, nextRange, state.options)) {
                 return;
             }
 
@@ -240,9 +236,11 @@ export default {
             const chartState = getState(chart);
             chartState.options.live = live;
 
-            const nextRange = getRange(chartState.data, chartState.options);
-            if (updateRange(chart, nextRange, chartState.options)) {
-                chart.update('none');
+            if (live) {
+                const nextRange = getRange(chartState.data, chartState.options);
+                if (updateRange(chart, nextRange, chartState.options)) {
+                    chart.update('none');
+                }
             }
         };
 
@@ -252,10 +250,10 @@ export default {
 
             if (state.options.live) {
                 const nextRange = getRange(state.data, state.options);
-                updateRange(chart, nextRange, state.options);
+                if (updateRange(chart, nextRange, state.options)) {
+                    chart.update('none');
+                }
             }
-
-            chart.update('none');
         };
 
         state.data = [];
@@ -306,19 +304,12 @@ export default {
             const scaleDiffPercent = scaleDiff / chart.chartArea.width;
             const delta = options.resolution * scaleDiffPercent;
 
-            let nextRange = {
+            const nextRange = {
                 xMax: options.currentRange.xMax + delta,
                 xMin: options.currentRange.xMax - options.resolution + delta,
             };
 
-            const data = getState(chart).data;
-
-            const { valid, end } = isRangeValid(data, nextRange, options);
-
-            if (!valid) {
-                nextRange = getRange(data, options, !end);
-                lastX = newX;
-            }
+            lastX = newX;
 
             if (!updateRange(chart, nextRange, options)) {
                 return;
