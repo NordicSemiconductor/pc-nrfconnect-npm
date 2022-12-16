@@ -28,6 +28,7 @@ import { Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
 import { getShellParser } from '../../features/modem/modemSlice';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
+import CustomLegend from '../../utils/chart/CustomLegend';
 import highlightAxis from '../../utils/chart/highlightAxis';
 import { getState } from '../../utils/chart/state';
 import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
@@ -54,7 +55,7 @@ const options: ChartOptions<'line'> = {
     responsive: true,
     plugins: {
         legend: {
-            position: 'top' as const,
+            display: false,
         },
         tooltip: {
             callbacks: {
@@ -370,6 +371,7 @@ export default ({ active }: PaneProps) => {
                                 />
                             </div>
                         </div>
+                        <CustomLegend chart={ref.current} />
                         <Line
                             height="100vh"
                             options={options}
