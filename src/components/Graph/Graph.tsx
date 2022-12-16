@@ -314,7 +314,10 @@ export default ({ active }: PaneProps) => {
 
         if (chartActons?.zoom) {
             const chartOptions = chartStates?.options;
-            chartActons?.zoom(resolution, chartOptions?.live ? 1 : 0.5);
+            chartActons?.zoom(
+                resolution,
+                chartOptions?.live || resolution <= 0 ? 1 : 0.5
+            );
         }
     };
 
@@ -361,6 +364,12 @@ export default ({ active }: PaneProps) => {
                                     onClick={() => zoom(60000)}
                                 >
                                     1min
+                                </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(-1)}
+                                >
+                                    All
                                 </Button>
                             </div>
                             <div>

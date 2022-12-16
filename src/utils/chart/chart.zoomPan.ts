@@ -15,8 +15,9 @@ import type {
 import { getState, PanPluginOptions, removeState, XAxisRange } from './state';
 
 const initRange = (chart: Chart) => {
-    const options = getState(chart).options;
     const chartState = getState(chart);
+    const options = chartState.options;
+
     if (chartState.data.length === 0) {
         options.currentRange = { xMax: 0, xMin: 0 };
         return;
@@ -81,21 +82,20 @@ const getRange = (
 
     if (live) {
         const xMax = max;
-        const xMin = Math.max(min, max - options.resolution);
+        const xMin = Math.max(
+            min,
+            max - getResolution(options.resolution, data)
+        );
         return { xMin, xMax };
     }
 
     const xMin = min;
-    const xMax = Math.min(max, min + options.resolution);
+    const xMax = Math.min(max, min + getResolution(options.resolution, data));
     return { xMin, xMax };
 };
 
 // Calulate if range is valid from when checked against the data backup
-const isRangeValid = (
-    data: ScatterDataPoint[][],
-    rangeToCheck: XAxisRange,
-    options: PanPluginOptions
-) => {
+const isRangeValid = (data: ScatterDataPoint[][], rangeToCheck: XAxisRange) => {
     const xMax = getMaxX(data);
     const xMin = getMinX(data);
 
@@ -104,9 +104,7 @@ const isRangeValid = (
 
     return {
         valid: startValid && endValid,
-        start: startValid,
         end: endValid,
-        complete: rangeToCheck.xMax - rangeToCheck.xMin >= options.resolution,
     };
 };
 
@@ -146,35 +144,31 @@ const autoUpdateIsLive = (
     }
 };
 
-const updateRange = (
-    chart: Chart,
-    range: XAxisRange,
-    options: PanPluginOptions
-) => {
+const updateRange = (chart: Chart, range: XAxisRange) => {
     const chartState = getState(chart);
 
     autoUpdateIsLive(
         chartState.data,
         range,
-        options,
+        chartState.options,
         chartState.actions.onLiveChange
     );
 
-    const { valid } = isRangeValid(chartState.data, range, options);
+    const { valid } = isRangeValid(chartState.data, range);
     if (!valid) {
-        range = getRange(chartState.data, options);
+        range = getRange(chartState.data, chartState.options);
     }
 
     if (
-        options.currentRange.xMax === range.xMax &&
-        options.currentRange.xMin === range.xMin
+        chartState.options.currentRange.xMax === range.xMax &&
+        chartState.options.currentRange.xMin === range.xMin
     )
         return false;
 
     if (chartState.actions.onRangeChanged) {
         chartState.actions.onRangeChanged(range);
     }
-    options.currentRange = { ...range };
+    chartState.options.currentRange = { ...range };
 
     (chart.scales.x.options as CartesianScaleOptions).min =
         chartState.options.currentRange.xMin;
@@ -189,6 +183,17 @@ const isInChartArea = (chart: Chart, x: number, y: number) => {
     return x >= ca.left && x <= ca.right && y >= ca.top && y <= ca.bottom;
 };
 
+const getResolution = (resolution: number, data: ScatterDataPoint[][]) => {
+    if (resolution <= 0) {
+        const min = getMinX(data);
+        const max = getMaxX(data);
+
+        return max - min;
+    }
+
+    return resolution;
+};
+
 export default {
     id: 'pan',
     defaults: {
@@ -200,10 +205,57 @@ export default {
     },
     start(chart, _args, options) {
         const state = getState(chart);
-        state.options = options;
-        state.actions.zoom = (resolution, offset) => {
-            const resolutonDelta = resolution - state.options.resolution;
-            state.options.resolution = resolution;
+        state.options = { ...options };
+        state.data = [];
+        chart.data.datasets.forEach(() => {
+            state.data.push([]);
+        });
+
+        state.actions.zoom = (resolution, offset = 0.5, stickyAll = false) => {
+            const data = getState(chart).data;
+            const xMax = getMaxX(data);
+            const xMin = getMinX(data);
+
+            const fullResolution = xMax - xMin;
+
+            const visableDataResolution =
+                state.options.currentRange.xMax -
+                state.options.currentRange.xMin;
+
+            if (
+                resolution <= 0 ||
+                (stickyAll && fullResolution === resolution)
+            ) {
+                state.options.resolution = 0;
+            } else {
+                // We always want to change to the resolution the user wants in the long run
+                state.options.resolution = resolution;
+            }
+
+            if (
+                fullResolution === visableDataResolution &&
+                visableDataResolution === resolution
+            ) {
+                return;
+            }
+
+            // Show all
+            if (resolution <= 0) {
+                resolution = fullResolution;
+                const nextRange = {
+                    xMin,
+                    xMax,
+                };
+
+                if (!updateRange(chart, nextRange)) {
+                    return;
+                }
+
+                chart.update('none');
+                return;
+            }
+
+            const resolutonDelta = resolution - visableDataResolution;
 
             const deltaMin = resolutonDelta * offset;
             const deltaMax = resolutonDelta - deltaMin;
@@ -213,7 +265,7 @@ export default {
                 xMax: state.options.currentRange.xMax + deltaMax,
             };
 
-            if (!updateRange(chart, nextRange, state.options)) {
+            if (!updateRange(chart, nextRange)) {
                 return;
             }
 
@@ -238,7 +290,9 @@ export default {
 
             if (live) {
                 const nextRange = getRange(chartState.data, chartState.options);
-                if (updateRange(chart, nextRange, chartState.options)) {
+                chartState.options.resolution = nextRange.xMax - nextRange.xMin;
+
+                if (updateRange(chart, nextRange)) {
                     chart.update('none');
                 }
             }
@@ -250,22 +304,18 @@ export default {
 
             if (state.options.live) {
                 const nextRange = getRange(state.data, state.options);
-                if (updateRange(chart, nextRange, state.options)) {
+                if (updateRange(chart, nextRange)) {
                     chart.update('none');
                 }
             }
         };
-
-        state.data = [];
-        chart.data.datasets.forEach((dataset: ChartDataset) => {
-            state.data.push([...(dataset.data as ScatterDataPoint[])]);
-        });
     },
     afterInit(chart) {
         initRange(chart);
 
-        const actions = getState(chart).actions;
-        const options = getState(chart).options;
+        const state = getState(chart);
+        const actions = state.actions;
+        const options = state.options;
         const { canvas } = chart.ctx;
 
         let lastX = 0;
@@ -301,17 +351,19 @@ export default {
 
             if (Math.abs(scaleDiff) < 1) return;
 
+            const resolution = getResolution(options.resolution, state.data);
+
             const scaleDiffPercent = scaleDiff / chart.chartArea.width;
-            const delta = options.resolution * scaleDiffPercent;
+            const delta = resolution * scaleDiffPercent;
 
             const nextRange = {
                 xMax: options.currentRange.xMax + delta,
-                xMin: options.currentRange.xMax - options.resolution + delta,
+                xMin: options.currentRange.xMax - resolution + delta,
             };
 
             lastX = newX;
 
-            if (!updateRange(chart, nextRange, options)) {
+            if (!updateRange(chart, nextRange)) {
                 return;
             }
 
@@ -324,11 +376,6 @@ export default {
             if (event.deltaY === 0) return;
             if (!isInChartArea(chart, event.offsetX, event.offsetY)) return;
 
-            let newResolution =
-                event.deltaY < 0
-                    ? options.resolution / options.zoomFactor // Zoom In
-                    : options.resolution * options.zoomFactor; // Zoom out
-
             const data = getState(chart).data;
 
             const xMax = getMaxX(data);
@@ -336,9 +383,16 @@ export default {
 
             const fullResolution = xMax - xMin;
 
-            newResolution = Math.round(
+            const resolution = getResolution(options.resolution, state.data);
+
+            let newResolution =
+                event.deltaY < 0
+                    ? resolution / options.zoomFactor // Zoom In
+                    : resolution * options.zoomFactor; // Zoom out
+
+            newResolution = Math.ceil(
                 Math.max(
-                    options.minResolution,
+                    state.options.minResolution,
                     Math.min(newResolution, fullResolution)
                 )
             );
@@ -347,7 +401,7 @@ export default {
             const offset =
                 (event.offsetX - chart.chartArea.left) / chart.chartArea.width;
 
-            actions.zoom(newResolution, offset);
+            actions.zoom(newResolution, offset, true);
         });
     },
     beforeElementsUpdate(chart) {

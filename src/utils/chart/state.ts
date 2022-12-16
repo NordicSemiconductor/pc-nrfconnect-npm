@@ -20,7 +20,11 @@ export interface PanPluginOptions {
 }
 
 export interface ChartActions {
-    zoom: (resolution: number, centerOffset: number) => void;
+    zoom: (
+        resolution: number,
+        centerOffset?: number,
+        stickyAll?: boolean
+    ) => void;
     addData: (data: ScatterDataPoint[][]) => void;
     clearData: () => void;
     setLive: (live: boolean) => void;
