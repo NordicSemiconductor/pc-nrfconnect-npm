@@ -5,7 +5,12 @@
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ChartType, Plugin } from 'chart.js';
+import {
+    ChartType,
+    ChartTypeRegistry,
+    Plugin,
+    ScatterDataPoint,
+} from 'chart.js';
 
 declare module 'chart.js' {
     interface PluginOptionsByType<TType extends ChartType> {
@@ -16,5 +21,18 @@ declare module 'chart.js' {
             zoomFactor?: number;
             currentRange?: { xMin: number; xMax: number };
         };
+    }
+
+    interface Chart<
+        TType extends keyof ChartTypeRegistry = keyof ChartTypeRegistry
+    > {
+        zoom: (
+            resolution: number,
+            centerOffset: number,
+            stickyAll?: boolean
+        ) => void;
+        addData: (data: ScatterDataPoint[][]) => void;
+        resetData: () => void;
+        setLive: (live: boolean) => void;
     }
 }

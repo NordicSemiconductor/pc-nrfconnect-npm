@@ -209,8 +209,7 @@ export default ({ active }: PaneProps) => {
 
     useEffect(() => {
         if (shellParser) {
-            const chartStates = chart ? getState(chart) : undefined;
-            chartStates?.actions.clearData();
+            chart?.resetData();
             setHoursOverflowCounter(0);
             setLastHour(0);
             setInitUptime(null);
@@ -265,7 +264,7 @@ export default ({ active }: PaneProps) => {
                 }
 
                 if (chart && chartStates) {
-                    chartStates.actions.addData([
+                    chart.addData([
                         [{ x: timestamp, y: v }],
                         [{ x: timestamp, y: 50 }],
                         [{ x: timestamp, y: i }],
@@ -289,7 +288,7 @@ export default ({ active }: PaneProps) => {
         const chartOptions = chartStates?.options;
 
         if (chartOptions && active) {
-            chartStates.actions.setLive(isLive);
+            chart?.setLive(isLive);
         }
     }, [chart, isLive, active]);
 
@@ -297,8 +296,8 @@ export default ({ active }: PaneProps) => {
         const chartStates = chart ? getState(chart) : undefined;
 
         if (chart && chartStates) {
-            chartStates.actions.onLiveChange = setLive;
-            chartStates.actions.onRangeChanged = setRange;
+            chartStates.options.onLiveChange = setLive;
+            chartStates.options.onRangeChanged = setRange;
         }
     }, [chart]);
 
@@ -310,11 +309,10 @@ export default ({ active }: PaneProps) => {
 
     const zoom = (resolution: number) => {
         const chartStates = chart ? getState(chart) : undefined;
-        const chartActons = chartStates?.actions;
 
-        if (chartActons?.zoom) {
+        if (chart?.zoom) {
             const chartOptions = chartStates?.options;
-            chartActons?.zoom(
+            chart?.zoom(
                 resolution,
                 chartOptions?.live || resolution <= 0 ? 1 : 0.5
             );

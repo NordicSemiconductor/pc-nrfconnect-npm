@@ -7,12 +7,18 @@
 import type {
     CartesianScaleOptions,
     Chart,
-    ChartDataset,
     Plugin,
     ScatterDataPoint,
 } from 'chart.js';
 
-import { getState, PanPluginOptions, removeState, XAxisRange } from './state';
+import {
+    defaults,
+    getState,
+    InternalPanPluginOptions,
+    PanPluginOptions,
+    removeState,
+    XAxisRange,
+} from './state';
 
 const initRange = (chart: Chart) => {
     const chartState = getState(chart);
@@ -74,7 +80,7 @@ const getMaxX = (data: ScatterDataPoint[][]) =>
 // Calulate Range from Data Backup
 const getRange = (
     data: ScatterDataPoint[][],
-    options: PanPluginOptions,
+    options: InternalPanPluginOptions,
     live = options.live
 ) => {
     const max = getMaxX(data);
@@ -130,29 +136,23 @@ const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
 const autoUpdateIsLive = (
     data: ScatterDataPoint[][],
     range: XAxisRange,
-    options: PanPluginOptions,
-    onLiveChange?: (live: boolean) => void
+    options: InternalPanPluginOptions
 ) => {
     const xMax = getMaxX(data);
 
     const old = options.live;
 
-    options.live = xMax <= range.xMax;
+    options.live = xMax <= range.xMax || options.resolution <= 0;
 
-    if (old !== options.live && onLiveChange) {
-        onLiveChange(options.live);
+    if (old !== options.live) {
+        options.onLiveChange(options.live);
     }
 };
 
 const updateRange = (chart: Chart, range: XAxisRange) => {
     const chartState = getState(chart);
 
-    autoUpdateIsLive(
-        chartState.data,
-        range,
-        chartState.options,
-        chartState.actions.onLiveChange
-    );
+    autoUpdateIsLive(chartState.data, range, chartState.options);
 
     const { valid } = isRangeValid(chartState.data, range);
     if (!valid) {
@@ -165,9 +165,7 @@ const updateRange = (chart: Chart, range: XAxisRange) => {
     )
         return false;
 
-    if (chartState.actions.onRangeChanged) {
-        chartState.actions.onRangeChanged(range);
-    }
+    chartState.options.onRangeChanged(range);
     chartState.options.currentRange = { ...range };
 
     (chart.scales.x.options as CartesianScaleOptions).min =
@@ -203,16 +201,19 @@ export default {
         zoomFactor: 1.1,
         currentRange: { xMin: 0, xMax: 20000 },
     },
-    start(chart, _args, options) {
-        const state = getState(chart);
-        state.options = { ...options };
-        state.data = [];
-        chart.data.datasets.forEach(() => {
-            state.data.push([]);
-        });
+    start(chart, _args, pluginOptions) {
+        {
+            const state = getState(chart);
+            state.options = { ...state.options, ...pluginOptions };
+            state.data = [];
+            chart.data.datasets.forEach(() => {
+                state.data.push([]);
+            });
+        }
 
-        state.actions.zoom = (resolution, offset = 0.5, stickyAll = false) => {
-            const data = getState(chart).data;
+        chart.zoom = (resolution, offset = 0.5, stickyAll = false) => {
+            const state = getState(chart);
+            const data = state.data;
             const xMax = getMaxX(data);
             const xMin = getMinX(data);
 
@@ -239,22 +240,6 @@ export default {
                 return;
             }
 
-            // Show all
-            if (resolution <= 0) {
-                resolution = fullResolution;
-                const nextRange = {
-                    xMin,
-                    xMax,
-                };
-
-                if (!updateRange(chart, nextRange)) {
-                    return;
-                }
-
-                chart.update('none');
-                return;
-            }
-
             const resolutonDelta = resolution - visableDataResolution;
 
             const deltaMin = resolutonDelta * offset;
@@ -271,34 +256,33 @@ export default {
 
             chart.update('none');
         };
-        state.actions.clearData = () => {
+        chart.resetData = () => {
             const chartState = getState(chart);
             chartState.data.forEach(d => d.splice(0));
 
-            chartState.options.live = options.live;
-            chartState.options.resolution = options.resolution;
-            chartState.options.minResolution = options.minResolution;
-            chartState.options.zoomFactor = options.zoomFactor;
-            chartState.options.currentRange = options.currentRange;
+            chartState.options = { ...chartState.options, ...defaults };
 
             chart.update('none');
         };
-
-        state.actions.setLive = live => {
+        chart.setLive = live => {
             const chartState = getState(chart);
+            if (chartState.options.live === live) return;
+
             chartState.options.live = live;
 
             if (live) {
+                chartState.options.resolution =
+                    chartState.options.currentRange.xMax -
+                    chartState.options.currentRange.xMin;
                 const nextRange = getRange(chartState.data, chartState.options);
-                chartState.options.resolution = nextRange.xMax - nextRange.xMin;
 
                 if (updateRange(chart, nextRange)) {
                     chart.update('none');
                 }
             }
         };
-
-        state.actions.addData = (data: ScatterDataPoint[][]) => {
+        chart.addData = (data: ScatterDataPoint[][]) => {
+            const state = getState(chart);
             data.splice(state.data.length);
             state.data.forEach((d, index) => d.push(...data[index]));
 
@@ -312,10 +296,6 @@ export default {
     },
     afterInit(chart) {
         initRange(chart);
-
-        const state = getState(chart);
-        const actions = state.actions;
-        const options = state.options;
         const { canvas } = chart.ctx;
 
         let lastX = 0;
@@ -341,6 +321,9 @@ export default {
         canvas.addEventListener('pointermove', (event: PointerEvent) => {
             if (!paning) return;
             if (!isInChartArea(chart, event.offsetX, event.offsetY)) return;
+
+            const state = getState(chart);
+            const options = state.options;
 
             const currentNewX = event.offsetX - chart.chartArea.left;
 
@@ -376,7 +359,9 @@ export default {
             if (event.deltaY === 0) return;
             if (!isInChartArea(chart, event.offsetX, event.offsetY)) return;
 
-            const data = getState(chart).data;
+            const state = getState(chart);
+            const options = state.options;
+            const data = state.data;
 
             const xMax = getMaxX(data);
             const xMin = getMinX(data);
@@ -401,7 +386,7 @@ export default {
             const offset =
                 (event.offsetX - chart.chartArea.left) / chart.chartArea.width;
 
-            actions.zoom(newResolution, offset, true);
+            chart.zoom(newResolution, offset, true);
         });
     },
     beforeElementsUpdate(chart) {
