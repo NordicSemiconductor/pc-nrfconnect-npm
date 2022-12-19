@@ -25,7 +25,7 @@ type CommandEnque = {
     callbacks: ICallbacks;
 };
 
-export type ShellParser = ReturnType<typeof hookModemToShellParser>;
+export type ShellParser = Awaited<ReturnType<typeof hookModemToShellParser>>;
 export type XTerminalShellParser = ReturnType<
     typeof xTerminalShellParserWrapper
 >;
@@ -57,7 +57,7 @@ export const xTerminalShellParserWrapper = (terminal: Terminal) => ({
         terminal.write(data, callback),
 });
 
-export const hookModemToShellParser = (
+export const hookModemToShellParser = async (
     modem: Modem,
     xTerminalShellParser: XTerminalShellParser,
     settings: ShellParserSettings = {
@@ -77,7 +77,10 @@ export const hookModemToShellParser = (
     let oldPausedState = false;
 
     // init shell mode
-    if (modem.isOpen()) modem.write(String.fromCharCode(12));
+
+    if (await modem.isOpen()) {
+        modem.write(String.fromCharCode(12));
+    }
 
     const reset = () => {
         commandBuffer = '';
@@ -89,12 +92,12 @@ export const hookModemToShellParser = (
         crnl = false;
     };
 
-    const initDataSend = () => {
+    const initDataSend = async () => {
         if (isPaused()) return; // user is typing
 
         if (dataSendingStarted) return;
 
-        if (commandQueue.length > 0 && modem.isOpen()) {
+        if (commandQueue.length > 0 && (await modem.isOpen())) {
             modem.write(`${commandQueue[0].command}\r\n`);
             dataSendingStarted = true;
         }
@@ -149,11 +152,13 @@ export const hookModemToShellParser = (
 
             commandQueue.shift();
 
-            if (commandQueue.length > 0 && modem.isOpen() && !isPaused()) {
-                modem.write(`${commandQueue[0].command}\r\n`);
-            } else {
-                dataSendingStarted = false;
-            }
+            modem.isOpen().then(isOpen => {
+                if (isOpen && commandQueue.length > 0 && !isPaused()) {
+                    modem.write(`${commandQueue[0].command}\r\n`);
+                } else {
+                    dataSendingStarted = false;
+                }
+            });
         }
 
         // Trigger permanent time callbacks
@@ -202,9 +207,9 @@ export const hookModemToShellParser = (
         xTerminalShellParser.clear();
     };
 
-    const unregisterOnOpen = modem.onOpen(() => {
+    const unregisterOnOpen = modem.onOpen(async () => {
         modem.write(String.fromCharCode(12));
-        return initDataSend();
+        await initDataSend();
     });
 
     // Hook to listen to all modem data
@@ -230,9 +235,9 @@ export const hookModemToShellParser = (
 
         if (oldPausedState !== newPausedState) {
             oldPausedState = newPausedState;
-            eventEmitter.emit('pausedChanged', newPausedState);
             // init sending of commands
-            initDataSend();
+            if (!newPausedState) initDataSend();
+            eventEmitter.emit('pausedChanged', newPausedState);
         }
         return newPausedState;
     };
@@ -250,7 +255,7 @@ export const hookModemToShellParser = (
             eventEmitter.on('unknownCommand', handler);
             return () => eventEmitter.removeListener('unknownCommand', handler);
         },
-        enqueueRequest: (
+        enqueueRequest: async (
             command: string,
             onSuccess: (data: string) => void = () => {},
             onError: (error: string) => void = () => {}
@@ -264,7 +269,7 @@ export const hookModemToShellParser = (
             });
 
             // init sending of commands
-            initDataSend();
+            await initDataSend();
         },
         registerCommandCallback: (
             command: string,

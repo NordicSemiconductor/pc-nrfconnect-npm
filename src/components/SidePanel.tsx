@@ -31,34 +31,38 @@ const TerminalSidePanel = () => {
 
     // init shell parser
     useEffect(() => {
-        dispatch(setShellParser(undefined));
+        const init = async () => {
+            dispatch(setShellParser(undefined));
 
-        if (modem) {
-            console.log('Open Shell Parser');
-            const shellParser = hookModemToShellParser(
-                modem,
-                xTerminalShellParserWrapper(
-                    new Terminal({ allowProposedApi: true })
-                ),
-                {
-                    shellPromptUart: 'shell:~$ ',
-                    logRegex:
-                        '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
-                    errorRegex: '^error: ',
-                }
-            );
+            if (modem) {
+                console.log('Open Shell Parser');
+                const shellParser = await hookModemToShellParser(
+                    modem,
+                    xTerminalShellParserWrapper(
+                        new Terminal({ allowProposedApi: true })
+                    ),
+                    {
+                        shellPromptUart: 'shell:~$ ',
+                        logRegex:
+                            '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
+                        errorRegex: '^error: ',
+                    }
+                );
 
-            const relaseOnUnknowCommand = shellParser.onUnknowCommand(data => {
-                console.warn(`Unkown Command:\r\n${data}`);
-            });
+                const relaseOnUnknowCommand = shellParser.onUnknowCommand(
+                    data => {
+                        console.warn(`Unkown Command:\r\n${data}`);
+                    }
+                );
 
-            dispatch(setShellParser(shellParser));
-            return () => {
-                relaseOnUnknowCommand();
-                shellParser.unregister();
-            };
-        }
-        return () => {};
+                dispatch(setShellParser(shellParser));
+                return () => {
+                    relaseOnUnknowCommand();
+                    shellParser.unregister();
+                };
+            }
+        };
+        init().catch(console.error);
     }, [dispatch, modem]);
 
     useEffect(() => {
