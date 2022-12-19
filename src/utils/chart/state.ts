@@ -11,28 +11,31 @@ export interface XAxisRange {
     xMax: number;
 }
 
-export interface PanPluginOptions {
+export type InternalPanPluginOptions = {
     live: boolean;
     resolution: number;
     minResolution: number;
     zoomFactor: number;
     currentRange: XAxisRange;
-}
+} & Required<PanPluginOptions>;
 
-export interface ChartActions {
-    zoom: (resolution: number, centerOffset: number) => void;
-    addData: (data: ScatterDataPoint[][]) => void;
-    clearData: () => void;
-    setLive: (live: boolean) => void;
+export interface PanPluginOptions {
     onLiveChange?: (live: boolean) => void;
     onRangeChanged?: (range: XAxisRange) => void;
 }
 
 interface ChartState {
-    options: PanPluginOptions;
-    actions: ChartActions;
+    options: InternalPanPluginOptions;
     data: ScatterDataPoint[][];
 }
+
+export const defaults = {
+    live: true,
+    resolution: 20000,
+    minResolution: 1000,
+    zoomFactor: 1.1,
+    currentRange: { xMin: 0, xMax: 20000 },
+};
 
 const chartStates = new WeakMap<Chart, ChartState>();
 
@@ -41,17 +44,9 @@ export const getState = (chart: Chart) => {
     if (!state) {
         state = {
             options: {
-                live: true,
-                resolution: 20000,
-                minResolution: 1000,
-                zoomFactor: 1.1,
-                currentRange: { xMin: 0, xMax: 20000 },
-            },
-            actions: {
-                zoom: () => {},
-                addData: () => {},
-                clearData: () => {},
-                setLive: () => {},
+                ...defaults,
+                onLiveChange: () => {},
+                onRangeChanged: () => {},
             },
             data: [],
         };

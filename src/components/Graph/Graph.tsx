@@ -20,7 +20,7 @@ import {
     LinearScale,
     LineElement,
     PointElement,
-    TimeSeriesScale,
+    TimeScale,
     Title,
     Tooltip,
 } from 'chart.js';
@@ -28,6 +28,8 @@ import { Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
 import { getShellParser } from '../../features/modem/modemSlice';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
+import CustomLegend from '../../utils/chart/CustomLegend';
+import highlightAxis from '../../utils/chart/highlightAxis';
 import { getState } from '../../utils/chart/state';
 import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 
@@ -42,8 +44,9 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    TimeSeriesScale,
-    zoomPanPlugin
+    TimeScale,
+    zoomPanPlugin,
+    highlightAxis
 );
 
 const options: ChartOptions<'line'> = {
@@ -52,7 +55,7 @@ const options: ChartOptions<'line'> = {
     responsive: true,
     plugins: {
         legend: {
-            position: 'top' as const,
+            display: false,
         },
         tooltip: {
             callbacks: {
@@ -103,17 +106,13 @@ const options: ChartOptions<'line'> = {
         },
     },
     scales: {
-        xAxis: {
-            type: 'timeseries',
+        x: {
+            type: 'time',
             display: true,
             ticks: {
                 autoSkip: false,
                 maxTicksLimit: 5,
                 display: false,
-            },
-            grid: {
-                display: true,
-                drawOnChartArea: true,
             },
         },
         yVbat: {
@@ -122,12 +121,9 @@ const options: ChartOptions<'line'> = {
             position: 'left',
             ticks: {
                 callback(value) {
-                    return `${Number(value).toFixed(2)} V`;
+                    return ` ${Number(value).toFixed(2)} V`;
                 },
                 maxTicksLimit: 5,
-            },
-            grid: {
-                drawOnChartArea: true,
             },
             suggestedMin: 3,
             suggestedMax: 5,
@@ -138,12 +134,9 @@ const options: ChartOptions<'line'> = {
             position: 'left',
             ticks: {
                 callback(value) {
-                    return `${Number(value).toFixed(2)} mA`;
+                    return ` ${Number(value).toFixed(2)} mA`;
                 },
                 maxTicksLimit: 5,
-            },
-            grid: {
-                drawOnChartArea: true,
             },
             suggestedMin: 0,
             suggestedMax: 1,
@@ -154,7 +147,7 @@ const options: ChartOptions<'line'> = {
             position: 'right',
             ticks: {
                 callback(value) {
-                    return `${value} °C`;
+                    return ` ${value} °C`;
                 },
             },
             suggestedMin: 0,
@@ -216,8 +209,7 @@ export default ({ active }: PaneProps) => {
 
     useEffect(() => {
         if (shellParser) {
-            const chartStates = chart ? getState(chart) : undefined;
-            chartStates?.actions.clearData();
+            chart?.resetData();
             setHoursOverflowCounter(0);
             setLastHour(0);
             setInitUptime(null);
@@ -272,7 +264,7 @@ export default ({ active }: PaneProps) => {
                 }
 
                 if (chart && chartStates) {
-                    chartStates.actions.addData([
+                    chart.addData([
                         [{ x: timestamp, y: v }],
                         [{ x: timestamp, y: 50 }],
                         [{ x: timestamp, y: i }],
@@ -296,7 +288,7 @@ export default ({ active }: PaneProps) => {
         const chartOptions = chartStates?.options;
 
         if (chartOptions && active) {
-            chartStates.actions.setLive(isLive);
+            chart?.setLive(isLive);
         }
     }, [chart, isLive, active]);
 
@@ -304,8 +296,8 @@ export default ({ active }: PaneProps) => {
         const chartStates = chart ? getState(chart) : undefined;
 
         if (chart && chartStates) {
-            chartStates.actions.onLiveChange = setLive;
-            chartStates.actions.onRangeChanged = setRange;
+            chartStates.options.onLiveChange = setLive;
+            chartStates.options.onRangeChanged = setRange;
         }
     }, [chart]);
 
@@ -317,11 +309,13 @@ export default ({ active }: PaneProps) => {
 
     const zoom = (resolution: number) => {
         const chartStates = chart ? getState(chart) : undefined;
-        const chartActons = chartStates?.actions;
 
-        if (chartActons?.zoom) {
+        if (chart?.zoom) {
             const chartOptions = chartStates?.options;
-            chartActons?.zoom(resolution, chartOptions?.live ? 1 : 0.5);
+            chart?.zoom(
+                resolution,
+                chartOptions?.live || resolution <= 0 ? 1 : 0.5
+            );
         }
     };
 
@@ -330,21 +324,9 @@ export default ({ active }: PaneProps) => {
             <div className="graph">
                 <div className="graph-cards">
                     <Card title="Discharge Graph">
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                marginBottom: '30px',
-                            }}
-                        >
+                        <div className="graph-top-bar-wrapper">
                             <div />
-                            <div
-                                className="range-buttons"
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                }}
-                            >
+                            <div className="range-buttons">
                                 <Button
                                     className="btn-primary w-100 h-100"
                                     onClick={() => zoom(10)}
@@ -381,6 +363,12 @@ export default ({ active }: PaneProps) => {
                                 >
                                     1min
                                 </Button>
+                                <Button
+                                    className="btn-primary w-100 h-100"
+                                    onClick={() => zoom(-1)}
+                                >
+                                    All
+                                </Button>
                             </div>
                             <div>
                                 <Toggle
@@ -390,7 +378,13 @@ export default ({ active }: PaneProps) => {
                                 />
                             </div>
                         </div>
-                        <Line options={options} data={chartData} ref={ref} />
+                        <CustomLegend chart={ref.current} />
+                        <Line
+                            height="100vh"
+                            options={options}
+                            data={chartData}
+                            ref={ref}
+                        />
                         <TimeSpanDeltaLine
                             range={range}
                             chartArea={chartArea}
