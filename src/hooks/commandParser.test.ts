@@ -16,7 +16,7 @@ jest.mock('../features/modem/modem');
 describe('shell command parser', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        termnalBuffer = settings.shellPromptUart;
+        terminalBuffer = settings.shellPromptUart;
         mockIsOpen.mockReturnValue(
             new Promise<boolean>(resolve => {
                 resolve(true);
@@ -40,7 +40,7 @@ describe('shell command parser', () => {
                 resolve(true);
             })
     );
-    const mockGetpath = jest.fn(() => '');
+    const mockGetPath = jest.fn(() => '');
 
     const mockOnShellLogging = jest.fn(() => '');
     const mockOnUnknown = jest.fn(() => '');
@@ -62,22 +62,22 @@ describe('shell command parser', () => {
         update: mockWrite,
         set: mockWrite,
         isOpen: mockIsOpen,
-        getPath: mockGetpath,
+        getPath: mockGetPath,
     }));
 
-    let termnalBuffer = '';
+    let terminalBuffer = '';
 
-    const mockGetTerminalData = jest.fn(() => termnalBuffer);
+    const mockGetTerminalData = jest.fn(() => terminalBuffer);
     const mockClear = jest.fn(() => {
-        termnalBuffer = '';
+        terminalBuffer = '';
     });
     const mockGetLastLine = jest.fn(
-        () => termnalBuffer.split('\r\n').pop() as string
+        () => terminalBuffer.split('\r\n').pop() as string
     );
     const mockTerminalWrite = jest.fn(
         (data: string, callback: () => void | undefined) => {
             if (data !== '\r' && data !== '\n') {
-                termnalBuffer += data;
+                terminalBuffer += data;
             }
             callback();
         }
@@ -133,7 +133,7 @@ describe('shell command parser', () => {
         expect(mockWrite).toBeCalledWith(String.fromCharCode(12).toString());
     });
 
-    test('Verify that no callback is called untill we get a responce', async () => {
+    test('Verify that no callback is called until we get a response', async () => {
         mockIsOpen.mockReturnValue(
             new Promise<boolean>(resolve => {
                 resolve(false);
@@ -146,7 +146,7 @@ describe('shell command parser', () => {
         );
 
         (await shellParser).onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         await shellParser.enqueueRequest('Test Command');
 
@@ -238,7 +238,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         shellParser.enqueueRequest('Test Command', mockOnSuccess, mockOnError);
 
@@ -274,7 +274,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         await shellParser.enqueueRequest(
             'Test Command',
@@ -318,7 +318,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         await shellParser.enqueueRequest(
             'Test Command',
@@ -358,7 +358,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         await shellParser.enqueueRequest(
             'Test Command',
@@ -384,7 +384,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify that only one command is send at a time untill we get a response', async () => {
+    test('Verify that only one command is send at a time until we get a response', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -402,7 +402,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         await shellParser.enqueueRequest(
             'Test Command 1',
@@ -437,7 +437,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify that onSuccess is called for the appropriate responces', async () => {
+    test('Verify that onSuccess is called for the appropriate responses', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -458,7 +458,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         await shellParser.enqueueRequest(
             'Test Command 1',
@@ -491,7 +491,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify onError and onSuccess is called for the appropriate responces', async () => {
+    test('Verify onError and onSuccess is called for the appropriate responses', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -509,7 +509,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         await shellParser.enqueueRequest(
             'Test Command 1',
@@ -541,7 +541,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify perminent onSuccess callback is called when we have a response in one stream', async () => {
+    test('Verify permanent onSuccess callback is called when we have a response in one stream', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -565,7 +565,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         await shellParser.enqueueRequest('Test Command');
 
@@ -592,7 +592,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify perminent onSuccess callback is called when we have a response in multiple streams', async () => {
+    test('Verify permanent onSuccess callback is called when we have a response in multiple streams', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -610,7 +610,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         shellParser.registerCommandCallback(
             'Test Command',
@@ -637,7 +637,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify perminent onFail callback is called when we have a response in one stream', async () => {
+    test('Verify permanent onFail callback is called when we have a response in one stream', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -655,7 +655,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         shellParser.registerCommandCallback(
             'Test Command',
@@ -705,7 +705,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         shellParser.registerCommandCallback(
             'Test Command',
@@ -732,7 +732,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify perminent and one time onSuccess both callback is called when we have a response', async () => {
+    test('Verify permanent and one time onSuccess both callback is called when we have a response', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -750,7 +750,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         shellParser.registerCommandCallback(
             'Test Command',
@@ -778,7 +778,7 @@ describe('shell command parser', () => {
         expect(mockOnError).toBeCalledTimes(0);
     });
 
-    test('Verify perminent and one time onFail callback is called when we have a response', async () => {
+    test('Verify permanent and one time onFail callback is called when we have a response', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -796,7 +796,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         shellParser.registerCommandCallback(
             'Test Command',
@@ -841,7 +841,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         onResponseCallback([
             Buffer.from('<inf> main: v=3.595881,i=0.176776\r\nuart:~$'),
@@ -875,7 +875,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         onResponseCallback([Buffer.from('<inf> main: v=3.595881,i=0')]);
 
@@ -893,7 +893,7 @@ describe('shell command parser', () => {
         expect(mockOnUnknown).toBeCalledTimes(0);
     });
 
-    test('Verify onUnknown callback is called when we have a response that is not logging nor is it a registred command one stream', async () => {
+    test('Verify onUnknown callback is called when we have a response that is not logging nor is it a registered command one stream', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -911,7 +911,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         onResponseCallback([
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$'),
@@ -925,7 +925,7 @@ describe('shell command parser', () => {
         expect(mockOnShellLogging).toBeCalledTimes(0);
     });
 
-    test('Verify onUnknown callback is called when we have a response that is not logging nor is it a registred command multiple streams', async () => {
+    test('Verify onUnknown callback is called when we have a response that is not logging nor is it a registered command multiple streams', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -943,7 +943,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         onResponseCallback([Buffer.from('Test Command\r\nRespons')]);
 
@@ -959,7 +959,7 @@ describe('shell command parser', () => {
         expect(mockOnShellLogging).toBeCalledTimes(0);
     });
 
-    test('Verify perminent callback unregister removes the callback', async () => {
+    test('Verify permanent callback unregister removes the callback', async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         let onResponseCallback = (data: Buffer[], _error?: string) => {};
 
@@ -977,7 +977,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         const unregister = shellParser.registerCommandCallback(
             'Test Command',
@@ -1008,7 +1008,7 @@ describe('shell command parser', () => {
         expect(mockOnShellLogging).toBeCalledTimes(0);
     });
 
-    test('Verify perminent callback unregister removes the right callback', async () => {
+    test('Verify permanent callback unregister removes the right callback', async () => {
         const mockOnSuccess1 = jest.fn(() => '');
         const mockOnSuccess2 = jest.fn(() => '');
         const mockOnSuccess3 = jest.fn(() => '');
@@ -1030,7 +1030,7 @@ describe('shell command parser', () => {
         );
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
-        shellParser.onUnknowCommand(mockOnUnknown);
+        shellParser.onUnknownCommand(mockOnUnknown);
 
         shellParser.registerCommandCallback(
             'Test Command',

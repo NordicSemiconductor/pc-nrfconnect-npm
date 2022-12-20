@@ -20,7 +20,7 @@ export type ShellParserSettings = {
     errorRegex: string;
 };
 
-type CommandEnque = {
+type CommandEnqueue = {
     command: string;
     callbacks: ICallbacks;
 };
@@ -70,7 +70,7 @@ export const hookModemToShellParser = async (
 
     let commandBuffer = '';
     let commandQueueCallbacks = new Map<string, ICallbacks[]>();
-    let commandQueue: CommandEnque[] = [];
+    let commandQueue: CommandEnqueue[] = [];
     let dataSendingStarted = false;
     let cr = false;
     let crnl = false;
@@ -104,7 +104,7 @@ export const hookModemToShellParser = async (
     };
 
     const parseShellCommands = (data: string, endToken: string) => {
-        // Buffer does not have the end token hence we have to consider the responce
+        // Buffer does not have the end token hence we have to consider the response
         // to still have pending bytes hence we need to wait more.
         if (data.indexOf(endToken.trim()) !== -1) {
             const commands = data.split(endToken.trim());
@@ -130,23 +130,23 @@ export const hookModemToShellParser = async (
         return data;
     };
 
-    const responseCallback = (responce: string) => {
+    const responseCallback = (response: string) => {
         let callbackFound = false;
 
-        responce = responce.trim();
+        response = response.trim();
 
         // Trigger one time callbacks
         if (
             commandQueue.length > 0 &&
-            responce.match(`^${commandQueue[0].command}`)
+            response.match(`^${commandQueue[0].command}`)
         ) {
             const command = commandQueue[0].command;
-            const commandResponce = responce.replace(command, '').trim();
-            if (commandResponce.match(settings.errorRegex)) {
-                commandQueue[0].callbacks.onError(commandResponce);
+            const commandResponse = response.replace(command, '').trim();
+            if (commandResponse.match(settings.errorRegex)) {
+                commandQueue[0].callbacks.onError(commandResponse);
                 callbackFound = true;
             } else {
-                commandQueue[0].callbacks.onSuccess(commandResponce);
+                commandQueue[0].callbacks.onSuccess(commandResponse);
                 callbackFound = true;
             }
 
@@ -163,15 +163,15 @@ export const hookModemToShellParser = async (
 
         // Trigger permanent time callbacks
         commandQueueCallbacks.forEach((callbacks, key) => {
-            if (responce.match(`^${key}`)) {
-                const commandResponce = responce.replace(key, '').trim();
-                if (commandResponce.match(settings.errorRegex)) {
+            if (response.match(`^${key}`)) {
+                const commandResponse = response.replace(key, '').trim();
+                if (commandResponse.match(settings.errorRegex)) {
                     callbacks.forEach(callback => {
-                        callback.onError(commandResponce);
+                        callback.onError(commandResponse);
                     });
                 } else {
                     callbacks.forEach(callback => {
-                        callback.onSuccess(commandResponce);
+                        callback.onSuccess(commandResponse);
                     });
                 }
 
@@ -179,10 +179,10 @@ export const hookModemToShellParser = async (
             }
         });
 
-        if (responce.match(settings.logRegex)) {
-            eventEmitter.emit('shellLogging', responce);
+        if (response.match(settings.logRegex)) {
+            eventEmitter.emit('shellLogging', response);
         } else if (!callbackFound) {
-            eventEmitter.emit('unknownCommand', responce);
+            eventEmitter.emit('unknownCommand', response);
         }
     };
 
@@ -251,7 +251,7 @@ export const hookModemToShellParser = async (
             eventEmitter.on('shellLogging', handler);
             return () => eventEmitter.removeListener('shellLogging', handler);
         },
-        onUnknowCommand: (handler: (state: string) => void) => {
+        onUnknownCommand: (handler: (state: string) => void) => {
             eventEmitter.on('unknownCommand', handler);
             return () => eventEmitter.removeListener('unknownCommand', handler);
         },
@@ -276,7 +276,7 @@ export const hookModemToShellParser = async (
             onSuccess: (data: string) => void,
             onError: (error: string) => void
         ) => {
-            // Add Callbacks to the queue for future responces
+            // Add Callbacks to the queue for future responses
             const callbacks = { onSuccess, onError };
             const existingCallbacks = commandQueueCallbacks.get(command);
             if (typeof existingCallbacks !== 'undefined') {

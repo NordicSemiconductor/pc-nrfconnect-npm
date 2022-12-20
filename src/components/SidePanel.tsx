@@ -29,6 +29,11 @@ const TerminalSidePanel = () => {
     const dispatch = useDispatch();
     useShellEffects();
 
+    useEffect(() => {
+        window.addEventListener('minimize', () => {
+            console.log('minimize');
+        });
+    }, []);
     // init shell parser
     useEffect(() => {
         const init = async () => {
@@ -49,15 +54,15 @@ const TerminalSidePanel = () => {
                     }
                 );
 
-                const relaseOnUnknowCommand = shellParser.onUnknowCommand(
+                const releaseOnUnknownCommand = shellParser.onUnknownCommand(
                     data => {
-                        console.warn(`Unkown Command:\r\n${data}`);
+                        console.warn(`Unknown Command:\r\n${data}`);
                     }
                 );
 
                 dispatch(setShellParser(shellParser));
                 return () => {
-                    relaseOnUnknowCommand();
+                    releaseOnUnknownCommand();
                     shellParser.unregister();
                 };
             }
@@ -80,8 +85,8 @@ const TerminalSidePanel = () => {
         );
         shellParserO?.registerCommandCallback(
             'test_meas_read',
-            response => console.log(`Measurment:\r\n${response}`),
-            error => console.error(`Measurment error:\r\n${error}`)
+            response => console.log(`Measurement:\r\n${response}`),
+            error => console.error(`Measurement error:\r\n${error}`)
         );
         shellParserO?.enqueueRequest('test_stream start 5');
 
