@@ -29,11 +29,6 @@ const TerminalSidePanel = () => {
     const dispatch = useDispatch();
     useShellEffects();
 
-    useEffect(() => {
-        window.addEventListener('minimize', () => {
-            console.log('minimize');
-        });
-    }, []);
     // init shell parser
     useEffect(() => {
         const init = async () => {
@@ -90,21 +85,22 @@ const TerminalSidePanel = () => {
         );
         shellParserO?.enqueueRequest('test_stream start 5');
 
-        let ledState = false;
+        // let ledState = false;
+        return () => {};
 
-        const timer = setInterval(() => {
-            if (!modem?.isOpen() || shellParserO?.isPaused()) return;
+        // const timer = setInterval(() => {
+        //     if (!modem?.isOpen() || shellParserO?.isPaused()) return;
 
-            shellParserO?.enqueueRequest(
-                'test_version',
-                response => console.log(`version one time:\r\n${response}`),
-                error => console.error(`version error one time:\r\n${error}`)
-            );
-            shellParserO?.enqueueRequest('test_meas_read');
-            shellParserO?.enqueueRequest(`test_led ${ledState ? 'on' : 'off'}`);
-            ledState = !ledState;
-        }, 2500);
-        return () => clearInterval(timer);
+        //     shellParserO?.enqueueRequest(
+        //         'test_version',
+        //         response => console.log(`version one time:\r\n${response}`),
+        //         error => console.error(`version error one time:\r\n${error}`)
+        //     );
+        //     shellParserO?.enqueueRequest('test_meas_read');
+        //     shellParserO?.enqueueRequest(`test_led ${ledState ? 'on' : 'off'}`);
+        //     ledState = !ledState;
+        // }, 2500);
+        // return () => clearInterval(timer);
     }, [shellParserO, modem]);
 
     return (
