@@ -218,7 +218,7 @@ export default ({ active }: PaneProps) => {
 
     useEffect(() => {
         if (!shellParser) return () => {};
-        const relaseShellLoggingEvent = shellParser.onShellLoggingEvent(
+        const releaseShellLoggingEvent = shellParser.onShellLoggingEvent(
             data => {
                 const chartStates = chart ? getState(chart) : undefined;
                 const splitData = data.split(' <inf> main:');
@@ -244,7 +244,7 @@ export default ({ active }: PaneProps) => {
                     60 *
                     60;
 
-                // We have wrapped 99 hours incriment counter
+                // We have wrapped 99 hours increment counter
                 if (hr < lastHour) {
                     setHoursOverflowCounter(hoursOverflowCounter + 1);
                     hr += 99;
@@ -273,7 +273,7 @@ export default ({ active }: PaneProps) => {
             }
         );
 
-        return relaseShellLoggingEvent;
+        return releaseShellLoggingEvent;
     }, [
         chart,
         active,
