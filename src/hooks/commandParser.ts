@@ -287,7 +287,7 @@ export const hookModemToShellParser = async (
             return () => {
                 const cb = commandQueueCallbacks.get(command);
 
-                if (typeof cb === 'undefined') return;
+                if (cb === undefined) return;
 
                 if (cb.length === 1) {
                     commandQueueCallbacks.delete(command);
