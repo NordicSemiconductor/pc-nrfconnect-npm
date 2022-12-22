@@ -17,7 +17,7 @@ import styles from './Terminal.module.scss';
 
 interface Props {
     commandCallback: (command: string) => string | undefined;
-    onModemData?: (listener: (data: Buffer) => Promise<void>) => () => void;
+    onModemData: (listener: (data: Buffer) => Promise<void>) => () => void;
     onModemOpen: (listener: () => void) => () => void;
 }
 
@@ -50,7 +50,7 @@ const Terminal: React.FC<Props> = ({
         [commandCallback, echoOnShell]
     );
 
-    const clearTermial = () => {
+    const clearTerminal = () => {
         xtermRef.current?.terminal.write(
             ansiEscapes.eraseLine + ansiEscapes.cursorTo(0)
         );
@@ -63,22 +63,22 @@ const Terminal: React.FC<Props> = ({
         // we need New Page (Ascii 12) so not to create an empty line on top of shell
     }, [commandCallback, onModemOpen]);
 
-    // useEffect(
-    //     () =>
-    //         onModemData(
-    //             data =>
-    //                 new Promise<void>(resolve => {
-    //                     xtermRef.current?.terminal.write(data);
-    //                     resolve();
-    //                 })
-    //         ),
-    //     [onModemData]
-    // );
+    useEffect(
+        () =>
+            onModemData(
+                data =>
+                    new Promise<void>(resolve => {
+                        xtermRef.current?.terminal.write(data);
+                        resolve();
+                    })
+            ),
+        [onModemData]
+    );
 
     useEffect(
         () =>
             onModemOpen(() => {
-                clearTermial(); // New connection or mode: clear terminal
+                clearTerminal(); // New connection or mode: clear terminal
                 commandCallback(String.fromCharCode(12)); // init shell mode
                 // we need New Page (Ascii 12) so not to create an empty line on top of shell
             }),
