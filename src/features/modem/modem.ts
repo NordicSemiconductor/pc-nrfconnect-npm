@@ -25,7 +25,7 @@ export const createModem = async (serialPortPath: string) => {
         } as SerialPortOpenOptions<AutoDetectTypes>,
         { overwrite: true, settingsLocked: true },
         {
-            onData: data => eventEmitter.emit('response', [data]),
+            onData: data => eventEmitter.emit('response', data),
             onUpdate: opt =>
                 console.warn(
                     `Received onUpdate from serial port: ${JSON.stringify(opt)}`
@@ -46,7 +46,7 @@ export const createModem = async (serialPortPath: string) => {
     );
 
     return {
-        onResponse: (handler: (data: Buffer[], error?: string) => void) => {
+        onResponse: (handler: (data: Buffer, error?: string) => void) => {
             eventEmitter.on('response', handler);
             return () => {
                 eventEmitter.removeListener('response', handler);

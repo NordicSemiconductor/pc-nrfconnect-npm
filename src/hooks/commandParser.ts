@@ -213,20 +213,16 @@ export const hookModemToShellParser = async (
     });
 
     // Hook to listen to all modem data
-    const unregisterOnResponse = modem.onResponse(data =>
-        data.forEach(dd => {
-            dd.forEach(byte => {
-                cr = byte === 13 || (cr && byte === 10);
-                crnl = cr && byte === 10;
+    const unregisterOnResponse = modem.onResponse(data => {
+        data.forEach(byte => {
+            cr = byte === 13 || (cr && byte === 10);
+            crnl = cr && byte === 10;
 
-                const callback = crnl
-                    ? () => loadToBuffer(true)
-                    : processBuffer;
+            const callback = crnl ? () => loadToBuffer(true) : processBuffer;
 
-                xTerminalShellParser.write(String.fromCharCode(byte), callback);
-            });
-        })
-    );
+            xTerminalShellParser.write(String.fromCharCode(byte), callback);
+        });
+    });
 
     const isPaused = () => {
         const newPausedState =
