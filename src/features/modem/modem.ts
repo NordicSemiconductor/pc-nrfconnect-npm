@@ -46,7 +46,9 @@ export const createModem = async (serialPortPath: string) => {
     );
 
     return {
-        onResponse: (handler: (data: Buffer, error?: string) => void) => {
+        onResponse: (
+            handler: (data: Buffer, error?: string) => Promise<void>
+        ) => {
             eventEmitter.on('response', handler);
             return () => {
                 eventEmitter.removeListener('response', handler);

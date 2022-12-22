@@ -17,7 +17,7 @@ import styles from './Terminal.module.scss';
 
 interface Props {
     commandCallback: (command: string) => string | undefined;
-    onModemData: (listener: (data: Buffer) => void) => () => void;
+    onModemData?: (listener: (data: Buffer) => Promise<void>) => () => void;
     onModemOpen: (listener: () => void) => () => void;
 }
 
@@ -32,9 +32,9 @@ const Terminal: React.FC<Props> = ({
     const echoOnShell = true;
 
     // In Shell mode we need to only write to the serial port
-    // Shell mode will garantee that data is echoed back and hence
+    // Shell mode will guarantee that data is echoed back and hence
     // all we need to do is write the data back to the terminal and let
-    // the shell mode devide do all the auto complete etc...
+    // the shell mode device do all the auto complete etc...
     const handleUserInputShellMode = useCallback(
         (data: string) => {
             if (!echoOnShell) {
@@ -63,10 +63,17 @@ const Terminal: React.FC<Props> = ({
         // we need New Page (Ascii 12) so not to create an empty line on top of shell
     }, [commandCallback, onModemOpen]);
 
-    useEffect(
-        () => onModemData(data => xtermRef.current?.terminal.write(data)),
-        [onModemData]
-    );
+    // useEffect(
+    //     () =>
+    //         onModemData(
+    //             data =>
+    //                 new Promise<void>(resolve => {
+    //                     xtermRef.current?.terminal.write(data);
+    //                     resolve();
+    //                 })
+    //         ),
+    //     [onModemData]
+    // );
 
     useEffect(
         () =>

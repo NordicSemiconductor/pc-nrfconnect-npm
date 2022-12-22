@@ -17,7 +17,7 @@ const Main = ({ active }: PaneProps) => {
     const modem = useSelector(getModem);
 
     const onModemData = useCallback(
-        (listener: (data: Buffer) => void) => {
+        (listener: (data: Buffer) => Promise<void>) => {
             if (!modem) return () => {};
 
             const cleanup = modem.onResponse(listener);
