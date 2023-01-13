@@ -350,8 +350,6 @@ export default {
                 return;
             }
 
-            lastX = newX;
-
             chart.update('none');
         });
 

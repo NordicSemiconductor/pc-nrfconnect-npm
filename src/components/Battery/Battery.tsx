@@ -119,7 +119,7 @@ const Battery: FC<batteryProps> = ({ percent, state }) => {
                 )}
                 {state === 'unavailable' && (
                     <div className="battery-side-panel">
-                        <h2>Fuel Guage Unavailable </h2>
+                        <h2>Fuel Gauge Unavailable </h2>
                     </div>
                 )}
                 {!state && (

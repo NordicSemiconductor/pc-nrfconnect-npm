@@ -10,7 +10,7 @@ import { Card } from 'pc-nrfconnect-shared';
 import Battery, { batteryProps } from '../../Battery/Battery';
 
 const BatteryCard: FC<batteryProps> = ({ percent, state }) => (
-    <Card title="Fuel Guage">
+    <Card title="Fuel Gauge">
         <Battery percent={percent} state={state} />
     </Card>
 );

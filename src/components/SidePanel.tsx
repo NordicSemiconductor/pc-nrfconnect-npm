@@ -31,34 +31,38 @@ const TerminalSidePanel = () => {
 
     // init shell parser
     useEffect(() => {
-        dispatch(setShellParser(undefined));
+        const init = async () => {
+            dispatch(setShellParser(undefined));
 
-        if (modem) {
-            console.log('Open Shell Parser');
-            const shellParser = hookModemToShellParser(
-                modem,
-                xTerminalShellParserWrapper(
-                    new Terminal({ allowProposedApi: true })
-                ),
-                {
-                    shellPromptUart: 'shell:~$ ',
-                    logRegex:
-                        '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
-                    errorRegex: '^error: ',
-                }
-            );
+            if (modem) {
+                console.log('Open Shell Parser');
+                const shellParser = await hookModemToShellParser(
+                    modem,
+                    xTerminalShellParserWrapper(
+                        new Terminal({ allowProposedApi: true })
+                    ),
+                    {
+                        shellPromptUart: 'shell:~$ ',
+                        logRegex:
+                            '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
+                        errorRegex: '^error: ',
+                    }
+                );
 
-            const relaseOnUnknowCommand = shellParser.onUnknowCommand(data => {
-                console.warn(`Unkown Command:\r\n${data}`);
-            });
+                const releaseOnUnknownCommand = shellParser.onUnknownCommand(
+                    data => {
+                        console.warn(`Unknown Command:\r\n${data}`);
+                    }
+                );
 
-            dispatch(setShellParser(shellParser));
-            return () => {
-                relaseOnUnknowCommand();
-                shellParser.unregister();
-            };
-        }
-        return () => {};
+                dispatch(setShellParser(shellParser));
+                return () => {
+                    releaseOnUnknownCommand();
+                    shellParser.unregister();
+                };
+            }
+        };
+        init().catch(console.error);
     }, [dispatch, modem]);
 
     useEffect(() => {
@@ -76,26 +80,27 @@ const TerminalSidePanel = () => {
         );
         shellParserO?.registerCommandCallback(
             'test_meas_read',
-            response => console.log(`Measurment:\r\n${response}`),
-            error => console.error(`Measurment error:\r\n${error}`)
+            response => console.log(`Measurement:\r\n${response}`),
+            error => console.error(`Measurement error:\r\n${error}`)
         );
         shellParserO?.enqueueRequest('test_stream start 5');
 
-        let ledState = false;
+        // let ledState = false;
+        return () => {};
 
-        const timer = setInterval(() => {
-            if (!modem?.isOpen() || shellParserO?.isPaused()) return;
+        // const timer = setInterval(() => {
+        //     if (!modem?.isOpen() || shellParserO?.isPaused()) return;
 
-            shellParserO?.enqueueRequest(
-                'test_version',
-                response => console.log(`version one time:\r\n${response}`),
-                error => console.error(`version error one time:\r\n${error}`)
-            );
-            shellParserO?.enqueueRequest('test_meas_read');
-            shellParserO?.enqueueRequest(`test_led ${ledState ? 'on' : 'off'}`);
-            ledState = !ledState;
-        }, 2500);
-        return () => clearInterval(timer);
+        //     shellParserO?.enqueueRequest(
+        //         'test_version',
+        //         response => console.log(`version one time:\r\n${response}`),
+        //         error => console.error(`version error one time:\r\n${error}`)
+        //     );
+        //     shellParserO?.enqueueRequest('test_meas_read');
+        //     shellParserO?.enqueueRequest(`test_led ${ledState ? 'on' : 'off'}`);
+        //     ledState = !ledState;
+        // }, 2500);
+        // return () => clearInterval(timer);
     }, [shellParserO, modem]);
 
     return (

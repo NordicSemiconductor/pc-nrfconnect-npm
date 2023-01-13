@@ -17,7 +17,7 @@ import styles from './Terminal.module.scss';
 
 interface Props {
     commandCallback: (command: string) => string | undefined;
-    onModemData: (listener: (data: Buffer) => void) => () => void;
+    onModemData: (listener: (data: Buffer) => Promise<void>) => () => void;
     onModemOpen: (listener: () => void) => () => void;
 }
 
@@ -32,9 +32,9 @@ const Terminal: React.FC<Props> = ({
     const echoOnShell = true;
 
     // In Shell mode we need to only write to the serial port
-    // Shell mode will garantee that data is echoed back and hence
+    // Shell mode will guarantee that data is echoed back and hence
     // all we need to do is write the data back to the terminal and let
-    // the shell mode devide do all the auto complete etc...
+    // the shell mode device do all the auto complete etc...
     const handleUserInputShellMode = useCallback(
         (data: string) => {
             if (!echoOnShell) {
@@ -50,7 +50,7 @@ const Terminal: React.FC<Props> = ({
         [commandCallback, echoOnShell]
     );
 
-    const clearTermial = () => {
+    const clearTerminal = () => {
         xtermRef.current?.terminal.write(
             ansiEscapes.eraseLine + ansiEscapes.cursorTo(0)
         );
@@ -64,14 +64,21 @@ const Terminal: React.FC<Props> = ({
     }, [commandCallback, onModemOpen]);
 
     useEffect(
-        () => onModemData(data => xtermRef.current?.terminal.write(data)),
+        () =>
+            onModemData(
+                data =>
+                    new Promise<void>(resolve => {
+                        xtermRef.current?.terminal.write(data);
+                        resolve();
+                    })
+            ),
         [onModemData]
     );
 
     useEffect(
         () =>
             onModemOpen(() => {
-                clearTermial(); // New connection or mode: clear terminal
+                clearTerminal(); // New connection or mode: clear terminal
                 commandCallback(String.fromCharCode(12)); // init shell mode
                 // we need New Page (Ascii 12) so not to create an empty line on top of shell
             }),

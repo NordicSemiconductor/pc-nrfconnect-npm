@@ -25,7 +25,6 @@ export default {
                 chart.tooltip.dataPoints.length > 0
             ) {
                 chart.tooltip.dataPoints = [];
-                console.log('clear');
 
                 (chart.data.datasets as ChartDataset<'line'>[]).forEach(d => {
                     if (d.yAxisID) {

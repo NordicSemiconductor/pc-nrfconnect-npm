@@ -4,67 +4,83 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import type {
+    AutoDetectTypes,
+    SetOptions,
+    UpdateOptions,
+} from '@serialport/bindings-cpp';
 import EventEmitter from 'events';
-import { logger } from 'pc-nrfconnect-shared';
-import { SerialPort } from 'serialport/dist/serialport';
+import { logger, SerialPort } from 'pc-nrfconnect-shared';
+import type { SerialPortOpenOptions } from 'serialport';
 
-export interface Modem {
-    onResponse: (
-        handler: (data: Buffer[], error?: string) => void
-    ) => () => void;
-    onOpen: (handler: (error?: string) => void) => () => void;
-    close: (callback?: (error?: Error | null) => void) => void;
-    write: (command: string) => boolean;
-    isOpen: () => boolean;
-    getpath: () => string;
-}
+export type Modem = Awaited<ReturnType<typeof createModem>>;
 
-export const createModem = (serialPortPath: string): Modem => {
+export const createModem = async (serialPortPath: string) => {
     const eventEmitter = new EventEmitter();
 
-    logger.info(`Opening: '${serialPortPath}'`);
-
-    const serialPort = new SerialPort({
-        path: serialPortPath,
-        baudRate: 115200,
-    });
-
-    serialPort.on('open', () => {
-        eventEmitter.emit('open');
-    });
-
-    serialPort.on('data', (data: Buffer) => {
-        eventEmitter.emit('response', [data]);
-    });
+    const serialPort = await SerialPort(
+        {
+            path: serialPortPath,
+            baudRate: 115200,
+        } as SerialPortOpenOptions<AutoDetectTypes>,
+        { overwrite: true, settingsLocked: true },
+        {
+            onData: data => eventEmitter.emit('response', data),
+            onUpdate: opt =>
+                console.warn(
+                    `Received onUpdate from serial port: ${JSON.stringify(opt)}`
+                ),
+            onSet: opt =>
+                console.warn(
+                    `Received onSet from serial port: ${JSON.stringify(opt)}`
+                ),
+            onChange: opt => {
+                console.warn(
+                    `Received new settings from serial port: ${JSON.stringify(
+                        opt
+                    )}`
+                );
+            },
+            onDataWritten: () => {},
+        }
+    );
 
     return {
-        onResponse: (handler: (data: Buffer[], error?: string) => void) => {
+        onResponse: (
+            handler: (data: Buffer, error?: string) => Promise<void>
+        ) => {
             eventEmitter.on('response', handler);
-            return () => eventEmitter.removeListener('response', handler);
+            return () => {
+                eventEmitter.removeListener('response', handler);
+            };
         },
 
         onOpen: (handler: (error?: string) => void) => {
             eventEmitter.on('open', handler);
-            return () => eventEmitter.removeListener('open', handler);
+            return () => {
+                eventEmitter.removeListener('open', handler);
+            };
         },
 
-        close: (callback?: (error?: Error | null) => void) => {
-            if (serialPort.isOpen) {
+        close: async () => {
+            if (await serialPort.isOpen()) {
                 logger.info(`Closing: '${serialPort.path}'`);
-                serialPort.close(callback);
+                return serialPort.close();
             }
         },
 
         write: (command: string) => {
-            serialPort.write(command, e => {
-                if (e) console.error(e);
-            });
-
+            serialPort.write(command);
             return true;
         },
 
-        isOpen: () => serialPort.isOpen,
+        update: (newOptions: UpdateOptions): void =>
+            serialPort.update(newOptions),
 
-        getpath: () => serialPort.path,
+        set: (newOptions: SetOptions): void => serialPort.set(newOptions),
+
+        isOpen: (): Promise<boolean> => serialPort.isOpen(),
+
+        getPath: (): string => serialPort.path,
     };
 };

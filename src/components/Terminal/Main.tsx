@@ -17,12 +17,11 @@ const Main = ({ active }: PaneProps) => {
     const modem = useSelector(getModem);
 
     const onModemData = useCallback(
-        (listener: (data: Buffer) => void) => {
+        (listener: (data: Buffer) => Promise<void>) => {
             if (!modem) return () => {};
 
-            const cleanup = [modem.onResponse(data => data.forEach(listener))];
-
-            return () => cleanup.forEach(fn => fn());
+            const cleanup = modem.onResponse(listener);
+            return () => cleanup();
         },
         [modem]
     );
@@ -31,9 +30,8 @@ const Main = ({ active }: PaneProps) => {
         (listener: () => void) => {
             if (!modem) return () => {};
 
-            const cleanup = [modem.onOpen(listener)];
-
-            return () => cleanup.forEach(fn => fn());
+            const cleanup = modem.onOpen(listener);
+            return () => cleanup();
         },
         [modem]
     );
