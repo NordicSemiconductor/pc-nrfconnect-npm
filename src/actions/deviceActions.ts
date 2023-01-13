@@ -6,6 +6,7 @@
 
 import { Device, logger } from 'pc-nrfconnect-shared';
 
+import { createModem } from '../features/modem/modem';
 import {
     setAvailableSerialPorts,
     setModem,
@@ -24,16 +25,33 @@ export const closeDevice = (): TAction => dispatch => {
 
 export const openDevice =
     (device: Device): TAction =>
-    dispatch => {
+    async dispatch => {
         // Reset serial port settings
-        dispatch(setAvailableSerialPorts([]));
-        dispatch(setSelectedSerialport(undefined));
-        dispatch(setShellParser(undefined));
-
         const ports = device.serialPorts;
-        if (ports?.length > 0) {
+
+        if (ports && ports?.length > 0) {
             dispatch(
                 setAvailableSerialPorts(ports.map(port => port.comName ?? ''))
             );
         }
+
+        if (ports) {
+            const comPort = ports[0].comName; // We want to connect to vComIndex 0
+            if (comPort) {
+                dispatch(setSelectedSerialport(comPort));
+                await dispatch(setModem(await createModem(comPort)));
+            }
+        }
+    };
+
+export const deviceConnected =
+    (device: Device): TAction =>
+    () => {
+        logger.info(`Device Connected SN:${device.serialNumber}`);
+    };
+
+export const deviceDisconnected =
+    (device: Device): TAction =>
+    () => {
+        logger.info(`Device Disconnected SN:${device.serialNumber}`);
     };
