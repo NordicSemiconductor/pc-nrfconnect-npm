@@ -5,8 +5,6 @@
  */
 
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { mdiArrowUpBold, mdiCheckBold, mdiThermometerHigh } from '@mdi/js';
-import Icon from '@mdi/react';
 
 import { PmicChargingState } from '../../features/pmicControl/npm/types';
 
@@ -37,16 +35,22 @@ const BatterIcon: FC<batteryIconProps> = ({ pmicChargingState }) => {
 
     let icon = '';
 
-    if (charging) icon = mdiArrowUpBold;
-    else if (pmicChargingState.batteryFull) icon = mdiCheckBold;
-    else if (pmicChargingState.dieTempHigh) icon = mdiThermometerHigh;
+    if (charging) icon = 'mdi-arrow-up-bold';
+    else if (pmicChargingState.batteryFull) icon = 'mdi-check-bold';
+    else if (pmicChargingState.dieTempHigh) icon = 'mdi-thermometer-high';
 
     return (
         <div
             ref={iconWrapper}
             className={`icon-wrapper ${showIcon ? '' : 'hidden'}`}
         >
-            <Icon path={icon} size={`${iconSize}px`} color={styles.gray700} />
+            <span
+                className={`mdi ${icon}`}
+                style={{
+                    fontSize: `${Math.round(iconSize)}px`,
+                    color: styles.gray700,
+                }}
+            />
         </div>
     );
 };

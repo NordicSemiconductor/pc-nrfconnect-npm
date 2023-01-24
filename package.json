@@ -44,8 +44,6 @@
         "xterm-headless": "^5.1.0"
     },
     "dependencies": {
-        "@mdi/js": "^7.1.96",
-        "@mdi/react": "^1.6.1",
         "esbuild": "^0.14.50",
         "npm": "^6.14.13"
     },
