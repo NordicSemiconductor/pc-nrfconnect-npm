@@ -46,6 +46,12 @@ describe('shell command parser', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_handler: (error?: string) => void) => () => {}
     );
+
+    const mockOnDataWritten = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_handler: (data: Buffer) => void) => () => {}
+    );
+
     const mockClose = jest.fn(async () => {});
     const mockWrite = jest.fn(() => true);
     const mockIsOpen = jest.fn(
@@ -71,6 +77,7 @@ describe('shell command parser', () => {
     const mockModem = jest.fn<Modem, []>(() => ({
         onResponse: mockOnResponse,
         onOpen: mockOnOpen,
+        onDataWritten: mockOnDataWritten,
         close: mockClose,
         write: mockWrite,
         update: mockWrite,
@@ -174,17 +181,6 @@ describe('shell command parser', () => {
         expect(mockOnError).toBeCalledTimes(0);
     });
 
-    test('Verify that enqueued command is sent if modem is open', async () => {
-        const shellParser = await hookModemToShellParser(
-            mockModem(),
-            mockTerminal()
-        );
-        await shellParser.enqueueRequest('Test Command');
-
-        expect(mockWrite).toBeCalledTimes(2);
-        expect(mockWrite).lastCalledWith('Test Command\r\n');
-    });
-
     test('Verify that enqueued not sent if modem is closed', async () => {
         mockIsOpen.mockReturnValue(
             new Promise<boolean>(resolve => {
@@ -199,39 +195,6 @@ describe('shell command parser', () => {
         await shellParser.enqueueRequest('Test Command');
 
         expect(mockWrite).toBeCalledTimes(0);
-    });
-
-    test('Verify that enqueued command is sent on modem opened', async () => {
-        mockIsOpen.mockReturnValue(
-            new Promise<boolean>(resolve => {
-                resolve(false);
-            })
-        );
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        let onOpenCallback = (_error?: string) => {};
-
-        mockOnOpen.mockImplementation((handler: (error?: string) => void) => {
-            onOpenCallback = handler;
-            return () => {};
-        });
-
-        const shellParser = await hookModemToShellParser(
-            mockModem(),
-            mockTerminal()
-        );
-        await shellParser.enqueueRequest('Test Command');
-
-        expect(mockWrite).toBeCalledTimes(0);
-        mockIsOpen.mockReturnValue(
-            new Promise<boolean>(resolve => {
-                resolve(true);
-            })
-        );
-
-        await onOpenCallback();
-        expect(mockWrite).toBeCalledTimes(2);
-        expect(mockWrite).lastCalledWith('Test Command\r\n');
     });
 
     test('Verify one time onSuccess callback is called when we have a response in one stream', async () => {

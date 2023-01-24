@@ -15,6 +15,7 @@ export type InternalPanPluginOptions = {
     live: boolean;
     resolution: number;
     minResolution: number;
+    maxResolution: number;
     zoomFactor: number;
     currentRange: XAxisRange;
 } & Required<PanPluginOptions>;
@@ -33,6 +34,7 @@ export const defaults = {
     live: true,
     resolution: 20000,
     minResolution: 1000,
+    maxResolution: 604800000,
     zoomFactor: 1.1,
     currentRange: { xMin: 0, xMax: 20000 },
 };

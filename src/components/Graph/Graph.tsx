@@ -6,7 +6,6 @@
 import 'chartjs-adapter-date-fns';
 
 import React, { useEffect, useRef, useState } from 'react';
-// eslint-disable-next-line import/no-unresolved
 import { Line } from 'react-chartjs-2';
 import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
@@ -26,7 +25,7 @@ import {
 } from 'chart.js';
 import { Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
-import { getShellParser } from '../../features/modem/modemSlice';
+import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
 import CustomLegend from '../../utils/chart/CustomLegend';
 import highlightAxis from '../../utils/chart/highlightAxis';
@@ -153,6 +152,18 @@ const options: ChartOptions<'line'> = {
             suggestedMin: 0,
             suggestedMax: 150,
         },
+        ySocBat: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            ticks: {
+                callback(value) {
+                    return ` ${value} %`;
+                },
+            },
+            suggestedMin: 0,
+            suggestedMax: 100,
+        },
     },
 };
 
@@ -188,19 +199,25 @@ const chartData: ChartData<'line'> = {
             tension: 0.4,
             yAxisID: 'yIbat',
         },
+        {
+            label: 'SOC',
+            data: [],
+            borderColor: styles.green,
+            backgroundColor: styles.green,
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            yAxisID: 'ySocBat',
+        },
     ],
 };
 
 export default ({ active }: PaneProps) => {
     const ref = useRef<ChartJSOrUndefined<'line'>>();
     const chart = ref.current;
-    const shellParser = useSelector(getShellParser);
+    const npmDevice = useSelector(getNpmDevice);
     const [isLive, setLive] = useState(true);
     const [range, setRange] = useState({ xMin: 0, xMax: 0 });
-    const [hoursOverflowCounter, setHoursOverflowCounter] = useState(0);
-    const [lastHour, setLastHour] = useState(0);
-    const [initUptime, setInitUptime] = useState<number | null>(null);
-
     const [chartArea, setChartCanvas] = useState(chart?.chartArea);
 
     options.onResize = (c: Chart) => {
@@ -208,80 +225,28 @@ export default ({ active }: PaneProps) => {
     };
 
     useEffect(() => {
-        if (shellParser) {
+        if (npmDevice) {
             chart?.resetData();
-            setHoursOverflowCounter(0);
-            setLastHour(0);
-            setInitUptime(null);
         }
-    }, [chart, shellParser]);
+    }, [chart, npmDevice]);
 
     useEffect(() => {
-        if (!shellParser) return () => {};
-        const releaseShellLoggingEvent = shellParser.onShellLoggingEvent(
-            data => {
-                const chartStates = chart ? getState(chart) : undefined;
-                const splitData = data.split(' <inf> main:');
+        if (!npmDevice) return () => {};
+        const releaseOnAdcSampleEvent = npmDevice.onAdcSample(sample => {
+            const chartStates = chart ? getState(chart) : undefined;
 
-                const variables = splitData[1].trim().split(',');
-                const time = splitData[0]
-                    .trim()
-                    .replace('[', '')
-                    .replace(']', '')
-                    .split(',')[0]
-                    .replace('.', ':')
-                    .split(':');
-
-                const v = Number(variables[0].split('=')[1]);
-                const i = Number(variables[1].split('=')[1]);
-
-                const msec = Number(time[3]);
-                const sec = Number(time[2]) * 1000;
-                const min = Number(time[1]) * 1000 * 60;
-                let hr =
-                    (Number(time[0]) + hoursOverflowCounter * 99) *
-                    1000 *
-                    60 *
-                    60;
-
-                // We have wrapped 99 hours increment counter
-                if (hr < lastHour) {
-                    setHoursOverflowCounter(hoursOverflowCounter + 1);
-                    hr += 99;
-                }
-
-                if (hr !== lastHour) {
-                    setLastHour(hr);
-                }
-
-                let timestamp = msec + sec + min + hr;
-
-                if (initUptime === null) {
-                    setInitUptime(timestamp);
-                    timestamp = 0;
-                } else {
-                    timestamp -= initUptime;
-                }
-
-                if (chart && chartStates) {
-                    chart.addData([
-                        [{ x: timestamp, y: v }],
-                        [{ x: timestamp, y: 50 }],
-                        [{ x: timestamp, y: i }],
-                    ]);
-                }
+            if (chart && chartStates) {
+                chart.addData([
+                    [{ x: sample.timestamp, y: sample.vBat }],
+                    [{ x: sample.timestamp, y: sample.tBat }],
+                    [{ x: sample.timestamp, y: sample.iBat }],
+                    [{ x: sample.timestamp, y: sample.soc ?? 0 }],
+                ]);
             }
-        );
+        });
 
-        return releaseShellLoggingEvent;
-    }, [
-        chart,
-        active,
-        shellParser,
-        hoursOverflowCounter,
-        lastHour,
-        initUptime,
-    ]);
+        return releaseOnAdcSampleEvent;
+    }, [chart, active, npmDevice]);
 
     useEffect(() => {
         const chartStates = chart ? getState(chart) : undefined;
@@ -329,45 +294,39 @@ export default ({ active }: PaneProps) => {
                             <div className="range-buttons">
                                 <Button
                                     className="btn-primary w-100 h-100"
-                                    onClick={() => zoom(10)}
+                                    onClick={() => zoom(300000)}
                                 >
-                                    10ms
+                                    5min
                                 </Button>
                                 <Button
                                     className="btn-primary w-100 h-100"
-                                    onClick={() => zoom(100)}
+                                    onClick={() => zoom(1800000)}
                                 >
-                                    100ms
+                                    30min
                                 </Button>
                                 <Button
                                     className="btn-primary w-100 h-100"
-                                    onClick={() => zoom(1000)}
+                                    onClick={() => zoom(3600000)}
                                 >
-                                    1s
+                                    1hr
                                 </Button>
                                 <Button
                                     className="btn-primary w-100 h-100"
-                                    onClick={() => zoom(3000)}
+                                    onClick={() => zoom(21600000)}
                                 >
-                                    3s
+                                    6hr
                                 </Button>
                                 <Button
                                     className="btn-primary w-100 h-100"
-                                    onClick={() => zoom(10000)}
+                                    onClick={() => zoom(86400000)}
                                 >
-                                    10s
+                                    1 Day
                                 </Button>
                                 <Button
                                     className="btn-primary w-100 h-100"
-                                    onClick={() => zoom(60000)}
+                                    onClick={() => zoom(604800000)}
                                 >
-                                    1min
-                                </Button>
-                                <Button
-                                    className="btn-primary w-100 h-100"
-                                    onClick={() => zoom(-1)}
-                                >
-                                    All
+                                    1 Week
                                 </Button>
                             </div>
                             <div>

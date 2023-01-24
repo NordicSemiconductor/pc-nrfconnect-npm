@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Device, logger } from 'pc-nrfconnect-shared';
+import { Device } from 'pc-nrfconnect-shared';
 
 import { createModem } from '../features/modem/modem';
 import {
@@ -16,11 +16,10 @@ import {
 import { TAction } from '../thunk';
 
 export const closeDevice = (): TAction => dispatch => {
-    logger.info('Closing device');
+    dispatch(setShellParser(undefined));
+    dispatch(setModem(undefined));
     dispatch(setAvailableSerialPorts([]));
     dispatch(setSelectedSerialport(undefined));
-    dispatch(setModem(undefined));
-    dispatch(setShellParser(undefined));
 };
 
 export const openDevice =
@@ -44,14 +43,6 @@ export const openDevice =
         }
     };
 
-export const deviceConnected =
-    (device: Device): TAction =>
-    () => {
-        logger.info(`Device Connected SN:${device.serialNumber}`);
-    };
+export const deviceConnected = (): TAction => () => {};
 
-export const deviceDisconnected =
-    (device: Device): TAction =>
-    () => {
-        logger.info(`Device Disconnected SN:${device.serialNumber}`);
-    };
+export const deviceDisconnected = (): TAction => () => {};

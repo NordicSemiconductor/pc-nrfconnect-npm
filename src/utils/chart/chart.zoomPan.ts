@@ -198,6 +198,7 @@ export default {
         live: true,
         resolution: 20000,
         minResolution: 1000,
+        maxResolution: 604800000,
         zoomFactor: 1.1,
         currentRange: { xMin: 0, xMax: 20000 },
     },
@@ -376,7 +377,10 @@ export default {
             newResolution = Math.ceil(
                 Math.max(
                     state.options.minResolution,
-                    Math.min(newResolution, fullResolution)
+                    Math.min(
+                        newResolution,
+                        Math.min(fullResolution, state.options.maxResolution)
+                    )
                 )
             );
 

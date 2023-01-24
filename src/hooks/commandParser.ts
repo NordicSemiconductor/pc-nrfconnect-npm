@@ -23,6 +23,7 @@ export type ShellParserSettings = {
 type CommandEnqueue = {
     command: string;
     callbacks: ICallbacks;
+    sent: boolean;
 };
 
 export type ShellParser = Awaited<ReturnType<typeof hookModemToShellParser>>;
@@ -62,8 +63,9 @@ export const hookModemToShellParser = async (
     xTerminalShellParser: XTerminalShellParser,
     settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$ ',
-        logRegex: '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
-        errorRegex: 'error: ',
+        logRegex:
+            '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): ',
+        errorRegex: 'Error ',
     }
 ) => {
     const eventEmitter = new EventEmitter();
@@ -74,7 +76,7 @@ export const hookModemToShellParser = async (
     let dataSendingStarted = false;
     let cr = false;
     let crnl = false;
-    let oldPausedState = false;
+    let pausedState = true; // Assume we have some command in the shell that has user has started typing
 
     // init shell mode
 
@@ -94,14 +96,23 @@ export const hookModemToShellParser = async (
 
     const initDataSend = async () => {
         if (!(await modem.isOpen())) return;
-        if (isPaused()) return; // user is typing
+        if (pausedState) return; // user is typing
 
         if (dataSendingStarted) return;
 
         if (commandQueue.length > 0) {
-            modem.write(`${commandQueue[0].command}\r\n`);
-            dataSendingStarted = true;
+            sendCommands();
         }
+    };
+
+    const sendCommands = () => {
+        commandQueue.forEach(c => {
+            if (!c.sent) {
+                modem.write(`${c.command}\r\n`);
+                c.sent = true;
+            }
+        });
+        dataSendingStarted = true;
     };
 
     const parseShellCommands = (data: string, endToken: string) => {
@@ -154,8 +165,8 @@ export const hookModemToShellParser = async (
             commandQueue.shift();
 
             modem.isOpen().then(isOpen => {
-                if (isOpen && commandQueue.length > 0 && !isPaused()) {
-                    modem.write(`${commandQueue[0].command}\r\n`);
+                if (isOpen && commandQueue.length > 0 && !pausedState) {
+                    sendCommands();
                 } else {
                     dataSendingStarted = false;
                 }
@@ -164,8 +175,10 @@ export const hookModemToShellParser = async (
 
         // Trigger permanent time callbacks
         commandQueueCallbacks.forEach((callbacks, key) => {
-            if (response.match(`^${key}`)) {
-                const commandResponse = response.replace(key, '').trim();
+            if (response.match(`^(${key})`)) {
+                const commandResponse = response
+                    .replace(new RegExp(`^(${key})\r\n`), '')
+                    .trim();
                 if (commandResponse.match(settings.errorRegex)) {
                     callbacks.forEach(callback => {
                         callback.onError(commandResponse);
@@ -195,7 +208,7 @@ export const hookModemToShellParser = async (
     };
 
     const processBuffer = () => {
-        if (isPaused()) {
+        if (!canProcess()) {
             return;
         }
 
@@ -208,9 +221,8 @@ export const hookModemToShellParser = async (
         xTerminalShellParser.clear();
     };
 
-    const unregisterOnOpen = modem.onOpen(async () => {
+    const unregisterOnOpen = modem.onOpen(() => {
         modem.write(String.fromCharCode(12));
-        await initDataSend();
     });
 
     // Hook to listen to all modem data
@@ -224,25 +236,35 @@ export const hookModemToShellParser = async (
             xTerminalShellParser.write(String.fromCharCode(byte), callback);
         });
 
+        updateIsPaused();
         await initDataSend();
     });
 
-    const isPaused = () => {
-        const newPausedState =
-            xTerminalShellParser.getLastLine() !==
-            settings.shellPromptUart.trim();
+    const unregisterOnDataWritten = modem.onDataWritten(() => {
+        pausedState = true;
+        updateIsPaused();
+    });
 
-        if (oldPausedState !== newPausedState) {
-            oldPausedState = newPausedState;
-            // init sending of commands
-            eventEmitter.emit('pausedChanged', newPausedState);
-        }
-        return newPausedState;
+    const canProcess = () =>
+        xTerminalShellParser.getLastLine() === settings.shellPromptUart.trim();
+
+    let t: NodeJS.Timeout;
+    const updateIsPaused = () => {
+        clearTimeout(t);
+        // if we have uart string we can technically update the the shell as not paused, but this might not be true us device has some
+        // partial command in its buffer hance we delay some time to make use we have uart string only for some time ensuring unpaused state.
+        t = setTimeout(() => {
+            if (pausedState === canProcess()) {
+                pausedState = !canProcess();
+                eventEmitter.emit('pausedChanged', pausedState);
+            }
+        }, 2);
     };
 
     return {
         onPausedChange: (handler: (state: boolean) => void) => {
             eventEmitter.on('pausedChanged', handler);
+            handler(pausedState);
             return () => eventEmitter.removeListener('pausedChanged', handler);
         },
         onShellLoggingEvent: (handler: (state: string) => void) => {
@@ -256,14 +278,25 @@ export const hookModemToShellParser = async (
         enqueueRequest: async (
             command: string,
             onSuccess: (data: string) => void = () => {},
-            onError: (error: string) => void = () => {}
+            onError: (error: string) => void = () => {},
+            unique = false
         ) => {
+            if (unique) {
+                if (
+                    commandQueue?.findIndex(
+                        item => item.command === command
+                    ) !== -1
+                )
+                    return;
+            }
+
             commandQueue.push({
                 command,
                 callbacks: {
                     onSuccess,
                     onError,
                 },
+                sent: false,
             });
 
             // init sending of commands
@@ -303,8 +336,9 @@ export const hookModemToShellParser = async (
         unregister: () => {
             unregisterOnOpen();
             unregisterOnResponse();
+            unregisterOnDataWritten();
             reset();
         },
-        isPaused,
+        isPaused: () => pausedState,
     };
 };

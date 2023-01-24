@@ -5,44 +5,142 @@
  */
 
 import React, { FC, useEffect, useRef, useState } from 'react';
-import {
-    mdiArrowDownBold,
-    mdiArrowUpBold,
-    mdiAutorenew,
-    mdiClose,
-} from '@mdi/js';
+import { mdiArrowUpBold, mdiCheckBold, mdiThermometerHigh } from '@mdi/js';
 import Icon from '@mdi/react';
+
+import { PmicChargingState } from '../../features/pmicControl/npm/types';
 
 import './battery.scss';
 import styles from './Battery.module.scss';
 
-export interface batteryProps {
-    percent: number;
-    state?: 'missing' | 'charging' | 'discharging' | 'updating' | 'unavailable';
+interface batteryIconProps {
+    pmicChargingState: PmicChargingState;
 }
 
-const Battery: FC<batteryProps> = ({ percent, state }) => {
+const BatterIcon: FC<batteryIconProps> = ({ pmicChargingState }) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
+
+    const charging =
+        (pmicChargingState.constantCurrentCharging ||
+            pmicChargingState.constantVoltageCharging ||
+            pmicChargingState.trickleCharge) &&
+        !pmicChargingState.batteryFull;
+
+    const showIcon =
+        charging ||
+        pmicChargingState.batteryFull ||
+        pmicChargingState.dieTempHigh;
+
+    const newIconSize = (iconWrapper.current?.clientHeight ?? 20) * 0.9;
+    if (newIconSize !== iconSize) setIconSize(newIconSize);
+
+    let icon = '';
+
+    if (charging) icon = mdiArrowUpBold;
+    else if (pmicChargingState.batteryFull) icon = mdiCheckBold;
+    else if (pmicChargingState.dieTempHigh) icon = mdiThermometerHigh;
+
+    return (
+        <div
+            ref={iconWrapper}
+            className={`icon-wrapper ${showIcon ? '' : 'hidden'}`}
+        >
+            <Icon path={icon} size={`${iconSize}px`} color={styles.gray700} />
+        </div>
+    );
+};
+
+interface batterySideTextProps {
+    pmicChargingState: PmicChargingState;
+    batteryConnected: boolean;
+    percent: number;
+    fuelGauge: boolean;
+}
+
+const SideText: FC<batterySideTextProps> = ({
+    pmicChargingState,
+    batteryConnected,
+    percent,
+    fuelGauge,
+}) => (
+    <div>
+        <div className="battery-side-panel">
+            {!batteryConnected && <h2>No Battery Connected</h2>}
+
+            {batteryConnected && (
+                <>
+                    {fuelGauge ? (
+                        <h2>{`${percent}% soc`}</h2>
+                    ) : (
+                        <h2>Fuel Gauge Off</h2>
+                    )}
+                    {pmicChargingState.constantCurrentCharging && (
+                        <span>Constant Current Charging</span>
+                    )}
+                    {pmicChargingState.constantVoltageCharging && (
+                        <span>Constant Voltage Charging</span>
+                    )}
+                    {pmicChargingState.trickleCharge && (
+                        <span>Trickle Charging</span>
+                    )}
+                    {pmicChargingState.batteryFull && <span>Battery Full</span>}
+                    {pmicChargingState.dieTempHigh && (
+                        <span>Battery Too Hot</span>
+                    )}
+                    {pmicChargingState.batteryRechargeNeeded && (
+                        <span>Battery Recharge Needed</span>
+                    )}
+                </>
+            )}
+        </div>
+    </div>
+);
+
+export interface batteryProps {
+    percent: number;
+    pmicChargingState: PmicChargingState;
+    batteryConnected: boolean;
+    fuelGauge: boolean;
+    disabled: boolean;
+}
+
+const Battery: FC<batteryProps> = ({
+    percent,
+    pmicChargingState,
+    batteryConnected,
+    fuelGauge,
+    disabled,
+}) => {
+    const [iconSize, setIconSize] = useState(0);
+    const iconWrapper = useRef<HTMLDivElement | null>(null);
+
+    percent = Math.round(percent);
 
     useEffect(() => {
         const newIconSize = (iconWrapper.current?.clientHeight ?? 20) * 0.9;
         if (newIconSize !== iconSize) setIconSize(newIconSize);
     }, [iconSize]);
 
-    const animated = state === 'charging' || state === 'discharging';
+    const charging =
+        pmicChargingState.constantCurrentCharging ||
+        pmicChargingState.constantVoltageCharging ||
+        pmicChargingState.trickleCharge;
 
-    const showPercent = state === undefined || animated ? percent : 0;
+    const showPercent =
+        pmicChargingState.batteryFull || charging || batteryConnected
+            ? percent
+            : 0;
 
     return (
-        <div className="battery-wrapper">
+        <div className={`battery-wrapper ${disabled ? 'disabled' : ''}`}>
             <div className="battery-graphic-wrapper">
                 <div className="battery-nipple" />
                 <div className="battery">
                     <div
-                        className={`gauge ${animated ? 'animated' : ''} ${
-                            state === 'charging' ? 'charging' : ''
-                        } ${state === 'discharging' ? 'discharging' : ''}`}
+                        className={`gauge ${charging ? 'animated' : ''} ${
+                            charging ? 'charging' : ''
+                        }`}
                         style={{
                             height: `calc(${showPercent}% + 8px)`,
                         }}
@@ -50,85 +148,17 @@ const Battery: FC<batteryProps> = ({ percent, state }) => {
                 </div>
                 <div
                     className={`state-missing ${
-                        state === 'missing' ? '' : 'hidden'
+                        !batteryConnected ? '' : 'hidden'
                     }`}
                 />
-                <div
-                    ref={iconWrapper}
-                    className={`icon-wrapper ${
-                        state !== 'missing' && state !== undefined
-                            ? ''
-                            : 'hidden'
-                    }`}
-                >
-                    {state === 'charging' && (
-                        <Icon
-                            className="bounce"
-                            path={mdiArrowUpBold}
-                            size={`${iconSize}px`}
-                            color={styles.gray700}
-                        />
-                    )}
-                    {state === 'discharging' && (
-                        <Icon
-                            className="bounce"
-                            path={mdiArrowDownBold}
-                            size={`${iconSize}px`}
-                            color={styles.gray700}
-                        />
-                    )}
-                    {state === 'updating' && (
-                        <Icon
-                            path={mdiAutorenew}
-                            size={`${iconSize}px`}
-                            color={styles.gray700}
-                            spin={2}
-                        />
-                    )}
-                    {state === 'unavailable' && (
-                        <Icon
-                            path={mdiClose}
-                            size={`${iconSize}px`}
-                            color={styles.gray700}
-                        />
-                    )}
-                </div>
+                <BatterIcon pmicChargingState={pmicChargingState} />
             </div>
-            <div>
-                {state === 'charging' && (
-                    <div className="battery-side-panel">
-                        <div>Charging</div>
-                        <h2>{`${percent}%`}</h2>
-                    </div>
-                )}
-                {state === 'discharging' && (
-                    <div className="battery-side-panel">
-                        <div>Discharging</div>
-                        <h2>{`${percent}%`}</h2>
-                    </div>
-                )}
-                {state === 'updating' && (
-                    <div className="battery-side-panel">
-                        <h2>Updating Battery Status</h2>
-                    </div>
-                )}
-                {state === 'missing' && (
-                    <div className="battery-side-panel">
-                        <h2>No Battery Connected</h2>
-                    </div>
-                )}
-                {state === 'unavailable' && (
-                    <div className="battery-side-panel">
-                        <h2>Fuel Gauge Unavailable </h2>
-                    </div>
-                )}
-                {!state && (
-                    <div className="battery-side-panel">
-                        <div>Charge</div>
-                        <h2>{`${percent}%`}</h2>
-                    </div>
-                )}
-            </div>
+            <SideText
+                pmicChargingState={pmicChargingState}
+                batteryConnected={batteryConnected}
+                percent={percent}
+                fuelGauge={fuelGauge}
+            />
         </div>
     );
 };

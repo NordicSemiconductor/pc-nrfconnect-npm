@@ -13,7 +13,12 @@ import {
     logger,
 } from 'pc-nrfconnect-shared';
 
-import { closeDevice, openDevice } from '../actions/deviceActions';
+import {
+    closeDevice,
+    deviceConnected,
+    deviceDisconnected,
+    openDevice,
+} from '../actions/deviceActions';
 import { TDispatch } from '../thunk';
 
 /**
@@ -60,15 +65,18 @@ const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
         logger.info(`Selected device with s/n ${device.serialNumber}`);
         dispatch(openDevice(device));
     },
-    // releaseCurrentDevice: () => {
-    //     logger.info('Will set up selected device');
-    // },
-    // onDeviceIsReady: device => {
-    //     logger.info(`Device with s/n ${device.serialNumber} was set up with a firmware`);
-    // },
     onDeviceDeselected: () => {
         logger.info('Deselected device');
         dispatch(closeDevice());
+    },
+    onDeviceConnected: (device: Device) => {
+        logger.info(`Device Connected SN:${device.serialNumber}`);
+        dispatch(deviceConnected());
+    },
+
+    onDeviceDisconnected: (device: Device) => {
+        logger.info(`Device Disconnected SN:${device.serialNumber}`);
+        dispatch(deviceDisconnected());
     },
 });
 

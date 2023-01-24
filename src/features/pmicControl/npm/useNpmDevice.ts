@@ -1,0 +1,168 @@
+/*
+ * Copyright (c) 2023 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
+ */
+
+import { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { ShellParser } from '../../../hooks/commandParser';
+import {
+    getNpmDevice as getNpmDeviceSlice,
+    isSupportedVersion,
+    setBatteryConnected,
+    setBucks,
+    setChargers,
+    setFuelGauge,
+    setLdos,
+    setNpmDevice,
+    setPmicChargingState,
+    setPmicState,
+    setStateOfCharge,
+    setSupportedVersion,
+    updateBuck,
+    updateCharger,
+    updateLdo,
+} from '../pmicControlSlice';
+import { getNpmDevice } from './pmicHelpers';
+import { Buck, Charger, Ldo } from './types';
+
+export default (shellParser: ShellParser | undefined) => {
+    const npmDevice = useSelector(getNpmDeviceSlice);
+    const dispatch = useDispatch();
+    const supportedVersion = useSelector(isSupportedVersion);
+
+    const initDevice = useCallback(() => {
+        if (!npmDevice) return;
+
+        npmDevice.startAdcSample(2000);
+
+        for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
+            npmDevice.requestUpdate.chargerVTerm(i);
+            npmDevice.requestUpdate.chargerIChg(i);
+            npmDevice.requestUpdate.chargerEnabled(i);
+        }
+
+        for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
+            npmDevice.requestUpdate.buckVOut(i);
+            npmDevice.requestUpdate.buckMode(i);
+            npmDevice.requestUpdate.buckEnabled(i);
+        }
+
+        for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
+            npmDevice.requestUpdate.ldoVoltage(i);
+            npmDevice.requestUpdate.ldoMode(i);
+            npmDevice.requestUpdate.ldoEnabled(i);
+        }
+
+        npmDevice.requestUpdate.pmicChargingState();
+        npmDevice.requestUpdate.fuelGauge();
+    }, [npmDevice]);
+
+    const initComponents = useCallback(() => {
+        if (!npmDevice) return;
+
+        const emptyChargers: Charger[] = [];
+        for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
+            emptyChargers.push({
+                vTerm: npmDevice.getChargerVoltageRange(i)[0],
+                iChg: npmDevice.getChargerCurrentRange(i).min,
+                enabled: false,
+            });
+        }
+        dispatch(setChargers(emptyChargers));
+
+        const emptyBuck: Buck[] = [];
+        for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
+            emptyBuck.push({
+                vOut: npmDevice.getBuckVoltageRange(i).min,
+                mode: 'vSet',
+                enabled: false,
+            });
+        }
+        dispatch(setBucks(emptyBuck));
+
+        const emptyLdos: Ldo[] = [];
+        for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
+            emptyLdos.push({
+                voltage: npmDevice.getLdoVoltageRange(i).min,
+                mode: 'LDO',
+                enabled: false,
+            });
+        }
+        dispatch(setLdos(emptyLdos));
+    }, [dispatch, npmDevice]);
+
+    useEffect(() => {
+        dispatch(setNpmDevice(getNpmDevice(shellParser)));
+    }, [dispatch, shellParser]);
+
+    useEffect(() => {
+        if (npmDevice) {
+            const releaseOnPmicStateChange = npmDevice.onPmicStateChange(
+                state => {
+                    dispatch(setPmicState(state));
+                    if (state === 'connected' && supportedVersion) {
+                        initDevice();
+                    }
+                }
+            );
+
+            const releaseOnAdcSample = npmDevice.onAdcSample(sample => {
+                dispatch(setBatteryConnected(sample.vBat > 0));
+                dispatch(setStateOfCharge(sample.soc));
+            });
+
+            const releaseOnChargerUpdate = npmDevice.onChargerUpdate(
+                payload => {
+                    dispatch(updateCharger(payload));
+                }
+            );
+
+            const releaseOnFuelGaugeUpdate = npmDevice.onFuelGaugeUpdate(
+                payload => {
+                    dispatch(setFuelGauge(payload));
+                }
+            );
+
+            const releaseOnChargingStatusUpdate =
+                npmDevice.onChargingStatusUpdate(payload => {
+                    dispatch(setPmicChargingState(payload));
+                });
+
+            const releaseOnBuckUpdate = npmDevice.onBuckUpdate(payload => {
+                dispatch(updateBuck(payload));
+            });
+
+            const releaseOnLdoUpdate = npmDevice.onLdoUpdate(payload => {
+                dispatch(updateLdo(payload));
+            });
+
+            dispatch(setPmicState(npmDevice.getConnectionState()));
+
+            initComponents();
+            let chargerStateUpdateInterval: NodeJS.Timer | undefined;
+            npmDevice.isSupportedVersion().then(result => {
+                dispatch(setSupportedVersion(result));
+                if (result) {
+                    chargerStateUpdateInterval = setInterval(() => {
+                        if (npmDevice.getConnectionState() === 'connected')
+                            npmDevice.requestUpdate.pmicChargingState();
+                    }, 5000);
+                }
+            });
+
+            return () => {
+                releaseOnPmicStateChange();
+                releaseOnAdcSample();
+                releaseOnChargingStatusUpdate();
+                releaseOnChargerUpdate();
+                releaseOnBuckUpdate();
+                releaseOnLdoUpdate();
+                releaseOnFuelGaugeUpdate();
+                clearInterval(chargerStateUpdateInterval);
+            };
+        }
+    }, [dispatch, initComponents, initDevice, npmDevice, supportedVersion]);
+};

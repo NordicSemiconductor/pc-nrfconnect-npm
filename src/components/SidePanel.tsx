@@ -14,8 +14,8 @@ import {
     getShellParser,
     setShellParser,
 } from '../features/modem/modemSlice';
+import useNpmDevice from '../features/pmicControl/npm/useNpmDevice';
 import { setIsPaused } from '../features/shell/shellSlice';
-import useShellEffects from '../features/shell/useShellEffects';
 import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
@@ -27,7 +27,7 @@ const TerminalSidePanel = () => {
     const shellParserO = useSelector(getShellParser);
 
     const dispatch = useDispatch();
-    useShellEffects();
+    useNpmDevice(shellParserO);
 
     // init shell parser
     useEffect(() => {
@@ -35,17 +35,16 @@ const TerminalSidePanel = () => {
             dispatch(setShellParser(undefined));
 
             if (modem) {
-                console.log('Open Shell Parser');
                 const shellParser = await hookModemToShellParser(
                     modem,
                     xTerminalShellParserWrapper(
-                        new Terminal({ allowProposedApi: true })
+                        new Terminal({ allowProposedApi: true, cols: 999 })
                     ),
                     {
                         shellPromptUart: 'shell:~$ ',
                         logRegex:
-                            '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <inf>',
-                        errorRegex: '^error: ',
+                            '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): ',
+                        errorRegex: 'Error ',
                     }
                 );
 
@@ -67,41 +66,10 @@ const TerminalSidePanel = () => {
 
     useEffect(() => {
         shellParserO?.onPausedChange(state => {
+            console.log('onPausedChange', state);
             dispatch(setIsPaused(state));
         });
     }, [dispatch, shellParserO]);
-
-    // init data getters
-    useEffect(() => {
-        shellParserO?.registerCommandCallback(
-            'test_version',
-            response => console.log(`version 1:\r\n${response}`),
-            error => console.error(`version error:\r\n${error}`)
-        );
-        shellParserO?.registerCommandCallback(
-            'test_meas_read',
-            response => console.log(`Measurement:\r\n${response}`),
-            error => console.error(`Measurement error:\r\n${error}`)
-        );
-        shellParserO?.enqueueRequest('test_stream start 5');
-
-        // let ledState = false;
-        return () => {};
-
-        // const timer = setInterval(() => {
-        //     if (!modem?.isOpen() || shellParserO?.isPaused()) return;
-
-        //     shellParserO?.enqueueRequest(
-        //         'test_version',
-        //         response => console.log(`version one time:\r\n${response}`),
-        //         error => console.error(`version error one time:\r\n${error}`)
-        //     );
-        //     shellParserO?.enqueueRequest('test_meas_read');
-        //     shellParserO?.enqueueRequest(`test_led ${ledState ? 'on' : 'off'}`);
-        //     ledState = !ledState;
-        // }, 2500);
-        // return () => clearInterval(timer);
-    }, [shellParserO, modem]);
 
     return (
         <SidePanel className="side-panel">

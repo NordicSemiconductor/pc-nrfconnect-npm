@@ -35,13 +35,15 @@ const SerialSettings = () => {
               ]
             : [{ label: 'Not connected', value: 'Not connected' }];
 
-    const selectedComPortItem = selectedSerialport
-        ? comPortsDropdownItems[
-              comPortsDropdownItems.findIndex(
-                  e => e.value === selectedSerialport
-              )
-          ]
-        : comPortsDropdownItems[0];
+    const selectedComPortItem =
+        comPortsDropdownItems[
+            Math.max(
+                0,
+                comPortsDropdownItems.findIndex(
+                    e => e.value === selectedSerialport
+                )
+            )
+        ];
 
     const updateSerialPort = async (portPath: string | undefined) => {
         if (typeof portPath === 'undefined') {
