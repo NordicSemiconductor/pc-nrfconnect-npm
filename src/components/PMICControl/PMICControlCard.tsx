@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { FC } from 'react';
 import { useSelector } from 'react-redux';
 
 import {
@@ -22,7 +22,11 @@ import BuckCard from '../cards/Buck/BuckCard';
 import LDOCard from '../cards/LDO/LDOCard';
 import PowerCard from '../cards/Power/PowerCard';
 
-export default () => {
+interface PMICControlCardProps {
+    disabled: boolean;
+}
+
+const PMICControlCard: FC<PMICControlCardProps> = ({ disabled }) => {
     const npmDevice = useSelector(getNpmDevice);
     const chargers = useSelector(getChargers);
     const bucks = useSelector(getBucks);
@@ -32,7 +36,6 @@ export default () => {
     const stateOfCharge = useSelector(getStateOfCharge);
     const pmicChargingState = useSelector(getPmicChargingState);
     const fuelGauge = useSelector(getFuelGauge);
-    const pmicState = npmDevice?.getConnectionState();
 
     return (
         <div className="pmic-control">
@@ -42,7 +45,7 @@ export default () => {
                     pmicChargingState={pmicChargingState}
                     batteryConnected={batteryConnected}
                     fuelGauge={fuelGauge}
-                    disabled={pmicState === 'disconnected'}
+                    disabled={disabled}
                 />
                 {chargers.map((charger, index) => (
                     <PowerCard
@@ -51,7 +54,7 @@ export default () => {
                         key={`Charging${1 + index}`}
                         index={index}
                         cardLabel="Charging"
-                        disabled={pmicState === 'disconnected'}
+                        disabled={disabled}
                     />
                 ))}
                 {bucks.map((buck, index) => (
@@ -60,7 +63,7 @@ export default () => {
                         npmDevice={npmDevice}
                         key={`Buck${1 + index}`}
                         index={index}
-                        disabled={pmicState === 'disconnected'}
+                        disabled={disabled}
                     />
                 ))}
                 {ldos.map((ldo, index) => (
@@ -69,10 +72,12 @@ export default () => {
                         npmDevice={npmDevice}
                         key={`Buck${1 + index}`}
                         index={index}
-                        disabled={pmicState === 'disconnected'}
+                        disabled={disabled}
                     />
                 ))}
             </div>
         </div>
     );
 };
+
+export default PMICControlCard;

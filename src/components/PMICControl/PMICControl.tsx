@@ -28,6 +28,7 @@ const PMICControl = ({ active }: PaneProps) => {
     const shellParser = useSelector(getShellParser);
 
     const [pauseFor1Second, setPauseFor1Second] = useState(paused);
+    const disabled = pmicState === 'disconnected' || pauseFor1Second;
 
     useEffect(() => {
         if (!paused) {
@@ -86,7 +87,7 @@ const PMICControl = ({ active }: PaneProps) => {
                         )}
 
                         <div className="pmicControl-cards">
-                            <PMICControlCard />
+                            <PMICControlCard disabled={disabled} />
                         </div>
                     </div>
                 </div>
