@@ -66,7 +66,6 @@ const TerminalSidePanel = () => {
 
     useEffect(() => {
         shellParserO?.onPausedChange(state => {
-            console.log('onPausedChange', state);
             dispatch(setIsPaused(state));
         });
     }, [dispatch, shellParserO]);

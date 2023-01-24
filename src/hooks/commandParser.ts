@@ -241,6 +241,9 @@ export const hookModemToShellParser = async (
     });
 
     const unregisterOnDataWritten = modem.onDataWritten(() => {
+        if (!pausedState) {
+            eventEmitter.emit('pausedChanged', true);
+        }
         pausedState = true;
         updateIsPaused();
     });
@@ -258,7 +261,7 @@ export const hookModemToShellParser = async (
                 pausedState = !canProcess();
                 eventEmitter.emit('pausedChanged', pausedState);
             }
-        }, 2);
+        }, 5);
     };
 
     return {
@@ -340,5 +343,6 @@ export const hookModemToShellParser = async (
             reset();
         },
         isPaused: () => pausedState,
+        unPause: () => modem.write(String.fromCharCode(21)),
     };
 };

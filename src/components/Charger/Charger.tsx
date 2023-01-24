@@ -12,13 +12,13 @@ import './charger.scss';
 export default () => (
     <div className="charger-container">
         <div className="charger">
-            <Alert variant="info" label="nPM powerUP 0.1​ - Preview release! ">
+            <Alert variant="info" label="nPM PowerUP​ 0.1​ - Preview release! ">
                 This is an unsupported, experimental preview and it is subject
                 to major redesigns in the future.
             </Alert>
 
             <div className="charger-cards">
-                <p>TODO Placholder</p>
+                <p>TODO Placeholder</p>
             </div>
         </div>
     </div>

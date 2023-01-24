@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Alert, PaneProps } from 'pc-nrfconnect-shared';
+import { Alert, Button, PaneProps } from 'pc-nrfconnect-shared';
 
+import { getShellParser } from '../../features/modem/modemSlice';
 import {
     getNpmDevice,
     getPmicState,
@@ -24,6 +25,21 @@ const PMICControl = ({ active }: PaneProps) => {
 
     const npmDevice = useSelector(getNpmDevice);
     const pmicState = useSelector(getPmicState);
+    const shellParser = useSelector(getShellParser);
+
+    const [pauseFor1Second, setPauseFor1Second] = useState(paused);
+
+    useEffect(() => {
+        if (!paused) {
+            setPauseFor1Second(paused);
+        } else {
+            const t = setTimeout(() => {
+                setPauseFor1Second(paused);
+            }, 1000);
+
+            return () => clearTimeout(t);
+        }
+    }, [paused]);
 
     return (
         // eslint-disable-next-line react/jsx-no-useless-fragment
@@ -33,7 +49,7 @@ const PMICControl = ({ active }: PaneProps) => {
                     <div className="pmicControl">
                         <Alert
                             variant="info"
-                            label="nPM powerUP 0.1​ - Preview release! "
+                            label="nPM PowerUP​ 0.1​ - Preview release! "
                         >
                             This is an unsupported, experimental preview and it
                             is subject to major redesigns in the future.
@@ -49,10 +65,17 @@ const PMICControl = ({ active }: PaneProps) => {
                                 battery or USB to the EK
                             </Alert>
                         )}
-                        {pmicState !== 'offline' && paused && (
+                        {pmicState !== 'offline' && pauseFor1Second && (
                             <Alert variant="warning" label="Shell Paused: ">
                                 There is a command written in the shell that has
-                                not been submitted. Release shall to use APP
+                                not been submitted. Release shall to use
+                                APP.&nbsp;
+                                <Button
+                                    title="Unpause"
+                                    onClick={() => shellParser?.unPause()}
+                                >
+                                    Unpause
+                                </Button>
                             </Alert>
                         )}
                         {supportedVersion !== undefined && !supportedVersion && (
