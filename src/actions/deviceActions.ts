@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Device, logger } from 'pc-nrfconnect-shared';
+import { Device } from 'pc-nrfconnect-shared';
 
+import { createModem } from '../features/modem/modem';
 import {
     setAvailableSerialPorts,
     setModem,
@@ -15,25 +16,33 @@ import {
 import { TAction } from '../thunk';
 
 export const closeDevice = (): TAction => dispatch => {
-    logger.info('Closing device');
+    dispatch(setShellParser(undefined));
+    dispatch(setModem(undefined));
     dispatch(setAvailableSerialPorts([]));
     dispatch(setSelectedSerialport(undefined));
-    dispatch(setModem(undefined));
-    dispatch(setShellParser(undefined));
 };
 
 export const openDevice =
     (device: Device): TAction =>
-    dispatch => {
+    async dispatch => {
         // Reset serial port settings
-        dispatch(setAvailableSerialPorts([]));
-        dispatch(setSelectedSerialport(undefined));
-        dispatch(setShellParser(undefined));
-
         const ports = device.serialPorts;
-        if (ports?.length > 0) {
+
+        if (ports && ports?.length > 0) {
             dispatch(
                 setAvailableSerialPorts(ports.map(port => port.comName ?? ''))
             );
         }
+
+        if (ports) {
+            const comPort = ports[0].comName; // We want to connect to vComIndex 0
+            if (comPort) {
+                dispatch(setSelectedSerialport(comPort));
+                await dispatch(setModem(await createModem(comPort)));
+            }
+        }
     };
+
+export const deviceConnected = (): TAction => () => {};
+
+export const deviceDisconnected = (): TAction => () => {};

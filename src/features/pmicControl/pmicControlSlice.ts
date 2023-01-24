@@ -4,157 +4,151 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../appReducer';
+import {
+    Buck,
+    Charger,
+    Ldo,
+    NpmDevice,
+    PartialUpdate,
+    PmicChargingState,
+    PmicState,
+} from './npm/types';
 
-interface pmicControleState {
-    vTerm: number;
-    iCHG: number;
-    enableCharging: boolean;
-    vOut1: number;
-    enableV1Set: boolean;
-    enableBuck1: boolean;
-    vOut2: number;
-    enableV2Set: boolean;
-    enableBuck2: boolean;
-    vLdo1: number;
-    enableLdo1: boolean;
-    enableLoadSw1: boolean;
-    vLdo2: number;
-    enableLdo2: boolean;
-    enableLoadSw2: boolean;
+interface pmicControlState {
+    npmDevice?: NpmDevice;
+    chargers: Charger[];
+    bucks: Buck[];
+    ldos: Ldo[];
+    soc?: number;
+    pmicState: PmicState;
+    pmicChargingState: PmicChargingState;
+    batteryConnected: boolean;
+    fuelGauge: boolean;
+    supportedVersion?: boolean;
 }
 
-const initialState: pmicControleState = {
-    vTerm: 3.5,
-    iCHG: 32,
-    enableCharging: false,
-    vOut1: 1,
-    enableV1Set: true,
-    enableBuck1: false,
-    vOut2: 1,
-    enableV2Set: true,
-    enableBuck2: false,
-    vLdo1: 1.2,
-    enableLdo1: false,
-    enableLoadSw1: false,
-    vLdo2: 1.2,
-    enableLdo2: false,
-    enableLoadSw2: false,
+const initialState: pmicControlState = {
+    chargers: [],
+    bucks: [],
+    ldos: [],
+    pmicChargingState: {
+        batteryFull: false,
+        trickleCharge: false,
+        constantCurrentCharging: false,
+        constantVoltageCharging: false,
+        batteryRechargeNeeded: false,
+        dieTempHigh: false,
+        supplementModeActive: false,
+    },
+    pmicState: 'offline',
+    batteryConnected: false,
+    fuelGauge: false,
 };
 
 const pmicControlSlice = createSlice({
-    name: 'pmicControle',
+    name: 'pmicControl',
     initialState,
     reducers: {
-        npmVTermChanged(state, action) {
-            state.vTerm = action.payload;
+        setNpmDevice(state, action: PayloadAction<NpmDevice | undefined>) {
+            state.npmDevice = action.payload;
         },
-        npmICHGChanged(state, action) {
-            state.iCHG = action.payload;
+        updateCharger(state, action: PayloadAction<PartialUpdate<Charger>>) {
+            if (state.chargers.length < action.payload.index) return;
+            const chargers = [...state.chargers];
+            chargers[action.payload.index] = {
+                ...state.chargers[action.payload.index],
+                ...action.payload.data,
+            };
+            state.chargers = chargers;
         },
-        npmEnableChargingChanged(state, action) {
-            state.enableCharging = action.payload;
+        setPmicState(state, action: PayloadAction<PmicState>) {
+            state.pmicState = action.payload;
         },
-        npmVOut1Changed(state, action) {
-            state.vOut1 = action.payload;
+        setChargers(state, action: PayloadAction<Charger[]>) {
+            state.chargers = action.payload;
         },
-        npmEnableV1SetChanged(state, action) {
-            state.enableV1Set = action.payload;
+        setPmicChargingState(state, action: PayloadAction<PmicChargingState>) {
+            state.pmicChargingState = action.payload;
         },
-        npmEnableBuck1Changed(state, action) {
-            state.enableBuck1 = action.payload;
+        setStateOfCharge(state, action: PayloadAction<number | undefined>) {
+            state.soc = action.payload;
         },
-        npmVOut2Changed(state, action) {
-            state.vOut2 = action.payload;
+        setBucks(state, action: PayloadAction<Buck[]>) {
+            state.bucks = action.payload;
         },
-        npmEnableV2SetChanged(state, action) {
-            state.enableV2Set = action.payload;
+        updateBuck(state, action: PayloadAction<PartialUpdate<Buck>>) {
+            if (state.bucks.length < action.payload.index) return;
+            const buck = state.bucks[action.payload.index];
+            state.bucks[action.payload.index] = {
+                ...buck,
+                ...action.payload.data,
+            };
         },
-        npmEnableBuck2Changed(state, action) {
-            state.enableBuck2 = action.payload;
+        setLdos(state, action: PayloadAction<Ldo[]>) {
+            state.ldos = action.payload;
         },
-        npmVLdo1Change(state, action) {
-            state.vLdo1 = action.payload;
+        updateLdo(state, action: PayloadAction<PartialUpdate<Ldo>>) {
+            if (state.ldos.length < action.payload.index) return;
+
+            const ldo = state.ldos[action.payload.index];
+            state.ldos[action.payload.index] = {
+                ...ldo,
+                ...action.payload.data,
+            };
         },
-        npmEnableLdo1Change(state, action) {
-            state.enableLdo1 = action.payload;
+        setBatteryConnected(state, action: PayloadAction<boolean>) {
+            state.batteryConnected = action.payload;
         },
-        npmEnableLoadSw1Changed(state, action) {
-            state.enableLoadSw1 = action.payload;
+        setFuelGauge(state, action: PayloadAction<boolean>) {
+            state.fuelGauge = action.payload;
         },
-        npmVLdo2Change(state, action) {
-            state.vLdo2 = action.payload;
-        },
-        npmEnableLdo2Change(state, action) {
-            state.enableLdo2 = action.payload;
-        },
-        npmEnableLoadSw2Changed(state, action) {
-            state.enableLoadSw2 = action.payload;
+        setSupportedVersion(state, action: PayloadAction<boolean | undefined>) {
+            state.supportedVersion = action.payload;
         },
     },
 });
+export const getNpmDevice = (state: RootState) =>
+    state.app.pmicControl.npmDevice;
+export const getPmicState = (state: RootState) =>
+    state.app.pmicControl.pmicState;
+export const getChargers = (state: RootState) => state.app.pmicControl.chargers;
+export const getStateOfCharge = (state: RootState) =>
+    state.app.pmicControl.pmicState === 'connected'
+        ? state.app.pmicControl.soc
+        : initialState.soc;
+export const getPmicChargingState = (state: RootState) =>
+    state.app.pmicControl.pmicState === 'connected'
+        ? state.app.pmicControl.pmicChargingState
+        : initialState.pmicChargingState;
+export const getBucks = (state: RootState) => state.app.pmicControl.bucks;
+export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
+export const isBatteryConnected = (state: RootState) =>
+    state.app.pmicControl.pmicState === 'connected'
+        ? state.app.pmicControl.batteryConnected
+        : initialState.batteryConnected;
+export const getFuelGauge = (state: RootState) =>
+    state.app.pmicControl.fuelGauge;
+export const isSupportedVersion = (state: RootState) =>
+    state.app.pmicControl.pmicState !== 'offline'
+        ? state.app.pmicControl.supportedVersion
+        : initialState.supportedVersion;
 
-const {
-    npmVTermChanged,
-    npmICHGChanged,
-    npmEnableChargingChanged,
-    npmVOut1Changed,
-    npmEnableV1SetChanged,
-    npmEnableBuck1Changed,
-    npmVOut2Changed,
-    npmEnableV2SetChanged,
-    npmEnableBuck2Changed,
-    npmVLdo1Change,
-    npmEnableLdo1Change,
-    npmEnableLoadSw1Changed,
-    npmVLdo2Change,
-    npmEnableLdo2Change,
-    npmEnableLoadSw2Changed,
+export const {
+    setNpmDevice,
+    setPmicState,
+    setPmicChargingState,
+    setStateOfCharge,
+    updateCharger,
+    setChargers,
+    setBucks,
+    updateBuck,
+    setLdos,
+    updateLdo,
+    setBatteryConnected,
+    setFuelGauge,
+    setSupportedVersion,
 } = pmicControlSlice.actions;
-
-export const getVTerm = (state: RootState) => state.app.pmicControl.vTerm;
-export const getICHG = (state: RootState) => state.app.pmicControl.iCHG;
-export const getEnableCharging = (state: RootState) =>
-    state.app.pmicControl.enableCharging;
-export const getVOut1 = (state: RootState) => state.app.pmicControl.vOut1;
-export const getEnableV1Set = (state: RootState) =>
-    state.app.pmicControl.enableV1Set;
-export const getEnableBuck1 = (state: RootState) =>
-    state.app.pmicControl.enableBuck1;
-export const getVOut2 = (state: RootState) => state.app.pmicControl.vOut2;
-export const getEnableV2Set = (state: RootState) =>
-    state.app.pmicControl.enableV2Set;
-export const getEnableBuck2 = (state: RootState) =>
-    state.app.pmicControl.enableBuck2;
-export const getVLdo1 = (state: RootState) => state.app.pmicControl.vLdo1;
-export const getEnableLdo1 = (state: RootState) =>
-    state.app.pmicControl.enableLdo1;
-export const getEnableLoadSw1 = (state: RootState) =>
-    state.app.pmicControl.enableLoadSw1;
-export const getVLdo2 = (state: RootState) => state.app.pmicControl.vLdo2;
-export const getEnableLdo2 = (state: RootState) =>
-    state.app.pmicControl.enableLdo2;
-export const getEnableLoadSw2 = (state: RootState) =>
-    state.app.pmicControl.enableLoadSw2;
-
-export {
-    npmVTermChanged,
-    npmICHGChanged,
-    npmEnableChargingChanged,
-    npmVOut1Changed,
-    npmEnableV1SetChanged,
-    npmEnableBuck1Changed,
-    npmVOut2Changed,
-    npmEnableV2SetChanged,
-    npmEnableBuck2Changed,
-    npmVLdo1Change,
-    npmEnableLdo1Change,
-    npmEnableLoadSw1Changed,
-    npmVLdo2Change,
-    npmEnableLdo2Change,
-    npmEnableLoadSw2Changed,
-};
-
 export default pmicControlSlice.reducer;

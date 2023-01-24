@@ -4,40 +4,18 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 
 import {
-    getEnableBuck1,
-    getEnableBuck2,
-    getEnableCharging,
-    getEnableLdo1,
-    getEnableLdo2,
-    getEnableLoadSw1,
-    getEnableLoadSw2,
-    getEnableV1Set,
-    getEnableV2Set,
-    getICHG,
-    getVLdo1,
-    getVLdo2,
-    getVOut1,
-    getVOut2,
-    getVTerm,
-    npmEnableBuck1Changed,
-    npmEnableBuck2Changed,
-    npmEnableChargingChanged,
-    npmEnableLdo1Change,
-    npmEnableLdo2Change,
-    npmEnableLoadSw1Changed,
-    npmEnableLoadSw2Changed,
-    npmEnableV1SetChanged,
-    npmEnableV2SetChanged,
-    npmICHGChanged,
-    npmVLdo1Change,
-    npmVLdo2Change,
-    npmVOut1Changed,
-    npmVOut2Changed,
-    npmVTermChanged,
+    getBucks,
+    getChargers,
+    getFuelGauge,
+    getLdos,
+    getNpmDevice,
+    getPmicChargingState,
+    getStateOfCharge,
+    isBatteryConnected,
 } from '../../features/pmicControl/pmicControlSlice';
 import BatteryCard from '../cards/Battery/BatteryCard';
 import BuckCard from '../cards/Buck/BuckCard';
@@ -45,83 +23,55 @@ import LDOCard from '../cards/LDO/LDOCard';
 import PowerCard from '../cards/Power/PowerCard';
 
 export default () => {
-    const dispatch = useDispatch();
+    const npmDevice = useSelector(getNpmDevice);
+    const chargers = useSelector(getChargers);
+    const bucks = useSelector(getBucks);
+    const ldos = useSelector(getLdos);
+    const batteryConnected = useSelector(isBatteryConnected);
 
-    const vOut1 = useSelector(getVOut1);
-    const [internalVout1, setInternalVOut1] = useState(vOut1);
-
-    const vOut2 = useSelector(getVOut2);
-    const [internalVout2, setInternalVOut2] = useState(vOut2);
+    const stateOfCharge = useSelector(getStateOfCharge);
+    const pmicChargingState = useSelector(getPmicChargingState);
+    const fuelGauge = useSelector(getFuelGauge);
+    const pmicState = npmDevice?.getConnectionState();
 
     return (
         <div className="pmic-control">
             <div className="pmic-control-inner">
-                <BatteryCard percent={80} state={undefined} />
-                <PowerCard
-                    cardLabel="Charging"
-                    vTermSelector={getVTerm}
-                    iCHGSelector={getICHG}
-                    enableChargingSelector={getEnableCharging}
-                    onVTermChange={value => dispatch(npmVTermChanged(value))}
-                    onEnableChargingToggle={value =>
-                        dispatch(npmEnableChargingChanged(value))
-                    }
-                    onICHGChange={value => dispatch(npmICHGChanged(value))}
+                <BatteryCard
+                    percent={stateOfCharge ?? 0}
+                    pmicChargingState={pmicChargingState}
+                    batteryConnected={batteryConnected}
+                    fuelGauge={fuelGauge}
+                    disabled={pmicState === 'disconnected'}
                 />
-                <BuckCard
-                    cardLabel="BUCK 1"
-                    vOut={internalVout1}
-                    buckSelector={getEnableBuck1}
-                    vSetSelector={getEnableV1Set}
-                    onVSetToggle={value =>
-                        dispatch(npmEnableV1SetChanged(value))
-                    }
-                    onVOutChange={value => setInternalVOut1(value)}
-                    onVOutChangeComplete={() =>
-                        dispatch(npmVOut1Changed(internalVout1))
-                    }
-                    onBuckToggle={value =>
-                        dispatch(npmEnableBuck1Changed(value))
-                    }
-                />
-                <BuckCard
-                    cardLabel="BUCK 2"
-                    vOut={internalVout2}
-                    buckSelector={getEnableBuck2}
-                    vSetSelector={getEnableV2Set}
-                    onVSetToggle={value =>
-                        dispatch(npmEnableV2SetChanged(value))
-                    }
-                    onVOutChange={value => setInternalVOut2(value)}
-                    onVOutChangeComplete={() =>
-                        dispatch(npmVOut2Changed(internalVout2))
-                    }
-                    onBuckToggle={value =>
-                        dispatch(npmEnableBuck2Changed(value))
-                    }
-                />
-                <LDOCard
-                    cardLabel="LDO/Load Switch 1"
-                    ldoSelector={getEnableLdo1}
-                    vLdoSelector={getVLdo1}
-                    onLdoToggle={value => dispatch(npmEnableLdo1Change(value))}
-                    onVLdoChange={value => dispatch(npmVLdo1Change(value))}
-                    ldoSwitchSelector={getEnableLoadSw1}
-                    onLdoSwitchToggle={value =>
-                        dispatch(npmEnableLoadSw1Changed(value))
-                    }
-                />
-                <LDOCard
-                    cardLabel="LDO/Load Switch 2"
-                    ldoSelector={getEnableLdo2}
-                    vLdoSelector={getVLdo2}
-                    onLdoToggle={value => dispatch(npmEnableLdo2Change(value))}
-                    onVLdoChange={value => dispatch(npmVLdo2Change(value))}
-                    ldoSwitchSelector={getEnableLoadSw2}
-                    onLdoSwitchToggle={value =>
-                        dispatch(npmEnableLoadSw2Changed(value))
-                    }
-                />
+                {chargers.map((charger, index) => (
+                    <PowerCard
+                        npmDevice={npmDevice}
+                        charger={charger}
+                        key={`Charging${1 + index}`}
+                        index={index}
+                        cardLabel="Charging"
+                        disabled={pmicState === 'disconnected'}
+                    />
+                ))}
+                {bucks.map((buck, index) => (
+                    <BuckCard
+                        buck={buck}
+                        npmDevice={npmDevice}
+                        key={`Buck${1 + index}`}
+                        index={index}
+                        disabled={pmicState === 'disconnected'}
+                    />
+                ))}
+                {ldos.map((ldo, index) => (
+                    <LDOCard
+                        ldo={ldo}
+                        npmDevice={npmDevice}
+                        key={`Buck${1 + index}`}
+                        index={index}
+                        disabled={pmicState === 'disconnected'}
+                    />
+                ))}
             </div>
         </div>
     );

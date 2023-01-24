@@ -41,7 +41,9 @@ export const createModem = async (serialPortPath: string) => {
                     )}`
                 );
             },
-            onDataWritten: () => {},
+            onDataWritten: data => {
+                eventEmitter.emit('dataWritten', data);
+            },
         }
     );
 
@@ -59,6 +61,13 @@ export const createModem = async (serialPortPath: string) => {
             eventEmitter.on('open', handler);
             return () => {
                 eventEmitter.removeListener('open', handler);
+            };
+        },
+
+        onDataWritten: (handler: (data: Buffer) => void) => {
+            eventEmitter.on('dataWritten', handler);
+            return () => {
+                eventEmitter.removeListener('dataWritten', handler);
             };
         },
 

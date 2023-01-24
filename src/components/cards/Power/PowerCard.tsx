@@ -4,120 +4,143 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import FormLabel from 'react-bootstrap/FormLabel';
-import { useSelector } from 'react-redux';
 import { Card, NumberInlineInput, Slider, Toggle } from 'pc-nrfconnect-shared';
+import {
+    Range,
+    Values,
+} from 'pc-nrfconnect-shared/typings/generated/src/Slider/range';
 
-import { RootState } from '../../../appReducer';
-import vTermValues from '../../../utils/vTermValues';
+import { Charger, NpmDevice } from '../../../features/pmicControl/npm/types';
 
 interface powerProps {
-    cardLabel: string;
-    vTermSelector: (state: RootState) => number;
-    iCHGSelector: (state: RootState) => number;
-    enableChargingSelector: (state: RootState) => boolean;
-    onVTermChange: (value: number) => void;
-    onEnableChargingToggle: (value: boolean) => void;
-    onICHGChange: (value: number) => void;
+    index: number;
+    npmDevice?: NpmDevice;
+    charger?: Charger;
+    cardLabel?: string;
+    disabled: boolean;
 }
 
 const PowerCard: FC<powerProps> = ({
-    cardLabel,
-    vTermSelector,
-    iCHGSelector,
-    enableChargingSelector,
-    onVTermChange,
-    onEnableChargingToggle,
-    onICHGChange,
+    index,
+    npmDevice,
+    charger,
+    cardLabel = `Charging ${index + 1}`,
+    disabled,
 }) => {
-    const vTerm = useSelector(vTermSelector);
-    const [internalVTerm, setInternaVTerm] = useState(vTerm);
-    const iCHG = useSelector(iCHGSelector);
-    const [internalICHG, setInternaICHG] = useState(iCHG);
-    const enableCharging = useSelector(enableChargingSelector);
+    const currentRange = npmDevice?.getChargerCurrentRange(index);
+    const currentVoltage = npmDevice?.getChargerVoltageRange(index) as Values;
+
+    const onVTermChange = (value: number) =>
+        npmDevice?.setChargerVTerm(index, value);
+
+    const onEnableChargingToggle = (value: boolean) =>
+        npmDevice?.setChargerEnabled(index, value);
+
+    const onIChgChange = (value: number) =>
+        npmDevice?.setChargerIChg(index, value);
+
+    const [internalVTerm, setInternalVTerm] = useState(charger?.vTerm ?? 0);
+    const [internalIChg, setInternalIChg] = useState(charger?.iChg ?? 0);
+
+    useEffect(() => {
+        if (charger) {
+            setInternalVTerm(charger.vTerm);
+            setInternalIChg(charger.iChg);
+        }
+    }, [charger]);
 
     return (
-        <Card
-            title={
-                <div className="d-flex justify-content-between">
-                    <span>{cardLabel}</span>
-                    <Toggle
-                        label="Enable"
-                        isToggled={enableCharging}
-                        onToggle={onEnableChargingToggle}
-                    />
-                </div>
-            }
-        >
-            <div className="slider-container">
-                <FormLabel className="flex-row">
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">TERM</span>
-                    </div>
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={internalVTerm}
-                            range={vTermValues}
-                            onChange={value => setInternaVTerm(value)}
+        <>
+            {charger && (
+                <Card
+                    title={
+                        <div
+                            className={`d-flex justify-content-between ${
+                                disabled ? 'disabled' : ''
+                            }`}
+                        >
+                            <span>{cardLabel}</span>
+                            <Toggle
+                                label="Enable"
+                                isToggled={charger.enabled}
+                                onToggle={onEnableChargingToggle}
+                                disabled={disabled}
+                            />
+                        </div>
+                    }
+                >
+                    <div
+                        className={`slider-container ${
+                            disabled ? 'disabled' : ''
+                        }`}
+                    >
+                        <FormLabel className="flex-row ">
+                            <div>
+                                <span>V</span>
+                                <span className="subscript">TERM</span>
+                            </div>
+                            <div className="flex-row">
+                                <NumberInlineInput
+                                    value={internalVTerm}
+                                    range={currentVoltage}
+                                    onChange={value => setInternalVTerm(value)}
+                                    onChangeComplete={() =>
+                                        onVTermChange(internalVTerm)
+                                    }
+                                    disabled={disabled}
+                                />
+                                <span>V</span>
+                            </div>
+                        </FormLabel>
+                        <Slider
+                            values={[currentVoltage.indexOf(internalVTerm)]}
+                            onChange={[
+                                i => setInternalVTerm(currentVoltage[i]),
+                            ]}
                             onChangeComplete={() =>
                                 onVTermChange(internalVTerm)
                             }
-                        />
-                        <span>V</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[vTermValues.indexOf(internalVTerm)]}
-                    onChange={[index => setInternaVTerm(vTermValues[index])]}
-                    onChangeComplete={() => onVTermChange(internalVTerm)}
-                    range={{
-                        min: 0,
-                        max: vTermValues.length - 1,
-                    }}
-                />
-            </div>
-            <div className="slider-container">
-                <FormLabel className="flex-row">
-                    <div>
-                        <span>I</span>
-                        <span className="subscript">CHG</span>
-                    </div>
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={internalICHG}
                             range={{
-                                min: 32,
-                                max: 800,
-                                decimals: 0,
-                                step: 2,
+                                min: 0,
+                                max: currentVoltage.length - 1,
                             }}
-                            onChange={value => setInternaICHG(value)}
-                            onChangeComplete={() => {
-                                onEnableChargingToggle(false);
-                                onICHGChange(internalICHG);
-                            }}
+                            disabled={disabled}
                         />
-                        <span>mA</span>
                     </div>
-                </FormLabel>
-                <Slider
-                    values={[internalICHG]}
-                    onChange={[value => setInternaICHG(value)]}
-                    onChangeComplete={() => {
-                        onEnableChargingToggle(false);
-                        onICHGChange(internalICHG);
-                    }}
-                    range={{
-                        min: 32,
-                        max: 800,
-                        decimals: 0,
-                        step: 2,
-                    }}
-                />
-            </div>
-        </Card>
+                    <div className="slider-container">
+                        <FormLabel
+                            className={`flex-row ${disabled ? 'disabled' : ''}`}
+                        >
+                            <div>
+                                <span>I</span>
+                                <span className="subscript">CHG</span>
+                            </div>
+                            <div className="flex-row">
+                                <NumberInlineInput
+                                    value={internalIChg}
+                                    range={currentRange as Range}
+                                    onChange={value => setInternalIChg(value)}
+                                    onChangeComplete={() =>
+                                        onIChgChange(internalIChg)
+                                    }
+                                    disabled={disabled}
+                                />
+                                <span>mA</span>
+                            </div>
+                        </FormLabel>
+                        <Slider
+                            values={[internalIChg]}
+                            onChange={[value => setInternalIChg(value)]}
+                            onChangeComplete={() => onIChgChange(internalIChg)}
+                            range={currentRange as Range}
+                            disabled={disabled}
+                        />
+                    </div>
+                </Card>
+            )}{' '}
+        </>
     );
 };
 

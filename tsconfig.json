@@ -1,6 +1,7 @@
 {
+    "extends": "./node_modules/pc-nrfconnect-shared/config/tsconfig.json",
     "compilerOptions": {
-        "skipLibCheck": true
-    },
-    "extends": "./node_modules/pc-nrfconnect-shared/config/tsconfig.json"
+        "skipLibCheck": true,
+        "target": "es2021"
+    }
 }

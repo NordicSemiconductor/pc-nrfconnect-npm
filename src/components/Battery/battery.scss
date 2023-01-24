@@ -15,11 +15,14 @@
  .battery-wrapper {
     display: flex;
     height: 100%;
-    max-height: 100px;
+    max-height: 130px;
+    min-height: 100px;
     align-items: center;
 
     .battery-side-panel {
         text-align: 'center';
+        display: flex;
+        flex-direction: column;
         h2 {
             margin: 0;
         }
@@ -34,7 +37,7 @@
         position: relative;
         align-items: center;
 
-        .hidden {display: none !important;}
+        .hidden {opacity: 0 !important;}
 
         .icon-wrapper {
             background: white;

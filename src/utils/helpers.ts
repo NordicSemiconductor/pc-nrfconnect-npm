@@ -9,15 +9,15 @@ import lodashRange from 'lodash.range';
 export interface RangeType {
     min: number;
     max: number;
-    step: number;
+    step?: number;
 }
 
 export const getRange = (ranges: RangeType[]): number[] => {
     const out: number[] = [];
 
     ranges.forEach(range => {
-        lodashRange(range.min, range.max + range.step, range.step).map(
-            (_value, index) => out.push(range.min + index * range.step)
+        lodashRange(range.min, range.max + (range.step ?? 1), range.step).map(
+            (_value, index) => out.push(range.min + index * (range.step ?? 1))
         );
     });
 
