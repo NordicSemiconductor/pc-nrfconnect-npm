@@ -14,6 +14,7 @@ import {
     Buck,
     BuckMode,
     Charger,
+    IrqEvent,
     Ldo,
     LdoMode,
     NpmDevice,
@@ -202,6 +203,36 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         eventEmitter.emit('onAdcSample', adcSample);
     };
 
+    const processModulePmicIrq = (
+        timestamp: number,
+        logLevel: string,
+        module: string,
+        message: string
+    ) => {
+        const messageParts = message.split(',');
+        const event: IrqEvent = {
+            type: '',
+            event: '',
+        };
+        messageParts.forEach(part => {
+            const pair = part.split('=');
+            switch (pair[0]) {
+                case 'type':
+                    event.type = pair[1];
+                    break;
+                case 'bit':
+                    event.event = pair[1];
+                    break;
+            }
+        });
+
+        doActionOnEvent(event);
+    };
+
+    const doActionOnEvent = (irqEvent: IrqEvent) => {
+        console.log(irqEvent);
+    };
+
     const startAdcSample = (samplingRate: number) => {
         sendCommand(`npm_adc_sample ${samplingRate}`);
     };
@@ -211,22 +242,19 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     shellParser?.onShellLoggingEvent(logEvent => {
-        parseLogData(logEvent, (timestamp, logLevel, module, message) => {
-            switch (module) {
+        parseLogData(logEvent, (...args) => {
+            switch (args[2]) {
                 case 'module_pmic':
-                    processModulePmic(timestamp, logLevel, module, message);
+                    processModulePmic(...args);
                     break;
                 case 'module_pmic_adc':
-                    processModulePmicAdc(timestamp, logLevel, module, message);
+                    processModulePmicAdc(...args);
+                    break;
+                case 'module_pmic_irq':
+                    processModulePmicIrq(...args);
                     break;
                 default:
-                    console.warn(
-                        'Unknown Module message: ',
-                        timestamp,
-                        logLevel,
-                        module,
-                        message
-                    );
+                    console.warn('Unknown Module message: ', ...args);
                     break;
             }
         });

@@ -75,7 +75,7 @@ const SideText: FC<batterySideTextProps> = ({
             {batteryConnected && (
                 <>
                     {fuelGauge ? (
-                        <h2>{`${percent}% soc`}</h2>
+                        <h2>{`${percent}%`}</h2>
                     ) : (
                         <h2>Fuel Gauge Off</h2>
                     )}
