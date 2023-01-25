@@ -11,6 +11,7 @@ import { ShellParser } from '../../../hooks/commandParser';
 import {
     dequeueWarningDialog,
     getNpmDevice as getNpmDeviceSlice,
+    getPmicState,
     isSupportedVersion,
     requestWarningDialog,
     setBatteryConnected,
@@ -34,6 +35,7 @@ export default (shellParser: ShellParser | undefined) => {
     const npmDevice = useSelector(getNpmDeviceSlice);
     const dispatch = useDispatch();
     const supportedVersion = useSelector(isSupportedVersion);
+    const pmicState = useSelector(getPmicState);
 
     const initDevice = useCallback(() => {
         if (!npmDevice) return;
@@ -139,13 +141,16 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
+        if (pmicState === 'connected' && supportedVersion) {
+            initDevice();
+        }
+    }, [initDevice, pmicState, supportedVersion]);
+
+    useEffect(() => {
         if (npmDevice) {
             const releaseOnPmicStateChange = npmDevice.onPmicStateChange(
                 state => {
                     dispatch(setPmicState(state));
-                    if (state === 'connected' && supportedVersion) {
-                        initDevice();
-                    }
                 }
             );
 
@@ -193,5 +198,5 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnFuelGaugeUpdate();
             };
         }
-    }, [dispatch, initComponents, initDevice, npmDevice, supportedVersion]);
+    }, [dispatch, initComponents, npmDevice]);
 };

@@ -32,11 +32,11 @@ interface ChartState {
 
 export const defaults = {
     live: true,
-    resolution: 20000,
+    resolution: 300000,
     minResolution: 1000,
     maxResolution: 604800000,
     zoomFactor: 1.1,
-    currentRange: { xMin: 0, xMax: 20000 },
+    currentRange: { xMin: 0, xMax: 300000 },
 };
 
 const chartStates = new WeakMap<Chart, ChartState>();
