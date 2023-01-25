@@ -121,6 +121,25 @@ export default (shellParser: ShellParser | undefined) => {
 
     useEffect(() => {
         if (npmDevice) {
+            let chargerStateUpdateInterval: NodeJS.Timer | undefined;
+            npmDevice.isSupportedVersion().then(result => {
+                dispatch(setSupportedVersion(result));
+                if (result) {
+                    chargerStateUpdateInterval = setInterval(() => {
+                        if (npmDevice.getConnectionState() === 'connected')
+                            npmDevice.requestUpdate.pmicChargingState();
+                    }, 5000);
+                }
+            });
+
+            return () => {
+                clearInterval(chargerStateUpdateInterval);
+            };
+        }
+    }, [dispatch, npmDevice]);
+
+    useEffect(() => {
+        if (npmDevice) {
             const releaseOnPmicStateChange = npmDevice.onPmicStateChange(
                 state => {
                     dispatch(setPmicState(state));
@@ -163,16 +182,6 @@ export default (shellParser: ShellParser | undefined) => {
             dispatch(setPmicState(npmDevice.getConnectionState()));
 
             initComponents();
-            let chargerStateUpdateInterval: NodeJS.Timer | undefined;
-            npmDevice.isSupportedVersion().then(result => {
-                dispatch(setSupportedVersion(result));
-                if (result) {
-                    chargerStateUpdateInterval = setInterval(() => {
-                        if (npmDevice.getConnectionState() === 'connected')
-                            npmDevice.requestUpdate.pmicChargingState();
-                    }, 5000);
-                }
-            });
 
             return () => {
                 releaseOnPmicStateChange();
@@ -182,7 +191,6 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnBuckUpdate();
                 releaseOnLdoUpdate();
                 releaseOnFuelGaugeUpdate();
-                clearInterval(chargerStateUpdateInterval);
             };
         }
     }, [dispatch, initComponents, initDevice, npmDevice, supportedVersion]);
