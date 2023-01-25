@@ -20,6 +20,7 @@ import {
     PartialUpdate,
     PmicChargingState,
     PmicState,
+    PmicWarningDialog,
 } from './types';
 
 const maxTimeStamp = 359999999; // 99hrs 59min 59sec 999ms
@@ -85,12 +86,13 @@ const parseLogData = (
 };
 
 interface INpmDevice extends IBaseNpmDevice {
-    (shellParser: ShellParser | undefined): NpmDevice;
+    (
+        shellParser: ShellParser | undefined,
+        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void
+    ): NpmDevice;
 }
 
-export const getNPM1300: INpmDevice = (
-    shellParser: ShellParser | undefined
-) => {
+export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     const eventEmitter = new EventEmitter();
     const devices = {
         noOfBucks: 2,
@@ -99,6 +101,7 @@ export const getNPM1300: INpmDevice = (
     };
     const baseDevice = baseNpmDevice(
         shellParser,
+        warningDialogHandler,
         eventEmitter,
         devices,
         '0.0.0+1'
@@ -459,14 +462,34 @@ export const getNPM1300: INpmDevice = (
     };
 
     const setBuckVOut = (index: number, value: number) => {
-        sendCommand(`npmx buck voltage normal set ${index} ${value * 1000}`);
+        const action = () => {
+            sendCommand(
+                `npmx buck voltage normal set ${index} ${value * 1000}`
+            );
 
-        if (pmicState === 'offline')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                vOut: value,
-            });
+            if (pmicState === 'offline')
+                emitPartialEvent<Buck>('onBuckUpdate', index, {
+                    vOut: value,
+                });
 
-        setBuckMode(index, 'software');
+            setBuckMode(index, 'software');
+        };
+
+        if (index === 0 && value <= 1.7) {
+            const warningDialog: PmicWarningDialog = {
+                message: `Buck 1 Powers the I2C communications that are needed for this app. 
+                    Any voltage lower that 1.7v Might cause issues with the Connection to the app. Are you sure you want to continue`,
+                confirmLabel: 'Yes',
+                cancelLabel: 'No',
+                title: 'Warning',
+                onConfirm: action,
+                onCancel: () => requestUpdate.buckVOut(index),
+            };
+
+            warningDialogHandler(warningDialog);
+        } else {
+            action();
+        }
     };
 
     const setBuckMode = (index: number, mode: BuckMode) => {
@@ -482,12 +505,30 @@ export const getNPM1300: INpmDevice = (
         requestUpdate.buckVOut(index);
     };
     const setBuckEnabled = (index: number, enabled: boolean) => {
-        sendCommand(`npmx buck ${enabled ? 'enable' : 'disable'} ${index}`);
+        const action = () => {
+            sendCommand(`npmx buck ${enabled ? 'enable' : 'disable'} ${index}`);
 
-        if (pmicState === 'offline')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                enabled,
-            });
+            if (pmicState === 'offline')
+                emitPartialEvent<Buck>('onBuckUpdate', index, {
+                    enabled,
+                });
+        };
+
+        if (index === 0 && !enabled) {
+            const warningDialog: PmicWarningDialog = {
+                message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
+                disconnected from the app. Are you sure you want to proceed?`,
+                confirmLabel: 'Yes',
+                cancelLabel: 'No',
+                title: 'Warning',
+                onConfirm: action,
+                onCancel: () => {},
+            };
+
+            warningDialogHandler(warningDialog);
+        } else {
+            action();
+        }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

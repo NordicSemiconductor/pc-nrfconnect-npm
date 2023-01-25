@@ -133,3 +133,14 @@ export type NpmDevice = {
 
     setFuelGaugeEnabled: (state: boolean) => void;
 } & BaseNpmDevice;
+
+export interface PmicWarningDialog {
+    message: string;
+    optionalLabel?: string;
+    confirmLabel: string;
+    cancelLabel: string;
+    title: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+    onOptional?: () => void;
+}

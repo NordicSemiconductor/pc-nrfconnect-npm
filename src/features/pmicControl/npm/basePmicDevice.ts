@@ -16,11 +16,13 @@ import {
     PartialUpdate,
     PmicChargingState,
     PmicState,
+    PmicWarningDialog,
 } from './types';
 
 export interface IBaseNpmDevice {
     (
         shellParser: ShellParser | undefined,
+        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void,
         eventEmitter: EventEmitter,
         devices: {
             noOfChargers?: number;
@@ -33,6 +35,7 @@ export interface IBaseNpmDevice {
 
 export const baseNpmDevice: IBaseNpmDevice = (
     shellParser: ShellParser | undefined,
+    _warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void,
     eventEmitter: EventEmitter,
     devices: {
         noOfChargers?: number;

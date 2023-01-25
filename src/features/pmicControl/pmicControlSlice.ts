@@ -15,6 +15,7 @@ import {
     PartialUpdate,
     PmicChargingState,
     PmicState,
+    PmicWarningDialog,
 } from './npm/types';
 
 interface pmicControlState {
@@ -28,6 +29,7 @@ interface pmicControlState {
     batteryConnected: boolean;
     fuelGauge: boolean;
     supportedVersion?: boolean;
+    warningDialog: PmicWarningDialog[];
 }
 
 const initialState: pmicControlState = {
@@ -46,6 +48,7 @@ const initialState: pmicControlState = {
     pmicState: 'offline',
     batteryConnected: false,
     fuelGauge: false,
+    warningDialog: [],
 };
 
 const pmicControlSlice = createSlice({
@@ -108,6 +111,12 @@ const pmicControlSlice = createSlice({
         setSupportedVersion(state, action: PayloadAction<boolean | undefined>) {
             state.supportedVersion = action.payload;
         },
+        requestWarningDialog(state, action: PayloadAction<PmicWarningDialog>) {
+            state.warningDialog = [...state.warningDialog, action.payload];
+        },
+        dequeueWarningDialog(state) {
+            state.warningDialog = [...state.warningDialog.slice(1)];
+        },
     },
 });
 export const getNpmDevice = (state: RootState) =>
@@ -135,6 +144,10 @@ export const isSupportedVersion = (state: RootState) =>
     state.app.pmicControl.pmicState !== 'offline'
         ? state.app.pmicControl.supportedVersion
         : initialState.supportedVersion;
+export const getWarningDialog = (state: RootState) =>
+    state.app.pmicControl.warningDialog.length > 0
+        ? state.app.pmicControl.warningDialog[0]
+        : undefined;
 
 export const {
     setNpmDevice,
@@ -150,5 +163,7 @@ export const {
     setBatteryConnected,
     setFuelGauge,
     setSupportedVersion,
+    requestWarningDialog,
+    dequeueWarningDialog,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;

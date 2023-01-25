@@ -9,8 +9,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { ShellParser } from '../../../hooks/commandParser';
 import {
+    dequeueWarningDialog,
     getNpmDevice as getNpmDeviceSlice,
     isSupportedVersion,
+    requestWarningDialog,
     setBatteryConnected,
     setBucks,
     setChargers,
@@ -26,7 +28,7 @@ import {
     updateLdo,
 } from '../pmicControlSlice';
 import { getNpmDevice } from './pmicHelpers';
-import { Buck, Charger, Ldo } from './types';
+import { Buck, Charger, Ldo, PmicWarningDialog } from './types';
 
 export default (shellParser: ShellParser | undefined) => {
     const npmDevice = useSelector(getNpmDeviceSlice);
@@ -60,6 +62,25 @@ export default (shellParser: ShellParser | undefined) => {
         npmDevice.requestUpdate.fuelGauge();
     }, [npmDevice]);
 
+    const warningDialogHandler = useCallback(
+        (pmicWarningDialog: PmicWarningDialog) => {
+            const onConfirm = pmicWarningDialog.onConfirm;
+            pmicWarningDialog.onConfirm = () => {
+                onConfirm();
+                dispatch(dequeueWarningDialog());
+            };
+
+            const onCancel = pmicWarningDialog.onCancel;
+            pmicWarningDialog.onCancel = () => {
+                onCancel();
+                dispatch(dequeueWarningDialog());
+            };
+
+            dispatch(requestWarningDialog(pmicWarningDialog));
+        },
+        [dispatch]
+    );
+
     const initComponents = useCallback(() => {
         if (!npmDevice) return;
 
@@ -78,7 +99,7 @@ export default (shellParser: ShellParser | undefined) => {
             emptyBuck.push({
                 vOut: npmDevice.getBuckVoltageRange(i).min,
                 mode: 'vSet',
-                enabled: false,
+                enabled: true,
             });
         }
         dispatch(setBucks(emptyBuck));
@@ -95,8 +116,8 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        dispatch(setNpmDevice(getNpmDevice(shellParser)));
-    }, [dispatch, shellParser]);
+        dispatch(setNpmDevice(getNpmDevice(shellParser, warningDialogHandler)));
+    }, [dispatch, shellParser, warningDialogHandler]);
 
     useEffect(() => {
         if (npmDevice) {
