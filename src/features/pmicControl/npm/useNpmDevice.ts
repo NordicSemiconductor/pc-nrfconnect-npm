@@ -110,7 +110,7 @@ export default (shellParser: ShellParser | undefined) => {
         for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
             emptyLdos.push({
                 voltage: npmDevice.getLdoVoltageRange(i).min,
-                mode: 'LDO',
+                mode: 'ldoSwitch',
                 enabled: false,
             });
         }
