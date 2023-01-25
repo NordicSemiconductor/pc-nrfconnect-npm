@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { getPersistentStore } from 'pc-nrfconnect-shared';
 
 import { ShellParser } from '../../../hooks/commandParser';
 import {
@@ -66,6 +67,15 @@ export default (shellParser: ShellParser | undefined) => {
 
     const warningDialogHandler = useCallback(
         (pmicWarningDialog: PmicWarningDialog) => {
+            if (
+                getPersistentStore().get(
+                    `pmicDialogs:${pmicWarningDialog.storeID}`
+                )?.doNotShowAgain === true
+            ) {
+                pmicWarningDialog.onConfirm();
+                return;
+            }
+
             const onConfirm = pmicWarningDialog.onConfirm;
             pmicWarningDialog.onConfirm = () => {
                 onConfirm();
@@ -77,6 +87,21 @@ export default (shellParser: ShellParser | undefined) => {
                 onCancel();
                 dispatch(dequeueWarningDialog());
             };
+
+            if (
+                pmicWarningDialog.optionalDoNotAskAgain &&
+                pmicWarningDialog.onOptional
+            ) {
+                const onOptional = pmicWarningDialog.onOptional;
+                pmicWarningDialog.onOptional = () => {
+                    onOptional();
+                    dispatch(dequeueWarningDialog());
+                    getPersistentStore().set(
+                        `pmicDialogs:${pmicWarningDialog.storeID}`,
+                        { doNotShowAgain: true }
+                    );
+                };
+            }
 
             dispatch(requestWarningDialog(pmicWarningDialog));
         },

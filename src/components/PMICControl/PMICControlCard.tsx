@@ -47,22 +47,22 @@ const PMICControlCard: FC<PMICControlCardProps> = ({ disabled }) => {
                     fuelGauge={fuelGauge}
                     disabled={disabled}
                 />
-                {chargers.map((charger, index) => (
-                    <PowerCard
-                        npmDevice={npmDevice}
-                        charger={charger}
-                        key={`Charging${1 + index}`}
-                        index={index}
-                        cardLabel="Charging"
-                        disabled={disabled}
-                    />
-                ))}
                 {bucks.map((buck, index) => (
                     <BuckCard
                         buck={buck}
                         npmDevice={npmDevice}
                         key={`Buck${1 + index}`}
                         index={index}
+                        disabled={disabled}
+                    />
+                ))}
+                {chargers.map((charger, index) => (
+                    <PowerCard
+                        npmDevice={npmDevice}
+                        charger={charger}
+                        key={`Charger${1 + index}`}
+                        index={index}
+                        cardLabel="Charger"
                         disabled={disabled}
                     />
                 ))}

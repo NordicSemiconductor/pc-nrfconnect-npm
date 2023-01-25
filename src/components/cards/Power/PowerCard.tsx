@@ -26,7 +26,7 @@ const PowerCard: FC<powerProps> = ({
     index,
     npmDevice,
     charger,
-    cardLabel = `Charging ${index + 1}`,
+    cardLabel = `Charger ${index + 1}`,
     disabled,
 }) => {
     const currentRange = npmDevice?.getChargerCurrentRange(index);

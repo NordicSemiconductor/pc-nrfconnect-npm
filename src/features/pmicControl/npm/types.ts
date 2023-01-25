@@ -132,6 +132,7 @@ export type NpmDevice = {
 } & BaseNpmDevice;
 
 export interface PmicWarningDialog {
+    storeID: string;
     message: string;
     optionalLabel?: string;
     confirmLabel: string;
@@ -140,4 +141,5 @@ export interface PmicWarningDialog {
     onConfirm: () => void;
     onCancel: () => void;
     onOptional?: () => void;
+    optionalDoNotAskAgain?: boolean;
 }

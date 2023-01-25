@@ -505,13 +505,17 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         if (index === 0 && value <= 1.7) {
             const warningDialog: PmicWarningDialog = {
+                storeID: 'pmic1300-setBuckVOut-0',
                 message: `Buck 1 Powers the I2C communications that are needed for this app. 
                     Any voltage lower that 1.7v Might cause issues with the Connection to the app. Are you sure you want to continue`,
                 confirmLabel: 'Yes',
+                optionalLabel: "Yes, Don't ask again",
                 cancelLabel: 'No',
                 title: 'Warning',
                 onConfirm: action,
                 onCancel: () => requestUpdate.buckVOut(index),
+                onOptional: action,
+                optionalDoNotAskAgain: true,
             };
 
             warningDialogHandler(warningDialog);
@@ -544,13 +548,17 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         if (index === 0 && !enabled) {
             const warningDialog: PmicWarningDialog = {
+                storeID: 'pmic1300-setBuckEnabled-0',
                 message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
                 disconnected from the app. Are you sure you want to proceed?`,
                 confirmLabel: 'Yes',
+                optionalLabel: "Yes, Don't ask again",
                 cancelLabel: 'No',
                 title: 'Warning',
                 onConfirm: action,
                 onCancel: () => {},
+                onOptional: action,
+                optionalDoNotAskAgain: true,
             };
 
             warningDialogHandler(warningDialog);
