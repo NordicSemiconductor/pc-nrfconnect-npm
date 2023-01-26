@@ -34,6 +34,20 @@ const DisplayPmicState = ({
     getSupportedVersion,
     shellParser,
 }: DisplayPmicStateProperties) => {
+    const [pauseFor1Second, setPauseFor1Second] = useState(paused);
+
+    useEffect(() => {
+        if (!paused) {
+            setPauseFor1Second(paused);
+        } else {
+            const t = setTimeout(() => {
+                setPauseFor1Second(paused);
+            }, 1000);
+
+            return () => clearTimeout(t);
+        }
+    }, [paused]);
+
     if (pmicState === 'offline') {
         return (
             <Alert variant="warning" label="Offline Mode: ">
@@ -49,7 +63,7 @@ const DisplayPmicState = ({
             </Alert>
         );
     }
-    if (paused) {
+    if (pauseFor1Second) {
         return (
             <Alert variant="warning" label="Shell Paused: ">
                 There is a command written in the shell that has not been
