@@ -26,10 +26,12 @@ import {
 
 const maxTimeStamp = 359999999; // 99hrs 59min 59sec 999ms
 
-const parseOnSuccess = (message: string) => message.split(':')[1]?.trim();
+// parse strings like value is: XXX mV
+const parseColonBasedAnswer = (message: string) =>
+    message.split(':')[1]?.trim();
 
 const parseToNumber = (message: string) =>
-    Number.parseInt(parseOnSuccess(message), 10);
+    Number.parseInt(parseColonBasedAnswer(message), 10);
 
 const toRegex = (
     command: string,
@@ -380,7 +382,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         shellParser?.registerCommandCallback(
             toRegex('npmx buck vout select', true, i, '[0-1]'),
             res => {
-                const valueString = parseOnSuccess(res);
+                const valueString = parseColonBasedAnswer(res);
                 let mode: BuckMode | undefined;
 
                 switch (valueString) {

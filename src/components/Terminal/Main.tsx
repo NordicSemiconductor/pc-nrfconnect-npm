@@ -8,57 +8,41 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { PaneProps } from 'pc-nrfconnect-shared';
 
-import { getModem } from '../../features/modem/modemSlice';
+import { getSerialPort } from '../../features/serial/serialSlice';
 import Terminal from './Terminal';
 
 import './overlay.scss';
 
 const Main = ({ active }: PaneProps) => {
-    const modem = useSelector(getModem);
+    const serialPort = useSelector(getSerialPort);
 
-    const onModemData = useCallback(
-        (listener: (data: Buffer) => Promise<void>) => {
-            if (!modem) return () => {};
+    const onSerialData = useCallback(
+        (listener: (data: Uint8Array) => Promise<void>) => {
+            if (!serialPort) return () => {};
 
-            const cleanup = modem.onResponse(listener);
+            const cleanup = serialPort.onData(listener);
             return () => cleanup();
         },
-        [modem]
-    );
-
-    const onModemOpen = useCallback(
-        (listener: () => void) => {
-            if (!modem) return () => {};
-
-            const cleanup = modem.onOpen(listener);
-            return () => cleanup();
-        },
-        [modem]
+        [serialPort]
     );
 
     const commandCallback = useCallback(
         (command: string) => {
-            if (!modem) return 'Please connect a device';
+            if (!serialPort) return 'Please connect a device';
 
-            if (!modem.isOpen()) return 'Connection is not open';
+            if (!serialPort.isOpen()) return 'Connection is not open';
 
-            if (!modem?.write(command)) return 'Modem busy or invalid command';
+            serialPort.write(command);
         },
-        [modem]
+        [serialPort]
     );
 
-    return (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
-        <>
-            {active && (
-                <Terminal
-                    commandCallback={commandCallback}
-                    onModemData={onModemData}
-                    onModemOpen={onModemOpen}
-                />
-            )}
-        </>
-    );
+    return active ? (
+        <Terminal
+            commandCallback={commandCallback}
+            onSerialData={onSerialData}
+        />
+    ) : null;
 };
 
 export default Main;

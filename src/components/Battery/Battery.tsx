@@ -4,26 +4,22 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { PmicChargingState } from '../../features/pmicControl/npm/types';
 
 import './battery.scss';
 import styles from './Battery.module.scss';
 
-interface batteryIconProps {
+interface BatteryIconProperties {
     pmicChargingState: PmicChargingState;
 }
 
-const BatterIcon: FC<batteryIconProps> = ({ pmicChargingState }) => {
+const BatterIcon = ({ pmicChargingState }: BatteryIconProperties) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
 
-    const charging =
-        (pmicChargingState.constantCurrentCharging ||
-            pmicChargingState.constantVoltageCharging ||
-            pmicChargingState.trickleCharge) &&
-        !pmicChargingState.batteryFull;
+    const charging = isCharging(pmicChargingState);
 
     const showIcon =
         charging ||
@@ -55,27 +51,27 @@ const BatterIcon: FC<batteryIconProps> = ({ pmicChargingState }) => {
     );
 };
 
-interface batterySideTextProps {
+interface BatterySideTextProperties {
     pmicChargingState: PmicChargingState;
     batteryConnected: boolean;
-    percent: number;
+    soc: number | undefined;
     fuelGauge: boolean;
 }
 
-const SideText: FC<batterySideTextProps> = ({
+const SideText = ({
     pmicChargingState,
     batteryConnected,
-    percent,
+    soc,
     fuelGauge,
-}) => (
+}: BatterySideTextProperties) => (
     <div>
         <div className="battery-side-panel">
             {!batteryConnected && <h2>No Battery Connected</h2>}
 
             {batteryConnected && (
                 <>
-                    {fuelGauge ? (
-                        <h2>{`${percent}%`}</h2>
+                    {fuelGauge !== undefined ? (
+                        <h2>{`${Math.round(soc ?? 0)}% soc`}</h2>
                     ) : (
                         <h2>Fuel Gauge Off</h2>
                     )}
@@ -101,40 +97,30 @@ const SideText: FC<batterySideTextProps> = ({
     </div>
 );
 
-export interface batteryProps {
-    percent: number;
+export interface BatteryProperties {
+    soc: number | undefined;
     pmicChargingState: PmicChargingState;
     batteryConnected: boolean;
     fuelGauge: boolean;
     disabled: boolean;
 }
 
-const Battery: FC<batteryProps> = ({
-    percent,
+export default ({
+    soc,
     pmicChargingState,
     batteryConnected,
     fuelGauge,
     disabled,
-}) => {
+}: BatteryProperties) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
-
-    percent = Math.round(percent);
 
     useEffect(() => {
         const newIconSize = (iconWrapper.current?.clientHeight ?? 20) * 0.9;
         if (newIconSize !== iconSize) setIconSize(newIconSize);
     }, [iconSize]);
 
-    const charging =
-        pmicChargingState.constantCurrentCharging ||
-        pmicChargingState.constantVoltageCharging ||
-        pmicChargingState.trickleCharge;
-
-    const showPercent =
-        pmicChargingState.batteryFull || charging || batteryConnected
-            ? percent
-            : 0;
+    const charging = isCharging(pmicChargingState);
 
     return (
         <div className={`battery-wrapper ${disabled ? 'disabled' : ''}`}>
@@ -146,7 +132,7 @@ const Battery: FC<batteryProps> = ({
                             charging ? 'charging' : ''
                         }`}
                         style={{
-                            height: `calc(${showPercent}% + 8px)`,
+                            height: `calc(${soc ?? 0}% + 8px)`,
                         }}
                     />
                 </div>
@@ -160,11 +146,15 @@ const Battery: FC<batteryProps> = ({
             <SideText
                 pmicChargingState={pmicChargingState}
                 batteryConnected={batteryConnected}
-                percent={percent}
+                soc={soc}
                 fuelGauge={fuelGauge}
             />
         </div>
     );
 };
 
-export default Battery;
+const isCharging = (pmicChargingState: PmicChargingState) =>
+    (pmicChargingState.constantCurrentCharging ||
+        pmicChargingState.constantVoltageCharging ||
+        pmicChargingState.trickleCharge) &&
+    !pmicChargingState.batteryFull;

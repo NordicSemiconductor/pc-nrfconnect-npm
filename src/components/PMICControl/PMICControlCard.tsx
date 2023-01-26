@@ -17,10 +17,10 @@ import {
     getStateOfCharge,
     isBatteryConnected,
 } from '../../features/pmicControl/pmicControlSlice';
-import BatteryCard from '../cards/Battery/BatteryCard';
-import BuckCard from '../cards/Buck/BuckCard';
-import LDOCard from '../cards/LDO/LDOCard';
-import PowerCard from '../cards/Power/PowerCard';
+import BatteryCard from '../Cards/Battery/BatteryCard';
+import BuckCard from '../Cards/Buck/BuckCard';
+import LDOCard from '../Cards/LDO/LDOCard';
+import PowerCard from '../Cards/Power/PowerCard';
 
 interface PMICControlCardProps {
     disabled: boolean;
@@ -41,7 +41,7 @@ const PMICControlCard: FC<PMICControlCardProps> = ({ disabled }) => {
         <div className="pmic-control">
             <div className="pmic-control-inner">
                 <BatteryCard
-                    percent={stateOfCharge ?? 0}
+                    soc={stateOfCharge}
                     pmicChargingState={pmicChargingState}
                     batteryConnected={batteryConnected}
                     fuelGauge={fuelGauge}

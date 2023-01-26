@@ -5,26 +5,28 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SerialPort } from 'pc-nrfconnect-shared';
 
 import type { RootState } from '../../appReducer';
 import { ShellParser } from '../../hooks/commandParser';
-import { Modem } from './modem';
 
-interface ModemState {
+interface SerialState {
     availableSerialPorts: string[];
     selectedSerialport?: string;
-    modem?: Modem;
+    serialPort?: SerialPort;
     shellParser?: ShellParser;
+    isPaused: boolean;
 }
 
-const initialState: ModemState = {
+const initialState: SerialState = {
     availableSerialPorts: [],
     selectedSerialport: undefined,
-    modem: undefined,
+    serialPort: undefined,
+    isPaused: false,
 };
 
-const modemSlice = createSlice({
-    name: 'modem',
+const serialSlice = createSlice({
+    name: 'serial',
     initialState,
     reducers: {
         setAvailableSerialPorts: (state, action: PayloadAction<string[]>) => {
@@ -36,9 +38,12 @@ const modemSlice = createSlice({
         ) => {
             state.selectedSerialport = action.payload;
         },
-        setModem: (state, action: PayloadAction<Modem | undefined>) => {
-            state.modem?.close();
-            state.modem = action.payload;
+        setSerialPort: (
+            state,
+            action: PayloadAction<SerialPort | undefined>
+        ) => {
+            state.serialPort?.close();
+            state.serialPort = action.payload;
         },
         setShellParser: (
             state,
@@ -46,20 +51,27 @@ const modemSlice = createSlice({
         ) => {
             state.shellParser = action.payload;
         },
+        setIsPaused: (state, action: PayloadAction<boolean>) => {
+            state.isPaused = action.payload;
+        },
     },
 });
 
-export const getModem = (state: RootState) => state.app.modem.modem;
+export const getSerialPort = (state: RootState) => state.app.serial.serialPort;
 export const getSelectedSerialport = (state: RootState) =>
-    state.app.modem.selectedSerialport;
+    state.app.serial.selectedSerialport;
 export const getAvailableSerialPorts = (state: RootState) =>
-    state.app.modem.availableSerialPorts;
-export const getShellParser = (state: RootState) => state.app.modem.shellParser;
+    state.app.serial.availableSerialPorts;
+export const getShellParser = (state: RootState) =>
+    state.app.serial.shellParser;
+
+export const isPaused = (state: RootState) => state.app.serial.isPaused;
 
 export const {
-    setModem,
+    setSerialPort,
     setAvailableSerialPorts,
     setSelectedSerialport,
     setShellParser,
-} = modemSlice.actions;
-export default modemSlice.reducer;
+    setIsPaused,
+} = serialSlice.actions;
+export default serialSlice.reducer;

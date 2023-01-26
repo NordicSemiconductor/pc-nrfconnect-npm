@@ -4,47 +4,52 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Modem } from '../features/modem/modem';
+import type {
+    AutoDetectTypes,
+    SetOptions,
+    UpdateOptions,
+} from '@serialport/bindings-cpp';
+import { SerialPort } from 'pc-nrfconnect-shared';
+import type { SerialPortOpenOptions } from 'serialport';
+
 import {
     hookModemToShellParser,
     ShellParserSettings,
     XTerminalShellParser,
 } from './commandParser';
 
-jest.mock('../features/modem/modem');
+jest.mock('pc-nrfconnect-shared');
 
-describe('shell command parser', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        terminalBuffer = settings.shellPromptUart;
-        mockIsOpen.mockReturnValue(
-            new Promise<boolean>(resolve => {
-                resolve(true);
-            })
-        );
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onResponseCallback = (data: Buffer, _error?: string) =>
-            new Promise<void>(resolve => {
-                resolve();
-            });
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let onResponseCallback = (data: Uint8Array) => {};
+
+const setupMocks = () => {
+    const mockOnData = jest.fn((handler: (data: Uint8Array) => void) => {
+        onResponseCallback = handler;
+        return () => {};
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let onResponseCallback = (data: Buffer, _error?: string) =>
-        new Promise<void>(resolve => {
-            resolve();
-        });
+    const mockOnClose = jest.fn((_handler: () => void) => () => {});
 
-    const mockOnResponse = jest.fn(
-        (handler: (data: Buffer, error?: string) => Promise<void>) => {
-            onResponseCallback = handler;
-            return () => {};
-        }
+    const mockOnUpdate = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_handler: (newOptions: UpdateOptions) => void) => () => {}
     );
 
-    const mockOnOpen = jest.fn(
+    const mockOnSet = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_handler: (error?: string) => void) => () => {}
+        (_handler: (newOptions: SetOptions) => void) => () => {}
+    );
+
+    const mockOnChange = jest.fn(
+        (
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                _handler: (
+                    newOptions: SerialPortOpenOptions<AutoDetectTypes>
+                ) => void
+            ) =>
+            () => {}
     );
 
     const mockOnDataWritten = jest.fn(
@@ -53,14 +58,15 @@ describe('shell command parser', () => {
     );
 
     const mockClose = jest.fn(async () => {});
-    const mockWrite = jest.fn(() => true);
+    const mockWrite = jest.fn(() => {});
     const mockIsOpen = jest.fn(
         () =>
             new Promise<boolean>(resolve => {
                 resolve(true);
             })
     );
-    const mockGetPath = jest.fn(() => '');
+    const mockUpdate = jest.fn(() => '');
+    const mockSet = jest.fn(() => '');
 
     const mockOnShellLogging = jest.fn(() => '');
     const mockOnUnknown = jest.fn(() => '');
@@ -74,16 +80,19 @@ describe('shell command parser', () => {
         errorRegex: 'error: ',
     };
 
-    const mockModem = jest.fn<Modem, []>(() => ({
-        onResponse: mockOnResponse,
-        onOpen: mockOnOpen,
-        onDataWritten: mockOnDataWritten,
-        close: mockClose,
+    const mockModem = jest.fn<SerialPort, []>(() => ({
+        path: 'fakePort',
         write: mockWrite,
-        update: mockWrite,
-        set: mockWrite,
+        close: mockClose,
         isOpen: mockIsOpen,
-        getPath: mockGetPath,
+        update: mockUpdate,
+        set: mockSet,
+        onData: mockOnData,
+        onClosed: mockOnClose,
+        onUpdate: mockOnUpdate,
+        onSet: mockOnSet,
+        onChange: mockOnChange,
+        onDataWritten: mockOnDataWritten,
     }));
 
     let terminalBuffer = '';
@@ -111,47 +120,61 @@ describe('shell command parser', () => {
         write: mockTerminalWrite,
     }));
 
-    test('Verify that shell init char is sent on open', async () => {
+    return {
+        getTerminalBuffer: () => terminalBuffer,
+        setTerminalBuffer: (value: string) => {
+            terminalBuffer = value;
+        },
+        mockIsOpen,
+        mockModem,
+        mockOnError,
+        mockOnResponse: mockOnData,
+        mockOnShellLogging,
+        mockOnSuccess,
+        mockOnUnknown,
+        mockTerminal,
+        mockWrite,
+        mockClose,
+        settings,
+    };
+};
+
+const {
+    setTerminalBuffer,
+    mockIsOpen,
+    mockModem,
+    mockOnError,
+    mockOnShellLogging,
+    mockOnSuccess,
+    mockOnUnknown,
+    mockTerminal,
+    mockWrite,
+    mockClose,
+    settings,
+} = setupMocks();
+
+describe('shell command parser', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setTerminalBuffer(settings.shellPromptUart);
         mockIsOpen.mockReturnValue(
             new Promise<boolean>(resolve => {
                 resolve(true);
             })
         );
-
-        await hookModemToShellParser(mockModem(), mockTerminal());
-
-        expect(mockWrite).toBeCalledTimes(1);
-        expect(mockWrite).toBeCalledWith(String.fromCharCode(21).toString());
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        onResponseCallback = (data: Uint8Array) => {};
     });
 
     test('Verify that shell init char is sent on open', async () => {
-        mockIsOpen.mockReturnValue(
-            new Promise<boolean>(resolve => {
-                resolve(false);
-            })
-        );
-
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        let onOpenCallback = (_error?: string) => {};
-
-        mockOnOpen.mockImplementation((handler: (error?: string) => void) => {
-            onOpenCallback = handler;
-            return () => {};
-        });
-
         await hookModemToShellParser(mockModem(), mockTerminal());
 
-        expect(mockWrite).toBeCalledTimes(0);
-
-        mockIsOpen.mockReturnValue(
-            new Promise<boolean>(resolve => {
-                resolve(true);
-            })
-        );
-        onOpenCallback();
-
         expect(mockWrite).toBeCalledTimes(1);
-        expect(mockWrite).toBeCalledWith(String.fromCharCode(21).toString());
+        expect(mockWrite).toBeCalledWith(
+            `${String.fromCharCode(12).toString()}${String.fromCharCode(
+                21
+            ).toString()}`
+        );
     });
 
     test('Verify that no callback is called until we get a response', async () => {

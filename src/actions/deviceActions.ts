@@ -4,20 +4,21 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Device } from 'pc-nrfconnect-shared';
+import type { AutoDetectTypes } from '@serialport/bindings-cpp';
+import { createSerialPort, Device } from 'pc-nrfconnect-shared';
+import type { SerialPortOpenOptions } from 'serialport';
 
-import { createModem } from '../features/modem/modem';
 import {
     setAvailableSerialPorts,
-    setModem,
     setSelectedSerialport,
+    setSerialPort,
     setShellParser,
-} from '../features/modem/modemSlice';
+} from '../features/serial/serialSlice';
 import { TAction } from '../thunk';
 
 export const closeDevice = (): TAction => dispatch => {
     dispatch(setShellParser(undefined));
-    dispatch(setModem(undefined));
+    dispatch(setSerialPort(undefined));
     dispatch(setAvailableSerialPorts([]));
     dispatch(setSelectedSerialport(undefined));
 };
@@ -38,7 +39,17 @@ export const openDevice =
             const comPort = ports[0].comName; // We want to connect to vComIndex 0
             if (comPort) {
                 dispatch(setSelectedSerialport(comPort));
-                await dispatch(setModem(await createModem(comPort)));
+                await dispatch(
+                    setSerialPort(
+                        await createSerialPort(
+                            {
+                                path: comPort,
+                                baudRate: 115200,
+                            } as SerialPortOpenOptions<AutoDetectTypes>,
+                            { overwrite: true, settingsLocked: true }
+                        )
+                    )
+                );
             }
         }
     };
