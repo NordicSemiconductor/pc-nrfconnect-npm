@@ -21,8 +21,6 @@ import Terminal from './components/Terminal/Main';
 // import logLibVersions from './utils/logLibVersions';
 import './index.scss';
 
-// logLibVersions();
-
 export default () => (
     <App
         autoReconnectByDefault

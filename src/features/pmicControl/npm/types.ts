@@ -11,12 +11,9 @@ export type PartialUpdate<T> = { index: number; data: Partial<T> };
 export type LdoMode = 'ldoSwitch' | 'LDO';
 export type BuckMode = 'vSet' | 'software';
 
-export type IrqType = string;
-export type IrqEvent = string;
-
-export type IrqTypeEventPair = {
-    type: IrqType;
-    event: IrqEvent;
+export type IrqEvent = {
+    type: string;
+    event: string;
 };
 
 export type Charger = {
@@ -133,3 +130,16 @@ export type NpmDevice = {
 
     setFuelGaugeEnabled: (state: boolean) => void;
 } & BaseNpmDevice;
+
+export interface PmicWarningDialog {
+    storeID: string;
+    message: string;
+    optionalLabel?: string;
+    confirmLabel: string;
+    cancelLabel: string;
+    title: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+    onOptional?: () => void;
+    optionalDoNotAskAgain?: boolean;
+}

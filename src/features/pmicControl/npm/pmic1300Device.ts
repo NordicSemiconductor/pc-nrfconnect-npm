@@ -14,12 +14,14 @@ import {
     Buck,
     BuckMode,
     Charger,
+    IrqEvent,
     Ldo,
     LdoMode,
     NpmDevice,
     PartialUpdate,
     PmicChargingState,
     PmicState,
+    PmicWarningDialog,
 } from './types';
 
 const maxTimeStamp = 359999999; // 99hrs 59min 59sec 999ms
@@ -85,12 +87,13 @@ const parseLogData = (
 };
 
 interface INpmDevice extends IBaseNpmDevice {
-    (shellParser: ShellParser | undefined): NpmDevice;
+    (
+        shellParser: ShellParser | undefined,
+        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void
+    ): NpmDevice;
 }
 
-export const getNPM1300: INpmDevice = (
-    shellParser: ShellParser | undefined
-) => {
+export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     const eventEmitter = new EventEmitter();
     const devices = {
         noOfBucks: 2,
@@ -99,6 +102,7 @@ export const getNPM1300: INpmDevice = (
     };
     const baseDevice = baseNpmDevice(
         shellParser,
+        warningDialogHandler,
         eventEmitter,
         devices,
         '0.0.0+1'
@@ -199,6 +203,36 @@ export const getNPM1300: INpmDevice = (
         eventEmitter.emit('onAdcSample', adcSample);
     };
 
+    const processModulePmicIrq = (
+        timestamp: number,
+        logLevel: string,
+        module: string,
+        message: string
+    ) => {
+        const messageParts = message.split(',');
+        const event: IrqEvent = {
+            type: '',
+            event: '',
+        };
+        messageParts.forEach(part => {
+            const pair = part.split('=');
+            switch (pair[0]) {
+                case 'type':
+                    event.type = pair[1];
+                    break;
+                case 'bit':
+                    event.event = pair[1];
+                    break;
+            }
+        });
+
+        doActionOnEvent(event);
+    };
+
+    const doActionOnEvent = (irqEvent: IrqEvent) => {
+        console.log(irqEvent);
+    };
+
     const startAdcSample = (samplingRate: number) => {
         sendCommand(`npm_adc_sample ${samplingRate}`);
     };
@@ -208,22 +242,19 @@ export const getNPM1300: INpmDevice = (
     };
 
     shellParser?.onShellLoggingEvent(logEvent => {
-        parseLogData(logEvent, (timestamp, logLevel, module, message) => {
-            switch (module) {
+        parseLogData(logEvent, (...args) => {
+            switch (args[2]) {
                 case 'module_pmic':
-                    processModulePmic(timestamp, logLevel, module, message);
+                    processModulePmic(...args);
                     break;
                 case 'module_pmic_adc':
-                    processModulePmicAdc(timestamp, logLevel, module, message);
+                    processModulePmicAdc(...args);
+                    break;
+                case 'module_pmic_irq':
+                    processModulePmicIrq(...args);
                     break;
                 default:
-                    console.warn(
-                        'Unknown Module message: ',
-                        timestamp,
-                        logLevel,
-                        module,
-                        message
-                    );
+                    console.warn('Unknown Module message: ', ...args);
                     break;
             }
         });
@@ -459,14 +490,38 @@ export const getNPM1300: INpmDevice = (
     };
 
     const setBuckVOut = (index: number, value: number) => {
-        sendCommand(`npmx buck voltage normal set ${index} ${value * 1000}`);
+        const action = () => {
+            sendCommand(
+                `npmx buck voltage normal set ${index} ${value * 1000}`
+            );
 
-        if (pmicState === 'offline')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                vOut: value,
-            });
+            if (pmicState === 'offline')
+                emitPartialEvent<Buck>('onBuckUpdate', index, {
+                    vOut: value,
+                });
 
-        setBuckMode(index, 'software');
+            setBuckMode(index, 'software');
+        };
+
+        if (index === 0 && value <= 1.7) {
+            const warningDialog: PmicWarningDialog = {
+                storeID: 'pmic1300-setBuckVOut-0',
+                message: `Buck 1 Powers the I2C communications that are needed for this app. 
+                    Any voltage lower that 1.7v Might cause issues with the Connection to the app. Are you sure you want to continue`,
+                confirmLabel: 'Yes',
+                optionalLabel: "Yes, Don't ask again",
+                cancelLabel: 'No',
+                title: 'Warning',
+                onConfirm: action,
+                onCancel: () => requestUpdate.buckVOut(index),
+                onOptional: action,
+                optionalDoNotAskAgain: true,
+            };
+
+            warningDialogHandler(warningDialog);
+        } else {
+            action();
+        }
     };
 
     const setBuckMode = (index: number, mode: BuckMode) => {
@@ -482,12 +537,34 @@ export const getNPM1300: INpmDevice = (
         requestUpdate.buckVOut(index);
     };
     const setBuckEnabled = (index: number, enabled: boolean) => {
-        sendCommand(`npmx buck ${enabled ? 'enable' : 'disable'} ${index}`);
+        const action = () => {
+            sendCommand(`npmx buck ${enabled ? 'enable' : 'disable'} ${index}`);
 
-        if (pmicState === 'offline')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                enabled,
-            });
+            if (pmicState === 'offline')
+                emitPartialEvent<Buck>('onBuckUpdate', index, {
+                    enabled,
+                });
+        };
+
+        if (index === 0 && !enabled) {
+            const warningDialog: PmicWarningDialog = {
+                storeID: 'pmic1300-setBuckEnabled-0',
+                message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
+                disconnected from the app. Are you sure you want to proceed?`,
+                confirmLabel: 'Yes',
+                optionalLabel: "Yes, Don't ask again",
+                cancelLabel: 'No',
+                title: 'Warning',
+                onConfirm: action,
+                onCancel: () => {},
+                onOptional: action,
+                optionalDoNotAskAgain: true,
+            };
+
+            warningDialogHandler(warningDialog);
+        } else {
+            action();
+        }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

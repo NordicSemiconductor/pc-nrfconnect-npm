@@ -4,6 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+ .graph-container {
+    background: white;
+    padding: 32px;
+ }
+
  .graph-top-bar-wrapper {
     display: flex;
     justify-content: space-between;

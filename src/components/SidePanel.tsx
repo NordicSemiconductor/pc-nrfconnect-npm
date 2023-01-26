@@ -6,7 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SidePanel } from 'pc-nrfconnect-shared';
+import { ConfirmationDialog, SidePanel } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
 import {
@@ -15,6 +15,7 @@ import {
     setShellParser,
 } from '../features/modem/modemSlice';
 import useNpmDevice from '../features/pmicControl/npm/useNpmDevice';
+import { getWarningDialog } from '../features/pmicControl/pmicControlSlice';
 import { setIsPaused } from '../features/shell/shellSlice';
 import {
     hookModemToShellParser,
@@ -25,6 +26,19 @@ import SerialSettings from './SerialSettings';
 const TerminalSidePanel = () => {
     const modem = useSelector(getModem);
     const shellParserO = useSelector(getShellParser);
+
+    const noop = () => {};
+
+    const currentPmicWarningDialog = useSelector(getWarningDialog);
+    const showConfirmDialog = currentPmicWarningDialog !== undefined;
+    const message = currentPmicWarningDialog?.message;
+    const optionalLabel = currentPmicWarningDialog?.optionalLabel;
+    const confirmLabel = currentPmicWarningDialog?.confirmLabel;
+    const cancelLabel = currentPmicWarningDialog?.cancelLabel;
+    const title = currentPmicWarningDialog?.title;
+    const onConfirm = currentPmicWarningDialog?.onConfirm ?? noop;
+    const onCancel = currentPmicWarningDialog?.onCancel ?? noop;
+    const onOptional = currentPmicWarningDialog?.onOptional;
 
     const dispatch = useDispatch();
     useNpmDevice(shellParserO);
@@ -73,6 +87,18 @@ const TerminalSidePanel = () => {
     return (
         <SidePanel className="side-panel">
             <SerialSettings />
+            <ConfirmationDialog
+                title={title}
+                isVisible={showConfirmDialog}
+                onConfirm={onConfirm}
+                confirmLabel={confirmLabel}
+                onCancel={onCancel}
+                cancelLabel={cancelLabel}
+                onOptional={onOptional}
+                optionalLabel={optionalLabel}
+            >
+                {message}
+            </ConfirmationDialog>
         </SidePanel>
     );
 };

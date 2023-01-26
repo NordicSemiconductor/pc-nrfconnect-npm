@@ -6,11 +6,15 @@
 
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { getPersistentStore } from 'pc-nrfconnect-shared';
 
 import { ShellParser } from '../../../hooks/commandParser';
 import {
+    dequeueWarningDialog,
     getNpmDevice as getNpmDeviceSlice,
+    getPmicState,
     isSupportedVersion,
+    requestWarningDialog,
     setBatteryConnected,
     setBucks,
     setChargers,
@@ -26,12 +30,13 @@ import {
     updateLdo,
 } from '../pmicControlSlice';
 import { getNpmDevice } from './pmicHelpers';
-import { Buck, Charger, Ldo } from './types';
+import { Buck, Charger, Ldo, PmicWarningDialog } from './types';
 
 export default (shellParser: ShellParser | undefined) => {
     const npmDevice = useSelector(getNpmDeviceSlice);
     const dispatch = useDispatch();
     const supportedVersion = useSelector(isSupportedVersion);
+    const pmicState = useSelector(getPmicState);
 
     const initDevice = useCallback(() => {
         if (!npmDevice) return;
@@ -60,6 +65,49 @@ export default (shellParser: ShellParser | undefined) => {
         npmDevice.requestUpdate.fuelGauge();
     }, [npmDevice]);
 
+    const warningDialogHandler = useCallback(
+        (pmicWarningDialog: PmicWarningDialog) => {
+            if (
+                getPersistentStore().get(
+                    `pmicDialogs:${pmicWarningDialog.storeID}`
+                )?.doNotShowAgain === true
+            ) {
+                pmicWarningDialog.onConfirm();
+                return;
+            }
+
+            const onConfirm = pmicWarningDialog.onConfirm;
+            pmicWarningDialog.onConfirm = () => {
+                onConfirm();
+                dispatch(dequeueWarningDialog());
+            };
+
+            const onCancel = pmicWarningDialog.onCancel;
+            pmicWarningDialog.onCancel = () => {
+                onCancel();
+                dispatch(dequeueWarningDialog());
+            };
+
+            if (
+                pmicWarningDialog.optionalDoNotAskAgain &&
+                pmicWarningDialog.onOptional
+            ) {
+                const onOptional = pmicWarningDialog.onOptional;
+                pmicWarningDialog.onOptional = () => {
+                    onOptional();
+                    dispatch(dequeueWarningDialog());
+                    getPersistentStore().set(
+                        `pmicDialogs:${pmicWarningDialog.storeID}`,
+                        { doNotShowAgain: true }
+                    );
+                };
+            }
+
+            dispatch(requestWarningDialog(pmicWarningDialog));
+        },
+        [dispatch]
+    );
+
     const initComponents = useCallback(() => {
         if (!npmDevice) return;
 
@@ -78,7 +126,7 @@ export default (shellParser: ShellParser | undefined) => {
             emptyBuck.push({
                 vOut: npmDevice.getBuckVoltageRange(i).min,
                 mode: 'vSet',
-                enabled: false,
+                enabled: true,
             });
         }
         dispatch(setBucks(emptyBuck));
@@ -87,7 +135,7 @@ export default (shellParser: ShellParser | undefined) => {
         for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
             emptyLdos.push({
                 voltage: npmDevice.getLdoVoltageRange(i).min,
-                mode: 'LDO',
+                mode: 'ldoSwitch',
                 enabled: false,
             });
         }
@@ -95,17 +143,39 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        dispatch(setNpmDevice(getNpmDevice(shellParser)));
-    }, [dispatch, shellParser]);
+        dispatch(setNpmDevice(getNpmDevice(shellParser, warningDialogHandler)));
+    }, [dispatch, shellParser, warningDialogHandler]);
+
+    useEffect(() => {
+        if (npmDevice) {
+            let chargerStateUpdateInterval: NodeJS.Timer | undefined;
+            npmDevice.isSupportedVersion().then(result => {
+                dispatch(setSupportedVersion(result));
+                if (result) {
+                    chargerStateUpdateInterval = setInterval(() => {
+                        if (npmDevice.getConnectionState() === 'connected')
+                            npmDevice.requestUpdate.pmicChargingState();
+                    }, 5000);
+                }
+            });
+
+            return () => {
+                clearInterval(chargerStateUpdateInterval);
+            };
+        }
+    }, [dispatch, npmDevice]);
+
+    useEffect(() => {
+        if (pmicState === 'connected' && supportedVersion) {
+            initDevice();
+        }
+    }, [initDevice, pmicState, supportedVersion]);
 
     useEffect(() => {
         if (npmDevice) {
             const releaseOnPmicStateChange = npmDevice.onPmicStateChange(
                 state => {
                     dispatch(setPmicState(state));
-                    if (state === 'connected' && supportedVersion) {
-                        initDevice();
-                    }
                 }
             );
 
@@ -142,16 +212,6 @@ export default (shellParser: ShellParser | undefined) => {
             dispatch(setPmicState(npmDevice.getConnectionState()));
 
             initComponents();
-            let chargerStateUpdateInterval: NodeJS.Timer | undefined;
-            npmDevice.isSupportedVersion().then(result => {
-                dispatch(setSupportedVersion(result));
-                if (result) {
-                    chargerStateUpdateInterval = setInterval(() => {
-                        if (npmDevice.getConnectionState() === 'connected')
-                            npmDevice.requestUpdate.pmicChargingState();
-                    }, 5000);
-                }
-            });
 
             return () => {
                 releaseOnPmicStateChange();
@@ -161,8 +221,7 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnBuckUpdate();
                 releaseOnLdoUpdate();
                 releaseOnFuelGaugeUpdate();
-                clearInterval(chargerStateUpdateInterval);
             };
         }
-    }, [dispatch, initComponents, initDevice, npmDevice, supportedVersion]);
+    }, [dispatch, initComponents, npmDevice]);
 };

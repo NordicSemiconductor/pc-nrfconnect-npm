@@ -121,7 +121,7 @@ describe('shell command parser', () => {
         await hookModemToShellParser(mockModem(), mockTerminal());
 
         expect(mockWrite).toBeCalledTimes(1);
-        expect(mockWrite).toBeCalledWith(String.fromCharCode(12).toString());
+        expect(mockWrite).toBeCalledWith(String.fromCharCode(21).toString());
     });
 
     test('Verify that shell init char is sent on open', async () => {
@@ -151,7 +151,7 @@ describe('shell command parser', () => {
         onOpenCallback();
 
         expect(mockWrite).toBeCalledTimes(1);
-        expect(mockWrite).toBeCalledWith(String.fromCharCode(12).toString());
+        expect(mockWrite).toBeCalledWith(String.fromCharCode(21).toString());
     });
 
     test('Verify that no callback is called until we get a response', async () => {

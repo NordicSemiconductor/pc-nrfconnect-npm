@@ -81,7 +81,7 @@ export const hookModemToShellParser = async (
     // init shell mode
 
     if (await modem.isOpen()) {
-        modem.write(String.fromCharCode(12));
+        modem.write(String.fromCharCode(21));
     }
 
     const reset = () => {
@@ -222,7 +222,7 @@ export const hookModemToShellParser = async (
     };
 
     const unregisterOnOpen = modem.onOpen(() => {
-        modem.write(String.fromCharCode(12));
+        modem.write(String.fromCharCode(21));
     });
 
     // Hook to listen to all modem data
