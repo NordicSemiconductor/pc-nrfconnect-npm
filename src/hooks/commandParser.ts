@@ -5,9 +5,8 @@
  */
 
 import EventEmitter from 'events';
+import { SerialPort } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
-
-import { Modem } from '../features/modem/modem';
 
 interface ICallbacks {
     onSuccess: (data: string) => void;
@@ -59,7 +58,7 @@ export const xTerminalShellParserWrapper = (terminal: Terminal) => ({
 });
 
 export const hookModemToShellParser = async (
-    modem: Modem,
+    serialPort: SerialPort,
     xTerminalShellParser: XTerminalShellParser,
     settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$ ',
@@ -80,8 +79,12 @@ export const hookModemToShellParser = async (
 
     // init shell mode
 
-    if (await modem.isOpen()) {
-        modem.write(String.fromCharCode(21));
+    if (await serialPort.isOpen()) {
+        serialPort.write(
+            `${String.fromCharCode(12).toString()}${String.fromCharCode(
+                21
+            ).toString()}`
+        );
     }
 
     const reset = () => {
@@ -95,9 +98,8 @@ export const hookModemToShellParser = async (
     };
 
     const initDataSend = async () => {
-        if (!(await modem.isOpen())) return;
+        if (!(await serialPort.isOpen())) return;
         if (pausedState) return; // user is typing
-
         if (dataSendingStarted) return;
 
         if (commandQueue.length > 0) {
@@ -108,7 +110,7 @@ export const hookModemToShellParser = async (
     const sendCommands = () => {
         commandQueue.forEach(c => {
             if (!c.sent) {
-                modem.write(`${c.command}\r\n`);
+                serialPort.write(`${c.command}\r\n`);
                 c.sent = true;
             }
         });
@@ -164,7 +166,7 @@ export const hookModemToShellParser = async (
 
             commandQueue.shift();
 
-            modem.isOpen().then(isOpen => {
+            serialPort.isOpen().then(isOpen => {
                 if (isOpen && commandQueue.length > 0 && !pausedState) {
                     sendCommands();
                 } else {
@@ -221,12 +223,8 @@ export const hookModemToShellParser = async (
         xTerminalShellParser.clear();
     };
 
-    const unregisterOnOpen = modem.onOpen(() => {
-        modem.write(String.fromCharCode(21));
-    });
-
     // Hook to listen to all modem data
-    const unregisterOnResponse = modem.onResponse(async data => {
+    const unregisterOnResponse = serialPort.onData(data => {
         data.forEach(byte => {
             cr = byte === 13 || (cr && byte === 10);
             crnl = cr && byte === 10;
@@ -237,10 +235,9 @@ export const hookModemToShellParser = async (
         });
 
         updateIsPaused();
-        await initDataSend();
     });
 
-    const unregisterOnDataWritten = modem.onDataWritten(() => {
+    const unregisterOnDataWritten = serialPort.onDataWritten(() => {
         if (!pausedState) {
             eventEmitter.emit('pausedChanged', true);
         }
@@ -256,10 +253,12 @@ export const hookModemToShellParser = async (
         clearTimeout(t);
         // if we have uart string we can technically update the the shell as not paused, but this might not be true us device has some
         // partial command in its buffer hance we delay some time to make use we have uart string only for some time ensuring unpaused state.
-        t = setTimeout(() => {
-            if (pausedState === canProcess()) {
-                pausedState = !canProcess();
+        t = setTimeout(async () => {
+            const shellFree = canProcess();
+            if (pausedState === shellFree) {
+                pausedState = !shellFree;
                 eventEmitter.emit('pausedChanged', pausedState);
+                await initDataSend();
             }
         }, 5);
     };
@@ -337,12 +336,11 @@ export const hookModemToShellParser = async (
             };
         },
         unregister: () => {
-            unregisterOnOpen();
             unregisterOnResponse();
             unregisterOnDataWritten();
             reset();
         },
         isPaused: () => pausedState,
-        unPause: () => modem.write(String.fromCharCode(21)),
+        unPause: () => serialPort.write(String.fromCharCode(21)),
     };
 };

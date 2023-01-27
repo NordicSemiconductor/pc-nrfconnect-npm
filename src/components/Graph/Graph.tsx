@@ -35,6 +35,29 @@ import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 import './graph.scss';
 import styles from './Graph.module.scss';
 
+const getTimeString = (milliseconds: number): string => {
+    const ms = milliseconds % 1000;
+
+    milliseconds = Math.max((milliseconds - ms) / 1000, 0);
+    const secs = milliseconds % 60;
+
+    milliseconds = Math.max((milliseconds - secs) / 60, 0);
+    const mins = milliseconds % 60;
+
+    milliseconds = Math.max((milliseconds - mins) / 60, 0);
+    const hrs = milliseconds % 60;
+
+    milliseconds = Math.max((milliseconds - hrs) / 60, 0);
+    const days = milliseconds % 24;
+
+    const daysString = days > 0 ? `${days} days ` : '';
+    return `${daysString}${hrs.toString().padStart(2, '0')}:${mins
+        .toString()
+        .padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms
+        .toString()
+        .padStart(3, '0')} `;
+};
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -58,49 +81,8 @@ const options: ChartOptions<'line'> = {
         },
         tooltip: {
             callbacks: {
-                title: context => {
-                    let label = 'Uptime: ';
-
-                    if (context[0]?.parsed.x !== null) {
-                        let uptimeMiliseconds = context[0].parsed.x;
-
-                        const ms = uptimeMiliseconds % 1000;
-
-                        uptimeMiliseconds = Math.max(
-                            (uptimeMiliseconds - ms) / 1000,
-                            0
-                        );
-                        const secs = uptimeMiliseconds % 60;
-
-                        uptimeMiliseconds = Math.max(
-                            (uptimeMiliseconds - secs) / 60,
-                            0
-                        );
-                        const mins = uptimeMiliseconds % 60;
-
-                        uptimeMiliseconds = Math.max(
-                            (uptimeMiliseconds - mins) / 60,
-                            0
-                        );
-                        const hrs = uptimeMiliseconds % 60;
-
-                        uptimeMiliseconds = Math.max(
-                            (uptimeMiliseconds - hrs) / 60,
-                            0
-                        );
-                        const days = uptimeMiliseconds % 24;
-
-                        label += days !== 0 ? `${days} days ` : '';
-                        label += `${hrs.toString().padStart(2, '0')}:${mins
-                            .toString()
-                            .padStart(2, '0')}:${secs
-                            .toString()
-                            .padStart(2, '0')}.${ms
-                            .toString()
-                            .padStart(3, '0')} `;
-                    }
-                    return label;
-                },
+                title: context =>
+                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
             },
         },
     },

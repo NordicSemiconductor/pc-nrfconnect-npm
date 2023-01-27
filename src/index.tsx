@@ -14,7 +14,7 @@ import DocumentationSections from './components/DocumentationSection';
 import Graph from './components/Graph/Graph';
 import PMICControl from './components/PMICControl/PMICControl';
 import Regulators from './components/Regulators/Regulators';
-import SidePanel from './components/SidePanel';
+import SidePanel from './components/SidePanel/SidePanel';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
 import Terminal from './components/Terminal/Main';
 

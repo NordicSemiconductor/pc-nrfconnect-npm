@@ -6,21 +6,27 @@
 
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Dropdown, Group, truncateMiddle } from 'pc-nrfconnect-shared';
+import type { AutoDetectTypes } from '@serialport/bindings-cpp';
+import {
+    createSerialPort,
+    Dropdown,
+    Group,
+    truncateMiddle,
+} from 'pc-nrfconnect-shared';
+import type { SerialPortOpenOptions } from 'serialport';
 
-import { createModem } from '../features/modem/modem';
 import {
     getAvailableSerialPorts,
-    getModem,
     getSelectedSerialport,
-    setModem,
+    getSerialPort,
     setSelectedSerialport,
-} from '../features/modem/modemSlice';
+    setSerialPort,
+} from '../../features/serial/serialSlice';
 
 const SerialSettings = () => {
     const availablePorts = useSelector(getAvailableSerialPorts);
     const selectedSerialport = useSelector(getSelectedSerialport);
-    const modem = useSelector(getModem);
+    const modem = useSelector(getSerialPort);
 
     const dispatch = useDispatch();
 
@@ -52,12 +58,22 @@ const SerialSettings = () => {
 
         if (portPath !== 'Not connected') {
             const action = async () =>
-                dispatch(setModem(await createModem(portPath as string)));
+                dispatch(
+                    setSerialPort(
+                        await createSerialPort(
+                            {
+                                path: portPath,
+                                baudRate: 115200,
+                            } as SerialPortOpenOptions<AutoDetectTypes>,
+                            { overwrite: true, settingsLocked: true }
+                        )
+                    )
+                );
 
             if (modem?.isOpen()) modem.close().then(await action);
             else action();
         } else {
-            setModem(undefined);
+            setSerialPort(undefined);
         }
 
         dispatch(setSelectedSerialport(portPath));

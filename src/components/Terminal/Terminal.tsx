@@ -6,7 +6,6 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
-import ansiEscapes from 'ansi-escapes';
 import { XTerm } from 'xterm-for-react';
 
 import useFitAddon from '../../hooks/useFitAddon';
@@ -17,15 +16,10 @@ import styles from './Terminal.module.scss';
 
 interface Props {
     commandCallback: (command: string) => string | undefined;
-    onModemData: (listener: (data: Buffer) => Promise<void>) => () => void;
-    onModemOpen: (listener: () => void) => () => void;
+    onSerialData: (listener: (data: Uint8Array) => Promise<void>) => () => void;
 }
 
-const Terminal: React.FC<Props> = ({
-    commandCallback,
-    onModemData,
-    onModemOpen,
-}) => {
+const Terminal: React.FC<Props> = ({ commandCallback, onSerialData }) => {
     const xtermRef = useRef<XTerm | null>(null);
     const { width, height, ref: resizeRef } = useResizeDetector();
     const fitAddon = useFitAddon(height, width);
@@ -50,39 +44,16 @@ const Terminal: React.FC<Props> = ({
         [commandCallback, echoOnShell]
     );
 
-    const clearTerminal = () => {
-        xtermRef.current?.terminal.write(
-            ansiEscapes.eraseLine + ansiEscapes.cursorTo(0)
-        );
-        xtermRef.current?.terminal.clear();
-    };
-
-    // Prepare Terminal for new connection or mode
-    useEffect(() => {
-        commandCallback(String.fromCharCode(12)); // init shell mode
-        // we need New Page (Ascii 12) so not to create an empty line on top of shell
-    }, [commandCallback, onModemOpen]);
-
     useEffect(
         () =>
-            onModemData(
+            onSerialData(
                 data =>
                     new Promise<void>(resolve => {
                         xtermRef.current?.terminal.write(data);
                         resolve();
                     })
             ),
-        [onModemData]
-    );
-
-    useEffect(
-        () =>
-            onModemOpen(() => {
-                clearTerminal(); // New connection or mode: clear terminal
-                commandCallback(String.fromCharCode(12)); // init shell mode
-                // we need New Page (Ascii 12) so not to create an empty line on top of shell
-            }),
-        [commandCallback, onModemOpen]
+        [onSerialData]
     );
 
     const terminalOptions = {

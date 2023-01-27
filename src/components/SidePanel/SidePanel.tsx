@@ -6,39 +6,25 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ConfirmationDialog, SidePanel } from 'pc-nrfconnect-shared';
+import { SidePanel } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
+import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
 import {
-    getModem,
+    getSerialPort,
     getShellParser,
+    setIsPaused,
     setShellParser,
-} from '../features/modem/modemSlice';
-import useNpmDevice from '../features/pmicControl/npm/useNpmDevice';
-import { getWarningDialog } from '../features/pmicControl/pmicControlSlice';
-import { setIsPaused } from '../features/shell/shellSlice';
+} from '../../features/serial/serialSlice';
 import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
-} from '../hooks/commandParser';
+} from '../../hooks/commandParser';
 import SerialSettings from './SerialSettings';
 
-const TerminalSidePanel = () => {
-    const modem = useSelector(getModem);
+export default () => {
+    const serialPort = useSelector(getSerialPort);
     const shellParserO = useSelector(getShellParser);
-
-    const noop = () => {};
-
-    const currentPmicWarningDialog = useSelector(getWarningDialog);
-    const showConfirmDialog = currentPmicWarningDialog !== undefined;
-    const message = currentPmicWarningDialog?.message;
-    const optionalLabel = currentPmicWarningDialog?.optionalLabel;
-    const confirmLabel = currentPmicWarningDialog?.confirmLabel;
-    const cancelLabel = currentPmicWarningDialog?.cancelLabel;
-    const title = currentPmicWarningDialog?.title;
-    const onConfirm = currentPmicWarningDialog?.onConfirm ?? noop;
-    const onCancel = currentPmicWarningDialog?.onCancel ?? noop;
-    const onOptional = currentPmicWarningDialog?.onOptional;
 
     const dispatch = useDispatch();
     useNpmDevice(shellParserO);
@@ -48,9 +34,9 @@ const TerminalSidePanel = () => {
         const init = async () => {
             dispatch(setShellParser(undefined));
 
-            if (modem) {
+            if (serialPort) {
                 const shellParser = await hookModemToShellParser(
-                    modem,
+                    serialPort,
                     xTerminalShellParserWrapper(
                         new Terminal({ allowProposedApi: true, cols: 999 })
                     ),
@@ -76,7 +62,7 @@ const TerminalSidePanel = () => {
             }
         };
         init().catch(console.error);
-    }, [dispatch, modem]);
+    }, [dispatch, serialPort]);
 
     useEffect(() => {
         shellParserO?.onPausedChange(state => {
@@ -87,20 +73,6 @@ const TerminalSidePanel = () => {
     return (
         <SidePanel className="side-panel">
             <SerialSettings />
-            <ConfirmationDialog
-                title={title}
-                isVisible={showConfirmDialog}
-                onConfirm={onConfirm}
-                confirmLabel={confirmLabel}
-                onCancel={onCancel}
-                cancelLabel={cancelLabel}
-                onOptional={onOptional}
-                optionalLabel={optionalLabel}
-            >
-                {message}
-            </ConfirmationDialog>
         </SidePanel>
     );
 };
-
-export default TerminalSidePanel;

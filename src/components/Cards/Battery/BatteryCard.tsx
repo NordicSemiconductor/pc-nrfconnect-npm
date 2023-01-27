@@ -4,20 +4,22 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { FC } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { Card, Toggle } from 'pc-nrfconnect-shared';
 
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
-import Battery, { batteryProps } from '../../Battery/Battery';
+import Battery, {
+    BatteryProperties as BatteryCardProperties,
+} from '../../Battery/Battery';
 
-const BatteryCard: FC<batteryProps> = ({
-    percent,
+export default ({
+    soc,
     pmicChargingState,
     batteryConnected,
     fuelGauge,
     disabled,
-}) => {
+}: BatteryCardProperties) => {
     const npmDevice = useSelector(getNpmDevice);
 
     return (
@@ -39,7 +41,7 @@ const BatteryCard: FC<batteryProps> = ({
             }
         >
             <Battery
-                percent={percent}
+                soc={soc}
                 pmicChargingState={pmicChargingState}
                 batteryConnected={batteryConnected}
                 fuelGauge={fuelGauge}
@@ -48,5 +50,3 @@ const BatteryCard: FC<batteryProps> = ({
         </Card>
     );
 };
-
-export default BatteryCard;

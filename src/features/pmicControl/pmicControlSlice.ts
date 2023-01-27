@@ -59,13 +59,12 @@ const pmicControlSlice = createSlice({
             state.npmDevice = action.payload;
         },
         updateCharger(state, action: PayloadAction<PartialUpdate<Charger>>) {
-            if (state.chargers.length < action.payload.index) return;
-            const chargers = [...state.chargers];
-            chargers[action.payload.index] = {
-                ...state.chargers[action.payload.index],
-                ...action.payload.data,
-            };
-            state.chargers = chargers;
+            if (state.chargers.length >= action.payload.index) {
+                state.chargers[action.payload.index] = {
+                    ...state.chargers[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
         },
         setPmicState(state, action: PayloadAction<PmicState>) {
             state.pmicState = action.payload;
@@ -83,24 +82,23 @@ const pmicControlSlice = createSlice({
             state.bucks = action.payload;
         },
         updateBuck(state, action: PayloadAction<PartialUpdate<Buck>>) {
-            if (state.bucks.length < action.payload.index) return;
-            const buck = state.bucks[action.payload.index];
-            state.bucks[action.payload.index] = {
-                ...buck,
-                ...action.payload.data,
-            };
+            if (state.bucks.length >= action.payload.index) {
+                state.bucks[action.payload.index] = {
+                    ...state.bucks[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
         },
         setLdos(state, action: PayloadAction<Ldo[]>) {
             state.ldos = action.payload;
         },
         updateLdo(state, action: PayloadAction<PartialUpdate<Ldo>>) {
-            if (state.ldos.length < action.payload.index) return;
-
-            const ldo = state.ldos[action.payload.index];
-            state.ldos[action.payload.index] = {
-                ...ldo,
-                ...action.payload.data,
-            };
+            if (state.ldos.length >= action.payload.index) {
+                state.ldos[action.payload.index] = {
+                    ...state.ldos[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
         },
         setBatteryConnected(state, action: PayloadAction<boolean>) {
             state.batteryConnected = action.payload;
@@ -119,25 +117,40 @@ const pmicControlSlice = createSlice({
         },
     },
 });
+
+const parseConnectedState = <T>(
+    state: PmicState,
+    connectedValue: T,
+    fallback: T
+) => (state === 'connected' ? connectedValue : fallback);
+
 export const getNpmDevice = (state: RootState) =>
     state.app.pmicControl.npmDevice;
 export const getPmicState = (state: RootState) =>
     state.app.pmicControl.pmicState;
 export const getChargers = (state: RootState) => state.app.pmicControl.chargers;
-export const getStateOfCharge = (state: RootState) =>
-    state.app.pmicControl.pmicState === 'connected'
-        ? state.app.pmicControl.soc
-        : initialState.soc;
-export const getPmicChargingState = (state: RootState) =>
-    state.app.pmicControl.pmicState === 'connected'
-        ? state.app.pmicControl.pmicChargingState
-        : initialState.pmicChargingState;
+export const getStateOfCharge = (state: RootState) => {
+    const { pmicState, soc } = state.app.pmicControl;
+    return parseConnectedState(pmicState, soc, initialState.soc);
+};
+export const getPmicChargingState = (state: RootState) => {
+    const { pmicState, pmicChargingState } = state.app.pmicControl;
+    return parseConnectedState(
+        pmicState,
+        pmicChargingState,
+        initialState.pmicChargingState
+    );
+};
 export const getBucks = (state: RootState) => state.app.pmicControl.bucks;
 export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
-export const isBatteryConnected = (state: RootState) =>
-    state.app.pmicControl.pmicState === 'connected'
-        ? state.app.pmicControl.batteryConnected
-        : initialState.batteryConnected;
+export const isBatteryConnected = (state: RootState) => {
+    const { pmicState, batteryConnected } = state.app.pmicControl;
+    return parseConnectedState(
+        pmicState,
+        batteryConnected,
+        initialState.batteryConnected
+    );
+};
 export const getFuelGauge = (state: RootState) =>
     state.app.pmicControl.fuelGauge;
 export const isSupportedVersion = (state: RootState) =>
