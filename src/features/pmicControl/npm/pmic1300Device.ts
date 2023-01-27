@@ -617,6 +617,57 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
     return {
         ...baseDevice,
+        applyConfig: config => {
+            if (config.deviceType !== 'npm13000') {
+                return;
+            }
+
+            const action = () => {
+                config.chargers.forEach((charger, index) => {
+                    setChargerVTerm(index, charger.vTerm);
+                    setChargerIChg(index, charger.iChg);
+                    setChargerEnabled(index, charger.enabled);
+                });
+
+                config.bucks.forEach((buck, index) => {
+                    setBuckVOut(index, buck.vOut);
+                    setBuckMode(index, buck.mode);
+                    setBuckEnabled(index, buck.enabled);
+                });
+
+                config.ldos.forEach((ldo, index) => {
+                    setLdoVoltage(index, ldo.voltage);
+                    setLdoMode(index, ldo.mode);
+                    setLdoEnabled(index, ldo.enabled);
+                });
+
+                setFuelGaugeEnabled(config.fuelGauge);
+            };
+
+            if (config.firmwareVersion !== baseDevice.getSupportedVersion()) {
+                const warningDialog: PmicWarningDialog = {
+                    storeID: 'pmic1300-load-config-mismatch',
+                    message: `The configuration was intended for firmware version ${
+                        config.firmwareVersion
+                    }. Device is running a different version. 
+                    ${baseDevice.getSupportedVersion()}. Do you still want to apply this configuration?`,
+                    confirmLabel: 'Yes',
+                    optionalLabel: "Yes, Don't ask again",
+                    cancelLabel: 'No',
+                    title: 'Warning',
+                    onConfirm: action,
+                    onCancel: () => {},
+                    onOptional: action,
+                    optionalDoNotAskAgain: true,
+                };
+
+                warningDialogHandler(warningDialog);
+                return;
+            }
+
+            action();
+        },
+        getDeviceType: () => 'npm13000',
         getConnectionState: () => pmicState,
         startAdcSample,
         stopAdcSample,

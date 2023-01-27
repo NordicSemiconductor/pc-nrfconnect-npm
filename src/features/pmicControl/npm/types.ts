@@ -90,6 +90,8 @@ export type BaseNpmDevice = {
 };
 
 export type NpmDevice = {
+    applyConfig: (config: NpmExport) => void;
+    getDeviceType: () => NpmModel;
     getConnectionState: () => PmicState;
 
     startAdcSample: (intervalMs: number) => void;
@@ -142,4 +144,15 @@ export interface PmicWarningDialog {
     onCancel: () => void;
     onOptional?: () => void;
     optionalDoNotAskAgain?: boolean;
+}
+
+export type NpmModel = 'npm13000';
+
+export interface NpmExport {
+    chargers: Charger[];
+    bucks: Buck[];
+    ldos: Ldo[];
+    fuelGauge: boolean;
+    firmwareVersion: string;
+    deviceType: NpmModel;
 }
