@@ -100,7 +100,6 @@ export const hookModemToShellParser = async (
     const initDataSend = async () => {
         if (!(await serialPort.isOpen())) return;
         if (pausedState) return; // user is typing
-
         if (dataSendingStarted) return;
 
         if (commandQueue.length > 0) {
@@ -225,7 +224,7 @@ export const hookModemToShellParser = async (
     };
 
     // Hook to listen to all modem data
-    const unregisterOnResponse = serialPort.onData(async data => {
+    const unregisterOnResponse = serialPort.onData(data => {
         data.forEach(byte => {
             cr = byte === 13 || (cr && byte === 10);
             crnl = cr && byte === 10;
@@ -236,7 +235,6 @@ export const hookModemToShellParser = async (
         });
 
         updateIsPaused();
-        await initDataSend();
     });
 
     const unregisterOnDataWritten = serialPort.onDataWritten(() => {
@@ -255,10 +253,12 @@ export const hookModemToShellParser = async (
         clearTimeout(t);
         // if we have uart string we can technically update the the shell as not paused, but this might not be true us device has some
         // partial command in its buffer hance we delay some time to make use we have uart string only for some time ensuring unpaused state.
-        t = setTimeout(() => {
-            if (pausedState === canProcess()) {
-                pausedState = !canProcess();
+        t = setTimeout(async () => {
+            const shellFree = canProcess();
+            if (pausedState === shellFree) {
+                pausedState = !shellFree;
                 eventEmitter.emit('pausedChanged', pausedState);
+                await initDataSend();
             }
         }, 5);
     };
