@@ -12,7 +12,7 @@ and this project adheres to
 
 -   Warning Dialogs on `Buck 1`
 -   Export and Import Buttons
--   Updated Default States for Bucks 
+-   Updated Default States for Bucks
 -   Recording of events to `csv`
 
 ## 0.0.3 - 2023-01-24
