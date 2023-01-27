@@ -13,6 +13,7 @@ import {
     Buck,
     Charger,
     Ldo,
+    LoggingEvent,
     PartialUpdate,
     PmicChargingState,
     PmicState,
@@ -118,6 +119,18 @@ export const baseNpmDevice: IBaseNpmDevice = (
             eventEmitter.on('onLdoUpdate', handler);
             return () => {
                 eventEmitter.removeListener('onLdoUpdate', handler);
+            };
+        },
+
+        onLoggingEvent: (
+            handler: (payload: {
+                loggingEvent: LoggingEvent;
+                dataPair: boolean;
+            }) => void
+        ) => {
+            eventEmitter.on('onLoggingEvent', handler);
+            return () => {
+                eventEmitter.removeListener('onLoggingEvent', handler);
             };
         },
         getNumberOfChargers: () => devices.noOfChargers ?? 0,

@@ -8,9 +8,9 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AutoDetectTypes } from '@serialport/bindings-cpp';
 import {
+    CollapsibleGroup,
     createSerialPort,
     Dropdown,
-    Group,
     truncateMiddle,
 } from 'pc-nrfconnect-shared';
 import type { SerialPortOpenOptions } from 'serialport';
@@ -80,14 +80,14 @@ const SerialSettings = () => {
     };
 
     return (
-        <Group heading="Serial Settings">
+        <CollapsibleGroup heading="Serial">
             <Dropdown
                 onSelect={({ value }) => updateSerialPort(value)}
                 items={comPortsDropdownItems}
                 selectedItem={selectedComPortItem}
                 disabled
             />
-        </Group>
+        </CollapsibleGroup>
     );
 };
 

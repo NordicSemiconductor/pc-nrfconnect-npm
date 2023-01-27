@@ -6,11 +6,11 @@
 
 import { dialog } from '@electron/remote';
 import Store from 'electron-store';
-import { readFileSync } from 'fs';
 import path from 'path';
 
 import { RootState } from '../appReducer';
 import { NpmExport } from '../features/pmicControl/npm/types';
+import { setEventRecordingPath } from '../features/pmicControl/pmicControlSlice';
 import { TDispatch } from '../thunk';
 
 const saveSettings =
@@ -70,6 +70,21 @@ export const openFileDialog = () => (dispatch: TDispatch) => {
         .then(
             ({ filePaths }: { filePaths: string[] }) =>
                 filePaths.length === 1 && dispatch(parseFile(filePaths[0]))
+        );
+};
+
+export const openDirectoryDialog = () => (dispatch: TDispatch) => {
+    const dialogOptions = {
+        title: 'Select a Directory for events',
+        properties: ['openDirectory'],
+        // eslint-disable-next-line no-undef
+    } as Electron.OpenDialogOptions;
+    dialog
+        .showOpenDialog(dialogOptions)
+        .then(
+            ({ filePaths }: { filePaths: string[] }) =>
+                filePaths.length === 1 &&
+                dispatch(setEventRecordingPath(filePaths[0]))
         );
 };
 

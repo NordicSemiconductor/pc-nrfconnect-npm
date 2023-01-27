@@ -17,6 +17,7 @@ import {
     IrqEvent,
     Ldo,
     LdoMode,
+    LoggingEvent,
     NpmDevice,
     PartialUpdate,
     PmicChargingState,
@@ -60,12 +61,7 @@ const parseTime = (timeString: string) => {
 
 const parseLogData = (
     logMessage: string,
-    callback: (
-        timestamp: number,
-        logLevel: string,
-        module: string,
-        message: string
-    ) => void
+    callback: (loggingEvent: LoggingEvent) => void
 ) => {
     const endOfTimestamp = logMessage.indexOf(']');
 
@@ -85,7 +81,7 @@ const parseLogData = (
         logMessage.indexOf(':', endOfLogLevel) + 2
     );
 
-    callback(parseTime(strTimeStamp), logLevel, module, message);
+    callback({ timestamp: parseTime(strTimeStamp), logLevel, module, message });
 };
 
 interface INpmDevice extends IBaseNpmDevice {
@@ -136,12 +132,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         }
     };
 
-    const processModulePmic = (
-        timestamp: number,
-        logLevel: string,
-        module: string,
-        message: string
-    ) => {
+    const processModulePmic = ({ message }: LoggingEvent) => {
         switch (message) {
             case 'No response from PMIC.':
                 clearConnectionTimeout();
@@ -156,12 +147,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         }
     };
 
-    const processModulePmicAdc = (
-        timestamp: number,
-        logLevel: string,
-        module: string,
-        message: string
-    ) => {
+    const processModulePmicAdc = ({ timestamp, message }: LoggingEvent) => {
         const messageParts = message.split(',');
         const adcSample: AdcSample = {
             timestamp,
@@ -205,12 +191,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         eventEmitter.emit('onAdcSample', adcSample);
     };
 
-    const processModulePmicIrq = (
-        timestamp: number,
-        logLevel: string,
-        module: string,
-        message: string
-    ) => {
+    const processModulePmicIrq = ({ message }: LoggingEvent) => {
         const messageParts = message.split(',');
         const event: IrqEvent = {
             type: '',
@@ -244,19 +225,34 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     shellParser?.onShellLoggingEvent(logEvent => {
-        parseLogData(logEvent, (...args) => {
-            switch (args[2]) {
+        parseLogData(logEvent, loggingEvent => {
+            switch (loggingEvent.module) {
                 case 'module_pmic':
-                    processModulePmic(...args);
+                    processModulePmic(loggingEvent);
+                    eventEmitter.emit('onLoggingEvent', {
+                        loggingEvent,
+                        dataPair: false,
+                    });
                     break;
                 case 'module_pmic_adc':
-                    processModulePmicAdc(...args);
+                    processModulePmicAdc(loggingEvent);
+                    eventEmitter.emit('onLoggingEvent', {
+                        loggingEvent,
+                        dataPair: true,
+                    });
                     break;
                 case 'module_pmic_irq':
-                    processModulePmicIrq(...args);
+                    processModulePmicIrq(loggingEvent);
+                    eventEmitter.emit('onLoggingEvent', {
+                        loggingEvent,
+                        dataPair: true,
+                    });
                     break;
                 default:
-                    console.warn('Unknown Module message: ', ...args);
+                    eventEmitter.emit('onLoggingEvent', {
+                        loggingEvent,
+                        dataPair: false,
+                    });
                     break;
             }
         });
