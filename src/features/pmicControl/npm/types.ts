@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import EventEmitter from 'events';
+
+import { ShellParser } from '../../../hooks/commandParser';
 import { RangeType } from '../../../utils/helpers';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
@@ -58,8 +61,23 @@ export type PmicChargingState = {
     supplementModeActive: boolean;
 };
 
+export interface IBaseNpmDevice {
+    (
+        shellParser: ShellParser | undefined,
+        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void,
+        eventEmitter: EventEmitter,
+        devices: {
+            noOfChargers?: number;
+            noOfBucks?: number;
+            noOfLdos?: number;
+        },
+        supportsVersion: string
+    ): BaseNpmDevice;
+}
+
 export type BaseNpmDevice = {
     kernelReset: (mode: 'cold' | 'warm', callback?: () => void) => void;
+    kernelUptime: (callback: (milliseconds: number) => void) => void;
     onPmicStateChange: (
         handler: (state: PmicState, error?: string) => void
     ) => () => void;
@@ -95,6 +113,13 @@ export type BaseNpmDevice = {
     isSupportedVersion: () => Promise<boolean>;
     getSupportedVersion: () => string;
 };
+
+export interface INpmDevice extends IBaseNpmDevice {
+    (
+        shellParser: ShellParser | undefined,
+        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void
+    ): NpmDevice;
+}
 
 export type NpmDevice = {
     applyConfig: (config: NpmExport) => void;

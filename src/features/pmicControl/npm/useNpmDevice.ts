@@ -32,7 +32,7 @@ import {
     updateCharger,
     updateLdo,
 } from '../pmicControlSlice';
-import { getNpmDevice } from './pmicHelpers';
+import { getNpmDevice } from './npmFactory';
 import { Buck, Charger, Ldo, PmicWarningDialog } from './types';
 
 export default (shellParser: ShellParser | undefined) => {

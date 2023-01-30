@@ -7,11 +7,12 @@
 import EventEmitter from 'events';
 
 import { ShellParser } from '../../../hooks/commandParser';
+import { parseToNumber } from './pmicHelpers';
 import {
     AdcSample,
-    BaseNpmDevice,
     Buck,
     Charger,
+    IBaseNpmDevice,
     Ldo,
     LoggingEvent,
     PartialUpdate,
@@ -19,20 +20,6 @@ import {
     PmicState,
     PmicWarningDialog,
 } from './types';
-
-export interface IBaseNpmDevice {
-    (
-        shellParser: ShellParser | undefined,
-        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void,
-        eventEmitter: EventEmitter,
-        devices: {
-            noOfChargers?: number;
-            noOfBucks?: number;
-            noOfLdos?: number;
-        },
-        supportsVersion: string
-    ): BaseNpmDevice;
-}
 
 export const baseNpmDevice: IBaseNpmDevice = (
     shellParser: ShellParser | undefined,
@@ -69,6 +56,11 @@ export const baseNpmDevice: IBaseNpmDevice = (
 
     return {
         kernelReset,
+        kernelUptime(callback) {
+            shellParser?.enqueueRequest('kernel uptime', res => {
+                callback(parseToNumber(res));
+            });
+        },
         onPmicStateChange: (handler: (state: PmicState) => void) => {
             eventEmitter.on('onPmicStateChange', handler);
             return () => {

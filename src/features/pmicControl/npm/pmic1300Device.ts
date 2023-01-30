@@ -6,19 +6,19 @@
 
 import EventEmitter from 'events';
 
-import { ShellParser } from '../../../hooks/commandParser';
 import { getRange } from '../../../utils/helpers';
-import { baseNpmDevice, IBaseNpmDevice } from './basePmicDevice';
+import { baseNpmDevice } from './basePmicDevice';
+import { parseColonBasedAnswer, parseToNumber } from './pmicHelpers';
 import {
     AdcSample,
     Buck,
     BuckMode,
     Charger,
+    INpmDevice,
     IrqEvent,
     Ldo,
     LdoMode,
     LoggingEvent,
-    NpmDevice,
     PartialUpdate,
     PmicChargingState,
     PmicState,
@@ -26,13 +26,6 @@ import {
 } from './types';
 
 const maxTimeStamp = 359999999; // 99hrs 59min 59sec 999ms
-
-// parse strings like value is: XXX mV
-const parseColonBasedAnswer = (message: string) =>
-    message.split(':')[1]?.trim();
-
-const parseToNumber = (message: string) =>
-    Number.parseInt(parseColonBasedAnswer(message), 10);
 
 const toRegex = (
     command: string,
@@ -84,13 +77,6 @@ const parseLogData = (
     callback({ timestamp: parseTime(strTimeStamp), logLevel, module, message });
 };
 
-interface INpmDevice extends IBaseNpmDevice {
-    (
-        shellParser: ShellParser | undefined,
-        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void
-    ): NpmDevice;
-}
-
 export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     const eventEmitter = new EventEmitter();
     const devices = {
@@ -130,6 +116,12 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             clearTimeout(pmicStateUnknownTimeout);
             pmicStateUnknownTimeout = undefined;
         }
+    };
+
+    const updateUptimeOverflowCounter = () => {
+        baseDevice.kernelUptime(milliseconds => {
+            uptimeOverflowCounter = Math.floor(milliseconds / maxTimeStamp);
+        });
     };
 
     const processModulePmic = ({ message }: LoggingEvent) => {
@@ -587,6 +579,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     initConnectionTimeout();
+    updateUptimeOverflowCounter();
 
     const requestUpdate = {
         pmicChargingState: () => sendCommand('npmx charger status get'),
