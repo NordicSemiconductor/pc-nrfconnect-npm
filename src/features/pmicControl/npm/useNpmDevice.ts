@@ -246,11 +246,11 @@ export default (shellParser: ShellParser | undefined) => {
                     break;
             }
             if (recordEvents) {
-                const path = `${recordEventsPath}/${e.loggingEvent.module}.csv`;
-                const addHeaders = !existsSync(path);
-                let data = '';
                 if (e.dataPair) {
+                    let data = '';
                     // sample message abc=10,xyz=44
+                    const path = `${recordEventsPath}/${e.loggingEvent.module}.csv`;
+                    const addHeaders = !existsSync(path);
                     const valuePairs = e.loggingEvent.message.split(',');
                     if (addHeaders) {
                         data += `timestamp,${(data += valuePairs
@@ -260,12 +260,14 @@ export default (shellParser: ShellParser | undefined) => {
                     data += `${e.loggingEvent.timestamp},${valuePairs
                         .map(p => p.split('=')[1] ?? 'NaN')
                         .join(',')}\r\n`;
-                } else {
-                    if (addHeaders) data += `timestamp,logLevel,message\r\n`;
-                    data += `${e.loggingEvent.timestamp},${e.loggingEvent.logLevel},${e.loggingEvent.message}\r\n`;
+                    appendFile(path, data, () => {});
                 }
-
-                appendFile(path, data, logger.error);
+                let data = '';
+                const path = `${recordEventsPath}/all_events.csv`;
+                const addHeaders = !existsSync(path);
+                if (addHeaders) data += `timestamp,logLevel,module,message\r\n`;
+                data += `${e.loggingEvent.timestamp},${e.loggingEvent.logLevel},${e.loggingEvent.module},"${e.loggingEvent.message}"\r\n`;
+                appendFile(path, data, () => {});
             }
         });
         return () => releaseOnLoggingEvent();

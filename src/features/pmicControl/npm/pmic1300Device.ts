@@ -93,6 +93,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     );
     let lastUptime = 0;
     let uptimeOverflowCounter = 0;
+    let deviceUptimeToSystemDelta = 0;
 
     // can only change from:
     //  - 'disconnected' --> 'connected' --> 'disconnected'
@@ -119,6 +120,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
     const updateUptimeOverflowCounter = () => {
         baseDevice.kernelUptime(milliseconds => {
+            deviceUptimeToSystemDelta = Date.now() - milliseconds;
             uptimeOverflowCounter = Math.floor(milliseconds / maxTimeStamp);
         });
     };
@@ -402,8 +404,29 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         onSuccess?: () => void,
         onFail?: () => void
     ) => {
-        if (pmicState !== 'offline')
-            shellParser?.enqueueRequest(command, onSuccess, onFail, true);
+        if (pmicState !== 'offline') {
+            const wrapper = (result: string, action?: () => void) => {
+                const event: LoggingEvent = {
+                    timestamp: Date.now() - deviceUptimeToSystemDelta,
+                    module: 'shell_commands',
+                    logLevel: 'inf',
+                    message: `command: "${command}" response: "${result}"`,
+                };
+
+                eventEmitter.emit('onLoggingEvent', {
+                    loggingEvent: event,
+                    dataPair: true,
+                });
+
+                if (action) action();
+            };
+            shellParser?.enqueueRequest(
+                command,
+                result => wrapper(result, onSuccess),
+                result => wrapper(result, onFail),
+                true
+            );
+        }
     };
 
     const setChargerVTerm = (index: number, value: number) => {
