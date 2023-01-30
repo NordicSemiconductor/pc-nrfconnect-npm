@@ -70,7 +70,7 @@ const SideText = ({
 
             {batteryConnected && (
                 <>
-                    {fuelGauge !== undefined ? (
+                    {fuelGauge && soc !== undefined ? (
                         <h2>{`${Math.round(soc ?? 0)}% soc`}</h2>
                     ) : (
                         <h2>Fuel Gauge Off</h2>
