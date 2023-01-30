@@ -20,7 +20,7 @@ interface TimeSpanLineProps {
 const TimeSpanDeltaLine: FC<TimeSpanLineProps> = ({ range, chartArea }) => {
     const duration = range.xMax - range.xMin;
 
-    const label = `\u0394${formatDuration(duration * 1000)}`;
+    const label = `\u0394${formatDuration(duration)}`;
 
     return (
         <div
@@ -33,11 +33,11 @@ const TimeSpanDeltaLine: FC<TimeSpanLineProps> = ({ range, chartArea }) => {
         >
             <div className="content">
                 <div className="start">
-                    {formatDuration(Math.round(range.xMin) * 1000)}
+                    {formatDuration(Math.round(range.xMin))}
                 </div>
                 <div className="delta">{label}</div>
                 <div className="end">
-                    {formatDuration(Math.round(range.xMax) * 1000)}
+                    {formatDuration(Math.round(range.xMax))}
                 </div>
             </div>
         </div>

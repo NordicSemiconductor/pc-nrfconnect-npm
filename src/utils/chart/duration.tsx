@@ -3,80 +3,20 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- conservative refactoring, TODO: remove this line */
 
-import React, { ReactElement } from 'react';
-
-const toString = (
-    value: any,
-    unit: any,
-    value2: any = null,
-    unit2: any = null
-): string =>
-    value2 === null ? `${value}${unit}` : `${value}${unit} ${value2}${unit2}`;
-
-const toHTML = (
-    value: any,
-    unit: any,
-    value2: any = null,
-    unit2: any = null
-): ReactElement<any, any> => (
-    <div className="value">
-        {value}
-        <span className="unit">{unit}</span>
-        {value2 !== null && (
-            <>
-                {' '}
-                {value2}
-                <span className="unit">{unit2}</span>
-            </>
-        )}
-    </div>
-);
-
-const format = (
-    microseconds: number,
-    formatter: any
-): ReactElement<any, any> | string | null => {
-    if (Number.isNaN(microseconds)) return null;
-    const usec = Math.floor(microseconds);
-    const u = `${usec % 1000}`;
-
-    if (usec < 1000) return formatter(u, '\u00B5s');
-    const t = new Date(Math.floor(usec / 1000));
+const format = (milliseconds: number): string | null => {
+    if (Number.isNaN(milliseconds)) return null;
+    const t = new Date(Math.floor(milliseconds));
     const z = `${t.getUTCMilliseconds()}`;
-
-    if (usec < 10000) return formatter(`${z}.${u.padStart(3, '0')}`, 'ms');
-    if (usec < 100000)
-        return formatter(`${z}.${u.padStart(3, '0').substr(0, 2)}`, 'ms');
-    if (usec < 1000000)
-        return formatter(`${z}.${u.padStart(3, '0').substr(0, 1)}`, 'ms');
-
     const s = `${t.getUTCSeconds()}`;
-    if (usec < 10000000) return formatter(`${s}.${z.padStart(3, '0')}`, 's');
-    if (usec < 60000000)
-        return formatter(`${s}.${z.padStart(3, '0').substr(0, 2)}`, 's');
-
     const m = `${t.getUTCMinutes()}`;
-    if (usec < 600000000)
-        return formatter(
-            `${m}:${s.padStart(2, '0')}.${z.padStart(3, '0').substr(0, 1)}`,
-            'm'
-        );
-    if (usec < 3600000000) return formatter(`${m}:${s.padStart(2, '0')}`, 'm');
-
     const h = `${t.getUTCHours()}`;
-    if (usec < 86400000000)
-        return formatter(
-            `${h}:${m.padStart(2, '0')}:${s.padStart(2, '0')}`,
-            'h'
-        );
+    const d = Math.floor(milliseconds / 86400000);
 
-    const d = Math.floor(usec / 86400000000);
-    return formatter(d, 'd', `${h}:${m.padStart(2, '0')}`, 'h');
+    return `${d > 0 ? `${d} day ${d > 1 ? 's' : ''} ` : ''}${h.padStart(
+        2,
+        '0'
+    )}:${m.padStart(2, '0')}:${s.padStart(2, '0')}.${z.padStart(3, '0')}`;
 };
 
-export const formatDuration = (microseconds: number) =>
-    format(microseconds, toString);
-export const formatDurationHTML = (microseconds: number) =>
-    format(microseconds, toHTML);
+export const formatDuration = (milliseconds: number) => format(milliseconds);
