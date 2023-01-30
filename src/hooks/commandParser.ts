@@ -9,8 +9,8 @@ import { SerialPort } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
 interface ICallbacks {
-    onSuccess: (data: string) => void;
-    onError: (data: string) => void;
+    onSuccess: (response: string, command: string) => void;
+    onError: (message: string, command: string) => void;
 }
 
 export type ShellParserSettings = {
@@ -157,10 +157,10 @@ export const hookModemToShellParser = async (
             const command = commandQueue[0].command;
             const commandResponse = response.replace(command, '').trim();
             if (commandResponse.match(settings.errorRegex)) {
-                commandQueue[0].callbacks.onError(commandResponse);
+                commandQueue[0].callbacks.onError(commandResponse, command);
                 callbackFound = true;
             } else {
-                commandQueue[0].callbacks.onSuccess(commandResponse);
+                commandQueue[0].callbacks.onSuccess(commandResponse, command);
                 callbackFound = true;
             }
 
@@ -177,17 +177,19 @@ export const hookModemToShellParser = async (
 
         // Trigger permanent time callbacks
         commandQueueCallbacks.forEach((callbacks, key) => {
-            if (response.match(`^(${key})`)) {
+            const commandMatch = response.match(`^(${key})`);
+            if (commandMatch) {
                 const commandResponse = response
                     .replace(new RegExp(`^(${key})\r\n`), '')
                     .trim();
-                if (commandResponse.match(settings.errorRegex)) {
+                const match = commandResponse.match(settings.errorRegex);
+                if (match) {
                     callbacks.forEach(callback => {
-                        callback.onError(commandResponse);
+                        callback.onError(commandResponse, commandMatch[0]);
                     });
                 } else {
                     callbacks.forEach(callback => {
-                        callback.onSuccess(commandResponse);
+                        callback.onSuccess(commandResponse, commandMatch[0]);
                     });
                 }
 
@@ -279,8 +281,8 @@ export const hookModemToShellParser = async (
         },
         enqueueRequest: async (
             command: string,
-            onSuccess: (data: string) => void = () => {},
-            onError: (error: string) => void = () => {},
+            onSuccess: (response: string, command: string) => void = () => {},
+            onError: (message: string, command: string) => void = () => {},
             unique = false
         ) => {
             if (unique) {
@@ -306,8 +308,8 @@ export const hookModemToShellParser = async (
         },
         registerCommandCallback: (
             command: string,
-            onSuccess: (data: string) => void,
-            onError: (error: string) => void
+            onSuccess: (data: string, command?: string) => void,
+            onError: (error: string, command?: string) => void
         ) => {
             // Add Callbacks to the queue for future responses
             const callbacks = { onSuccess, onError };
