@@ -103,7 +103,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         warningDialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+1'
+        '0.0.0+2'
     );
     let lastUptime = 0;
     let initUptime = -1;
@@ -160,16 +160,16 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             const pair = part.split('=');
             switch (pair[0]) {
                 case 'vbat':
-                    adcSample.vBat = Number(pair[1]);
+                    adcSample.vBat = Number(pair[1] ?? 0);
                     break;
                 case 'ibat':
-                    adcSample.iBat = Number(pair[1]);
+                    adcSample.iBat = Number(pair[1] ?? 0);
                     break;
                 case 'tbat':
-                    adcSample.tBat = Number(pair[1]);
+                    adcSample.tBat = Number(pair[1] ?? 0);
                     break;
                 case 'soc':
-                    adcSample.soc = Number(pair[1]);
+                    adcSample.soc = Number(pair[1] ?? 0);
                     break;
             }
         });
@@ -217,7 +217,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const startAdcSample = (samplingRate: number) => {
-        sendCommand(`npm_adc_sample ${samplingRate}`);
+        sendCommand(`npm_adc_sample 500 ${samplingRate}`);
     };
 
     const stopAdcSample = () => {
@@ -317,20 +317,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     );
 
     shellParser?.registerCommandCallback(
-        toRegex('npmx charger module charger enable'),
-        () => {
+        toRegex('npmx charger module charger', true),
+        (_result, command) => {
             emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                enabled: true,
-            });
-        },
-        console.error
-    );
-
-    shellParser?.registerCommandCallback(
-        toRegex('npmx charger module charger disable'),
-        () => {
-            emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                enabled: false,
+                enabled: command?.endsWith('1'),
             });
         },
         console.error
@@ -401,20 +391,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         );
 
         shellParser?.registerCommandCallback(
-            toRegex('npmx buck enable', false, i),
-            () => {
+            toRegex('npmx buck', true, i),
+            (_result, command) => {
                 emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    enabled: true,
-                });
-            },
-            console.error
-        );
-
-        shellParser?.registerCommandCallback(
-            toRegex('npmx buck disable', false, i),
-            () => {
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    enabled: false,
+                    enabled: command?.endsWith('1'),
                 });
             },
             console.error
@@ -423,20 +403,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
     for (let i = 0; i < devices.noOfLdos; i += 1) {
         shellParser?.registerCommandCallback(
-            toRegex('npmx ldsw enable', false, i),
-            () => {
+            toRegex('npmx ldsw', true, i),
+            (_result, command) => {
                 emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                    enabled: true,
-                });
-            },
-            console.error
-        );
-
-        shellParser?.registerCommandCallback(
-            toRegex('npmx ldsw disable', false, i),
-            () => {
-                emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                    enabled: false,
+                    enabled: command?.endsWith('1'),
                 });
             },
             console.error
@@ -453,6 +423,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const setChargerVTerm = (index: number, value: number) => {
+        setChargerEnabled(index, false);
         sendCommand(
             `npmx charger termination_voltage normal set ${value * 1000}` // mv to V
         );
@@ -461,8 +432,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             emitPartialEvent<Charger>('onChargerUpdate', index, {
                 vTerm: value,
             });
-
-        setChargerEnabled(index, false);
     };
     const setChargerIChg = (index: number, value: number) => {
         sendCommand(`npmx charger charger_current set ${value}`);
@@ -475,9 +444,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         setChargerEnabled(index, false);
     };
     const setChargerEnabled = (index: number, enabled: boolean) => {
-        sendCommand(
-            `npmx charger module charger ${enabled ? 'enable' : 'disable'} 1`
-        );
+        sendCommand(`npmx charger module charger set ${enabled ? '1' : '0'}`);
 
         if (pmicState === 'offline')
             emitPartialEvent<Charger>('onChargerUpdate', index, {
@@ -536,7 +503,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
     const setBuckEnabled = (index: number, enabled: boolean) => {
         const action = () => {
-            sendCommand(`npmx buck ${enabled ? 'enable' : 'disable'} ${index}`);
+            sendCommand(`npmx buck set ${index} ${enabled ? '1' : '0'}`);
 
             if (pmicState === 'offline')
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
@@ -569,7 +536,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     const setLdoVoltage = (index: number, value: number) =>
         console.warn('Not implemented');
     const setLdoEnabled = (index: number, enabled: boolean) => {
-        sendCommand(`npmx ldsw ${enabled ? 'enable' : 'disable'} ${index}`);
+        sendCommand(`npmx ldsw set ${index} ${enabled ? '1' : '0'}`);
 
         if (pmicState === 'offline')
             emitPartialEvent<Ldo>('onLdoUpdate', index, {

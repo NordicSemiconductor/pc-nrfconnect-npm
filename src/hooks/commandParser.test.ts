@@ -234,12 +234,12 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
         expect(mockOnSuccess).toBeCalledTimes(1);
-        expect(mockOnSuccess).toBeCalledWith('Response Value');
+        expect(mockOnSuccess).toBeCalledWith('Response Value', 'Test Command');
 
         expect(mockOnShellLogging).toBeCalledTimes(0);
         expect(mockOnUnknown).toBeCalledTimes(0);
@@ -264,16 +264,16 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from('Test Com'));
+        onResponseCallback(Buffer.from('Test Com'));
 
-        await onResponseCallback(Buffer.from('mand\r\nResponse Val'));
+        onResponseCallback(Buffer.from('mand\r\nResponse Val'));
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from('ue\r\nuart:~$'));
+        onResponseCallback(Buffer.from('ue\r\nuart:~$'));
 
         expect(mockOnSuccess).toBeCalledTimes(1);
-        expect(mockOnSuccess).toBeCalledWith('Response Value');
+        expect(mockOnSuccess).toBeCalledWith('Response Value', 'Test Command');
 
         expect(mockOnShellLogging).toBeCalledTimes(0);
         expect(mockOnUnknown).toBeCalledTimes(0);
@@ -298,12 +298,15 @@ describe('shell command parser', () => {
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nerror: Response Value\r\nuart:~$')
         );
 
         expect(mockOnError).toBeCalledTimes(1);
-        expect(mockOnError).toBeCalledWith('error: Response Value');
+        expect(mockOnError).toBeCalledWith(
+            'error: Response Value',
+            'Test Command'
+        );
 
         expect(mockOnSuccess).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -328,16 +331,19 @@ describe('shell command parser', () => {
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from('Test Command\r\nerror: Re'));
+        onResponseCallback(Buffer.from('Test Command\r\nerror: Re'));
 
-        await onResponseCallback(Buffer.from('sponse Value\r\nuart'));
+        onResponseCallback(Buffer.from('sponse Value\r\nuart'));
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from(':~$'));
+        onResponseCallback(Buffer.from(':~$'));
 
         expect(mockOnError).toBeCalledTimes(1);
-        expect(mockOnError).toBeCalledWith('error: Response Value');
+        expect(mockOnError).toBeCalledWith(
+            'error: Response Value',
+            'Test Command'
+        );
 
         expect(mockOnSuccess).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -368,19 +374,25 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command 1\r\nResponse Value 1\r\nuart:~$')
         );
 
         expect(mockOnSuccess).toBeCalledTimes(1);
-        expect(mockOnSuccess).toBeCalledWith('Response Value 1');
+        expect(mockOnSuccess).toBeCalledWith(
+            'Response Value 1',
+            'Test Command 1'
+        );
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command 2\r\nResponse Value 2\r\nuart:~$')
         );
 
         expect(mockOnSuccess).toBeCalledTimes(2);
-        expect(mockOnSuccess).toBeCalledWith('Response Value 2');
+        expect(mockOnSuccess).toBeCalledWith(
+            'Response Value 2',
+            'Test Command 2'
+        );
 
         expect(mockOnError).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -414,17 +426,23 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess1).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from(
                 'Test Command 1\r\nResponse Value 1\r\nuart:~$Test Command 2\r\nResponse Value 2\r\nuart:~$'
             )
         );
 
         expect(mockOnSuccess1).toBeCalledTimes(1);
-        expect(mockOnSuccess1).toBeCalledWith('Response Value 1');
+        expect(mockOnSuccess1).toBeCalledWith(
+            'Response Value 1',
+            'Test Command 1'
+        );
 
         expect(mockOnSuccess2).toBeCalledTimes(1);
-        expect(mockOnSuccess2).toBeCalledWith('Response Value 2');
+        expect(mockOnSuccess2).toBeCalledWith(
+            'Response Value 2',
+            'Test Command 2'
+        );
 
         expect(mockOnError).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -455,17 +473,23 @@ describe('shell command parser', () => {
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from(
                 'Test Command 1\r\nerror: Response Value 1\r\nuart:~$Test Command 2\r\nResponse Value 2\r\nuart:~$'
             )
         );
 
         expect(mockOnError).toBeCalledTimes(1);
-        expect(mockOnError).toBeCalledWith('error: Response Value 1');
+        expect(mockOnError).toBeCalledWith(
+            'error: Response Value 1',
+            'Test Command 1'
+        );
 
         expect(mockOnSuccess).toBeCalledTimes(1);
-        expect(mockOnSuccess).toBeCalledWith('Response Value 2');
+        expect(mockOnSuccess).toBeCalledWith(
+            'Response Value 2',
+            'Test Command 2'
+        );
 
         expect(mockOnShellLogging).toBeCalledTimes(0);
         expect(mockOnUnknown).toBeCalledTimes(0);
@@ -491,21 +515,21 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
         expect(mockOnSuccess).toBeCalledTimes(1);
-        expect(mockOnSuccess).toBeCalledWith('Response Value');
+        expect(mockOnSuccess).toBeCalledWith('Response Value', 'Test Command');
 
         await shellParser.enqueueRequest('Test Command');
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
         expect(mockOnSuccess).toBeCalledTimes(2);
-        expect(mockOnSuccess).toBeCalledWith('Response Value');
+        expect(mockOnSuccess).toBeCalledWith('Response Value', 'Test Command');
 
         expect(mockOnError).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -531,16 +555,16 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from('Test Com'));
+        onResponseCallback(Buffer.from('Test Com'));
 
-        await onResponseCallback(Buffer.from('mand\r\nResponse Val'));
+        onResponseCallback(Buffer.from('mand\r\nResponse Val'));
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from('ue\r\nuart:~$'));
+        onResponseCallback(Buffer.from('ue\r\nuart:~$'));
 
         expect(mockOnSuccess).toBeCalledTimes(1);
-        expect(mockOnSuccess).toBeCalledWith('Response Value');
+        expect(mockOnSuccess).toBeCalledWith('Response Value', 'Test Command');
 
         expect(mockOnError).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -566,21 +590,27 @@ describe('shell command parser', () => {
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nerror: Response Value\r\nuart:~$')
         );
 
         expect(mockOnError).toBeCalledTimes(1);
-        expect(mockOnError).toBeCalledWith('error: Response Value');
+        expect(mockOnError).toBeCalledWith(
+            'error: Response Value',
+            'Test Command'
+        );
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nerror: Response Value\r\nuart:~$')
         );
 
         expect(mockOnError).toBeCalledTimes(2);
-        expect(mockOnError).toBeCalledWith('error: Response Value');
+        expect(mockOnError).toBeCalledWith(
+            'error: Response Value',
+            'Test Command'
+        );
 
         expect(mockOnSuccess).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -606,16 +636,19 @@ describe('shell command parser', () => {
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from('Test Command\r\nerror: Re'));
+        onResponseCallback(Buffer.from('Test Command\r\nerror: Re'));
 
-        await onResponseCallback(Buffer.from('sponse Value\r\nuart'));
+        onResponseCallback(Buffer.from('sponse Value\r\nuart'));
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from(':~$'));
+        onResponseCallback(Buffer.from(':~$'));
 
         expect(mockOnError).toBeCalledTimes(1);
-        expect(mockOnError).toBeCalledWith('error: Response Value');
+        expect(mockOnError).toBeCalledWith(
+            'error: Response Value',
+            'Test Command'
+        );
 
         expect(mockOnSuccess).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -646,12 +679,12 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
         expect(mockOnSuccess).toBeCalledTimes(2);
-        expect(mockOnSuccess).toBeCalledWith('Response Value');
+        expect(mockOnSuccess).toBeCalledWith('Response Value', 'Test Command');
 
         expect(mockOnShellLogging).toBeCalledTimes(0);
         expect(mockOnUnknown).toBeCalledTimes(0);
@@ -681,12 +714,15 @@ describe('shell command parser', () => {
 
         expect(mockOnError).toBeCalledTimes(0);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nerror: Response Value\r\nuart:~$')
         );
 
         expect(mockOnError).toBeCalledTimes(2);
-        expect(mockOnError).toBeCalledWith('error: Response Value');
+        expect(mockOnError).toBeCalledWith(
+            'error: Response Value',
+            'Test Command'
+        );
 
         expect(mockOnSuccess).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
@@ -703,7 +739,7 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('<inf> main: v=3.595881,i=0.176776\r\nuart:~$')
         );
 
@@ -727,11 +763,11 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await onResponseCallback(Buffer.from('<inf> main: v=3.595881,i=0'));
+        onResponseCallback(Buffer.from('<inf> main: v=3.595881,i=0'));
 
         expect(mockOnShellLogging).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from('.176776\r\nuart:~$'));
+        onResponseCallback(Buffer.from('.176776\r\nuart:~$'));
 
         expect(mockOnShellLogging).toBeCalledTimes(1);
         expect(mockOnShellLogging).toBeCalledWith(
@@ -753,7 +789,7 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
@@ -775,11 +811,11 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await onResponseCallback(Buffer.from('Test Command\r\nRespons'));
+        onResponseCallback(Buffer.from('Test Command\r\nRespons'));
 
         expect(mockOnUnknown).toBeCalledTimes(0);
 
-        await onResponseCallback(Buffer.from('e Value\r\nuart:~$'));
+        onResponseCallback(Buffer.from('e Value\r\nuart:~$'));
 
         expect(mockOnUnknown).toBeCalledTimes(1);
         expect(mockOnUnknown).toBeCalledWith('Test Command\r\nResponse Value');
@@ -807,18 +843,18 @@ describe('shell command parser', () => {
 
         await shellParser.enqueueRequest('Test Command');
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
         expect(mockOnSuccess).toBeCalledTimes(1);
-        expect(mockOnSuccess).toBeCalledWith('Response Value');
+        expect(mockOnSuccess).toBeCalledWith('Response Value', 'Test Command');
 
         unregister();
 
         await shellParser.enqueueRequest('Test Command');
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
@@ -862,45 +898,45 @@ describe('shell command parser', () => {
 
         await shellParser.enqueueRequest('Test Command');
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
         expect(mockOnSuccess1).toBeCalledTimes(1);
-        expect(mockOnSuccess1).toBeCalledWith('Response Value');
+        expect(mockOnSuccess1).toBeCalledWith('Response Value', 'Test Command');
 
         expect(mockOnSuccess2).toBeCalledTimes(1);
-        expect(mockOnSuccess2).toBeCalledWith('Response Value');
+        expect(mockOnSuccess2).toBeCalledWith('Response Value', 'Test Command');
 
         expect(mockOnSuccess3).toBeCalledTimes(1);
-        expect(mockOnSuccess3).toBeCalledWith('Response Value');
+        expect(mockOnSuccess3).toBeCalledWith('Response Value', 'Test Command');
 
         unregister2();
 
         await shellParser.enqueueRequest('Test Command');
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
         expect(mockOnSuccess1).toBeCalledTimes(2);
-        expect(mockOnSuccess1).toBeCalledWith('Response Value');
+        expect(mockOnSuccess1).toBeCalledWith('Response Value', 'Test Command');
 
         expect(mockOnSuccess2).toBeCalledTimes(1);
 
         expect(mockOnSuccess3).toBeCalledTimes(2);
-        expect(mockOnSuccess3).toBeCalledWith('Response Value');
+        expect(mockOnSuccess3).toBeCalledWith('Response Value', 'Test Command');
 
         unregister3();
 
         await shellParser.enqueueRequest('Test Command');
 
-        await onResponseCallback(
+        onResponseCallback(
             Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
         );
 
         expect(mockOnSuccess1).toBeCalledTimes(3);
-        expect(mockOnSuccess1).toBeCalledWith('Response Value');
+        expect(mockOnSuccess1).toBeCalledWith('Response Value', 'Test Command');
         expect(mockOnSuccess2).toBeCalledTimes(1);
         expect(mockOnSuccess3).toBeCalledTimes(2);
 
