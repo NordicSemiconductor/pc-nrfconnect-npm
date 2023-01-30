@@ -258,7 +258,7 @@ export default (shellParser: ShellParser | undefined) => {
                             .join(','))}\r\n`;
                     }
                     data += `${e.loggingEvent.timestamp},${valuePairs
-                        .map(p => p.split('=')[1])
+                        .map(p => p.split('=')[1] ?? 'NaN')
                         .join(',')}\r\n`;
                 } else {
                     if (addHeaders) data += `timestamp,logLevel,message\r\n`;

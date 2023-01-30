@@ -160,7 +160,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     adcSample.tBat = Number(pair[1] ?? 0);
                     break;
                 case 'soc':
-                    adcSample.soc = Number(pair[1] ?? 0);
+                    adcSample.soc = Number(pair[1] ?? undefined);
                     break;
             }
         });
