@@ -92,7 +92,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         '0.0.0+2'
     );
     let lastUptime = 0;
-    let initUptime = -1;
     let uptimeOverflowCounter = 0;
 
     // can only change from:
@@ -168,17 +167,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         if (adcSample.timestamp < lastUptime) {
             uptimeOverflowCounter += 1;
-            adcSample.timestamp += maxTimeStamp * (uptimeOverflowCounter + 1);
+            adcSample.timestamp += maxTimeStamp * uptimeOverflowCounter;
         }
-        if (adcSample.timestamp !== lastUptime) {
-            lastUptime = adcSample.timestamp;
-        }
-        if (initUptime < 0) {
-            initUptime = adcSample.timestamp;
-            adcSample.timestamp = 0;
-        } else {
-            adcSample.timestamp -= initUptime;
-        }
+
+        lastUptime = adcSample.timestamp;
 
         eventEmitter.emit('onAdcSample', adcSample);
     };
