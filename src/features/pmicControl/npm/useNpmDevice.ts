@@ -6,11 +6,14 @@
 
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPersistentStore } from 'pc-nrfconnect-shared';
+import { appendFile, existsSync } from 'fs';
+import { getPersistentStore, logger } from 'pc-nrfconnect-shared';
 
 import { ShellParser } from '../../../hooks/commandParser';
 import {
     dequeueWarningDialog,
+    getEventRecording,
+    getEventRecordingPath,
     getNpmDevice as getNpmDeviceSlice,
     getPmicState,
     isSupportedVersion,
@@ -37,6 +40,8 @@ export default (shellParser: ShellParser | undefined) => {
     const dispatch = useDispatch();
     const supportedVersion = useSelector(isSupportedVersion);
     const pmicState = useSelector(getPmicState);
+    const recordEvents = useSelector(getEventRecording);
+    const recordEventsPath = useSelector(getEventRecordingPath);
 
     const initDevice = useCallback(() => {
         if (!npmDevice) return;
@@ -224,4 +229,45 @@ export default (shellParser: ShellParser | undefined) => {
             };
         }
     }, [dispatch, initComponents, npmDevice]);
+
+    useEffect(() => {
+        if (!npmDevice) return;
+        const releaseOnLoggingEvent = npmDevice.onLoggingEvent(e => {
+            switch (e.loggingEvent.logLevel) {
+                case 'wrn':
+                    logger.warn(
+                        `${e.loggingEvent.module}: ${e.loggingEvent.message}`
+                    );
+                    break;
+                case 'err':
+                    logger.error(
+                        `${e.loggingEvent.module}: ${e.loggingEvent.message}`
+                    );
+                    break;
+            }
+            if (recordEvents) {
+                const path = `${recordEventsPath}/${e.loggingEvent.module}.csv`;
+                const addHeaders = !existsSync(path);
+                let data = '';
+                if (e.dataPair) {
+                    // sample message abc=10,xyz=44
+                    const valuePairs = e.loggingEvent.message.split(',');
+                    if (addHeaders) {
+                        data += `timestamp,${(data += valuePairs
+                            .map(p => p.split('=')[0])
+                            .join(','))}\r\n`;
+                    }
+                    data += `${e.loggingEvent.timestamp},${valuePairs
+                        .map(p => p.split('=')[1])
+                        .join(',')}\r\n`;
+                } else {
+                    if (addHeaders) data += `timestamp,logLevel,message\r\n`;
+                    data += `${e.loggingEvent.timestamp},${e.loggingEvent.logLevel},${e.loggingEvent.message}\r\n`;
+                }
+
+                appendFile(path, data, logger.error);
+            }
+        });
+        return () => releaseOnLoggingEvent();
+    }, [npmDevice, recordEvents, recordEventsPath]);
 };

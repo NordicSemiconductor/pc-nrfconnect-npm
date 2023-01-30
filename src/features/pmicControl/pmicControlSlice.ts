@@ -30,6 +30,8 @@ interface pmicControlState {
     fuelGauge: boolean;
     supportedVersion?: boolean;
     warningDialog: PmicWarningDialog[];
+    eventRecording: boolean;
+    eventRecordingPath?: string;
 }
 
 const initialState: pmicControlState = {
@@ -49,6 +51,7 @@ const initialState: pmicControlState = {
     batteryConnected: false,
     fuelGauge: false,
     warningDialog: [],
+    eventRecording: false,
 };
 
 const pmicControlSlice = createSlice({
@@ -115,6 +118,15 @@ const pmicControlSlice = createSlice({
         dequeueWarningDialog(state) {
             state.warningDialog = [...state.warningDialog.slice(1)];
         },
+        setEventRecording(state, action: PayloadAction<boolean>) {
+            state.eventRecording = action.payload;
+        },
+        setEventRecordingPath(
+            state,
+            action: PayloadAction<string | undefined>
+        ) {
+            state.eventRecordingPath = action.payload;
+        },
     },
 });
 
@@ -162,6 +174,11 @@ export const getWarningDialog = (state: RootState) =>
         ? state.app.pmicControl.warningDialog[0]
         : undefined;
 
+export const getEventRecording = (state: RootState) =>
+    state.app.pmicControl.eventRecording;
+export const getEventRecordingPath = (state: RootState) =>
+    state.app.pmicControl.eventRecordingPath;
+
 export const {
     setNpmDevice,
     setPmicState,
@@ -178,5 +195,7 @@ export const {
     setSupportedVersion,
     requestWarningDialog,
     dequeueWarningDialog,
+    setEventRecording,
+    setEventRecordingPath,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;
