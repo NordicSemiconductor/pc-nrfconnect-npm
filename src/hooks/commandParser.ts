@@ -308,8 +308,8 @@ export const hookModemToShellParser = async (
         },
         registerCommandCallback: (
             command: string,
-            onSuccess: (data: string, command?: string) => void,
-            onError: (error: string, command?: string) => void
+            onSuccess: (data: string, command: string) => void,
+            onError: (error: string, command: string) => void
         ) => {
             // Add Callbacks to the queue for future responses
             const callbacks = { onSuccess, onError };

@@ -118,9 +118,6 @@ const pmicControlSlice = createSlice({
         dequeueWarningDialog(state) {
             state.warningDialog = [...state.warningDialog.slice(1)];
         },
-        setEventRecording(state, action: PayloadAction<boolean>) {
-            state.eventRecording = action.payload;
-        },
         setEventRecordingPath(
             state,
             action: PayloadAction<string | undefined>
@@ -175,7 +172,8 @@ export const getWarningDialog = (state: RootState) =>
         : undefined;
 
 export const getEventRecording = (state: RootState) =>
-    state.app.pmicControl.eventRecording;
+    state.app.pmicControl.eventRecordingPath !== undefined &&
+    state.app.pmicControl.eventRecordingPath.length > 0;
 export const getEventRecordingPath = (state: RootState) =>
     state.app.pmicControl.eventRecordingPath;
 
@@ -195,7 +193,6 @@ export const {
     setSupportedVersion,
     requestWarningDialog,
     dequeueWarningDialog,
-    setEventRecording,
     setEventRecordingPath,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;

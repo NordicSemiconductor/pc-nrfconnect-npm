@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
@@ -25,7 +25,6 @@ import {
     getEventRecordingPath,
     getNpmDevice,
     getWarningDialog,
-    setEventRecording,
     setEventRecordingPath,
 } from '../../features/pmicControl/pmicControlSlice';
 import {
@@ -42,8 +41,6 @@ import SerialSettings from './SerialSettings';
 
 export default () => {
     const noop = () => {};
-
-    const [recordingState, setRecordingState] = useState(false);
 
     const currentPmicWarningDialog = useSelector(getWarningDialog);
     const eventRecordingPath = useSelector(getEventRecordingPath);
@@ -69,7 +66,6 @@ export default () => {
     useEffect(() => {
         const init = async () => {
             dispatch(setShellParser(undefined));
-
             if (serialPort) {
                 const shellParser = await hookModemToShellParser(
                     serialPort,
@@ -102,14 +98,9 @@ export default () => {
 
     useEffect(() => {
         if (shellParserO === undefined) {
-            setRecordingState(false);
             dispatch(setEventRecordingPath(undefined));
         }
     }, [dispatch, shellParserO]);
-
-    useEffect(() => {
-        dispatch(setEventRecording(recordingState));
-    }, [dispatch, recordingState]);
 
     useEffect(() => {
         shellParserO?.onPausedChange(state => {
@@ -141,29 +132,32 @@ export default () => {
                 >
                     Reset
                 </Button>
-            </CollapsibleGroup>
-            <CollapsibleGroup defaultCollapsed={false} heading="Recording">
                 <StartStopButton
+                    className="w-100 secondary-btn"
                     startText="Start Recording Events"
                     stopText="Stop Recording Events"
-                    onClick={() => setRecordingState(!recordingState)}
-                    disabled={
-                        pmicConnection === 'offline' ||
-                        eventRecordingPath === undefined
+                    onClick={() => {
+                        if (
+                            eventRecordingPath === undefined ||
+                            eventRecordingPath.length === 0
+                        ) {
+                            dispatch(openDirectoryDialog());
+                        } else {
+                            dispatch(setEventRecordingPath(''));
+                        }
+                    }}
+                    disabled={shellParserO === undefined}
+                    started={
+                        eventRecordingPath !== undefined &&
+                        eventRecordingPath.length > 0
                     }
                 />
-                <Button
-                    disabled={pmicConnection === 'offline' || recordingState}
-                    className="w-100 secondary-btn"
-                    onClick={() => dispatch(openDirectoryDialog())}
-                >
-                    Select Folder
-                </Button>
                 <div>
                     <span>Saving Events to: </span>
                     <span>{eventRecordingPath}</span>
                 </div>
             </CollapsibleGroup>
+
             <ConfirmationDialog
                 title={title}
                 isVisible={showConfirmDialog}
