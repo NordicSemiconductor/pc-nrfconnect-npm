@@ -8,6 +8,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../appReducer';
 import {
+    AdcSample,
+    BatteryModel,
     Buck,
     Charger,
     Ldo,
@@ -23,7 +25,7 @@ interface pmicControlState {
     chargers: Charger[];
     bucks: Buck[];
     ldos: Ldo[];
-    soc?: number;
+    latestAdcSample?: AdcSample;
     pmicState: PmicState;
     pmicChargingState: PmicChargingState;
     batteryConnected: boolean;
@@ -32,6 +34,9 @@ interface pmicControlState {
     warningDialog: PmicWarningDialog[];
     eventRecording: boolean;
     eventRecordingPath?: string;
+    activeBatterModel?: BatteryModel;
+    defaultBatterModels: BatteryModel[];
+    storedBatterModels: BatteryModel[];
 }
 
 const initialState: pmicControlState = {
@@ -50,6 +55,8 @@ const initialState: pmicControlState = {
     pmicState: 'offline',
     batteryConnected: false,
     fuelGauge: false,
+    defaultBatterModels: [],
+    storedBatterModels: [],
     warningDialog: [],
     eventRecording: false,
 };
@@ -78,8 +85,11 @@ const pmicControlSlice = createSlice({
         setPmicChargingState(state, action: PayloadAction<PmicChargingState>) {
             state.pmicChargingState = action.payload;
         },
-        setStateOfCharge(state, action: PayloadAction<number | undefined>) {
-            state.soc = action.payload;
+        setLatestAdcSample(
+            state,
+            action: PayloadAction<AdcSample | undefined>
+        ) {
+            state.latestAdcSample = action.payload;
         },
         setBucks(state, action: PayloadAction<Buck[]>) {
             state.bucks = action.payload;
@@ -108,6 +118,15 @@ const pmicControlSlice = createSlice({
         },
         setFuelGauge(state, action: PayloadAction<boolean>) {
             state.fuelGauge = action.payload;
+        },
+        setActiveBatterModel(state, action: PayloadAction<BatteryModel>) {
+            state.activeBatterModel = action.payload;
+        },
+        setDefaultBatterModels(state, action: PayloadAction<BatteryModel[]>) {
+            state.defaultBatterModels = action.payload;
+        },
+        setStoredBatterModels(state, action: PayloadAction<BatteryModel[]>) {
+            state.storedBatterModels = action.payload;
         },
         setSupportedVersion(state, action: PayloadAction<boolean | undefined>) {
             state.supportedVersion = action.payload;
@@ -138,9 +157,13 @@ export const getNpmDevice = (state: RootState) =>
 export const getPmicState = (state: RootState) =>
     state.app.pmicControl.pmicState;
 export const getChargers = (state: RootState) => state.app.pmicControl.chargers;
-export const getStateOfCharge = (state: RootState) => {
-    const { pmicState, soc } = state.app.pmicControl;
-    return parseConnectedState(pmicState, soc, initialState.soc);
+export const getLatestAdcSample = (state: RootState) => {
+    const { pmicState, latestAdcSample } = state.app.pmicControl;
+    return parseConnectedState(
+        pmicState,
+        latestAdcSample,
+        initialState.latestAdcSample
+    );
 };
 export const getPmicChargingState = (state: RootState) => {
     const { pmicState, pmicChargingState } = state.app.pmicControl;
@@ -162,6 +185,12 @@ export const isBatteryConnected = (state: RootState) => {
 };
 export const getFuelGauge = (state: RootState) =>
     state.app.pmicControl.fuelGauge;
+export const getActiveBatterModel = (state: RootState) =>
+    state.app.pmicControl.activeBatterModel;
+export const getDefaultBatterModels = (state: RootState) =>
+    state.app.pmicControl.defaultBatterModels;
+export const getStoredBatterModels = (state: RootState) =>
+    state.app.pmicControl.storedBatterModels;
 export const isSupportedVersion = (state: RootState) =>
     state.app.pmicControl.pmicState !== 'offline'
         ? state.app.pmicControl.supportedVersion
@@ -181,7 +210,7 @@ export const {
     setNpmDevice,
     setPmicState,
     setPmicChargingState,
-    setStateOfCharge,
+    setLatestAdcSample,
     updateCharger,
     setChargers,
     setBucks,
@@ -190,6 +219,9 @@ export const {
     updateLdo,
     setBatteryConnected,
     setFuelGauge,
+    setActiveBatterModel,
+    setDefaultBatterModels,
+    setStoredBatterModels,
     setSupportedVersion,
     requestWarningDialog,
     dequeueWarningDialog,

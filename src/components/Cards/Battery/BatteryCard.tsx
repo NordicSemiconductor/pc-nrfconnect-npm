@@ -8,19 +8,17 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Card, Toggle } from 'pc-nrfconnect-shared';
 
-import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
+import {
+    getFuelGauge,
+    getNpmDevice,
+} from '../../../features/pmicControl/pmicControlSlice';
 import Battery, {
     BatteryProperties as BatteryCardProperties,
 } from '../../Battery/Battery';
 
-export default ({
-    soc,
-    pmicChargingState,
-    batteryConnected,
-    fuelGauge,
-    disabled,
-}: BatteryCardProperties) => {
+export default ({ disabled }: BatteryCardProperties) => {
     const npmDevice = useSelector(getNpmDevice);
+    const fuelGauge = useSelector(getFuelGauge);
 
     return (
         <Card
@@ -40,13 +38,7 @@ export default ({
                 </div>
             }
         >
-            <Battery
-                soc={soc}
-                pmicChargingState={pmicChargingState}
-                batteryConnected={batteryConnected}
-                fuelGauge={fuelGauge}
-                disabled={disabled}
-            />
+            <Battery disabled={disabled} />
         </Card>
     );
 };

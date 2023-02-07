@@ -10,12 +10,8 @@ import { useSelector } from 'react-redux';
 import {
     getBucks,
     getChargers,
-    getFuelGauge,
     getLdos,
     getNpmDevice,
-    getPmicChargingState,
-    getStateOfCharge,
-    isBatteryConnected,
 } from '../../features/pmicControl/pmicControlSlice';
 import BatteryCard from '../Cards/Battery/BatteryCard';
 import BuckCard from '../Cards/Buck/BuckCard';
@@ -31,22 +27,11 @@ const PMICControlCard: FC<PMICControlCardProps> = ({ disabled }) => {
     const chargers = useSelector(getChargers);
     const bucks = useSelector(getBucks);
     const ldos = useSelector(getLdos);
-    const batteryConnected = useSelector(isBatteryConnected);
-
-    const stateOfCharge = useSelector(getStateOfCharge);
-    const pmicChargingState = useSelector(getPmicChargingState);
-    const fuelGauge = useSelector(getFuelGauge);
 
     return (
         <div className="pmic-control">
             <div className="pmic-control-inner">
-                <BatteryCard
-                    soc={stateOfCharge}
-                    pmicChargingState={pmicChargingState}
-                    batteryConnected={batteryConnected}
-                    fuelGauge={fuelGauge}
-                    disabled={disabled}
-                />
+                <BatteryCard disabled={disabled} />
                 {bucks.map((buck, index) => (
                     <BuckCard
                         buck={buck}

@@ -18,15 +18,18 @@ import {
     getPmicState,
     isSupportedVersion,
     requestWarningDialog,
+    setActiveBatterModel,
     setBatteryConnected,
     setBucks,
     setChargers,
+    setDefaultBatterModels,
     setFuelGauge,
+    setLatestAdcSample,
     setLdos,
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
-    setStateOfCharge,
+    setStoredBatterModels,
     setSupportedVersion,
     updateBuck,
     updateCharger,
@@ -68,7 +71,13 @@ export default (shellParser: ShellParser | undefined) => {
 
         npmDevice.requestUpdate.pmicChargingState();
         npmDevice.requestUpdate.fuelGauge();
-    }, [npmDevice]);
+        npmDevice.requestUpdate.activeBatteryModel();
+        npmDevice.requestUpdate.storedBatteryModels();
+
+        npmDevice.getDefaultBatteryModels().then(models => {
+            dispatch(setDefaultBatterModels(models));
+        });
+    }, [dispatch, npmDevice]);
 
     const warningDialogHandler = useCallback(
         (pmicWarningDialog: PmicWarningDialog) => {
@@ -186,7 +195,7 @@ export default (shellParser: ShellParser | undefined) => {
 
             const releaseOnAdcSample = npmDevice.onAdcSample(sample => {
                 dispatch(setBatteryConnected(sample.vBat > 0));
-                dispatch(setStateOfCharge(sample.soc));
+                dispatch(setLatestAdcSample(sample));
             });
 
             const releaseOnChargerUpdate = npmDevice.onChargerUpdate(
@@ -214,6 +223,16 @@ export default (shellParser: ShellParser | undefined) => {
                 dispatch(updateLdo(payload));
             });
 
+            const releaseOnActiveBatteryModelUpdate =
+                npmDevice.onActiveBatteryModelUpdate(payload => {
+                    dispatch(setActiveBatterModel(payload));
+                });
+
+            const releaseOnStoredBatteryModelUpdate =
+                npmDevice.onStoredBatteryModelUpdate(payload => {
+                    dispatch(setStoredBatterModels(payload));
+                });
+
             dispatch(setPmicState(npmDevice.getConnectionState()));
 
             initComponents();
@@ -226,6 +245,8 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnBuckUpdate();
                 releaseOnLdoUpdate();
                 releaseOnFuelGaugeUpdate();
+                releaseOnActiveBatteryModelUpdate();
+                releaseOnStoredBatteryModelUpdate();
             };
         }
     }, [dispatch, initComponents, npmDevice]);

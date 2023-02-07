@@ -5,8 +5,20 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { PmicChargingState } from '../../features/pmicControl/npm/types';
+import {
+    AdcSample,
+    BatteryModel,
+    PmicChargingState,
+} from '../../features/pmicControl/npm/types';
+import {
+    getActiveBatterModel,
+    getFuelGauge,
+    getLatestAdcSample,
+    getPmicChargingState,
+    isBatteryConnected,
+} from '../../features/pmicControl/pmicControlSlice';
 
 import './battery.scss';
 import styles from './Battery.module.scss';
@@ -51,18 +63,26 @@ const BatterIcon = ({ pmicChargingState }: BatteryIconProperties) => {
     );
 };
 
+const formatSecondsToString = (seconds: number) => {
+    const date = new Date(0);
+    date.setSeconds(seconds); // specify value for SECONDS here
+    return date.toISOString().slice(11, 19);
+};
+
 interface BatterySideTextProperties {
     pmicChargingState: PmicChargingState;
     batteryConnected: boolean;
-    soc: number | undefined;
+    latestAdcSample?: AdcSample;
     fuelGauge: boolean;
+    activeBatteryModel?: BatteryModel;
 }
 
 const SideText = ({
     pmicChargingState,
     batteryConnected,
-    soc,
+    latestAdcSample,
     fuelGauge,
+    activeBatteryModel,
 }: BatterySideTextProperties) => (
     <div>
         <div className="battery-side-panel">
@@ -70,8 +90,10 @@ const SideText = ({
 
             {batteryConnected && (
                 <>
-                    {fuelGauge && soc !== undefined ? (
-                        <h2>{`${Math.round(soc ?? 0)}% soc`}</h2>
+                    {fuelGauge &&
+                    latestAdcSample &&
+                    !Number.isNaN(latestAdcSample.soc) ? (
+                        <h2>{`${Math.round(latestAdcSample.soc ?? 0)}%`}</h2>
                     ) : (
                         <h2>Fuel Gauge Off</h2>
                     )}
@@ -91,6 +113,38 @@ const SideText = ({
                     {pmicChargingState.batteryRechargeNeeded && (
                         <span>Battery Recharge Needed</span>
                     )}
+                    {latestAdcSample && !Number.isNaN(latestAdcSample.tte) && (
+                        <span>
+                            Time to empty{' '}
+                            {formatSecondsToString(latestAdcSample.tte)}
+                        </span>
+                    )}
+                    {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) && (
+                        <span>
+                            Time to full{' '}
+                            {formatSecondsToString(latestAdcSample.ttf)}
+                        </span>
+                    )}
+                    {latestAdcSample && (
+                        <div>
+                            {`${latestAdcSample?.tBat.toFixed(
+                                2
+                            )}°C, ${Math.round(
+                                latestAdcSample?.iBat
+                            )}mA, ${latestAdcSample?.vBat.toFixed(2)}v`}
+                        </div>
+                    )}
+                    {activeBatteryModel && latestAdcSample && (
+                        <div>
+                            {`${
+                                getClosest(
+                                    activeBatteryModel,
+                                    latestAdcSample.tBat
+                                ).capacity
+                            }
+                            mAh`}
+                        </div>
+                    )}
                 </>
             )}
         </div>
@@ -98,22 +152,26 @@ const SideText = ({
 );
 
 export interface BatteryProperties {
-    soc: number | undefined;
-    pmicChargingState: PmicChargingState;
-    batteryConnected: boolean;
-    fuelGauge: boolean;
     disabled: boolean;
 }
 
-export default ({
-    soc,
-    pmicChargingState,
-    batteryConnected,
-    fuelGauge,
-    disabled,
-}: BatteryProperties) => {
+const getClosest = (batteryModel: BatteryModel, temperature: number) =>
+    batteryModel.characterizations.reduce((prev, curr) =>
+        Math.abs(curr.temperature - temperature) <
+        Math.abs(prev.temperature - temperature)
+            ? curr
+            : prev
+    );
+
+export default ({ disabled }: BatteryProperties) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
+
+    const fuelGauge = useSelector(getFuelGauge);
+    const pmicChargingState = useSelector(getPmicChargingState);
+    const latestAdcSample = useSelector(getLatestAdcSample);
+    const activeBatteryModel = useSelector(getActiveBatterModel);
+    const batteryConnected = useSelector(isBatteryConnected);
 
     useEffect(() => {
         const newIconSize = (iconWrapper.current?.clientHeight ?? 20) * 0.9;
@@ -123,32 +181,39 @@ export default ({
     const charging = isCharging(pmicChargingState);
 
     return (
-        <div className={`battery-wrapper ${disabled ? 'disabled' : ''}`}>
-            <div className="battery-graphic-wrapper">
-                <div className="battery-nipple" />
-                <div className="battery">
-                    <div
-                        className={`gauge ${charging ? 'animated' : ''} ${
-                            charging ? 'charging' : ''
-                        }`}
-                        style={{
-                            height: `calc(${soc ?? 0}% + 8px)`,
-                        }}
-                    />
+        <div className={`battery ${disabled ? 'disabled' : ''}`}>
+            <div className="battery-wrapper">
+                <div className="battery-graphic-wrapper">
+                    <div className="battery-graphic">
+                        <div className="battery-nipple" />
+                        <div className="battery">
+                            <div
+                                className={`gauge ${
+                                    charging ? 'animated' : ''
+                                } ${charging ? 'charging' : ''}`}
+                                style={{
+                                    height: `calc(${
+                                        latestAdcSample?.soc ?? 0
+                                    }% + 8px)`,
+                                }}
+                            />
+                        </div>
+                        <div
+                            className={`state-missing ${
+                                !batteryConnected ? '' : 'hidden'
+                            }`}
+                        />
+                        <BatterIcon pmicChargingState={pmicChargingState} />
+                    </div>
                 </div>
-                <div
-                    className={`state-missing ${
-                        !batteryConnected ? '' : 'hidden'
-                    }`}
+                <SideText
+                    pmicChargingState={pmicChargingState}
+                    batteryConnected={batteryConnected}
+                    latestAdcSample={latestAdcSample}
+                    fuelGauge={fuelGauge}
+                    activeBatteryModel={activeBatteryModel}
                 />
-                <BatterIcon pmicChargingState={pmicChargingState} />
             </div>
-            <SideText
-                pmicChargingState={pmicChargingState}
-                batteryConnected={batteryConnected}
-                soc={soc}
-                fuelGauge={fuelGauge}
-            />
         </div>
     );
 };

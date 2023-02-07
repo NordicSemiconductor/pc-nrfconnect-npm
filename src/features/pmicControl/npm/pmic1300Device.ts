@@ -9,9 +9,15 @@ import { logger } from 'pc-nrfconnect-shared';
 
 import { getRange } from '../../../utils/helpers';
 import { baseNpmDevice } from './basePmicDevice';
-import { parseColonBasedAnswer, parseToNumber } from './pmicHelpers';
+import {
+    parseBatteryModel,
+    parseColonBasedAnswer,
+    parseToBoolean,
+    parseToNumber,
+} from './pmicHelpers';
 import {
     AdcSample,
+    BatteryModel,
     Buck,
     BuckMode,
     Charger,
@@ -100,7 +106,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         warningDialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+2'
+        '0.0.0+4'
     );
     let lastUptime = 0;
     let uptimeOverflowCounter = 0;
@@ -158,7 +164,9 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             vBat: 0,
             iBat: 0,
             tBat: 0,
-            soc: undefined,
+            soc: NaN,
+            tte: NaN,
+            ttf: NaN,
         };
         messageParts.forEach(part => {
             const pair = part.split('=');
@@ -167,13 +175,19 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     adcSample.vBat = Number(pair[1] ?? 0);
                     break;
                 case 'ibat':
-                    adcSample.iBat = Number(pair[1] ?? 0);
+                    adcSample.iBat = Math.abs(Number(pair[1] ?? 0)) * 1000;
                     break;
                 case 'tbat':
                     adcSample.tBat = Number(pair[1] ?? 0);
                     break;
                 case 'soc':
-                    adcSample.soc = Number(pair[1] ?? undefined);
+                    adcSample.soc = Number(pair[1] ?? NaN);
+                    break;
+                case 'tte':
+                    adcSample.tte = Number(pair[1] ?? NaN);
+                    break;
+                case 'ttf':
+                    adcSample.ttf = Number(pair[1] ?? NaN);
                     break;
             }
         });
@@ -214,7 +228,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const startAdcSample = (samplingRate: number) => {
-        sendCommand(`npm_adc_sample 500 ${samplingRate}`);
+        sendCommand(`npm_adc_sample 1000 ${samplingRate}`);
     };
 
     const stopAdcSample = () => {
@@ -314,37 +328,58 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     );
 
     shellParser?.registerCommandCallback(
-        toRegex('npmx charger module charger', true),
-        (_result, command) => {
+        toRegex('npmx charger module charger', true, undefined, '(1|0)'),
+        res => {
             emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                enabled: command?.endsWith('1'),
+                enabled: parseToBoolean(res),
             });
         },
         noop
     );
 
     shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge status'),
+        toRegex('fuel_gauge', true, undefined, '(1|0)'),
+        res => {
+            eventEmitter.emit('onFuelGauge', parseToBoolean(res));
+        },
+        noop
+    );
+
+    shellParser?.registerCommandCallback(
+        toRegex('fuel_gauge model', true, undefined, '[A-Za-z0-9]+'),
         res => {
             eventEmitter.emit(
-                'onFuelGauge',
-                res.match('state=ENABLED') !== null
+                'onActiveBatteryModelUpdate',
+                parseBatteryModel(parseColonBasedAnswer(res))
             );
         },
         noop
     );
 
     shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge (enable|disable)'),
-        (_res, command) => {
-            eventEmitter.emit('onFuelGauge', command.includes('enable'));
+        toRegex('fuel_gauge model store'),
+        () => {
+            requestUpdate.activeBatteryModel();
+            requestUpdate.storedBatteryModels();
+        },
+        noop
+    );
+
+    shellParser?.registerCommandCallback(
+        toRegex('fuel_gauge model list'),
+        res => {
+            const models = res.split('Battery model stored in database:');
+            if (models.length < 2) return;
+            const stringModels = models[1].trim().split('\r\n');
+            const list = stringModels.map(parseBatteryModel);
+            eventEmitter.emit('onStoredBatteryModelUpdate', list);
         },
         noop
     );
 
     for (let i = 0; i < devices.noOfBucks; i += 1) {
         shellParser?.registerCommandCallback(
-            toRegex('npmx buck voltage normal', true, i),
+            toRegex('npmx buck voltage', true, i),
             res => {
                 const value = parseToNumber(res);
                 emitPartialEvent<Buck>('onBuckUpdate', i, {
@@ -357,33 +392,19 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         shellParser?.registerCommandCallback(
             toRegex('npmx buck vout select', true, i),
             res => {
-                const valueString = parseColonBasedAnswer(res);
-                let mode: BuckMode | undefined;
-
-                switch (valueString) {
-                    case 'vset pin select':
-                    case '0':
-                        mode = 'vSet';
-                        break;
-                    case 'software select':
-                    case '1':
-                        mode = 'software';
-                        break;
-                }
-
-                if (mode)
-                    emitPartialEvent<Buck>('onBuckUpdate', i, {
-                        mode,
-                    });
+                const value = parseToNumber(res);
+                emitPartialEvent<Buck>('onBuckUpdate', i, {
+                    mode: value === 0 ? 'vSet' : 'software',
+                });
             },
             noop
         );
 
         shellParser?.registerCommandCallback(
             toRegex('npmx buck', true, i),
-            (_result, command) => {
+            res => {
                 emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    enabled: command?.endsWith('1'),
+                    enabled: parseToBoolean(res),
                 });
             },
             noop
@@ -393,9 +414,19 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     for (let i = 0; i < devices.noOfLdos; i += 1) {
         shellParser?.registerCommandCallback(
             toRegex('npmx ldsw', true, i),
-            (_result, command) => {
+            res => {
                 emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                    enabled: command?.endsWith('1'),
+                    enabled: parseToBoolean(res),
+                });
+            },
+            noop
+        );
+
+        shellParser?.registerCommandCallback(
+            toRegex('npmx ldsw status', true, i),
+            res => {
+                emitPartialEvent<Ldo>('onLdoUpdate', i, {
+                    enabled: parseToBoolean(res),
                 });
             },
             noop
@@ -452,6 +483,12 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         );
     };
     const setChargerIChg = (index: number, value: number) => {
+        emitPartialEvent<Charger>('onChargerUpdate', index, {
+            iChg: value,
+        });
+
+        setChargerEnabled(index, false);
+
         sendCommand(
             `npmx charger charger_current set ${value}`,
             noop,
@@ -459,13 +496,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 if (isSetCommand(command)) requestUpdate.chargerIChg();
             }
         );
-
-        setChargerEnabled(index, false);
-
-        if (pmicState === 'offline')
-            emitPartialEvent<Charger>('onChargerUpdate', index, {
-                iChg: value,
-            });
     };
     const setChargerEnabled = (index: number, enabled: boolean) => {
         sendCommand(
@@ -487,7 +517,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     const setBuckVOut = (index: number, value: number) => {
         const action = () => {
             sendCommand(
-                `npmx buck voltage normal set ${index} ${value * 1000}`,
+                `npmx buck voltage set ${index} ${value * 1000}`,
                 noop,
                 (_res, command) => {
                     if (isSetCommand(command)) requestUpdate.buckVOut(index);
@@ -599,7 +629,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
     const setFuelGaugeEnabled = (enabled: boolean) => {
         sendCommand(
-            `fuel_gauge ${enabled ? 'enable' : 'disable'}`,
+            `fuel_gauge set ${enabled ? '1' : '0'}`,
             noop,
             (_res, command) => {
                 if (isSetCommand(command)) requestUpdate.fuelGauge();
@@ -607,6 +637,12 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         );
 
         if (pmicState === 'offline') eventEmitter.emit('onFuelGauge', enabled);
+    };
+
+    const setActiveBatteryModel = (name: string) => {
+        sendCommand(`fuel_gauge model set ${name}`, noop, (_res, command) => {
+            if (isSetCommand(command)) requestUpdate.activeBatteryModel();
+        });
     };
 
     initConnectionTimeout();
@@ -617,10 +653,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         chargerVTerm: () =>
             sendCommand('npmx charger termination_voltage normal get'),
         chargerIChg: () => sendCommand('npmx charger charger_current get'),
-        chargerEnabled: () => console.warn('Not implemented'),
+        chargerEnabled: () => sendCommand('npmx charger module charger get'),
 
         buckVOut: (index: number) =>
-            sendCommand(`npmx buck voltage normal get ${index}`),
+            sendCommand(`npmx buck voltage get ${index}`),
         buckMode: (index: number) =>
             sendCommand(`npmx buck vout select get ${index}`),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -628,14 +664,23 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ldoVoltage: (_index: number) => console.warn('Not implemented'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ldoEnabled: (_index: number) => console.warn('Not implemented'),
+        ldoEnabled: (index: number) =>
+            sendCommand(`npmx ldsw status get ${index}`),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ldoMode: (_index: number) => console.warn('Not implemented'),
 
         fuelGauge: () => {
-            sendCommand('fuel_gauge status');
+            sendCommand('fuel_gauge get');
         },
+
+        activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
+        storedBatteryModels: () => console.warn('Not implemented'),
+    };
+
+    const storeBattery = () => {
+        sendCommand(`fuel_gauge model store`, () => {
+            requestUpdate.activeBatteryModel;
+        });
     };
 
     return {
@@ -742,5 +787,23 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         setLdoMode,
 
         setFuelGaugeEnabled,
+
+        setActiveBatteryModel,
+        storeBattery,
+
+        getDefaultBatteryModels: () =>
+            new Promise<BatteryModel[]>((resolve, reject) => {
+                shellParser?.enqueueRequest(
+                    'fuel_gauge model list',
+                    result => {
+                        const models = result.split(':');
+                        if (models.length < 3) reject();
+                        const stringModels = models[2].trim().split('\r\n');
+                        const list = stringModels.map(parseBatteryModel);
+                        resolve(list.filter(item => item.name !== ''));
+                    },
+                    reject
+                );
+            }),
     };
 };
