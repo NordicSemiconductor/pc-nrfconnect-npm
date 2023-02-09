@@ -42,7 +42,19 @@ export type AdcSample = {
     vBat: number;
     iBat: number;
     tBat: number;
-    soc?: number;
+    soc: number;
+    tte: number;
+    ttf: number;
+};
+
+export type BatteryModelCharacterization = {
+    temperature: number;
+    capacity: number;
+};
+
+export type BatteryModel = {
+    name: string;
+    characterizations: BatteryModelCharacterization[];
 };
 
 // 'connected' -> Shell ok - PMIC Online
@@ -96,6 +108,14 @@ export type BaseNpmDevice = {
 
     onFuelGaugeUpdate: (handler: (payload: boolean) => void) => () => void;
 
+    onActiveBatteryModelUpdate: (
+        handler: (payload: BatteryModel) => void
+    ) => () => void;
+
+    onStoredBatteryModelUpdate: (
+        handler: (payload: BatteryModel[]) => void
+    ) => () => void;
+
     onLoggingEvent: (
         handler: (payload: {
             loggingEvent: LoggingEvent;
@@ -148,6 +168,9 @@ export type NpmDevice = {
         ldoMode: (index: number) => void;
 
         fuelGauge: () => void;
+
+        activeBatteryModel: () => void;
+        storedBatteryModels: () => void;
     };
 
     setChargerVTerm: (index: number, value: number) => void;
@@ -163,6 +186,9 @@ export type NpmDevice = {
     setLdoMode: (index: number, mode: LdoMode) => void;
 
     setFuelGaugeEnabled: (state: boolean) => void;
+    getDefaultBatteryModels: () => Promise<BatteryModel[]>;
+    setActiveBatteryModel: (name: string) => void;
+    storeBattery: () => void;
 } & BaseNpmDevice;
 
 export interface PmicWarningDialog {

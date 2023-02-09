@@ -10,6 +10,7 @@ import { ShellParser } from '../../../hooks/commandParser';
 import { parseToNumber } from './pmicHelpers';
 import {
     AdcSample,
+    BatteryModel,
     Buck,
     Charger,
     IBaseNpmDevice,
@@ -125,6 +126,31 @@ export const baseNpmDevice: IBaseNpmDevice = (
                 eventEmitter.removeListener('onLoggingEvent', handler);
             };
         },
+
+        onActiveBatteryModelUpdate: (
+            handler: (payload: BatteryModel) => void
+        ) => {
+            eventEmitter.on('onActiveBatteryModelUpdate', handler);
+            return () => {
+                eventEmitter.removeListener(
+                    'onActiveBatteryModelUpdate',
+                    handler
+                );
+            };
+        },
+
+        onStoredBatteryModelUpdate: (
+            handler: (payload: BatteryModel[]) => void
+        ) => {
+            eventEmitter.on('onStoredBatteryModelUpdate', handler);
+            return () => {
+                eventEmitter.removeListener(
+                    'onStoredBatteryModelUpdate',
+                    handler
+                );
+            };
+        },
+
         getNumberOfChargers: () => devices.noOfChargers ?? 0,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
