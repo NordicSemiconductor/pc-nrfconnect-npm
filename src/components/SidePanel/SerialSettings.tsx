@@ -85,7 +85,6 @@ const SerialSettings = () => {
                 onSelect={({ value }) => updateSerialPort(value)}
                 items={comPortsDropdownItems}
                 selectedItem={selectedComPortItem}
-                disabled
             />
         </CollapsibleGroup>
     );

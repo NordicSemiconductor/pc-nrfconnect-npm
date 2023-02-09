@@ -23,9 +23,10 @@
         align-items: center;
 
         .battery-side-panel {
-            text-align: 'center';
+            text-align: center;
             display: flex;
             flex-direction: column;
+            max-width: 130px;
             h2 {
                 margin: 0;
             }

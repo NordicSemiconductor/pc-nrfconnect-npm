@@ -10,3 +10,26 @@
     vertical-align: sub;
     font-size: 80%;
 }
+
+.card-body {
+    margin-bottom: 1em;
+
+    & > * {
+        margin: 15px 0;
+    }
+
+    & > *:first-child {
+        margin-top: 0;
+    }
+
+    & > *:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}

@@ -84,70 +84,62 @@ const SideText = ({
     fuelGauge,
     activeBatteryModel,
 }: BatterySideTextProperties) => (
-    <div>
-        <div className="battery-side-panel">
-            {!batteryConnected && <h2>No Battery Connected</h2>}
+    <div className="battery-side-panel">
+        {!batteryConnected && <h2>No Battery Connected</h2>}
 
-            {batteryConnected && (
-                <>
-                    {fuelGauge &&
-                    latestAdcSample &&
-                    !Number.isNaN(latestAdcSample.soc) ? (
-                        <h2>{`${Math.round(latestAdcSample.soc ?? 0)}%`}</h2>
-                    ) : (
-                        <h2>Fuel Gauge Off</h2>
-                    )}
-                    {pmicChargingState.constantCurrentCharging && (
-                        <span>Constant Current Charging</span>
-                    )}
-                    {pmicChargingState.constantVoltageCharging && (
-                        <span>Constant Voltage Charging</span>
-                    )}
-                    {pmicChargingState.trickleCharge && (
-                        <span>Trickle Charging</span>
-                    )}
-                    {pmicChargingState.batteryFull && <span>Battery Full</span>}
-                    {pmicChargingState.dieTempHigh && (
-                        <span>Battery Too Hot</span>
-                    )}
-                    {pmicChargingState.batteryRechargeNeeded && (
-                        <span>Battery Recharge Needed</span>
-                    )}
-                    {latestAdcSample && !Number.isNaN(latestAdcSample.tte) && (
-                        <span>
-                            Time to empty{' '}
-                            {formatSecondsToString(latestAdcSample.tte)}
-                        </span>
-                    )}
-                    {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) && (
-                        <span>
-                            Time to full{' '}
-                            {formatSecondsToString(latestAdcSample.ttf)}
-                        </span>
-                    )}
-                    {latestAdcSample && (
-                        <div>
-                            {`${latestAdcSample?.tBat.toFixed(
-                                2
-                            )}°C, ${Math.round(
-                                latestAdcSample?.iBat
-                            )}mA, ${latestAdcSample?.vBat.toFixed(2)}v`}
-                        </div>
-                    )}
-                    {activeBatteryModel && latestAdcSample && (
-                        <div>
-                            {`${
-                                getClosest(
-                                    activeBatteryModel,
-                                    latestAdcSample.tBat
-                                ).capacity
-                            }
+        {batteryConnected && (
+            <>
+                {fuelGauge &&
+                latestAdcSample &&
+                !Number.isNaN(latestAdcSample.soc) ? (
+                    <h2>{`${Math.round(latestAdcSample.soc ?? 0)}%`}</h2>
+                ) : (
+                    <h2>Fuel Gauge Off</h2>
+                )}
+                {pmicChargingState.constantCurrentCharging && (
+                    <span>Constant Current Charging</span>
+                )}
+                {pmicChargingState.constantVoltageCharging && (
+                    <span>Constant Voltage Charging</span>
+                )}
+                {pmicChargingState.trickleCharge && (
+                    <span>Trickle Charging</span>
+                )}
+                {pmicChargingState.batteryFull && <span>Battery Full</span>}
+                {pmicChargingState.dieTempHigh && <span>Battery Too Hot</span>}
+                {pmicChargingState.batteryRechargeNeeded && (
+                    <span>Battery Recharge Needed</span>
+                )}
+                {latestAdcSample && !Number.isNaN(latestAdcSample.tte) && (
+                    <span>
+                        Time to empty{' '}
+                        {formatSecondsToString(latestAdcSample.tte)}
+                    </span>
+                )}
+                {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) && (
+                    <span>
+                        Time to full{' '}
+                        {formatSecondsToString(latestAdcSample.ttf)}
+                    </span>
+                )}
+                {latestAdcSample && (
+                    <div>
+                        {`${latestAdcSample?.tBat.toFixed(2)}°C, ${Math.round(
+                            latestAdcSample?.iBat
+                        )}mA, ${latestAdcSample?.vBat.toFixed(2)}v`}
+                    </div>
+                )}
+                {activeBatteryModel && latestAdcSample && (
+                    <div>
+                        {`${
+                            getClosest(activeBatteryModel, latestAdcSample.tBat)
+                                .capacity
+                        }
                             mAh`}
-                        </div>
-                    )}
-                </>
-            )}
-        </div>
+                    </div>
+                )}
+            </>
+        )}
     </div>
 );
 

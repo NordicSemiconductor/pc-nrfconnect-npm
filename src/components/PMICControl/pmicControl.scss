@@ -4,53 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
- .card {
-    margin: 5px 0;
- }
-
- .flex-row {
+.pmic-control {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
- }
-
- .pmic-control {
-    display: flex;
-    align-items: center;
+    flex-flow: column wrap;
+    align-content: stretch;
     height: 100%;
-
-    .pmic-control-inner {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        flex-wrap: wrap;
-        width: 100%;
-        margin: auto;
-        padding-bottom: 16px;
-        padding-right: 16px;
-        .card {
-            min-width: 320px;
-            margin-left: 8px;
-            margin-bottom: 8px;
-        }
-        .card-body {
-            margin-bottom: 1em;
-
-            & > * {
-                margin: 15px 0;
-            } 
-
-            & > *:first-child {
-                margin-top: 0;
-            } 
-
-            & > *:last-child {
-                margin-bottom: 0;
-            } 
-        }
-    }
-    button {
-        width: 100%;
-    }
+    width: calc(100% + 8px);
+    position: relative;
+    right: 4px;
+    overflow: hidden;
 }
