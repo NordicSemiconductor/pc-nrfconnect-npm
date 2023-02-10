@@ -20,21 +20,25 @@ export const MasonryLayout: React.FC<MasonryLayoutProperties> = ({
     const [width, setWidth] = useState(-1);
     const [height, setHeight] = useState(-1);
     const [columns, setColumns] = useState(-1);
+    const [orders, setOrders] = useState<number[]>([]);
 
     const calcMaxHeight = (col: number, masonryLayout: HTMLDivElement) => {
         let child = masonryLayout.firstElementChild;
         const heights: number[] = Array(col).fill(0);
-        let i = 0;
+        const newOrder = [];
         while (child) {
             if (child instanceof HTMLElement) {
-                heights[i % col] +=
-                    child.offsetHeight + Number.parseInt(styles.margin, 10);
+                const smallest =
+                    heights.findIndex(v => v === Math.min(...heights)) ?? 0;
+                heights[smallest] += child.offsetHeight;
                 child = child.nextElementSibling;
-                i += 1;
+                newOrder.push(smallest + 1);
             }
         }
 
-        return Math.max(...heights);
+        setOrders(newOrder);
+
+        return Math.max(...heights) + 1;
     };
 
     useEffect(() => {
@@ -49,13 +53,14 @@ export const MasonryLayout: React.FC<MasonryLayoutProperties> = ({
                     current.clientWidth /
                         (minWidth + Number.parseInt(styles.margin, 10))
                 );
+
                 if (noOfColumns !== columns) {
                     setColumns(noOfColumns);
-                    setHeight(calcMaxHeight(noOfColumns, current));
                 }
+
+                setHeight(calcMaxHeight(noOfColumns, current));
             } else {
                 setHeight(calcMaxHeight(columns, current));
-                console.log('noOfColumns', columns);
             }
         });
         observer.observe(cardRef.current);
@@ -75,7 +80,7 @@ export const MasonryLayout: React.FC<MasonryLayoutProperties> = ({
                 <div
                     style={{
                         minWidth,
-                        order: `${(i % columns) + 1}`,
+                        order: `${orders[i]}`,
                         pageBreakBefore: `${i < columns ? 'always' : 'auto'}`,
                     }}
                 >
