@@ -14,6 +14,9 @@ and this project adheres to
 -   Export and Import Buttons
 -   Updated Default States for Bucks
 -   Recording of events to `csv`
+-   PMIC1300 App Version 0.0.0+4
+-   Masonry Layout
+-   Battery Profile controls
 
 ## 0.0.3 - 2023-01-24
 
