@@ -204,7 +204,7 @@ export interface PmicWarningDialog {
     optionalDoNotAskAgain?: boolean;
 }
 
-export type NpmModel = 'npm13000';
+export type NpmModel = 'npm1300';
 
 export interface NpmExport {
     chargers: Charger[];

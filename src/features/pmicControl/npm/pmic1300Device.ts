@@ -686,7 +686,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     return {
         ...baseDevice,
         applyConfig: config => {
-            if (config.deviceType !== 'npm13000') {
+            if (config.deviceType !== 'npm1300') {
                 return;
             }
 
@@ -735,7 +735,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
             action();
         },
-        getDeviceType: () => 'npm13000',
+        getDeviceType: () => 'npm1300',
         getConnectionState: () => pmicState,
         startAdcSample,
         stopAdcSample,
