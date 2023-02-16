@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { MasonryLayout } from 'pc-nrfconnect-shared';
 
 import {
     getBucks,
@@ -17,7 +18,6 @@ import BatteryCard from '../Cards/Battery/BatteryCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
 import PowerCard from '../Cards/Power/PowerCard';
-import { MasonryLayout } from '../MasonryLayout/MasonryLayout';
 
 interface PMICControlCardProps {
     disabled: boolean;
