@@ -10,7 +10,13 @@ import { Card } from 'pc-nrfconnect-shared';
 import BatteryStatus from '../../Battery/BatteryStatus';
 
 export default () => (
-    <Card title="Battery Status">
+    <Card
+        title={
+            <div className="d-flex justify-content-between">
+                <span>Battery Status</span>
+            </div>
+        }
+    >
         <BatteryStatus />
     </Card>
 );
