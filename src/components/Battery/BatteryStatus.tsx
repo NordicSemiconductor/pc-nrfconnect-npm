@@ -62,7 +62,7 @@ export default () => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <span className="line-title">Charging Mode</span>
+                <span className="line-title">Charging Mode:</span>
                 <span className="line-data">{mode}</span>
             </div>
         </div>
