@@ -16,9 +16,9 @@ import {
 } from '../../features/pmicControl/pmicControlSlice';
 import { getShellParser, isPaused } from '../../features/serial/serialSlice';
 import { ShellParser } from '../../hooks/commandParser';
-import PMICControlCard from './PMICControlCard';
+import DashboardControlCard from './DasboardControlCard';
 
-import './pmicControl.scss';
+import './dashboardControl.scss';
 
 type DisplayPmicStateProperties = {
     pmicState: PmicState;
@@ -88,7 +88,7 @@ const DisplayPmicState = ({
     return null;
 };
 
-const PMICControl = ({ active }: PaneProps) => {
+export default ({ active }: PaneProps) => {
     const paused = useSelector(isPaused);
     const supportedVersion = useSelector(isSupportedVersion);
 
@@ -129,11 +129,9 @@ const PMICControl = ({ active }: PaneProps) => {
                     shellParser={shellParser}
                 />
                 <div className="pmicControl-cards">
-                    <PMICControlCard disabled={disabled} />
+                    <DashboardControlCard disabled={disabled} />
                 </div>
             </div>
         </div>
     );
 };
-
-export default PMICControl;

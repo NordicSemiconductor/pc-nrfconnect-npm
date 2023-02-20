@@ -19,11 +19,10 @@ import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
 import PowerCard from '../Cards/Power/PowerCard';
 
-interface PMICControlCardProps {
+interface DashboardControlCardProps {
     disabled: boolean;
 }
-
-const PMICControlCard = ({ disabled }: PMICControlCardProps) => {
+export default ({ disabled }: DashboardControlCardProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const chargers = useSelector(getChargers);
     const bucks = useSelector(getBucks);
@@ -41,6 +40,15 @@ const PMICControlCard = ({ disabled }: PMICControlCardProps) => {
                     disabled={disabled}
                 />
             ))}
+            {ldos.map((ldo, index) => (
+                <LDOCard
+                    ldo={ldo}
+                    npmDevice={npmDevice}
+                    key={`Buck${1 + index}`}
+                    index={index}
+                    disabled={disabled}
+                />
+            ))}
             {chargers.map((charger, index) => (
                 <PowerCard
                     npmDevice={npmDevice}
@@ -51,17 +59,6 @@ const PMICControlCard = ({ disabled }: PMICControlCardProps) => {
                     disabled={disabled}
                 />
             ))}
-            {ldos.map((ldo, index) => (
-                <LDOCard
-                    ldo={ldo}
-                    npmDevice={npmDevice}
-                    key={`Buck${1 + index}`}
-                    index={index}
-                    disabled={disabled}
-                />
-            ))}
         </MasonryLayout>
     );
 };
-
-export default PMICControlCard;
