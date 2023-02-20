@@ -85,7 +85,13 @@ const SideText = ({
     activeBatteryModel,
 }: BatterySideTextProperties) => (
     <div className="battery-side-panel">
-        {!batteryConnected && <h2>No Battery Connected</h2>}
+        {!batteryConnected && (
+            <h2>
+                No Battery
+                <br />
+                Connected
+            </h2>
+        )}
 
         {batteryConnected && (
             <>
@@ -187,26 +193,28 @@ export default ({ disabled }: BatteryProperties) => {
         <div className={`battery ${disabled ? 'disabled' : ''}`}>
             <div className="battery-wrapper">
                 <div className="battery-graphic-wrapper">
-                    <div className="battery-graphic">
-                        <div className="battery-nipple" />
-                        <div className="battery">
+                    <div className="battery-graphic-wrapper-wrapper">
+                        <div className="battery-graphic">
+                            <div className="battery-nipple" />
+                            <div className="battery">
+                                <div
+                                    className={`gauge ${
+                                        charging ? 'animated' : ''
+                                    } ${charging ? 'charging' : ''}`}
+                                    style={{
+                                        height: `calc(${
+                                            latestAdcSample?.soc ?? 0
+                                        }% + 8px)`,
+                                    }}
+                                />
+                            </div>
                             <div
-                                className={`gauge ${
-                                    charging ? 'animated' : ''
-                                } ${charging ? 'charging' : ''}`}
-                                style={{
-                                    height: `calc(${
-                                        latestAdcSample?.soc ?? 0
-                                    }% + 8px)`,
-                                }}
+                                className={`state-missing ${
+                                    !batteryConnected ? '' : 'hidden'
+                                }`}
                             />
+                            <BatterIcon pmicChargingState={pmicChargingState} />
                         </div>
-                        <div
-                            className={`state-missing ${
-                                !batteryConnected ? '' : 'hidden'
-                            }`}
-                        />
-                        <BatterIcon pmicChargingState={pmicChargingState} />
                     </div>
                 </div>
                 <SideText

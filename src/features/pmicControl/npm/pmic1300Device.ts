@@ -326,10 +326,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         toRegex('npmx charger status', true),
         res => {
             const value = parseToNumber(res);
-            eventEmitter.emit(
-                'onChargingStatusUpdate',
-                emitOnChargingStatusUpdate(value)
-            );
+            emitOnChargingStatusUpdate(value);
         },
         noop
     );
@@ -536,7 +533,20 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     vOut: value,
                 });
 
-            setBuckMode(index, 'software');
+            sendCommand(
+                `npmx buck vout select set ${index} 1`,
+                noop,
+                (_res, command) => {
+                    if (isSetCommand(command)) requestUpdate.buckMode(index);
+                }
+            );
+
+            if (pmicState === 'offline')
+                emitPartialEvent<Buck>('onBuckUpdate', index, {
+                    mode: 'software',
+                });
+
+            requestUpdate.buckVOut(index);
         };
 
         if (index === 0 && value <= 1.7) {

@@ -4,12 +4,28 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
- .graph-container {
+.graph-outer {
     background: white;
     padding: 32px;
- }
+    flex: 1;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
 
- .graph-top-bar-wrapper {
+    height: 100%;
+
+    .graph-container {
+        height: 100%;
+        contain: size;
+        position: relative;
+        flex: 1;
+    }
+}
+
+.graph-top-bar-wrapper {
     display: flex;
     justify-content: space-between;
     margin-bottom: 30px;
@@ -32,8 +48,7 @@
 
         & button {
             min-width: 70px;
-            margin: 0 2px
+            margin: 0 2px;
         }
-     }
- }
- 
+    }
+}
