@@ -9,14 +9,18 @@ import { Card } from 'pc-nrfconnect-shared';
 
 import BatteryStatus from '../../Battery/BatteryStatus';
 
-export default () => (
+export default ({ disabled }: { disabled: boolean }) => (
     <Card
         title={
-            <div className="d-flex justify-content-between">
+            <div
+                className={`d-flex justify-content-between ${
+                    disabled ? 'disabled' : ''
+                }`}
+            >
                 <span>Battery Status</span>
             </div>
         }
     >
-        <BatteryStatus />
+        <BatteryStatus disabled={disabled} />
     </Card>
 );

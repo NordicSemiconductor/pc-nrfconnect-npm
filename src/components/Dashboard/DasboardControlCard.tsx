@@ -32,7 +32,7 @@ export default ({ disabled }: DashboardControlCardProps) => {
     return (
         <MasonryLayout minWidth={300}>
             <BatteryCard disabled={disabled} />
-            <BatteryStatusCard />
+            <BatteryStatusCard disabled={disabled} />
             {chargers.map((charger, index) => (
                 <PowerCard
                     npmDevice={npmDevice}

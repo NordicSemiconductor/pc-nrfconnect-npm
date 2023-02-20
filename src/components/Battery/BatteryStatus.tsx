@@ -14,7 +14,7 @@ import {
 
 import './battery.scss';
 
-export default () => {
+export default ({ disabled }: { disabled: boolean }) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
 
@@ -36,7 +36,7 @@ export default () => {
     }, [iconSize]);
 
     return (
-        <div className="battery-side-panel">
+        <div className={`${disabled ? 'disabled' : ''}`}>
             <div className="line-wrapper">
                 <span className="line-title">Voltage:</span>
                 <span className="line-data">

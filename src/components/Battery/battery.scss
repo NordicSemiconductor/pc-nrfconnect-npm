@@ -142,3 +142,14 @@
         text-align: right;
     }
 }
+.disabled {
+    .line-wrapper {
+        .line-title {
+            color: $gray-300;
+        }
+
+        .line-data {
+            color: $gray-300;
+        }
+    }
+}
