@@ -105,7 +105,7 @@ export default ({ active }: PaneProps) => {
         } else {
             const t = setTimeout(() => {
                 setPauseFor1Second(paused);
-            }, 1000);
+            }, 3000);
 
             return () => clearTimeout(t);
         }

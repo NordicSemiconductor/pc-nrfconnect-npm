@@ -27,7 +27,6 @@
         justify-content: stretch;
 
         .battery-side-panel {
-            text-align: center;
             display: flex;
             flex-direction: column;
             width: 100%;
@@ -128,5 +127,18 @@
                 }
             }
         }
+    }
+}
+
+.line-wrapper {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid $gray-200;
+    .line-title {
+        font-weight: 500;
+    }
+
+    .line-data {
+        text-align: right;
     }
 }

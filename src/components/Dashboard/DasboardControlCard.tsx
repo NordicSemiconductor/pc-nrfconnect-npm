@@ -15,6 +15,7 @@ import {
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
 import BatteryCard from '../Cards/Battery/BatteryCard';
+import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
 import PowerCard from '../Cards/Power/PowerCard';
@@ -31,6 +32,17 @@ export default ({ disabled }: DashboardControlCardProps) => {
     return (
         <MasonryLayout minWidth={300}>
             <BatteryCard disabled={disabled} />
+            <BatteryStatusCard />
+            {chargers.map((charger, index) => (
+                <PowerCard
+                    npmDevice={npmDevice}
+                    charger={charger}
+                    key={`Charger${1 + index}`}
+                    index={index}
+                    cardLabel="Charger"
+                    disabled={disabled}
+                />
+            ))}
             {bucks.map((buck, index) => (
                 <BuckCard
                     buck={buck}
@@ -46,16 +58,6 @@ export default ({ disabled }: DashboardControlCardProps) => {
                     npmDevice={npmDevice}
                     key={`Buck${1 + index}`}
                     index={index}
-                    disabled={disabled}
-                />
-            ))}
-            {chargers.map((charger, index) => (
-                <PowerCard
-                    npmDevice={npmDevice}
-                    charger={charger}
-                    key={`Charger${1 + index}`}
-                    index={index}
-                    cardLabel="Charger"
                     disabled={disabled}
                 />
             ))}
