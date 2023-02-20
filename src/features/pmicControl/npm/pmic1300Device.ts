@@ -106,7 +106,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         warningDialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+4'
+        '0.0.0+6'
     );
     let lastUptime = 0;
     let uptimeOverflowCounter = 0;
@@ -223,12 +223,18 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         doActionOnEvent(event);
     };
 
+    const processModulePmicCharger = ({ message }: LoggingEvent) => {
+        const messageParts = message.split('=');
+        const value = Number.parseInt(messageParts[1], 10);
+        emitOnChargingStatusUpdate(value);
+    };
+
     const doActionOnEvent = (irqEvent: IrqEvent) => {
         console.log(irqEvent);
     };
 
     const startAdcSample = (samplingRate: number) => {
-        sendCommand(`npm_adc_sample 1000 ${samplingRate}`);
+        sendCommand(`npm_adc sample 1000 ${samplingRate}`);
     };
 
     const stopAdcSample = () => {
@@ -237,37 +243,51 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
     shellParser?.onShellLoggingEvent(logEvent => {
         parseLogData(logEvent, loggingEvent => {
+            let dataPair = false;
             switch (loggingEvent.module) {
                 case 'module_pmic':
                     processModulePmic(loggingEvent);
-                    eventEmitter.emit('onLoggingEvent', {
-                        loggingEvent,
-                        dataPair: false,
-                    });
                     break;
                 case 'module_pmic_adc':
                     processModulePmicAdc(loggingEvent);
-                    eventEmitter.emit('onLoggingEvent', {
-                        loggingEvent,
-                        dataPair: true,
-                    });
+                    dataPair = true;
                     break;
                 case 'module_pmic_irq':
                     processModulePmicIrq(loggingEvent);
-                    eventEmitter.emit('onLoggingEvent', {
-                        loggingEvent,
-                        dataPair: true,
-                    });
+                    dataPair = true;
+                    break;
+                case 'module_pmic_charger':
+                    processModulePmicCharger(loggingEvent);
                     break;
                 default:
-                    eventEmitter.emit('onLoggingEvent', {
-                        loggingEvent,
-                        dataPair: false,
-                    });
                     break;
             }
+
+            eventEmitter.emit('onLoggingEvent', {
+                loggingEvent,
+                dataPair,
+            });
         });
     });
+
+    const emitOnChargingStatusUpdate = (value: number) =>
+        eventEmitter.emit('onChargingStatusUpdate', {
+            // batteryDetected: (value & 0x01) > 0,
+            // eslint-disable-next-line no-bitwise
+            batteryFull: (value & 0x02) > 0,
+            // eslint-disable-next-line no-bitwise
+            trickleCharge: (value & 0x04) > 0,
+            // eslint-disable-next-line no-bitwise
+            constantCurrentCharging: (value & 0x08) > 0,
+            // eslint-disable-next-line no-bitwise
+            constantVoltageCharging: (value & 0x10) > 0,
+            // eslint-disable-next-line no-bitwise
+            batteryRechargeNeeded: (value & 0x20) > 0,
+            // eslint-disable-next-line no-bitwise
+            dieTempHigh: (value & 0x40) > 0,
+            // eslint-disable-next-line no-bitwise
+            supplementModeActive: (value & 0x80) > 0,
+        } as PmicChargingState);
 
     const emitPartialEvent = <T>(
         eventName: string,
@@ -306,23 +326,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         toRegex('npmx charger status', true),
         res => {
             const value = parseToNumber(res);
-            eventEmitter.emit('onChargingStatusUpdate', {
-                // batteryDetected: (value & 0x01) > 0,
-                // eslint-disable-next-line no-bitwise
-                batteryFull: (value & 0x02) > 0,
-                // eslint-disable-next-line no-bitwise
-                trickleCharge: (value & 0x04) > 0,
-                // eslint-disable-next-line no-bitwise
-                constantCurrentCharging: (value & 0x08) > 0,
-                // eslint-disable-next-line no-bitwise
-                constantVoltageCharging: (value & 0x10) > 0,
-                // eslint-disable-next-line no-bitwise
-                batteryRechargeNeeded: (value & 0x20) > 0,
-                // eslint-disable-next-line no-bitwise
-                dieTempHigh: (value & 0x40) > 0,
-                // eslint-disable-next-line no-bitwise
-                supplementModeActive: (value & 0x80) > 0,
-            } as PmicChargingState);
+            eventEmitter.emit(
+                'onChargingStatusUpdate',
+                emitOnChargingStatusUpdate(value)
+            );
         },
         noop
     );
@@ -423,7 +430,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         );
 
         shellParser?.registerCommandCallback(
-            toRegex('npmx ldsw status', true, i),
+            toRegex('npmx ldsw', true, i),
             res => {
                 emitPartialEvent<Ldo>('onLdoUpdate', i, {
                     enabled: parseToBoolean(res),
@@ -554,20 +561,45 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const setBuckMode = (index: number, mode: BuckMode) => {
-        sendCommand(
-            `npmx buck vout select set ${index} ${mode === 'software' ? 1 : 0}`,
-            noop,
-            (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.buckMode(index);
-            }
-        );
+        const action = () => {
+            sendCommand(
+                `npmx buck vout select set ${index} ${
+                    mode === 'software' ? 1 : 0
+                }`,
+                noop,
+                (_res, command) => {
+                    if (isSetCommand(command)) requestUpdate.buckMode(index);
+                }
+            );
 
-        if (pmicState === 'offline')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                mode,
-            });
+            if (pmicState === 'offline')
+                emitPartialEvent<Buck>('onBuckUpdate', index, {
+                    mode,
+                });
 
-        requestUpdate.buckVOut(index);
+            requestUpdate.buckVOut(index);
+        };
+
+        // TODO Check software voltage as well
+        if (index === 0 && mode === 'software') {
+            const warningDialog: PmicWarningDialog = {
+                storeID: 'pmic1300-setBuckVOut-0',
+                message: `Buck 1 Powers the I2C communications that are needed for this app. 
+                    Software voltage might be already set to less then 1.7V . Are you sure you want to continue`,
+                confirmLabel: 'Yes',
+                optionalLabel: "Yes, Don't ask again",
+                cancelLabel: 'No',
+                title: 'Warning',
+                onConfirm: action,
+                onCancel: () => requestUpdate.buckVOut(index),
+                onOptional: action,
+                optionalDoNotAskAgain: true,
+            };
+
+            warningDialogHandler(warningDialog);
+        } else {
+            action();
+        }
     };
     const setBuckEnabled = (index: number, enabled: boolean) => {
         const action = () => {
@@ -645,6 +677,12 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         });
     };
 
+    const startBatteryStatusCheck = () =>
+        sendCommand('npm_chg_status_check set 1');
+
+    const stopBatteryStatusCheck = () =>
+        sendCommand('npm_chg_status_check set 0');
+
     initConnectionTimeout();
     updateUptimeOverflowCounter();
 
@@ -664,8 +702,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ldoVoltage: (_index: number) => console.warn('Not implemented'),
-        ldoEnabled: (index: number) =>
-            sendCommand(`npmx ldsw status get ${index}`),
+        ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ldoMode: (_index: number) => console.warn('Not implemented'),
 
@@ -805,5 +842,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     reject
                 );
             }),
+
+        startBatteryStatusCheck,
+        stopBatteryStatusCheck,
     };
 };

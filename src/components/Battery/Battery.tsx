@@ -112,26 +112,37 @@ const SideText = ({
                 )}
                 {latestAdcSample && !Number.isNaN(latestAdcSample.tte) && (
                     <span>
-                        Time to empty{' '}
-                        {formatSecondsToString(latestAdcSample.tte)}
+                        {` Time to empty: ${formatSecondsToString(
+                            latestAdcSample.tte
+                        )}`}
                     </span>
                 )}
                 {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) && (
                     <span>
-                        Time to full{' '}
-                        {formatSecondsToString(latestAdcSample.ttf)}
+                        {` Time to full: ${formatSecondsToString(
+                            latestAdcSample.ttf
+                        )}`}
                     </span>
                 )}
                 {latestAdcSample && (
                     <div>
-                        {`${latestAdcSample?.tBat.toFixed(2)}°C, ${Math.round(
+                        <span>{`Temperature: ${latestAdcSample?.tBat.toFixed(
+                            2
+                        )}°C`}</span>
+                        <br />
+                        <span>{`Current: ${Math.round(
                             latestAdcSample?.iBat
-                        )}mA, ${latestAdcSample?.vBat.toFixed(2)}v`}
+                        )}mA`}</span>
+                        <br />
+                        <span>{`Voltage: ${latestAdcSample?.vBat.toFixed(
+                            2
+                        )}v`}</span>
+                        <br />
                     </div>
                 )}
                 {activeBatteryModel && latestAdcSample && (
                     <div>
-                        {`${
+                        {`Capacity: ${
                             getClosest(activeBatteryModel, latestAdcSample.tBat)
                                 .capacity
                         }
