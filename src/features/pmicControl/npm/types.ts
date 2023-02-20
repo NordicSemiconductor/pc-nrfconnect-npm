@@ -189,6 +189,9 @@ export type NpmDevice = {
     getDefaultBatteryModels: () => Promise<BatteryModel[]>;
     setActiveBatteryModel: (name: string) => void;
     storeBattery: () => void;
+
+    startBatteryStatusCheck: () => void;
+    stopBatteryStatusCheck: () => void;
 } & BaseNpmDevice;
 
 export interface PmicWarningDialog {

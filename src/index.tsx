@@ -9,10 +9,10 @@ import { App } from 'pc-nrfconnect-shared';
 
 import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
+import DashboardControl from './components/Dashboard/DashboardControl';
 import DeviceSelector from './components/DeviceSelector';
 import DocumentationSections from './components/DocumentationSection';
 import Graph from './components/Graph/Graph';
-import PMICControl from './components/PMICControl/PMICControl';
 import Regulators from './components/Regulators/Regulators';
 import SidePanel from './components/SidePanel/SidePanel';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
@@ -30,8 +30,8 @@ export default () => (
         sidePanel={<SidePanel />}
         panes={[
             {
-                name: 'PMIC Control',
-                Main: PMICControl,
+                name: 'Dashboard',
+                Main: DashboardControl,
             },
             {
                 name: 'Charger',

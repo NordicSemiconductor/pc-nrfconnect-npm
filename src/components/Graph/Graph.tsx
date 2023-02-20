@@ -74,7 +74,7 @@ ChartJS.register(
 const options: ChartOptions<'line'> = {
     parsing: false,
     animation: false,
-    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
         legend: {
             display: false,
@@ -267,67 +267,60 @@ export default ({ active }: PaneProps) => {
     };
 
     return (
-        <div className="graph-container">
-            <div className="graph">
-                <div className="graph-cards">
-                    <div className="graph-top-bar-wrapper">
-                        <div />
-                        <div className="range-buttons">
-                            <Button
-                                className="btn-primary w-100 h-100"
-                                onClick={() => zoom(300000)}
-                            >
-                                5min
-                            </Button>
-                            <Button
-                                className="btn-primary w-100 h-100"
-                                onClick={() => zoom(1800000)}
-                            >
-                                30min
-                            </Button>
-                            <Button
-                                className="btn-primary w-100 h-100"
-                                onClick={() => zoom(3600000)}
-                            >
-                                1hr
-                            </Button>
-                            <Button
-                                className="btn-primary w-100 h-100"
-                                onClick={() => zoom(21600000)}
-                            >
-                                6hr
-                            </Button>
-                            <Button
-                                className="btn-primary w-100 h-100"
-                                onClick={() => zoom(86400000)}
-                            >
-                                1 Day
-                            </Button>
-                            <Button
-                                className="btn-primary w-100 h-100"
-                                onClick={() => zoom(604800000)}
-                            >
-                                1 Week
-                            </Button>
-                        </div>
-                        <div>
-                            <Toggle
-                                label="Live"
-                                isToggled={isLive}
-                                onToggle={value => setLive(value)}
-                            />
-                        </div>
-                    </div>
-                    <CustomLegend chart={ref.current} />
-                    <Line
-                        height="100vh"
-                        options={options}
-                        data={chartData}
-                        ref={ref}
+        <div className="graph-outer">
+            <div className="graph-top-bar-wrapper">
+                <div />
+                <div className="range-buttons">
+                    <Button
+                        className="btn-primary w-100 h-100"
+                        onClick={() => zoom(300000)}
+                    >
+                        5min
+                    </Button>
+                    <Button
+                        className="btn-primary w-100 h-100"
+                        onClick={() => zoom(1800000)}
+                    >
+                        30min
+                    </Button>
+                    <Button
+                        className="btn-primary w-100 h-100"
+                        onClick={() => zoom(3600000)}
+                    >
+                        1hr
+                    </Button>
+                    <Button
+                        className="btn-primary w-100 h-100"
+                        onClick={() => zoom(21600000)}
+                    >
+                        6hr
+                    </Button>
+                    <Button
+                        className="btn-primary w-100 h-100"
+                        onClick={() => zoom(86400000)}
+                    >
+                        1 Day
+                    </Button>
+                    <Button
+                        className="btn-primary w-100 h-100"
+                        onClick={() => zoom(604800000)}
+                    >
+                        1 Week
+                    </Button>
+                </div>
+                <div>
+                    <Toggle
+                        label="Live"
+                        isToggled={isLive}
+                        onToggle={value => setLive(value)}
                     />
-                    <TimeSpanDeltaLine range={range} chartArea={chartArea} />
                 </div>
             </div>
+            <CustomLegend chart={ref.current} />
+            <div className="graph-container">
+                <Line options={options} data={chartData} ref={ref} />
+            </div>
+            <TimeSpanDeltaLine range={range} chartArea={chartArea} />
         </div>
     );
 };

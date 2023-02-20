@@ -70,7 +70,6 @@ const formatSecondsToString = (seconds: number) => {
 };
 
 interface BatterySideTextProperties {
-    pmicChargingState: PmicChargingState;
     batteryConnected: boolean;
     latestAdcSample?: AdcSample;
     fuelGauge: boolean;
@@ -78,66 +77,68 @@ interface BatterySideTextProperties {
 }
 
 const SideText = ({
-    pmicChargingState,
     batteryConnected,
     latestAdcSample,
     fuelGauge,
     activeBatteryModel,
 }: BatterySideTextProperties) => (
     <div className="battery-side-panel">
-        {!batteryConnected && <h2>No Battery Connected</h2>}
+        {!batteryConnected && (
+            <h2>
+                No Battery
+                <br />
+                Connected
+            </h2>
+        )}
 
         {batteryConnected && (
             <>
-                {fuelGauge &&
-                latestAdcSample &&
-                !Number.isNaN(latestAdcSample.soc) ? (
-                    <h2>{`${Math.round(latestAdcSample.soc ?? 0)}%`}</h2>
+                <h2>
+                    {fuelGauge &&
+                    latestAdcSample &&
+                    !Number.isNaN(latestAdcSample.soc)
+                        ? `${Math.round(latestAdcSample.soc ?? 0)}%`
+                        : 'N/A %'}
+                </h2>
+                {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) ? (
+                    <div className="line-wrapper">
+                        <span className="line-title">Time to full:</span>
+                        <span className="line-data">
+                            {latestAdcSample &&
+                            !Number.isNaN(latestAdcSample.ttf)
+                                ? `${formatSecondsToString(
+                                      latestAdcSample.ttf
+                                  )}`
+                                : 'N/A'}
+                        </span>
+                    </div>
                 ) : (
-                    <h2>Fuel Gauge Off</h2>
-                )}
-                {pmicChargingState.constantCurrentCharging && (
-                    <span>Constant Current Charging</span>
-                )}
-                {pmicChargingState.constantVoltageCharging && (
-                    <span>Constant Voltage Charging</span>
-                )}
-                {pmicChargingState.trickleCharge && (
-                    <span>Trickle Charging</span>
-                )}
-                {pmicChargingState.batteryFull && <span>Battery Full</span>}
-                {pmicChargingState.dieTempHigh && <span>Battery Too Hot</span>}
-                {pmicChargingState.batteryRechargeNeeded && (
-                    <span>Battery Recharge Needed</span>
-                )}
-                {latestAdcSample && !Number.isNaN(latestAdcSample.tte) && (
-                    <span>
-                        Time to empty{' '}
-                        {formatSecondsToString(latestAdcSample.tte)}
-                    </span>
-                )}
-                {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) && (
-                    <span>
-                        Time to full{' '}
-                        {formatSecondsToString(latestAdcSample.ttf)}
-                    </span>
-                )}
-                {latestAdcSample && (
-                    <div>
-                        {`${latestAdcSample?.tBat.toFixed(2)}°C, ${Math.round(
-                            latestAdcSample?.iBat
-                        )}mA, ${latestAdcSample?.vBat.toFixed(2)}v`}
+                    <div className="line-wrapper">
+                        <span className="line-title">Time to empty:</span>
+                        <span className="line-data">
+                            {latestAdcSample &&
+                            !Number.isNaN(latestAdcSample.tte)
+                                ? `${formatSecondsToString(
+                                      latestAdcSample.tte
+                                  )}`
+                                : 'N/A'}
+                        </span>
                     </div>
                 )}
-                {activeBatteryModel && latestAdcSample && (
-                    <div>
-                        {`${
-                            getClosest(activeBatteryModel, latestAdcSample.tBat)
-                                .capacity
-                        }
-                            mAh`}
-                    </div>
-                )}
+                <div className="line-wrapper">
+                    <span className="line-title">Capacity:</span>
+                    <span className="line-data">
+                        {activeBatteryModel && latestAdcSample
+                            ? `${
+                                  getClosest(
+                                      activeBatteryModel,
+                                      latestAdcSample.tBat
+                                  ).capacity
+                              }
+                            mAh`
+                            : '??'}
+                    </span>
+                </div>
             </>
         )}
     </div>
@@ -176,30 +177,33 @@ export default ({ disabled }: BatteryProperties) => {
         <div className={`battery ${disabled ? 'disabled' : ''}`}>
             <div className="battery-wrapper">
                 <div className="battery-graphic-wrapper">
-                    <div className="battery-graphic">
-                        <div className="battery-nipple" />
-                        <div className="battery">
+                    <div className="battery-graphic-wrapper-wrapper">
+                        <div className="battery-graphic">
+                            <div className="battery-nipple" />
+                            <div className="battery">
+                                <div
+                                    className={`gauge ${
+                                        charging ? 'animated' : ''
+                                    } ${charging ? 'charging' : ''}`}
+                                    style={{
+                                        height: `calc(${
+                                            fuelGauge
+                                                ? latestAdcSample?.soc ?? 0
+                                                : 0
+                                        }% + 8px)`,
+                                    }}
+                                />
+                            </div>
                             <div
-                                className={`gauge ${
-                                    charging ? 'animated' : ''
-                                } ${charging ? 'charging' : ''}`}
-                                style={{
-                                    height: `calc(${
-                                        latestAdcSample?.soc ?? 0
-                                    }% + 8px)`,
-                                }}
+                                className={`state-missing ${
+                                    !batteryConnected ? '' : 'hidden'
+                                }`}
                             />
+                            <BatterIcon pmicChargingState={pmicChargingState} />
                         </div>
-                        <div
-                            className={`state-missing ${
-                                !batteryConnected ? '' : 'hidden'
-                            }`}
-                        />
-                        <BatterIcon pmicChargingState={pmicChargingState} />
                     </div>
                 </div>
                 <SideText
-                    pmicChargingState={pmicChargingState}
                     batteryConnected={batteryConnected}
                     latestAdcSample={latestAdcSample}
                     fuelGauge={fuelGauge}

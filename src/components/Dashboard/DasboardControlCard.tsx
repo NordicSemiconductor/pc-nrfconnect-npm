@@ -15,15 +15,15 @@ import {
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
 import BatteryCard from '../Cards/Battery/BatteryCard';
+import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
 import PowerCard from '../Cards/Power/PowerCard';
 
-interface PMICControlCardProps {
+interface DashboardControlCardProps {
     disabled: boolean;
 }
-
-const PMICControlCard = ({ disabled }: PMICControlCardProps) => {
+export default ({ disabled }: DashboardControlCardProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const chargers = useSelector(getChargers);
     const bucks = useSelector(getBucks);
@@ -32,15 +32,7 @@ const PMICControlCard = ({ disabled }: PMICControlCardProps) => {
     return (
         <MasonryLayout minWidth={300}>
             <BatteryCard disabled={disabled} />
-            {bucks.map((buck, index) => (
-                <BuckCard
-                    buck={buck}
-                    npmDevice={npmDevice}
-                    key={`Buck${1 + index}`}
-                    index={index}
-                    disabled={disabled}
-                />
-            ))}
+            <BatteryStatusCard disabled={disabled} />
             {chargers.map((charger, index) => (
                 <PowerCard
                     npmDevice={npmDevice}
@@ -48,6 +40,15 @@ const PMICControlCard = ({ disabled }: PMICControlCardProps) => {
                     key={`Charger${1 + index}`}
                     index={index}
                     cardLabel="Charger"
+                    disabled={disabled}
+                />
+            ))}
+            {bucks.map((buck, index) => (
+                <BuckCard
+                    buck={buck}
+                    npmDevice={npmDevice}
+                    key={`Buck${1 + index}`}
+                    index={index}
                     disabled={disabled}
                 />
             ))}
@@ -63,5 +64,3 @@ const PMICControlCard = ({ disabled }: PMICControlCardProps) => {
         </MasonryLayout>
     );
 };
-
-export default PMICControlCard;

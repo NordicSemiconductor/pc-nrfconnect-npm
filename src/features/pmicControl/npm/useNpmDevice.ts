@@ -50,6 +50,7 @@ export default (shellParser: ShellParser | undefined) => {
         if (!npmDevice) return;
 
         npmDevice.startAdcSample(2000);
+        npmDevice.startBatteryStatusCheck();
 
         for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
             npmDevice.requestUpdate.chargerVTerm(i);
@@ -194,7 +195,7 @@ export default (shellParser: ShellParser | undefined) => {
             );
 
             const releaseOnAdcSample = npmDevice.onAdcSample(sample => {
-                dispatch(setBatteryConnected(sample.vBat > 0));
+                dispatch(setBatteryConnected(sample.vBat > 1));
                 dispatch(setLatestAdcSample(sample));
             });
 
