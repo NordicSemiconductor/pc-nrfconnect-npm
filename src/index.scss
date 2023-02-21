@@ -40,4 +40,16 @@ label {
 
 .form-label {
     height: 24px;
+    line-height: 1;
+}
+
+.channel-selection {
+    .btn {
+        padding: 8px !important;
+        line-height: 1 !important;
+    }
+}
+
+.card-title {
+    min-height: 16px;
 }

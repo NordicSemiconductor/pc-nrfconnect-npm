@@ -9,11 +9,9 @@ import { useSelector } from 'react-redux';
 
 import {
     AdcSample,
-    BatteryModel,
     PmicChargingState,
 } from '../../features/pmicControl/npm/types';
 import {
-    getActiveBatterModel,
     getFuelGauge,
     getLatestAdcSample,
     getPmicChargingState,
@@ -73,14 +71,12 @@ interface BatterySideTextProperties {
     batteryConnected: boolean;
     latestAdcSample?: AdcSample;
     fuelGauge: boolean;
-    activeBatteryModel?: BatteryModel;
 }
 
 const SideText = ({
     batteryConnected,
     latestAdcSample,
     fuelGauge,
-    activeBatteryModel,
 }: BatterySideTextProperties) => (
     <div className="battery-side-panel">
         {!batteryConnected && (
@@ -125,20 +121,6 @@ const SideText = ({
                         </span>
                     </div>
                 )}
-                <div className="line-wrapper">
-                    <span className="line-title">Capacity:</span>
-                    <span className="line-data">
-                        {activeBatteryModel && latestAdcSample
-                            ? `${
-                                  getClosest(
-                                      activeBatteryModel,
-                                      latestAdcSample.tBat
-                                  ).capacity
-                              }
-                            mAh`
-                            : '??'}
-                    </span>
-                </div>
             </>
         )}
     </div>
@@ -147,15 +129,6 @@ const SideText = ({
 export interface BatteryProperties {
     disabled: boolean;
 }
-
-const getClosest = (batteryModel: BatteryModel, temperature: number) =>
-    batteryModel.characterizations.reduce((prev, curr) =>
-        Math.abs(curr.temperature - temperature) <
-        Math.abs(prev.temperature - temperature)
-            ? curr
-            : prev
-    );
-
 export default ({ disabled }: BatteryProperties) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
@@ -163,7 +136,6 @@ export default ({ disabled }: BatteryProperties) => {
     const fuelGauge = useSelector(getFuelGauge);
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
-    const activeBatteryModel = useSelector(getActiveBatterModel);
     const batteryConnected = useSelector(isBatteryConnected);
 
     useEffect(() => {
@@ -190,7 +162,7 @@ export default ({ disabled }: BatteryProperties) => {
                                             fuelGauge
                                                 ? latestAdcSample?.soc ?? 0
                                                 : 0
-                                        }% + 8px)`,
+                                        }% + 2px)`,
                                     }}
                                 />
                             </div>
@@ -207,7 +179,6 @@ export default ({ disabled }: BatteryProperties) => {
                     batteryConnected={batteryConnected}
                     latestAdcSample={latestAdcSample}
                     fuelGauge={fuelGauge}
-                    activeBatteryModel={activeBatteryModel}
                 />
             </div>
         </div>

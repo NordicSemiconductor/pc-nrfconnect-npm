@@ -20,13 +20,15 @@ export default ({ disabled }: { disabled: boolean }) => {
 
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
+    const batteryConnected =
+        latestAdcSample !== undefined && latestAdcSample?.vBat > 1;
 
     let mode = 'N/A';
-    if (pmicChargingState.constantCurrentCharging) {
+    if (batteryConnected && pmicChargingState.constantCurrentCharging) {
         mode = 'Constant Current';
-    } else if (pmicChargingState.constantVoltageCharging) {
+    } else if (batteryConnected && pmicChargingState.constantVoltageCharging) {
         mode = 'Constant Voltage';
-    } else if (pmicChargingState.trickleCharge) {
+    } else if (batteryConnected && pmicChargingState.trickleCharge) {
         mode = 'Trickle';
     }
 
@@ -40,7 +42,7 @@ export default ({ disabled }: { disabled: boolean }) => {
             <div className="line-wrapper">
                 <span className="line-title">Voltage:</span>
                 <span className="line-data">
-                    {latestAdcSample
+                    {batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.vBat.toFixed(2)}v`
                         : 'N/A'}
                 </span>
@@ -48,7 +50,7 @@ export default ({ disabled }: { disabled: boolean }) => {
             <div className="line-wrapper">
                 <span className="line-title">Current:</span>
                 <span className="line-data">
-                    {latestAdcSample
+                    {batteryConnected && latestAdcSample
                         ? `${Math.round(latestAdcSample?.iBat)}mA`
                         : 'N/A'}
                 </span>
@@ -56,7 +58,7 @@ export default ({ disabled }: { disabled: boolean }) => {
             <div className="line-wrapper">
                 <span className="line-title">Temperature:</span>
                 <span className="line-data">
-                    {latestAdcSample
+                    {batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.tBat.toFixed(2)}°C`
                         : 'N/A'}
                 </span>

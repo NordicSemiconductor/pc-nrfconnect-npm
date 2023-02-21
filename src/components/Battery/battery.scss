@@ -30,13 +30,10 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            h2 {
-                margin: 0;
-            }
         }
 
         .battery-graphic-wrapper {
-            padding: 0 30px 0 30px;
+            padding: 0 34px 0 30px;
 
             .battery-graphic-wrapper-wrapper {
                 aspect-ratio: 9/ 14;
@@ -50,7 +47,7 @@
                     position: relative;
                     align-items: center;
                     max-height: 130px;
-                    min-height: 120px;
+                    min-height: 104px;
 
                     .hidden {
                         opacity: 0 !important;
@@ -70,14 +67,14 @@
                     }
 
                     .battery-nipple {
-                        width: 50%;
-                        height: 10%;
+                        width: 38%;
+                        height: 5%;
                         background: $gray-700;
                     }
 
                     .battery {
                         width: 100%;
-                        border: 8px solid $gray-700;
+                        border: 6px solid $gray-700;
                         height: 100%;
                         border-radius: 8px;
                         display: flex;
@@ -89,7 +86,7 @@
                             position: relative;
                             height: 100%;
                             bottom: 0px;
-                            border: 4px solid white;
+                            border: 2px solid white;
                             background-color: $gray-700;
 
                             &.animated {
@@ -121,7 +118,7 @@
                         width: 20%;
                         position: absolute;
                         top: -10%;
-                        border-left: 8px solid $gray-700;
+                        border-left: 6px solid $gray-700;
                         border-right: 8px solid white;
                     }
                 }
@@ -134,8 +131,14 @@
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid $gray-200;
-    padding-bottom: 3px;
+    padding-bottom: 7px;
     margin-bottom: 6px;
+    line-height: 1;
+
+    &:last-child {
+        margin-bottom: 0px;
+        padding-bottom: 5px;
+    }
 
     .line-title {
         font-weight: 500;
