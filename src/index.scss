@@ -12,10 +12,10 @@
 }
 
 .card-body {
-    margin-bottom: 1em;
+    margin-bottom: 8px;
 
     & > * {
-        margin: 15px 0;
+        margin: 8px 0;
     }
 
     & > *:first-child {
@@ -32,4 +32,24 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+}
+
+label {
+    margin-bottom: 8px;
+}
+
+.form-label {
+    height: 24px;
+    line-height: 1;
+}
+
+.channel-selection {
+    .btn {
+        padding: 8px !important;
+        line-height: 1 !important;
+    }
+}
+
+.card-title {
+    min-height: 16px;
 }

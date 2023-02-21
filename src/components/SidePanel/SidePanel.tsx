@@ -22,11 +22,13 @@ import {
     openFileDialog,
     saveFileDialog,
 } from '../../actions/fileActions';
+import { BatteryModel } from '../../features/pmicControl/npm/types';
 import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
 import {
     getActiveBatterModel,
     getDefaultBatterModels,
     getEventRecordingPath,
+    getLatestAdcSample,
     getNpmDevice,
     getStoredBatterModels,
     getWarningDialog,
@@ -70,15 +72,32 @@ export default () => {
     const activeBatteryModel = useSelector(getActiveBatterModel);
     const defaultBatterModels = useSelector(getDefaultBatterModels);
     const storedBatterModels = useSelector(getStoredBatterModels);
+    const latestAdcSample = useSelector(getLatestAdcSample);
+
+    const getClosest = (
+        batteryModel: BatteryModel | undefined,
+        temperature: number
+    ) =>
+        batteryModel?.characterizations.reduce((prev, curr) =>
+            Math.abs(curr.temperature - temperature) <
+            Math.abs(prev.temperature - temperature)
+                ? curr
+                : prev
+        ) ?? undefined;
 
     const batteryModelItems = useMemo(() => {
         const items = [...defaultBatterModels, ...storedBatterModels];
         const keys = new Set(items.map(item => item.name));
         return Array.from(keys).map(key => ({
-            label: key,
+            label: `${key} (${
+                getClosest(
+                    items.find(batterModel => batterModel.name === key),
+                    latestAdcSample?.tBat ?? 24
+                )?.capacity ?? ''
+            } mAh)`,
             value: key,
         }));
-    }, [defaultBatterModels, storedBatterModels]);
+    }, [defaultBatterModels, latestAdcSample?.tBat, storedBatterModels]);
 
     const selectedItemBatteryMode = useMemo(
         () =>
