@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.0.7 - 2023-02-24
+
+### Added
+
+-   PMIC1300 Support FW Version 0.0.0+7
+
+### Changed
+
+-   On Disconnect we reset all the UI component to the initial state.
+-   Set Default profile is not a dropdown.
+
+### Fixed
+
+-   Dashboard card ordering
+
 ## 0.0.6 - 2023-02-21
 
 ### Changed
@@ -16,7 +31,7 @@ and this project adheres to
 
 ### Added
 
--   PMIC1300 App Version 0.0.0+6
+-   PMIC1300 Support FW Version 0.0.0+6
 
 ## 0.0.4 - 2023-02-10
 
@@ -32,4 +47,4 @@ and this project adheres to
 
 ## 0.0.3 - 2023-01-24
 
--   First implementation for PMIC1300 App Version 0.0.0+1
+-   First implementation for PMIC1300 Support FW Version 0.0.0+1

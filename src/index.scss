@@ -38,9 +38,10 @@ label {
     margin-bottom: 8px;
 }
 
-.form-label {
-    height: 24px;
-    line-height: 1;
+.card {
+    .form-label {
+        height: 24px;
+    }
 }
 
 .channel-selection {

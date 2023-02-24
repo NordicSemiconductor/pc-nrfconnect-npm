@@ -36,7 +36,7 @@ interface pmicControlState {
     eventRecordingPath?: string;
     activeBatterModel?: BatteryModel;
     defaultBatterModels: BatteryModel[];
-    storedBatterModels: BatteryModel[];
+    storedBatterModel?: BatteryModel;
 }
 
 const initialState: pmicControlState = {
@@ -56,7 +56,6 @@ const initialState: pmicControlState = {
     batteryConnected: false,
     fuelGauge: false,
     defaultBatterModels: [],
-    storedBatterModels: [],
     warningDialog: [],
     eventRecording: false,
 };
@@ -65,8 +64,11 @@ const pmicControlSlice = createSlice({
     name: 'pmicControl',
     initialState,
     reducers: {
-        setNpmDevice(state, action: PayloadAction<NpmDevice | undefined>) {
-            state.npmDevice = action.payload;
+        setNpmDevice(_, action: PayloadAction<NpmDevice | undefined>) {
+            return {
+                ...initialState,
+                npmDevice: action.payload,
+            };
         },
         updateCharger(state, action: PayloadAction<PartialUpdate<Charger>>) {
             if (state.chargers.length >= action.payload.index) {
@@ -125,8 +127,11 @@ const pmicControlSlice = createSlice({
         setDefaultBatterModels(state, action: PayloadAction<BatteryModel[]>) {
             state.defaultBatterModels = action.payload;
         },
-        setStoredBatterModels(state, action: PayloadAction<BatteryModel[]>) {
-            state.storedBatterModels = action.payload;
+        setStoredBatterModel(
+            state,
+            action: PayloadAction<BatteryModel | undefined>
+        ) {
+            state.storedBatterModel = action.payload;
         },
         setSupportedVersion(state, action: PayloadAction<boolean | undefined>) {
             state.supportedVersion = action.payload;
@@ -189,8 +194,8 @@ export const getActiveBatterModel = (state: RootState) =>
     state.app.pmicControl.activeBatterModel;
 export const getDefaultBatterModels = (state: RootState) =>
     state.app.pmicControl.defaultBatterModels;
-export const getStoredBatterModels = (state: RootState) =>
-    state.app.pmicControl.storedBatterModels;
+export const getStoredBatterModel = (state: RootState) =>
+    state.app.pmicControl.storedBatterModel;
 export const isSupportedVersion = (state: RootState) =>
     state.app.pmicControl.pmicState !== 'offline'
         ? state.app.pmicControl.supportedVersion
@@ -221,7 +226,7 @@ export const {
     setFuelGauge,
     setActiveBatterModel,
     setDefaultBatterModels,
-    setStoredBatterModels,
+    setStoredBatterModel,
     setSupportedVersion,
     requestWarningDialog,
     dequeueWarningDialog,

@@ -159,7 +159,11 @@ export default ({ disabled }: BatteryProperties) => {
                                     } ${charging ? 'charging' : ''}`}
                                     style={{
                                         height: `calc(${
-                                            fuelGauge
+                                            fuelGauge &&
+                                            batteryConnected &&
+                                            !Number.isNaN(
+                                                latestAdcSample?.soc ?? 0
+                                            )
                                                 ? latestAdcSample?.soc ?? 0
                                                 : 0
                                         }% + 2px)`,

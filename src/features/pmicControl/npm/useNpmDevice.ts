@@ -29,7 +29,7 @@ import {
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
-    setStoredBatterModels,
+    setStoredBatterModel,
     setSupportedVersion,
     updateBuck,
     updateCharger,
@@ -73,7 +73,7 @@ export default (shellParser: ShellParser | undefined) => {
         npmDevice.requestUpdate.pmicChargingState();
         npmDevice.requestUpdate.fuelGauge();
         npmDevice.requestUpdate.activeBatteryModel();
-        npmDevice.requestUpdate.storedBatteryModels();
+        npmDevice.requestUpdate.storedBatteryModel();
 
         npmDevice.getDefaultBatteryModels().then(models => {
             dispatch(setDefaultBatterModels(models));
@@ -163,20 +163,9 @@ export default (shellParser: ShellParser | undefined) => {
 
     useEffect(() => {
         if (npmDevice) {
-            let chargerStateUpdateInterval: NodeJS.Timer | undefined;
             npmDevice.isSupportedVersion().then(result => {
                 dispatch(setSupportedVersion(result));
-                if (result) {
-                    chargerStateUpdateInterval = setInterval(() => {
-                        if (npmDevice.getConnectionState() === 'connected')
-                            npmDevice.requestUpdate.pmicChargingState();
-                    }, 5000);
-                }
             });
-
-            return () => {
-                clearInterval(chargerStateUpdateInterval);
-            };
         }
     }, [dispatch, npmDevice]);
 
@@ -231,7 +220,7 @@ export default (shellParser: ShellParser | undefined) => {
 
             const releaseOnStoredBatteryModelUpdate =
                 npmDevice.onStoredBatteryModelUpdate(payload => {
-                    dispatch(setStoredBatterModels(payload));
+                    dispatch(setStoredBatterModel(payload));
                 });
 
             dispatch(setPmicState(npmDevice.getConnectionState()));
