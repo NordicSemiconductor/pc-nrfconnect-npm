@@ -106,7 +106,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         warningDialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+6'
+        '0.0.0+7'
     );
     let lastUptime = 0;
     let uptimeOverflowCounter = 0;
@@ -363,8 +363,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     shellParser?.registerCommandCallback(
         toRegex('fuel_gauge model store'),
         () => {
+            requestUpdate.storedBatteryModel();
             requestUpdate.activeBatteryModel();
-            requestUpdate.storedBatteryModels();
         },
         noop
     );
@@ -376,7 +376,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             if (models.length < 2) return;
             const stringModels = models[1].trim().split('\r\n');
             const list = stringModels.map(parseBatteryModel);
-            eventEmitter.emit('onStoredBatteryModelUpdate', list);
+            eventEmitter.emit(
+                'onStoredBatteryModelUpdate',
+                list.length !== 0 ? list[0] : undefined
+            );
         },
         noop
     );
@@ -721,13 +724,11 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         },
 
         activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
-        storedBatteryModels: () => console.warn('Not implemented'),
+        storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
     };
 
     const storeBattery = () => {
-        sendCommand(`fuel_gauge model store`, () => {
-            requestUpdate.activeBatteryModel;
-        });
+        sendCommand(`fuel_gauge model store`);
     };
 
     return {

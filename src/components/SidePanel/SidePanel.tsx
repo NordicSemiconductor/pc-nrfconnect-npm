@@ -30,7 +30,7 @@ import {
     getEventRecordingPath,
     getLatestAdcSample,
     getNpmDevice,
-    getStoredBatterModels,
+    getStoredBatterModel,
     getWarningDialog,
     setEventRecordingPath,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -71,7 +71,7 @@ export default () => {
 
     const activeBatteryModel = useSelector(getActiveBatterModel);
     const defaultBatterModels = useSelector(getDefaultBatterModels);
-    const storedBatterModels = useSelector(getStoredBatterModels);
+    const storedBatterModel = useSelector(getStoredBatterModel);
     const latestAdcSample = useSelector(getLatestAdcSample);
 
     const getClosest = (
@@ -86,7 +86,9 @@ export default () => {
         ) ?? undefined;
 
     const batteryModelItems = useMemo(() => {
-        const items = [...defaultBatterModels, ...storedBatterModels];
+        const items = [...defaultBatterModels];
+        if (storedBatterModel) items.push(storedBatterModel);
+
         const keys = new Set(items.map(item => item.name));
         return Array.from(keys).map(key => ({
             label: `${key} (${
@@ -97,9 +99,9 @@ export default () => {
             } mAh)`,
             value: key,
         }));
-    }, [defaultBatterModels, latestAdcSample?.tBat, storedBatterModels]);
+    }, [defaultBatterModels, latestAdcSample?.tBat, storedBatterModel]);
 
-    const selectedItemBatteryMode = useMemo(
+    const selectedActiveItemBatteryMode = useMemo(
         () =>
             batteryModelItems.find(
                 item => item.value === activeBatteryModel?.name
@@ -108,6 +110,17 @@ export default () => {
                 value: '',
             },
         [activeBatteryModel, batteryModelItems]
+    );
+
+    const selectedDefaultItemBatteryMode = useMemo(
+        () =>
+            batteryModelItems.find(
+                item => item.value === storedBatterModel?.name
+            ) ?? {
+                label: 'N/A',
+                value: '',
+            },
+        [storedBatterModel, batteryModelItems]
     );
 
     // init shell parser
@@ -211,18 +224,19 @@ export default () => {
                     onSelect={(item: DropdownItem) => {
                         npmDevice?.setActiveBatteryModel(item.value);
                     }}
-                    selectedItem={selectedItemBatteryMode}
-                    disabled={selectedItemBatteryMode.value === ''}
+                    selectedItem={selectedActiveItemBatteryMode}
+                    disabled={selectedActiveItemBatteryMode.value === ''}
                 />
-                <Button
-                    className="w-100 secondary-btn"
-                    onClick={() => {
+                <Dropdown
+                    label="Default profile"
+                    items={batteryModelItems}
+                    onSelect={(item: DropdownItem) => {
+                        npmDevice?.setActiveBatteryModel(item.value);
                         npmDevice?.storeBattery();
                     }}
-                    disabled={npmDevice?.getConnectionState() !== 'connected'}
-                >
-                    Set as default
-                </Button>
+                    selectedItem={selectedDefaultItemBatteryMode}
+                    disabled={selectedDefaultItemBatteryMode.value === ''}
+                />
                 <Button
                     className="w-100 secondary-btn"
                     onClick={() => {}}

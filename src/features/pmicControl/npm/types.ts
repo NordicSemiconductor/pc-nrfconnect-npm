@@ -113,7 +113,7 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     onStoredBatteryModelUpdate: (
-        handler: (payload: BatteryModel[]) => void
+        handler: (payload: BatteryModel | undefined) => void
     ) => () => void;
 
     onLoggingEvent: (
@@ -170,7 +170,7 @@ export type NpmDevice = {
         fuelGauge: () => void;
 
         activeBatteryModel: () => void;
-        storedBatteryModels: () => void;
+        storedBatteryModel: () => void;
     };
 
     setChargerVTerm: (index: number, value: number) => void;
