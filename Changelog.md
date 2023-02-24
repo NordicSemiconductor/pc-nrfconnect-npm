@@ -10,7 +10,16 @@ and this project adheres to
 
 ### Added
 
--   PMIC1300 App Version 0.0.0+6
+-   PMIC1300 Support FW Version 0.0.0+7
+
+### Changed
+
+-   On Disconnect we reset all the UI component to the initial state.
+-   Set Default profile is not a dropdown.
+
+### Fixed
+
+-   Dashboard card ordering
 
 ## 0.0.6 - 2023-02-21
 
@@ -22,7 +31,7 @@ and this project adheres to
 
 ### Added
 
--   PMIC1300 App Version 0.0.0+6
+-   PMIC1300 Support FW Version 0.0.0+6
 
 ## 0.0.4 - 2023-02-10
 
@@ -38,4 +47,4 @@ and this project adheres to
 
 ## 0.0.3 - 2023-01-24
 
--   First implementation for PMIC1300 App Version 0.0.0+1
+-   First implementation for PMIC1300 Support FW Version 0.0.0+1
