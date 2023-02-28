@@ -231,11 +231,13 @@ export default () => {
                     label="Default profile"
                     items={batteryModelItems}
                     onSelect={(item: DropdownItem) => {
-                        npmDevice?.setActiveBatteryModel(item.value);
-                        npmDevice?.storeBattery();
+                        if (item.value) {
+                            npmDevice?.setActiveBatteryModel(item.value);
+                            npmDevice?.storeBattery();
+                        }
                     }}
                     selectedItem={selectedDefaultItemBatteryMode}
-                    disabled={selectedDefaultItemBatteryMode.value === ''}
+                    disabled={batteryModelItems.length === 0}
                 />
                 <Button
                     className="w-100 secondary-btn"

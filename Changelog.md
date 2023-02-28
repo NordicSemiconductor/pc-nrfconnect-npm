@@ -16,6 +16,10 @@ and this project adheres to
 
 -   Time to full/empty format show hours and minutes
 
+### Fixed
+
+-   Store default battery with clean devices
+
 ## 0.0.8 - 2023-02-28
 
 ### Added
