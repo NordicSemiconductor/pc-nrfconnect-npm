@@ -106,7 +106,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         warningDialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+7'
+        '0.0.0+8'
     );
     let lastUptime = 0;
     let uptimeOverflowCounter = 0;
@@ -175,7 +175,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     adcSample.vBat = Number(pair[1] ?? 0);
                     break;
                 case 'ibat':
-                    adcSample.iBat = Math.abs(Number(pair[1] ?? 0)) * 1000;
+                    adcSample.iBat = Number(pair[1] ?? 0) * 1000;
                     break;
                 case 'tbat':
                     adcSample.tBat = Number(pair[1] ?? 0);
