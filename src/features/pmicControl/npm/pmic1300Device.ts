@@ -106,7 +106,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         warningDialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+7'
+        '0.0.0+9'
     );
     let lastUptime = 0;
     let uptimeOverflowCounter = 0;
