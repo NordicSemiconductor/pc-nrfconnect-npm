@@ -93,7 +93,7 @@ const SideText = ({
                     {fuelGauge &&
                     latestAdcSample &&
                     !Number.isNaN(latestAdcSample.soc)
-                        ? `${Math.round(latestAdcSample.soc ?? 0)}%`
+                        ? `${latestAdcSample.soc.toFixed(1) ?? 0}%`
                         : 'N/A %'}
                 </h2>
                 {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) ? (
