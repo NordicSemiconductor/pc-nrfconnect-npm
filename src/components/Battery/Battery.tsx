@@ -62,15 +62,9 @@ const BatterIcon = ({ pmicChargingState }: BatteryIconProperties) => {
 };
 
 const formatSecondsToString = (seconds: number) => {
-    const date = new Date(0);
-    date.setSeconds(seconds); // specify value for SECONDS here
-    return `${date
-        .toISOString()
-        .slice(11, 16)
-        .split(':')
-        .map(v => Number.parseInt(v, 10))
-        .toString()
-        .replace(',', 'hr ')}min`;
+    const hrs = Math.floor(seconds / (60 * 60));
+    const min = Math.floor((seconds - hrs * 60 * 60) / 60);
+    return `${hrs}hr ${min.toString().padStart(2, '0')}min`;
 };
 
 interface BatterySideTextProperties {
