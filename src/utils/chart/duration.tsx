@@ -7,7 +7,6 @@
 const format = (milliseconds: number): string | null => {
     if (Number.isNaN(milliseconds)) return null;
     const t = new Date(Math.floor(milliseconds));
-    const z = `${t.getUTCMilliseconds()}`;
     const s = `${t.getUTCSeconds()}`;
     const m = `${t.getUTCMinutes()}`;
     const h = `${t.getUTCHours()}`;
@@ -16,7 +15,7 @@ const format = (milliseconds: number): string | null => {
     return `${d > 0 ? `${d} day ${d > 1 ? 's' : ''} ` : ''}${h.padStart(
         2,
         '0'
-    )}:${m.padStart(2, '0')}:${s.padStart(2, '0')}.${z.padStart(3, '0')}`;
+    )}:${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
 };
 
 export const formatDuration = (milliseconds: number) => format(milliseconds);
