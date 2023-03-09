@@ -294,6 +294,26 @@ export default {
                 }
             }
         };
+        chart.pan = range => {
+            const chartState = getState(chart);
+
+            if (chartState.options.live) return;
+
+            if (
+                chartState.options.currentRange.xMax === range.xMax &&
+                chartState.options.currentRange.xMin === range.xMin
+            )
+                return;
+
+            chartState.options.currentRange = { ...range };
+
+            (chart.scales.x.options as CartesianScaleOptions).min =
+                chartState.options.currentRange.xMin;
+            (chart.scales.x.options as CartesianScaleOptions).max =
+                chartState.options.currentRange.xMax;
+
+            chart.update('none');
+        };
     },
     afterInit(chart) {
         initRange(chart);
@@ -369,10 +389,15 @@ export default {
 
             const resolution = getResolution(options.resolution, state.data);
 
+            const delta = Math.min(
+                Math.max(resolution - resolution * options.zoomFactor, 1000),
+                60000 * 10
+            ); // min zoom at 1 sec, max zoom 10 min per scroll
+
             let newResolution =
                 event.deltaY < 0
-                    ? resolution / options.zoomFactor // Zoom In
-                    : resolution * options.zoomFactor; // Zoom out
+                    ? resolution - delta // Zoom In
+                    : resolution + delta; // Zoom out
 
             newResolution = Math.ceil(
                 Math.max(

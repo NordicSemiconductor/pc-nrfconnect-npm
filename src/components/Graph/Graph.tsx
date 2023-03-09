@@ -5,7 +5,7 @@
  */
 import 'chartjs-adapter-date-fns';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ import {
     CategoryScale,
     Chart,
     Chart as ChartJS,
+    ChartArea,
     ChartData,
     ChartOptions,
     Legend,
@@ -25,9 +26,9 @@ import {
 } from 'chart.js';
 import { Button, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
+import { AdcSample } from '../../features/pmicControl/npm/types';
 import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
-import CustomLegend from '../../utils/chart/CustomLegend';
 import highlightAxis from '../../utils/chart/highlightAxis';
 import { getState } from '../../utils/chart/state';
 import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
@@ -71,7 +72,87 @@ ChartJS.register(
     highlightAxis
 );
 
-const options: ChartOptions<'line'> = {
+const optionsSoc: ChartOptions<'line'> = {
+    parsing: false,
+    animation: false,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            display: false,
+        },
+        tooltip: {
+            callbacks: {
+                title: context =>
+                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
+            },
+        },
+    },
+    scales: {
+        x: {
+            type: 'time',
+            display: true,
+            ticks: {
+                autoSkip: false,
+                maxTicksLimit: 5,
+                display: false,
+            },
+        },
+        ySocBat: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            ticks: {
+                callback(value) {
+                    return ` ${value} %`;
+                },
+            },
+            suggestedMin: 0,
+            suggestedMax: 100,
+        },
+    },
+};
+
+const optionsTBat: ChartOptions<'line'> = {
+    parsing: false,
+    animation: false,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            display: false,
+        },
+        tooltip: {
+            callbacks: {
+                title: context =>
+                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
+            },
+        },
+    },
+    scales: {
+        x: {
+            type: 'time',
+            display: true,
+            ticks: {
+                autoSkip: false,
+                maxTicksLimit: 5,
+                display: false,
+            },
+        },
+        yTbat: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            ticks: {
+                callback(value) {
+                    return ` ${value} °C`;
+                },
+            },
+            suggestedMin: 0,
+            suggestedMax: 150,
+        },
+    },
+};
+
+const optionsVBat: ChartOptions<'line'> = {
     parsing: false,
     animation: false,
     maintainAspectRatio: false,
@@ -109,78 +190,52 @@ const options: ChartOptions<'line'> = {
             suggestedMin: 3,
             suggestedMax: 5,
         },
+    },
+};
+
+const optionsIBat: ChartOptions<'line'> = {
+    parsing: false,
+    animation: false,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            display: false,
+        },
+        tooltip: {
+            callbacks: {
+                title: context =>
+                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
+            },
+        },
+    },
+    scales: {
+        x: {
+            type: 'time',
+            display: true,
+            ticks: {
+                autoSkip: false,
+                maxTicksLimit: 5,
+                display: false,
+            },
+        },
         yIbat: {
             type: 'linear',
             display: true,
             position: 'left',
             ticks: {
                 callback(value) {
-                    return ` ${Number(value).toFixed(2)} mA`;
+                    return ` ${Number(value).toFixed(0)} mA`;
                 },
                 maxTicksLimit: 5,
             },
             suggestedMin: 0,
             suggestedMax: 1,
         },
-        yTbat: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            ticks: {
-                callback(value) {
-                    return ` ${value} °C`;
-                },
-            },
-            suggestedMin: 0,
-            suggestedMax: 150,
-        },
-        ySocBat: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            ticks: {
-                callback(value) {
-                    return ` ${value} %`;
-                },
-            },
-            suggestedMin: 0,
-            suggestedMax: 100,
-        },
     },
 };
 
-const chartData: ChartData<'line'> = {
+const chartDataSoc: ChartData<'line'> = {
     datasets: [
-        {
-            label: 'Vbat',
-            data: [],
-            borderColor: styles.indigo,
-            backgroundColor: styles.indigo,
-            fill: false,
-            cubicInterpolationMode: 'monotone',
-            tension: 0.4,
-            yAxisID: 'yVbat',
-        },
-        {
-            label: 'Tbat',
-            data: [],
-            borderColor: styles.red,
-            backgroundColor: styles.red,
-            fill: false,
-            cubicInterpolationMode: 'monotone',
-            tension: 0.4,
-            yAxisID: 'yTbat',
-        },
-        {
-            label: 'Ibat',
-            data: [],
-            borderColor: styles.amber,
-            backgroundColor: styles.amber,
-            fill: false,
-            cubicInterpolationMode: 'monotone',
-            tension: 0.4,
-            yAxisID: 'yIbat',
-        },
         {
             label: 'SOC',
             data: [],
@@ -194,76 +249,183 @@ const chartData: ChartData<'line'> = {
     ],
 };
 
+const chartDataVBat: ChartData<'line'> = {
+    datasets: [
+        {
+            label: 'Vbat',
+            data: [],
+            borderColor: styles.indigo,
+            backgroundColor: styles.indigo,
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            yAxisID: 'yVbat',
+        },
+    ],
+};
+
+const chartDataIBat: ChartData<'line'> = {
+    datasets: [
+        {
+            label: 'Ibat',
+            data: [],
+            borderColor: styles.amber,
+            backgroundColor: styles.amber,
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            yAxisID: 'yIbat',
+        },
+    ],
+};
+
+const chartDataTBat: ChartData<'line'> = {
+    datasets: [
+        {
+            label: 'Tbat',
+            data: [],
+            borderColor: styles.red,
+            backgroundColor: styles.red,
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            yAxisID: 'yTbat',
+        },
+    ],
+};
+
 export default ({ active }: PaneProps) => {
-    const ref = useRef<ChartJSOrUndefined<'line'>>();
-    const chart = ref.current;
+    const refIBat = useRef<ChartJSOrUndefined<'line'>>();
+    const refTBat = useRef<ChartJSOrUndefined<'line'>>();
+    const refVBat = useRef<ChartJSOrUndefined<'line'>>();
+    const refSoc = useRef<ChartJSOrUndefined<'line'>>();
+
+    const chartIBat = refIBat.current;
+    const chartTBat = refTBat.current;
+    const chartVBat = refVBat.current;
+    const chartSoc = refSoc.current;
+
     const npmDevice = useSelector(getNpmDevice);
     const [isLive, setLive] = useState(true);
     const [range, setRange] = useState({ xMin: 0, xMax: 0 });
-    const [chartArea, setChartCanvas] = useState(chart?.chartArea);
+    const [chartAreaVBat, setChartCanvasVBat] = useState<ChartArea>();
+    const [chartAreaIBat, setChartCanvasIBat] = useState<ChartArea>();
+    const [chartAreaTBat, setChartCanvasTBat] = useState<ChartArea>();
+    const [chartAreaSoc, setChartCanvasSoc] = useState<ChartArea>();
 
-    options.onResize = (c: Chart) => {
-        setTimeout(() => setChartCanvas(c.chartArea));
-    };
+    const chartMetaData = useMemo(
+        () => ({
+            charts: [chartVBat, chartIBat, chartTBat, chartSoc],
+            options: [optionsVBat, optionsIBat, optionsTBat, optionsSoc],
+            data: [chartDataVBat, chartDataIBat, chartDataTBat, chartDataSoc],
+            refs: [refVBat, refIBat, refTBat, refSoc],
+            labels: ['Voltage', 'Current', 'Temperature', 'State of Charge'],
+            chartArea: [
+                { value: chartAreaVBat, setter: setChartCanvasVBat },
+                { value: chartAreaIBat, setter: setChartCanvasIBat },
+                { value: chartAreaTBat, setter: setChartCanvasTBat },
+                { value: chartAreaSoc, setter: setChartCanvasSoc },
+            ],
+        }),
+        [
+            chartAreaIBat,
+            chartAreaSoc,
+            chartAreaTBat,
+            chartAreaVBat,
+            chartIBat,
+            chartSoc,
+            chartTBat,
+            chartVBat,
+        ]
+    );
+
+    chartMetaData.options.forEach((option, index) => {
+        option.onResize = (c: Chart) => {
+            setTimeout(() =>
+                chartMetaData.chartArea[index].setter(c.chartArea)
+            );
+        };
+    });
 
     useEffect(() => {
-        if (npmDevice) {
-            chart?.resetData();
+        if (npmDevice === undefined) {
+            chartMetaData.charts.forEach(chart => {
+                chart?.resetData();
+            });
         }
-    }, [chart, npmDevice]);
+    }, [chartMetaData.charts, npmDevice]);
 
     useEffect(() => {
         if (!npmDevice) return () => {};
         const releaseOnAdcSampleEvent = npmDevice.onAdcSample(sample => {
-            const chartStates = chart ? getState(chart) : undefined;
+            // order is important
+            const keys: (keyof AdcSample)[] = ['vBat', 'iBat', 'tBat', 'soc'];
+            chartMetaData.charts.forEach((chart, index) => {
+                const chartStates = chart ? getState(chart) : undefined;
 
-            if (chart && chartStates) {
-                chart.addData([
-                    [{ x: sample.timestamp, y: sample.vBat }],
-                    [{ x: sample.timestamp, y: sample.tBat }],
-                    [{ x: sample.timestamp, y: sample.iBat }],
-                    [{ x: sample.timestamp, y: sample.soc ?? 0 }],
-                ]);
-            }
+                if (chart && chartStates) {
+                    chart.addData([
+                        [
+                            {
+                                x: sample.timestamp,
+                                y: sample[keys[index]] ?? 0,
+                            },
+                        ],
+                    ]);
+                }
+            });
         });
 
         return releaseOnAdcSampleEvent;
-    }, [chart, active, npmDevice]);
+    }, [chartMetaData, active, npmDevice]);
 
     useEffect(() => {
-        const chartStates = chart ? getState(chart) : undefined;
-        const chartOptions = chartStates?.options;
+        chartMetaData.charts.forEach(chart => {
+            const chartStates = chart ? getState(chart) : undefined;
+            const chartOptions = chartStates?.options;
 
-        if (chartOptions && active) {
-            chart?.setLive(isLive);
-        }
-    }, [chart, isLive, active]);
-
-    useEffect(() => {
-        const chartStates = chart ? getState(chart) : undefined;
-
-        if (chart && chartStates) {
-            chartStates.options.onLiveChange = setLive;
-            chartStates.options.onRangeChanged = setRange;
-        }
-    }, [chart]);
+            if (chartOptions && active) {
+                chart?.setLive(isLive);
+            }
+        });
+    }, [chartMetaData, isLive, active]);
 
     useEffect(() => {
-        if (active && chart) {
-            chart?.update('none');
-        }
-    }, [chart, active]);
+        chartMetaData.charts.forEach(chart => {
+            const chartStates = chart ? getState(chart) : undefined;
+
+            if (chart && chartStates) {
+                chartStates.options.onLiveChange = setLive;
+                chartStates.options.onRangeChanged = r => {
+                    setRange(r);
+                    chartMetaData.charts.forEach(c => {
+                        if (c !== chart) c?.pan(r);
+                    });
+                };
+            }
+        });
+    }, [chartMetaData, range]);
+
+    useEffect(() => {
+        chartMetaData.charts.forEach(chart => {
+            if (active && chart) {
+                chart?.update('none');
+            }
+        });
+    }, [chartMetaData, active]);
 
     const zoom = (resolution: number) => {
-        const chartStates = chart ? getState(chart) : undefined;
+        chartMetaData.charts.forEach(chart => {
+            const chartStates = chart ? getState(chart) : undefined;
 
-        if (chart?.zoom) {
-            const chartOptions = chartStates?.options;
-            chart?.zoom(
-                resolution,
-                chartOptions?.live || resolution <= 0 ? 1 : 0.5
-            );
-        }
+            if (chart?.zoom) {
+                const chartOptions = chartStates?.options;
+                chart?.zoom(
+                    resolution,
+                    chartOptions?.live || resolution <= 0 ? 1 : 0.5
+                );
+            }
+        });
     };
 
     return (
@@ -316,11 +478,25 @@ export default ({ active }: PaneProps) => {
                     />
                 </div>
             </div>
-            <CustomLegend chart={ref.current} />
-            <div className="graph-container">
-                <Line options={options} data={chartData} ref={ref} />
-            </div>
-            <TimeSpanDeltaLine range={range} chartArea={chartArea} />
+            {chartMetaData.charts.map((_, index) => (
+                // eslint-disable-next-line react/jsx-key
+                <>
+                    <div className="text-center">
+                        <span>{chartMetaData.labels[index]}</span>
+                    </div>
+                    <div className="graph-container">
+                        <Line
+                            options={chartMetaData.options[index]}
+                            data={chartMetaData.data[index]}
+                            ref={chartMetaData.refs[index]}
+                        />
+                    </div>
+                    <TimeSpanDeltaLine
+                        range={range}
+                        chartArea={chartMetaData.chartArea[index].value}
+                    />
+                </>
+            ))}
         </div>
     );
 };
