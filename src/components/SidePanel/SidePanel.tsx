@@ -174,27 +174,31 @@ export default () => {
             <SerialSettings />
             <CollapsibleGroup defaultCollapsed={false} heading="Settings">
                 <Button
-                    className="w-100 secondary-btn"
+                    variant="secondary"
+                    className="w-100"
                     onClick={() => dispatch(saveFileDialog())}
                 >
                     Export Configuration
                 </Button>
                 <Button
+                    variant="secondary"
                     disabled={pmicConnection !== 'connected'}
-                    className="w-100 secondary-btn"
+                    className="w-100"
                     onClick={() => dispatch(openFileDialog())}
                 >
                     Load Configuration
                 </Button>
                 <Button
+                    variant="secondary"
                     disabled={pmicConnection === 'offline'}
-                    className="w-100 secondary-btn"
+                    className="w-100"
                     onClick={() => npmDevice?.kernelReset('cold')}
                 >
                     Reset Device
                 </Button>
                 <StartStopButton
-                    className="w-100 secondary-btn"
+                    variant="secondary"
+                    className="w-100"
                     startText="Start Recording Events"
                     stopText="Stop Recording Events"
                     onClick={() => {
@@ -240,7 +244,8 @@ export default () => {
                     disabled={batteryModelItems.length === 0}
                 />
                 <Button
-                    className="w-100 secondary-btn"
+                    variant="secondary"
+                    className="w-100"
                     onClick={() => {}}
                     disabled
                 >

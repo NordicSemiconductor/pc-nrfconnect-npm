@@ -272,37 +272,43 @@ export default ({ active }: PaneProps) => {
                 <div />
                 <div className="range-buttons">
                     <Button
-                        className="btn-primary w-100 h-100"
+                        variant="secondary"
+                        className="w-100"
                         onClick={() => zoom(300000)}
                     >
                         5min
                     </Button>
                     <Button
-                        className="btn-primary w-100 h-100"
+                        variant="secondary"
+                        className="w-100"
                         onClick={() => zoom(1800000)}
                     >
                         30min
                     </Button>
                     <Button
-                        className="btn-primary w-100 h-100"
+                        variant="secondary"
+                        className="w-100"
                         onClick={() => zoom(3600000)}
                     >
                         1hr
                     </Button>
                     <Button
-                        className="btn-primary w-100 h-100"
+                        variant="secondary"
+                        className="w-100"
                         onClick={() => zoom(21600000)}
                     >
                         6hr
                     </Button>
                     <Button
-                        className="btn-primary w-100 h-100"
+                        variant="secondary"
+                        className="w-100"
                         onClick={() => zoom(86400000)}
                     >
                         1 Day
                     </Button>
                     <Button
-                        className="btn-primary w-100 h-100"
+                        variant="secondary"
+                        className="w-100"
                         onClick={() => zoom(604800000)}
                     >
                         1 Week

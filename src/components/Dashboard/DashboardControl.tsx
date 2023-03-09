@@ -68,7 +68,11 @@ const DisplayPmicState = ({
             <Alert variant="warning" label="Shell Paused: ">
                 There is a command written in the shell that has not been
                 submitted. Release shall to use APP.&nbsp;
-                <Button title="Unpause" onClick={() => shellParser?.unPause()}>
+                <Button
+                    variant="secondary"
+                    title="Unpause"
+                    onClick={() => shellParser?.unPause()}
+                >
                     Unpause
                 </Button>
             </Alert>
