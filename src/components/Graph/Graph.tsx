@@ -29,7 +29,7 @@ import { Button, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 import { AdcSample } from '../../features/pmicControl/npm/types';
 import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
-import highlightAxis from '../../utils/chart/highlightAxis';
+import CustomLegend from '../../utils/chart/CustomLegend';
 import { getState } from '../../utils/chart/state';
 import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 
@@ -68,8 +68,7 @@ ChartJS.register(
     Tooltip,
     Legend,
     TimeScale,
-    zoomPanPlugin,
-    highlightAxis
+    zoomPanPlugin
 );
 
 const optionsSoc: ChartOptions<'line'> = {
@@ -103,8 +102,9 @@ const optionsSoc: ChartOptions<'line'> = {
             position: 'left',
             ticks: {
                 callback(value) {
-                    return ` ${value} %`;
+                    return `${value} %`;
                 },
+                maxTicksLimit: 5,
             },
             suggestedMin: 0,
             suggestedMax: 100,
@@ -143,8 +143,9 @@ const optionsTBat: ChartOptions<'line'> = {
             position: 'left',
             ticks: {
                 callback(value) {
-                    return ` ${value} °C`;
+                    return `${value} °C`;
                 },
+                maxTicksLimit: 5,
             },
             suggestedMin: 0,
             suggestedMax: 150,
@@ -183,7 +184,7 @@ const optionsVBat: ChartOptions<'line'> = {
             position: 'left',
             ticks: {
                 callback(value) {
-                    return ` ${Number(value).toFixed(2)} V`;
+                    return `${Number(value).toFixed(2)} V`;
                 },
                 maxTicksLimit: 5,
             },
@@ -224,12 +225,12 @@ const optionsIBat: ChartOptions<'line'> = {
             position: 'left',
             ticks: {
                 callback(value) {
-                    return ` ${Number(value).toFixed(0)} mA`;
+                    return `${Number(value).toFixed(0)} mA`;
                 },
                 maxTicksLimit: 5,
             },
-            suggestedMin: 0,
-            suggestedMax: 1,
+            suggestedMin: -800,
+            suggestedMax: 100,
         },
     },
 };
@@ -237,7 +238,7 @@ const optionsIBat: ChartOptions<'line'> = {
 const chartDataSoc: ChartData<'line'> = {
     datasets: [
         {
-            label: 'SOC',
+            label: 'Charge',
             data: [],
             borderColor: styles.green,
             backgroundColor: styles.green,
@@ -252,7 +253,7 @@ const chartDataSoc: ChartData<'line'> = {
 const chartDataVBat: ChartData<'line'> = {
     datasets: [
         {
-            label: 'Vbat',
+            label: 'Voltage',
             data: [],
             borderColor: styles.indigo,
             backgroundColor: styles.indigo,
@@ -267,7 +268,7 @@ const chartDataVBat: ChartData<'line'> = {
 const chartDataIBat: ChartData<'line'> = {
     datasets: [
         {
-            label: 'Ibat',
+            label: 'Current',
             data: [],
             borderColor: styles.amber,
             backgroundColor: styles.amber,
@@ -282,7 +283,7 @@ const chartDataIBat: ChartData<'line'> = {
 const chartDataTBat: ChartData<'line'> = {
     datasets: [
         {
-            label: 'Tbat',
+            label: 'Temperature',
             data: [],
             borderColor: styles.red,
             backgroundColor: styles.red,
@@ -478,6 +479,7 @@ export default ({ active }: PaneProps) => {
                     />
                 </div>
             </div>
+            <CustomLegend charts={chartMetaData.charts} />
             {chartMetaData.charts.map((_, index) => (
                 // eslint-disable-next-line react/jsx-key
                 <>
@@ -491,12 +493,12 @@ export default ({ active }: PaneProps) => {
                             ref={chartMetaData.refs[index]}
                         />
                     </div>
-                    <TimeSpanDeltaLine
-                        range={range}
-                        chartArea={chartMetaData.chartArea[index].value}
-                    />
                 </>
             ))}
+            <TimeSpanDeltaLine
+                range={range}
+                chartArea={chartMetaData.chartArea[0].value}
+            />
         </div>
     );
 };
