@@ -390,7 +390,7 @@ export default {
             const resolution = getResolution(options.resolution, state.data);
 
             const delta = Math.min(
-                Math.max(resolution - resolution * options.zoomFactor, 1000),
+                Math.max(resolution * options.zoomFactor - resolution, 1000),
                 60000 * 10
             ); // min zoom at 1 sec, max zoom 10 min per scroll
 
