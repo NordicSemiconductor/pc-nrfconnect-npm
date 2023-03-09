@@ -7,7 +7,7 @@
 import EventEmitter from 'events';
 
 import { ShellParser } from '../../../hooks/commandParser';
-import { parseToNumber } from './pmicHelpers';
+import { parseToNumber, toRegex } from './pmicHelpers';
 import {
     AdcSample,
     BatteryModel,
@@ -20,6 +20,7 @@ import {
     PmicChargingState,
     PmicState,
     PmicWarningDialog,
+    RebootMode,
 } from './types';
 
 export const baseNpmDevice: IBaseNpmDevice = (
@@ -42,6 +43,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
             rebooting = false;
         }, 1000);
 
+        eventEmitter.emit('onBeforeReboot', mode);
         shellParser.enqueueRequest(
             `kernel reboot ${mode}`,
             () => {
@@ -54,6 +56,12 @@ export const baseNpmDevice: IBaseNpmDevice = (
             }
         );
     };
+
+    shellParser?.registerCommandCallback(
+        toRegex('kernel reboot (cold|warm)'),
+        () => eventEmitter.emit('onReboot', true),
+        error => eventEmitter.emit('onReboot', false, error)
+    );
 
     return {
         kernelReset,
@@ -148,6 +156,20 @@ export const baseNpmDevice: IBaseNpmDevice = (
                     'onStoredBatteryModelUpdate',
                     handler
                 );
+            };
+        },
+
+        onBeforeReboot: (handler: (mode: RebootMode) => void) => {
+            eventEmitter.on('onBeforeReboot', handler);
+            return () => {
+                eventEmitter.removeListener('onBeforeReboot', handler);
+            };
+        },
+
+        onReboot: (handler: (success: boolean) => void) => {
+            eventEmitter.on('onReboot', handler);
+            return () => {
+                eventEmitter.removeListener('onReboot', handler);
             };
         },
 

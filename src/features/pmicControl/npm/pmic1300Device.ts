@@ -14,6 +14,7 @@ import {
     parseColonBasedAnswer,
     parseToBoolean,
     parseToNumber,
+    toRegex,
 } from './pmicHelpers';
 import {
     AdcSample,
@@ -34,21 +35,6 @@ import {
 
 const noop = () => {};
 const maxTimeStamp = 359999999; // 99hrs 59min 59sec 999ms
-
-const toRegex = (
-    command: string,
-    getSet?: boolean,
-    index?: number,
-    valueRegex = '[0-9]+'
-) => {
-    const indexRegex = index !== undefined ? ` ${index}` : '';
-    if (getSet)
-        command += ` (set${indexRegex} ${valueRegex}( [^\\s-]+)?|get${indexRegex})`;
-    else if (index !== undefined) command += indexRegex;
-
-    command = command.replaceAll(' ', '([^\\S\\r\\n])+');
-    return `${command}`;
-};
 
 const isSetCommand = (
     command: string,

@@ -23,7 +23,6 @@ import './index.scss';
 
 export default () => (
     <App
-        autoReconnectByDefault
         reportUsageData
         appReducer={appReducer}
         deviceSelect={<DeviceSelector />}

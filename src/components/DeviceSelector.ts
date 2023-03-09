@@ -29,7 +29,6 @@ import { TDispatch } from '../thunk';
 const deviceListing: DeviceTraits = {
     nordicUsb: true,
     serialPorts: true,
-    jlink: true,
 };
 
 /**

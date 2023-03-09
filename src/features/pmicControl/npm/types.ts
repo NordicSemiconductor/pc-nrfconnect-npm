@@ -11,6 +11,7 @@ import { RangeType } from '../../../utils/helpers';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
 
+export type RebootMode = 'cold' | 'warm';
 export type LdoMode = 'ldoSwitch' | 'LDO';
 export type BuckMode = 'vSet' | 'software';
 
@@ -88,7 +89,7 @@ export interface IBaseNpmDevice {
 }
 
 export type BaseNpmDevice = {
-    kernelReset: (mode: 'cold' | 'warm', callback?: () => void) => void;
+    kernelReset: (mode: RebootMode, callback?: () => void) => void;
     kernelUptime: (callback: (milliseconds: number) => void) => void;
     onPmicStateChange: (
         handler: (state: PmicState, error?: string) => void
@@ -104,6 +105,12 @@ export type BaseNpmDevice = {
     ) => () => void;
     onBuckUpdate: (
         handler: (payload: PartialUpdate<Buck>, error?: string) => void
+    ) => () => void;
+    onBeforeReboot: (
+        handler: (payload: RebootMode, error?: string) => void
+    ) => () => void;
+    onReboot: (
+        handler: (success: boolean, error?: string) => void
     ) => () => void;
 
     onFuelGaugeUpdate: (handler: (payload: boolean) => void) => () => void;

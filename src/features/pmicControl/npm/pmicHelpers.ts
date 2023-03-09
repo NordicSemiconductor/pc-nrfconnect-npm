@@ -59,3 +59,18 @@ export const parseBatteryModel = (message: string) => {
         characterizations,
     } as BatteryModel;
 };
+
+export const toRegex = (
+    command: string,
+    getSet?: boolean,
+    index?: number,
+    valueRegex = '[0-9]+'
+) => {
+    const indexRegex = index !== undefined ? ` ${index}` : '';
+    if (getSet)
+        command += ` (set${indexRegex} ${valueRegex}( [^\\s-]+)?|get${indexRegex})`;
+    else if (index !== undefined) command += indexRegex;
+
+    command = command.replaceAll(' ', '([^\\S\\r\\n])+');
+    return `${command}`;
+};
