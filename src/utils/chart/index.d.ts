@@ -41,6 +41,6 @@ declare module 'chart.js' {
         addData: (data: ScatterDataPoint[][]) => void;
         resetData: () => void;
         setLive: (live: boolean) => void;
-        pan: ({ xMin: number, xMax: number }) => void;
+        changeRange: ({ xMin: number, xMax: number }) => void;
     }
 }

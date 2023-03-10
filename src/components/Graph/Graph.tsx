@@ -37,7 +37,6 @@ import './graph.scss';
 import styles from './Graph.module.scss';
 
 const yAxisWidth = parseInt(styles.yAxisWidthPx, 10);
-console.log('yAxisWidth', yAxisWidth);
 
 const getTimeString = (milliseconds: number): string => {
     const ms = milliseconds % 1000;
@@ -326,11 +325,9 @@ export default ({ active }: PaneProps) => {
     );
 
     useEffect(() => {
-        if (npmDevice === undefined) {
-            chartMetaData.charts.forEach(chart => {
-                chart?.resetData();
-            });
-        }
+        chartMetaData.charts.forEach(chart => {
+            chart?.resetData();
+        });
     }, [chartMetaData.charts, npmDevice]);
 
     useEffect(() => {
@@ -373,11 +370,16 @@ export default ({ active }: PaneProps) => {
             const chartStates = chart ? getState(chart) : undefined;
 
             if (chart && chartStates) {
-                chartStates.options.onLiveChange = setLive;
+                chartStates.options.onLiveChange = live => {
+                    setLive(live);
+                    chartMetaData.charts.forEach(c => {
+                        if (c !== chart) c?.setLive(live);
+                    });
+                };
                 chartStates.options.onRangeChanged = r => {
                     setRange(r);
                     chartMetaData.charts.forEach(c => {
-                        if (c !== chart) c?.pan(r);
+                        if (c !== chart) c?.changeRange(r);
                     });
                 };
             }

@@ -262,6 +262,7 @@ export default {
             chartState.data.forEach(d => d.splice(0));
 
             chartState.options = { ...chartState.options, ...defaults };
+            chartState.options.onRangeChanged(chartState.options.currentRange);
 
             chart.update('none');
         };
@@ -294,10 +295,17 @@ export default {
                 }
             }
         };
-        chart.pan = range => {
+        chart.changeRange = range => {
             const chartState = getState(chart);
 
-            if (chartState.options.live) return;
+            if (chartState.options.live) {
+                const newResolution = range.xMax - range.xMin;
+                chartState.options.resolution = Math.max(
+                    newResolution,
+                    chartState.options.resolution
+                );
+                range = getRange(chartState.data, chartState.options);
+            }
 
             if (
                 chartState.options.currentRange.xMax === range.xMax &&
@@ -306,6 +314,7 @@ export default {
                 return;
 
             chartState.options.currentRange = { ...range };
+            chartState.options.resolution = range.xMax - range.xMin;
 
             (chart.scales.x.options as CartesianScaleOptions).min =
                 chartState.options.currentRange.xMin;
