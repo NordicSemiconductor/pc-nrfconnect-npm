@@ -6,6 +6,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+    ChartArea,
     ChartType,
     ChartTypeRegistry,
     Plugin,
@@ -20,6 +21,12 @@ declare module 'chart.js' {
             minResolution?: number;
             zoomFactor?: number;
             currentRange?: { xMin: number; xMax: number };
+        };
+    }
+
+    interface PluginOptionsByType<TType extends ChartType> {
+        canvasAreaNotifier?: {
+            onChartAreaChanged?: (chartArea: ChartArea) => void;
         };
     }
 

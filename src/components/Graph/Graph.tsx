@@ -11,7 +11,6 @@ import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
 import {
     CategoryScale,
-    Chart,
     Chart as ChartJS,
     ChartArea,
     ChartData,
@@ -28,6 +27,7 @@ import { Button, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
 import { AdcSample } from '../../features/pmicControl/npm/types';
 import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
+import canvasAreaNotifier from '../../utils/chart/canvasAreaNotifier';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
 import CustomLegend from '../../utils/chart/CustomLegend';
 import { getState } from '../../utils/chart/state';
@@ -35,6 +35,9 @@ import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 
 import './graph.scss';
 import styles from './Graph.module.scss';
+
+const yAxisWidth = parseInt(styles.yAxisWidthPx, 10);
+console.log('yAxisWidth', yAxisWidth);
 
 const getTimeString = (milliseconds: number): string => {
     const ms = milliseconds % 1000;
@@ -68,172 +71,9 @@ ChartJS.register(
     Tooltip,
     Legend,
     TimeScale,
-    zoomPanPlugin
+    zoomPanPlugin,
+    canvasAreaNotifier
 );
-
-const optionsSoc: ChartOptions<'line'> = {
-    parsing: false,
-    animation: false,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            display: false,
-        },
-        tooltip: {
-            callbacks: {
-                title: context =>
-                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
-            },
-        },
-    },
-    scales: {
-        x: {
-            type: 'time',
-            display: true,
-            ticks: {
-                autoSkip: false,
-                maxTicksLimit: 5,
-                display: false,
-            },
-        },
-        ySocBat: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            ticks: {
-                callback(value) {
-                    return `${value} %`;
-                },
-                maxTicksLimit: 5,
-            },
-            suggestedMin: 0,
-            suggestedMax: 100,
-        },
-    },
-};
-
-const optionsTBat: ChartOptions<'line'> = {
-    parsing: false,
-    animation: false,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            display: false,
-        },
-        tooltip: {
-            callbacks: {
-                title: context =>
-                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
-            },
-        },
-    },
-    scales: {
-        x: {
-            type: 'time',
-            display: true,
-            ticks: {
-                autoSkip: false,
-                maxTicksLimit: 5,
-                display: false,
-            },
-        },
-        yTbat: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            ticks: {
-                callback(value) {
-                    return `${value} °C`;
-                },
-                maxTicksLimit: 5,
-            },
-            suggestedMin: 0,
-            suggestedMax: 150,
-        },
-    },
-};
-
-const optionsVBat: ChartOptions<'line'> = {
-    parsing: false,
-    animation: false,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            display: false,
-        },
-        tooltip: {
-            callbacks: {
-                title: context =>
-                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
-            },
-        },
-    },
-    scales: {
-        x: {
-            type: 'time',
-            display: true,
-            ticks: {
-                autoSkip: false,
-                maxTicksLimit: 5,
-                display: false,
-            },
-        },
-        yVbat: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            ticks: {
-                callback(value) {
-                    return `${Number(value).toFixed(2)} V`;
-                },
-                maxTicksLimit: 5,
-            },
-            suggestedMin: 3,
-            suggestedMax: 5,
-        },
-    },
-};
-
-const optionsIBat: ChartOptions<'line'> = {
-    parsing: false,
-    animation: false,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: {
-            display: false,
-        },
-        tooltip: {
-            callbacks: {
-                title: context =>
-                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
-            },
-        },
-    },
-    scales: {
-        x: {
-            type: 'time',
-            display: true,
-            ticks: {
-                autoSkip: false,
-                maxTicksLimit: 5,
-                display: false,
-            },
-        },
-        yIbat: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            ticks: {
-                callback(value) {
-                    return `${Number(value).toFixed(0)} mA`;
-                },
-                maxTicksLimit: 5,
-            },
-            suggestedMin: -800,
-            suggestedMax: 100,
-        },
-    },
-};
 
 const chartDataSoc: ChartData<'line'> = {
     datasets: [
@@ -245,7 +85,7 @@ const chartDataSoc: ChartData<'line'> = {
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
-            yAxisID: 'ySocBat',
+            yAxisID: 'y',
         },
     ],
 };
@@ -260,7 +100,7 @@ const chartDataVBat: ChartData<'line'> = {
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
-            yAxisID: 'yVbat',
+            yAxisID: 'y',
         },
     ],
 };
@@ -275,7 +115,7 @@ const chartDataIBat: ChartData<'line'> = {
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
-            yAxisID: 'yIbat',
+            yAxisID: 'y',
         },
     ],
 };
@@ -290,9 +130,37 @@ const chartDataTBat: ChartData<'line'> = {
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
-            yAxisID: 'yTbat',
+            yAxisID: 'y',
         },
     ],
+};
+
+const commonOption: ChartOptions<'line'> = {
+    parsing: false,
+    animation: false,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            display: false,
+        },
+        tooltip: {
+            callbacks: {
+                title: context =>
+                    `Uptime: ${getTimeString(context[0]?.parsed.x)}`,
+            },
+        },
+    },
+    scales: {
+        x: {
+            type: 'linear',
+            display: true,
+            ticks: {
+                autoSkip: false,
+                maxTicksLimit: 5,
+                display: false,
+            },
+        },
+    },
 };
 
 export default ({ active }: PaneProps) => {
@@ -309,10 +177,133 @@ export default ({ active }: PaneProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const [isLive, setLive] = useState(true);
     const [range, setRange] = useState({ xMin: 0, xMax: 0 });
-    const [chartAreaVBat, setChartCanvasVBat] = useState<ChartArea>();
-    const [chartAreaIBat, setChartCanvasIBat] = useState<ChartArea>();
-    const [chartAreaTBat, setChartCanvasTBat] = useState<ChartArea>();
-    const [chartAreaSoc, setChartCanvasSoc] = useState<ChartArea>();
+    const [chartArea, setChartCanvas] = useState<ChartArea>();
+
+    const optionsSoc: ChartOptions<'line'> = useMemo(
+        () => ({
+            ...commonOption,
+            plugins: {
+                ...commonOption.plugins,
+                canvasAreaNotifier: {
+                    onChartAreaChanged: setChartCanvas,
+                },
+            },
+            scales: {
+                ...commonOption.scales,
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    ticks: {
+                        callback(value) {
+                            return `${value} %`;
+                        },
+                        maxTicksLimit: 5,
+                    },
+                    grid: {
+                        drawBorder: true,
+                        drawOnChartArea: true,
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 100,
+                    afterFit: scale => {
+                        scale.width = yAxisWidth;
+                    },
+                },
+            },
+        }),
+        []
+    );
+
+    const optionsTBat: ChartOptions<'line'> = useMemo(
+        () => ({
+            ...commonOption,
+            scales: {
+                ...commonOption.scales,
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    ticks: {
+                        callback(value) {
+                            return `${value} °C`;
+                        },
+                        maxTicksLimit: 5,
+                    },
+                    grid: {
+                        drawBorder: true,
+                        drawOnChartArea: true,
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 150,
+                    afterFit: scale => {
+                        scale.width = yAxisWidth;
+                    },
+                },
+            },
+        }),
+        []
+    );
+
+    const optionsVBat: ChartOptions<'line'> = useMemo(
+        () => ({
+            ...commonOption,
+            scales: {
+                ...commonOption.scales,
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    ticks: {
+                        callback(value) {
+                            return `${Number(value).toFixed(2)} V`;
+                        },
+                        maxTicksLimit: 5,
+                    },
+                    grid: {
+                        drawBorder: true,
+                        drawOnChartArea: true,
+                    },
+                    suggestedMin: 3,
+                    suggestedMax: 5,
+                    afterFit: scale => {
+                        scale.width = yAxisWidth;
+                    },
+                },
+            },
+        }),
+        []
+    );
+
+    const optionsIBat: ChartOptions<'line'> = useMemo(
+        () => ({
+            ...commonOption,
+            scales: {
+                ...commonOption.scales,
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    ticks: {
+                        callback(value) {
+                            return `${Number(value).toFixed(0)} mA`;
+                        },
+                        maxTicksLimit: 5,
+                    },
+                    grid: {
+                        drawBorder: true,
+                        drawOnChartArea: true,
+                    },
+                    suggestedMin: -800,
+                    suggestedMax: 100,
+                    afterFit: scale => {
+                        scale.width = yAxisWidth;
+                    },
+                },
+            },
+        }),
+        []
+    );
 
     const chartMetaData = useMemo(
         () => ({
@@ -321,32 +312,18 @@ export default ({ active }: PaneProps) => {
             data: [chartDataVBat, chartDataIBat, chartDataTBat, chartDataSoc],
             refs: [refVBat, refIBat, refTBat, refSoc],
             labels: ['Voltage', 'Current', 'Temperature', 'State of Charge'],
-            chartArea: [
-                { value: chartAreaVBat, setter: setChartCanvasVBat },
-                { value: chartAreaIBat, setter: setChartCanvasIBat },
-                { value: chartAreaTBat, setter: setChartCanvasTBat },
-                { value: chartAreaSoc, setter: setChartCanvasSoc },
-            ],
         }),
         [
-            chartAreaIBat,
-            chartAreaSoc,
-            chartAreaTBat,
-            chartAreaVBat,
             chartIBat,
             chartSoc,
             chartTBat,
             chartVBat,
+            optionsIBat,
+            optionsSoc,
+            optionsTBat,
+            optionsVBat,
         ]
     );
-
-    chartMetaData.options.forEach((option, index) => {
-        option.onResize = (c: Chart) => {
-            setTimeout(() =>
-                chartMetaData.chartArea[index].setter(c.chartArea)
-            );
-        };
-    });
 
     useEffect(() => {
         if (npmDevice === undefined) {
@@ -488,6 +465,7 @@ export default ({ active }: PaneProps) => {
                     </div>
                     <div className="graph-container">
                         <Line
+                            width={100 + 1}
                             options={chartMetaData.options[index]}
                             data={chartMetaData.data[index]}
                             ref={chartMetaData.refs[index]}
@@ -495,10 +473,7 @@ export default ({ active }: PaneProps) => {
                     </div>
                 </>
             ))}
-            <TimeSpanDeltaLine
-                range={range}
-                chartArea={chartMetaData.chartArea[0].value}
-            />
+            <TimeSpanDeltaLine range={range} chartArea={chartArea} />
         </div>
     );
 };
