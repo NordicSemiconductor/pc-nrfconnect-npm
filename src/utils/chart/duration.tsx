@@ -12,7 +12,7 @@ const format = (milliseconds: number): string | null => {
     const h = `${t.getUTCHours()}`;
     const d = Math.floor(milliseconds / 86400000);
 
-    return `${d > 0 ? `${d} day ${d > 1 ? 's' : ''} ` : ''}${h.padStart(
+    return `${d > 0 ? `${d} day${d > 1 ? 's ' : ' '} ` : ''}${h.padStart(
         2,
         '0'
     )}:${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
