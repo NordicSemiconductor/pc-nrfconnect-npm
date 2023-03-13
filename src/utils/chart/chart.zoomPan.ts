@@ -188,6 +188,29 @@ const getResolution = (resolution: number, data: ScatterDataPoint[][]) => {
     return resolution;
 };
 
+const updateData = (chart: Chart) => {
+    const state = getState(chart);
+
+    clearTimeout(state.updateDataTimeout);
+    state.updateDataTimeout = setTimeout(() => {
+        const chartState = getState(chart);
+        chartState.updateDataTimeout = undefined;
+        chartState.data.forEach((data: ScatterDataPoint[], index: number) => {
+            // Point the chart to the decimated data
+            chart.data.datasets[index].data = mutateData(
+                data,
+                chartState.options.currentRange
+            );
+        });
+
+        // Update data
+        chart.update('none');
+    });
+
+    // Update range
+    chart.update('none');
+};
+
 export default {
     id: 'pan',
     defaults: {
@@ -251,7 +274,7 @@ export default {
                 return;
             }
 
-            chart.update('none');
+            updateData(chart);
         };
         chart.resetData = () => {
             const chartState = getState(chart);
@@ -260,7 +283,7 @@ export default {
             chartState.options = { ...chartState.options, ...defaults };
             chartState.options.onRangeChanged(chartState.options.currentRange);
 
-            chart.update('none');
+            updateData(chart);
         };
         chart.setLive = live => {
             const chartState = getState(chart);
@@ -275,7 +298,7 @@ export default {
                 const nextRange = getRange(chartState.data, chartState.options);
 
                 if (updateRange(chart, nextRange)) {
-                    chart.update('none');
+                    updateData(chart);
                 }
             }
         };
@@ -287,7 +310,7 @@ export default {
             if (state.options.live) {
                 const nextRange = getRange(state.data, state.options);
                 if (updateRange(chart, nextRange)) {
-                    chart.update('none');
+                    updateData(chart);
                 }
             }
         };
@@ -317,7 +340,7 @@ export default {
             (chart.scales.x.options as CartesianScaleOptions).max =
                 chartState.options.currentRange.xMax;
 
-            chart.update('none');
+            updateData(chart);
         };
     },
     afterInit(chart) {
@@ -348,9 +371,9 @@ export default {
             const state = getState(chart);
             const options = state.options;
 
-            const currentNewX = event.offsetX - chart.chartArea.left;
+            newX = event.offsetX - chart.chartArea.left;
 
-            const scaleDiff = lastX - currentNewX;
+            const scaleDiff = lastX - newX;
 
             if (Math.abs(scaleDiff) < 1) return;
 
@@ -370,7 +393,7 @@ export default {
                 return;
             }
 
-            chart.update('none');
+            updateData(chart);
         });
 
         canvas.addEventListener('wheel', (event: WheelEvent) => {
@@ -413,17 +436,6 @@ export default {
                 (event.offsetX - chart.chartArea.left) / chart.chartArea.width;
 
             chart.zoom(newResolution, offset, true);
-        });
-    },
-    beforeElementsUpdate(chart) {
-        const chartState = getState(chart);
-
-        chartState.data.forEach((data: ScatterDataPoint[], index: number) => {
-            // Point the chart to the decimated data
-            chart.data.datasets[index].data = mutateData(
-                data,
-                chartState.options.currentRange
-            );
         });
     },
     stop(chart) {

@@ -28,6 +28,7 @@ export interface PanPluginOptions {
 interface ChartState {
     options: InternalPanPluginOptions;
     data: ScatterDataPoint[][];
+    updateDataTimeout?: NodeJS.Timeout;
 }
 
 export const defaults = {
