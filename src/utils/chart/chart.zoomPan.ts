@@ -57,7 +57,6 @@ const getX = (
     return selection.shift() || 0;
 };
 
-// Calulate Min from Data Backup
 const getMinX = (data: ScatterDataPoint[][]) =>
     getX(data, (d: ScatterDataPoint[]) => {
         if (d.length > 0) {
@@ -67,7 +66,6 @@ const getMinX = (data: ScatterDataPoint[][]) =>
         return 0;
     });
 
-// Calulate Max from Data Backup
 const getMaxX = (data: ScatterDataPoint[][]) =>
     getX(data, (d: ScatterDataPoint[]) => {
         if (d.length > 0) {
@@ -77,7 +75,6 @@ const getMaxX = (data: ScatterDataPoint[][]) =>
         return 0;
     });
 
-// Calulate Range from Data Backup
 const getRange = (
     data: ScatterDataPoint[][],
     options: InternalPanPluginOptions,
@@ -100,7 +97,6 @@ const getRange = (
     return { xMin, xMax };
 };
 
-// Calulate if range is valid from when checked against the data backup
 const isRangeValid = (data: ScatterDataPoint[][], rangeToCheck: XAxisRange) => {
     const xMax = getMaxX(data);
     const xMin = getMinX(data);
@@ -114,7 +110,7 @@ const isRangeValid = (data: ScatterDataPoint[][], rangeToCheck: XAxisRange) => {
     };
 };
 
-// We expact the raw data to be the in the dataset.data at this call
+// We expect the raw data to be the in the dataset.data at this call
 const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
     let startIndex =
         data.findIndex((element: ScatterDataPoint) => element.x > range.xMin) -
@@ -220,7 +216,7 @@ export default {
 
             const fullResolution = xMax - xMin;
 
-            const visableDataResolution =
+            const visibleDataResolution =
                 state.options.currentRange.xMax -
                 state.options.currentRange.xMin;
 
@@ -235,16 +231,16 @@ export default {
             }
 
             if (
-                fullResolution === visableDataResolution &&
-                visableDataResolution === resolution
+                fullResolution === visibleDataResolution &&
+                visibleDataResolution === resolution
             ) {
                 return;
             }
 
-            const resolutonDelta = resolution - visableDataResolution;
+            const resolutionDelta = resolution - visibleDataResolution;
 
-            const deltaMin = resolutonDelta * offset;
-            const deltaMax = resolutonDelta - deltaMin;
+            const deltaMin = resolutionDelta * offset;
+            const deltaMax = resolutionDelta - deltaMin;
 
             const nextRange = {
                 xMin: state.options.currentRange.xMin - deltaMin,
@@ -330,9 +326,9 @@ export default {
 
         let lastX = 0;
         let newX = 0;
-        let paning = false;
+        let panning = false;
 
-        // Running avarage to smoth Scroll
+        // Running average to smooth Scroll
         const alpha = 1;
 
         canvas.addEventListener('pointerdown', (event: PointerEvent) => {
@@ -341,15 +337,15 @@ export default {
             lastX = event.offsetX - chart.chartArea.left;
             newX = lastX;
 
-            paning = true;
+            panning = true;
         });
 
         window.addEventListener('pointerup', () => {
-            paning = false;
+            panning = false;
         });
 
         canvas.addEventListener('pointermove', (event: PointerEvent) => {
-            if (!paning) return;
+            if (!panning) return;
             if (!isInChartArea(chart, event.offsetX, event.offsetY)) return;
 
             const state = getState(chart);
@@ -357,7 +353,7 @@ export default {
 
             const currentNewX = event.offsetX - chart.chartArea.left;
 
-            // Running avarage to smoth scrolls
+            // Running average to smooth scrolls
             newX = alpha * currentNewX + (1.0 - alpha) * newX;
 
             const scaleDiff = lastX - newX;
