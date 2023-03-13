@@ -328,9 +328,6 @@ export default {
         let newX = 0;
         let panning = false;
 
-        // Running average to smooth Scroll
-        const alpha = 1;
-
         canvas.addEventListener('pointerdown', (event: PointerEvent) => {
             if (!isInChartArea(chart, event.offsetX, event.offsetY)) return;
 
@@ -353,10 +350,7 @@ export default {
 
             const currentNewX = event.offsetX - chart.chartArea.left;
 
-            // Running average to smooth scrolls
-            newX = alpha * currentNewX + (1.0 - alpha) * newX;
-
-            const scaleDiff = lastX - newX;
+            const scaleDiff = lastX - currentNewX;
 
             if (Math.abs(scaleDiff) < 1) return;
 
