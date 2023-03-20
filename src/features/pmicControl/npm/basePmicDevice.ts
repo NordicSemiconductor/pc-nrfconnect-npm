@@ -173,6 +173,13 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
+        onUsbPowered: (handler: (success: boolean) => void) => {
+            eventEmitter.on('onUsbPowered', handler);
+            return () => {
+                eventEmitter.removeListener('onUsbPowered', handler);
+            };
+        },
+
         getNumberOfChargers: () => devices.noOfChargers ?? 0,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,

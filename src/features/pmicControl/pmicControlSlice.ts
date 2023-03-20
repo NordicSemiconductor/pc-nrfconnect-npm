@@ -37,6 +37,7 @@ interface pmicControlState {
     activeBatterModel?: BatteryModel;
     defaultBatterModels: BatteryModel[];
     storedBatterModel?: BatteryModel;
+    usbPowered: boolean;
 }
 
 const initialState: pmicControlState = {
@@ -52,12 +53,13 @@ const initialState: pmicControlState = {
         dieTempHigh: false,
         supplementModeActive: false,
     },
-    pmicState: 'offline',
+    pmicState: 'ek-disconnected',
     batteryConnected: false,
     fuelGauge: false,
     defaultBatterModels: [],
     warningDialog: [],
     eventRecording: false,
+    usbPowered: false,
 };
 
 const pmicControlSlice = createSlice({
@@ -148,6 +150,9 @@ const pmicControlSlice = createSlice({
         ) {
             state.eventRecordingPath = action.payload;
         },
+        setUsbPowered(state, action: PayloadAction<boolean>) {
+            state.usbPowered = action.payload;
+        },
     },
 });
 
@@ -155,7 +160,7 @@ const parseConnectedState = <T>(
     state: PmicState,
     connectedValue: T,
     fallback: T
-) => (state === 'connected' ? connectedValue : fallback);
+) => (state === 'pmic-connected' ? connectedValue : fallback);
 
 export const getNpmDevice = (state: RootState) =>
     state.app.pmicControl.npmDevice;
@@ -196,8 +201,10 @@ export const getDefaultBatterModels = (state: RootState) =>
     state.app.pmicControl.defaultBatterModels;
 export const getStoredBatterModel = (state: RootState) =>
     state.app.pmicControl.storedBatterModel;
+export const isUsbPowered = (state: RootState) =>
+    state.app.pmicControl.usbPowered;
 export const isSupportedVersion = (state: RootState) =>
-    state.app.pmicControl.pmicState !== 'offline'
+    state.app.pmicControl.pmicState !== 'ek-disconnected'
         ? state.app.pmicControl.supportedVersion
         : initialState.supportedVersion;
 export const getWarningDialog = (state: RootState) =>
@@ -231,5 +238,6 @@ export const {
     requestWarningDialog,
     dequeueWarningDialog,
     setEventRecordingPath,
+    setUsbPowered,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;

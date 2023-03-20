@@ -8,6 +8,7 @@ import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, existsSync } from 'fs';
 import {
+    clearWaitForDevice,
     getPersistentStore,
     logger,
     setWaitForDevice,
@@ -36,6 +37,7 @@ import {
     setPmicState,
     setStoredBatterModel,
     setSupportedVersion,
+    setUsbPowered,
     updateBuck,
     updateCharger,
     updateLdo,
@@ -56,6 +58,7 @@ export default (shellParser: ShellParser | undefined) => {
 
         npmDevice.startAdcSample(2000);
         npmDevice.startBatteryStatusCheck();
+        npmDevice.requestUpdate.usbPowered();
 
         for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
             npmDevice.requestUpdate.chargerVTerm(i);
@@ -175,7 +178,7 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        if (pmicState === 'connected' && supportedVersion) {
+        if (pmicState === 'pmic-connected' && supportedVersion) {
             initDevice();
         }
     }, [initDevice, pmicState, supportedVersion]);
@@ -228,6 +231,10 @@ export default (shellParser: ShellParser | undefined) => {
                     dispatch(setStoredBatterModel(payload));
                 });
 
+            const releaseOnUsbPowered = npmDevice.onUsbPowered(payload => {
+                dispatch(setUsbPowered(payload));
+            });
+
             const releaseOnBeforeReboot = npmDevice.onBeforeReboot(() => {
                 dispatch(
                     setWaitForDevice({
@@ -244,7 +251,7 @@ export default (shellParser: ShellParser | undefined) => {
 
             const releaseOnReboot = npmDevice.onReboot(success => {
                 if (!success) {
-                    dispatch(setWaitForDevice(undefined));
+                    dispatch(clearWaitForDevice());
                 } else {
                     dispatch(
                         setWaitForDevice({
@@ -276,6 +283,7 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnStoredBatteryModelUpdate();
                 releaseOnBeforeReboot();
                 releaseOnReboot();
+                releaseOnUsbPowered();
             };
         }
     }, [dispatch, initComponents, npmDevice]);

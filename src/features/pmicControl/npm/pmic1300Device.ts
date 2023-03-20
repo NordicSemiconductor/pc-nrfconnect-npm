@@ -99,17 +99,17 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     let deviceUptimeToSystemDelta = 0;
 
     // can only change from:
-    //  - 'disconnected' --> 'connected' --> 'disconnected'
-    //  - 'offline'
-    let pmicState: PmicState = shellParser ? 'disconnected' : 'offline';
+    //  - 'pmic-unknown' --> 'pmic-connected' --> 'pmic-disconnected'
+    //  - 'ek-disconnected'
+    let pmicState: PmicState = shellParser ? 'pmic-unknown' : 'ek-disconnected';
 
     let pmicStateUnknownTimeout: NodeJS.Timeout | undefined;
 
     const initConnectionTimeout = () => {
         clearConnectionTimeout();
-        if (pmicState === 'offline') return;
+        if (pmicState === 'ek-disconnected') return;
         pmicStateUnknownTimeout = setTimeout(() => {
-            pmicState = 'connected';
+            pmicState = 'pmic-connected';
             eventEmitter.emit('onPmicStateChange', pmicState);
         }, 2000);
     };
@@ -132,8 +132,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         switch (message) {
             case 'No response from PMIC.':
                 clearConnectionTimeout();
-                if (pmicState !== 'disconnected') {
-                    pmicState = 'disconnected';
+                if (pmicState !== 'pmic-disconnected') {
+                    pmicState = 'pmic-disconnected';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 }
                 break;
@@ -216,7 +216,24 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const doActionOnEvent = (irqEvent: IrqEvent) => {
-        console.log(irqEvent);
+        switch (irqEvent.type) {
+            case 'EVENTSVBUSIN0SET':
+                processEventVBus0Set(irqEvent);
+                break;
+            default:
+                console.log(irqEvent);
+        }
+    };
+
+    const processEventVBus0Set = (irqEvent: IrqEvent) => {
+        switch (irqEvent.event) {
+            case 'EVENTVBUSREMOVED':
+                eventEmitter.emit('onUsbPowered', false);
+                break;
+            case 'EVENTVBUSDETECTED':
+                eventEmitter.emit('onUsbPowered', true);
+                break;
+        }
     };
 
     const startAdcSample = (samplingRate: number) => {
@@ -370,6 +387,14 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         noop
     );
 
+    shellParser?.registerCommandCallback(
+        toRegex('npmx vbusin vbus status get'),
+        res => {
+            eventEmitter.emit('onUsbPowered', parseToBoolean(res));
+        },
+        noop
+    );
+
     for (let i = 0; i < devices.noOfBucks; i += 1) {
         shellParser?.registerCommandCallback(
             toRegex('npmx buck voltage', true, i),
@@ -431,7 +456,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         onSuccess: (response: string, command: string) => void = noop,
         onFail: (response: string, command: string) => void = noop
     ) => {
-        if (pmicState !== 'offline') {
+        if (pmicState !== 'ek-disconnected') {
             const wrapper = (result: string, action: () => void) => {
                 const event: LoggingEvent = {
                     timestamp: Date.now() - deviceUptimeToSystemDelta,
@@ -499,7 +524,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             }
         );
 
-        if (pmicState === 'offline')
+        if (pmicState === 'ek-disconnected')
             emitPartialEvent<Charger>('onChargerUpdate', index, {
                 enabled,
             });
@@ -517,7 +542,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 }
             );
 
-            if (pmicState === 'offline')
+            if (pmicState === 'ek-disconnected')
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     vOut: value,
                 });
@@ -530,7 +555,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 }
             );
 
-            if (pmicState === 'offline')
+            if (pmicState === 'ek-disconnected')
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     mode: 'software',
                 });
@@ -571,7 +596,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 }
             );
 
-            if (pmicState === 'offline')
+            if (pmicState === 'ek-disconnected')
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     mode,
                 });
@@ -610,7 +635,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 }
             );
 
-            if (pmicState === 'offline')
+            if (pmicState === 'ek-disconnected')
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     enabled,
                 });
@@ -649,7 +674,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             }
         );
 
-        if (pmicState === 'offline')
+        if (pmicState === 'ek-disconnected')
             emitPartialEvent<Ldo>('onLdoUpdate', index, {
                 enabled,
             });
@@ -667,7 +692,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             }
         );
 
-        if (pmicState === 'offline') eventEmitter.emit('onFuelGauge', enabled);
+        if (pmicState === 'ek-disconnected')
+            eventEmitter.emit('onFuelGauge', enabled);
     };
 
     const setActiveBatteryModel = (name: string) => {
@@ -711,6 +737,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
         storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
+
+        usbPowered: () => sendCommand(`npmx vbusin vbus status get`),
     };
 
     const storeBattery = () => {

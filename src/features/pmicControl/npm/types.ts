@@ -58,10 +58,15 @@ export type BatteryModel = {
     characterizations: BatteryModelCharacterization[];
 };
 
-// 'connected' -> Shell ok - PMIC Online
-// 'disconnected' -> Shell ok - PMIC disconnected
-// 'offline' -> Shell off - PMIC disconnected
-export type PmicState = 'offline' | 'connected' | 'disconnected';
+// 'pmic-connected' -> Shell ok - PMIC Online
+// 'pmic-disconnected' -> Shell ok - PMIC disconnected
+// 'pmic-unknown' -> Shell ok - PMIC unknown
+// 'ek-disconnected' -> Shell off - PMIC disconnected
+export type PmicState =
+    | 'ek-disconnected'
+    | 'pmic-connected'
+    | 'pmic-disconnected'
+    | 'pmic-unknown';
 
 export type PmicChargingState = {
     toBeDefinedBetter?: boolean; // Documentation is wrong for this and should not be used to detected if battery is connected or not
@@ -110,6 +115,10 @@ export type BaseNpmDevice = {
         handler: (payload: RebootMode, error?: string) => void
     ) => () => void;
     onReboot: (
+        handler: (success: boolean, error?: string) => void
+    ) => () => void;
+
+    onUsbPowered: (
         handler: (success: boolean, error?: string) => void
     ) => () => void;
 
@@ -178,6 +187,8 @@ export type NpmDevice = {
 
         activeBatteryModel: () => void;
         storedBatteryModel: () => void;
+
+        usbPowered: () => void;
     };
 
     setChargerVTerm: (index: number, value: number) => void;

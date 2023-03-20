@@ -44,7 +44,7 @@ import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
 } from '../../hooks/commandParser';
-import SerialSettings from './SerialSettings';
+import ConnectionStatus from './ConnectionStatus';
 
 export default () => {
     const noop = () => {};
@@ -171,7 +171,6 @@ export default () => {
 
     return (
         <SidePanel className="side-panel">
-            <SerialSettings />
             <CollapsibleGroup defaultCollapsed={false} heading="Settings">
                 <Button
                     variant="secondary"
@@ -182,7 +181,7 @@ export default () => {
                 </Button>
                 <Button
                     variant="secondary"
-                    disabled={pmicConnection !== 'connected'}
+                    disabled={pmicConnection !== 'pmic-connected'}
                     className="w-100"
                     onClick={() => dispatch(openFileDialog())}
                 >
@@ -190,7 +189,7 @@ export default () => {
                 </Button>
                 <Button
                     variant="secondary"
-                    disabled={pmicConnection === 'offline'}
+                    disabled={pmicConnection === 'ek-disconnected'}
                     className="w-100"
                     onClick={() => npmDevice?.kernelReset('cold')}
                 >
@@ -252,6 +251,7 @@ export default () => {
                     Upload profile
                 </Button>
             </CollapsibleGroup>
+            <ConnectionStatus />
 
             <ConfirmationDialog
                 title={title}
