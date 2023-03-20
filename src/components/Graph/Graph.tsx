@@ -408,48 +408,62 @@ export default ({ active }: PaneProps) => {
         });
     };
 
+    const resolution = range.xMax - range.xMin;
+
     return (
         <div className="graph-outer">
             <div className="graph-top-bar-wrapper">
                 <div />
                 <div className="range-buttons">
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 300000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(300000)}
                     >
                         5min
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 1800000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(1800000)}
                     >
                         30min
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 3600000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(3600000)}
                     >
                         1hr
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 21600000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(21600000)}
                     >
                         6hr
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 86400000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(86400000)}
                     >
                         1 Day
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 604800000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(604800000)}
                     >
