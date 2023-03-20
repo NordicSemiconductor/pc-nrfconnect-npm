@@ -7,8 +7,13 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, existsSync } from 'fs';
-import { getPersistentStore, logger } from 'pc-nrfconnect-shared';
+import {
+    getPersistentStore,
+    logger,
+    setWaitForDevice,
+} from 'pc-nrfconnect-shared';
 
+import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { ShellParser } from '../../../hooks/commandParser';
 import {
     dequeueWarningDialog,
@@ -223,6 +228,38 @@ export default (shellParser: ShellParser | undefined) => {
                     dispatch(setStoredBatterModel(payload));
                 });
 
+            const releaseOnBeforeReboot = npmDevice.onBeforeReboot(() => {
+                dispatch(
+                    setWaitForDevice({
+                        when: 'applicationMode',
+                        once: true,
+                        timeout: 3000,
+                        onSuccess: device => {
+                            dispatch(closeDevice());
+                            dispatch(openDevice(device));
+                        },
+                    })
+                );
+            });
+
+            const releaseOnReboot = npmDevice.onReboot(success => {
+                if (!success) {
+                    dispatch(setWaitForDevice(undefined));
+                } else {
+                    dispatch(
+                        setWaitForDevice({
+                            when: 'applicationMode',
+                            once: true,
+                            timeout: 3000,
+                            onSuccess: device => {
+                                dispatch(closeDevice());
+                                dispatch(openDevice(device));
+                            },
+                        })
+                    );
+                }
+            });
+
             dispatch(setPmicState(npmDevice.getConnectionState()));
 
             initComponents();
@@ -237,6 +274,8 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnFuelGaugeUpdate();
                 releaseOnActiveBatteryModelUpdate();
                 releaseOnStoredBatteryModelUpdate();
+                releaseOnBeforeReboot();
+                releaseOnReboot();
             };
         }
     }, [dispatch, initComponents, npmDevice]);

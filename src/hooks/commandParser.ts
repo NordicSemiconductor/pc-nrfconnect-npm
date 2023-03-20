@@ -222,8 +222,22 @@ export const hookModemToShellParser = async (
             commandBuffer,
             settings.shellPromptUart
         );
+
         xTerminalShellParser.clear();
     };
+
+    const unregisterOnClosed = serialPort.onClosed(() => {
+        loadToBuffer(false);
+
+        commandBuffer += settings.shellPromptUart;
+
+        commandBuffer = parseShellCommands(
+            commandBuffer,
+            settings.shellPromptUart
+        );
+
+        xTerminalShellParser.clear();
+    });
 
     // Hook to listen to all modem data
     const unregisterOnResponse = serialPort.onData(data => {
@@ -340,6 +354,7 @@ export const hookModemToShellParser = async (
         unregister: () => {
             unregisterOnResponse();
             unregisterOnDataWritten();
+            unregisterOnClosed();
             reset();
         },
         isPaused: () => pausedState,
