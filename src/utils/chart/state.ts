@@ -28,6 +28,7 @@ export interface PanPluginOptions {
 interface ChartState {
     options: InternalPanPluginOptions;
     data: ScatterDataPoint[][];
+    updateDataTimeout?: NodeJS.Timeout;
 }
 
 export const defaults = {
@@ -36,7 +37,7 @@ export const defaults = {
     minResolution: 1000,
     maxResolution: 604800000,
     zoomFactor: 1.1,
-    currentRange: { xMin: 0, xMax: 300000 },
+    currentRange: { xMin: 0, xMax: 0 },
 };
 
 const chartStates = new WeakMap<Chart, ChartState>();

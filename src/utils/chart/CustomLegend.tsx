@@ -10,77 +10,93 @@ import type { Chart } from 'chart.js';
 import './customLegend.scss';
 
 interface CustomLegendProps {
-    chart: Chart | undefined;
+    charts: (Chart | undefined)[];
 }
 
-const CustomLegend: FC<CustomLegendProps> = ({ chart }) => {
-    const [lagendsState, setLagendsState] = useState<boolean[]>([]);
+const CustomLegend: FC<CustomLegendProps> = ({ charts }) => {
+    const [legendsState, setLegendsState] = useState<boolean[]>([]);
 
-    useEffect(() => {
-        chart?.data.datasets.forEach((dataset, index) => {
-            const newState = [...lagendsState];
-            if (newState[index] !== chart.isDatasetVisible(index)) {
-                newState[index] = chart.isDatasetVisible(index);
-                setLagendsState(newState);
-            }
-        });
-    }, [chart, lagendsState]);
+    const updateLegendsState = useCallback(() => {
+        setLegendsState(
+            charts
+                ?.map(
+                    chart =>
+                        chart?.data.datasets.map((_, index) =>
+                            chart.isDatasetVisible(index)
+                        ) ?? false
+                )
+                .flat()
+        );
+    }, [charts]);
 
-    const toggelState = useCallback(
-        (index: number) => {
-            if (!chart) return;
-
-            const newState = [...lagendsState];
-            newState[index] = !chart.isDatasetVisible(index);
-            setLagendsState(newState);
-            chart.setDatasetVisibility(index, newState[index]);
+    const toggleState = useCallback(
+        (chart: Chart, index: number) => {
+            if (chart.data.datasets.length === 1) return;
+            chart.setDatasetVisibility(index, !chart.isDatasetVisible(index));
             chart.update();
+            updateLegendsState();
         },
-        [chart, lagendsState]
+        [updateLegendsState]
     );
 
+    useEffect(() => {
+        updateLegendsState();
+    }, [charts, updateLegendsState]);
+
+    // todo allowExpressionValues: true, for role
+    // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/93f78856655696a55309440593e0948c6fb96134/docs/rules/no-static-element-interactions.md
     const items = useMemo(
         () => (
             <div className="custom-legend-wrapper">
-                {chart &&
-                    chart.data.datasets.map((dataset, index) => (
-                        <div className="custom-legend" key={dataset.label}>
-                            <span
-                                className={`title ${
-                                    lagendsState[index] ? 'active' : 'inactive'
-                                }`}
-                                tabIndex={index}
-                                role="button"
-                                onClick={() => {
-                                    toggelState(index);
-                                }}
-                                onKeyDown={keyEvent => {
-                                    if (keyEvent.key !== 'Space') return;
+                {charts &&
+                    charts
+                        .map(chart =>
+                            chart?.data.datasets.map((dataset, index) => (
+                                <div
+                                    className="custom-legend"
+                                    key={dataset.label}
+                                >
+                                    <span
+                                        className={`title ${
+                                            legendsState[index]
+                                                ? 'active'
+                                                : 'inactive'
+                                        }`}
+                                        tabIndex={index}
+                                        role="button"
+                                        onClick={() => {
+                                            toggleState(chart, index);
+                                        }}
+                                        onKeyDown={keyEvent => {
+                                            if (keyEvent.key !== 'Space')
+                                                return;
 
-                                    toggelState(index);
-                                }}
-                                data-dataset-index={index}
-                                style={{
-                                    borderColor:
-                                        dataset.borderColor?.toString(),
-                                }}
-                            >
-                                {dataset.label ?? ''}
-                            </span>
-                            <span
-                                className="line"
-                                style={{
-                                    backgroundColor:
-                                        dataset.backgroundColor?.toString(),
-                                    borderColor:
-                                        dataset.borderColor?.toString(),
-                                }}
-                            />
-                        </div>
-                    ))}
+                                            toggleState(chart, index);
+                                        }}
+                                        data-dataset-index={index}
+                                        style={{
+                                            borderColor:
+                                                dataset.borderColor?.toString(),
+                                        }}
+                                    >
+                                        {dataset.label ?? ''}
+                                    </span>
+                                    <span
+                                        className="line"
+                                        style={{
+                                            backgroundColor:
+                                                dataset.backgroundColor?.toString(),
+                                            borderColor:
+                                                dataset.borderColor?.toString(),
+                                        }}
+                                    />
+                                </div>
+                            ))
+                        )
+                        .flat()}
             </div>
         ),
-        [chart, lagendsState, toggelState]
+        [charts, legendsState, toggleState]
     );
 
     return items;

@@ -6,6 +6,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+    ChartArea,
     ChartType,
     ChartTypeRegistry,
     Plugin,
@@ -23,6 +24,12 @@ declare module 'chart.js' {
         };
     }
 
+    interface PluginOptionsByType<TType extends ChartType> {
+        canvasAreaNotifier?: {
+            onChartAreaChanged?: (chartArea: ChartArea) => void;
+        };
+    }
+
     interface Chart<
         TType extends keyof ChartTypeRegistry = keyof ChartTypeRegistry
     > {
@@ -34,5 +41,6 @@ declare module 'chart.js' {
         addData: (data: ScatterDataPoint[][]) => void;
         resetData: () => void;
         setLive: (live: boolean) => void;
+        changeRange: ({ xMin: number, xMax: number }) => void;
     }
 }
