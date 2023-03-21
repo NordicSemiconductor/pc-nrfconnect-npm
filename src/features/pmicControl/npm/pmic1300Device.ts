@@ -662,7 +662,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const setLdoVoltage = (index: number, value: number) =>
         console.warn('Not implemented');
     const setLdoEnabled = (index: number, enabled: boolean) => {
@@ -679,7 +678,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 enabled,
             });
     };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const setLdoMode = (index: number, mode: LdoMode) =>
         console.warn('Not implemented');
 
@@ -722,13 +720,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             sendCommand(`npmx buck voltage get ${index}`),
         buckMode: (index: number) =>
             sendCommand(`npmx buck vout select get ${index}`),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckEnabled: (_index: number) => console.warn('Not implemented'),
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ldoVoltage: (_index: number) => console.warn('Not implemented'),
         ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ldoMode: (_index: number) => console.warn('Not implemented'),
 
         fuelGauge: () => {
