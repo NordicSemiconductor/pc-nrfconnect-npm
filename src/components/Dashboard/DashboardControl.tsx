@@ -51,7 +51,6 @@ export default ({ active }: PaneProps) => {
                     This is an unsupported, experimental preview and it is
                     subject to major redesigns in the future.
                 </Alert>
-                ``
                 <div className="pmicControl-cards">
                     <DashboardControlCard disabled={disabled} />
                 </div>
