@@ -265,6 +265,40 @@ export default () => {
             >
                 {message}
             </ConfirmationDialog>
+            <CollapsibleGroup
+                defaultCollapsed={false}
+                heading="Fuel Gauge Profiles"
+            >
+                <Dropdown
+                    label="Active profile"
+                    items={batteryModelItems}
+                    onSelect={(item: DropdownItem) => {
+                        npmDevice?.setActiveBatteryModel(item.value);
+                    }}
+                    selectedItem={selectedActiveItemBatteryMode}
+                    disabled={selectedActiveItemBatteryMode.value === ''}
+                />
+                <Dropdown
+                    label="Default profile"
+                    items={batteryModelItems}
+                    onSelect={(item: DropdownItem) => {
+                        if (item.value) {
+                            npmDevice?.setActiveBatteryModel(item.value);
+                            npmDevice?.storeBattery();
+                        }
+                    }}
+                    selectedItem={selectedDefaultItemBatteryMode}
+                    disabled={batteryModelItems.length === 0}
+                />
+                <Button
+                    variant="secondary"
+                    className="w-100"
+                    onClick={() => {}}
+                    disabled
+                >
+                    Upload profile
+                </Button>
+            </CollapsibleGroup>
         </SidePanel>
     );
 };

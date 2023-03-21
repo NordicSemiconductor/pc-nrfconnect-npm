@@ -79,9 +79,9 @@ export default ({
                     ldo.mode === 'ldoSwitch' ? modeItems[0] : modeItems[1]
                 }
             />
-            <div className="slider-container">
+            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <div className="disabled">
+                    <div>
                         <span>V</span>
                         <span className="subscript">LDO</span>
                     </div>
@@ -95,7 +95,7 @@ export default ({
                                 onVoltageChange(internalVLdo)
                             }
                         />
-                        <span className="disabled">V</span>
+                        <span>V</span>
                     </div>
                 </FormLabel>
                 <Slider

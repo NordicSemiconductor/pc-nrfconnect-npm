@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
     ChartArea,
     ChartType,

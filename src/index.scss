@@ -40,7 +40,13 @@ label {
 
 .card {
     .form-label {
-        height: 24px;
+        font-size: 14px;
+    }
+
+    .slider-container {
+        .form-label {
+            height: 24px;
+        }
     }
 }
 

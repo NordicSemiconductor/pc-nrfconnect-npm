@@ -52,6 +52,7 @@ export default () => {
                     id: '2',
                     caption: 'unpause',
                     action: () => shellParser?.unPause(),
+                    tooltip: 'as',
                 },
             ];
 

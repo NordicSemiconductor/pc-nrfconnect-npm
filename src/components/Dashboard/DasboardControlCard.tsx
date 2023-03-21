@@ -50,6 +50,7 @@ export default ({ disabled }: DashboardControlCardProps) => {
                     key={`Buck${1 + index}`}
                     index={index}
                     disabled={disabled}
+                    summary
                 />
             ))}
             {ldos.map((ldo, index) => (

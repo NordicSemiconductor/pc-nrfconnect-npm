@@ -20,7 +20,6 @@ import {
 
 jest.mock('pc-nrfconnect-shared');
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let onResponseCallback = (data: Uint8Array) => {};
 
 const setupMocks = () => {
@@ -29,22 +28,18 @@ const setupMocks = () => {
         return () => {};
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const mockOnClose = jest.fn((_handler: () => void) => () => {});
 
     const mockOnUpdate = jest.fn(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_handler: (newOptions: UpdateOptions) => void) => () => {}
     );
 
     const mockOnSet = jest.fn(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_handler: (newOptions: SetOptions) => void) => () => {}
     );
 
     const mockOnChange = jest.fn(
         (
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _handler: (
                     newOptions: SerialPortOpenOptions<AutoDetectTypes>
                 ) => void
@@ -53,7 +48,6 @@ const setupMocks = () => {
     );
 
     const mockOnDataWritten = jest.fn(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_handler: (data: Buffer) => void) => () => {}
     );
 
@@ -162,7 +156,6 @@ describe('shell command parser', () => {
                 resolve(true);
             })
         );
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onResponseCallback = (data: Uint8Array) => {};
     });
 

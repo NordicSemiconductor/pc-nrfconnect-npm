@@ -145,6 +145,7 @@ export type BaseNpmDevice = {
     getNumberOfChargers: () => number;
     getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
+    getNumberOfGPIOs: () => number;
 
     isSupportedVersion: () => Promise<boolean>;
     getSupportedVersion: () => string;
@@ -167,6 +168,7 @@ export type NpmDevice = {
     getChargerCurrentRange: (index: number) => RangeType;
     getChargerVoltageRange: (index: number) => number[];
     getBuckVoltageRange: (index: number) => RangeType;
+    getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
 
     requestUpdate: {

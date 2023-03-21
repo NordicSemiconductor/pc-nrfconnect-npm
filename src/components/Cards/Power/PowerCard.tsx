@@ -70,7 +70,7 @@ export default ({
             }
         >
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row ">
+                <FormLabel className="flex-row">
                     <div>
                         <span>V</span>
                         <span className="subscript">TERM</span>
@@ -99,8 +99,8 @@ export default ({
                     disabled={disabled}
                 />
             </div>
-            <div className="slider-container">
-                <FormLabel className={`flex-row ${disabled ? 'disabled' : ''}`}>
+            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
+                <FormLabel className="flex-row">
                     <div>
                         <span>I</span>
                         <span className="subscript">CHG</span>

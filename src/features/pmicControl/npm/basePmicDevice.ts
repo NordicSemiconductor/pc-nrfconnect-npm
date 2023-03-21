@@ -31,6 +31,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         noOfChargers?: number;
         noOfBucks?: number;
         noOfLdos?: number;
+        noOfGPIOs?: number;
     },
     supportsVersion: string
 ) => {
@@ -183,6 +184,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         getNumberOfChargers: () => devices.noOfChargers ?? 0,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
+        getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,
 
         isSupportedVersion: () =>
             new Promise<boolean>((resolve, reject) => {

@@ -86,6 +86,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         noOfBucks: 2,
         noOfChargers: 1,
         noOfLdos: 2,
+        noOfGPIOs: 4,
     };
     const baseDevice = baseNpmDevice(
         shellParser,
@@ -821,6 +822,12 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         getBuckVoltageRange: () => ({
             min: 1,
             max: 3.3,
+            decimals: 1,
+        }),
+
+        getBuckRetVOutRange: () => ({
+            min: 1,
+            max: 3,
             decimals: 1,
         }),
 
