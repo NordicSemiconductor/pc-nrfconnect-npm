@@ -6,8 +6,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { CollapsibleGroup, Steppers } from 'pc-nrfconnect-shared';
-import { Step } from 'pc-nrfconnect-shared/src/Steppers/Steppers';
+import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
 
 import {
     getPmicState,
@@ -25,13 +24,16 @@ export default () => {
     const paused = useSelector(isPaused);
 
     const connectionStep: Step = {
+        id: '1',
         title: 'CONNECTION',
         caption: 'Offline Mode',
     };
     const shellStep: Step = {
+        id: '2',
         title: 'SHELL',
     };
     const pmicStep: Step = {
+        id: '3',
         title: 'PMIC',
     };
 
@@ -45,8 +47,9 @@ export default () => {
         if (paused) {
             shellStep.state = 'warning';
             shellStep.caption = [
-                'Shell is busy',
+                { id: '1', caption: 'Shell is busy' },
                 {
+                    id: '2',
                     caption: 'unpause',
                     action: () => shellParser?.unPause(),
                 },
@@ -75,7 +78,7 @@ export default () => {
     return (
         <CollapsibleGroup heading="Connection Status" defaultCollapsed={false}>
             <div className="connection-status-container">
-                <Steppers steps={[connectionStep, shellStep, pmicStep]} />
+                <Stepper steps={[connectionStep, shellStep, pmicStep]} />
             </div>
         </CollapsibleGroup>
     );
