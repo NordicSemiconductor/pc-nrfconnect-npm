@@ -5,7 +5,7 @@
  */
 import 'chartjs-adapter-date-fns';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
@@ -480,8 +480,7 @@ export default ({ active }: PaneProps) => {
             </div>
             <CustomLegend charts={chartMetaData.charts} />
             {chartMetaData.charts.map((_, index) => (
-                // eslint-disable-next-line react/jsx-key
-                <>
+                <Fragment key={chartMetaData.labels[index]}>
                     <div className="text-center">
                         <span>{chartMetaData.labels[index]}</span>
                     </div>
@@ -493,7 +492,7 @@ export default ({ active }: PaneProps) => {
                             ref={chartMetaData.refs[index]}
                         />
                     </div>
-                </>
+                </Fragment>
             ))}
             <TimeSpanDeltaLine range={range} chartArea={chartArea} />
         </div>
