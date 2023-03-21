@@ -15,8 +15,6 @@ import {
 import { isPaused } from '../../features/serial/serialSlice';
 import DashboardControlCard from './DasboardControlCard';
 
-import './dashboardControl.scss';
-
 export default ({ active }: PaneProps) => {
     const paused = useSelector(isPaused);
     const supportedVersion = useSelector(isSupportedVersion);
@@ -42,18 +40,13 @@ export default ({ active }: PaneProps) => {
     }, [paused]);
 
     return !active ? null : (
-        <div className="pmicControl-container">
-            <div className="pmicControl">
-                <Alert
-                    variant="info"
-                    label="nPM PowerUP​ 0.1​ - Preview release! "
-                >
-                    This is an unsupported, experimental preview and it is
-                    subject to major redesigns in the future.
-                </Alert>
-                <div className="pmicControl-cards">
-                    <DashboardControlCard disabled={disabled} />
-                </div>
+        <div>
+            <Alert variant="info" label="nPM PowerUP​ 0.1​ - Preview release! ">
+                This is an unsupported, experimental preview and it is subject
+                to major redesigns in the future.
+            </Alert>
+            <div>
+                <DashboardControlCard disabled={disabled} />
             </div>
         </div>
     );
