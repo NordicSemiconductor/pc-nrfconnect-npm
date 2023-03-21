@@ -8,7 +8,10 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Alert, PaneProps } from 'pc-nrfconnect-shared';
 
-import { getPmicState } from '../../features/pmicControl/pmicControlSlice';
+import {
+    getPmicState,
+    isSupportedVersion,
+} from '../../features/pmicControl/pmicControlSlice';
 import { isPaused } from '../../features/serial/serialSlice';
 import DashboardControlCard from './DasboardControlCard';
 
@@ -16,11 +19,12 @@ import './dashboardControl.scss';
 
 export default ({ active }: PaneProps) => {
     const paused = useSelector(isPaused);
-
+    const supportedVersion = useSelector(isSupportedVersion);
     const pmicState = useSelector(getPmicState);
 
     const [pauseFor1Second, setPauseFor1Second] = useState(paused);
     const disabled =
+        !supportedVersion ||
         pmicState === 'pmic-disconnected' ||
         pmicState === 'pmic-unknown' ||
         pauseFor1Second;
@@ -31,7 +35,7 @@ export default ({ active }: PaneProps) => {
         } else {
             const t = setTimeout(() => {
                 setPauseFor1Second(paused);
-            }, 5000);
+            }, 1000);
 
             return () => clearTimeout(t);
         }
