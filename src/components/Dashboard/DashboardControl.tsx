@@ -22,7 +22,7 @@ export default ({ active }: PaneProps) => {
 
     const [pauseFor1Second, setPauseFor1Second] = useState(paused);
     const disabled =
-        !supportedVersion ||
+        (!supportedVersion && pmicState !== 'ek-disconnected') ||
         pmicState === 'pmic-disconnected' ||
         pmicState === 'pmic-unknown' ||
         pauseFor1Second;
