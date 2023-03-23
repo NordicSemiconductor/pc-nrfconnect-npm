@@ -33,7 +33,7 @@ interface PowerCardProperties {
     charger?: Charger;
     cardLabel?: string;
     disabled: boolean;
-    summary?: boolean;
+    defaultSummary?: boolean;
 }
 
 export default ({
@@ -42,8 +42,9 @@ export default ({
     charger,
     cardLabel = `Charging ${index + 1}`,
     disabled,
-    summary = false,
+    defaultSummary = false,
 }: PowerCardProperties) => {
+    const [summary, setSummary] = useState(defaultSummary);
     const currentRange = npmDevice?.getChargerCurrentRange(index);
     const currentVoltage = npmDevice?.getChargerVoltageRange(index) as Values;
 
@@ -85,12 +86,29 @@ export default ({
                     }`}
                 >
                     <span>{cardLabel}</span>
-                    <Toggle
-                        label="Enable"
-                        isToggled={charger.enabled}
-                        onToggle={onEnableChargingToggle}
-                        disabled={disabled}
-                    />
+
+                    <div className="d-flex">
+                        <Toggle
+                            label="Enable"
+                            isToggled={charger.enabled}
+                            onToggle={onEnableChargingToggle}
+                            disabled={disabled}
+                        />
+                        <span
+                            role="button"
+                            tabIndex={0}
+                            onKeyUp={() => {}}
+                            onClick={() => {
+                                setSummary(!summary);
+                            }}
+                        >
+                            {summary ? (
+                                <span className="mdi mdi-chevron-down" />
+                            ) : (
+                                <span className="mdi mdi-chevron-up" />
+                            )}
+                        </span>
+                    </div>
                 </div>
             }
         >
@@ -195,6 +213,7 @@ export default ({
                         }
                         disabled={disabled}
                     />
+
                     <Toggle
                         label="Enable Recharging"
                         isToggled={charger.enableRecharging}

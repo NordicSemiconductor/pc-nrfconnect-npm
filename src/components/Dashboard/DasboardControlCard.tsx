@@ -41,7 +41,7 @@ export default ({ disabled }: DashboardControlCardProps) => {
                     index={index}
                     cardLabel="Charger"
                     disabled={disabled}
-                    summary
+                    defaultSummary
                 />
             ))}
             {bucks.map((buck, index) => (
@@ -51,7 +51,7 @@ export default ({ disabled }: DashboardControlCardProps) => {
                     key={`Buck${1 + index}`}
                     index={index}
                     disabled={disabled}
-                    summary
+                    defaultSummary
                 />
             ))}
             {ldos.map((ldo, index) => (

@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FormLabel from 'react-bootstrap/FormLabel';
 import {
+    Button,
     Card,
     Dropdown,
-    DropdownItem,
     NumberInlineInput,
     Slider,
     StateSelector,
@@ -35,7 +35,7 @@ interface BuckCardProperties {
     npmDevice?: NpmDevice;
     buck?: Buck;
     cardLabel?: string;
-    summary?: boolean;
+    defaultSummary?: boolean;
     disabled: boolean;
 }
 
@@ -45,8 +45,10 @@ export default ({
     buck,
     cardLabel = `BUCK ${index + 1}`,
     disabled,
-    summary = false,
+    defaultSummary = false,
 }: BuckCardProperties) => {
+    const [summary, setSummary] = useState(defaultSummary);
+
     const onVOutChange = (value: number) =>
         npmDevice?.setBuckVOut(index, value);
 
@@ -106,12 +108,28 @@ export default ({
                     }`}
                 >
                     <span>{cardLabel}</span>
-                    <Toggle
-                        label="Enable"
-                        isToggled={buck.enabled}
-                        onToggle={value => onBuckToggle(value)}
-                        disabled={disabled}
-                    />
+                    <div className="d-flex">
+                        <Toggle
+                            label="Enable"
+                            isToggled={buck.enabled}
+                            onToggle={value => onBuckToggle(value)}
+                            disabled={disabled}
+                        />
+                        <span
+                            role="button"
+                            tabIndex={0}
+                            onKeyUp={() => {}}
+                            onClick={() => {
+                                setSummary(!summary);
+                            }}
+                        >
+                            {summary ? (
+                                <span className="mdi mdi-chevron-down" />
+                            ) : (
+                                <span className="mdi mdi-chevron-up" />
+                            )}
+                        </span>
+                    </div>
                 </div>
             }
         >
