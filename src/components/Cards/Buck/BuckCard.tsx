@@ -19,6 +19,13 @@ import {
 import {
     Buck,
     BuckMode,
+    BuckModeControl,
+    BuckModeControlValues,
+    BuckOnOffControl,
+    BuckOnOffControlValues,
+    BuckRetentionControl,
+    BuckRetentionControlValues,
+    GPIOValues,
     NpmDevice,
 } from '../../../features/pmicControl/npm/types';
 import { RangeType } from '../../../utils/helpers';
@@ -44,7 +51,7 @@ export default ({
         npmDevice?.setBuckVOut(index, value);
 
     const onRetVOutChange = (value: number) => {
-        // TODO
+        npmDevice?.setBuckRetentionVOut(index, value);
     };
 
     const onModeToggle = (mode: BuckMode) =>
@@ -57,23 +64,26 @@ export default ({
     const retVOutRange = npmDevice?.getBuckRetVOutRange(index);
     const numberOfGPIOs = npmDevice?.getNumberOfGPIOs() ?? 0;
 
-    const gpioNames: string[] = [];
+    const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
 
-    for (let i = 0; i < numberOfGPIOs; i += 1) {
-        gpioNames.push(`GPIO${i}`);
-    }
+    const modeControlItems = [...BuckModeControlValues, ...gpioNames].map(
+        item => ({
+            label: item,
+            value: item,
+        })
+    );
 
-    const modeControlItems = ['Auto', 'PWM', 'PFM', ...gpioNames].map(item => ({
-        label: item,
-        value: item,
-    }));
+    const buckOnOffControlItems = [...BuckOnOffControlValues, ...gpioNames].map(
+        item => ({
+            label: item,
+            value: item,
+        })
+    );
 
-    const buckOnOffControlItems = ['Off', ...gpioNames].map(item => ({
-        label: item,
-        value: item,
-    }));
-
-    const buckRetentionControlItems = ['Off', ...gpioNames].map(item => ({
+    const buckRetentionControlItems = [
+        ...BuckRetentionControlValues,
+        ...gpioNames,
+    ].map(item => ({
         label: item,
         value: item,
     }));
@@ -143,28 +153,55 @@ export default ({
                     <Dropdown
                         label="Buck Mode Control"
                         items={modeControlItems}
-                        onSelect={() => {
-                            // TODO;
-                        }}
-                        selectedItem={modeControlItems[0]}
+                        onSelect={item =>
+                            npmDevice?.setBuckModeControl(
+                                index,
+                                item.value as BuckModeControl
+                            )
+                        }
+                        selectedItem={
+                            modeControlItems[
+                                modeControlItems.findIndex(
+                                    item => item.value === buck.modeControl
+                                ) ?? 0
+                            ]
+                        }
                         disabled={disabled}
                     />
                     <Dropdown
                         label="On/Off Control"
                         items={buckOnOffControlItems}
-                        onSelect={() => {
-                            // TODO;
+                        onSelect={item => {
+                            npmDevice?.setBuckOnOffControl(
+                                index,
+                                item.value as BuckOnOffControl
+                            );
                         }}
-                        selectedItem={buckOnOffControlItems[0]}
+                        selectedItem={
+                            buckOnOffControlItems[
+                                buckOnOffControlItems.findIndex(
+                                    item => item.value === buck.onOffControl
+                                ) ?? 0
+                            ]
+                        }
                         disabled={disabled}
                     />
                     <Dropdown
                         label="Retention control"
                         items={buckRetentionControlItems}
-                        onSelect={() => {
-                            // TODO;
-                        }}
-                        selectedItem={buckRetentionControlItems[0]}
+                        onSelect={item =>
+                            npmDevice?.setBuckRetentionControl(
+                                index,
+                                item.value as BuckRetentionControl
+                            )
+                        }
+                        selectedItem={
+                            buckRetentionControlItems[
+                                buckRetentionControlItems.findIndex(
+                                    item => item.value === buck.retentionControl
+                                ) ?? 0
+                            ]
+                        }
                         disabled={disabled}
                     />
                     <div
@@ -175,7 +212,7 @@ export default ({
                         <FormLabel className="flex-row">
                             <div>
                                 <span>RET</span>
-                                <span className="subscript">VOUT1</span>
+                                <span className="subscript">VOUT</span>
                             </div>
                             <div className="flex-row">
                                 <NumberInlineInput

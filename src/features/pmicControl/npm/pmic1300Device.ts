@@ -21,6 +21,9 @@ import {
     BatteryModel,
     Buck,
     BuckMode,
+    BuckModeControl,
+    BuckOnOffControl,
+    BuckRetentionControl,
     Charger,
     INpmDevice,
     IrqEvent,
@@ -86,7 +89,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         noOfBucks: 2,
         noOfChargers: 1,
         noOfLdos: 2,
-        noOfGPIOs: 4,
+        noOfGPIOs: 5,
     };
     const baseDevice = baseNpmDevice(
         shellParser,
@@ -585,6 +588,17 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         }
     };
 
+    const setBuckRetentionVOut = (index: number, value: number) => {
+        console.warn('Not implemented');
+
+        if (pmicState === 'ek-disconnected')
+            emitPartialEvent<Buck>('onBuckUpdate', index, {
+                retentionVOut: value,
+            });
+
+        requestUpdate.buckRetentionVOut(index);
+    };
+
     const setBuckMode = (index: number, mode: BuckMode) => {
         const action = () => {
             sendCommand(
@@ -626,6 +640,47 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             action();
         }
     };
+
+    const setBuckModeControl = (
+        index: number,
+        modeControl: BuckModeControl
+    ) => {
+        console.warn('Not implemented');
+
+        if (pmicState === 'ek-disconnected')
+            emitPartialEvent<Buck>('onBuckUpdate', index, {
+                modeControl,
+            });
+
+        requestUpdate.buckModeControl(index);
+    };
+    const setBuckOnOffControl = (
+        index: number,
+        onOffControl: BuckOnOffControl
+    ) => {
+        console.warn('Not implemented');
+
+        if (pmicState === 'ek-disconnected')
+            emitPartialEvent<Buck>('onBuckUpdate', index, {
+                onOffControl,
+            });
+
+        requestUpdate.buckOnOffControl(index);
+    };
+    const setBuckRetentionControl = (
+        index: number,
+        retentionControl: BuckRetentionControl
+    ) => {
+        console.warn('Not implemented');
+
+        if (pmicState === 'ek-disconnected')
+            emitPartialEvent<Buck>('onBuckUpdate', index, {
+                retentionControl,
+            });
+
+        requestUpdate.buckRetentionControl(index);
+    };
+
     const setBuckEnabled = (index: number, enabled: boolean) => {
         const action = () => {
             sendCommand(
@@ -719,13 +774,18 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         buckVOut: (index: number) =>
             sendCommand(`npmx buck voltage get ${index}`),
+        buckRetentionVOut: (index: number) => console.warn('Not implemented'),
         buckMode: (index: number) =>
             sendCommand(`npmx buck vout select get ${index}`),
-        buckEnabled: (_index: number) => console.warn('Not implemented'),
+        buckModeControl: (index: number) => console.warn('Not implemented'),
+        buckOnOffControl: (index: number) => console.warn('Not implemented'),
+        buckRetentionControl: (index: number) =>
+            console.warn('Not implemented'),
+        buckEnabled: (index: number) => console.warn('Not implemented'),
 
-        ldoVoltage: (_index: number) => console.warn('Not implemented'),
+        ldoVoltage: (index: number) => console.warn('Not implemented'),
         ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
-        ldoMode: (_index: number) => console.warn('Not implemented'),
+        ldoMode: (index: number) => console.warn('Not implemented'),
 
         fuelGauge: () => {
             sendCommand('fuel_gauge get');
@@ -844,8 +904,12 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         setChargerIChg,
         setChargerEnabled,
         setBuckVOut,
+        setBuckRetentionVOut,
         setBuckMode,
         setBuckEnabled,
+        setBuckModeControl,
+        setBuckOnOffControl,
+        setBuckRetentionControl,
         setLdoVoltage,
         setLdoEnabled,
         setLdoMode,

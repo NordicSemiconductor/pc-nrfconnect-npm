@@ -11,9 +11,28 @@ import { RangeType } from '../../../utils/helpers';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
 
+export const GPIOValues = [
+    'GPIO0',
+    'GPIO1',
+    'GPIO2',
+    'GPIO3',
+    'GPIO4',
+    'GPIO5',
+] as const;
+
+export const BuckModeControlValues = ['Auto', 'PWM', 'PFM'] as const;
+export const BuckOnOffControlValues = ['Off'] as const;
+export const BuckRetentionControlValues = ['Off'] as const;
+
+export type GPIO = typeof GPIOValues[number];
 export type RebootMode = 'cold' | 'warm';
 export type LdoMode = 'ldoSwitch' | 'LDO';
 export type BuckMode = 'vSet' | 'software';
+export type BuckModeControl = typeof BuckModeControlValues[number] | GPIO;
+export type BuckOnOffControl = typeof BuckOnOffControlValues[number] | GPIO;
+export type BuckRetentionControl =
+    | typeof BuckRetentionControlValues[number]
+    | GPIO;
 
 export type IrqEvent = {
     type: string;
@@ -28,7 +47,11 @@ export type Charger = {
 
 export type Buck = {
     vOut: number;
+    retentionVOut: number;
     mode: BuckMode;
+    modeControl: BuckModeControl;
+    onOffControl: BuckOnOffControl;
+    retentionControl: BuckRetentionControl;
     enabled: boolean;
 };
 
@@ -178,7 +201,11 @@ export type NpmDevice = {
         chargerEnabled: (index: number) => void;
 
         buckVOut: (index: number) => void;
+        buckRetentionVOut: (index: number) => void;
         buckMode: (index: number) => void;
+        buckModeControl: (index: number) => void;
+        buckOnOffControl: (index: number) => void;
+        buckRetentionControl: (index: number) => void;
         buckEnabled: (index: number) => void;
 
         ldoVoltage: (index: number) => void;
@@ -198,7 +225,14 @@ export type NpmDevice = {
     setChargerEnabled: (index: number, state: boolean) => void;
 
     setBuckVOut: (index: number, value: number) => void;
+    setBuckRetentionVOut: (index: number, value: number) => void;
     setBuckMode: (index: number, mode: BuckMode) => void;
+    setBuckModeControl: (index: number, mode: BuckModeControl) => void;
+    setBuckOnOffControl: (index: number, mode: BuckOnOffControl) => void;
+    setBuckRetentionControl: (
+        index: number,
+        mode: BuckRetentionControl
+    ) => void;
     setBuckEnabled: (index: number, state: boolean) => void;
 
     setLdoVoltage: (index: number, value: number) => void;
