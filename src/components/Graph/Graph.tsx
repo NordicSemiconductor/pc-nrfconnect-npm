@@ -478,7 +478,6 @@ export default ({ active }: PaneProps) => {
                     />
                 </div>
             </div>
-            <CustomLegend charts={chartMetaData.charts} />
             {chartMetaData.charts.map((_, index) => (
                 <Fragment key={chartMetaData.labels[index]}>
                     <div className="text-center">
