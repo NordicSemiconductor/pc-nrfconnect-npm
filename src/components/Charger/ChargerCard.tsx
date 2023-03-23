@@ -26,8 +26,6 @@ interface DashboardControlCardProps {
 export default ({ disabled }: DashboardControlCardProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const chargers = useSelector(getChargers);
-    const bucks = useSelector(getBucks);
-    const ldos = useSelector(getLdos);
 
     return (
         <MasonryLayout minWidth={300}>

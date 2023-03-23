@@ -64,6 +64,9 @@ export default (shellParser: ShellParser | undefined) => {
             npmDevice.requestUpdate.chargerVTerm(i);
             npmDevice.requestUpdate.chargerIChg(i);
             npmDevice.requestUpdate.chargerEnabled(i);
+            npmDevice.requestUpdate.chargerVTrickleFast(i);
+            npmDevice.requestUpdate.chargerITerm(i);
+            npmDevice.requestUpdate.chargerEnabledRecharging(i);
         }
 
         for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
@@ -142,8 +145,11 @@ export default (shellParser: ShellParser | undefined) => {
         for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
             emptyChargers.push({
                 vTerm: npmDevice.getChargerVoltageRange(i)[0],
+                vTrickleFast: 2.5,
                 iChg: npmDevice.getChargerCurrentRange(i).min,
                 enabled: false,
+                iTerm: '10%',
+                enableRecharging: false,
             });
         }
         dispatch(setChargers(emptyChargers));

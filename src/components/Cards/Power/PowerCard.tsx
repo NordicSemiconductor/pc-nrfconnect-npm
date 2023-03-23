@@ -6,13 +6,26 @@
 
 import React, { useEffect, useState } from 'react';
 import FormLabel from 'react-bootstrap/FormLabel';
-import { Card, NumberInlineInput, Slider, Toggle } from 'pc-nrfconnect-shared';
+import {
+    Card,
+    Dropdown,
+    NumberInlineInput,
+    Slider,
+    Toggle,
+} from 'pc-nrfconnect-shared';
 import {
     Range,
     Values,
 } from 'pc-nrfconnect-shared/typings/generated/src/Slider/range';
 
-import { Charger, NpmDevice } from '../../../features/pmicControl/npm/types';
+import {
+    Charger,
+    ITerm,
+    ITermValues,
+    NpmDevice,
+    VTrickleFast,
+    VTrickleFastValues,
+} from '../../../features/pmicControl/npm/types';
 
 interface PowerCardProperties {
     index: number;
@@ -20,6 +33,7 @@ interface PowerCardProperties {
     charger?: Charger;
     cardLabel?: string;
     disabled: boolean;
+    summary?: boolean;
 }
 
 export default ({
@@ -28,6 +42,7 @@ export default ({
     charger,
     cardLabel = `Charging ${index + 1}`,
     disabled,
+    summary = false,
 }: PowerCardProperties) => {
     const currentRange = npmDevice?.getChargerCurrentRange(index);
     const currentVoltage = npmDevice?.getChargerVoltageRange(index) as Values;
@@ -50,6 +65,16 @@ export default ({
             setInternalIChg(charger.iChg);
         }
     }, [charger]);
+
+    const vTrickleFastItems = [...VTrickleFastValues].map(item => ({
+        label: `${item}`,
+        value: `${item}`,
+    }));
+
+    const iTermItems = [...ITermValues].map(item => ({
+        label: item,
+        value: item,
+    }));
 
     return charger ? (
         <Card
@@ -124,6 +149,60 @@ export default ({
                     disabled={disabled}
                 />
             </div>
+            {!summary && (
+                <>
+                    <Dropdown
+                        label="iTerm"
+                        items={iTermItems}
+                        onSelect={item =>
+                            npmDevice?.setChargerITerm(
+                                index,
+                                item.value as ITerm
+                            )
+                        }
+                        selectedItem={
+                            iTermItems[
+                                Math.min(
+                                    0,
+                                    iTermItems.findIndex(
+                                        item => item.value === charger.iTerm
+                                    )
+                                ) ?? 0
+                            ]
+                        }
+                        disabled={disabled}
+                    />
+                    <Dropdown
+                        label="V Trickle Fast"
+                        items={vTrickleFastItems}
+                        onSelect={item =>
+                            npmDevice?.setChargerVTrickleFast(
+                                index,
+                                Number.parseFloat(item.value) as VTrickleFast
+                            )
+                        }
+                        selectedItem={
+                            vTrickleFastItems[
+                                Math.min(
+                                    0,
+                                    vTrickleFastItems.findIndex(
+                                        item =>
+                                            Number.parseFloat(item.value) ===
+                                            charger.vTrickleFast
+                                    )
+                                ) ?? 0
+                            ]
+                        }
+                        disabled={disabled}
+                    />
+                    <Toggle
+                        label="Enable Recharging"
+                        isToggled={charger.enableRecharging}
+                        onToggle={() => {}}
+                        disabled={disabled}
+                    />
+                </>
+            )}
         </Card>
     ) : null;
 };

@@ -34,6 +34,12 @@ export type BuckRetentionControl =
     | typeof BuckRetentionControlValues[number]
     | GPIO;
 
+export const ITermValues = ['10%', '20%'] as const;
+export type ITerm = typeof ITermValues[number];
+
+export const VTrickleFastValues = [2.5, 2.9] as const;
+export type VTrickleFast = typeof VTrickleFastValues[number];
+
 export type IrqEvent = {
     type: string;
     event: string;
@@ -41,8 +47,11 @@ export type IrqEvent = {
 
 export type Charger = {
     vTerm: number;
+    vTrickleFast: VTrickleFast;
     iChg: number;
     enabled: boolean;
+    enableRecharging: boolean;
+    iTerm: ITerm;
 };
 
 export type Buck = {
@@ -199,6 +208,9 @@ export type NpmDevice = {
         chargerVTerm: (index: number) => void;
         chargerIChg: (index: number) => void;
         chargerEnabled: (index: number) => void;
+        chargerVTrickleFast: (index: number) => void;
+        chargerITerm: (index: number) => void;
+        chargerEnabledRecharging: (index: number) => void;
 
         buckVOut: (index: number) => void;
         buckRetentionVOut: (index: number) => void;
@@ -223,6 +235,9 @@ export type NpmDevice = {
     setChargerVTerm: (index: number, value: number) => void;
     setChargerIChg: (index: number, value: number) => void;
     setChargerEnabled: (index: number, state: boolean) => void;
+    setChargerVTrickleFast: (index: number, value: VTrickleFast) => void;
+    setChargerITerm: (index: number, iTerm: ITerm) => void;
+    setChargerEnabledRecharging: (index: number, enabled: boolean) => void;
 
     setBuckVOut: (index: number, value: number) => void;
     setBuckRetentionVOut: (index: number, value: number) => void;

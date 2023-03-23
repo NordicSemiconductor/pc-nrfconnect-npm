@@ -41,6 +41,7 @@ export default ({ disabled }: DashboardControlCardProps) => {
                     index={index}
                     cardLabel="Charger"
                     disabled={disabled}
+                    summary
                 />
             ))}
             {bucks.map((buck, index) => (

@@ -161,8 +161,11 @@ export default ({
                         }
                         selectedItem={
                             modeControlItems[
-                                modeControlItems.findIndex(
-                                    item => item.value === buck.modeControl
+                                Math.min(
+                                    0,
+                                    modeControlItems.findIndex(
+                                        item => item.value === buck.modeControl
+                                    )
                                 ) ?? 0
                             ]
                         }
@@ -179,8 +182,11 @@ export default ({
                         }}
                         selectedItem={
                             buckOnOffControlItems[
-                                buckOnOffControlItems.findIndex(
-                                    item => item.value === buck.onOffControl
+                                Math.min(
+                                    0,
+                                    buckOnOffControlItems.findIndex(
+                                        item => item.value === buck.onOffControl
+                                    )
                                 ) ?? 0
                             ]
                         }
@@ -197,8 +203,12 @@ export default ({
                         }
                         selectedItem={
                             buckRetentionControlItems[
-                                buckRetentionControlItems.findIndex(
-                                    item => item.value === buck.retentionControl
+                                Math.min(
+                                    0,
+                                    buckRetentionControlItems.findIndex(
+                                        item =>
+                                            item.value === buck.retentionControl
+                                    )
                                 ) ?? 0
                             ]
                         }

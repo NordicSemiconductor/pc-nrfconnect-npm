@@ -27,6 +27,7 @@ import {
     Charger,
     INpmDevice,
     IrqEvent,
+    ITerm,
     Ldo,
     LdoMode,
     LoggingEvent,
@@ -34,6 +35,7 @@ import {
     PmicChargingState,
     PmicState,
     PmicWarningDialog,
+    VTrickleFast,
 } from './types';
 
 const noop = () => {};
@@ -500,7 +502,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             `npmx charger termination_voltage normal set ${value * 1000}`, // mv to V
             noop,
             (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.chargerVTerm();
+                if (isSetCommand(command)) requestUpdate.chargerVTerm(index);
             }
         );
     };
@@ -515,16 +517,41 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             `npmx charger charger_current set ${value}`,
             noop,
             (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.chargerIChg();
+                if (isSetCommand(command)) requestUpdate.chargerIChg(index);
             }
         );
     };
+
+    const setChargerVTrickleFast = (index: number, value: VTrickleFast) => {
+        console.warn('Not implemented');
+
+        emitPartialEvent<Charger>('onChargerUpdate', index, {
+            vTrickleFast: value,
+        });
+    };
+
+    const setChargerITerm = (index: number, iTerm: ITerm) => {
+        console.warn('Not implemented');
+
+        emitPartialEvent<Charger>('onChargerUpdate', index, {
+            iTerm,
+        });
+    };
+
+    const setChargerEnabledRecharging = (index: number, enabled: boolean) => {
+        console.warn('Not implemented');
+
+        emitPartialEvent<Charger>('onChargerUpdate', index, {
+            enableRecharging: enabled,
+        });
+    };
+
     const setChargerEnabled = (index: number, enabled: boolean) => {
         sendCommand(
             `npmx charger module charger set ${enabled ? '1' : '0'}`,
             noop,
             (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.chargerEnabled();
+                if (isSetCommand(command)) requestUpdate.chargerEnabled(index);
             }
         );
 
@@ -595,8 +622,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             emitPartialEvent<Buck>('onBuckUpdate', index, {
                 retentionVOut: value,
             });
-
-        requestUpdate.buckRetentionVOut(index);
     };
 
     const setBuckMode = (index: number, mode: BuckMode) => {
@@ -651,8 +676,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             emitPartialEvent<Buck>('onBuckUpdate', index, {
                 modeControl,
             });
-
-        requestUpdate.buckModeControl(index);
     };
     const setBuckOnOffControl = (
         index: number,
@@ -664,8 +687,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             emitPartialEvent<Buck>('onBuckUpdate', index, {
                 onOffControl,
             });
-
-        requestUpdate.buckOnOffControl(index);
     };
     const setBuckRetentionControl = (
         index: number,
@@ -677,8 +698,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             emitPartialEvent<Buck>('onBuckUpdate', index, {
                 retentionControl,
             });
-
-        requestUpdate.buckRetentionControl(index);
     };
 
     const setBuckEnabled = (index: number, enabled: boolean) => {
@@ -767,10 +786,16 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
     const requestUpdate = {
         pmicChargingState: () => sendCommand('npmx charger status get'),
-        chargerVTerm: () =>
+        chargerVTerm: (index: number) =>
             sendCommand('npmx charger termination_voltage normal get'),
-        chargerIChg: () => sendCommand('npmx charger charger_current get'),
-        chargerEnabled: () => sendCommand('npmx charger module charger get'),
+        chargerIChg: (index: number) =>
+            sendCommand('npmx charger charger_current get'),
+        chargerEnabled: (index: number) =>
+            sendCommand('npmx charger module charger get'),
+        chargerVTrickleFast: (index: number) => console.warn('Not implemented'),
+        chargerITerm: (index: number) => console.warn('Not implemented'),
+        chargerEnabledRecharging: (index: number) =>
+            console.warn('Not implemented'),
 
         buckVOut: (index: number) =>
             sendCommand(`npmx buck voltage get ${index}`),
@@ -903,6 +928,9 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         setChargerVTerm,
         setChargerIChg,
         setChargerEnabled,
+        setChargerVTrickleFast,
+        setChargerITerm,
+        setChargerEnabledRecharging,
         setBuckVOut,
         setBuckRetentionVOut,
         setBuckMode,
