@@ -9,6 +9,7 @@ import FormLabel from 'react-bootstrap/FormLabel';
 import {
     Button,
     Card,
+    classNames,
     Dropdown,
     NumberInlineInput,
     Slider,
@@ -116,19 +117,18 @@ export default ({
                             disabled={disabled}
                         />
                         <span
+                            className={classNames(
+                                'show-more-toggle mdi',
+                                summary && 'mdi-chevron-down',
+                                !summary && 'mdi-chevron-up'
+                            )}
                             role="button"
                             tabIndex={0}
                             onKeyUp={() => {}}
                             onClick={() => {
                                 setSummary(!summary);
                             }}
-                        >
-                            {summary ? (
-                                <span className="mdi mdi-chevron-down" />
-                            ) : (
-                                <span className="mdi mdi-chevron-up" />
-                            )}
-                        </span>
+                        />
                     </div>
                 </div>
             }
