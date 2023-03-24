@@ -66,7 +66,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
 
     return {
         kernelReset,
-        kernelUptime(callback) {
+        getKernelUptime(callback) {
             shellParser?.enqueueRequest('kernel uptime', res => {
                 callback(parseToNumber(res));
             });

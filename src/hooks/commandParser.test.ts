@@ -18,8 +18,6 @@ import {
     XTerminalShellParser,
 } from './commandParser';
 
-jest.mock('pc-nrfconnect-shared');
-
 let onResponseCallback = (data: Uint8Array) => {};
 
 const setupMocks = () => {

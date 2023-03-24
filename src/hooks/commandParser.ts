@@ -283,15 +283,21 @@ export const hookModemToShellParser = async (
         onPausedChange: (handler: (state: boolean) => void) => {
             eventEmitter.on('pausedChanged', handler);
             handler(pausedState);
-            return () => eventEmitter.removeListener('pausedChanged', handler);
+            return () => {
+                eventEmitter.removeListener('pausedChanged', handler);
+            };
         },
         onShellLoggingEvent: (handler: (state: string) => void) => {
             eventEmitter.on('shellLogging', handler);
-            return () => eventEmitter.removeListener('shellLogging', handler);
+            return () => {
+                eventEmitter.removeListener('shellLogging', handler);
+            };
         },
         onUnknownCommand: (handler: (state: string) => void) => {
             eventEmitter.on('unknownCommand', handler);
-            return () => eventEmitter.removeListener('unknownCommand', handler);
+            return () => {
+                eventEmitter.removeListener('unknownCommand', handler);
+            };
         },
         enqueueRequest: async (
             command: string,

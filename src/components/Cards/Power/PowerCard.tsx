@@ -180,7 +180,7 @@ export default ({
                         }
                         selectedItem={
                             iTermItems[
-                                Math.min(
+                                Math.max(
                                     0,
                                     iTermItems.findIndex(
                                         item => item.value === charger.iTerm
@@ -201,7 +201,7 @@ export default ({
                         }
                         selectedItem={
                             vTrickleFastItems[
-                                Math.min(
+                                Math.max(
                                     0,
                                     vTrickleFastItems.findIndex(
                                         item =>

@@ -179,7 +179,7 @@ export default ({
                         }
                         selectedItem={
                             modeControlItems[
-                                Math.min(
+                                Math.max(
                                     0,
                                     modeControlItems.findIndex(
                                         item => item.value === buck.modeControl
@@ -200,7 +200,7 @@ export default ({
                         }}
                         selectedItem={
                             buckOnOffControlItems[
-                                Math.min(
+                                Math.max(
                                     0,
                                     buckOnOffControlItems.findIndex(
                                         item => item.value === buck.onOffControl
@@ -221,7 +221,7 @@ export default ({
                         }
                         selectedItem={
                             buckRetentionControlItems[
-                                Math.min(
+                                Math.max(
                                     0,
                                     buckRetentionControlItems.findIndex(
                                         item =>

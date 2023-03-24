@@ -127,7 +127,7 @@ export interface IBaseNpmDevice {
 
 export type BaseNpmDevice = {
     kernelReset: (mode: RebootMode, callback?: () => void) => void;
-    kernelUptime: (callback: (milliseconds: number) => void) => void;
+    getKernelUptime: (callback: (milliseconds: number) => void) => void;
     onPmicStateChange: (
         handler: (state: PmicState, error?: string) => void
     ) => () => void;
@@ -204,7 +204,7 @@ export type NpmDevice = {
     getLdoVoltageRange: (index: number) => RangeType;
 
     requestUpdate: {
-        pmicChargingState: () => void;
+        pmicChargingState: (index: number) => void;
         chargerVTerm: (index: number) => void;
         chargerIChg: (index: number) => void;
         chargerEnabled: (index: number) => void;

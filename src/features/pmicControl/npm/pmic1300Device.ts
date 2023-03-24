@@ -128,7 +128,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const updateUptimeOverflowCounter = () => {
-        baseDevice.kernelUptime(milliseconds => {
+        baseDevice.getKernelUptime(milliseconds => {
             deviceUptimeToSystemDelta = Date.now() - milliseconds;
             uptimeOverflowCounter = Math.floor(milliseconds / maxTimeStamp);
         });
@@ -506,6 +506,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             }
         );
     };
+
     const setChargerIChg = (index: number, value: number) => {
         emitPartialEvent<Charger>('onChargerUpdate', index, {
             iChg: value,
@@ -560,7 +561,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 enabled,
             });
 
-        requestUpdate.pmicChargingState();
+        requestUpdate.pmicChargingState(index);
     };
 
     const setBuckVOut = (index: number, value: number) => {
@@ -677,6 +678,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 modeControl,
             });
     };
+
     const setBuckOnOffControl = (
         index: number,
         onOffControl: BuckOnOffControl
@@ -688,6 +690,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 onOffControl,
             });
     };
+
     const setBuckRetentionControl = (
         index: number,
         retentionControl: BuckRetentionControl
@@ -785,7 +788,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     updateUptimeOverflowCounter();
 
     const requestUpdate = {
-        pmicChargingState: () => sendCommand('npmx charger status get'),
+        pmicChargingState: (index: number) =>
+            sendCommand('npmx charger status get'),
         chargerVTerm: (index: number) =>
             sendCommand('npmx charger termination_voltage normal get'),
         chargerIChg: (index: number) =>
@@ -812,10 +816,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
         ldoMode: (index: number) => console.warn('Not implemented'),
 
-        fuelGauge: () => {
-            sendCommand('fuel_gauge get');
-        },
-
+        fuelGauge: () => sendCommand('fuel_gauge get'),
         activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
         storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
 
