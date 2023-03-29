@@ -560,8 +560,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             emitPartialEvent<Charger>('onChargerUpdate', index, {
                 enabled,
             });
-
-        requestUpdate.pmicChargingState(index);
     };
 
     const setBuckVOut = (index: number, value: number) => {
@@ -591,11 +589,9 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     mode: 'software',
                 });
-
-            requestUpdate.buckVOut(index);
         };
 
-        if (index === 0 && value <= 1.7) {
+        if (pmicState !== 'ek-disconnected' && index === 0 && value <= 1.7) {
             const warningDialog: PmicWarningDialog = {
                 storeID: 'pmic1300-setBuckVOut-0',
                 message: `Buck 1 Powers the I2C communications that are needed for this app. 
@@ -646,7 +642,11 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         };
 
         // TODO Check software voltage as well
-        if (index === 0 && mode === 'software') {
+        if (
+            pmicState !== 'ek-disconnected' &&
+            index === 0 &&
+            mode === 'software'
+        ) {
             const warningDialog: PmicWarningDialog = {
                 storeID: 'pmic1300-setBuckVOut-0',
                 message: `Buck 1 Powers the I2C communications that are needed for this app. 
@@ -719,7 +719,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 });
         };
 
-        if (index === 0 && !enabled) {
+        if (pmicState !== 'ek-disconnected' && index === 0 && !enabled) {
             const warningDialog: PmicWarningDialog = {
                 storeID: 'pmic1300-setBuckEnabled-0',
                 message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
@@ -784,6 +784,10 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     const stopBatteryStatusCheck = () =>
         sendCommand('npm_chg_status_check set 0');
 
+    const storeBattery = () => {
+        sendCommand(`fuel_gauge model store`);
+    };
+
     initConnectionTimeout();
     updateUptimeOverflowCounter();
 
@@ -821,10 +825,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
 
         usbPowered: () => sendCommand(`npmx vbusin vbus status get`),
-    };
-
-    const storeBattery = () => {
-        sendCommand(`fuel_gauge model store`);
     };
 
     return {

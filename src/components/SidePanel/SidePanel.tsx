@@ -196,10 +196,11 @@ export default () => {
                     Reset Device
                 </Button>
                 <StartStopButton
+                    large={false}
                     variant="secondary"
                     className="w-100"
-                    startText="Start Recording Events"
-                    stopText="Stop Recording Events"
+                    startText="Recording Events"
+                    stopText="Stop Recording"
                     onClick={() => {
                         if (
                             eventRecordingPath === undefined ||
