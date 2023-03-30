@@ -268,7 +268,7 @@ export type NpmDevice = {
     setActiveBatteryModel: (name: string) => Promise<void>;
     storeBattery: () => Promise<void>;
 
-    setBatteryStatusCheckEnabled: (enabled: boolean) => Promise<void>;
+    setBatteryStatusCheckEnabled: (enabled: boolean) => void;
 } & BaseNpmDevice;
 
 export interface PmicWarningDialog {

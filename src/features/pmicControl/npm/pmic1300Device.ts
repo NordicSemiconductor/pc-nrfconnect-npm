@@ -830,7 +830,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     `npmx ldsw set ${index} ${enabled ? '1' : '0'}`,
                     () => resolve(),
                     () => {
-                        requestUpdate.buckVOut(index);
+                        requestUpdate.ldoEnabled(index);
                         reject();
                     }
                 );
