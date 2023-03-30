@@ -488,158 +488,214 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 },
                 true
             );
+        } else {
+            onFail('No Shell connection', command);
         }
     };
 
-    const setChargerVTerm = (index: number, value: number) => {
-        emitPartialEvent<Charger>('onChargerUpdate', index, {
-            vTerm: value,
-        });
-
-        setChargerEnabled(index, false);
-
-        sendCommand(
-            `npmx charger termination_voltage normal set ${value * 1000}`, // mv to V
-            noop,
-            (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.chargerVTerm(index);
-            }
-        );
-    };
-
-    const setChargerIChg = (index: number, value: number) => {
-        emitPartialEvent<Charger>('onChargerUpdate', index, {
-            iChg: value,
-        });
-
-        setChargerEnabled(index, false);
-
-        sendCommand(
-            `npmx charger charger_current set ${value}`,
-            noop,
-            (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.chargerIChg(index);
-            }
-        );
-    };
-
-    const setChargerVTrickleFast = (index: number, value: VTrickleFast) => {
-        console.warn('Not implemented');
-
-        emitPartialEvent<Charger>('onChargerUpdate', index, {
-            vTrickleFast: value,
-        });
-    };
-
-    const setChargerITerm = (index: number, iTerm: ITerm) => {
-        console.warn('Not implemented');
-
-        emitPartialEvent<Charger>('onChargerUpdate', index, {
-            iTerm,
-        });
-    };
-
-    const setChargerEnabledRecharging = (index: number, enabled: boolean) => {
-        console.warn('Not implemented');
-
-        emitPartialEvent<Charger>('onChargerUpdate', index, {
-            enableRecharging: enabled,
-        });
-    };
-
-    const setChargerEnabled = (index: number, enabled: boolean) => {
-        sendCommand(
-            `npmx charger module charger set ${enabled ? '1' : '0'}`,
-            noop,
-            (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.chargerEnabled(index);
-            }
-        );
-
-        if (pmicState === 'ek-disconnected')
+    const setChargerVTerm = (index: number, value: number) =>
+        new Promise<void>((resolve, reject) => {
             emitPartialEvent<Charger>('onChargerUpdate', index, {
-                enabled,
+                vTerm: value,
             });
-    };
+
+            if (pmicState === 'ek-disconnected') {
+                resolve();
+            } else {
+                setChargerEnabled(index, false)
+                    .then(() => {
+                        sendCommand(
+                            `npmx charger termination_voltage normal set ${
+                                value * 1000
+                            }`, // mv to V
+                            () => resolve(),
+                            () => {
+                                requestUpdate.chargerVTerm(index);
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
+                        requestUpdate.chargerVTerm(index);
+                        reject();
+                    });
+            }
+        });
+
+    const setChargerIChg = (index: number, value: number) =>
+        new Promise<void>((resolve, reject) => {
+            emitPartialEvent<Charger>('onChargerUpdate', index, {
+                iChg: value,
+            });
+
+            if (pmicState === 'ek-disconnected') {
+                resolve();
+            } else {
+                setChargerEnabled(index, false)
+                    .then(() =>
+                        sendCommand(
+                            `npmx charger charger_current set ${value}`,
+                            () => resolve(),
+                            () => {
+                                requestUpdate.chargerIChg(index);
+                                reject();
+                            }
+                        )
+                    )
+                    .catch(() => {
+                        requestUpdate.chargerIChg(index);
+                        reject();
+                    });
+            }
+        });
+
+    const setChargerVTrickleFast = (index: number, value: VTrickleFast) =>
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
+
+            emitPartialEvent<Charger>('onChargerUpdate', index, {
+                vTrickleFast: value,
+            });
+
+            resolve();
+        });
+
+    const setChargerITerm = (index: number, iTerm: ITerm) =>
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
+
+            emitPartialEvent<Charger>('onChargerUpdate', index, {
+                iTerm,
+            });
+
+            resolve();
+        });
+
+    const setChargerEnabledRecharging = (index: number, enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
+
+            emitPartialEvent<Charger>('onChargerUpdate', index, {
+                enableRecharging: enabled,
+            });
+
+            resolve();
+        });
+
+    const setChargerEnabled = (index: number, enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', index, {
+                    enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx charger module charger set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerEnabled(index);
+                        reject();
+                    }
+                );
+            }
+        });
 
     const setBuckVOut = (index: number, value: number) => {
-        const action = () => {
-            sendCommand(
-                `npmx buck voltage set ${index} ${value * 1000}`,
-                noop,
-                (_res, command) => {
-                    if (isSetCommand(command)) requestUpdate.buckVOut(index);
+        const action = () =>
+            new Promise<void>((resolve, reject) => {
+                if (pmicState === 'ek-disconnected') {
+                    emitPartialEvent<Buck>('onBuckUpdate', index, {
+                        vOut: value,
+                    });
+
+                    emitPartialEvent<Buck>('onBuckUpdate', index, {
+                        mode: 'software',
+                    });
+
+                    resolve();
+                } else {
+                    sendCommand(
+                        `npmx buck voltage set ${index} ${value * 1000}`,
+                        () =>
+                            sendCommand(
+                                `npmx buck vout select set ${index} 1`,
+                                () => resolve(),
+                                () => {
+                                    requestUpdate.buckMode(index);
+                                    reject();
+                                }
+                            ),
+                        () => {
+                            requestUpdate.buckVOut(index);
+                            reject();
+                        }
+                    );
                 }
-            );
-
-            if (pmicState === 'ek-disconnected')
-                emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    vOut: value,
-                });
-
-            sendCommand(
-                `npmx buck vout select set ${index} 1`,
-                noop,
-                (_res, command) => {
-                    if (isSetCommand(command)) requestUpdate.buckMode(index);
-                }
-            );
-
-            if (pmicState === 'ek-disconnected')
-                emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    mode: 'software',
-                });
-        };
+            });
 
         if (pmicState !== 'ek-disconnected' && index === 0 && value <= 1.7) {
-            const warningDialog: PmicWarningDialog = {
-                storeID: 'pmic1300-setBuckVOut-0',
-                message: `Buck 1 Powers the I2C communications that are needed for this app. 
+            return new Promise<void>((resolve, reject) => {
+                const warningDialog: PmicWarningDialog = {
+                    storeID: 'pmic1300-setBuckVOut-0',
+                    message: `Buck 1 Powers the I2C communications that are needed for this app. 
                     Any voltage lower that 1.7v Might cause issues with the Connection to the app. Are you sure you want to continue`,
-                confirmLabel: 'Yes',
-                optionalLabel: "Yes, Don't ask again",
-                cancelLabel: 'No',
-                title: 'Warning',
-                onConfirm: action,
-                onCancel: () => requestUpdate.buckVOut(index),
-                onOptional: action,
-                optionalDoNotAskAgain: true,
-            };
+                    confirmLabel: 'Yes',
+                    optionalLabel: "Yes, Don't ask again",
+                    cancelLabel: 'No',
+                    title: 'Warning',
+                    onConfirm: () => action().then(resolve).catch(reject),
+                    onCancel: () => {
+                        requestUpdate.buckVOut(index);
+                        resolve();
+                    },
+                    onOptional: () => action().then(resolve).catch(reject),
+                    optionalDoNotAskAgain: true,
+                };
 
-            warningDialogHandler(warningDialog);
-        } else {
-            action();
-        }
-    };
-
-    const setBuckRetentionVOut = (index: number, value: number) => {
-        console.warn('Not implemented');
-
-        if (pmicState === 'ek-disconnected')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                retentionVOut: value,
+                warningDialogHandler(warningDialog);
             });
+        }
+
+        return action();
     };
 
-    const setBuckMode = (index: number, mode: BuckMode) => {
-        const action = () => {
-            sendCommand(
-                `npmx buck vout select set ${index} ${
-                    mode === 'software' ? 1 : 0
-                }`,
-                noop,
-                (_res, command) => {
-                    if (isSetCommand(command)) requestUpdate.buckMode(index);
-                }
-            );
+    const setBuckRetentionVOut = (index: number, value: number) =>
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
 
             if (pmicState === 'ek-disconnected')
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    mode,
+                    retentionVOut: value,
                 });
 
-            requestUpdate.buckVOut(index);
-        };
+            resolve();
+        });
+
+    const setBuckMode = (index: number, mode: BuckMode) => {
+        const action = () =>
+            new Promise<void>((resolve, reject) => {
+                if (pmicState === 'ek-disconnected') {
+                    emitPartialEvent<Buck>('onBuckUpdate', index, {
+                        mode,
+                    });
+                    resolve();
+                } else {
+                    sendCommand(
+                        `npmx buck vout select set ${index} ${
+                            mode === 'software' ? 1 : 0
+                        }`,
+                        () => {
+                            requestUpdate.buckVOut(index);
+                            resolve();
+                        },
+                        () => {
+                            requestUpdate.buckMode(index);
+                            reject();
+                        }
+                    );
+                }
+            });
 
         // TODO Check software voltage as well
         if (
@@ -647,146 +703,191 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             index === 0 &&
             mode === 'software'
         ) {
-            const warningDialog: PmicWarningDialog = {
-                storeID: 'pmic1300-setBuckVOut-0',
-                message: `Buck 1 Powers the I2C communications that are needed for this app. 
+            return new Promise<void>((resolve, reject) => {
+                const warningDialog: PmicWarningDialog = {
+                    storeID: 'pmic1300-setBuckVOut-0',
+                    message: `Buck 1 Powers the I2C communications that are needed for this app. 
                     Software voltage might be already set to less then 1.7V . Are you sure you want to continue`,
-                confirmLabel: 'Yes',
-                optionalLabel: "Yes, Don't ask again",
-                cancelLabel: 'No',
-                title: 'Warning',
-                onConfirm: action,
-                onCancel: () => requestUpdate.buckVOut(index),
-                onOptional: action,
-                optionalDoNotAskAgain: true,
-            };
+                    confirmLabel: 'Yes',
+                    optionalLabel: "Yes, Don't ask again",
+                    cancelLabel: 'No',
+                    title: 'Warning',
+                    onConfirm: () => action().then(resolve).catch(reject),
+                    onCancel: () => {
+                        requestUpdate.buckVOut(index);
+                        resolve();
+                    },
+                    onOptional: () => action().then(resolve).catch(reject),
+                    optionalDoNotAskAgain: true,
+                };
 
-            warningDialogHandler(warningDialog);
-        } else {
-            action();
-        }
-    };
-
-    const setBuckModeControl = (
-        index: number,
-        modeControl: BuckModeControl
-    ) => {
-        console.warn('Not implemented');
-
-        if (pmicState === 'ek-disconnected')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                modeControl,
+                warningDialogHandler(warningDialog);
             });
+        }
+
+        return action();
     };
+
+    const setBuckModeControl = (index: number, modeControl: BuckModeControl) =>
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
+
+            if (pmicState === 'ek-disconnected')
+                emitPartialEvent<Buck>('onBuckUpdate', index, {
+                    modeControl,
+                });
+
+            resolve();
+        });
 
     const setBuckOnOffControl = (
         index: number,
         onOffControl: BuckOnOffControl
-    ) => {
-        console.warn('Not implemented');
+    ) =>
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
 
-        if (pmicState === 'ek-disconnected')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                onOffControl,
-            });
-    };
+            if (pmicState === 'ek-disconnected')
+                emitPartialEvent<Buck>('onBuckUpdate', index, {
+                    onOffControl,
+                });
+
+            resolve();
+        });
 
     const setBuckRetentionControl = (
         index: number,
         retentionControl: BuckRetentionControl
-    ) => {
-        console.warn('Not implemented');
-
-        if (pmicState === 'ek-disconnected')
-            emitPartialEvent<Buck>('onBuckUpdate', index, {
-                retentionControl,
-            });
-    };
-
-    const setBuckEnabled = (index: number, enabled: boolean) => {
-        const action = () => {
-            sendCommand(
-                `npmx buck set ${index} ${enabled ? '1' : '0'}`,
-                noop,
-                (_res, command) => {
-                    if (isSetCommand(command)) requestUpdate.buckEnabled(index);
-                }
-            );
+    ) =>
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
 
             if (pmicState === 'ek-disconnected')
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    enabled,
+                    retentionControl,
                 });
-        };
+
+            resolve();
+        });
+
+    const setBuckEnabled = (index: number, enabled: boolean) => {
+        const action = () =>
+            new Promise<void>((resolve, reject) => {
+                if (pmicState === 'ek-disconnected') {
+                    emitPartialEvent<Buck>('onBuckUpdate', index, {
+                        enabled,
+                    });
+                    resolve();
+                } else {
+                    sendCommand(
+                        `npmx buck set ${index} ${enabled ? '1' : '0'}`,
+                        () => resolve(),
+                        () => {
+                            requestUpdate.buckEnabled(index);
+                            reject();
+                        }
+                    );
+                }
+            });
 
         if (pmicState !== 'ek-disconnected' && index === 0 && !enabled) {
-            const warningDialog: PmicWarningDialog = {
-                storeID: 'pmic1300-setBuckEnabled-0',
-                message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
+            return new Promise<void>((resolve, reject) => {
+                const warningDialog: PmicWarningDialog = {
+                    storeID: 'pmic1300-setBuckEnabled-0',
+                    message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
                 disconnected from the app. Are you sure you want to proceed?`,
-                confirmLabel: 'Yes',
-                optionalLabel: "Yes, Don't ask again",
-                cancelLabel: 'No',
-                title: 'Warning',
-                onConfirm: action,
-                onCancel: () => {},
-                onOptional: action,
-                optionalDoNotAskAgain: true,
-            };
+                    confirmLabel: 'Yes',
+                    optionalLabel: "Yes, Don't ask again",
+                    cancelLabel: 'No',
+                    title: 'Warning',
+                    onConfirm: () => action().then(resolve).catch(reject),
+                    onCancel: resolve,
+                    onOptional: () => action().then(resolve).catch(reject),
+                    optionalDoNotAskAgain: true,
+                };
 
-            warningDialogHandler(warningDialog);
-        } else {
-            action();
+                warningDialogHandler(warningDialog);
+            });
         }
+
+        return action();
     };
 
     const setLdoVoltage = (index: number, value: number) =>
-        console.warn('Not implemented');
-    const setLdoEnabled = (index: number, enabled: boolean) => {
-        sendCommand(
-            `npmx ldsw set ${index} ${enabled ? '1' : '0'}`,
-            noop,
-            (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.buckVOut(index);
-            }
-        );
-
-        if (pmicState === 'ek-disconnected')
-            emitPartialEvent<Ldo>('onLdoUpdate', index, {
-                enabled,
-            });
-    };
-    const setLdoMode = (index: number, mode: LdoMode) =>
-        console.warn('Not implemented');
-
-    const setFuelGaugeEnabled = (enabled: boolean) => {
-        sendCommand(
-            `fuel_gauge set ${enabled ? '1' : '0'}`,
-            noop,
-            (_res, command) => {
-                if (isSetCommand(command)) requestUpdate.fuelGauge();
-            }
-        );
-
-        if (pmicState === 'ek-disconnected')
-            eventEmitter.emit('onFuelGauge', enabled);
-    };
-
-    const setActiveBatteryModel = (name: string) => {
-        sendCommand(`fuel_gauge model set ${name}`, noop, (_res, command) => {
-            if (isSetCommand(command)) requestUpdate.activeBatteryModel();
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
+            resolve();
         });
-    };
+    const setLdoEnabled = (index: number, enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Ldo>('onLdoUpdate', index, {
+                    enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw set ${index} ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.buckVOut(index);
+                        reject();
+                    }
+                );
+            }
+        });
+    const setLdoMode = (index: number, mode: LdoMode) =>
+        new Promise<void>((resolve, reject) => {
+            console.warn('Not implemented');
+            resolve();
+        });
 
-    const startBatteryStatusCheck = () =>
-        sendCommand('npm_chg_status_check set 1');
+    const setFuelGaugeEnabled = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                eventEmitter.emit('onFuelGauge', enabled);
+                resolve();
+            } else {
+                sendCommand(
+                    `fuel_gauge set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.fuelGauge();
+                        reject();
+                    }
+                );
+            }
+        });
 
-    const stopBatteryStatusCheck = () =>
-        sendCommand('npm_chg_status_check set 0');
+    const setActiveBatteryModel = (name: string) =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `fuel_gauge model set ${name}`,
+                () => resolve(),
+                () => {
+                    requestUpdate.activeBatteryModel();
+                    reject();
+                }
+            );
+        });
 
-    const storeBattery = () => {
-        sendCommand(`fuel_gauge model store`);
-    };
+    const setBatteryStatusCheckEnabled = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `npm_chg_status_check set ${enabled ? '1' : '0'}`,
+                () => resolve(),
+                () => reject()
+            );
+        });
+
+    const storeBattery = () =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `fuel_gauge model store`,
+                () => resolve(),
+                () => reject()
+            );
+        });
 
     initConnectionTimeout();
     updateUptimeOverflowCounter();
@@ -963,7 +1064,6 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                 );
             }),
 
-        startBatteryStatusCheck,
-        stopBatteryStatusCheck,
+        setBatteryStatusCheckEnabled,
     };
 };

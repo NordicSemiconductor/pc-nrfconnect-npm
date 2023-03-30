@@ -134,14 +134,14 @@ describe('PMIC 1300', () => {
             mockEnqueueRequest,
             pmic,
         } = setupMocksWithShellParser();
-        describe('Test pmic 1300 Request commands', () => {
+        describe('Request commands', () => {
             beforeEach(() => {
                 jest.clearAllMocks();
             });
 
-            test('Request update pmicChargingState', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.each(PMIC_1300_CHARGERS)(
+                'Request update pmicChargingState index: %p',
+                index => {
                     pmic.requestUpdate.pmicChargingState(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -151,12 +151,12 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
-            });
+                }
+            );
 
-            test('Request update chargerVTerm', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.each(PMIC_1300_CHARGERS)(
+                'Request update chargerVTerm index: %p',
+                index => {
                     pmic.requestUpdate.chargerVTerm(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -166,12 +166,12 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
-            });
+                }
+            );
 
-            test('Request update chargerIChg', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.each(PMIC_1300_CHARGERS)(
+                'Request update chargerIChg index: %p',
+                index => {
                     pmic.requestUpdate.chargerIChg(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -181,12 +181,12 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
-            });
+                }
+            );
 
-            test('Request update chargerEnabled', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.each(PMIC_1300_CHARGERS)(
+                'Request update chargerEnabled index: %p',
+                index => {
                     pmic.requestUpdate.chargerEnabled(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -196,39 +196,39 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
-            });
+                }
+            );
 
-            test.skip('Request update chargerVTrickleFast', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_CHARGERS)(
+                'Request update chargerVTrickleFast index: %p',
+                index => {
                     pmic.requestUpdate.chargerVTrickleFast(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test.skip('Request update chargerITerm', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_CHARGERS)(
+                'Request update chargerITerm index: %p',
+                index => {
                     pmic.requestUpdate.chargerITerm(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test.skip('Request update chargerEnabledRecharging', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_CHARGERS)(
+                'Request update chargerEnabledRecharging index: %p',
+                index => {
                     pmic.requestUpdate.chargerEnabledRecharging(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test('Request update buckVOut', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.each(PMIC_1300_BUCKS)(
+                'Request update buckVOut index: %p',
+                index => {
                     pmic.requestUpdate.buckVOut(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -238,21 +238,21 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
-            });
+                }
+            );
 
-            test.skip('Request update buckRetentionVOut', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Request update buckRetentionVOut index: %p',
+                index => {
                     pmic.requestUpdate.buckRetentionVOut(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test('Request update buckMode', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.each(PMIC_1300_BUCKS)(
+                'Request update buckMode index: %p',
+                index => {
                     pmic.requestUpdate.buckMode(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -262,57 +262,57 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
-            });
+                }
+            );
 
-            test.skip('Request update buckModeControl', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Request update buckModeControl index: %p',
+                index => {
                     pmic.requestUpdate.buckModeControl(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test.skip('Request update buckOnOffControl', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Request update buckOnOffControl index: %p',
+                index => {
                     pmic.requestUpdate.buckOnOffControl(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test.skip('Request update buckRetentionControl', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Request update buckRetentionControl index: %p',
+                index => {
                     pmic.requestUpdate.buckRetentionControl(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test.skip('Request update buckEnabled', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Request update buckEnabled index: %p',
+                index => {
                     pmic.requestUpdate.buckEnabled(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test.skip('Request update ldoVoltage', () => {
-                PMIC_1300_LDOS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_LDOS)(
+                'Request update ldoVoltage index: %p',
+                index => {
                     pmic.requestUpdate.ldoVoltage(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test('Request update ldoEnabled', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.each(PMIC_1300_LDOS)(
+                'Request update ldoEnabled index: %p',
+                index => {
                     pmic.requestUpdate.ldoEnabled(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -322,17 +322,17 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
-            });
+                }
+            );
 
-            test.skip('Request update ldoMode', () => {
-                PMIC_1300_LDOS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
+            test.skip.each(PMIC_1300_LDOS)(
+                'Request update ldoMode index: %p',
+                index => {
                     pmic.requestUpdate.ldoMode(index);
 
                     // TODO
-                });
-            });
+                }
+            );
 
             test('Request update fuelGauge', () => {
                 pmic.requestUpdate.fuelGauge();
@@ -371,14 +371,26 @@ describe('PMIC 1300', () => {
             });
         });
 
-        describe('Setters and effects state not ek_disconnected', () => {
+        describe('Setters and effects state not ek_disconnected success', () => {
             beforeEach(() => {
                 jest.clearAllMocks();
+
+                mockEnqueueRequest.mockImplementation(
+                    (
+                        command: string,
+                        onSuccess?: (response: string, command: string) => void,
+                        onError?: (message: string, command: string) => void,
+                        unique?: boolean
+                    ) => {
+                        if (onSuccess) onSuccess('', '');
+                        return Promise.resolve();
+                    }
+                );
             });
-            test('Set setChargerVTerm', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setChargerVTerm(index, 3.2);
+            test.each(PMIC_1300_CHARGERS)(
+                'Set setChargerVTerm index: %p',
+                async index => {
+                    await pmic.setChargerVTerm(index, 3.2);
 
                     expect(mockOnChargerUpdate).toBeCalledTimes(1);
                     expect(mockOnChargerUpdate).toBeCalledWith({
@@ -402,13 +414,13 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
-            });
+                }
+            );
 
-            test.skip('Set setChargerVTrickleFast', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setChargerVTrickleFast(index, 2.5);
+            test.skip.each(PMIC_1300_CHARGERS)(
+                'Set setChargerVTrickleFast index: %p',
+                async index => {
+                    await pmic.setChargerVTrickleFast(index, 2.5);
 
                     expect(mockOnChargerUpdate).toBeCalledTimes(1);
                     expect(mockOnChargerUpdate).toBeCalledWith({
@@ -417,13 +429,13 @@ describe('PMIC 1300', () => {
                     });
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test.skip('Set setChargerITerm', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setChargerITerm(index, '10%');
+            test.skip.each(PMIC_1300_CHARGERS)(
+                'Set setChargerITerm index: %p',
+                async index => {
+                    await pmic.setChargerITerm(index, '10%');
 
                     expect(mockOnChargerUpdate).toBeCalledTimes(1);
                     expect(mockOnChargerUpdate).toBeCalledWith({
@@ -432,52 +444,65 @@ describe('PMIC 1300', () => {
                     });
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test.skip('Set setChargerEnabledRecharging', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    [true, false].forEach(enabled => {
-                        mockEnqueueRequest.mockReset();
-                        pmic.setChargerEnabledRecharging(index, enabled);
+            test.skip.each(
+                PMIC_1300_CHARGERS.map(index => [
+                    {
+                        index,
+                        enabled: false,
+                    },
+                    {
+                        index,
+                        enabled: true,
+                    },
+                ])
+            )(
+                'Set setChargerEnabledRecharging %p',
+                async ({ index, enabled }) => {
+                    await pmic.setChargerEnabledRecharging(index, enabled);
 
-                        expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                        expect(mockOnChargerUpdate).toBeCalledWith({
-                            data: { enableRecharging: enabled },
-                            index,
-                        });
-
-                        // TODO
+                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
+                    expect(mockOnChargerUpdate).toBeCalledWith({
+                        data: { enableRecharging: enabled },
+                        index,
                     });
-                });
+
+                    // TODO
+                }
+            );
+
+            test.each(
+                PMIC_1300_CHARGERS.map(index => [
+                    {
+                        index,
+                        enabled: false,
+                    },
+                    {
+                        index,
+                        enabled: true,
+                    },
+                ])
+            )('Set setChargerEnabled %p', async ({ index, enabled }) => {
+                await pmic.setChargerEnabled(index, enabled);
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx charger module charger set ${enabled ? '1' : '0'}`,
+                    expect.anything(),
+                    expect.anything(),
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
             });
 
-            test('Set setChargerEnabled', () => {
-                PMIC_1300_CHARGERS.forEach(index => {
-                    [true, false].forEach(enabled => {
-                        mockEnqueueRequest.mockReset();
-                        pmic.setChargerEnabled(index, enabled);
-
-                        expect(mockEnqueueRequest).toBeCalledTimes(1);
-                        expect(mockEnqueueRequest).toBeCalledWith(
-                            `npmx charger module charger set ${
-                                enabled ? '1' : '0'
-                            }`,
-                            expect.anything(),
-                            expect.anything(),
-                            true
-                        );
-
-                        // Updates should only be emitted when we get response
-                        expect(mockOnChargerUpdate).toBeCalledTimes(0);
-                    });
-                });
-            });
-
-            test('Set setBuckVOut', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setBuckVOut(index, 1.8);
+            test.each(PMIC_1300_CHARGERS)(
+                'Set setBuckVOut index: %p',
+                async index => {
+                    await pmic.setBuckVOut(index, 1.8);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(2);
                     expect(mockEnqueueRequest).nthCalledWith(
@@ -499,19 +524,17 @@ describe('PMIC 1300', () => {
 
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);
-                });
-            });
+                }
+            );
 
-            test('Set setBuckVOut 0 with warning - cancel', () => {
-                mockEnqueueRequest.mockReset();
-
+            test('Set setBuckVOut index: 0 with warning - cancel', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
                         warningDialog.onCancel();
                     }
                 );
 
-                pmic.setBuckVOut(0, 1.7);
+                await pmic.setBuckVOut(0, 1.7);
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
@@ -527,16 +550,14 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test('Set setBuckVOut 0 with warning - confirm', () => {
-                mockEnqueueRequest.mockReset();
-
+            test('Set setBuckVOut index: 0 with warning - confirm', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
                         warningDialog.onConfirm();
                     }
                 );
 
-                pmic.setBuckVOut(0, 1.7);
+                await pmic.setBuckVOut(0, 1.7);
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -561,9 +582,7 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test("Set setBuckVOut 0 with warning - yes, don't ask", () => {
-                mockEnqueueRequest.mockReset();
-
+            test("Set setBuckVOut index: 0 with warning - yes, don't ask", async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
                         if (warningDialog?.onOptional)
@@ -571,7 +590,7 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                pmic.setBuckVOut(0, 1.7);
+                await pmic.setBuckVOut(0, 1.7);
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -596,10 +615,10 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test.skip('Set setBuckRetentionVOut', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setBuckRetentionVOut(index, 1.7);
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Set setBuckRetentionVOut index: %p',
+                async index => {
+                    await pmic.setBuckRetentionVOut(index, 1.7);
 
                     expect(mockOnChargerUpdate).toBeCalledTimes(1);
                     expect(mockOnChargerUpdate).toBeCalledWith({
@@ -608,13 +627,13 @@ describe('PMIC 1300', () => {
                     });
 
                     // TODO
-                });
-            });
+                }
+            );
 
-            test('Set setBuckMode - vSet', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setBuckMode(index, 'vSet');
+            test.each(PMIC_1300_BUCKS)(
+                'Set setBuckMode - vSet',
+                async index => {
+                    await pmic.setBuckMode(index, 'vSet');
 
                     expect(mockEnqueueRequest).toBeCalledTimes(2);
                     expect(mockEnqueueRequest).nthCalledWith(
@@ -636,19 +655,17 @@ describe('PMIC 1300', () => {
 
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);
-                });
-            });
+                }
+            );
 
-            test('Set setBuckMode 0 with software - cancel', () => {
-                mockEnqueueRequest.mockReset();
-
+            test('Set setBuckMode index: 0 with software - cancel', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
                         warningDialog.onCancel();
                     }
                 );
 
-                pmic.setBuckMode(0, 'software');
+                await pmic.setBuckMode(0, 'software');
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
@@ -664,16 +681,14 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test('Set setBuckMode 0 with software - confirm', () => {
-                mockEnqueueRequest.mockReset();
-
+            test('Set setBuckMode index: 0 with software - confirm', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
                         warningDialog.onConfirm();
                     }
                 );
 
-                pmic.setBuckMode(0, 'software');
+                await pmic.setBuckMode(0, 'software');
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
@@ -699,9 +714,7 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test("Set setBuckMode 0 with software - yes, don't ask", () => {
-                mockEnqueueRequest.mockReset();
-
+            test("Set setBuckMode index: 0 with software - yes, don't ask", async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
                         if (warningDialog.onOptional)
@@ -709,7 +722,7 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                pmic.setBuckMode(0, 'software');
+                await pmic.setBuckMode(0, 'software');
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
@@ -735,10 +748,10 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test.skip('Set setBuckModeControl', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setBuckModeControl(index, 'Auto');
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Set setBuckModeControl index: %p',
+                async index => {
+                    await pmic.setBuckModeControl(index, 'Auto');
 
                     expect(mockOnBuckUpdate).toBeCalledTimes(1);
                     expect(mockOnBuckUpdate).toBeCalledWith({
@@ -749,13 +762,13 @@ describe('PMIC 1300', () => {
                     // TODO
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);
-                });
-            });
+                }
+            );
 
-            test.skip('Set setBuckOnOffControl', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setBuckOnOffControl(index, 'Off');
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Set setBuckOnOffControl index: %p',
+                async index => {
+                    await pmic.setBuckOnOffControl(index, 'Off');
 
                     expect(mockOnBuckUpdate).toBeCalledTimes(1);
                     expect(mockOnBuckUpdate).toBeCalledWith({
@@ -766,13 +779,13 @@ describe('PMIC 1300', () => {
                     // TODO
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);
-                });
-            });
+                }
+            );
 
-            test.skip('Set setBuckRetentionControl', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setBuckRetentionControl(index, 'Off');
+            test.skip.each(PMIC_1300_BUCKS)(
+                'Set setBuckRetentionControl index: %p',
+                async index => {
+                    await pmic.setBuckRetentionControl(index, 'Off');
 
                     expect(mockOnBuckUpdate).toBeCalledTimes(1);
                     expect(mockOnBuckUpdate).toBeCalledWith({
@@ -781,15 +794,13 @@ describe('PMIC 1300', () => {
                     });
 
                     // TODO
-                    // Updates should only be emitted when we get response
-                    expect(mockOnBuckUpdate).toBeCalledTimes(0);
-                });
-            });
+                }
+            );
 
-            test('Set setBuckEnabled', () => {
-                PMIC_1300_BUCKS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setBuckEnabled(index, true);
+            test.each(PMIC_1300_BUCKS)(
+                'Set setBuckEnabled index: %p',
+                async index => {
+                    await pmic.setBuckEnabled(index, true);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
                     expect(mockEnqueueRequest).nthCalledWith(
@@ -799,22 +810,20 @@ describe('PMIC 1300', () => {
                         expect.anything(),
                         true
                     );
-                });
 
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            });
+                    // Updates should only be emitted when we get response
+                    expect(mockOnBuckUpdate).toBeCalledTimes(0);
+                }
+            );
 
-            test('Set setBuckEnabled 0 false - cancel', () => {
-                mockEnqueueRequest.mockReset();
-
+            test('Set setBuckEnabled index: 0 false - cancel', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
                         warningDialog.onCancel();
                     }
                 );
 
-                pmic.setBuckEnabled(0, false);
+                await pmic.setBuckEnabled(0, false);
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 // No need to request UI update
@@ -824,8 +833,8 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test("Set setBuckEnabled 0 false -  yes, don't ask", () => {
-                mockEnqueueRequest.mockReset();
+            test("Set setBuckEnabled index: 0 false -  yes, don't ask", async () => {
+                mockEnqueueRequest.mockClear();
 
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
@@ -833,7 +842,7 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                pmic.setBuckEnabled(0, false);
+                await pmic.setBuckEnabled(0, false);
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -849,8 +858,8 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test('Set setBuckEnabled 0 false - confirm', () => {
-                mockEnqueueRequest.mockReset();
+            test('Set setBuckEnabled index: 0 false - confirm', async () => {
+                mockEnqueueRequest.mockClear();
 
                 mockWarningDialogHandler.mockImplementationOnce(
                     (warningDialog: PmicWarningDialog) => {
@@ -859,7 +868,7 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                pmic.setBuckEnabled(0, false);
+                await pmic.setBuckEnabled(0, false);
                 expect(mockWarningDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -875,59 +884,60 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test.skip('Set setLdoVoltage', () => {
-                PMIC_1300_LDOS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setLdoVoltage(index, 3);
+            test.skip.each(PMIC_1300_LDOS)(
+                'Set setLdoVoltage index: %p',
+                async index => {
+                    await pmic.setLdoVoltage(index, 3);
 
                     // TODO
 
                     // Updates should only be emitted when we get response
                     expect(mockOnLdoUpdate).toBeCalledTimes(0);
-                });
+                }
+            );
+
+            test.each(
+                PMIC_1300_LDOS.map(index => [
+                    {
+                        index,
+                        enabled: false,
+                    },
+                    {
+                        index,
+                        enabled: true,
+                    },
+                ])
+            )('Set setLdoEnabled %p', async ({ index, enabled }) => {
+                await pmic.setLdoEnabled(index, enabled);
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx ldsw set ${index} ${enabled ? '1' : '0'}`,
+                    expect.anything(),
+                    expect.anything(),
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
             });
 
-            test('Set setLdoEnabled', () => {
-                PMIC_1300_LDOS.forEach(index => {
-                    [true, false].forEach(enabled => {
-                        mockEnqueueRequest.mockReset();
-                        pmic.setLdoEnabled(index, enabled);
-
-                        expect(mockEnqueueRequest).toBeCalledTimes(1);
-                        expect(mockEnqueueRequest).nthCalledWith(
-                            1,
-                            `npmx ldsw set ${index} ${enabled ? '1' : '0'}`,
-                            expect.anything(),
-                            expect.anything(),
-                            true
-                        );
-
-                        // Updates should only be emitted when we get response
-                        expect(mockOnLdoUpdate).toBeCalledTimes(0);
-                    });
-                });
-            });
-
-            test.skip('Set setLdoMode', () => {
-                PMIC_1300_LDOS.forEach(index => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setLdoMode(index, 'LDO');
+            test.skip.each(PMIC_1300_LDOS)(
+                'Set setLdoMode index: %p',
+                async index => {
+                    await pmic.setLdoMode(index, 'LDO');
 
                     // TODO
+                }
+            );
 
-                    // Updates should only be emitted when we get response
-                    expect(mockOnLdoUpdate).toBeCalledTimes(0);
-                });
-            });
-
-            test('Set setFuelGaugeEnabled', () => {
-                [true, false].forEach(enabled => {
-                    mockEnqueueRequest.mockReset();
-                    pmic.setFuelGaugeEnabled(enabled);
+            test.each([true, false])(
+                'Set setFuelGaugeEnabled enabled: %p',
+                async enabled => {
+                    await pmic.setFuelGaugeEnabled(enabled);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
-                    expect(mockEnqueueRequest).nthCalledWith(
-                        1,
+                    expect(mockEnqueueRequest).toBeCalledWith(
                         `fuel_gauge set ${enabled ? '1' : '0'}`,
                         expect.anything(),
                         expect.anything(),
@@ -936,16 +946,14 @@ describe('PMIC 1300', () => {
 
                     // Updates should only be emitted when we get response
                     expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-                });
-            });
+                }
+            );
 
-            test('Set setActiveBatteryModel', () => {
-                mockEnqueueRequest.mockReset();
-                pmic.setActiveBatteryModel('someProfileName');
+            test('Set setActiveBatteryModel', async () => {
+                await pmic.setActiveBatteryModel('someProfileName');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
+                expect(mockEnqueueRequest).toBeCalledWith(
                     `fuel_gauge model set someProfileName`,
                     expect.anything(),
                     expect.anything(),
@@ -956,35 +964,23 @@ describe('PMIC 1300', () => {
                 expect(mockOnActiveBatteryModelUpdate).toBeCalledTimes(0);
             });
 
-            test('startBatteryStatusCheck', () => {
-                mockEnqueueRequest.mockReset();
-                pmic.startBatteryStatusCheck();
+            test.each([true, false])(
+                'startBatteryStatusCheck enabled: %p',
+                async enabled => {
+                    await pmic.setBatteryStatusCheckEnabled(enabled);
 
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npm_chg_status_check set 1`,
-                    expect.anything(),
-                    expect.anything(),
-                    true
-                );
-            });
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npm_chg_status_check set ${enabled ? '1' : '0'}`,
+                        expect.anything(),
+                        expect.anything(),
+                        true
+                    );
+                }
+            );
 
-            test('stopBatteryStatusCheck', () => {
-                mockEnqueueRequest.mockReset();
-                pmic.stopBatteryStatusCheck();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npm_chg_status_check set 0`,
-                    expect.anything(),
-                    expect.anything(),
-                    true
-                );
-            });
-
-            test('storeBattery', () => {
-                mockEnqueueRequest.mockReset();
-                pmic.storeBattery();
+            test('storeBattery', async () => {
+                await pmic.storeBattery();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -1014,112 +1010,98 @@ describe('PMIC 1300', () => {
             jest.clearAllMocks();
         });
 
-        test('Set setChargerVTerm', () => {
-            PMIC_1300_CHARGERS.forEach(index => {
-                mockOnChargerUpdate.mockReset();
-                pmic.setChargerVTerm(index, 1);
+        test.each(PMIC_1300_CHARGERS)(
+            'Set setChargerVTerm index: %p',
+            async index => {
+                await pmic.setChargerVTerm(index, 1);
 
-                expect(mockOnChargerUpdate).toBeCalledTimes(2);
+                expect(mockOnChargerUpdate).toBeCalledTimes(1);
                 expect(mockOnChargerUpdate).nthCalledWith(1, {
                     data: { vTerm: 1 },
                     index,
                 });
-                expect(mockOnChargerUpdate).nthCalledWith(2, {
-                    data: { enabled: false },
-                    index,
-                });
-            });
-        });
+            }
+        );
 
-        test('Set setChargerIChg', () => {
-            PMIC_1300_CHARGERS.forEach(index => {
-                mockOnChargerUpdate.mockReset();
-                pmic.setChargerIChg(index, 1);
+        test.each(PMIC_1300_CHARGERS)(
+            'Set setChargerIChg index: %p',
+            async index => {
+                await pmic.setChargerIChg(index, 1);
 
-                expect(mockOnChargerUpdate).toBeCalledTimes(2);
-                expect(mockOnChargerUpdate).nthCalledWith(1, {
+                expect(mockOnChargerUpdate).toBeCalledTimes(1);
+                expect(mockOnChargerUpdate).toBeCalledWith({
                     data: { iChg: 1 },
                     index,
                 });
-                expect(mockOnChargerUpdate).nthCalledWith(2, {
-                    data: { enabled: false },
-                    index,
-                });
-            });
-        });
+            }
+        );
 
-        test('Set setChargerVTrickleFast', () => {
-            PMIC_1300_CHARGERS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setChargerVTrickleFast(index, 2.5);
+        test.each(PMIC_1300_CHARGERS)(
+            'Set setChargerVTrickleFast index: %p',
+            async index => {
+                await pmic.setChargerVTrickleFast(index, 2.5);
 
                 expect(mockOnChargerUpdate).toBeCalledTimes(1);
                 expect(mockOnChargerUpdate).toBeCalledWith({
                     data: { vTrickleFast: 2.5 },
                     index,
                 });
+            }
+        );
+
+        test.each(PMIC_1300_CHARGERS)('Set setChargerITerm', async index => {
+            await pmic.setChargerITerm(index, '10%');
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({
+                data: { iTerm: '10%' },
+                index,
             });
         });
 
-        test('Set setChargerITerm', () => {
-            PMIC_1300_CHARGERS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setChargerITerm(index, '10%');
-
-                expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                expect(mockOnChargerUpdate).toBeCalledWith({
-                    data: { iTerm: '10%' },
-                    index,
-                });
-            });
-        });
-
-        test('Set setChargerEnabledRecharging', () => {
-            PMIC_1300_CHARGERS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setChargerEnabledRecharging(index, true);
+        test.each(PMIC_1300_CHARGERS)(
+            'Set setChargerEnabledRecharging index: %p',
+            async index => {
+                await pmic.setChargerEnabledRecharging(index, true);
 
                 expect(mockOnChargerUpdate).toBeCalledTimes(1);
                 expect(mockOnChargerUpdate).toBeCalledWith({
                     data: { enableRecharging: true },
                     index,
                 });
-            });
-        });
+            }
+        );
 
-        test('Set setChargerEnabled', () => {
-            PMIC_1300_CHARGERS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setChargerEnabled(index, true);
+        test.each(PMIC_1300_CHARGERS)(
+            'Set setChargerEnabled index: %p',
+            async index => {
+                await pmic.setChargerEnabled(index, true);
 
                 expect(mockOnChargerUpdate).toBeCalledTimes(1);
                 expect(mockOnChargerUpdate).toBeCalledWith({
                     data: { enabled: true },
                     index,
                 });
+            }
+        );
+
+        test.each(PMIC_1300_BUCKS)('Set setBuckVOut index: %p', async index => {
+            await pmic.setBuckVOut(index, 1.2);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(2);
+            expect(mockOnBuckUpdate).nthCalledWith(1, {
+                data: { vOut: 1.2 },
+                index,
+            });
+            expect(mockOnBuckUpdate).nthCalledWith(2, {
+                data: { mode: 'software' },
+                index,
             });
         });
 
-        test('Set setBuckVOut', () => {
-            PMIC_1300_BUCKS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setBuckVOut(index, 1.2);
-
-                expect(mockOnBuckUpdate).toBeCalledTimes(2);
-                expect(mockOnBuckUpdate).nthCalledWith(1, {
-                    data: { vOut: 1.2 },
-                    index,
-                });
-                expect(mockOnBuckUpdate).nthCalledWith(2, {
-                    data: { mode: 'software' },
-                    index,
-                });
-            });
-        });
-
-        test('Set setBuckRetentionVOut', () => {
-            PMIC_1300_BUCKS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
+        test.each(PMIC_1300_BUCKS)(
+            'Set setBuckRetentionVOut  index: %p',
+            index => {
                 pmic.setBuckRetentionVOut(index, 1.2);
 
                 expect(mockOnBuckUpdate).toBeCalledTimes(1);
@@ -1127,106 +1109,102 @@ describe('PMIC 1300', () => {
                     data: { retentionVOut: 1.2 },
                     index,
                 });
+            }
+        );
+
+        test.each(PMIC_1300_BUCKS)('Set setBuckMode index: %p', async index => {
+            await pmic.setBuckMode(index, 'software');
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: { mode: 'software' },
+                index,
             });
         });
 
-        test('Set setBuckMode', () => {
-            PMIC_1300_BUCKS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setBuckMode(index, 'software');
-
-                expect(mockOnBuckUpdate).toBeCalledTimes(1);
-                expect(mockOnBuckUpdate).toBeCalledWith({
-                    data: { mode: 'software' },
-                    index,
-                });
-            });
-        });
-
-        test('Set setBuckModeControl', () => {
-            PMIC_1300_BUCKS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setBuckModeControl(index, 'Auto');
+        test.each(PMIC_1300_BUCKS)(
+            'Set setBuckModeControl index: %p',
+            async index => {
+                await pmic.setBuckModeControl(index, 'Auto');
 
                 expect(mockOnBuckUpdate).toBeCalledTimes(1);
                 expect(mockOnBuckUpdate).toBeCalledWith({
                     data: { modeControl: 'Auto' },
                     index,
                 });
-            });
-        });
+            }
+        );
 
-        test('Set setBuckOnOffControl', () => {
-            PMIC_1300_BUCKS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setBuckOnOffControl(index, 'Off');
+        test.each(PMIC_1300_BUCKS)(
+            'Set setBuckOnOffControl index: %p',
+            async index => {
+                await pmic.setBuckOnOffControl(index, 'Off');
 
                 expect(mockOnBuckUpdate).toBeCalledTimes(1);
                 expect(mockOnBuckUpdate).toBeCalledWith({
                     data: { onOffControl: 'Off' },
                     index,
                 });
-            });
-        });
+            }
+        );
 
-        test('Set setBuckRetentionControl', () => {
-            PMIC_1300_BUCKS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setBuckRetentionControl(index, 'Off');
+        test.each(PMIC_1300_BUCKS)(
+            'Set setBuckRetentionControl index: %p',
+            async index => {
+                await pmic.setBuckRetentionControl(index, 'Off');
 
                 expect(mockOnBuckUpdate).toBeCalledTimes(1);
                 expect(mockOnBuckUpdate).toBeCalledWith({
                     data: { retentionControl: 'Off' },
                     index,
                 });
-            });
-        });
+            }
+        );
 
-        test('Set setBuckEnabled', () => {
-            PMIC_1300_BUCKS.forEach(index => {
-                mockOnBuckUpdate.mockReset();
-                pmic.setBuckEnabled(index, false);
+        test.each(PMIC_1300_BUCKS)(
+            'Set setBuckEnabled index: %p',
+            async index => {
+                await pmic.setBuckEnabled(index, false);
 
                 expect(mockOnBuckUpdate).toBeCalledTimes(1);
                 expect(mockOnBuckUpdate).toBeCalledWith({
                     data: { enabled: false },
                     index,
                 });
-            });
-        });
+            }
+        );
 
-        test.skip('Set setLdoVoltage', () => {
-            PMIC_1300_LDOS.forEach(index => {
-                mockOnLdoUpdate.mockReset();
-                pmic.setLdoVoltage(index, 1.2);
+        test.skip.each(PMIC_1300_LDOS)(
+            'Set setLdoVoltage index: %p',
+            async index => {
+                await pmic.setLdoVoltage(index, 1.2);
                 // TODO
-            });
-        });
+            }
+        );
 
-        test('Set setLdoEnabled', () => {
-            PMIC_1300_LDOS.forEach(index => {
-                mockOnLdoUpdate.mockReset();
-                pmic.setLdoEnabled(index, false);
+        test.each(PMIC_1300_LDOS)(
+            'Set setLdoEnabled index: %p',
+            async index => {
+                await pmic.setLdoEnabled(index, false);
 
                 expect(mockOnLdoUpdate).toBeCalledTimes(1);
                 expect(mockOnLdoUpdate).toBeCalledWith({
                     data: { enabled: false },
                     index,
                 });
-            });
-        });
+            }
+        );
 
-        test.skip('Set setLdoMode', () => {
-            PMIC_1300_LDOS.forEach(index => {
-                mockOnLdoUpdate.mockReset();
-                pmic.setLdoMode(index, 'LDO');
+        test.skip.each(PMIC_1300_LDOS)(
+            'Set setLdoMode index: %p',
+            async index => {
+                await pmic.setLdoMode(index, 'LDO');
                 // TODO
-            });
-        });
+            }
+        );
 
-        test('Set setFuelGaugeEnabled', () => {
-            mockOnFuelGaugeUpdate.mockReset();
-            pmic.setFuelGaugeEnabled(false);
+        test('Set setFuelGaugeEnabled', async () => {
+            await pmic.setFuelGaugeEnabled(false);
 
             expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
             expect(mockOnFuelGaugeUpdate).toBeCalledWith(false);

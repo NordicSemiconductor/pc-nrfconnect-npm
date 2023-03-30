@@ -232,35 +232,43 @@ export type NpmDevice = {
         usbPowered: () => void;
     };
 
-    setChargerVTerm: (index: number, value: number) => void;
-    setChargerIChg: (index: number, value: number) => void;
-    setChargerEnabled: (index: number, state: boolean) => void;
-    setChargerVTrickleFast: (index: number, value: VTrickleFast) => void;
-    setChargerITerm: (index: number, iTerm: ITerm) => void;
-    setChargerEnabledRecharging: (index: number, enabled: boolean) => void;
+    setChargerVTerm: (index: number, value: number) => Promise<void>;
+    setChargerIChg: (index: number, value: number) => Promise<void>;
+    setChargerEnabled: (index: number, state: boolean) => Promise<void>;
+    setChargerVTrickleFast: (
+        index: number,
+        value: VTrickleFast
+    ) => Promise<void>;
+    setChargerITerm: (index: number, iTerm: ITerm) => Promise<void>;
+    setChargerEnabledRecharging: (
+        index: number,
+        enabled: boolean
+    ) => Promise<void>;
 
-    setBuckVOut: (index: number, value: number) => void;
-    setBuckRetentionVOut: (index: number, value: number) => void;
-    setBuckMode: (index: number, mode: BuckMode) => void;
-    setBuckModeControl: (index: number, mode: BuckModeControl) => void;
-    setBuckOnOffControl: (index: number, mode: BuckOnOffControl) => void;
+    setBuckVOut: (index: number, value: number) => Promise<void>;
+    setBuckRetentionVOut: (index: number, value: number) => Promise<void>;
+    setBuckMode: (index: number, mode: BuckMode) => Promise<void>;
+    setBuckModeControl: (index: number, mode: BuckModeControl) => Promise<void>;
+    setBuckOnOffControl: (
+        index: number,
+        mode: BuckOnOffControl
+    ) => Promise<void>;
     setBuckRetentionControl: (
         index: number,
         mode: BuckRetentionControl
-    ) => void;
-    setBuckEnabled: (index: number, state: boolean) => void;
+    ) => Promise<void>;
+    setBuckEnabled: (index: number, state: boolean) => Promise<void>;
 
-    setLdoVoltage: (index: number, value: number) => void;
-    setLdoEnabled: (index: number, state: boolean) => void;
-    setLdoMode: (index: number, mode: LdoMode) => void;
+    setLdoVoltage: (index: number, value: number) => Promise<void>;
+    setLdoEnabled: (index: number, state: boolean) => Promise<void>;
+    setLdoMode: (index: number, mode: LdoMode) => Promise<void>;
 
-    setFuelGaugeEnabled: (state: boolean) => void;
+    setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     getDefaultBatteryModels: () => Promise<BatteryModel[]>;
-    setActiveBatteryModel: (name: string) => void;
-    storeBattery: () => void;
+    setActiveBatteryModel: (name: string) => Promise<void>;
+    storeBattery: () => Promise<void>;
 
-    startBatteryStatusCheck: () => void;
-    stopBatteryStatusCheck: () => void;
+    setBatteryStatusCheckEnabled: (enabled: boolean) => Promise<void>;
 } & BaseNpmDevice;
 
 export interface PmicWarningDialog {
