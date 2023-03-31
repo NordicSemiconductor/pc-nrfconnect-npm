@@ -126,8 +126,8 @@ export interface IBaseNpmDevice {
 }
 
 export type BaseNpmDevice = {
-    kernelReset: (mode: RebootMode, callback?: () => void) => void;
-    getKernelUptime: (callback: (milliseconds: number) => void) => void;
+    kernelReset: (mode: RebootMode) => void;
+    getKernelUptime: () => Promise<number>;
     onPmicStateChange: (
         handler: (state: PmicState, error?: string) => void
     ) => () => void;
@@ -181,6 +181,15 @@ export type BaseNpmDevice = {
 
     isSupportedVersion: () => Promise<boolean>;
     getSupportedVersion: () => string;
+
+    registerCommandCallbackLoggerWrapper: (
+        command: string,
+        onSuccess: (data: string, command: string) => void,
+        onError: (error: string, command: string) => void
+    ) => (() => void) | undefined;
+
+    getUptimeOverflowCounter: () => number;
+    setUptimeOverflowCounter: (value: number) => void;
 };
 
 export interface INpmDevice extends IBaseNpmDevice {
@@ -196,6 +205,7 @@ export type NpmDevice = {
     getConnectionState: () => PmicState;
 
     startAdcSample: (intervalMs: number) => void;
+    stopAdcSample: () => void;
 
     getChargerCurrentRange: (index: number) => RangeType;
     getChargerVoltageRange: (index: number) => number[];

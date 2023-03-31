@@ -57,7 +57,7 @@ export default (shellParser: ShellParser | undefined) => {
         if (!npmDevice) return;
 
         npmDevice.startAdcSample(2000);
-        npmDevice.startBatteryStatusCheck();
+        npmDevice.setBatteryStatusCheckEnabled(true);
         npmDevice.requestUpdate.usbPowered();
 
         for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
@@ -305,17 +305,19 @@ export default (shellParser: ShellParser | undefined) => {
     useEffect(() => {
         if (!npmDevice) return;
         const releaseOnLoggingEvent = npmDevice.onLoggingEvent(e => {
-            switch (e.loggingEvent.logLevel) {
-                case 'wrn':
-                    logger.warn(
-                        `${e.loggingEvent.module}: ${e.loggingEvent.message}`
-                    );
-                    break;
-                case 'err':
-                    logger.error(
-                        `${e.loggingEvent.module}: ${e.loggingEvent.message}`
-                    );
-                    break;
+            if (e.loggingEvent.module !== 'shell_commands') {
+                switch (e.loggingEvent.logLevel) {
+                    case 'wrn':
+                        logger.warn(
+                            `${e.loggingEvent.module}: ${e.loggingEvent.message}`
+                        );
+                        break;
+                    case 'err':
+                        logger.error(
+                            `${e.loggingEvent.module}: ${e.loggingEvent.message}`
+                        );
+                        break;
+                }
             }
             if (recordEvents) {
                 if (e.dataPair) {

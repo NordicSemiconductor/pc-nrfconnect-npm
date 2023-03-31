@@ -17,7 +17,10 @@ export const parseToBoolean = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10) === 1;
 
 export const parseBatteryModel = (message: string) => {
-    const valuePairs = message.replaceAll(/("|}),/g, ';').split(';');
+    const valuePairs = message
+        .trim()
+        .replaceAll(/("|}),/g, ';')
+        .split(';');
     const characterizations: BatteryModelCharacterization[] = [];
     let temperature: number[] = [];
     let capacity: number[] = [];
@@ -74,3 +77,5 @@ export const toRegex = (
     command = command.replaceAll(' ', '([^\\S\\r\\n])+');
     return `${command}`;
 };
+
+export const MAX_TIMESTAMP = 359999999; // 99hrs 59min 59sec 999ms
