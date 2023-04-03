@@ -45,12 +45,19 @@ const setupMocks = () => {
             () => {}
     );
 
+    let onDataWrittenCallback = (data: Uint8Array) => {};
     const mockOnDataWritten = jest.fn(
-        (_handler: (data: Buffer) => void) => () => {}
+        (handler: (data: Uint8Array) => void) => () => {
+            onDataWrittenCallback = handler;
+            return () => {};
+        }
     );
 
     const mockClose = jest.fn(async () => {});
-    const mockWrite = jest.fn(() => {});
+    const mockWrite = jest.fn((data: string | number[] | Buffer) =>
+        onDataWrittenCallback(Buffer.from(data))
+    );
+
     const mockIsOpen = jest.fn(
         () =>
             new Promise<boolean>(resolve => {

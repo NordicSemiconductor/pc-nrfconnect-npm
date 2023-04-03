@@ -274,6 +274,7 @@ export type NpmDevice = {
     setLdoMode: (index: number, mode: LdoMode) => Promise<void>;
 
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
+    downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
     getDefaultBatteryModels: () => Promise<BatteryModel[]>;
     setActiveBatteryModel: (name: string) => Promise<void>;
     storeBattery: () => Promise<void>;

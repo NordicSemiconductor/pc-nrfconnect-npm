@@ -18,9 +18,10 @@ import {
 import { Terminal } from 'xterm-headless';
 
 import {
+    loadConfiguration,
     openDirectoryDialog,
-    openFileDialog,
     saveFileDialog,
+    uploadProfile,
 } from '../../actions/fileActions';
 import { BatteryModel } from '../../features/pmicControl/npm/types';
 import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
@@ -183,7 +184,7 @@ export default () => {
                     variant="secondary"
                     disabled={pmicConnection !== 'pmic-connected'}
                     className="w-100"
-                    onClick={() => dispatch(openFileDialog())}
+                    onClick={() => dispatch(loadConfiguration())}
                 >
                     Load Configuration
                 </Button>
@@ -246,8 +247,8 @@ export default () => {
                 <Button
                     variant="secondary"
                     className="w-100"
-                    onClick={() => {}}
-                    disabled
+                    onClick={() => dispatch(uploadProfile())}
+                    disabled={pmicConnection === 'ek-disconnected'}
                 >
                     Upload profile
                 </Button>

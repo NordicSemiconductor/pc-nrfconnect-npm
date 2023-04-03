@@ -160,6 +160,7 @@ const setupMocksWithShellParser = () => {
     const mockUnregister = jest.fn(() => {});
     const mockIsPause = jest.fn(() => false);
     const mockUnPause = jest.fn(() => {});
+    const mockSetShellEchos = jest.fn(() => {});
 
     const mockShellParser = jest.fn<ShellParser, []>(() => ({
         onPausedChange: mockOnPausedChange,
@@ -170,6 +171,7 @@ const setupMocksWithShellParser = () => {
         unregister: mockUnregister,
         isPaused: mockIsPause,
         unPause: mockUnPause,
+        setShellEchos: mockSetShellEchos,
     }));
 
     mockEnqueueRequest.mockImplementationOnce(
@@ -506,7 +508,8 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `fuel_gauge model list`,
                     expect.anything(),
-                    expect.anything()
+                    expect.anything(),
+                    true
                 );
             });
 

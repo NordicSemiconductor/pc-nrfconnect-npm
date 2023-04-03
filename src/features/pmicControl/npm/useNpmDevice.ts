@@ -56,8 +56,6 @@ export default (shellParser: ShellParser | undefined) => {
     const initDevice = useCallback(() => {
         if (!npmDevice) return;
 
-        npmDevice.startAdcSample(2000);
-        npmDevice.setBatteryStatusCheckEnabled(true);
         npmDevice.requestUpdate.usbPowered();
 
         for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
@@ -93,6 +91,9 @@ export default (shellParser: ShellParser | undefined) => {
         npmDevice.getDefaultBatteryModels().then(models => {
             dispatch(setDefaultBatterModels(models));
         });
+
+        npmDevice.startAdcSample(2000);
+        npmDevice.setBatteryStatusCheckEnabled(true);
     }, [dispatch, npmDevice]);
 
     const warningDialogHandler = useCallback(

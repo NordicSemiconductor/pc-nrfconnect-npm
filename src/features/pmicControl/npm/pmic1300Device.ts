@@ -342,6 +342,22 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     );
 
     baseDevice.registerCommandCallbackLoggerWrapper(
+        toRegex('fuel_gauge model download begin'),
+
+        () => {
+            shellParser?.setShellEchos(false);
+        },
+        noop
+    );
+
+    baseDevice.registerCommandCallbackLoggerWrapper(
+        toRegex('fuel_gauge model download (apply|abort)'),
+
+        () => shellParser?.setShellEchos(true),
+        () => shellParser?.setShellEchos(true)
+    );
+
+    baseDevice.registerCommandCallbackLoggerWrapper(
         toRegex('fuel_gauge model', true, undefined, '[A-Za-z0-9]+'),
         res => {
             eventEmitter.emit(
@@ -822,6 +838,48 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             }
         });
 
+    const downloadFuelGaugeProfile = (profile: Buffer) => {
+        const chunkSize = 512;
+        const view = new Uint8Array(profile);
+
+        const downloadData = () =>
+            new Promise<void>((resolve, reject) => {
+                const chunks = Math.ceil(profile.byteLength / chunkSize);
+                for (let i = 0; i < chunks; i += 1) {
+                    sendCommand(
+                        `fuel_gauge model download "${view.slice(
+                            i * chunkSize,
+                            (i + 1) * chunkSize
+                        )}"`,
+                        noop,
+                        () => reject()
+                    );
+                }
+
+                sendCommand(
+                    `fuel_gauge model download apply`,
+                    () => {
+                        requestUpdate.activeBatteryModel();
+                        resolve();
+                    },
+                    () => {
+                        requestUpdate.activeBatteryModel();
+                        reject();
+                    }
+                );
+            });
+
+        return new Promise<void>((resolve, reject) => {
+            setFuelGaugeEnabled(false).then(() =>
+                sendCommand(
+                    'fuel_gauge model download begin',
+                    () => downloadData().then(resolve).catch(reject),
+                    () => reject()
+                )
+            );
+        });
+    };
+
     const setActiveBatteryModel = (name: string) =>
         new Promise<void>((resolve, reject) => {
             sendCommand(
@@ -1018,6 +1076,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         setLdoMode,
 
         setFuelGaugeEnabled,
+        downloadFuelGaugeProfile,
 
         setActiveBatteryModel,
         storeBattery,
@@ -1033,7 +1092,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                         const list = stringModels.map(parseBatteryModel);
                         resolve(list.filter(item => item.name !== ''));
                     },
-                    reject
+                    reject,
+                    true
                 );
             }),
 
