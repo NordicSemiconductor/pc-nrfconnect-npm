@@ -81,7 +81,9 @@ const stream2buffer = (stream: fs.ReadStream) =>
             buf += chunk.toString();
         });
         stream.on('end', () =>
-            resolve(Buffer.from(buf.replaceAll('"', '\\"')))
+            resolve(
+                Buffer.from(buf.replaceAll('"', '\\"').replaceAll('\\s', ''))
+            )
         );
         stream.on('error', err =>
             reject(new Error(`error converting stream - ${err}`))

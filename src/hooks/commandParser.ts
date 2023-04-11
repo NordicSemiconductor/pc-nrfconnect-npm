@@ -111,14 +111,12 @@ export const hookModemToShellParser = async (
             const command = commandQueue[0];
             if (command && !command.sent) {
                 serialPort.write(`${command.command}\r\n`);
-                console.log('write', command.command);
                 command.sent = true;
                 if (!shellEchos) {
                     if (!pausedState) {
                         eventEmitter.emit('pausedChanged', true);
                     }
                     pausedState = true;
-                    console.log('pausedState', pausedState);
                     updateIsPaused();
                     processSerialData(Buffer.from(`${command.command}\r\n`));
                 }
@@ -161,37 +159,41 @@ export const hookModemToShellParser = async (
         response = response.trim();
 
         // Trigger one time callbacks
-        if (
-            (commandQueue.length > 0 &&
-                response.match(`^${commandQueue[0].command}`)) ||
-            (commandQueue.length > 0 && !shellEchos)
-        ) {
-            const command = commandQueue[0].command;
-            const commandResponse = response.replace(command, '').trim();
-            console.log('commandResponse');
-            if (commandResponse.match(settings.errorRegex)) {
-                console.log('onError');
-                commandQueue[0].callbacks.forEach(callback =>
-                    callback.onError(commandResponse, command)
-                );
-                callbackFound = true;
-            } else {
-                console.log('onSuccess');
-                commandQueue[0].callbacks.forEach(callback =>
-                    callback.onSuccess(commandResponse, command)
-                );
-                callbackFound = true;
-            }
+        if (commandQueue.length > 0) {
+            const regex = `^(${commandQueue[0].command.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                '\\$&'
+            )})`;
 
-            commandQueue.shift();
-
-            serialPort.isOpen().then(isOpen => {
-                if (isOpen && commandQueue.length > 0 && !pausedState) {
-                    sendCommands();
+            if (
+                (!shellEchos && bufferedDataWrittenData.match(regex)) ||
+                response.match(regex)
+            ) {
+                bufferedDataWrittenData = '';
+                const command = commandQueue[0].command;
+                const commandResponse = response.replace(command, '').trim();
+                if (commandResponse.match(settings.errorRegex)) {
+                    commandQueue[0].callbacks.forEach(callback =>
+                        callback.onError(commandResponse, command)
+                    );
+                    callbackFound = true;
                 } else {
-                    dataSendingStarted = false;
+                    commandQueue[0].callbacks.forEach(callback =>
+                        callback.onSuccess(commandResponse, command)
+                    );
+                    callbackFound = true;
                 }
-            });
+
+                commandQueue.shift();
+
+                serialPort.isOpen().then(isOpen => {
+                    if (isOpen && commandQueue.length > 0 && !pausedState) {
+                        sendCommands();
+                    } else {
+                        dataSendingStarted = false;
+                    }
+                });
+            }
         }
 
         // Trigger permanent time callbacks
@@ -274,35 +276,32 @@ export const hookModemToShellParser = async (
     // Hook to listen to all modem data
     const unregisterOnResponse = serialPort.onData(processSerialData);
 
-    let bufferedUnSubmittedData = '';
+    let bufferedDataWrittenData = '';
     const unregisterOnDataWritten = serialPort.onDataWritten(data => {
         if (!pausedState) {
             eventEmitter.emit('pausedChanged', true);
         }
         pausedState = true;
-        console.log('pausedState here', pausedState);
         updateIsPaused();
 
         if (!shellEchos) {
-            bufferedUnSubmittedData += Buffer.from(data).toString();
+            bufferedDataWrittenData += Buffer.from(data).toString();
         }
     });
 
     const canProcess = () => {
+        let newHasLine = false;
         if (!shellEchos) {
-            if (
-                bufferedUnSubmittedData.endsWith('\r') ||
-                bufferedUnSubmittedData.endsWith('\n')
-            ) {
-                bufferedUnSubmittedData = '';
-            }
+            newHasLine =
+                bufferedDataWrittenData.endsWith('\r') ||
+                bufferedDataWrittenData.endsWith('\n');
         } else {
-            bufferedUnSubmittedData = '';
+            bufferedDataWrittenData = '';
         }
 
         return (
             xTerminalShellParser.getLastLine() +
-                (shellEchos ? '' : bufferedUnSubmittedData) ===
+                (shellEchos || newHasLine ? '' : bufferedDataWrittenData) ===
             settings.shellPromptUart.trim()
         );
     };
@@ -316,7 +315,6 @@ export const hookModemToShellParser = async (
             const shellFree = canProcess();
             if (pausedState === shellFree) {
                 pausedState = !shellFree;
-                console.log('pausedState', pausedState);
                 eventEmitter.emit('pausedChanged', pausedState);
                 await initDataSend();
             }

@@ -839,15 +839,14 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         });
 
     const downloadFuelGaugeProfile = (profile: Buffer) => {
-        const chunkSize = 512;
-        const view = new Uint8Array(profile);
+        const chunkSize = 256;
 
         const downloadData = () =>
             new Promise<void>((resolve, reject) => {
                 const chunks = Math.ceil(profile.byteLength / chunkSize);
                 for (let i = 0; i < chunks; i += 1) {
                     sendCommand(
-                        `fuel_gauge model download "${view.slice(
+                        `fuel_gauge model download "${profile.subarray(
                             i * chunkSize,
                             (i + 1) * chunkSize
                         )}"`,
@@ -870,13 +869,13 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             });
 
         return new Promise<void>((resolve, reject) => {
-            setFuelGaugeEnabled(false).then(() =>
-                sendCommand(
-                    'fuel_gauge model download begin',
-                    () => downloadData().then(resolve).catch(reject),
-                    () => reject()
-                )
+            // setFuelGaugeEnabled(false).then(() =>
+            sendCommand(
+                'fuel_gauge model download begin',
+                () => downloadData().then(resolve).catch(reject),
+                () => reject()
             );
+            // );
         });
     };
 
