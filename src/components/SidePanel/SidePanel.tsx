@@ -9,9 +9,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     CollapsibleGroup,
-    ConfirmationDialog,
     Dropdown,
     DropdownItem,
+    ProgressDialog,
     SidePanel,
     StartStopButton,
 } from 'pc-nrfconnect-shared';
@@ -52,15 +52,6 @@ export default () => {
 
     const currentPmicDialog = useSelector(getDialog);
     const eventRecordingPath = useSelector(getEventRecordingPath);
-    const showConfirmDialog = currentPmicDialog !== undefined;
-    const message = currentPmicDialog?.message;
-    const optionalLabel = currentPmicDialog?.optionalLabel;
-    const confirmLabel = currentPmicDialog?.confirmLabel;
-    const cancelLabel = currentPmicDialog?.cancelLabel;
-    const title = currentPmicDialog?.title;
-    const onConfirm = currentPmicDialog?.onConfirm ?? noop;
-    const onCancel = currentPmicDialog?.onCancel ?? noop;
-    const onOptional = currentPmicDialog?.onOptional;
 
     const serialPort = useSelector(getSerialPort);
     const shellParserO = useSelector(getShellParser);
@@ -255,18 +246,23 @@ export default () => {
             </CollapsibleGroup>
             <ConnectionStatus />
 
-            <ConfirmationDialog
-                title={title}
-                isVisible={showConfirmDialog}
-                onConfirm={onConfirm}
-                confirmLabel={confirmLabel}
-                onCancel={onCancel}
-                cancelLabel={cancelLabel}
-                onOptional={onOptional}
-                optionalLabel={optionalLabel}
+            <ProgressDialog
+                title={currentPmicDialog?.title}
+                headerIcon={currentPmicDialog?.type}
+                isVisible={currentPmicDialog !== undefined}
+                onConfirm={currentPmicDialog?.onConfirm ?? noop}
+                confirmLabel={currentPmicDialog?.confirmLabel}
+                confirmDisabled={currentPmicDialog?.confirmDisabled}
+                onCancel={currentPmicDialog?.onCancel ?? noop}
+                cancelLabel={currentPmicDialog?.cancelLabel}
+                cancelDisabled={currentPmicDialog?.cancelDisabled}
+                onOptional={currentPmicDialog?.onOptional}
+                optionalLabel={currentPmicDialog?.optionalLabel}
+                optionalDisabled={currentPmicDialog?.optionalDisabled}
+                progress={currentPmicDialog?.progress}
             >
-                {message}
-            </ConfirmationDialog>
+                {currentPmicDialog?.message}
+            </ProgressDialog>
         </SidePanel>
     );
 };

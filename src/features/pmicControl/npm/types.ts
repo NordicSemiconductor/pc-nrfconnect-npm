@@ -283,17 +283,24 @@ export type NpmDevice = {
 } & BaseNpmDevice;
 
 export interface PmicDialog {
+    uuid: string;
     type: 'alert' | 'alert-circle' | 'information';
-    storeID: string;
-    message: string;
+    message: string | React.ReactNode;
     optionalLabel?: string;
+    optionalDisabled?: boolean;
+    optionalClosesDialog?: boolean;
     confirmLabel: string;
+    confirmDisabled?: boolean;
+    confirmClosesDialog?: boolean;
     cancelLabel: string;
+    cancelDisabled?: boolean;
+    cancelClosesDialog?: boolean;
     title: string;
     onConfirm: () => void;
     onCancel: () => void;
     onOptional?: () => void;
-    optionalDoNotAskAgain?: boolean;
+    doNotAskAgainStoreID?: string;
+    progress?: number;
 }
 
 export type NpmModel = 'npm1300';

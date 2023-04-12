@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import React from 'react';
 import EventEmitter from 'events';
+import { Alert } from 'pc-nrfconnect-shared';
+import { v4 as uuid } from 'uuid';
 
 import { getRange } from '../../../utils/helpers';
 import { baseNpmDevice } from './basePmicDevice';
@@ -279,7 +282,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             supplementModeActive: (value & 0x80) > 0,
         } as PmicChargingState);
 
-    const emitPartialEvent = <T>(
+    const emitPartialEvent = <T,>(
         eventName: string,
         index: number,
         data: Partial<T>
@@ -605,8 +608,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         if (pmicState !== 'ek-disconnected' && index === 0 && value <= 1.7) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
+                    uuid: uuid(),
                     type: 'alert',
-                    storeID: 'pmic1300-setBuckVOut-0',
+                    doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
                     message: `Buck 1 Powers the I2C communications that are needed for this app. 
                     Any voltage lower that 1.7v Might cause issues with the Connection to the app. Are you sure you want to continue`,
                     confirmLabel: 'Yes',
@@ -619,7 +623,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         resolve();
                     },
                     onOptional: () => action().then(resolve).catch(reject),
-                    optionalDoNotAskAgain: true,
                 };
 
                 dialogHandler(warningDialog);
@@ -674,8 +677,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
+                    uuid: uuid(),
                     type: 'alert',
-                    storeID: 'pmic1300-setBuckVOut-0',
+                    doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
                     message: `Buck 1 Powers the I2C communications that are needed for this app. 
                     Software voltage might be already set to less then 1.7V . Are you sure you want to continue`,
                     confirmLabel: 'Yes',
@@ -688,7 +692,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         resolve();
                     },
                     onOptional: () => action().then(resolve).catch(reject),
-                    optionalDoNotAskAgain: true,
                 };
 
                 dialogHandler(warningDialog);
@@ -763,8 +766,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         if (pmicState !== 'ek-disconnected' && index === 0 && !enabled) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
+                    uuid: uuid(),
                     type: 'alert',
-                    storeID: 'pmic1300-setBuckEnabled-0',
+                    doNotAskAgainStoreID: 'pmic1300-setBuckEnabled-0',
                     message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
                 disconnected from the app. Are you sure you want to proceed?`,
                     confirmLabel: 'Yes',
@@ -774,7 +778,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     onConfirm: () => action().then(resolve).catch(reject),
                     onCancel: resolve,
                     onOptional: () => action().then(resolve).catch(reject),
-                    optionalDoNotAskAgain: true,
                 };
 
                 dialogHandler(warningDialog);
@@ -843,42 +846,184 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const downloadFuelGaugeProfile = (profile: Buffer) => {
         const chunkSize = 256;
+        const chunks = Math.ceil(profile.byteLength / chunkSize);
 
-        const downloadData = () =>
-            new Promise<void>((resolve, reject) => {
-                const chunks = Math.ceil(profile.byteLength / chunkSize);
-                for (let i = 0; i < chunks; i += 1) {
-                    sendCommand(
-                        `fuel_gauge model download "${profile.subarray(
-                            i * chunkSize,
-                            (i + 1) * chunkSize
-                        )}"`,
-                        noop,
-                        () => reject()
-                    );
-                }
-
-                sendCommand(
-                    `fuel_gauge model download apply`,
-                    () => {
-                        requestUpdate.activeBatteryModel();
-                        resolve();
-                    },
-                    () => {
-                        requestUpdate.activeBatteryModel();
-                        reject();
-                    }
-                );
-            });
+        let aborted = false;
+        const progressDialog: PmicDialog = {
+            uuid: uuid(),
+            type: 'information',
+            message: `Uploading battery profile will reset the current fuel gauge. Click 'Upload' to continue.`,
+            confirmLabel: 'Upload',
+            confirmClosesDialog: false,
+            cancelLabel: 'Cancel',
+            title: 'Upload',
+            onConfirm: () => {},
+            onCancel: () => {},
+        };
 
         return new Promise<void>((resolve, reject) => {
-            // setFuelGaugeEnabled(false).then(() =>
-            sendCommand(
-                'fuel_gauge model download begin',
-                () => downloadData().then(resolve).catch(reject),
-                () => reject()
-            );
-            // );
+            const downloadData = (chunk = 0) => {
+                dialogHandler({
+                    ...progressDialog,
+                    confirmDisabled: true,
+                    cancelLabel: 'Abort',
+                    cancelClosesDialog: false,
+                    onCancel: () => {
+                        aborted = true;
+                    },
+                    message: (
+                        <>
+                            <div>Uploading battery profile.</div>
+                            <br />
+                            <strong>Status: </strong>
+                            {`Downloading chunk ${chunk + 1} of ${chunks}`}
+                        </>
+                    ),
+                    progress: Math.ceil((chunk / chunks) * 100),
+                });
+
+                sendCommand(
+                    `fuel_gauge model download "${profile.subarray(
+                        chunk * chunkSize,
+                        (chunk + 1) * chunkSize
+                    )}"`,
+                    () => {
+                        if (!aborted && chunk !== chunks)
+                            downloadData(chunk + 1);
+                        else if (aborted) {
+                            dialogHandler({
+                                ...progressDialog,
+                                confirmDisabled: true,
+                                cancelDisabled: true,
+                                cancelLabel: 'Close',
+                                message: (
+                                    <>
+                                        <div>Uploading battery profile.</div>
+                                        <br />
+                                        <strong>Status: </strong>
+                                        Aborting download
+                                    </>
+                                ),
+                                progress: Math.ceil((chunk / chunks) * 100),
+                            });
+
+                            sendCommand(
+                                `fuel_gauge model download abort`,
+                                () => {
+                                    dialogHandler({
+                                        ...progressDialog,
+                                        confirmDisabled: true,
+                                        cancelLabel: 'Close',
+                                        type: 'alert',
+                                        message: (
+                                            <>
+                                                <div>
+                                                    Uploading battery profile.
+                                                </div>
+                                                <br />
+                                                <Alert
+                                                    label="Warning "
+                                                    variant="warning"
+                                                >
+                                                    Download aborted
+                                                </Alert>
+                                            </>
+                                        ),
+                                    });
+
+                                    resolve();
+                                },
+                                () => reject()
+                            );
+                        } else {
+                            dialogHandler({
+                                ...progressDialog,
+                                cancelDisabled: true,
+                                progress: Math.ceil((chunk / chunks) * 100),
+                                message: (
+                                    <>
+                                        <div>Uploading battery profile.</div>
+                                        <br />
+                                        <strong>Status: </strong>
+                                        Download complete. Applying profile
+                                    </>
+                                ),
+                            });
+
+                            sendCommand(
+                                `fuel_gauge model download apply`,
+                                res => {
+                                    dialogHandler({
+                                        ...progressDialog,
+                                        confirmDisabled: true,
+                                        cancelLabel: 'Close',
+                                        cancelDisabled: false,
+                                        message: (
+                                            <>
+                                                <div>
+                                                    Uploading battery profile.
+                                                </div>
+                                                <br />
+                                                <Alert
+                                                    label="Success "
+                                                    variant="success"
+                                                >
+                                                    {`${parseColonBasedAnswer(
+                                                        res
+                                                    )}`}
+                                                </Alert>
+                                            </>
+                                        ),
+                                    });
+
+                                    requestUpdate.activeBatteryModel();
+                                    resolve();
+                                },
+                                res => {
+                                    dialogHandler({
+                                        ...progressDialog,
+                                        type: 'alert-circle',
+                                        confirmDisabled: true,
+                                        cancelLabel: 'Close',
+                                        cancelDisabled: false,
+                                        message: (
+                                            <>
+                                                <div>
+                                                    Uploading battery profile.
+                                                </div>
+                                                <br />
+                                                <Alert
+                                                    label="Error "
+                                                    variant="danger"
+                                                >
+                                                    {parseColonBasedAnswer(res)}
+                                                </Alert>
+                                            </>
+                                        ),
+                                    });
+
+                                    requestUpdate.activeBatteryModel();
+                                    reject();
+                                }
+                            );
+                        }
+                    },
+                    () => {}
+                );
+            };
+
+            const beginDownload = () => {
+                // setFuelGaugeEnabled(false).then(() =>
+                sendCommand(
+                    'fuel_gauge model download begin',
+                    () => downloadData(),
+                    () => reject()
+                );
+                // );
+            };
+
+            progressDialog.onConfirm = beginDownload;
+            dialogHandler(progressDialog);
         });
     };
 
@@ -1005,7 +1150,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             if (config.firmwareVersion !== baseDevice.getSupportedVersion()) {
                 const warningDialog: PmicDialog = {
-                    storeID: 'pmic1300-load-config-mismatch',
+                    uuid: uuid(),
+                    doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
                     type: 'alert',
                     message: `The configuration was intended for firmware version ${
                         config.firmwareVersion
@@ -1018,7 +1164,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     onConfirm: action,
                     onCancel: () => {},
                     onOptional: action,
-                    optionalDoNotAskAgain: true,
                 };
 
                 dialogHandler(warningDialog);

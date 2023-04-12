@@ -99,34 +99,45 @@ export default (shellParser: ShellParser | undefined) => {
     const dialogHandler = useCallback(
         (pmicDialog: PmicDialog) => {
             if (
-                getPersistentStore().get(`pmicDialogs:${pmicDialog.storeID}`)
-                    ?.doNotShowAgain === true
+                pmicDialog.doNotAskAgainStoreID !== undefined &&
+                getPersistentStore().get(
+                    `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`
+                )?.doNotShowAgain === true
             ) {
                 pmicDialog.onConfirm();
                 return;
             }
 
-            const onConfirm = pmicDialog.onConfirm;
-            pmicDialog.onConfirm = () => {
-                onConfirm();
-                dispatch(dequeueDialog());
-            };
+            if (pmicDialog.cancelClosesDialog !== false) {
+                const onCancel = pmicDialog.onCancel;
+                pmicDialog.onCancel = () => {
+                    onCancel();
+                    dispatch(dequeueDialog());
+                };
+            }
 
-            const onCancel = pmicDialog.onCancel;
-            pmicDialog.onCancel = () => {
-                onCancel();
-                dispatch(dequeueDialog());
-            };
-
-            if (pmicDialog.optionalDoNotAskAgain && pmicDialog.onOptional) {
+            if (
+                pmicDialog.doNotAskAgainStoreID !== undefined &&
+                pmicDialog.onOptional
+            ) {
                 const onOptional = pmicDialog.onOptional;
                 pmicDialog.onOptional = () => {
                     onOptional();
-                    dispatch(dequeueDialog());
+                    if (pmicDialog.optionalClosesDialog !== false) {
+                        dispatch(dequeueDialog());
+                    }
                     getPersistentStore().set(
-                        `pmicDialogs:${pmicDialog.storeID}`,
+                        `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`,
                         { doNotShowAgain: true }
                     );
+                };
+            }
+
+            if (pmicDialog.confirmClosesDialog !== false) {
+                const onConfirm = pmicDialog.onConfirm;
+                pmicDialog.onConfirm = () => {
+                    onConfirm();
+                    dispatch(dequeueDialog());
                 };
             }
 

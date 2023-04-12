@@ -139,7 +139,15 @@ const pmicControlSlice = createSlice({
             state.supportedVersion = action.payload;
         },
         requestDialog(state, action: PayloadAction<PmicDialog>) {
-            state.dialog = [...state.dialog, action.payload];
+            const dialogIndex = state.dialog.findIndex(
+                dialog => dialog.uuid === action.payload.uuid
+            );
+
+            if (dialogIndex !== -1) {
+                state.dialog[dialogIndex] = action.payload;
+            } else {
+                state.dialog = [...state.dialog, action.payload];
+            }
         },
         dequeueDialog(state) {
             state.dialog = [...state.dialog.slice(1)];
