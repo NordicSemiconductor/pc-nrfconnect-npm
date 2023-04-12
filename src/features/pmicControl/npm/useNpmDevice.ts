@@ -17,13 +17,13 @@ import {
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { ShellParser } from '../../../hooks/commandParser';
 import {
-    dequeueWarningDialog,
+    dequeueDialog,
     getEventRecording,
     getEventRecordingPath,
     getNpmDevice as getNpmDeviceSlice,
     getPmicState,
     isSupportedVersion,
-    requestWarningDialog,
+    requestDialog,
     setActiveBatterModel,
     setBatteryConnected,
     setBucks,
@@ -96,45 +96,41 @@ export default (shellParser: ShellParser | undefined) => {
         npmDevice.setBatteryStatusCheckEnabled(true);
     }, [dispatch, npmDevice]);
 
-    const warningDialogHandler = useCallback(
-        (pmicWarningDialog: PmicDialog) => {
+    const dialogHandler = useCallback(
+        (pmicDialog: PmicDialog) => {
             if (
-                getPersistentStore().get(
-                    `pmicDialogs:${pmicWarningDialog.storeID}`
-                )?.doNotShowAgain === true
+                getPersistentStore().get(`pmicDialogs:${pmicDialog.storeID}`)
+                    ?.doNotShowAgain === true
             ) {
-                pmicWarningDialog.onConfirm();
+                pmicDialog.onConfirm();
                 return;
             }
 
-            const onConfirm = pmicWarningDialog.onConfirm;
-            pmicWarningDialog.onConfirm = () => {
+            const onConfirm = pmicDialog.onConfirm;
+            pmicDialog.onConfirm = () => {
                 onConfirm();
-                dispatch(dequeueWarningDialog());
+                dispatch(dequeueDialog());
             };
 
-            const onCancel = pmicWarningDialog.onCancel;
-            pmicWarningDialog.onCancel = () => {
+            const onCancel = pmicDialog.onCancel;
+            pmicDialog.onCancel = () => {
                 onCancel();
-                dispatch(dequeueWarningDialog());
+                dispatch(dequeueDialog());
             };
 
-            if (
-                pmicWarningDialog.optionalDoNotAskAgain &&
-                pmicWarningDialog.onOptional
-            ) {
-                const onOptional = pmicWarningDialog.onOptional;
-                pmicWarningDialog.onOptional = () => {
+            if (pmicDialog.optionalDoNotAskAgain && pmicDialog.onOptional) {
+                const onOptional = pmicDialog.onOptional;
+                pmicDialog.onOptional = () => {
                     onOptional();
-                    dispatch(dequeueWarningDialog());
+                    dispatch(dequeueDialog());
                     getPersistentStore().set(
-                        `pmicDialogs:${pmicWarningDialog.storeID}`,
+                        `pmicDialogs:${pmicDialog.storeID}`,
                         { doNotShowAgain: true }
                     );
                 };
             }
 
-            dispatch(requestWarningDialog(pmicWarningDialog));
+            dispatch(requestDialog(pmicDialog));
         },
         [dispatch]
     );
@@ -181,8 +177,8 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        dispatch(setNpmDevice(getNpmDevice(shellParser, warningDialogHandler)));
-    }, [dispatch, shellParser, warningDialogHandler]);
+        dispatch(setNpmDevice(getNpmDevice(shellParser, dialogHandler)));
+    }, [dispatch, shellParser, dialogHandler]);
 
     useEffect(() => {
         if (npmDevice) {

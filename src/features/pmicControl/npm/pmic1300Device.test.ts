@@ -51,12 +51,12 @@ const helpers = {
 };
 
 const setupMocksBase = (shellParser: ShellParser | undefined = undefined) => {
-    const mockWarningDialogHandler = jest.fn(
+    const mockDialogHandler = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_pmicWarningDialog: PmicDialog) => {}
+        (_pmicDialog: PmicDialog) => {}
     );
 
-    const pmic = getNPM1300(shellParser, mockWarningDialogHandler);
+    const pmic = getNPM1300(shellParser, mockDialogHandler);
 
     const mockOnActiveBatteryModelUpdate = jest.fn(() => {});
     const mockOnAdcSample = jest.fn(() => {});
@@ -94,7 +94,7 @@ const setupMocksBase = (shellParser: ShellParser | undefined = undefined) => {
     pmic.onUsbPowered(mockOnUsbPowered);
 
     return {
-        mockWarningDialogHandler,
+        mockDialogHandler,
         mockOnActiveBatteryModelUpdate,
         mockOnAdcSample,
         mockOnBeforeReboot,
@@ -220,7 +220,7 @@ const setupMocksWithShellParser = () => {
 describe('PMIC 1300', () => {
     describe('State not ek_disconnected', () => {
         const {
-            mockWarningDialogHandler,
+            mockDialogHandler,
             mockOnActiveBatteryModelUpdate,
             mockOnBuckUpdate,
             mockOnChargerUpdate,
@@ -814,14 +814,14 @@ describe('PMIC 1300', () => {
             );
 
             test('Set setBuckVOut index: 0 with warning - cancel', async () => {
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        warningDialog.onCancel();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onCancel();
                     }
                 );
 
                 await pmic.setBuckVOut(0, 1.7);
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -837,14 +837,14 @@ describe('PMIC 1300', () => {
             });
 
             test('Set setBuckVOut index: 0 with warning - confirm', async () => {
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        warningDialog.onConfirm();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
                     }
                 );
 
                 await pmic.setBuckVOut(0, 1.7);
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -869,15 +869,14 @@ describe('PMIC 1300', () => {
             });
 
             test("Set setBuckVOut index: 0 with warning - yes, don't ask", async () => {
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        if (warningDialog?.onOptional)
-                            warningDialog.onOptional();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        if (dialog?.onOptional) dialog.onOptional();
                     }
                 );
 
                 await pmic.setBuckVOut(0, 1.7);
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -945,14 +944,14 @@ describe('PMIC 1300', () => {
             );
 
             test('Set setBuckMode index: 0 with software - cancel', async () => {
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        warningDialog.onCancel();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onCancel();
                     }
                 );
 
                 await pmic.setBuckMode(0, 'software');
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -968,14 +967,14 @@ describe('PMIC 1300', () => {
             });
 
             test('Set setBuckMode index: 0 with software - confirm', async () => {
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        warningDialog.onConfirm();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
                     }
                 );
 
                 await pmic.setBuckMode(0, 'software');
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1001,15 +1000,14 @@ describe('PMIC 1300', () => {
             });
 
             test("Set setBuckMode index: 0 with software - yes, don't ask", async () => {
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        if (warningDialog.onOptional)
-                            warningDialog.onOptional();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        if (dialog.onOptional) dialog.onOptional();
                     }
                 );
 
                 await pmic.setBuckMode(0, 'software');
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1103,14 +1101,14 @@ describe('PMIC 1300', () => {
             );
 
             test('Set setBuckEnabled index: 0 false - cancel', async () => {
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        warningDialog.onCancel();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onCancel();
                     }
                 );
 
                 await pmic.setBuckEnabled(0, false);
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // No need to request UI update
                 expect(mockEnqueueRequest).toBeCalledTimes(0);
@@ -1122,14 +1120,14 @@ describe('PMIC 1300', () => {
             test("Set setBuckEnabled index: 0 false -  yes, don't ask", async () => {
                 mockEnqueueRequest.mockClear();
 
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        warningDialog.onConfirm();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
                     }
                 );
 
                 await pmic.setBuckEnabled(0, false);
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -1147,15 +1145,14 @@ describe('PMIC 1300', () => {
             test('Set setBuckEnabled index: 0 false - confirm', async () => {
                 mockEnqueueRequest.mockClear();
 
-                mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicDialog) => {
-                        if (warningDialog.onOptional)
-                            warningDialog.onOptional();
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        if (dialog.onOptional) dialog.onOptional();
                     }
                 );
 
                 await pmic.setBuckEnabled(0, false);
-                expect(mockWarningDialogHandler).toBeCalledTimes(1);
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -2171,7 +2168,7 @@ describe('PMIC 1300', () => {
             mockOnBuckUpdate,
             mockOnLdoUpdate,
             mockOnFuelGaugeUpdate,
-            mockWarningDialogHandler,
+            mockDialogHandler,
             pmic,
         } = setupMocksBase();
 
@@ -2345,11 +2342,9 @@ describe('PMIC 1300', () => {
         });
 
         test('Apply wrong firmware version -- Yes', () => {
-            mockWarningDialogHandler.mockImplementationOnce(
-                (warningDialog: PmicDialog) => {
-                    warningDialog.onConfirm();
-                }
-            );
+            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
+                dialog.onConfirm();
+            });
 
             pmic.applyConfig({
                 chargers: [
@@ -2399,17 +2394,15 @@ describe('PMIC 1300', () => {
                 deviceType: 'npm1300',
             });
 
-            expect(mockWarningDialogHandler).toBeCalledTimes(1);
+            expect(mockDialogHandler).toBeCalledTimes(1);
 
             verifyApplyConfig();
         });
 
         test("Apply wrong firmware version -- Yes, Don't ask again", () => {
-            mockWarningDialogHandler.mockImplementationOnce(
-                (warningDialog: PmicDialog) => {
-                    if (warningDialog.onOptional) warningDialog.onOptional();
-                }
-            );
+            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
+                if (dialog.onOptional) dialog.onOptional();
+            });
 
             pmic.applyConfig({
                 chargers: [
@@ -2459,17 +2452,15 @@ describe('PMIC 1300', () => {
                 deviceType: 'npm1300',
             });
 
-            expect(mockWarningDialogHandler).toBeCalledTimes(1);
+            expect(mockDialogHandler).toBeCalledTimes(1);
 
             verifyApplyConfig();
         });
 
         test('Apply wrong firmware version -- Cancel', () => {
-            mockWarningDialogHandler.mockImplementationOnce(
-                (warningDialog: PmicDialog) => {
-                    warningDialog.onCancel();
-                }
-            );
+            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
+                dialog.onCancel();
+            });
 
             pmic.applyConfig({
                 chargers: [
@@ -2519,7 +2510,7 @@ describe('PMIC 1300', () => {
                 deviceType: 'npm1300',
             });
 
-            expect(mockWarningDialogHandler).toBeCalledTimes(1);
+            expect(mockDialogHandler).toBeCalledTimes(1);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
             expect(mockOnBuckUpdate).toBeCalledTimes(0);

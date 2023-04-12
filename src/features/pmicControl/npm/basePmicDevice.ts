@@ -26,7 +26,7 @@ import {
 
 export const baseNpmDevice: IBaseNpmDevice = (
     shellParser: ShellParser | undefined,
-    _warningDialogHandler: (pmicWarningDialog: PmicDialog) => void,
+    _dialogHandler: (pmicDialog: PmicDialog) => void,
     eventEmitter: EventEmitter,
     devices: {
         noOfChargers?: number;

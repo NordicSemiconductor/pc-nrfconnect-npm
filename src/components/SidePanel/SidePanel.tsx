@@ -50,17 +50,17 @@ import ConnectionStatus from './ConnectionStatus';
 export default () => {
     const noop = () => {};
 
-    const currentPmicWarningDialog = useSelector(getDialog);
+    const currentPmicDialog = useSelector(getDialog);
     const eventRecordingPath = useSelector(getEventRecordingPath);
-    const showConfirmDialog = currentPmicWarningDialog !== undefined;
-    const message = currentPmicWarningDialog?.message;
-    const optionalLabel = currentPmicWarningDialog?.optionalLabel;
-    const confirmLabel = currentPmicWarningDialog?.confirmLabel;
-    const cancelLabel = currentPmicWarningDialog?.cancelLabel;
-    const title = currentPmicWarningDialog?.title;
-    const onConfirm = currentPmicWarningDialog?.onConfirm ?? noop;
-    const onCancel = currentPmicWarningDialog?.onCancel ?? noop;
-    const onOptional = currentPmicWarningDialog?.onOptional;
+    const showConfirmDialog = currentPmicDialog !== undefined;
+    const message = currentPmicDialog?.message;
+    const optionalLabel = currentPmicDialog?.optionalLabel;
+    const confirmLabel = currentPmicDialog?.confirmLabel;
+    const cancelLabel = currentPmicDialog?.cancelLabel;
+    const title = currentPmicDialog?.title;
+    const onConfirm = currentPmicDialog?.onConfirm ?? noop;
+    const onCancel = currentPmicDialog?.onCancel ?? noop;
+    const onOptional = currentPmicDialog?.onOptional;
 
     const serialPort = useSelector(getSerialPort);
     const shellParserO = useSelector(getShellParser);

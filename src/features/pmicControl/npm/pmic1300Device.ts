@@ -75,7 +75,7 @@ const parseLogData = (
     callback({ timestamp: parseTime(strTimeStamp), logLevel, module, message });
 };
 
-export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
+export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();
     const devices = {
         noOfBucks: 2,
@@ -85,7 +85,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
     const baseDevice = baseNpmDevice(
         shellParser,
-        warningDialogHandler,
+        dialogHandler,
         eventEmitter,
         devices,
         '0.0.0+10'
@@ -622,7 +622,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     optionalDoNotAskAgain: true,
                 };
 
-                warningDialogHandler(warningDialog);
+                dialogHandler(warningDialog);
             });
         }
 
@@ -691,7 +691,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     optionalDoNotAskAgain: true,
                 };
 
-                warningDialogHandler(warningDialog);
+                dialogHandler(warningDialog);
             });
         }
 
@@ -777,7 +777,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     optionalDoNotAskAgain: true,
                 };
 
-                warningDialogHandler(warningDialog);
+                dialogHandler(warningDialog);
             });
         }
 
@@ -1021,7 +1021,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
                     optionalDoNotAskAgain: true,
                 };
 
-                warningDialogHandler(warningDialog);
+                dialogHandler(warningDialog);
                 return;
             }
 

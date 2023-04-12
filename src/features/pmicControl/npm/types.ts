@@ -114,7 +114,7 @@ export type PmicChargingState = {
 export interface IBaseNpmDevice {
     (
         shellParser: ShellParser | undefined,
-        warningDialogHandler: (pmicWarningDialog: PmicDialog) => void,
+        dialogHandler: (pmicDialog: PmicDialog) => void,
         eventEmitter: EventEmitter,
         devices: {
             noOfChargers?: number;
@@ -195,7 +195,7 @@ export type BaseNpmDevice = {
 export interface INpmDevice extends IBaseNpmDevice {
     (
         shellParser: ShellParser | undefined,
-        warningDialogHandler: (pmicWarningDialog: PmicDialog) => void
+        dialogHandler: (pmicDialog: PmicDialog) => void
     ): NpmDevice;
 }
 

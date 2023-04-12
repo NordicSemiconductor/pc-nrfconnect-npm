@@ -10,7 +10,7 @@ import { NpmDevice, PmicDialog } from './types';
 
 export const getNpmDevice = (
     shellParser: ShellParser | undefined,
-    warningDialogHandler: (pmicWarningDialog: PmicDialog) => void
+    dialogHandler: (pmicDialog: PmicDialog) => void
 ): NpmDevice =>
     // TODO query device chip model ?
-    getNPM1300(shellParser, warningDialogHandler);
+    getNPM1300(shellParser, dialogHandler);

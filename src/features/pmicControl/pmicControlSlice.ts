@@ -138,10 +138,10 @@ const pmicControlSlice = createSlice({
         setSupportedVersion(state, action: PayloadAction<boolean | undefined>) {
             state.supportedVersion = action.payload;
         },
-        requestWarningDialog(state, action: PayloadAction<PmicDialog>) {
+        requestDialog(state, action: PayloadAction<PmicDialog>) {
             state.dialog = [...state.dialog, action.payload];
         },
-        dequeueWarningDialog(state) {
+        dequeueDialog(state) {
             state.dialog = [...state.dialog.slice(1)];
         },
         setEventRecordingPath(
@@ -235,8 +235,8 @@ export const {
     setDefaultBatterModels,
     setStoredBatterModel,
     setSupportedVersion,
-    requestWarningDialog,
-    dequeueWarningDialog,
+    requestDialog,
+    dequeueDialog,
     setEventRecordingPath,
     setUsbPowered,
 } = pmicControlSlice.actions;
