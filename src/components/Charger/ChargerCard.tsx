@@ -9,15 +9,11 @@ import { useSelector } from 'react-redux';
 import { MasonryLayout } from 'pc-nrfconnect-shared';
 
 import {
-    getBucks,
     getChargers,
-    getLdos,
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
 import BatteryCard from '../Cards/Battery/BatteryCard';
 import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
-import BuckCard from '../Cards/Buck/BuckCard';
-import LDOCard from '../Cards/LDO/LDOCard';
 import PowerCard from '../Cards/Power/PowerCard';
 
 interface DashboardControlCardProps {

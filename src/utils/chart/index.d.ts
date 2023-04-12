@@ -8,11 +8,11 @@ import {
     ChartArea,
     ChartType,
     ChartTypeRegistry,
-    Plugin,
     ScatterDataPoint,
 } from 'chart.js';
 
 declare module 'chart.js' {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface PluginOptionsByType<TType extends ChartType> {
         panZoom?: {
             live?: boolean;
@@ -23,6 +23,7 @@ declare module 'chart.js' {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface PluginOptionsByType<TType extends ChartType> {
         canvasAreaNotifier?: {
             onChartAreaChanged?: (chartArea: ChartArea) => void;
@@ -30,6 +31,7 @@ declare module 'chart.js' {
     }
 
     interface Chart<
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         TType extends keyof ChartTypeRegistry = keyof ChartTypeRegistry
     > {
         zoom: (

@@ -28,11 +28,11 @@ import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
 import {
     getActiveBatterModel,
     getDefaultBatterModels,
+    getDialog,
     getEventRecordingPath,
     getLatestAdcSample,
     getNpmDevice,
     getStoredBatterModel,
-    getWarningDialog,
     setEventRecordingPath,
 } from '../../features/pmicControl/pmicControlSlice';
 import {
@@ -50,7 +50,7 @@ import ConnectionStatus from './ConnectionStatus';
 export default () => {
     const noop = () => {};
 
-    const currentPmicWarningDialog = useSelector(getWarningDialog);
+    const currentPmicWarningDialog = useSelector(getDialog);
     const eventRecordingPath = useSelector(getEventRecordingPath);
     const showConfirmDialog = currentPmicWarningDialog !== undefined;
     const message = currentPmicWarningDialog?.message;

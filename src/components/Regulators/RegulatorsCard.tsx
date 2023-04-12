@@ -10,7 +10,6 @@ import { MasonryLayout } from 'pc-nrfconnect-shared';
 
 import {
     getBucks,
-    getChargers,
     getLdos,
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';

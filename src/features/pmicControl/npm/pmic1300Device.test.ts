@@ -13,13 +13,12 @@ import {
     Ldo,
     PartialUpdate,
     PmicChargingState,
-    PmicWarningDialog,
+    PmicDialog,
 } from './types';
 
 const PMIC_1300_BUCKS = [0, 1];
 const PMIC_1300_LDOS = [0, 1];
 const PMIC_1300_CHARGERS = [0];
-const PMIC_1300_GPIOS = [0, 1, 2, 3, 4];
 
 jest.useFakeTimers();
 jest.spyOn(global, 'setTimeout');
@@ -29,19 +28,22 @@ jest.setSystemTime(systemTime);
 
 const helpers = {
     registerCommandCallbackError: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
+        _command: string,
+        _onSuccess?: (response: string, command: string) => void,
         onError?: (message: string, command: string) => void,
-        unique?: boolean
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _unique?: boolean
     ) => {
         if (onError) onError('', '');
         return Promise.resolve();
     },
     registerCommandCallbackSuccess: (
-        command: string,
+        _command: string,
         onSuccess?: (response: string, command: string) => void,
-        onError?: (message: string, command: string) => void,
-        unique?: boolean
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _onError?: (message: string, command: string) => void,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _unique?: boolean
     ) => {
         if (onSuccess) onSuccess('', '');
         return Promise.resolve();
@@ -50,7 +52,8 @@ const helpers = {
 
 const setupMocksBase = (shellParser: ShellParser | undefined = undefined) => {
     const mockWarningDialogHandler = jest.fn(
-        (pmicWarningDialog: PmicWarningDialog) => {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_pmicWarningDialog: PmicDialog) => {}
     );
 
     const pmic = getNPM1300(shellParser, mockWarningDialogHandler);
@@ -59,14 +62,17 @@ const setupMocksBase = (shellParser: ShellParser | undefined = undefined) => {
     const mockOnAdcSample = jest.fn(() => {});
     const mockOnBeforeReboot = jest.fn(() => {});
     const mockOnBuckUpdate = jest.fn(
-        (partialUpdate: PartialUpdate<Buck>) => {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: PartialUpdate<Buck>) => {}
     );
     const mockOnChargerUpdate = jest.fn(
-        (partialUpdate: PartialUpdate<Charger>) => {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: PartialUpdate<Charger>) => {}
     );
     const mockOnChargingStatusUpdate = jest.fn(() => {});
     const mockOnFuelGaugeUpdate = jest.fn(() => {});
-    const mockOnLdoUpdate = jest.fn((partialUpdate: PartialUpdate<Ldo>) => {});
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const mockOnLdoUpdate = jest.fn((_partialUpdate: PartialUpdate<Ldo>) => {});
     const mockOnLoggingEvent = jest.fn(() => {});
     const mockOnPmicStateChange = jest.fn(() => {});
     const mockOnReboot = jest.fn(() => {});
@@ -114,11 +120,13 @@ type CommandCallback = {
 
 const setupMocksWithShellParser = () => {
     const mockOnPausedChange = jest.fn(
-        (handler: (state: boolean) => void) => () => {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_handler: (state: boolean) => void) => () => {}
     );
 
     const eventHandlers = {
-        mockOnShellLoggingEventHandler: (state: string) => {},
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        mockOnShellLoggingEventHandler: (_state: string) => {},
         mockRegisterCommandCallbackHandlers: [] as CommandCallback[],
         mockRegisterCommandCallbackHandler: (command: string) =>
             eventHandlers.mockRegisterCommandCallbackHandlers.find(element =>
@@ -133,14 +141,19 @@ const setupMocksWithShellParser = () => {
         }
     );
     const mockOnUnknownCommand = jest.fn(
-        (handler: (state: string) => void) => () => {}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_handler: (state: string) => void) => () => {}
     );
     const mockEnqueueRequest = jest.fn(
         (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (message: string, command: string) => void,
-            unique?: boolean
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            _command: string,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            _onSuccess?: (response: string, command: string) => void,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            _onError?: (message: string, command: string) => void,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            _unique?: boolean
         ) => Promise.resolve()
     );
     const mockRegisterCommandCallback = jest.fn(
@@ -178,8 +191,10 @@ const setupMocksWithShellParser = () => {
         (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (message: string, command: string) => void,
-            unique?: boolean
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            _onError?: (message: string, command: string) => void,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            _unique?: boolean
         ) => {
             expect(command).toBe('kernel uptime');
             if (onSuccess) onSuccess('Uptime: 0 ms', command);
@@ -453,10 +468,12 @@ describe('PMIC 1300', () => {
             test('Request getDefaultBatteryModels success', async () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
-                        command: string,
+                        _command: string,
                         onSuccess?: (response: string, command: string) => void,
-                        onError?: (message: string, command: string) => void,
-                        unique?: boolean
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _onError?: (message: string, command: string) => void,
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _unique?: boolean
                     ) => {
                         if (onSuccess)
                             onSuccess(
@@ -542,8 +559,10 @@ describe('PMIC 1300', () => {
                     (
                         command: string,
                         onSuccess?: (response: string, command: string) => void,
-                        onError?: (message: string, command: string) => void,
-                        unique?: boolean
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _onError?: (message: string, command: string) => void,
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _unique?: boolean
                     ) => {
                         if (onSuccess) onSuccess('Uptime: 2945165 ms', command);
                         return Promise.resolve();
@@ -566,8 +585,10 @@ describe('PMIC 1300', () => {
                     (
                         command: string,
                         onSuccess?: (response: string, command: string) => void,
-                        onError?: (message: string, command: string) => void,
-                        unique?: boolean
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _onError?: (message: string, command: string) => void,
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _unique?: boolean
                     ) => {
                         if (onSuccess)
                             onSuccess('app_version=0.0.0+10', command);
@@ -591,8 +612,10 @@ describe('PMIC 1300', () => {
                     (
                         command: string,
                         onSuccess?: (response: string, command: string) => void,
-                        onError?: (message: string, command: string) => void,
-                        unique?: boolean
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _onError?: (message: string, command: string) => void,
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _unique?: boolean
                     ) => {
                         if (onSuccess)
                             onSuccess('app_version=0.0.0+9', command);
@@ -792,7 +815,7 @@ describe('PMIC 1300', () => {
 
             test('Set setBuckVOut index: 0 with warning - cancel', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         warningDialog.onCancel();
                     }
                 );
@@ -815,7 +838,7 @@ describe('PMIC 1300', () => {
 
             test('Set setBuckVOut index: 0 with warning - confirm', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         warningDialog.onConfirm();
                     }
                 );
@@ -847,7 +870,7 @@ describe('PMIC 1300', () => {
 
             test("Set setBuckVOut index: 0 with warning - yes, don't ask", async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         if (warningDialog?.onOptional)
                             warningDialog.onOptional();
                     }
@@ -923,7 +946,7 @@ describe('PMIC 1300', () => {
 
             test('Set setBuckMode index: 0 with software - cancel', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         warningDialog.onCancel();
                     }
                 );
@@ -946,7 +969,7 @@ describe('PMIC 1300', () => {
 
             test('Set setBuckMode index: 0 with software - confirm', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         warningDialog.onConfirm();
                     }
                 );
@@ -979,7 +1002,7 @@ describe('PMIC 1300', () => {
 
             test("Set setBuckMode index: 0 with software - yes, don't ask", async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         if (warningDialog.onOptional)
                             warningDialog.onOptional();
                     }
@@ -1081,7 +1104,7 @@ describe('PMIC 1300', () => {
 
             test('Set setBuckEnabled index: 0 false - cancel', async () => {
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         warningDialog.onCancel();
                     }
                 );
@@ -1100,7 +1123,7 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockClear();
 
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         warningDialog.onConfirm();
                     }
                 );
@@ -1125,7 +1148,7 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockClear();
 
                 mockWarningDialogHandler.mockImplementationOnce(
-                    (warningDialog: PmicWarningDialog) => {
+                    (warningDialog: PmicDialog) => {
                         if (warningDialog.onOptional)
                             warningDialog.onOptional();
                     }
@@ -2323,7 +2346,7 @@ describe('PMIC 1300', () => {
 
         test('Apply wrong firmware version -- Yes', () => {
             mockWarningDialogHandler.mockImplementationOnce(
-                (warningDialog: PmicWarningDialog) => {
+                (warningDialog: PmicDialog) => {
                     warningDialog.onConfirm();
                 }
             );
@@ -2383,7 +2406,7 @@ describe('PMIC 1300', () => {
 
         test("Apply wrong firmware version -- Yes, Don't ask again", () => {
             mockWarningDialogHandler.mockImplementationOnce(
-                (warningDialog: PmicWarningDialog) => {
+                (warningDialog: PmicDialog) => {
                     if (warningDialog.onOptional) warningDialog.onOptional();
                 }
             );
@@ -2443,7 +2466,7 @@ describe('PMIC 1300', () => {
 
         test('Apply wrong firmware version -- Cancel', () => {
             mockWarningDialogHandler.mockImplementationOnce(
-                (warningDialog: PmicWarningDialog) => {
+                (warningDialog: PmicDialog) => {
                     warningDialog.onCancel();
                 }
             );
@@ -3161,7 +3184,7 @@ describe('PMIC 1300', () => {
         });
 
         test("Goes from 'pmic-connected' to 'pmic-disconnected' if 'No response from PMIC.' is received", () => {
-            const { eventHandlers, mockOnPmicStateChange, pmic } =
+            const { eventHandlers, mockOnPmicStateChange } =
                 setupMocksWithShellParser();
 
             jest.runAllTimers();
@@ -3176,7 +3199,7 @@ describe('PMIC 1300', () => {
         });
 
         test("Goes from 'pmic-unknown' to 'pmic-disconnected' if 'No response from PMIC.' is received", () => {
-            const { eventHandlers, mockOnPmicStateChange, pmic } =
+            const { eventHandlers, mockOnPmicStateChange } =
                 setupMocksWithShellParser();
 
             expect(clearTimeout).toHaveBeenCalledTimes(0);

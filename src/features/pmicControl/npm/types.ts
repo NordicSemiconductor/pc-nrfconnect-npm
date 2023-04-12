@@ -24,21 +24,21 @@ export const BuckModeControlValues = ['Auto', 'PWM', 'PFM'] as const;
 export const BuckOnOffControlValues = ['Off'] as const;
 export const BuckRetentionControlValues = ['Off'] as const;
 
-export type GPIO = typeof GPIOValues[number];
+export type GPIO = (typeof GPIOValues)[number];
 export type RebootMode = 'cold' | 'warm';
 export type LdoMode = 'ldoSwitch' | 'LDO';
 export type BuckMode = 'vSet' | 'software';
-export type BuckModeControl = typeof BuckModeControlValues[number] | GPIO;
-export type BuckOnOffControl = typeof BuckOnOffControlValues[number] | GPIO;
+export type BuckModeControl = (typeof BuckModeControlValues)[number] | GPIO;
+export type BuckOnOffControl = (typeof BuckOnOffControlValues)[number] | GPIO;
 export type BuckRetentionControl =
-    | typeof BuckRetentionControlValues[number]
+    | (typeof BuckRetentionControlValues)[number]
     | GPIO;
 
 export const ITermValues = ['10%', '20%'] as const;
-export type ITerm = typeof ITermValues[number];
+export type ITerm = (typeof ITermValues)[number];
 
 export const VTrickleFastValues = [2.5, 2.9] as const;
-export type VTrickleFast = typeof VTrickleFastValues[number];
+export type VTrickleFast = (typeof VTrickleFastValues)[number];
 
 export type IrqEvent = {
     type: string;
@@ -114,7 +114,7 @@ export type PmicChargingState = {
 export interface IBaseNpmDevice {
     (
         shellParser: ShellParser | undefined,
-        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void,
+        warningDialogHandler: (pmicWarningDialog: PmicDialog) => void,
         eventEmitter: EventEmitter,
         devices: {
             noOfChargers?: number;
@@ -195,7 +195,7 @@ export type BaseNpmDevice = {
 export interface INpmDevice extends IBaseNpmDevice {
     (
         shellParser: ShellParser | undefined,
-        warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void
+        warningDialogHandler: (pmicWarningDialog: PmicDialog) => void
     ): NpmDevice;
 }
 
@@ -282,7 +282,8 @@ export type NpmDevice = {
     setBatteryStatusCheckEnabled: (enabled: boolean) => void;
 } & BaseNpmDevice;
 
-export interface PmicWarningDialog {
+export interface PmicDialog {
+    type: 'alert' | 'alert-circle' | 'information';
     storeID: string;
     message: string;
     optionalLabel?: string;

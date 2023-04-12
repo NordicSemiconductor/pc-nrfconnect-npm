@@ -33,8 +33,8 @@ import {
     LoggingEvent,
     PartialUpdate,
     PmicChargingState,
+    PmicDialog,
     PmicState,
-    PmicWarningDialog,
     VTrickleFast,
 } from './types';
 
@@ -518,7 +518,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         });
 
     const setChargerVTrickleFast = (index: number, value: VTrickleFast) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             emitPartialEvent<Charger>('onChargerUpdate', index, {
@@ -529,7 +529,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         });
 
     const setChargerITerm = (index: number, iTerm: ITerm) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             emitPartialEvent<Charger>('onChargerUpdate', index, {
@@ -540,7 +540,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         });
 
     const setChargerEnabledRecharging = (index: number, enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             emitPartialEvent<Charger>('onChargerUpdate', index, {
@@ -604,7 +604,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         if (pmicState !== 'ek-disconnected' && index === 0 && value <= 1.7) {
             return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicWarningDialog = {
+                const warningDialog: PmicDialog = {
+                    type: 'alert',
                     storeID: 'pmic1300-setBuckVOut-0',
                     message: `Buck 1 Powers the I2C communications that are needed for this app. 
                     Any voltage lower that 1.7v Might cause issues with the Connection to the app. Are you sure you want to continue`,
@@ -629,7 +630,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const setBuckRetentionVOut = (index: number, value: number) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             if (pmicState === 'ek-disconnected')
@@ -672,7 +673,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             mode === 'software'
         ) {
             return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicWarningDialog = {
+                const warningDialog: PmicDialog = {
+                    type: 'alert',
                     storeID: 'pmic1300-setBuckVOut-0',
                     message: `Buck 1 Powers the I2C communications that are needed for this app. 
                     Software voltage might be already set to less then 1.7V . Are you sure you want to continue`,
@@ -697,7 +699,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const setBuckModeControl = (index: number, modeControl: BuckModeControl) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             if (pmicState === 'ek-disconnected')
@@ -712,7 +714,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         index: number,
         onOffControl: BuckOnOffControl
     ) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             if (pmicState === 'ek-disconnected')
@@ -727,7 +729,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
         index: number,
         retentionControl: BuckRetentionControl
     ) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             if (pmicState === 'ek-disconnected')
@@ -760,7 +762,8 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
 
         if (pmicState !== 'ek-disconnected' && index === 0 && !enabled) {
             return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicWarningDialog = {
+                const warningDialog: PmicDialog = {
+                    type: 'alert',
                     storeID: 'pmic1300-setBuckEnabled-0',
                     message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
                 disconnected from the app. Are you sure you want to proceed?`,
@@ -782,7 +785,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     };
 
     const setLdoVoltage = (index: number, voltage: number) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
             if (pmicState === 'ek-disconnected') {
                 emitPartialEvent<Ldo>('onLdoUpdate', index, {
@@ -810,7 +813,7 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             }
         });
     const setLdoMode = (index: number, mode: LdoMode) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             if (pmicState === 'ek-disconnected') {
@@ -912,32 +915,46 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
     initConnectionTimeout();
 
     const requestUpdate = {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         pmicChargingState: (index: number) =>
             sendCommand('npmx charger status get'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerVTerm: (index: number) =>
             sendCommand('npmx charger termination_voltage normal get'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerIChg: (index: number) =>
             sendCommand('npmx charger charger_current get'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerEnabled: (index: number) =>
             sendCommand('npmx charger module charger get'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerVTrickleFast: (index: number) => console.warn('Not implemented'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerITerm: (index: number) => console.warn('Not implemented'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerEnabledRecharging: (index: number) =>
             console.warn('Not implemented'),
 
         buckVOut: (index: number) =>
             sendCommand(`npmx buck voltage get ${index}`),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckRetentionVOut: (index: number) => console.warn('Not implemented'),
         buckMode: (index: number) =>
             sendCommand(`npmx buck vout select get ${index}`),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckModeControl: (index: number) => console.warn('Not implemented'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckOnOffControl: (index: number) => console.warn('Not implemented'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckRetentionControl: (index: number) =>
             console.warn('Not implemented'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckEnabled: (index: number) => console.warn('Not implemented'),
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ldoVoltage: (index: number) => console.warn('Not implemented'),
         ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ldoMode: (index: number) => console.warn('Not implemented'),
 
         fuelGauge: () => sendCommand('fuel_gauge get'),
@@ -987,8 +1004,9 @@ export const getNPM1300: INpmDevice = (shellParser, warningDialogHandler) => {
             };
 
             if (config.firmwareVersion !== baseDevice.getSupportedVersion()) {
-                const warningDialog: PmicWarningDialog = {
+                const warningDialog: PmicDialog = {
                     storeID: 'pmic1300-load-config-mismatch',
+                    type: 'alert',
                     message: `The configuration was intended for firmware version ${
                         config.firmwareVersion
                     }. Device is running a different version. 

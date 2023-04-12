@@ -43,7 +43,7 @@ import {
     updateLdo,
 } from '../pmicControlSlice';
 import { getNpmDevice } from './npmFactory';
-import { Buck, Charger, Ldo, PmicWarningDialog } from './types';
+import { Buck, Charger, Ldo, PmicDialog } from './types';
 
 export default (shellParser: ShellParser | undefined) => {
     const npmDevice = useSelector(getNpmDeviceSlice);
@@ -97,7 +97,7 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     const warningDialogHandler = useCallback(
-        (pmicWarningDialog: PmicWarningDialog) => {
+        (pmicWarningDialog: PmicDialog) => {
             if (
                 getPersistentStore().get(
                     `pmicDialogs:${pmicWarningDialog.storeID}`

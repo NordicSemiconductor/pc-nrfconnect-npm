@@ -29,7 +29,6 @@ import { AdcSample } from '../../features/pmicControl/npm/types';
 import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import canvasAreaNotifier from '../../utils/chart/canvasAreaNotifier';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
-import CustomLegend from '../../utils/chart/CustomLegend';
 import { getState } from '../../utils/chart/state';
 import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 

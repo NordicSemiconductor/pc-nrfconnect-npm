@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
 

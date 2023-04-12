@@ -16,8 +16,8 @@ import {
     NpmDevice,
     PartialUpdate,
     PmicChargingState,
+    PmicDialog,
     PmicState,
-    PmicWarningDialog,
 } from './npm/types';
 
 interface pmicControlState {
@@ -31,7 +31,7 @@ interface pmicControlState {
     batteryConnected: boolean;
     fuelGauge: boolean;
     supportedVersion?: boolean;
-    warningDialog: PmicWarningDialog[];
+    dialog: PmicDialog[];
     eventRecording: boolean;
     eventRecordingPath?: string;
     activeBatterModel?: BatteryModel;
@@ -57,7 +57,7 @@ const initialState: pmicControlState = {
     batteryConnected: false,
     fuelGauge: false,
     defaultBatterModels: [],
-    warningDialog: [],
+    dialog: [],
     eventRecording: false,
     usbPowered: false,
 };
@@ -138,11 +138,11 @@ const pmicControlSlice = createSlice({
         setSupportedVersion(state, action: PayloadAction<boolean | undefined>) {
             state.supportedVersion = action.payload;
         },
-        requestWarningDialog(state, action: PayloadAction<PmicWarningDialog>) {
-            state.warningDialog = [...state.warningDialog, action.payload];
+        requestWarningDialog(state, action: PayloadAction<PmicDialog>) {
+            state.dialog = [...state.dialog, action.payload];
         },
         dequeueWarningDialog(state) {
-            state.warningDialog = [...state.warningDialog.slice(1)];
+            state.dialog = [...state.dialog.slice(1)];
         },
         setEventRecordingPath(
             state,
@@ -207,9 +207,9 @@ export const isSupportedVersion = (state: RootState) =>
     state.app.pmicControl.pmicState !== 'ek-disconnected'
         ? state.app.pmicControl.supportedVersion
         : initialState.supportedVersion;
-export const getWarningDialog = (state: RootState) =>
-    state.app.pmicControl.warningDialog.length > 0
-        ? state.app.pmicControl.warningDialog[0]
+export const getDialog = (state: RootState) =>
+    state.app.pmicControl.dialog.length > 0
+        ? state.app.pmicControl.dialog[0]
         : undefined;
 
 export const getEventRecording = (state: RootState) =>
