@@ -185,7 +185,7 @@ export default () => {
                     variant="secondary"
                     disabled={pmicConnection === 'ek-disconnected'}
                     className="w-100"
-                    onClick={() => npmDevice?.kernelReset('cold')}
+                    onClick={() => npmDevice?.kernelReset()}
                 >
                     Reset Device
                 </Button>

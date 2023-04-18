@@ -126,7 +126,7 @@ export interface IBaseNpmDevice {
 }
 
 export type BaseNpmDevice = {
-    kernelReset: (mode: RebootMode) => void;
+    kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
     onPmicStateChange: (
         handler: (state: PmicState, error?: string) => void

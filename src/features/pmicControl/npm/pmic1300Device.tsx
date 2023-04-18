@@ -91,7 +91,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         dialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+10'
+        '0.0.0+12'
     );
     let lastUptime = 0;
 
@@ -128,7 +128,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
                 break;
             case 'PMIC available. Application can be restarted.':
-                baseDevice.kernelReset('cold');
+                baseDevice.kernelReset();
                 break;
         }
     };

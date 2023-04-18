@@ -52,13 +52,13 @@ export const baseNpmDevice: IBaseNpmDevice = (
             );
         });
 
-    const kernelReset = (mode: 'cold' | 'warm') => {
+    const kernelReset = () => {
         if (rebooting || !shellParser) return;
         rebooting = true;
 
-        eventEmitter.emit('onBeforeReboot', mode);
+        eventEmitter.emit('onBeforeReboot');
         shellParser.enqueueRequest(
-            `kernel reboot ${mode}`,
+            'delayed_reboot 100',
             () => {},
             () => {
                 rebooting = false;
@@ -114,7 +114,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
     };
 
     registerCommandCallbackLoggerWrapper(
-        toRegex('kernel reboot (cold|warm)'),
+        toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
         () => {
             rebooting = true;
             eventEmitter.emit('onReboot', true);
