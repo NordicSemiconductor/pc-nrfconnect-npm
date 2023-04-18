@@ -5,33 +5,36 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
+import { Form, ProgressBar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     CollapsibleGroup,
-    ConfirmationDialog,
+    DialogButton,
     Dropdown,
     DropdownItem,
+    GenericDialog,
     SidePanel,
     StartStopButton,
 } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
 import {
+    loadConfiguration,
     openDirectoryDialog,
-    openFileDialog,
     saveFileDialog,
+    uploadProfile,
 } from '../../actions/fileActions';
 import { BatteryModel } from '../../features/pmicControl/npm/types';
 import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
 import {
     getActiveBatterModel,
     getDefaultBatterModels,
+    getDialog,
     getEventRecordingPath,
     getLatestAdcSample,
     getNpmDevice,
     getStoredBatterModel,
-    getWarningDialog,
     setEventRecordingPath,
 } from '../../features/pmicControl/pmicControlSlice';
 import {
@@ -44,22 +47,13 @@ import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
 } from '../../hooks/commandParser';
-import SerialSettings from './SerialSettings';
+import ConnectionStatus from './ConnectionStatus';
 
 export default () => {
     const noop = () => {};
 
-    const currentPmicWarningDialog = useSelector(getWarningDialog);
+    const currentPmicDialog = useSelector(getDialog);
     const eventRecordingPath = useSelector(getEventRecordingPath);
-    const showConfirmDialog = currentPmicWarningDialog !== undefined;
-    const message = currentPmicWarningDialog?.message;
-    const optionalLabel = currentPmicWarningDialog?.optionalLabel;
-    const confirmLabel = currentPmicWarningDialog?.confirmLabel;
-    const cancelLabel = currentPmicWarningDialog?.cancelLabel;
-    const title = currentPmicWarningDialog?.title;
-    const onConfirm = currentPmicWarningDialog?.onConfirm ?? noop;
-    const onCancel = currentPmicWarningDialog?.onCancel ?? noop;
-    const onOptional = currentPmicWarningDialog?.onOptional;
 
     const serialPort = useSelector(getSerialPort);
     const shellParserO = useSelector(getShellParser);
@@ -85,7 +79,7 @@ export default () => {
                 : prev
         ) ?? undefined;
 
-    const batteryModelItems = useMemo(() => {
+    const batteryModelItems: DropdownItem[] = useMemo(() => {
         const items = [...defaultBatterModels];
         if (storedBatterModel) items.push(storedBatterModel);
 
@@ -171,7 +165,6 @@ export default () => {
 
     return (
         <SidePanel className="side-panel">
-            <SerialSettings />
             <CollapsibleGroup defaultCollapsed={false} heading="Settings">
                 <Button
                     variant="secondary"
@@ -182,25 +175,26 @@ export default () => {
                 </Button>
                 <Button
                     variant="secondary"
-                    disabled={pmicConnection !== 'connected'}
+                    disabled={pmicConnection !== 'pmic-connected'}
                     className="w-100"
-                    onClick={() => dispatch(openFileDialog())}
+                    onClick={() => dispatch(loadConfiguration())}
                 >
                     Load Configuration
                 </Button>
                 <Button
                     variant="secondary"
-                    disabled={pmicConnection === 'offline'}
+                    disabled={pmicConnection === 'ek-disconnected'}
                     className="w-100"
                     onClick={() => npmDevice?.kernelReset('cold')}
                 >
                     Reset Device
                 </Button>
                 <StartStopButton
+                    large={false}
                     variant="secondary"
                     className="w-100"
-                    startText="Start Recording Events"
-                    stopText="Stop Recording Events"
+                    startText="Recording Events"
+                    stopText="Stop Recording"
                     onClick={() => {
                         if (
                             eventRecordingPath === undefined ||
@@ -246,25 +240,64 @@ export default () => {
                 <Button
                     variant="secondary"
                     className="w-100"
-                    onClick={() => {}}
-                    disabled
+                    onClick={() => dispatch(uploadProfile())}
+                    disabled={pmicConnection === 'ek-disconnected'}
                 >
-                    Upload profile
+                    Load profile
                 </Button>
             </CollapsibleGroup>
+            <ConnectionStatus />
 
-            <ConfirmationDialog
-                title={title}
-                isVisible={showConfirmDialog}
-                onConfirm={onConfirm}
-                confirmLabel={confirmLabel}
-                onCancel={onCancel}
-                cancelLabel={cancelLabel}
-                onOptional={onOptional}
-                optionalLabel={optionalLabel}
-            >
-                {message}
-            </ConfirmationDialog>
+            {currentPmicDialog && (
+                <GenericDialog
+                    title={currentPmicDialog?.title ?? ''}
+                    headerIcon={currentPmicDialog?.type}
+                    isVisible
+                    showSpinner={currentPmicDialog?.progress !== undefined}
+                    closeOnEsc
+                    onHide={currentPmicDialog?.onCancel}
+                    footer={
+                        <>
+                            <DialogButton
+                                variant="primary"
+                                disabled={currentPmicDialog?.confirmDisabled}
+                                onClick={currentPmicDialog?.onConfirm ?? noop}
+                            >
+                                {currentPmicDialog?.confirmLabel}
+                            </DialogButton>
+                            <DialogButton
+                                disabled={currentPmicDialog?.cancelDisabled}
+                                onClick={currentPmicDialog?.onCancel ?? noop}
+                            >
+                                {currentPmicDialog?.cancelLabel}
+                            </DialogButton>
+                            {currentPmicDialog?.optionalLabel && (
+                                <DialogButton
+                                    disabled={
+                                        currentPmicDialog?.optionalDisabled
+                                    }
+                                    onClick={
+                                        currentPmicDialog?.onOptional ?? noop
+                                    }
+                                >
+                                    {currentPmicDialog?.optionalLabel}
+                                </DialogButton>
+                            )}
+                        </>
+                    }
+                >
+                    {currentPmicDialog?.message}
+                    {currentPmicDialog?.progress !== undefined && (
+                        <Form.Group>
+                            <br />
+                            <ProgressBar
+                                now={currentPmicDialog?.progress}
+                                style={{ height: '4px' }}
+                            />
+                        </Form.Group>
+                    )}
+                </GenericDialog>
+            )}
         </SidePanel>
     );
 };

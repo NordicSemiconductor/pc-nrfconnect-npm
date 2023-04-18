@@ -47,7 +47,7 @@ export default ({
 
     const [internalVLdo, setInternalVLdo] = useState(ldo?.voltage ?? 0);
 
-    const modeItems = ['Load Switch', 'LDO'];
+    const modeItems = ['LDO', 'Load Switch'];
 
     useEffect(() => {
         if (ldo) setInternalVLdo(ldo.voltage);
@@ -74,14 +74,14 @@ export default ({
             <StateSelector
                 disabled
                 items={modeItems}
-                onSelect={i => onModeChange(i === 0 ? 'ldoSwitch' : 'LDO')}
+                onSelect={i => onModeChange(i === 0 ? 'LDO' : 'ldoSwitch')}
                 selectedItem={
-                    ldo.mode === 'ldoSwitch' ? modeItems[0] : modeItems[1]
+                    ldo.mode === 'ldoSwitch' ? modeItems[1] : modeItems[0]
                 }
             />
-            <div className="slider-container">
+            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <div className="disabled">
+                    <div>
                         <span>V</span>
                         <span className="subscript">LDO</span>
                     </div>
@@ -95,7 +95,7 @@ export default ({
                                 onVoltageChange(internalVLdo)
                             }
                         />
-                        <span className="disabled">V</span>
+                        <span>V</span>
                     </div>
                 </FormLabel>
                 <Slider

@@ -6,11 +6,11 @@
 
 import { ShellParser } from '../../../hooks/commandParser';
 import { getNPM1300 } from './pmic1300Device';
-import { NpmDevice, PmicWarningDialog } from './types';
+import { NpmDevice, PmicDialog } from './types';
 
 export const getNpmDevice = (
     shellParser: ShellParser | undefined,
-    warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void
+    dialogHandler: (pmicDialog: PmicDialog) => void
 ): NpmDevice =>
     // TODO query device chip model ?
-    getNPM1300(shellParser, warningDialogHandler);
+    getNPM1300(shellParser, dialogHandler);

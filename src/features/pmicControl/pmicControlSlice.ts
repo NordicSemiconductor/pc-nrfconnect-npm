@@ -16,8 +16,8 @@ import {
     NpmDevice,
     PartialUpdate,
     PmicChargingState,
+    PmicDialog,
     PmicState,
-    PmicWarningDialog,
 } from './npm/types';
 
 interface pmicControlState {
@@ -31,12 +31,13 @@ interface pmicControlState {
     batteryConnected: boolean;
     fuelGauge: boolean;
     supportedVersion?: boolean;
-    warningDialog: PmicWarningDialog[];
+    dialog: PmicDialog[];
     eventRecording: boolean;
     eventRecordingPath?: string;
     activeBatterModel?: BatteryModel;
     defaultBatterModels: BatteryModel[];
     storedBatterModel?: BatteryModel;
+    usbPowered: boolean;
 }
 
 const initialState: pmicControlState = {
@@ -52,12 +53,13 @@ const initialState: pmicControlState = {
         dieTempHigh: false,
         supplementModeActive: false,
     },
-    pmicState: 'offline',
+    pmicState: 'ek-disconnected',
     batteryConnected: false,
     fuelGauge: false,
     defaultBatterModels: [],
-    warningDialog: [],
+    dialog: [],
     eventRecording: false,
+    usbPowered: false,
 };
 
 const pmicControlSlice = createSlice({
@@ -136,17 +138,28 @@ const pmicControlSlice = createSlice({
         setSupportedVersion(state, action: PayloadAction<boolean | undefined>) {
             state.supportedVersion = action.payload;
         },
-        requestWarningDialog(state, action: PayloadAction<PmicWarningDialog>) {
-            state.warningDialog = [...state.warningDialog, action.payload];
+        requestDialog(state, action: PayloadAction<PmicDialog>) {
+            const dialogIndex = state.dialog.findIndex(
+                dialog => dialog.uuid === action.payload.uuid
+            );
+
+            if (dialogIndex !== -1) {
+                state.dialog[dialogIndex] = action.payload;
+            } else {
+                state.dialog = [...state.dialog, action.payload];
+            }
         },
-        dequeueWarningDialog(state) {
-            state.warningDialog = [...state.warningDialog.slice(1)];
+        dequeueDialog(state) {
+            state.dialog = [...state.dialog.slice(1)];
         },
         setEventRecordingPath(
             state,
             action: PayloadAction<string | undefined>
         ) {
             state.eventRecordingPath = action.payload;
+        },
+        setUsbPowered(state, action: PayloadAction<boolean>) {
+            state.usbPowered = action.payload;
         },
     },
 });
@@ -155,7 +168,7 @@ const parseConnectedState = <T>(
     state: PmicState,
     connectedValue: T,
     fallback: T
-) => (state === 'connected' ? connectedValue : fallback);
+) => (state === 'pmic-connected' ? connectedValue : fallback);
 
 export const getNpmDevice = (state: RootState) =>
     state.app.pmicControl.npmDevice;
@@ -196,13 +209,15 @@ export const getDefaultBatterModels = (state: RootState) =>
     state.app.pmicControl.defaultBatterModels;
 export const getStoredBatterModel = (state: RootState) =>
     state.app.pmicControl.storedBatterModel;
+export const isUsbPowered = (state: RootState) =>
+    state.app.pmicControl.usbPowered;
 export const isSupportedVersion = (state: RootState) =>
-    state.app.pmicControl.pmicState !== 'offline'
+    state.app.pmicControl.pmicState !== 'ek-disconnected'
         ? state.app.pmicControl.supportedVersion
         : initialState.supportedVersion;
-export const getWarningDialog = (state: RootState) =>
-    state.app.pmicControl.warningDialog.length > 0
-        ? state.app.pmicControl.warningDialog[0]
+export const getDialog = (state: RootState) =>
+    state.app.pmicControl.dialog.length > 0
+        ? state.app.pmicControl.dialog[0]
         : undefined;
 
 export const getEventRecording = (state: RootState) =>
@@ -228,8 +243,9 @@ export const {
     setDefaultBatterModels,
     setStoredBatterModel,
     setSupportedVersion,
-    requestWarningDialog,
-    dequeueWarningDialog,
+    requestDialog,
+    dequeueDialog,
     setEventRecordingPath,
+    setUsbPowered,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;

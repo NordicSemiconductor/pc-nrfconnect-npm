@@ -5,7 +5,7 @@
  */
 import 'chartjs-adapter-date-fns';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
@@ -29,7 +29,6 @@ import { AdcSample } from '../../features/pmicControl/npm/types';
 import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import canvasAreaNotifier from '../../utils/chart/canvasAreaNotifier';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';
-import CustomLegend from '../../utils/chart/CustomLegend';
 import { getState } from '../../utils/chart/state';
 import TimeSpanDeltaLine from '../../utils/chart/TimeSpanDeltaLine';
 
@@ -408,48 +407,62 @@ export default ({ active }: PaneProps) => {
         });
     };
 
+    const resolution = range.xMax - range.xMin;
+
     return (
         <div className="graph-outer">
             <div className="graph-top-bar-wrapper">
                 <div />
                 <div className="range-buttons">
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 300000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(300000)}
                     >
                         5min
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 1800000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(1800000)}
                     >
                         30min
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 3600000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(3600000)}
                     >
                         1hr
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 21600000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(21600000)}
                     >
                         6hr
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 86400000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(86400000)}
                     >
                         1 Day
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant={
+                            resolution === 604800000 ? 'primary' : 'secondary'
+                        }
                         className="w-100"
                         onClick={() => zoom(604800000)}
                     >
@@ -464,10 +477,8 @@ export default ({ active }: PaneProps) => {
                     />
                 </div>
             </div>
-            <CustomLegend charts={chartMetaData.charts} />
             {chartMetaData.charts.map((_, index) => (
-                // eslint-disable-next-line react/jsx-key
-                <>
+                <Fragment key={chartMetaData.labels[index]}>
                     <div className="text-center">
                         <span>{chartMetaData.labels[index]}</span>
                     </div>
@@ -479,7 +490,7 @@ export default ({ active }: PaneProps) => {
                             ref={chartMetaData.refs[index]}
                         />
                     </div>
-                </>
+                </Fragment>
             ))}
             <TimeSpanDeltaLine range={range} chartArea={chartArea} />
         </div>

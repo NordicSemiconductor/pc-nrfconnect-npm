@@ -9,15 +9,11 @@ import { useSelector } from 'react-redux';
 import { MasonryLayout } from 'pc-nrfconnect-shared';
 
 import {
-    getBucks,
     getChargers,
-    getLdos,
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
 import BatteryCard from '../Cards/Battery/BatteryCard';
 import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
-import BuckCard from '../Cards/Buck/BuckCard';
-import LDOCard from '../Cards/LDO/LDOCard';
 import PowerCard from '../Cards/Power/PowerCard';
 
 interface DashboardControlCardProps {
@@ -26,8 +22,6 @@ interface DashboardControlCardProps {
 export default ({ disabled }: DashboardControlCardProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const chargers = useSelector(getChargers);
-    const bucks = useSelector(getBucks);
-    const ldos = useSelector(getLdos);
 
     return (
         <MasonryLayout minWidth={300}>
@@ -40,26 +34,6 @@ export default ({ disabled }: DashboardControlCardProps) => {
                     key={`Charger${1 + index}`}
                     index={index}
                     cardLabel="Charger"
-                    disabled={disabled}
-                    defaultSummary
-                />
-            ))}
-            {bucks.map((buck, index) => (
-                <BuckCard
-                    buck={buck}
-                    npmDevice={npmDevice}
-                    key={`Buck${1 + index}`}
-                    index={index}
-                    disabled={disabled}
-                    defaultSummary
-                />
-            ))}
-            {ldos.map((ldo, index) => (
-                <LDOCard
-                    ldo={ldo}
-                    npmDevice={npmDevice}
-                    key={`Buck${1 + index}`}
-                    index={index}
                     disabled={disabled}
                 />
             ))}

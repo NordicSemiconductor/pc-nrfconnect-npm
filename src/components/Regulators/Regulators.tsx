@@ -1,25 +1,58 @@
 /*
- * Copyright (c) 2015 Nordic Semiconductor ASA
+ * Copyright (c) 2022 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
-import { Alert } from 'pc-nrfconnect-shared';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Alert, PaneProps } from 'pc-nrfconnect-shared';
 
-import './regulators.scss';
+import {
+    getPmicState,
+    isSupportedVersion,
+} from '../../features/pmicControl/pmicControlSlice';
+import { isPaused } from '../../features/serial/serialSlice';
+import RegulatorsCard from './RegulatorsCard';
 
-export default () => (
-    <div className="regulators-container">
-        <div className="graph">
-            <Alert variant="info" label="nPM PowerUP​ 0.1​ - Preview release! ">
-                This is an unsupported, experimental preview and it is subject
-                to major redesigns in the future.
-            </Alert>
+export default ({ active }: PaneProps) => {
+    const paused = useSelector(isPaused);
+    const supportedVersion = useSelector(isSupportedVersion);
+    const pmicState = useSelector(getPmicState);
 
-            <div className="regulators-cards">
-                <p>TODO Placeholder</p>
+    const [pauseFor1Second, setPauseFor1Second] = useState(paused);
+    const disabled =
+        (!supportedVersion && pmicState !== 'ek-disconnected') ||
+        pmicState === 'pmic-disconnected' ||
+        pmicState === 'pmic-unknown' ||
+        pauseFor1Second;
+
+    useEffect(() => {
+        if (!paused) {
+            setPauseFor1Second(paused);
+        } else {
+            const t = setTimeout(() => {
+                setPauseFor1Second(paused);
+            }, 1000);
+
+            return () => clearTimeout(t);
+        }
+    }, [paused]);
+
+    return !active ? null : (
+        <div>
+            <div>
+                <Alert
+                    variant="info"
+                    label="nPM PowerUP​ 0.1​ - Preview release! "
+                >
+                    This is an unsupported, experimental preview and it is
+                    subject to major redesigns in the future.
+                </Alert>
+                <div>
+                    <RegulatorsCard disabled={disabled} />
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};

@@ -6,13 +6,27 @@
 
 import React, { useEffect, useState } from 'react';
 import FormLabel from 'react-bootstrap/FormLabel';
-import { Card, NumberInlineInput, Slider, Toggle } from 'pc-nrfconnect-shared';
+import {
+    Card,
+    classNames,
+    Dropdown,
+    NumberInlineInput,
+    Slider,
+    Toggle,
+} from 'pc-nrfconnect-shared';
 import {
     Range,
     Values,
 } from 'pc-nrfconnect-shared/typings/generated/src/Slider/range';
 
-import { Charger, NpmDevice } from '../../../features/pmicControl/npm/types';
+import {
+    Charger,
+    ITerm,
+    ITermValues,
+    NpmDevice,
+    VTrickleFast,
+    VTrickleFastValues,
+} from '../../../features/pmicControl/npm/types';
 
 interface PowerCardProperties {
     index: number;
@@ -20,6 +34,7 @@ interface PowerCardProperties {
     charger?: Charger;
     cardLabel?: string;
     disabled: boolean;
+    defaultSummary?: boolean;
 }
 
 export default ({
@@ -28,7 +43,9 @@ export default ({
     charger,
     cardLabel = `Charging ${index + 1}`,
     disabled,
+    defaultSummary = false,
 }: PowerCardProperties) => {
+    const [summary, setSummary] = useState(defaultSummary);
     const currentRange = npmDevice?.getChargerCurrentRange(index);
     const currentVoltage = npmDevice?.getChargerVoltageRange(index) as Values;
 
@@ -51,6 +68,16 @@ export default ({
         }
     }, [charger]);
 
+    const vTrickleFastItems = [...VTrickleFastValues].map(item => ({
+        label: `${item}`,
+        value: `${item}`,
+    }));
+
+    const iTermItems = [...ITermValues].map(item => ({
+        label: item,
+        value: item,
+    }));
+
     return charger ? (
         <Card
             title={
@@ -60,17 +87,33 @@ export default ({
                     }`}
                 >
                     <span>{cardLabel}</span>
-                    <Toggle
-                        label="Enable"
-                        isToggled={charger.enabled}
-                        onToggle={onEnableChargingToggle}
-                        disabled={disabled}
-                    />
+
+                    <div className="d-flex">
+                        <Toggle
+                            label="Enable"
+                            isToggled={charger.enabled}
+                            onToggle={onEnableChargingToggle}
+                            disabled={disabled}
+                        />
+                        <span
+                            className={classNames(
+                                'show-more-toggle mdi',
+                                summary && 'mdi-chevron-down',
+                                !summary && 'mdi-chevron-up'
+                            )}
+                            role="button"
+                            tabIndex={0}
+                            onKeyUp={() => {}}
+                            onClick={() => {
+                                setSummary(!summary);
+                            }}
+                        />
+                    </div>
                 </div>
             }
         >
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row ">
+                <FormLabel className="flex-row">
                     <div>
                         <span>V</span>
                         <span className="subscript">TERM</span>
@@ -99,8 +142,8 @@ export default ({
                     disabled={disabled}
                 />
             </div>
-            <div className="slider-container">
-                <FormLabel className={`flex-row ${disabled ? 'disabled' : ''}`}>
+            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
+                <FormLabel className="flex-row">
                     <div>
                         <span>I</span>
                         <span className="subscript">CHG</span>
@@ -124,6 +167,61 @@ export default ({
                     disabled={disabled}
                 />
             </div>
+            {!summary && (
+                <>
+                    <Dropdown
+                        label="iTerm"
+                        items={iTermItems}
+                        onSelect={item =>
+                            npmDevice?.setChargerITerm(
+                                index,
+                                item.value as ITerm
+                            )
+                        }
+                        selectedItem={
+                            iTermItems[
+                                Math.max(
+                                    0,
+                                    iTermItems.findIndex(
+                                        item => item.value === charger.iTerm
+                                    )
+                                ) ?? 0
+                            ]
+                        }
+                        disabled={disabled}
+                    />
+                    <Dropdown
+                        label="V Trickle Fast"
+                        items={vTrickleFastItems}
+                        onSelect={item =>
+                            npmDevice?.setChargerVTrickleFast(
+                                index,
+                                Number.parseFloat(item.value) as VTrickleFast
+                            )
+                        }
+                        selectedItem={
+                            vTrickleFastItems[
+                                Math.max(
+                                    0,
+                                    vTrickleFastItems.findIndex(
+                                        item =>
+                                            Number.parseFloat(item.value) ===
+                                            charger.vTrickleFast
+                                    )
+                                ) ?? 0
+                            ]
+                        }
+                        disabled={disabled}
+                    />
+
+                    <Toggle
+                        label="Enable Recharging"
+                        isToggled={charger.enableRecharging}
+                        onToggle={() => {}}
+                        disabled={disabled}
+                    />
+                </>
+            )}
         </Card>
     ) : null;
 };

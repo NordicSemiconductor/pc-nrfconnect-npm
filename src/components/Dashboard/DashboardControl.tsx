@@ -6,35 +6,26 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Alert, Button, PaneProps } from 'pc-nrfconnect-shared';
+import { Alert, PaneProps } from 'pc-nrfconnect-shared';
 
-import { PmicState } from '../../features/pmicControl/npm/types';
 import {
-    getNpmDevice,
     getPmicState,
     isSupportedVersion,
 } from '../../features/pmicControl/pmicControlSlice';
-import { getShellParser, isPaused } from '../../features/serial/serialSlice';
-import { ShellParser } from '../../hooks/commandParser';
+import { isPaused } from '../../features/serial/serialSlice';
 import DashboardControlCard from './DasboardControlCard';
 
-import './dashboardControl.scss';
+export default ({ active }: PaneProps) => {
+    const paused = useSelector(isPaused);
+    const supportedVersion = useSelector(isSupportedVersion);
+    const pmicState = useSelector(getPmicState);
 
-type DisplayPmicStateProperties = {
-    pmicState: PmicState;
-    paused: boolean;
-    supportedVersion: boolean | undefined;
-    getSupportedVersion: (() => string) | undefined;
-    shellParser?: ShellParser;
-};
-const DisplayPmicState = ({
-    pmicState,
-    paused,
-    supportedVersion,
-    getSupportedVersion,
-    shellParser,
-}: DisplayPmicStateProperties) => {
     const [pauseFor1Second, setPauseFor1Second] = useState(paused);
+    const disabled =
+        (!supportedVersion && pmicState !== 'ek-disconnected') ||
+        pmicState === 'pmic-disconnected' ||
+        pmicState === 'pmic-unknown' ||
+        pauseFor1Second;
 
     useEffect(() => {
         if (!paused) {
@@ -48,93 +39,14 @@ const DisplayPmicState = ({
         }
     }, [paused]);
 
-    if (pmicState === 'offline') {
-        return (
-            <Alert variant="warning" label="Offline Mode: ">
-                No Device is connected
-            </Alert>
-        );
-    }
-    if (pmicState === 'disconnected') {
-        return (
-            <Alert variant="warning" label="PMIC offline: ">
-                PMIC does not have a power source. Connect a battery or USB to
-                the EK
-            </Alert>
-        );
-    }
-    if (pauseFor1Second) {
-        return (
-            <Alert variant="warning" label="Shell Paused: ">
-                There is a command written in the shell that has not been
-                submitted. Release shall to use APP.&nbsp;
-                <Button
-                    variant="secondary"
-                    title="Unpause"
-                    onClick={() => shellParser?.unPause()}
-                >
-                    Unpause
-                </Button>
-            </Alert>
-        );
-    }
-    if (supportedVersion !== undefined && !supportedVersion) {
-        return (
-            <Alert variant="warning" label="Wrong firmware: ">
-                This firmware version is not supported, expected version is
-                {getSupportedVersion
-                    ? getSupportedVersion()
-                    : ('unknown' as never)}
-            </Alert>
-        );
-    }
-
-    return null;
-};
-
-export default ({ active }: PaneProps) => {
-    const paused = useSelector(isPaused);
-    const supportedVersion = useSelector(isSupportedVersion);
-
-    const npmDevice = useSelector(getNpmDevice);
-    const pmicState = useSelector(getPmicState);
-    const shellParser = useSelector(getShellParser);
-
-    const [pauseFor1Second, setPauseFor1Second] = useState(paused);
-    const disabled = pmicState === 'disconnected' || pauseFor1Second;
-
-    useEffect(() => {
-        if (!paused) {
-            setPauseFor1Second(paused);
-        } else {
-            const t = setTimeout(() => {
-                setPauseFor1Second(paused);
-            }, 5000);
-
-            return () => clearTimeout(t);
-        }
-    }, [paused]);
-
     return !active ? null : (
-        <div className="pmicControl-container">
-            <div className="pmicControl">
-                <Alert
-                    variant="info"
-                    label="nPM PowerUP​ 0.1​ - Preview release! "
-                >
-                    This is an unsupported, experimental preview and it is
-                    subject to major redesigns in the future.
-                </Alert>
-                <DisplayPmicState
-                    pmicState={pmicState}
-                    paused={paused}
-                    supportedVersion={supportedVersion}
-                    getSupportedVersion={npmDevice?.getSupportedVersion}
-                    shellParser={shellParser}
-                />
-                <div className="pmicControl-cards">
-                    <DashboardControlCard disabled={disabled} />
-                </div>
+        <div>
+            <Alert variant="info" label="nPM PowerUP​ 0.1​ - Preview release! ">
+                This is an unsupported, experimental preview and it is subject
+                to major redesigns in the future.
+            </Alert>
+            <div>
+                <DashboardControlCard disabled={disabled} />
             </div>
         </div>
     );

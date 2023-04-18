@@ -8,6 +8,7 @@ import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, existsSync } from 'fs';
 import {
+    clearWaitForDevice,
     getPersistentStore,
     logger,
     setWaitForDevice,
@@ -16,13 +17,13 @@ import {
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { ShellParser } from '../../../hooks/commandParser';
 import {
-    dequeueWarningDialog,
+    dequeueDialog,
     getEventRecording,
     getEventRecordingPath,
     getNpmDevice as getNpmDeviceSlice,
     getPmicState,
     isSupportedVersion,
-    requestWarningDialog,
+    requestDialog,
     setActiveBatterModel,
     setBatteryConnected,
     setBucks,
@@ -36,12 +37,13 @@ import {
     setPmicState,
     setStoredBatterModel,
     setSupportedVersion,
+    setUsbPowered,
     updateBuck,
     updateCharger,
     updateLdo,
 } from '../pmicControlSlice';
 import { getNpmDevice } from './npmFactory';
-import { Buck, Charger, Ldo, PmicWarningDialog } from './types';
+import { Buck, Charger, Ldo, PmicDialog } from './types';
 
 export default (shellParser: ShellParser | undefined) => {
     const npmDevice = useSelector(getNpmDeviceSlice);
@@ -54,19 +56,26 @@ export default (shellParser: ShellParser | undefined) => {
     const initDevice = useCallback(() => {
         if (!npmDevice) return;
 
-        npmDevice.startAdcSample(2000);
-        npmDevice.startBatteryStatusCheck();
+        npmDevice.requestUpdate.usbPowered();
 
         for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
             npmDevice.requestUpdate.chargerVTerm(i);
             npmDevice.requestUpdate.chargerIChg(i);
             npmDevice.requestUpdate.chargerEnabled(i);
+            npmDevice.requestUpdate.chargerVTrickleFast(i);
+            npmDevice.requestUpdate.chargerITerm(i);
+            npmDevice.requestUpdate.chargerEnabledRecharging(i);
+            npmDevice.requestUpdate.pmicChargingState(i);
         }
 
         for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
             npmDevice.requestUpdate.buckVOut(i);
+            npmDevice.requestUpdate.buckRetentionVOut(i);
             npmDevice.requestUpdate.buckMode(i);
             npmDevice.requestUpdate.buckEnabled(i);
+            npmDevice.requestUpdate.buckModeControl(i);
+            npmDevice.requestUpdate.buckOnOffControl(i);
+            npmDevice.requestUpdate.buckRetentionVOut(i);
         }
 
         for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
@@ -75,7 +84,6 @@ export default (shellParser: ShellParser | undefined) => {
             npmDevice.requestUpdate.ldoEnabled(i);
         }
 
-        npmDevice.requestUpdate.pmicChargingState();
         npmDevice.requestUpdate.fuelGauge();
         npmDevice.requestUpdate.activeBatteryModel();
         npmDevice.requestUpdate.storedBatteryModel();
@@ -83,47 +91,57 @@ export default (shellParser: ShellParser | undefined) => {
         npmDevice.getDefaultBatteryModels().then(models => {
             dispatch(setDefaultBatterModels(models));
         });
+
+        npmDevice.startAdcSample(2000);
+        npmDevice.setBatteryStatusCheckEnabled(true);
     }, [dispatch, npmDevice]);
 
-    const warningDialogHandler = useCallback(
-        (pmicWarningDialog: PmicWarningDialog) => {
+    const dialogHandler = useCallback(
+        (pmicDialog: PmicDialog) => {
             if (
+                pmicDialog.doNotAskAgainStoreID !== undefined &&
                 getPersistentStore().get(
-                    `pmicDialogs:${pmicWarningDialog.storeID}`
+                    `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`
                 )?.doNotShowAgain === true
             ) {
-                pmicWarningDialog.onConfirm();
+                pmicDialog.onConfirm();
                 return;
             }
 
-            const onConfirm = pmicWarningDialog.onConfirm;
-            pmicWarningDialog.onConfirm = () => {
-                onConfirm();
-                dispatch(dequeueWarningDialog());
-            };
-
-            const onCancel = pmicWarningDialog.onCancel;
-            pmicWarningDialog.onCancel = () => {
-                onCancel();
-                dispatch(dequeueWarningDialog());
-            };
+            if (pmicDialog.cancelClosesDialog !== false) {
+                const onCancel = pmicDialog.onCancel;
+                pmicDialog.onCancel = () => {
+                    onCancel();
+                    dispatch(dequeueDialog());
+                };
+            }
 
             if (
-                pmicWarningDialog.optionalDoNotAskAgain &&
-                pmicWarningDialog.onOptional
+                pmicDialog.doNotAskAgainStoreID !== undefined &&
+                pmicDialog.onOptional
             ) {
-                const onOptional = pmicWarningDialog.onOptional;
-                pmicWarningDialog.onOptional = () => {
+                const onOptional = pmicDialog.onOptional;
+                pmicDialog.onOptional = () => {
                     onOptional();
-                    dispatch(dequeueWarningDialog());
+                    if (pmicDialog.optionalClosesDialog !== false) {
+                        dispatch(dequeueDialog());
+                    }
                     getPersistentStore().set(
-                        `pmicDialogs:${pmicWarningDialog.storeID}`,
+                        `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`,
                         { doNotShowAgain: true }
                     );
                 };
             }
 
-            dispatch(requestWarningDialog(pmicWarningDialog));
+            if (pmicDialog.confirmClosesDialog !== false) {
+                const onConfirm = pmicDialog.onConfirm;
+                pmicDialog.onConfirm = () => {
+                    onConfirm();
+                    dispatch(dequeueDialog());
+                };
+            }
+
+            dispatch(requestDialog(pmicDialog));
         },
         [dispatch]
     );
@@ -135,8 +153,11 @@ export default (shellParser: ShellParser | undefined) => {
         for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
             emptyChargers.push({
                 vTerm: npmDevice.getChargerVoltageRange(i)[0],
+                vTrickleFast: 2.5,
                 iChg: npmDevice.getChargerCurrentRange(i).min,
                 enabled: false,
+                iTerm: '10%',
+                enableRecharging: false,
             });
         }
         dispatch(setChargers(emptyChargers));
@@ -145,8 +166,12 @@ export default (shellParser: ShellParser | undefined) => {
         for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
             emptyBuck.push({
                 vOut: npmDevice.getBuckVoltageRange(i).min,
+                retentionVOut: 1,
                 mode: 'vSet',
                 enabled: true,
+                modeControl: 'Auto',
+                onOffControl: 'Off',
+                retentionControl: 'Off',
             });
         }
         dispatch(setBucks(emptyBuck));
@@ -163,8 +188,8 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        dispatch(setNpmDevice(getNpmDevice(shellParser, warningDialogHandler)));
-    }, [dispatch, shellParser, warningDialogHandler]);
+        dispatch(setNpmDevice(getNpmDevice(shellParser, dialogHandler)));
+    }, [dispatch, shellParser, dialogHandler]);
 
     useEffect(() => {
         if (npmDevice) {
@@ -175,7 +200,7 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        if (pmicState === 'connected' && supportedVersion) {
+        if (pmicState === 'pmic-connected' && supportedVersion) {
             initDevice();
         }
     }, [initDevice, pmicState, supportedVersion]);
@@ -228,6 +253,10 @@ export default (shellParser: ShellParser | undefined) => {
                     dispatch(setStoredBatterModel(payload));
                 });
 
+            const releaseOnUsbPowered = npmDevice.onUsbPowered(payload => {
+                dispatch(setUsbPowered(payload));
+            });
+
             const releaseOnBeforeReboot = npmDevice.onBeforeReboot(() => {
                 dispatch(
                     setWaitForDevice({
@@ -244,7 +273,7 @@ export default (shellParser: ShellParser | undefined) => {
 
             const releaseOnReboot = npmDevice.onReboot(success => {
                 if (!success) {
-                    dispatch(setWaitForDevice(undefined));
+                    dispatch(clearWaitForDevice());
                 } else {
                     dispatch(
                         setWaitForDevice({
@@ -276,6 +305,7 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnStoredBatteryModelUpdate();
                 releaseOnBeforeReboot();
                 releaseOnReboot();
+                releaseOnUsbPowered();
             };
         }
     }, [dispatch, initComponents, npmDevice]);
@@ -283,17 +313,19 @@ export default (shellParser: ShellParser | undefined) => {
     useEffect(() => {
         if (!npmDevice) return;
         const releaseOnLoggingEvent = npmDevice.onLoggingEvent(e => {
-            switch (e.loggingEvent.logLevel) {
-                case 'wrn':
-                    logger.warn(
-                        `${e.loggingEvent.module}: ${e.loggingEvent.message}`
-                    );
-                    break;
-                case 'err':
-                    logger.error(
-                        `${e.loggingEvent.module}: ${e.loggingEvent.message}`
-                    );
-                    break;
+            if (e.loggingEvent.module !== 'shell_commands') {
+                switch (e.loggingEvent.logLevel) {
+                    case 'wrn':
+                        logger.warn(
+                            `${e.loggingEvent.module}: ${e.loggingEvent.message}`
+                        );
+                        break;
+                    case 'err':
+                        logger.error(
+                            `${e.loggingEvent.module}: ${e.loggingEvent.message}`
+                        );
+                        break;
+                }
             }
             if (recordEvents) {
                 if (e.dataPair) {

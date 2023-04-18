@@ -18,8 +18,6 @@ import {
     XTerminalShellParser,
 } from './commandParser';
 
-jest.mock('pc-nrfconnect-shared');
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let onResponseCallback = (data: Uint8Array) => {};
 
@@ -52,13 +50,20 @@ const setupMocks = () => {
             () => {}
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let onDataWrittenCallback = (data: Uint8Array) => {};
     const mockOnDataWritten = jest.fn(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_handler: (data: Buffer) => void) => () => {}
+        (handler: (data: Uint8Array) => void) => () => {
+            onDataWrittenCallback = handler;
+            return () => {};
+        }
     );
 
     const mockClose = jest.fn(async () => {});
-    const mockWrite = jest.fn(() => {});
+    const mockWrite = jest.fn((data: string | number[] | Buffer) =>
+        onDataWrittenCallback(Buffer.from(data))
+    );
+
     const mockIsOpen = jest.fn(
         () =>
             new Promise<boolean>(resolve => {

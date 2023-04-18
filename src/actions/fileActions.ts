@@ -5,7 +5,9 @@
  */
 
 import { dialog } from '@electron/remote';
+import { OpenDialogReturnValue } from 'electron';
 import Store from 'electron-store';
+import fs from 'fs';
 import path from 'path';
 
 import { RootState } from '../appReducer';
@@ -53,24 +55,70 @@ const parseFile =
         }
     };
 
-export const openFileDialog = () => (dispatch: TDispatch) => {
-    const dialogOptions = {
-        title: 'Select a JSON file',
-        filters: [
-            {
-                name: 'JSON',
-                extensions: ['json'],
-            },
-        ],
-        properties: ['openFile'],
-        // eslint-disable-next-line no-undef
-    } as Electron.OpenDialogOptions;
+export const loadConfiguration = () => (dispatch: TDispatch) => {
     dialog
-        .showOpenDialog(dialogOptions)
+        .showOpenDialog({
+            title: 'Select a JSON file',
+            filters: [
+                {
+                    name: 'JSON',
+                    extensions: ['json'],
+                },
+            ],
+            properties: ['openFile'],
+        })
         .then(
-            ({ filePaths }: { filePaths: string[] }) =>
+            ({ filePaths }: OpenDialogReturnValue) =>
                 filePaths.length === 1 && dispatch(parseFile(filePaths[0]))
         );
+};
+
+const stream2buffer = (stream: fs.ReadStream) =>
+    new Promise<Buffer>((resolve, reject) => {
+        let buf = '';
+
+        stream.on('data', chunk => {
+            buf += chunk.toString();
+        });
+        stream.on('end', () =>
+            resolve(
+                Buffer.from(buf.replaceAll('"', '\\"').replaceAll('\\s', ''))
+            )
+        );
+        stream.on('error', err =>
+            reject(new Error(`error converting stream - ${err}`))
+        );
+    });
+
+const parseAndUploadProfile =
+    (filePath: string) =>
+    async (_dispatch: TDispatch, getState: () => RootState) => {
+        const currentState = getState().app.pmicControl;
+
+        const readerStream = fs.createReadStream(filePath);
+        readerStream.setEncoding('utf8');
+
+        currentState.npmDevice?.downloadFuelGaugeProfile(
+            await stream2buffer(readerStream)
+        );
+    };
+
+export const uploadProfile = () => (dispatch: TDispatch) => {
+    dialog
+        .showOpenDialog({
+            title: 'Select a JSON file',
+            filters: [
+                {
+                    name: 'JSON',
+                    extensions: ['json'],
+                },
+            ],
+            properties: ['openFile'],
+        })
+        .then(async ({ filePaths }: OpenDialogReturnValue) => {
+            filePaths.length === 1 &&
+                dispatch(await parseAndUploadProfile(filePaths[0]));
+        });
 };
 
 export const openDirectoryDialog = () => (dispatch: TDispatch) => {

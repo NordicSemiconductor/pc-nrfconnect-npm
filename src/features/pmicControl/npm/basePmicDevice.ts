@@ -5,9 +5,10 @@
  */
 
 import EventEmitter from 'events';
+import { logger } from 'pc-nrfconnect-shared';
 
 import { ShellParser } from '../../../hooks/commandParser';
-import { parseToNumber, toRegex } from './pmicHelpers';
+import { MAX_TIMESTAMP, parseToNumber, toRegex } from './pmicHelpers';
 import {
     AdcSample,
     BatteryModel,
@@ -18,58 +19,117 @@ import {
     LoggingEvent,
     PartialUpdate,
     PmicChargingState,
+    PmicDialog,
     PmicState,
-    PmicWarningDialog,
     RebootMode,
 } from './types';
 
 export const baseNpmDevice: IBaseNpmDevice = (
     shellParser: ShellParser | undefined,
-    _warningDialogHandler: (pmicWarningDialog: PmicWarningDialog) => void,
+    _dialogHandler: (pmicDialog: PmicDialog) => void,
     eventEmitter: EventEmitter,
     devices: {
         noOfChargers?: number;
         noOfBucks?: number;
         noOfLdos?: number;
+        noOfGPIOs?: number;
     },
     supportsVersion: string
 ) => {
     let rebooting = false;
+    let deviceUptimeToSystemDelta = 0;
+    let uptimeOverflowCounter = 0;
 
-    const kernelReset = (mode: 'cold' | 'warm', callback?: () => void) => {
+    const getKernelUptime = () =>
+        new Promise<number>((resolve, reject) => {
+            shellParser?.enqueueRequest(
+                'kernel uptime',
+                res => {
+                    resolve(parseToNumber(res));
+                },
+                reject,
+                true
+            );
+        });
+
+    const kernelReset = (mode: 'cold' | 'warm') => {
         if (rebooting || !shellParser) return;
         rebooting = true;
-        setTimeout(() => {
-            rebooting = false;
-        }, 1000);
 
         eventEmitter.emit('onBeforeReboot', mode);
         shellParser.enqueueRequest(
             `kernel reboot ${mode}`,
+            () => {},
             () => {
-                if (callback) callback();
                 rebooting = false;
             },
-            () => {
-                if (callback) callback();
-                rebooting = false;
+            true
+        );
+    };
+
+    const updateUptimeOverflowCounter = () => {
+        getKernelUptime().then(milliseconds => {
+            deviceUptimeToSystemDelta = Date.now() - milliseconds;
+            uptimeOverflowCounter = Math.floor(milliseconds / MAX_TIMESTAMP);
+        });
+    };
+
+    const registerCommandCallbackLoggerWrapper = (
+        command: string,
+        onSuccess: (data: string, command: string) => void,
+        onError: (error: string, command: string) => void
+    ) => {
+        const loggerWrapper = (
+            cmd: string,
+            error: boolean,
+            result: string,
+            action: () => void
+        ) => {
+            const event: LoggingEvent = {
+                timestamp: Date.now() - deviceUptimeToSystemDelta,
+                module: 'shell_commands',
+                logLevel: error ? 'err' : 'inf',
+                message: `command: "${cmd}" response: "${result}"`,
+            };
+
+            eventEmitter.emit('onLoggingEvent', {
+                loggingEvent: event,
+                dataPair: false,
+            });
+
+            if (action) action();
+        };
+
+        return shellParser?.registerCommandCallback(
+            command,
+            (response, cmd) =>
+                loggerWrapper(cmd, false, response, () =>
+                    onSuccess(response, cmd)
+                ),
+            (error, cmd) => {
+                logger.error(error);
+                loggerWrapper(cmd, true, error, () => onError(error, cmd));
             }
         );
     };
 
-    shellParser?.registerCommandCallback(
+    registerCommandCallbackLoggerWrapper(
         toRegex('kernel reboot (cold|warm)'),
-        () => eventEmitter.emit('onReboot', true),
-        error => eventEmitter.emit('onReboot', false, error)
+        () => {
+            rebooting = true;
+            eventEmitter.emit('onReboot', true);
+        },
+        error => {
+            rebooting = false;
+            eventEmitter.emit('onReboot', false, error);
+        }
     );
+
+    updateUptimeOverflowCounter();
 
     return {
         kernelReset,
-        kernelUptime(callback) {
-            shellParser?.enqueueRequest('kernel uptime', res => {
-                callback(parseToNumber(res));
-            });
-        },
+        getKernelUptime,
         onPmicStateChange: (handler: (state: PmicState) => void) => {
             eventEmitter.on('onPmicStateChange', handler);
             return () => {
@@ -173,9 +233,17 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
+        onUsbPowered: (handler: (success: boolean) => void) => {
+            eventEmitter.on('onUsbPowered', handler);
+            return () => {
+                eventEmitter.removeListener('onUsbPowered', handler);
+            };
+        },
+
         getNumberOfChargers: () => devices.noOfChargers ?? 0,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
+        getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,
 
         isSupportedVersion: () =>
             new Promise<boolean>((resolve, reject) => {
@@ -184,9 +252,17 @@ export const baseNpmDevice: IBaseNpmDevice = (
                     result => {
                         resolve(`app_version=${supportsVersion}` === result);
                     },
-                    reject
+                    reject,
+                    true
                 );
             }),
         getSupportedVersion: () => supportsVersion,
+
+        registerCommandCallbackLoggerWrapper,
+
+        getUptimeOverflowCounter: () => uptimeOverflowCounter,
+        setUptimeOverflowCounter: (value: number) => {
+            uptimeOverflowCounter = value;
+        },
     };
 };
