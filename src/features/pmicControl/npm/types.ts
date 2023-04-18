@@ -284,7 +284,7 @@ export type NpmDevice = {
 
 export interface PmicDialog {
     uuid: string;
-    type: 'alert' | 'alert-circle' | 'information';
+    type?: 'alert' | 'alert-circle' | 'information';
     message: string | React.ReactNode;
     optionalLabel?: string;
     optionalDisabled?: boolean;

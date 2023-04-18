@@ -5,13 +5,15 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
+import { Form, ProgressBar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     CollapsibleGroup,
+    DialogButton,
     Dropdown,
     DropdownItem,
-    ProgressDialog,
+    GenericDialog,
     SidePanel,
     StartStopButton,
 } from 'pc-nrfconnect-shared';
@@ -77,7 +79,7 @@ export default () => {
                 : prev
         ) ?? undefined;
 
-    const batteryModelItems = useMemo(() => {
+    const batteryModelItems: DropdownItem[] = useMemo(() => {
         const items = [...defaultBatterModels];
         if (storedBatterModel) items.push(storedBatterModel);
 
@@ -241,28 +243,61 @@ export default () => {
                     onClick={() => dispatch(uploadProfile())}
                     disabled={pmicConnection === 'ek-disconnected'}
                 >
-                    Upload profile
+                    Load profile
                 </Button>
             </CollapsibleGroup>
             <ConnectionStatus />
 
-            <ProgressDialog
-                title={currentPmicDialog?.title}
-                headerIcon={currentPmicDialog?.type}
-                isVisible={currentPmicDialog !== undefined}
-                onConfirm={currentPmicDialog?.onConfirm ?? noop}
-                confirmLabel={currentPmicDialog?.confirmLabel}
-                confirmDisabled={currentPmicDialog?.confirmDisabled}
-                onCancel={currentPmicDialog?.onCancel ?? noop}
-                cancelLabel={currentPmicDialog?.cancelLabel}
-                cancelDisabled={currentPmicDialog?.cancelDisabled}
-                onOptional={currentPmicDialog?.onOptional}
-                optionalLabel={currentPmicDialog?.optionalLabel}
-                optionalDisabled={currentPmicDialog?.optionalDisabled}
-                progress={currentPmicDialog?.progress}
-            >
-                {currentPmicDialog?.message}
-            </ProgressDialog>
+            {currentPmicDialog && (
+                <GenericDialog
+                    title={currentPmicDialog?.title ?? ''}
+                    headerIcon={currentPmicDialog?.type}
+                    isVisible
+                    showSpinner={currentPmicDialog?.progress !== undefined}
+                    closeOnEsc
+                    onHide={currentPmicDialog?.onCancel}
+                    footer={
+                        <>
+                            <DialogButton
+                                variant="primary"
+                                disabled={currentPmicDialog?.confirmDisabled}
+                                onClick={currentPmicDialog?.onConfirm ?? noop}
+                            >
+                                {currentPmicDialog?.confirmLabel}
+                            </DialogButton>
+                            <DialogButton
+                                disabled={currentPmicDialog?.cancelDisabled}
+                                onClick={currentPmicDialog?.onCancel ?? noop}
+                            >
+                                {currentPmicDialog?.cancelLabel}
+                            </DialogButton>
+                            {currentPmicDialog?.optionalLabel && (
+                                <DialogButton
+                                    disabled={
+                                        currentPmicDialog?.optionalDisabled
+                                    }
+                                    onClick={
+                                        currentPmicDialog?.onOptional ?? noop
+                                    }
+                                >
+                                    {currentPmicDialog?.optionalLabel}
+                                </DialogButton>
+                            )}
+                        </>
+                    }
+                >
+                    {currentPmicDialog?.message}
+                    {currentPmicDialog?.progress !== undefined && (
+                        <Form.Group>
+                            <br />
+                            <ProgressBar
+                                now={currentPmicDialog?.progress}
+                                style={{ height: '4px' }}
+                            />
+                        </Form.Group>
+                    )}
+                </GenericDialog>
+            )}
         </SidePanel>
     );
 };

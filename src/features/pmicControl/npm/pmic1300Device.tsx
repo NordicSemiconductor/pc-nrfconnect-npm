@@ -851,12 +851,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         let aborted = false;
         const progressDialog: PmicDialog = {
             uuid: uuid(),
-            type: 'information',
-            message: `Uploading battery profile will reset the current fuel gauge. Click 'Upload' to continue.`,
-            confirmLabel: 'Upload',
+            message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
+            confirmLabel: 'Load',
             confirmClosesDialog: false,
             cancelLabel: 'Cancel',
-            title: 'Upload',
+            title: 'Load',
             onConfirm: () => {},
             onCancel: () => {},
         };
@@ -873,7 +872,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     },
                     message: (
                         <>
-                            <div>Uploading battery profile.</div>
+                            <div>Load battery profile.</div>
                             <br />
                             <strong>Status: </strong>
                             {`Downloading chunk ${chunk + 1} of ${chunks}`}
@@ -898,7 +897,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                 cancelLabel: 'Close',
                                 message: (
                                     <>
-                                        <div>Uploading battery profile.</div>
+                                        <div>Load battery profile.</div>
                                         <br />
                                         <strong>Status: </strong>
                                         Aborting download
@@ -914,12 +913,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                         ...progressDialog,
                                         confirmDisabled: true,
                                         cancelLabel: 'Close',
-                                        type: 'alert',
                                         message: (
                                             <>
-                                                <div>
-                                                    Uploading battery profile.
-                                                </div>
+                                                <div>Load battery profile.</div>
                                                 <br />
                                                 <Alert
                                                     label="Warning "
@@ -960,9 +956,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                         cancelDisabled: false,
                                         message: (
                                             <>
-                                                <div>
-                                                    Uploading battery profile.
-                                                </div>
+                                                <div>Load battery profile.</div>
                                                 <br />
                                                 <Alert
                                                     label="Success "
@@ -982,15 +976,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                 res => {
                                     dialogHandler({
                                         ...progressDialog,
-                                        type: 'alert-circle',
                                         confirmDisabled: true,
                                         cancelLabel: 'Close',
                                         cancelDisabled: false,
                                         message: (
                                             <>
-                                                <div>
-                                                    Uploading battery profile.
-                                                </div>
+                                                <div>Load battery profile.</div>
                                                 <br />
                                                 <Alert
                                                     label="Error "
@@ -1152,7 +1143,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     uuid: uuid(),
                     doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
-                    type: 'alert',
                     message: `The configuration was intended for firmware version ${
                         config.firmwareVersion
                     }. Device is running a different version. 
