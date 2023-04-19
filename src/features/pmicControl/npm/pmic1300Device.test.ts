@@ -591,7 +591,7 @@ describe('PMIC 1300', () => {
                         _unique?: boolean
                     ) => {
                         if (onSuccess)
-                            onSuccess('app_version=0.0.0+10', command);
+                            onSuccess('app_version=0.0.0+12', command);
                         return Promise.resolve();
                     }
                 );
@@ -2335,7 +2335,7 @@ describe('PMIC 1300', () => {
                     },
                 ],
                 fuelGauge: true,
-                firmwareVersion: '0.0.0+10',
+                firmwareVersion: '0.0.0+12',
                 deviceType: 'npm1300',
             });
             verifyApplyConfig();
@@ -2570,7 +2570,7 @@ describe('PMIC 1300', () => {
         });
 
         test('kernel reboot - error', () => {
-            const command = `delayed_reboot`;
+            const command = `delayed_reboot 100`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 

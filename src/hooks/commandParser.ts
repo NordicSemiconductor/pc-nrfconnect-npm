@@ -233,7 +233,6 @@ export const hookModemToShellParser = async (
         commandBuffer = `${commandBuffer}${xTerminalShellParser.getTerminalData()}${
             newline ? '\r\n' : ''
         }`;
-
         xTerminalShellParser.clear();
 
         if (commandBuffer === settings.shellPromptUart) commandBuffer = '';
