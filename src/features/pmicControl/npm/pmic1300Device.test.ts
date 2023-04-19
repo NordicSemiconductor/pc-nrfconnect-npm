@@ -2556,8 +2556,8 @@ describe('PMIC 1300', () => {
             });
         };
 
-        test.each(['cold', 'warm'])('kernel reboot %p - success', append => {
-            const command = `kernel reboot ${append}`;
+        test('kernel reboot - success', () => {
+            const command = `delayed_reboot 100`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -2569,8 +2569,8 @@ describe('PMIC 1300', () => {
             verifyLogging('inf', command, 'Success:');
         });
 
-        test.each(['cold', 'warm'])('kernel reboot %p - error', append => {
-            const command = `kernel reboot ${append}`;
+        test('kernel reboot - error', () => {
+            const command = `delayed_reboot`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -3205,17 +3205,17 @@ describe('PMIC 1300', () => {
             expect(mockOnPmicStateChange).toBeCalledWith('pmic-disconnected');
         });
 
-        test.each(['cold', 'warm'])('Request kernelReset %p', mode => {
+        test('Request kernelReset %p', () => {
             const { mockEnqueueRequest, pmic } = setupMocksWithShellParser();
 
             mockEnqueueRequest.mockClear();
 
-            pmic.kernelReset(mode as 'cold' | 'warm');
-            pmic.kernelReset(mode as 'cold' | 'warm'); // this should not be sent
+            pmic.kernelReset();
+            pmic.kernelReset(); // this should not be sent
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `kernel reboot ${mode}`,
+                `delayed_reboot 100`,
                 expect.anything(),
                 expect.anything(),
                 true

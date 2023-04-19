@@ -144,7 +144,7 @@ export type BaseNpmDevice = {
         handler: (payload: PartialUpdate<Buck>, error?: string) => void
     ) => () => void;
     onBeforeReboot: (
-        handler: (payload: RebootMode, error?: string) => void
+        handler: (payload: number, error?: string) => void
     ) => () => void;
     onReboot: (
         handler: (success: boolean, error?: string) => void

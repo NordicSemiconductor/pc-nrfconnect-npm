@@ -21,7 +21,6 @@ import {
     PmicChargingState,
     PmicDialog,
     PmicState,
-    RebootMode,
 } from './types';
 
 export const baseNpmDevice: IBaseNpmDevice = (
@@ -56,7 +55,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         if (rebooting || !shellParser) return;
         rebooting = true;
 
-        eventEmitter.emit('onBeforeReboot');
+        eventEmitter.emit('onBeforeReboot', 100);
         shellParser.enqueueRequest(
             'delayed_reboot 100',
             () => {},
@@ -219,7 +218,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
-        onBeforeReboot: (handler: (mode: RebootMode) => void) => {
+        onBeforeReboot: (handler: (waitTimeout: number) => void) => {
             eventEmitter.on('onBeforeReboot', handler);
             return () => {
                 eventEmitter.removeListener('onBeforeReboot', handler);
