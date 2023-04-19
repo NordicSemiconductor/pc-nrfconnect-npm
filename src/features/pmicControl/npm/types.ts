@@ -125,6 +125,13 @@ export interface IBaseNpmDevice {
     ): BaseNpmDevice;
 }
 
+export interface ProfileDownload {
+    state: 'downloading' | 'aborted' | 'aborting' | 'applied' | 'failed';
+    completeChunks?: number;
+    totalChunks?: number;
+    alertMessage?: string;
+}
+
 export type BaseNpmDevice = {
     kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
@@ -204,6 +211,10 @@ export type NpmDevice = {
     getDeviceType: () => NpmModel;
     getConnectionState: () => PmicState;
 
+    onProfileDownloadUpdate: (
+        handler: (success: ProfileDownload, error?: string) => void
+    ) => () => void;
+
     startAdcSample: (intervalMs: number) => void;
     stopAdcSample: () => void;
 
@@ -275,6 +286,8 @@ export type NpmDevice = {
 
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
+    abortDownloadFuelGaugeProfile: () => Promise<void>;
+    applyDownloadFuelGaugeProfile: () => Promise<void>;
     getDefaultBatteryModels: () => Promise<BatteryModel[]>;
     setActiveBatteryModel: (name: string) => Promise<void>;
     storeBattery: () => Promise<void>;
@@ -283,7 +296,7 @@ export type NpmDevice = {
 } & BaseNpmDevice;
 
 export interface PmicDialog {
-    uuid: string;
+    uuid?: string;
     type?: 'alert' | 'alert-circle' | 'information';
     message: string | React.ReactNode;
     optionalLabel?: string;

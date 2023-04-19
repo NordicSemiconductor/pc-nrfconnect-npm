@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, existsSync } from 'fs';
 import {
+    Alert,
     clearWaitForDevice,
-    getPersistentStore,
     logger,
     setWaitForDevice,
 } from 'pc-nrfconnect-shared';
@@ -17,13 +17,11 @@ import {
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { ShellParser } from '../../../hooks/commandParser';
 import {
-    dequeueDialog,
     getEventRecording,
     getEventRecordingPath,
     getNpmDevice as getNpmDeviceSlice,
     getPmicState,
     isSupportedVersion,
-    requestDialog,
     setActiveBatterModel,
     setBatteryConnected,
     setBucks,
@@ -43,6 +41,10 @@ import {
     updateLdo,
 } from '../pmicControlSlice';
 import { getNpmDevice } from './npmFactory';
+import {
+    dialogHandler,
+    DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+} from './pmicHelpers';
 import { Buck, Charger, Ldo, PmicDialog } from './types';
 
 export default (shellParser: ShellParser | undefined) => {
@@ -96,56 +98,6 @@ export default (shellParser: ShellParser | undefined) => {
         npmDevice.setBatteryStatusCheckEnabled(true);
     }, [dispatch, npmDevice]);
 
-    const dialogHandler = useCallback(
-        (pmicDialog: PmicDialog) => {
-            if (
-                pmicDialog.doNotAskAgainStoreID !== undefined &&
-                getPersistentStore().get(
-                    `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`
-                )?.doNotShowAgain === true
-            ) {
-                pmicDialog.onConfirm();
-                return;
-            }
-
-            if (pmicDialog.cancelClosesDialog !== false) {
-                const onCancel = pmicDialog.onCancel;
-                pmicDialog.onCancel = () => {
-                    onCancel();
-                    dispatch(dequeueDialog());
-                };
-            }
-
-            if (
-                pmicDialog.doNotAskAgainStoreID !== undefined &&
-                pmicDialog.onOptional
-            ) {
-                const onOptional = pmicDialog.onOptional;
-                pmicDialog.onOptional = () => {
-                    onOptional();
-                    if (pmicDialog.optionalClosesDialog !== false) {
-                        dispatch(dequeueDialog());
-                    }
-                    getPersistentStore().set(
-                        `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`,
-                        { doNotShowAgain: true }
-                    );
-                };
-            }
-
-            if (pmicDialog.confirmClosesDialog !== false) {
-                const onConfirm = pmicDialog.onConfirm;
-                pmicDialog.onConfirm = () => {
-                    onConfirm();
-                    dispatch(dequeueDialog());
-                };
-            }
-
-            dispatch(requestDialog(pmicDialog));
-        },
-        [dispatch]
-    );
-
     const initComponents = useCallback(() => {
         if (!npmDevice) return;
 
@@ -188,8 +140,14 @@ export default (shellParser: ShellParser | undefined) => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        dispatch(setNpmDevice(getNpmDevice(shellParser, dialogHandler)));
-    }, [dispatch, shellParser, dialogHandler]);
+        dispatch(
+            setNpmDevice(
+                getNpmDevice(shellParser, pmicDialog =>
+                    dispatch(dialogHandler(pmicDialog))
+                )
+            )
+        );
+    }, [dispatch, shellParser]);
 
     useEffect(() => {
         if (npmDevice) {
@@ -257,6 +215,133 @@ export default (shellParser: ShellParser | undefined) => {
                 dispatch(setUsbPowered(payload));
             });
 
+            const releaseOnProfileDownloadUpdate =
+                npmDevice.onProfileDownloadUpdate(payload => {
+                    const progressDialog: PmicDialog = {
+                        uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+                        message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
+                        confirmDisabled: true,
+                        confirmLabel: 'Load',
+                        cancelLabel: 'Close',
+                        cancelDisabled: false,
+                        title: 'Load',
+                        onConfirm: () => {},
+                        onCancel: () => {},
+                    };
+
+                    switch (payload.state) {
+                        case 'downloading':
+                            if (
+                                payload.completeChunks &&
+                                payload.completeChunks === payload.totalChunks
+                            ) {
+                                npmDevice.applyDownloadFuelGaugeProfile();
+                            }
+                            dispatch(
+                                dialogHandler({
+                                    ...progressDialog,
+                                    cancelLabel: 'Abort',
+                                    cancelClosesDialog: false,
+                                    onCancel: () => {
+                                        npmDevice.abortDownloadFuelGaugeProfile();
+                                    },
+                                    message: (
+                                        <>
+                                            <div>Load battery profile.</div>
+                                            <br />
+                                            <strong>Status: </strong>
+                                            {payload.totalChunks ===
+                                                undefined ||
+                                            payload.completeChunks === undefined
+                                                ? 'Downloading....'
+                                                : `Downloading chunk ${
+                                                      payload.completeChunks + 1
+                                                  } of ${payload.totalChunks}`}
+                                        </>
+                                    ),
+                                    progress: Math.ceil(
+                                        ((payload.completeChunks ?? 1) /
+                                            (payload.totalChunks ?? 1)) *
+                                            100
+                                    ),
+                                })
+                            );
+                            break;
+                        case 'aborting':
+                            dispatch(
+                                dialogHandler({
+                                    ...progressDialog,
+                                    message: (
+                                        <>
+                                            <div>Load battery profile.</div>
+                                            <br />
+                                            <strong>Status: </strong>
+                                            Aborting download
+                                        </>
+                                    ),
+                                })
+                            );
+                            break;
+                        case 'aborted':
+                            dispatch(
+                                dialogHandler({
+                                    ...progressDialog,
+                                    message: (
+                                        <>
+                                            <div>Load battery profile.</div>
+                                            <br />
+                                            <Alert
+                                                label="Warning "
+                                                variant="warning"
+                                            >
+                                                {payload.alertMessage}
+                                            </Alert>
+                                        </>
+                                    ),
+                                })
+                            );
+                            break;
+                        case 'applied':
+                            dispatch(
+                                dialogHandler({
+                                    ...progressDialog,
+                                    message: (
+                                        <>
+                                            <div>Load battery profile.</div>
+                                            <br />
+                                            <Alert
+                                                label="Success "
+                                                variant="success"
+                                            >
+                                                {payload.alertMessage}
+                                            </Alert>
+                                        </>
+                                    ),
+                                })
+                            );
+                            break;
+                        case 'failed':
+                            dispatch(
+                                dialogHandler({
+                                    ...progressDialog,
+                                    message: (
+                                        <>
+                                            <div>Load battery profile.</div>
+                                            <br />
+                                            <Alert
+                                                label="Error "
+                                                variant="danger"
+                                            >
+                                                {payload.alertMessage}
+                                            </Alert>
+                                        </>
+                                    ),
+                                })
+                            );
+                            break;
+                    }
+                });
+
             const releaseOnBeforeReboot = npmDevice.onBeforeReboot(() => {
                 dispatch(
                     setWaitForDevice({
@@ -306,6 +391,7 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnBeforeReboot();
                 releaseOnReboot();
                 releaseOnUsbPowered();
+                releaseOnProfileDownloadUpdate();
             };
         }
     }, [dispatch, initComponents, npmDevice]);

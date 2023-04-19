@@ -8,6 +8,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Form, ProgressBar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    Alert,
     Button,
     CollapsibleGroup,
     DialogButton,
@@ -20,11 +21,15 @@ import {
 import { Terminal } from 'xterm-headless';
 
 import {
+    getProfileBuffer,
     loadConfiguration,
     openDirectoryDialog,
     saveFileDialog,
-    uploadProfile,
 } from '../../actions/fileActions';
+import {
+    dialogHandler,
+    DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+} from '../../features/pmicControl/npm/pmicHelpers';
 import { BatteryModel } from '../../features/pmicControl/npm/types';
 import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
 import {
@@ -128,7 +133,7 @@ export default () => {
                         new Terminal({ allowProposedApi: true, cols: 999 })
                     ),
                     {
-                        shellPromptUart: 'shell:~$ ',
+                        shellPromptUart: 'shell:~$',
                         logRegex:
                             '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): ',
                         errorRegex: 'Error: ',
@@ -240,7 +245,53 @@ export default () => {
                 <Button
                     variant="secondary"
                     className="w-100"
-                    onClick={() => dispatch(uploadProfile())}
+                    onClick={() => {
+                        getProfileBuffer()
+                            .then(buffer => {
+                                dispatch(
+                                    dialogHandler({
+                                        uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+                                        message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
+                                        confirmLabel: 'Load',
+                                        confirmClosesDialog: false,
+                                        cancelLabel: 'Cancel',
+                                        title: 'Load',
+                                        onConfirm: () => {
+                                            npmDevice?.downloadFuelGaugeProfile(
+                                                buffer
+                                            );
+                                        },
+                                        onCancel: () => {},
+                                    })
+                                );
+                            })
+                            .catch(res => {
+                                dispatch(
+                                    dialogHandler({
+                                        uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+                                        message: (
+                                            <>
+                                                <div>Load battery profile.</div>
+                                                <br />
+                                                <Alert
+                                                    label="Error "
+                                                    variant="danger"
+                                                >
+                                                    {res}
+                                                </Alert>
+                                            </>
+                                        ),
+                                        type: 'alert',
+                                        confirmLabel: 'Load',
+                                        confirmDisabled: true,
+                                        cancelLabel: 'Cancel',
+                                        title: 'Load',
+                                        onConfirm: () => {},
+                                        onCancel: () => {},
+                                    })
+                                );
+                            });
+                    }}
                     disabled={pmicConnection === 'ek-disconnected'}
                 >
                     Load profile

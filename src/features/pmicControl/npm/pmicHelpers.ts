@@ -4,7 +4,16 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { BatteryModel, BatteryModelCharacterization } from './types';
+import { getPersistentStore } from 'pc-nrfconnect-shared';
+import { v4 as uuid } from 'uuid';
+
+import { TDispatch } from '../../../thunk';
+import { dequeueDialog, requestDialog } from '../pmicControlSlice';
+import {
+    BatteryModel,
+    BatteryModelCharacterization,
+    PmicDialog,
+} from './types';
 
 // parse strings like value is: XXX mV
 export const parseColonBasedAnswer = (message: string) =>
@@ -78,4 +87,55 @@ export const toRegex = (
     return `${command}`;
 };
 
+export const dialogHandler =
+    (pmicDialog: PmicDialog) => (dispatch: TDispatch) => {
+        if (!pmicDialog.uuid) pmicDialog.uuid === uuid();
+
+        if (
+            pmicDialog.doNotAskAgainStoreID !== undefined &&
+            getPersistentStore().get(
+                `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`
+            )?.doNotShowAgain === true
+        ) {
+            pmicDialog.onConfirm();
+            return;
+        }
+
+        if (pmicDialog.cancelClosesDialog !== false) {
+            const onCancel = pmicDialog.onCancel;
+            pmicDialog.onCancel = () => {
+                onCancel();
+                dispatch(dequeueDialog());
+            };
+        }
+
+        if (
+            pmicDialog.doNotAskAgainStoreID !== undefined &&
+            pmicDialog.onOptional
+        ) {
+            const onOptional = pmicDialog.onOptional;
+            pmicDialog.onOptional = () => {
+                onOptional();
+                if (pmicDialog.optionalClosesDialog !== false) {
+                    dispatch(dequeueDialog());
+                }
+                getPersistentStore().set(
+                    `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`,
+                    { doNotShowAgain: true }
+                );
+            };
+        }
+
+        if (pmicDialog.confirmClosesDialog !== false) {
+            const onConfirm = pmicDialog.onConfirm;
+            pmicDialog.onConfirm = () => {
+                onConfirm();
+                dispatch(dequeueDialog());
+            };
+        }
+
+        dispatch(requestDialog(pmicDialog));
+    };
+
 export const MAX_TIMESTAMP = 359999999; // 99hrs 59min 59sec 999ms
+export const DOWNLOAD_BATTERY_PROFILE_DIALOG_ID = 'downloadBatteryProfile';
