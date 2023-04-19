@@ -61,7 +61,7 @@ export const hookModemToShellParser = async (
     serialPort: SerialPort,
     xTerminalShellParser: XTerminalShellParser,
     settings: ShellParserSettings = {
-        shellPromptUart: 'uart:~$ ',
+        shellPromptUart: 'uart:~$',
         logRegex:
             '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): ',
         errorRegex: 'Error ',
@@ -107,7 +107,11 @@ export const hookModemToShellParser = async (
     };
 
     const sendCommands = () => {
-        if (commandQueue.length > 0) {
+        if (
+            commandQueue.length > 0 &&
+            bufferedDataWrittenData === '' &&
+            canProcess()
+        ) {
             const command = commandQueue[0];
             if (command && !command.sent) {
                 serialPort.write(`${command.command}\r\n`);
@@ -118,7 +122,6 @@ export const hookModemToShellParser = async (
                     }
                     pausedState = true;
                     updateIsPaused();
-                    processSerialData(Buffer.from(`${command.command}\r\n`));
                 }
             }
 
@@ -129,7 +132,7 @@ export const hookModemToShellParser = async (
     const parseShellCommands = (data: string, endToken: string) => {
         // Buffer does not have the end token hence we have to consider the response
         // to still have pending bytes hence we need to wait more.
-        if (data.indexOf(endToken.trim()) !== -1) {
+        if (data.indexOf(endToken) !== -1) {
             const commands = data.split(endToken.trim());
             commands.forEach((command, index) => {
                 if (index === commands.length - 1) return;
@@ -158,6 +161,11 @@ export const hookModemToShellParser = async (
 
         response = response.trim();
 
+        if (response.match(settings.logRegex)) {
+            eventEmitter.emit('shellLogging', response);
+            return;
+        }
+
         // Trigger one time callbacks
         if (commandQueue.length > 0) {
             const regex = `^(${commandQueue[0].command.replace(
@@ -166,10 +174,8 @@ export const hookModemToShellParser = async (
             )})`;
 
             if (
-                (!shellEchos && bufferedDataWrittenData.match(regex)) ||
-                response.match(regex)
+                response.replaceAll('\r', '').replaceAll('\n', '').match(regex)
             ) {
-                bufferedDataWrittenData = '';
                 const command = commandQueue[0].command;
                 const commandResponse = response.replace(command, '').trim();
                 if (commandResponse.match(settings.errorRegex)) {
@@ -218,9 +224,7 @@ export const hookModemToShellParser = async (
             }
         });
 
-        if (response.match(settings.logRegex)) {
-            eventEmitter.emit('shellLogging', response);
-        } else if (!callbackFound) {
+        if (!callbackFound) {
             eventEmitter.emit('unknownCommand', response);
         }
     };
@@ -229,7 +233,10 @@ export const hookModemToShellParser = async (
         commandBuffer = `${commandBuffer}${xTerminalShellParser.getTerminalData()}${
             newline ? '\r\n' : ''
         }`;
+
         xTerminalShellParser.clear();
+
+        if (commandBuffer === settings.shellPromptUart) commandBuffer = '';
     };
 
     const processBuffer = () => {
@@ -286,25 +293,19 @@ export const hookModemToShellParser = async (
 
         if (!shellEchos) {
             bufferedDataWrittenData += Buffer.from(data).toString();
+            if (bufferedDataWrittenData.endsWith('\r\n')) {
+                processSerialData(
+                    Buffer.from(
+                        settings.shellPromptUart + bufferedDataWrittenData
+                    )
+                );
+                bufferedDataWrittenData = '';
+            }
         }
     });
 
-    const canProcess = () => {
-        let newHasLine = false;
-        if (!shellEchos) {
-            newHasLine =
-                bufferedDataWrittenData.endsWith('\r') ||
-                bufferedDataWrittenData.endsWith('\n');
-        } else {
-            bufferedDataWrittenData = '';
-        }
-
-        return (
-            xTerminalShellParser.getLastLine() +
-                (shellEchos || newHasLine ? '' : bufferedDataWrittenData) ===
-            settings.shellPromptUart.trim()
-        );
-    };
+    const canProcess = () =>
+        xTerminalShellParser.getLastLine() === settings.shellPromptUart;
 
     let t: NodeJS.Timeout;
     const updateIsPaused = () => {
@@ -417,6 +418,7 @@ export const hookModemToShellParser = async (
         unPause: () => serialPort.write(String.fromCharCode(21)),
         setShellEchos: (value: boolean) => {
             shellEchos = value;
+            if (shellEchos) bufferedDataWrittenData = '';
         },
     };
 };
