@@ -164,23 +164,22 @@ export const hookModemToShellParser = async (
             return;
         }
 
+        if (bufferedDataWrittenData.includes('\r\n')) {
+            const splitDataWrittenData = bufferedDataWrittenData.split('\r\n');
+
+            response = `${splitDataWrittenData[0].trim()}\r\n${response}`;
+
+            bufferedDataWrittenData = splitDataWrittenData
+                .splice(1)
+                .join('\r\n');
+        }
+
         // Trigger one time callbacks
         if (commandQueue.length > 0) {
             const regex = `^(${commandQueue[0].command.replace(
                 /[.*+?^${}()|[\]\\]/g,
                 '\\$&'
             )})`;
-
-            if (bufferedDataWrittenData.includes('\r\n')) {
-                const splitDataWrittenData =
-                    bufferedDataWrittenData.split('\r\n');
-
-                response = `${splitDataWrittenData[0].trim()}\r\n${response}`;
-
-                bufferedDataWrittenData = splitDataWrittenData
-                    .splice(1)
-                    .join('\r\n');
-            }
 
             // we need to replace \r and \n as shell might add \r \n when shell wraps
             if (
