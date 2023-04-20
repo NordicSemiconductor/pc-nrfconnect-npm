@@ -47,6 +47,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
                     resolve(parseToNumber(res));
                 },
                 reject,
+                console.warn,
                 true
             );
         });
@@ -62,6 +63,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
             () => {
                 rebooting = false;
             },
+            console.warn,
             true
         );
     };
@@ -252,6 +254,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
                         resolve(`app_version=${supportsVersion}` === result);
                     },
                     reject,
+                    console.warn,
                     true
                 );
             }),

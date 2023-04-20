@@ -69,9 +69,9 @@ const parseLogData = (
         endOfLogLevel + 2,
         logMessage.indexOf(':', endOfLogLevel)
     );
-    const message = logMessage.substring(
-        logMessage.indexOf(':', endOfLogLevel) + 2
-    );
+    const message = logMessage
+        .substring(logMessage.indexOf(':', endOfLogLevel) + 2)
+        .trim();
 
     callback({ timestamp: parseTime(strTimeStamp), logLevel, module, message });
 };
@@ -225,14 +225,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         if (message === 'Battery model timeout') {
             shellParser?.setShellEchos(true);
 
-            profileDownloadInProgress = false;
             profileDownloadAborting = true;
-            const payload: ProfileDownload = {
-                state: 'aborted',
-                alertMessage: message,
-            };
+            if (profileDownloadInProgress) {
+                profileDownloadInProgress = false;
+                const payload: ProfileDownload = {
+                    state: 'aborted',
+                    alertMessage: message,
+                };
 
-            eventEmitter.emit('onProfileDownloadUpdate', payload);
+                eventEmitter.emit('onProfileDownloadUpdate', payload);
+            }
         }
     };
 
@@ -524,7 +526,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         unique = true
     ) => {
         if (pmicState !== 'ek-disconnected') {
-            shellParser?.enqueueRequest(command, onSuccess, onFail, unique);
+            shellParser?.enqueueRequest(
+                command,
+                onSuccess,
+                onFail,
+                console.warn,
+                unique
+            );
         } else {
             onFail('No Shell connection', command);
         }
@@ -1224,6 +1232,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         resolve(list.filter(item => item.name !== ''));
                     },
                     reject,
+                    console.warn,
                     true
                 );
             }),

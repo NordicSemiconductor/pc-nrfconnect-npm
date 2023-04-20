@@ -18,6 +18,8 @@ import {
     XTerminalShellParser,
 } from './commandParser';
 
+jest.useFakeTimers();
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let onResponseCallback = (data: Uint8Array) => {};
 
@@ -60,9 +62,9 @@ const setupMocks = () => {
     );
 
     const mockClose = jest.fn(async () => {});
-    const mockWrite = jest.fn((data: string | number[] | Buffer) =>
-        onDataWrittenCallback(Buffer.from(data))
-    );
+    const mockWrite = jest.fn((data: string | number[] | Buffer) => {
+        onDataWrittenCallback(Buffer.from(data));
+    });
 
     const mockIsOpen = jest.fn(
         () =>
@@ -83,6 +85,7 @@ const setupMocks = () => {
         shellPromptUart: 'uart:~$',
         logRegex: '<inf> ',
         errorRegex: 'error: ',
+        timeout: 1000,
     };
 
     const mockModem = jest.fn<SerialPort, []>(() => ({
@@ -235,7 +238,11 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        shellParser.enqueueRequest('Test Command', mockOnSuccess, mockOnError);
+        await shellParser.enqueueRequest(
+            'Test Command',
+            mockOnSuccess,
+            mockOnError
+        );
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -269,9 +276,7 @@ describe('shell command parser', () => {
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
-        onResponseCallback(Buffer.from('Test Com'));
-
-        onResponseCallback(Buffer.from('mand\r\nResponse Val'));
+        onResponseCallback(Buffer.from('Test Command\r\nResponse Val'));
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -745,12 +750,12 @@ describe('shell command parser', () => {
         shellParser.onUnknownCommand(mockOnUnknown);
 
         onResponseCallback(
-            Buffer.from('<inf> main: v=3.595881,i=0.176776\r\nuart:~$')
+            Buffer.from('<inf> main: v=3.595881,i=0.176776\r\n')
         );
 
         expect(mockOnShellLogging).toBeCalledTimes(1);
         expect(mockOnShellLogging).toBeCalledWith(
-            '<inf> main: v=3.595881,i=0.176776'
+            'uart:~$<inf> main: v=3.595881,i=0.176776'
         );
 
         expect(mockOnError).toBeCalledTimes(0);
@@ -772,11 +777,11 @@ describe('shell command parser', () => {
 
         expect(mockOnShellLogging).toBeCalledTimes(0);
 
-        onResponseCallback(Buffer.from('.176776\r\nuart:~$'));
+        onResponseCallback(Buffer.from('.176776\r\n'));
 
         expect(mockOnShellLogging).toBeCalledTimes(1);
         expect(mockOnShellLogging).toBeCalledWith(
-            '<inf> main: v=3.595881,i=0.176776'
+            'uart:~$<inf> main: v=3.595881,i=0.176776'
         );
 
         expect(mockOnError).toBeCalledTimes(0);
@@ -812,6 +817,7 @@ describe('shell command parser', () => {
             mockTerminal(),
             settings
         );
+        expect(mockOnUnknown).toBeCalledTimes(0);
 
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
