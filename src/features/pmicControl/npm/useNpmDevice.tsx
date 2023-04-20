@@ -254,9 +254,7 @@ export default (shellParser: ShellParser | undefined) => {
                                                 undefined ||
                                             payload.completeChunks === undefined
                                                 ? 'Downloading....'
-                                                : `Downloading chunk ${
-                                                      payload.completeChunks + 1
-                                                  } of ${payload.totalChunks}`}
+                                                : `Downloading chunk ${payload.completeChunks} of ${payload.totalChunks}`}
                                         </>
                                     ),
                                     progress: Math.ceil(

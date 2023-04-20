@@ -132,16 +132,14 @@ export const hookModemToShellParser = async (
     const parseShellCommands = (data: string, endToken: string) => {
         // Buffer does not have the end token hence we have to consider the response
         // to still have pending bytes hence we need to wait more.
-        if (data.indexOf(endToken) !== -1) {
+        if (data.indexOf(endToken.trim()) !== -1) {
             const commands = data.split(endToken.trim());
             commands.forEach((command, index) => {
                 if (index === commands.length - 1) return;
 
-                const cleanCommand = command.trim();
+                if (command.trim().length === 0 && command !== '\r\n') return;
 
-                if (cleanCommand.length === 0) return;
-
-                responseCallback(cleanCommand);
+                responseCallback(command.trimStart());
             });
 
             // Incomplete command leave it for future processing
@@ -173,6 +171,18 @@ export const hookModemToShellParser = async (
                 '\\$&'
             )})`;
 
+            if (bufferedDataWrittenData.includes('\r\n')) {
+                const splitDataWrittenData =
+                    bufferedDataWrittenData.split('\r\n');
+
+                response = `${splitDataWrittenData[0].trim()}\r\n${response}`;
+
+                bufferedDataWrittenData = splitDataWrittenData
+                    .splice(1)
+                    .join('\r\n');
+            }
+
+            // we need to replace \r and \n as shell might add \r \n when shell wraps
             if (
                 response.replaceAll('\r', '').replaceAll('\n', '').match(regex)
             ) {
@@ -292,14 +302,6 @@ export const hookModemToShellParser = async (
 
         if (!shellEchos) {
             bufferedDataWrittenData += Buffer.from(data).toString();
-            if (bufferedDataWrittenData.endsWith('\r\n')) {
-                processSerialData(
-                    Buffer.from(
-                        settings.shellPromptUart + bufferedDataWrittenData
-                    )
-                );
-                bufferedDataWrittenData = '';
-            }
         }
     });
 

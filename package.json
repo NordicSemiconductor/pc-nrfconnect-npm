@@ -38,7 +38,7 @@
     "devDependencies": {
         "chart.js": "^4.0.1",
         "chartjs-adapter-date-fns": "^2.0.1",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v34",
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v35",
         "react-chartjs-2": "^5.0.1",
         "xterm-addon-fit": "^0.5.0",
         "xterm-for-react": "^1.0.4",
