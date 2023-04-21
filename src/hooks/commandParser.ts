@@ -16,8 +16,8 @@ interface ICallbacks {
 
 export type ShellParserSettings = {
     shellPromptUart: string;
-    logRegex: string;
-    errorRegex: string;
+    logRegex: RegExp;
+    errorRegex: RegExp;
     timeout: number;
 };
 
@@ -66,8 +66,8 @@ export const hookModemToShellParser = async (
     settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$',
         logRegex:
-            '[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): ',
-        errorRegex: 'Error ',
+            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): /,
+        errorRegex: /Error /,
         timeout: 1000,
     },
     shellEchos = true
@@ -108,11 +108,7 @@ export const hookModemToShellParser = async (
     };
 
     const sendCommands = () => {
-        if (
-            commandQueue.length > 0 &&
-            bufferedDataWrittenData === '' &&
-            canProcess()
-        ) {
+        if (commandQueue.length > 0 && canProcess()) {
             const command = commandQueue[0];
             if (command && !command.sent) {
                 serialPort.write(`${command.command}\r\n`);
@@ -143,17 +139,17 @@ export const hookModemToShellParser = async (
         // Buffer does not have the end token hence we have to consider the response
         // to still have pending bytes hence we need to wait more.
         if (data.indexOf(endToken.trim()) !== -1) {
-            const commands = data.split(endToken.trim());
-            commands.forEach((command, index) => {
-                if (index === commands.length - 1) return;
+            const responseFromShell = data.split(endToken.trim());
+            responseFromShell.forEach((response, index) => {
+                if (index === responseFromShell.length - 1) return;
 
-                if (command.trim().length === 0 && command !== '\r\n') return;
+                if (response.trim().length === 0 && response !== '\r\n') return;
 
-                responseCallback(command.trimStart());
+                responseCallback(response.trimStart());
             });
 
             // Incomplete command leave it for future processing
-            const remainingCommandPart = commands.pop();
+            const remainingCommandPart = responseFromShell.pop();
             if (remainingCommandPart && remainingCommandPart.length > 0) {
                 return remainingCommandPart;
             }
@@ -169,14 +165,22 @@ export const hookModemToShellParser = async (
 
         response = response.trim();
 
-        if (bufferedDataWrittenData.includes('\r\n')) {
-            const splitDataWrittenData = bufferedDataWrittenData.split('\r\n');
+        if (bufferedDataWrittenData.includes('\r')) {
+            const splitDataWrittenData = bufferedDataWrittenData
+                .split('\r')
+                .filter(v => v.trim() !== '');
 
-            response = `${splitDataWrittenData[0].trim()}\r\n${response}`;
+            if (splitDataWrittenData) {
+                response = `${
+                    splitDataWrittenData[0]?.trim() ?? ''
+                }\r\n${response}`;
 
-            bufferedDataWrittenData = splitDataWrittenData
-                .splice(1)
-                .join('\r\n');
+                bufferedDataWrittenData = splitDataWrittenData
+                    .splice(1)
+                    .join('\r');
+            } else {
+                bufferedDataWrittenData = '';
+            }
         }
 
         // Trigger one time callbacks
@@ -238,7 +242,7 @@ export const hookModemToShellParser = async (
             }
         });
 
-        if (!callbackFound) {
+        if (!callbackFound && response !== '') {
             eventEmitter.emit('unknownCommand', response);
         }
     };
@@ -309,6 +313,7 @@ export const hookModemToShellParser = async (
     const unregisterOnDataWritten = serialPort.onDataWritten(data => {
         if (!shellEchos) {
             bufferedDataWrittenData += Buffer.from(data).toString();
+            bufferedDataWrittenData.replaceAll('\r\n', '\r');
         }
 
         if (!pausedState) {
@@ -321,7 +326,7 @@ export const hookModemToShellParser = async (
     const canProcess = () =>
         xTerminalShellParser.getLastLine() === settings.shellPromptUart &&
         (bufferedDataWrittenData === '' ||
-            bufferedDataWrittenData.match(/(\r\n|\r|\n)$/)) !== null;
+            bufferedDataWrittenData.endsWith('\r')) !== null;
 
     const updateIsPaused = () => {
         const shellPaused = !canProcess();

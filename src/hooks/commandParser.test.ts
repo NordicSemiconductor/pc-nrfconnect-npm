@@ -83,8 +83,8 @@ const setupMocks = () => {
 
     const settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$',
-        logRegex: '<inf> ',
-        errorRegex: 'error: ',
+        logRegex: /<inf> /,
+        errorRegex: /error: /,
         timeout: 1000,
     };
 
