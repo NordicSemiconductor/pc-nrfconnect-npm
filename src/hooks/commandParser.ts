@@ -11,18 +11,21 @@ import { Terminal } from 'xterm-headless';
 interface ICallbacks {
     onSuccess: (response: string, command: string) => void;
     onError: (message: string, command: string) => void;
+    onTimeout?: (message: string, command: string) => void;
 }
 
 export type ShellParserSettings = {
     shellPromptUart: string;
-    logRegex: string;
-    errorRegex: string;
+    logRegex: RegExp;
+    errorRegex: RegExp;
+    timeout: number;
 };
 
 type CommandEnqueue = {
     command: string;
     callbacks: ICallbacks[];
     sent: boolean;
+    sentTime: number;
 };
 
 export type ShellParser = Awaited<ReturnType<typeof hookModemToShellParser>>;
@@ -61,10 +64,11 @@ export const hookModemToShellParser = async (
     serialPort: SerialPort,
     xTerminalShellParser: XTerminalShellParser,
     settings: ShellParserSettings = {
-        shellPromptUart: 'uart:~$ ',
+        shellPromptUart: 'uart:~$',
         logRegex:
-            '^[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): ',
-        errorRegex: 'Error ',
+            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): /,
+        errorRegex: /Error /,
+        timeout: 1000,
     },
     shellEchos = true
 ) => {
@@ -73,7 +77,6 @@ export const hookModemToShellParser = async (
     let commandBuffer = '';
     let commandQueueCallbacks = new Map<string, ICallbacks[]>();
     let commandQueue: CommandEnqueue[] = [];
-    let dataSendingStarted = false;
     let cr = false;
     let crnl = false;
     let pausedState = true; // Assume we have some command in the shell that has user has started typing
@@ -92,7 +95,6 @@ export const hookModemToShellParser = async (
         commandBuffer = '';
         commandQueueCallbacks = new Map();
         commandQueue = [];
-        dataSendingStarted = false;
         xTerminalShellParser.clear();
         cr = false;
         crnl = false;
@@ -101,28 +103,35 @@ export const hookModemToShellParser = async (
     const initDataSend = async () => {
         if (!(await serialPort.isOpen())) return;
         if (pausedState) return; // user is typing
-        if (dataSendingStarted) return;
 
         sendCommands();
     };
 
     const sendCommands = () => {
-        if (commandQueue.length > 0) {
+        if (commandQueue.length > 0 && canProcess()) {
             const command = commandQueue[0];
             if (command && !command.sent) {
                 serialPort.write(`${command.command}\r\n`);
                 command.sent = true;
-                if (!shellEchos) {
-                    if (!pausedState) {
-                        eventEmitter.emit('pausedChanged', true);
-                    }
-                    pausedState = true;
-                    updateIsPaused();
-                    processSerialData(Buffer.from(`${command.command}\r\n`));
-                }
-            }
+                command.sentTime = Date.now();
+                const t = setTimeout(() => {
+                    const elapsedTime = Date.now() - command.sentTime;
+                    command.callbacks.forEach(callback => {
+                        if (callback.onTimeout)
+                            callback.onTimeout(
+                                `Callback timeout after ${elapsedTime}ms`,
+                                command.command
+                            );
+                    });
 
-            dataSendingStarted = true;
+                    commandQueue.shift();
+                    sendCommands();
+                }, settings.timeout);
+                command.callbacks.push({
+                    onSuccess: () => clearTimeout(t),
+                    onError: () => clearTimeout(t),
+                });
+            }
         }
     };
 
@@ -130,19 +139,17 @@ export const hookModemToShellParser = async (
         // Buffer does not have the end token hence we have to consider the response
         // to still have pending bytes hence we need to wait more.
         if (data.indexOf(endToken.trim()) !== -1) {
-            const commands = data.split(endToken.trim());
-            commands.forEach((command, index) => {
-                if (index === commands.length - 1) return;
+            const responseFromShell = data.split(endToken.trim());
+            responseFromShell.forEach((response, index) => {
+                if (index === responseFromShell.length - 1) return;
 
-                const cleanCommand = command.trim();
+                if (response.trim().length === 0 && response !== '\r\n') return;
 
-                if (cleanCommand.length === 0) return;
-
-                responseCallback(cleanCommand);
+                responseCallback(response.trimStart());
             });
 
             // Incomplete command leave it for future processing
-            const remainingCommandPart = commands.pop();
+            const remainingCommandPart = responseFromShell.pop();
             if (remainingCommandPart && remainingCommandPart.length > 0) {
                 return remainingCommandPart;
             }
@@ -158,6 +165,24 @@ export const hookModemToShellParser = async (
 
         response = response.trim();
 
+        if (bufferedDataWrittenData.includes('\r')) {
+            const splitDataWrittenData = bufferedDataWrittenData
+                .split('\r')
+                .filter(v => v.trim() !== '');
+
+            if (splitDataWrittenData) {
+                response = `${
+                    splitDataWrittenData[0]?.trim() ?? ''
+                }\r\n${response}`;
+
+                bufferedDataWrittenData = splitDataWrittenData
+                    .splice(1)
+                    .join('\r');
+            } else {
+                bufferedDataWrittenData = '';
+            }
+        }
+
         // Trigger one time callbacks
         if (commandQueue.length > 0) {
             const regex = `^(${commandQueue[0].command.replace(
@@ -165,11 +190,12 @@ export const hookModemToShellParser = async (
                 '\\$&'
             )})`;
 
-            if (
-                (!shellEchos && bufferedDataWrittenData.match(regex)) ||
-                response.match(regex)
-            ) {
-                bufferedDataWrittenData = '';
+            // we need to replace \r and \n as shell might add \r \n when shell wraps
+            const matched = response
+                .replaceAll('\r', '')
+                .replaceAll('\n', '')
+                .match(regex);
+            if (matched && commandQueue[0].sent) {
                 const command = commandQueue[0].command;
                 const commandResponse = response.replace(command, '').trim();
                 if (commandResponse.match(settings.errorRegex)) {
@@ -189,8 +215,6 @@ export const hookModemToShellParser = async (
                 serialPort.isOpen().then(isOpen => {
                     if (isOpen && commandQueue.length > 0 && !pausedState) {
                         sendCommands();
-                    } else {
-                        dataSendingStarted = false;
                     }
                 });
             }
@@ -218,9 +242,7 @@ export const hookModemToShellParser = async (
             }
         });
 
-        if (response.match(settings.logRegex)) {
-            eventEmitter.emit('shellLogging', response);
-        } else if (!callbackFound) {
+        if (!callbackFound && response !== '') {
             eventEmitter.emit('unknownCommand', response);
         }
     };
@@ -230,6 +252,16 @@ export const hookModemToShellParser = async (
             newline ? '\r\n' : ''
         }`;
         xTerminalShellParser.clear();
+
+        if (commandBuffer.match(settings.logRegex)) {
+            eventEmitter.emit('shellLogging', commandBuffer.trim());
+            commandBuffer = '';
+            return;
+        }
+
+        if (commandBuffer === settings.shellPromptUart) {
+            commandBuffer = '';
+        }
     };
 
     const processBuffer = () => {
@@ -261,16 +293,17 @@ export const hookModemToShellParser = async (
     });
 
     const processSerialData = (data: Uint8Array) => {
-        data.forEach(byte => {
+        data.forEach((byte, index) => {
             cr = byte === 13 || (cr && byte === 10);
             crnl = cr && byte === 10;
 
             const callback = crnl ? () => loadToBuffer(true) : processBuffer;
 
-            xTerminalShellParser.write(String.fromCharCode(byte), callback);
+            xTerminalShellParser.write(String.fromCharCode(byte), () => {
+                if (index + 1 === data.length) updateIsPaused();
+                callback();
+            });
         });
-
-        updateIsPaused();
     };
 
     // Hook to listen to all modem data
@@ -278,48 +311,33 @@ export const hookModemToShellParser = async (
 
     let bufferedDataWrittenData = '';
     const unregisterOnDataWritten = serialPort.onDataWritten(data => {
+        if (!shellEchos) {
+            bufferedDataWrittenData += Buffer.from(data).toString();
+            bufferedDataWrittenData.replaceAll('\r\n', '\r');
+        }
+
         if (!pausedState) {
             eventEmitter.emit('pausedChanged', true);
         }
-        pausedState = true;
-        updateIsPaused();
 
-        if (!shellEchos) {
-            bufferedDataWrittenData += Buffer.from(data).toString();
-        }
+        updateIsPaused();
     });
 
-    const canProcess = () => {
-        let newHasLine = false;
-        if (!shellEchos) {
-            newHasLine =
-                bufferedDataWrittenData.endsWith('\r') ||
-                bufferedDataWrittenData.endsWith('\n');
-        } else {
-            bufferedDataWrittenData = '';
-        }
+    const canProcess = () =>
+        xTerminalShellParser.getLastLine() === settings.shellPromptUart &&
+        (bufferedDataWrittenData === '' ||
+            bufferedDataWrittenData.endsWith('\r')) !== null;
 
-        return (
-            xTerminalShellParser.getLastLine() +
-                (shellEchos || newHasLine ? '' : bufferedDataWrittenData) ===
-            settings.shellPromptUart.trim()
-        );
-    };
-
-    let t: NodeJS.Timeout;
     const updateIsPaused = () => {
-        clearTimeout(t);
-        // if we have uart string we can technically update the the shell as not paused, but this might not be true us device has some
-        // partial command in its buffer hance we delay some time to make use we have uart string only for some time ensuring unpaused state.
-        t = setTimeout(async () => {
-            const shellFree = canProcess();
-            if (pausedState === shellFree) {
-                pausedState = !shellFree;
-                eventEmitter.emit('pausedChanged', pausedState);
-                await initDataSend();
-            }
-        }, 5);
+        const shellPaused = !canProcess();
+        if (pausedState !== shellPaused) {
+            pausedState = shellPaused;
+            eventEmitter.emit('pausedChanged', pausedState);
+        }
+        if (!shellPaused) sendCommands();
     };
+
+    updateIsPaused();
 
     return {
         onPausedChange: (handler: (state: boolean) => void) => {
@@ -345,6 +363,7 @@ export const hookModemToShellParser = async (
             command: string,
             onSuccess: (response: string, command: string) => void = () => {},
             onError: (message: string, command: string) => void = () => {},
+            onTimeout: (message: string, command: string) => void = () => {},
             unique = false
         ) => {
             if (unique) {
@@ -355,6 +374,7 @@ export const hookModemToShellParser = async (
                     existingCommand.callbacks.push({
                         onSuccess,
                         onError,
+                        onTimeout,
                     });
                     // init sending of commands
                     await initDataSend();
@@ -368,9 +388,11 @@ export const hookModemToShellParser = async (
                     {
                         onSuccess,
                         onError,
+                        onTimeout,
                     },
                 ],
                 sent: false,
+                sentTime: -1,
             });
 
             // init sending of commands
@@ -417,6 +439,7 @@ export const hookModemToShellParser = async (
         unPause: () => serialPort.write(String.fromCharCode(21)),
         setShellEchos: (value: boolean) => {
             shellEchos = value;
+            if (shellEchos) bufferedDataWrittenData = '';
         },
     };
 };

@@ -90,36 +90,34 @@ const stream2buffer = (stream: fs.ReadStream) =>
         );
     });
 
-const parseAndUploadProfile =
-    (filePath: string) =>
-    async (_dispatch: TDispatch, getState: () => RootState) => {
-        const currentState = getState().app.pmicControl;
-
+const loadBatteryProfile = (filePath: string) =>
+    new Promise<Buffer>((resolve, reject) => {
         const readerStream = fs.createReadStream(filePath);
         readerStream.setEncoding('utf8');
 
-        currentState.npmDevice?.downloadFuelGaugeProfile(
-            await stream2buffer(readerStream)
-        );
-    };
+        stream2buffer(readerStream).then(resolve).catch(reject);
+    });
 
-export const uploadProfile = () => (dispatch: TDispatch) => {
-    dialog
-        .showOpenDialog({
-            title: 'Select a JSON file',
-            filters: [
-                {
-                    name: 'JSON',
-                    extensions: ['json'],
-                },
-            ],
-            properties: ['openFile'],
-        })
-        .then(async ({ filePaths }: OpenDialogReturnValue) => {
-            filePaths.length === 1 &&
-                dispatch(await parseAndUploadProfile(filePaths[0]));
-        });
-};
+export const getProfileBuffer = () =>
+    new Promise<Buffer>((resolve, reject) => {
+        dialog
+            .showOpenDialog({
+                title: 'Select a JSON file',
+                filters: [
+                    {
+                        name: 'JSON',
+                        extensions: ['json'],
+                    },
+                ],
+                properties: ['openFile'],
+            })
+            .then(({ filePaths }: OpenDialogReturnValue) => {
+                filePaths.length === 1 &&
+                    loadBatteryProfile(filePaths[0])
+                        .then(resolve)
+                        .catch(reject);
+            });
+    });
 
 export const openDirectoryDialog = () => (dispatch: TDispatch) => {
     const dialogOptions = {

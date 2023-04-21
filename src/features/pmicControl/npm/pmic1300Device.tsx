@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
 import EventEmitter from 'events';
-import { Alert } from 'pc-nrfconnect-shared';
-import { v4 as uuid } from 'uuid';
 
 import { getRange } from '../../../utils/helpers';
 import { baseNpmDevice } from './basePmicDevice';
@@ -38,6 +35,7 @@ import {
     PmicChargingState,
     PmicDialog,
     PmicState,
+    ProfileDownload,
     VTrickleFast,
 } from './types';
 
@@ -71,9 +69,9 @@ const parseLogData = (
         endOfLogLevel + 2,
         logMessage.indexOf(':', endOfLogLevel)
     );
-    const message = logMessage.substring(
-        logMessage.indexOf(':', endOfLogLevel) + 2
-    );
+    const message = logMessage
+        .substring(logMessage.indexOf(':', endOfLogLevel) + 2)
+        .trim();
 
     callback({ timestamp: parseTime(strTimeStamp), logLevel, module, message });
 };
@@ -91,9 +89,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         dialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+10'
+        '0.0.0+12'
     );
     let lastUptime = 0;
+    let profileDownloadInProgress = false;
+    let profileDownloadAborting = false;
 
     // can only change from:
     //  - 'pmic-unknown' --> 'pmic-connected' --> 'pmic-disconnected'
@@ -128,7 +128,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
                 break;
             case 'PMIC available. Application can be restarted.':
-                baseDevice.kernelReset('cold');
+                baseDevice.kernelReset();
                 break;
         }
     };
@@ -221,6 +221,23 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
+    const processModuleFuelGauge = ({ message }: LoggingEvent) => {
+        if (message === 'Battery model timeout') {
+            shellParser?.setShellEchos(true);
+
+            profileDownloadAborting = true;
+            if (profileDownloadInProgress) {
+                profileDownloadInProgress = false;
+                const payload: ProfileDownload = {
+                    state: 'aborted',
+                    alertMessage: message,
+                };
+
+                eventEmitter.emit('onProfileDownloadUpdate', payload);
+            }
+        }
+    };
+
     const processModulePmicCharger = ({ message }: LoggingEvent) => {
         const messageParts = message.split('=');
         const value = Number.parseInt(messageParts[1], 10);
@@ -252,6 +269,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     break;
                 case 'module_pmic_charger':
                     processModulePmicCharger(loggingEvent);
+                    break;
+                case 'module_fg':
+                    processModuleFuelGauge(loggingEvent);
                     break;
             }
 
@@ -347,17 +367,64 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     baseDevice.registerCommandCallbackLoggerWrapper(
         toRegex('fuel_gauge model download begin'),
 
-        () => {
-            shellParser?.setShellEchos(false);
-        },
-        noop
+        () => shellParser?.setShellEchos(false),
+        () => shellParser?.setShellEchos(true)
     );
 
     baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('fuel_gauge model download (apply|abort)'),
+        toRegex('fuel_gauge model download apply'),
 
-        () => shellParser?.setShellEchos(true),
-        () => shellParser?.setShellEchos(true)
+        res => {
+            if (profileDownloadInProgress) {
+                profileDownloadInProgress = false;
+                const profileDownload: ProfileDownload = {
+                    state: 'applied',
+                    alertMessage: parseColonBasedAnswer(res),
+                };
+                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
+            }
+            shellParser?.setShellEchos(true);
+        },
+        res => {
+            if (profileDownloadInProgress) {
+                profileDownloadInProgress = false;
+                const profileDownload: ProfileDownload = {
+                    state: 'failed',
+                    alertMessage: parseColonBasedAnswer(res),
+                };
+                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
+            }
+            shellParser?.setShellEchos(true);
+        }
+    );
+
+    baseDevice.registerCommandCallbackLoggerWrapper(
+        toRegex('fuel_gauge model download abort'),
+
+        res => {
+            if (profileDownloadInProgress) {
+                profileDownloadInProgress = false;
+                const profileDownload: ProfileDownload = {
+                    state: 'aborted',
+                    alertMessage: parseColonBasedAnswer(res),
+                };
+                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
+            }
+
+            shellParser?.setShellEchos(true);
+        },
+        res => {
+            if (profileDownloadInProgress) {
+                profileDownloadInProgress = false;
+                const profileDownload: ProfileDownload = {
+                    state: 'failed',
+                    alertMessage: parseColonBasedAnswer(res),
+                };
+                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
+            }
+
+            shellParser?.setShellEchos(true);
+        }
     );
 
     baseDevice.registerCommandCallbackLoggerWrapper(
@@ -455,10 +522,17 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const sendCommand = (
         command: string,
         onSuccess: (response: string, command: string) => void = noop,
-        onFail: (response: string, command: string) => void = noop
+        onFail: (response: string, command: string) => void = noop,
+        unique = true
     ) => {
         if (pmicState !== 'ek-disconnected') {
-            shellParser?.enqueueRequest(command, onSuccess, onFail, true);
+            shellParser?.enqueueRequest(
+                command,
+                onSuccess,
+                onFail,
+                console.warn,
+                unique
+            );
         } else {
             onFail('No Shell connection', command);
         }
@@ -608,7 +682,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         if (pmicState !== 'ek-disconnected' && index === 0 && value <= 1.7) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
-                    uuid: uuid(),
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
                     message: `Buck 1 Powers the I2C communications that are needed for this app. 
@@ -677,7 +750,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
-                    uuid: uuid(),
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
                     message: `Buck 1 Powers the I2C communications that are needed for this app. 
@@ -766,7 +838,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         if (pmicState !== 'ek-disconnected' && index === 0 && !enabled) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
-                    uuid: uuid(),
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckEnabled-0',
                     message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
@@ -848,175 +919,92 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const chunkSize = 256;
         const chunks = Math.ceil(profile.byteLength / chunkSize);
 
-        let aborted = false;
-        const progressDialog: PmicDialog = {
-            uuid: uuid(),
-            message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
-            confirmLabel: 'Load',
-            confirmClosesDialog: false,
-            cancelLabel: 'Cancel',
-            title: 'Load',
-            onConfirm: () => {},
-            onCancel: () => {},
-        };
-
         return new Promise<void>((resolve, reject) => {
             const downloadData = (chunk = 0) => {
-                dialogHandler({
-                    ...progressDialog,
-                    confirmDisabled: true,
-                    cancelLabel: 'Abort',
-                    cancelClosesDialog: false,
-                    onCancel: () => {
-                        aborted = true;
-                    },
-                    message: (
-                        <>
-                            <div>Load battery profile.</div>
-                            <br />
-                            <strong>Status: </strong>
-                            {`Downloading chunk ${chunk + 1} of ${chunks}`}
-                        </>
-                    ),
-                    progress: Math.ceil((chunk / chunks) * 100),
-                });
-
                 sendCommand(
                     `fuel_gauge model download "${profile.subarray(
                         chunk * chunkSize,
                         (chunk + 1) * chunkSize
                     )}"`,
                     () => {
-                        if (!aborted && chunk !== chunks)
+                        const profileDownload: ProfileDownload = {
+                            state: 'downloading',
+                            completeChunks: chunk + 1,
+                            totalChunks: Math.ceil(
+                                profile.byteLength / chunkSize
+                            ),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+
+                        if (
+                            profileDownloadInProgress &&
+                            !profileDownloadAborting &&
+                            chunk + 1 !== chunks
+                        ) {
                             downloadData(chunk + 1);
-                        else if (aborted) {
-                            dialogHandler({
-                                ...progressDialog,
-                                confirmDisabled: true,
-                                cancelDisabled: true,
-                                cancelLabel: 'Close',
-                                message: (
-                                    <>
-                                        <div>Load battery profile.</div>
-                                        <br />
-                                        <strong>Status: </strong>
-                                        Aborting download
-                                    </>
-                                ),
-                                progress: Math.ceil((chunk / chunks) * 100),
-                            });
-
-                            sendCommand(
-                                `fuel_gauge model download abort`,
-                                () => {
-                                    dialogHandler({
-                                        ...progressDialog,
-                                        confirmDisabled: true,
-                                        cancelLabel: 'Close',
-                                        message: (
-                                            <>
-                                                <div>Load battery profile.</div>
-                                                <br />
-                                                <Alert
-                                                    label="Warning "
-                                                    variant="warning"
-                                                >
-                                                    Download aborted
-                                                </Alert>
-                                            </>
-                                        ),
-                                    });
-
-                                    resolve();
-                                },
-                                () => reject()
-                            );
                         } else {
-                            dialogHandler({
-                                ...progressDialog,
-                                cancelDisabled: true,
-                                progress: Math.ceil((chunk / chunks) * 100),
-                                message: (
-                                    <>
-                                        <div>Uploading battery profile.</div>
-                                        <br />
-                                        <strong>Status: </strong>
-                                        Download complete. Applying profile
-                                    </>
-                                ),
-                            });
-
-                            sendCommand(
-                                `fuel_gauge model download apply`,
-                                res => {
-                                    dialogHandler({
-                                        ...progressDialog,
-                                        confirmDisabled: true,
-                                        cancelLabel: 'Close',
-                                        cancelDisabled: false,
-                                        message: (
-                                            <>
-                                                <div>Load battery profile.</div>
-                                                <br />
-                                                <Alert
-                                                    label="Success "
-                                                    variant="success"
-                                                >
-                                                    {`${parseColonBasedAnswer(
-                                                        res
-                                                    )}`}
-                                                </Alert>
-                                            </>
-                                        ),
-                                    });
-
-                                    requestUpdate.activeBatteryModel();
-                                    resolve();
-                                },
-                                res => {
-                                    dialogHandler({
-                                        ...progressDialog,
-                                        confirmDisabled: true,
-                                        cancelLabel: 'Close',
-                                        cancelDisabled: false,
-                                        message: (
-                                            <>
-                                                <div>Load battery profile.</div>
-                                                <br />
-                                                <Alert
-                                                    label="Error "
-                                                    variant="danger"
-                                                >
-                                                    {parseColonBasedAnswer(res)}
-                                                </Alert>
-                                            </>
-                                        ),
-                                    });
-
-                                    requestUpdate.activeBatteryModel();
-                                    reject();
-                                }
-                            );
+                            resolve();
                         }
                     },
-                    () => {}
+                    res => {
+                        () => {
+                            const profileDownload: ProfileDownload = {
+                                state: 'failed',
+                                alertMessage: parseColonBasedAnswer('res'),
+                            };
+                            eventEmitter.emit(
+                                'onProfileDownloadUpdate',
+                                profileDownload
+                            );
+                            reject(res);
+                        };
+                    },
+                    false
                 );
             };
 
-            const beginDownload = () => {
-                // setFuelGaugeEnabled(false).then(() =>
-                sendCommand(
-                    'fuel_gauge model download begin',
-                    () => downloadData(),
-                    () => reject()
-                );
-                // );
-            };
-
-            progressDialog.onConfirm = beginDownload;
-            dialogHandler(progressDialog);
+            profileDownloadInProgress = true;
+            profileDownloadAborting = false;
+            sendCommand(
+                'fuel_gauge model download begin',
+                () => downloadData(),
+                () => reject()
+            );
         });
     };
+
+    const abortDownloadFuelGaugeProfile = () =>
+        new Promise<void>((resolve, reject) => {
+            const profileDownload: ProfileDownload = {
+                state: 'aborting',
+            };
+            eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
+
+            profileDownloadAborting = true;
+            sendCommand(
+                `fuel_gauge model download abort`,
+                () => {
+                    resolve();
+                },
+                () => {
+                    reject();
+                }
+            );
+        });
+
+    const applyDownloadFuelGaugeProfile = () =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `fuel_gauge model download apply`,
+                () => {
+                    resolve();
+                },
+                () => reject()
+            );
+        });
 
     const setActiveBatteryModel = (name: string) =>
         new Promise<void>((resolve, reject) => {
@@ -1141,7 +1129,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             if (config.firmwareVersion !== baseDevice.getSupportedVersion()) {
                 const warningDialog: PmicDialog = {
-                    uuid: uuid(),
                     doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
                     message: `The configuration was intended for firmware version ${
                         config.firmwareVersion
@@ -1245,10 +1232,23 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         resolve(list.filter(item => item.name !== ''));
                     },
                     reject,
+                    console.warn,
                     true
                 );
             }),
 
         setBatteryStatusCheckEnabled,
+
+        onProfileDownloadUpdate: (
+            handler: (payload: ProfileDownload, error?: string) => void
+        ) => {
+            eventEmitter.on('onProfileDownloadUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onProfileDownloadUpdate', handler);
+            };
+        },
+
+        abortDownloadFuelGaugeProfile,
+        applyDownloadFuelGaugeProfile,
     };
 };

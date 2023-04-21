@@ -21,7 +21,6 @@ import {
     PmicChargingState,
     PmicDialog,
     PmicState,
-    RebootMode,
 } from './types';
 
 export const baseNpmDevice: IBaseNpmDevice = (
@@ -48,21 +47,23 @@ export const baseNpmDevice: IBaseNpmDevice = (
                     resolve(parseToNumber(res));
                 },
                 reject,
+                console.warn,
                 true
             );
         });
 
-    const kernelReset = (mode: 'cold' | 'warm') => {
+    const kernelReset = () => {
         if (rebooting || !shellParser) return;
         rebooting = true;
 
-        eventEmitter.emit('onBeforeReboot', mode);
+        eventEmitter.emit('onBeforeReboot', 100);
         shellParser.enqueueRequest(
-            `kernel reboot ${mode}`,
+            'delayed_reboot 100',
             () => {},
             () => {
                 rebooting = false;
             },
+            console.warn,
             true
         );
     };
@@ -114,7 +115,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
     };
 
     registerCommandCallbackLoggerWrapper(
-        toRegex('kernel reboot (cold|warm)'),
+        toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
         () => {
             rebooting = true;
             eventEmitter.emit('onReboot', true);
@@ -219,7 +220,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
-        onBeforeReboot: (handler: (mode: RebootMode) => void) => {
+        onBeforeReboot: (handler: (waitTimeout: number) => void) => {
             eventEmitter.on('onBeforeReboot', handler);
             return () => {
                 eventEmitter.removeListener('onBeforeReboot', handler);
@@ -253,6 +254,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
                         resolve(`app_version=${supportsVersion}` === result);
                     },
                     reject,
+                    console.warn,
                     true
                 );
             }),
