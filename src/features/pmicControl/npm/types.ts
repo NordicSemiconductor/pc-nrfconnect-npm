@@ -287,6 +287,8 @@ export type NpmDevice = {
     storeBattery: () => Promise<void>;
 
     setBatteryStatusCheckEnabled: (enabled: boolean) => void;
+
+    getBatteryProfiler: () => BatteryProfiler | undefined;
 } & BaseNpmDevice;
 
 export interface PmicDialog {
@@ -327,3 +329,30 @@ export interface LoggingEvent {
     module: string;
     message: string;
 }
+
+export interface Profile {
+    tLoad: number;
+    tRest: number;
+    iLoad: number;
+    iRest: number;
+    cycles: number;
+    vCutoff?: number;
+}
+
+export interface IBatteryProfiler {
+    (shellParser: ShellParser, eventEmitter: EventEmitter): BatteryProfiler;
+}
+
+export type BatteryProfiler = {
+    setProfile: (
+        reportInterval: number,
+        vCutoff: number,
+        profiles: Profile[]
+    ) => Promise<void>;
+    startProfiling: () => Promise<void>;
+    stopProfiling: () => Promise<void>;
+    isProfiling: () => Promise<boolean>;
+    onProfilingStateChange: (
+        handler: (state: boolean, error?: string) => void
+    ) => () => void;
+};

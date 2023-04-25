@@ -33,6 +33,7 @@ import {
 import { BatteryModel } from '../../features/pmicControl/npm/types';
 import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
 import {
+    canProfile,
     getActiveBatterModel,
     getDefaultBatterModels,
     getDialog,
@@ -40,7 +41,10 @@ import {
     getLatestAdcSample,
     getNpmDevice,
     getStoredBatterModel,
+    isProfiling,
     setEventRecordingPath,
+    setShowProfilingWizard,
+    showProfilingWizard,
 } from '../../features/pmicControl/pmicControlSlice';
 import {
     getSerialPort,
@@ -52,6 +56,7 @@ import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
 } from '../../hooks/commandParser';
+import ProfilingWizard from '../Profiling/ProfilingWizard';
 import ConnectionStatus from './ConnectionStatus';
 
 export default () => {
@@ -72,6 +77,9 @@ export default () => {
     const defaultBatterModels = useSelector(getDefaultBatterModels);
     const storedBatterModel = useSelector(getStoredBatterModel);
     const latestAdcSample = useSelector(getLatestAdcSample);
+    const profilingSupported = useSelector(canProfile);
+    const profiling = useSelector(isProfiling);
+    const profilingWizard = useSelector(showProfilingWizard);
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
@@ -297,6 +305,20 @@ export default () => {
                 >
                     Load profile
                 </Button>
+                {profilingSupported && (
+                    <Button
+                        variant="secondary"
+                        className="w-100"
+                        onClick={() => {
+                            dispatch(setShowProfilingWizard(true));
+                        }}
+                        disabled={
+                            pmicConnection === 'ek-disconnected' || profiling
+                        }
+                    >
+                        Profile Battery
+                    </Button>
+                )}
             </CollapsibleGroup>
             <ConnectionStatus />
 
@@ -350,6 +372,7 @@ export default () => {
                     )}
                 </GenericDialog>
             )}
+            {profilingWizard && <ProfilingWizard />}
         </SidePanel>
     );
 };

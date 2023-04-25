@@ -8,6 +8,7 @@ import EventEmitter from 'events';
 
 import { getRange } from '../../../utils/helpers';
 import { baseNpmDevice } from './basePmicDevice';
+import { BatteryProfiler } from './batteryProfiler';
 import {
     MAX_TIMESTAMP,
     noop,
@@ -91,6 +92,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         devices,
         '0.0.0+12'
     );
+    const batteryProfiler = shellParser
+        ? BatteryProfiler(shellParser, eventEmitter)
+        : undefined;
     let lastUptime = 0;
     let profileDownloadInProgress = false;
     let profileDownloadAborting = false;
@@ -998,14 +1002,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             if (profileDownloadInProgress) {
                                 profileDownloadInProgress = false;
                                 profileDownloadAborting = false;
-                            const profileDownload: ProfileDownload = {
-                                state: 'failed',
-                                alertMessage: parseColonBasedAnswer('res'),
-                            };
-                            eventEmitter.emit(
-                                'onProfileDownloadUpdate',
-                                profileDownload
-                            );
+                                const profileDownload: ProfileDownload = {
+                                    state: 'failed',
+                                    alertMessage: parseColonBasedAnswer('res'),
+                                };
+                                eventEmitter.emit(
+                                    'onProfileDownloadUpdate',
+                                    profileDownload
+                                );
                             }
                             reject(res);
                         };
@@ -1298,5 +1302,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         abortDownloadFuelGaugeProfile,
         applyDownloadFuelGaugeProfile,
+
+        getBatteryProfiler: () => batteryProfiler,
     };
 };

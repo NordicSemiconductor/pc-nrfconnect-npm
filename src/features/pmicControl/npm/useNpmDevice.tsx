@@ -33,6 +33,7 @@ import {
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
+    setProfiling,
     setStoredBatterModel,
     setSupportedVersion,
     setUsbPowered,
@@ -379,6 +380,13 @@ export default () => {
                 }
             });
 
+            const releaseOnBatteryProfiler =
+                npmDevice
+                    .getBatteryProfiler()
+                    ?.onProfilingStateChange(profiling => {
+                        dispatch(setProfiling(profiling));
+                    }) ?? noop;
+
             dispatch(setPmicState(npmDevice.getConnectionState()));
 
             initComponents();
@@ -397,6 +405,7 @@ export default () => {
                 releaseOnReboot();
                 releaseOnUsbPowered();
                 releaseOnProfileDownloadUpdate();
+                releaseOnBatteryProfiler();
             };
         }
     }, [dispatch, initComponents, npmDevice]);
