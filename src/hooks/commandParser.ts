@@ -392,6 +392,8 @@ export const hookModemToShellParser = async (
             onTimeout: (message: string, command: string) => void = () => {},
             unique = false
         ) => {
+            command = command.trim();
+
             if (unique) {
                 const existingCommand = commandQueue.find(
                     item => item.command === command
