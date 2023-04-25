@@ -10,10 +10,12 @@ import { getRange } from '../../../utils/helpers';
 import { baseNpmDevice } from './basePmicDevice';
 import {
     MAX_TIMESTAMP,
+    noop,
     parseBatteryModel,
     parseColonBasedAnswer,
     parseToBoolean,
     parseToNumber,
+    registerCommandCallbackLoggerWrapper,
     toRegex,
 } from './pmicHelpers';
 import {
@@ -38,8 +40,6 @@ import {
     ProfileDownload,
     VTrickleFast,
 } from './types';
-
-const noop = () => {};
 
 const parseTime = (timeString: string) => {
     const time = timeString.trim().split(',')[0].replace('.', ':').split(':');
@@ -313,210 +313,254 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         } as PartialUpdate<T>);
     };
 
-    // TODO Add callback clean up
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('npmx charger termination_voltage normal', true),
-        res => {
-            const value = parseToNumber(res);
-            emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                vTerm: value / 1000, // mv to V
-            });
-        },
-        noop
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('npmx charger charger_current', true),
-        res => {
-            const value = parseToNumber(res);
-            emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                iChg: value,
-            });
-        },
-        noop
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('npmx charger status', true),
-        res => {
-            const value = parseToNumber(res);
-            emitOnChargingStatusUpdate(value);
-        },
-        noop
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('npmx charger module charger', true, undefined, '(1|0)'),
-        res => {
-            emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                enabled: parseToBoolean(res),
-            });
-        },
-        noop
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('fuel_gauge', true, undefined, '(1|0)'),
-
-        res => {
-            eventEmitter.emit('onFuelGauge', parseToBoolean(res));
-        },
-        noop
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('fuel_gauge model download begin'),
-
-        () => shellParser?.setShellEchos(false),
-        () => shellParser?.setShellEchos(true)
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('fuel_gauge model download apply'),
-
-        res => {
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const profileDownload: ProfileDownload = {
-                    state: 'applied',
-                    alertMessage: parseColonBasedAnswer(res),
-                };
-                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-            }
-            shellParser?.setShellEchos(true);
-        },
-        res => {
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const profileDownload: ProfileDownload = {
-                    state: 'failed',
-                    alertMessage: parseColonBasedAnswer(res),
-                };
-                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-            }
-            shellParser?.setShellEchos(true);
-        }
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('fuel_gauge model download abort'),
-
-        res => {
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const profileDownload: ProfileDownload = {
-                    state: 'aborted',
-                    alertMessage: parseColonBasedAnswer(res),
-                };
-                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-            }
-
-            shellParser?.setShellEchos(true);
-        },
-        res => {
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const profileDownload: ProfileDownload = {
-                    state: 'failed',
-                    alertMessage: parseColonBasedAnswer(res),
-                };
-                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-            }
-
-            shellParser?.setShellEchos(true);
-        }
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('fuel_gauge model', true, undefined, '[A-Za-z0-9]+'),
-        res => {
-            eventEmitter.emit(
-                'onActiveBatteryModelUpdate',
-                parseBatteryModel(parseColonBasedAnswer(res))
-            );
-        },
-        noop
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('fuel_gauge model store'),
-        () => {
-            requestUpdate.storedBatteryModel();
-            requestUpdate.activeBatteryModel();
-        },
-        noop
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('fuel_gauge model list'),
-        res => {
-            const models = res.split('Battery model stored in database:');
-            if (models.length < 2) {
-                eventEmitter.emit('onStoredBatteryModelUpdate', undefined);
-                return;
-            }
-            const stringModels = models[1].trim().split('\r\n');
-            const list = stringModels.map(parseBatteryModel);
-            eventEmitter.emit(
-                'onStoredBatteryModelUpdate',
-                list.length !== 0 ? list[0] : undefined
-            );
-        },
-        noop
-    );
-
-    baseDevice.registerCommandCallbackLoggerWrapper(
-        toRegex('npmx vbusin vbus status get'),
-        res => {
-            eventEmitter.emit('onUsbPowered', parseToBoolean(res));
-        },
-        noop
-    );
-
-    for (let i = 0; i < devices.noOfBucks; i += 1) {
-        baseDevice.registerCommandCallbackLoggerWrapper(
-            toRegex('npmx buck voltage', true, i),
+    if (shellParser) {
+        // TODO Add callback clean up
+        registerCommandCallbackLoggerWrapper(
+            toRegex('npmx charger termination_voltage normal', true),
             res => {
                 const value = parseToNumber(res);
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    vOut: value / 1000, // mV to V
+                emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                    vTerm: value / 1000, // mv to V
                 });
             },
-            noop
+            noop,
+            eventEmitter,
+            shellParser
         );
 
-        baseDevice.registerCommandCallbackLoggerWrapper(
-            toRegex('npmx buck vout select', true, i),
+        registerCommandCallbackLoggerWrapper(
+            toRegex('npmx charger charger_current', true),
             res => {
                 const value = parseToNumber(res);
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    mode: value === 0 ? 'vSet' : 'software',
+                emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                    iChg: value,
                 });
             },
-            noop
+            noop,
+            eventEmitter,
+            shellParser
         );
 
-        baseDevice.registerCommandCallbackLoggerWrapper(
-            toRegex('npmx buck', true, i),
+        registerCommandCallbackLoggerWrapper(
+            toRegex('npmx charger status', true),
             res => {
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
+                const value = parseToNumber(res);
+                emitOnChargingStatusUpdate(value);
+            },
+            noop,
+            eventEmitter,
+            shellParser
+        );
+
+        registerCommandCallbackLoggerWrapper(
+            toRegex('npmx charger module charger', true, undefined, '(1|0)'),
+            res => {
+                emitPartialEvent<Charger>('onChargerUpdate', 0, {
                     enabled: parseToBoolean(res),
                 });
             },
-            noop
+            noop,
+            eventEmitter,
+            shellParser
         );
-    }
 
-    for (let i = 0; i < devices.noOfLdos; i += 1) {
-        baseDevice.registerCommandCallbackLoggerWrapper(
-            toRegex('npmx ldsw', true, i),
+        registerCommandCallbackLoggerWrapper(
+            toRegex('fuel_gauge', true, undefined, '(1|0)'),
+
             res => {
-                emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                    enabled: parseToBoolean(res),
-                });
+                eventEmitter.emit('onFuelGauge', parseToBoolean(res));
             },
-            noop
+            noop,
+            eventEmitter,
+            shellParser
         );
+
+        registerCommandCallbackLoggerWrapper(
+            toRegex('fuel_gauge model download begin'),
+            () => shellParser?.setShellEchos(false),
+            () => shellParser?.setShellEchos(true),
+            eventEmitter,
+            shellParser
+        );
+
+        registerCommandCallbackLoggerWrapper(
+            toRegex('fuel_gauge model download apply'),
+
+            res => {
+                if (profileDownloadInProgress) {
+                    profileDownloadInProgress = false;
+                    const profileDownload: ProfileDownload = {
+                        state: 'applied',
+                        alertMessage: parseColonBasedAnswer(res),
+                    };
+                    eventEmitter.emit(
+                        'onProfileDownloadUpdate',
+                        profileDownload
+                    );
+                }
+                shellParser?.setShellEchos(true);
+            },
+            res => {
+                if (profileDownloadInProgress) {
+                    profileDownloadInProgress = false;
+                    const profileDownload: ProfileDownload = {
+                        state: 'failed',
+                        alertMessage: parseColonBasedAnswer(res),
+                    };
+                    eventEmitter.emit(
+                        'onProfileDownloadUpdate',
+                        profileDownload
+                    );
+                }
+                shellParser?.setShellEchos(true);
+            },
+            eventEmitter,
+            shellParser
+        );
+
+        registerCommandCallbackLoggerWrapper(
+            toRegex('fuel_gauge model download abort'),
+            res => {
+                if (profileDownloadInProgress) {
+                    profileDownloadInProgress = false;
+                    const profileDownload: ProfileDownload = {
+                        state: 'aborted',
+                        alertMessage: parseColonBasedAnswer(res),
+                    };
+                    eventEmitter.emit(
+                        'onProfileDownloadUpdate',
+                        profileDownload
+                    );
+                }
+
+                shellParser?.setShellEchos(true);
+            },
+            res => {
+                if (profileDownloadInProgress) {
+                    profileDownloadInProgress = false;
+                    const profileDownload: ProfileDownload = {
+                        state: 'failed',
+                        alertMessage: parseColonBasedAnswer(res),
+                    };
+                    eventEmitter.emit(
+                        'onProfileDownloadUpdate',
+                        profileDownload
+                    );
+                }
+
+                shellParser?.setShellEchos(true);
+            },
+            eventEmitter,
+            shellParser
+        );
+
+        registerCommandCallbackLoggerWrapper(
+            toRegex('fuel_gauge model', true, undefined, '[A-Za-z0-9]+'),
+            res => {
+                eventEmitter.emit(
+                    'onActiveBatteryModelUpdate',
+                    parseBatteryModel(parseColonBasedAnswer(res))
+                );
+            },
+            noop,
+            eventEmitter,
+            shellParser
+        );
+
+        registerCommandCallbackLoggerWrapper(
+            toRegex('fuel_gauge model store'),
+            () => {
+                requestUpdate.storedBatteryModel();
+                requestUpdate.activeBatteryModel();
+            },
+            noop,
+            eventEmitter,
+            shellParser
+        );
+
+        registerCommandCallbackLoggerWrapper(
+            toRegex('fuel_gauge model list'),
+            res => {
+                const models = res.split('Battery model stored in database:');
+                if (models.length < 2) {
+                    eventEmitter.emit('onStoredBatteryModelUpdate', undefined);
+                    return;
+                }
+                const stringModels = models[1].trim().split('\r\n');
+                const list = stringModels.map(parseBatteryModel);
+                eventEmitter.emit(
+                    'onStoredBatteryModelUpdate',
+                    list.length !== 0 ? list[0] : undefined
+                );
+            },
+            noop,
+            eventEmitter,
+            shellParser
+        );
+
+        registerCommandCallbackLoggerWrapper(
+            toRegex('npmx vbusin vbus status get'),
+            res => {
+                eventEmitter.emit('onUsbPowered', parseToBoolean(res));
+            },
+            noop,
+            eventEmitter,
+            shellParser
+        );
+
+        for (let i = 0; i < devices.noOfBucks; i += 1) {
+            registerCommandCallbackLoggerWrapper(
+                toRegex('npmx buck voltage', true, i),
+                res => {
+                    const value = parseToNumber(res);
+                    emitPartialEvent<Buck>('onBuckUpdate', i, {
+                        vOut: value / 1000, // mV to V
+                    });
+                },
+                noop,
+                eventEmitter,
+                shellParser
+            );
+
+            registerCommandCallbackLoggerWrapper(
+                toRegex('npmx buck vout select', true, i),
+                res => {
+                    const value = parseToNumber(res);
+                    emitPartialEvent<Buck>('onBuckUpdate', i, {
+                        mode: value === 0 ? 'vSet' : 'software',
+                    });
+                },
+                noop,
+                eventEmitter,
+                shellParser
+            );
+
+            registerCommandCallbackLoggerWrapper(
+                toRegex('npmx buck', true, i),
+                res => {
+                    emitPartialEvent<Buck>('onBuckUpdate', i, {
+                        enabled: parseToBoolean(res),
+                    });
+                },
+                noop,
+                eventEmitter,
+                shellParser
+            );
+        }
+
+        for (let i = 0; i < devices.noOfLdos; i += 1) {
+            registerCommandCallbackLoggerWrapper(
+                toRegex('npmx ldsw', true, i),
+                res => {
+                    emitPartialEvent<Ldo>('onLdoUpdate', i, {
+                        enabled: parseToBoolean(res),
+                    });
+                },
+                noop,
+                eventEmitter,
+                shellParser
+            );
+        }
     }
 
     const sendCommand = (

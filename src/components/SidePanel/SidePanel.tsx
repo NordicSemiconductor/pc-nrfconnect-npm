@@ -63,7 +63,7 @@ export default () => {
     const serialPort = useSelector(getSerialPort);
     const shellParserO = useSelector(getShellParser);
     const dispatch = useDispatch();
-    useNpmDevice(shellParserO);
+    useNpmDevice();
 
     const npmDevice = useSelector(getNpmDevice);
     const pmicConnection = npmDevice?.getConnectionState();

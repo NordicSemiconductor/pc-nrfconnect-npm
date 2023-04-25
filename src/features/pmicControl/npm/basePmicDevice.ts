@@ -5,10 +5,14 @@
  */
 
 import EventEmitter from 'events';
-import { logger } from 'pc-nrfconnect-shared';
 
 import { ShellParser } from '../../../hooks/commandParser';
-import { MAX_TIMESTAMP, parseToNumber, toRegex } from './pmicHelpers';
+import {
+    MAX_TIMESTAMP,
+    parseToNumber,
+    registerCommandCallbackLoggerWrapper,
+    toRegex,
+} from './pmicHelpers';
 import {
     AdcSample,
     BatteryModel,
@@ -36,7 +40,6 @@ export const baseNpmDevice: IBaseNpmDevice = (
     supportsVersion: string
 ) => {
     let rebooting = false;
-    let deviceUptimeToSystemDelta = 0;
     let uptimeOverflowCounter = 0;
 
     const getKernelUptime = () =>
@@ -70,61 +73,25 @@ export const baseNpmDevice: IBaseNpmDevice = (
 
     const updateUptimeOverflowCounter = () => {
         getKernelUptime().then(milliseconds => {
-            deviceUptimeToSystemDelta = Date.now() - milliseconds;
             uptimeOverflowCounter = Math.floor(milliseconds / MAX_TIMESTAMP);
         });
     };
 
-    const registerCommandCallbackLoggerWrapper = (
-        command: string,
-        onSuccess: (data: string, command: string) => void,
-        onError: (error: string, command: string) => void
-    ) => {
-        const loggerWrapper = (
-            cmd: string,
-            error: boolean,
-            result: string,
-            action: () => void
-        ) => {
-            const event: LoggingEvent = {
-                timestamp: Date.now() - deviceUptimeToSystemDelta,
-                module: 'shell_commands',
-                logLevel: error ? 'err' : 'inf',
-                message: `command: "${cmd}" response: "${result}"`,
-            };
-
-            eventEmitter.emit('onLoggingEvent', {
-                loggingEvent: event,
-                dataPair: false,
-            });
-
-            if (action) action();
-        };
-
-        return shellParser?.registerCommandCallback(
-            command,
-            (response, cmd) =>
-                loggerWrapper(cmd, false, response, () =>
-                    onSuccess(response, cmd)
-                ),
-            (error, cmd) => {
-                logger.error(error);
-                loggerWrapper(cmd, true, error, () => onError(error, cmd));
-            }
+    if (shellParser) {
+        registerCommandCallbackLoggerWrapper(
+            toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
+            () => {
+                rebooting = true;
+                eventEmitter.emit('onReboot', true);
+            },
+            error => {
+                rebooting = false;
+                eventEmitter.emit('onReboot', false, error);
+            },
+            eventEmitter,
+            shellParser
         );
-    };
-
-    registerCommandCallbackLoggerWrapper(
-        toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
-        () => {
-            rebooting = true;
-            eventEmitter.emit('onReboot', true);
-        },
-        error => {
-            rebooting = false;
-            eventEmitter.emit('onReboot', false, error);
-        }
-    );
+    }
 
     updateUptimeOverflowCounter();
 

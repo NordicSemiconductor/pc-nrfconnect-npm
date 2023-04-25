@@ -189,12 +189,6 @@ export type BaseNpmDevice = {
     isSupportedVersion: () => Promise<boolean>;
     getSupportedVersion: () => string;
 
-    registerCommandCallbackLoggerWrapper: (
-        command: string,
-        onSuccess: (data: string, command: string) => void,
-        onError: (error: string, command: string) => void
-    ) => (() => void) | undefined;
-
     getUptimeOverflowCounter: () => number;
     setUptimeOverflowCounter: (value: number) => void;
 };
