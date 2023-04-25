@@ -27,16 +27,17 @@ export default ({ disabled }: DashboardControlCardProps) => {
         <MasonryLayout minWidth={300}>
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
-            {chargers.map((charger, index) => (
-                <PowerCard
-                    npmDevice={npmDevice}
-                    charger={charger}
-                    key={`Charger${1 + index}`}
-                    index={index}
-                    cardLabel="Charger"
-                    disabled={disabled}
-                />
-            ))}
+            {npmDevice &&
+                chargers.map((charger, index) => (
+                    <PowerCard
+                        npmDevice={npmDevice}
+                        charger={charger}
+                        key={`Charger${1 + index}`}
+                        index={index}
+                        cardLabel="Charger"
+                        disabled={disabled}
+                    />
+                ))}
         </MasonryLayout>
     );
 };

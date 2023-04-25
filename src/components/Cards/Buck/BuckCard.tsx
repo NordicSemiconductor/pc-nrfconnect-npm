@@ -28,11 +28,10 @@ import {
     GPIOValues,
     NpmDevice,
 } from '../../../features/pmicControl/npm/types';
-import { RangeType } from '../../../utils/helpers';
 
 interface BuckCardProperties {
     index: number;
-    npmDevice?: NpmDevice;
+    npmDevice: NpmDevice;
     buck?: Buck;
     cardLabel?: string;
     defaultSummary?: boolean;
@@ -49,22 +48,20 @@ export default ({
 }: BuckCardProperties) => {
     const [summary, setSummary] = useState(defaultSummary);
 
-    const onVOutChange = (value: number) =>
-        npmDevice?.setBuckVOut(index, value);
+    const onVOutChange = (value: number) => npmDevice.setBuckVOut(index, value);
 
     const onRetVOutChange = (value: number) => {
-        npmDevice?.setBuckRetentionVOut(index, value);
+        npmDevice.setBuckRetentionVOut(index, value);
     };
 
-    const onModeToggle = (mode: BuckMode) =>
-        npmDevice?.setBuckMode(index, mode);
+    const onModeToggle = (mode: BuckMode) => npmDevice.setBuckMode(index, mode);
 
     const onBuckToggle = (value: boolean) =>
-        npmDevice?.setBuckEnabled(index, value);
+        npmDevice.setBuckEnabled(index, value);
 
-    const voltageRange = npmDevice?.getBuckVoltageRange(index);
-    const retVOutRange = npmDevice?.getBuckRetVOutRange(index);
-    const numberOfGPIOs = npmDevice?.getNumberOfGPIOs() ?? 0;
+    const voltageRange = npmDevice.getBuckVoltageRange(index);
+    const retVOutRange = npmDevice.getBuckRetVOutRange(index);
+    const numberOfGPIOs = npmDevice.getNumberOfGPIOs() ?? 0;
 
     const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
 
@@ -149,7 +146,7 @@ export default ({
                     <div className="flex-row">
                         <NumberInlineInput
                             value={internalVOut}
-                            range={voltageRange as RangeType}
+                            range={voltageRange}
                             onChange={value => setInternalVOut(value)}
                             onChangeComplete={() => onVOutChange(internalVOut)}
                             disabled={disabled}
@@ -161,7 +158,7 @@ export default ({
                     values={[internalVOut]}
                     onChange={[value => setInternalVOut(value)]}
                     onChangeComplete={() => onVOutChange(internalVOut)}
-                    range={voltageRange as RangeType}
+                    range={voltageRange}
                     disabled={disabled}
                 />
             </div>
@@ -171,7 +168,7 @@ export default ({
                         label="Buck Mode Control"
                         items={modeControlItems}
                         onSelect={item =>
-                            npmDevice?.setBuckModeControl(
+                            npmDevice.setBuckModeControl(
                                 index,
                                 item.value as BuckModeControl
                             )
@@ -192,7 +189,7 @@ export default ({
                         label="On/Off Control"
                         items={buckOnOffControlItems}
                         onSelect={item => {
-                            npmDevice?.setBuckOnOffControl(
+                            npmDevice.setBuckOnOffControl(
                                 index,
                                 item.value as BuckOnOffControl
                             );
@@ -213,7 +210,7 @@ export default ({
                         label="Retention control"
                         items={buckRetentionControlItems}
                         onSelect={item =>
-                            npmDevice?.setBuckRetentionControl(
+                            npmDevice.setBuckRetentionControl(
                                 index,
                                 item.value as BuckRetentionControl
                             )
@@ -244,7 +241,7 @@ export default ({
                             <div className="flex-row">
                                 <NumberInlineInput
                                     value={internalRetVOut}
-                                    range={retVOutRange as RangeType}
+                                    range={retVOutRange}
                                     onChange={value =>
                                         setInternalRetVOut(value)
                                     }
@@ -262,7 +259,7 @@ export default ({
                             onChangeComplete={() =>
                                 onRetVOutChange(internalRetVOut)
                             }
-                            range={retVOutRange as RangeType}
+                            range={retVOutRange}
                             disabled={disabled}
                         />
                     </div>

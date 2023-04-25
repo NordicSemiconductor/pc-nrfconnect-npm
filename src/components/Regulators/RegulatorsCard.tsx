@@ -26,24 +26,26 @@ export default ({ disabled }: DashboardControlCardProps) => {
 
     return (
         <MasonryLayout minWidth={300}>
-            {bucks.map((buck, index) => (
-                <BuckCard
-                    buck={buck}
-                    npmDevice={npmDevice}
-                    key={`Buck${1 + index}`}
-                    index={index}
-                    disabled={disabled}
-                />
-            ))}
-            {ldos.map((ldo, index) => (
-                <LDOCard
-                    ldo={ldo}
-                    npmDevice={npmDevice}
-                    key={`Buck${1 + index}`}
-                    index={index}
-                    disabled={disabled}
-                />
-            ))}
+            {npmDevice &&
+                bucks.map((buck, index) => (
+                    <BuckCard
+                        buck={buck}
+                        npmDevice={npmDevice}
+                        key={`Buck${1 + index}`}
+                        index={index}
+                        disabled={disabled}
+                    />
+                ))}
+            {npmDevice &&
+                ldos.map((ldo, index) => (
+                    <LDOCard
+                        ldo={ldo}
+                        npmDevice={npmDevice}
+                        key={`Buck${1 + index}`}
+                        index={index}
+                        disabled={disabled}
+                    />
+                ))}
         </MasonryLayout>
     );
 };
