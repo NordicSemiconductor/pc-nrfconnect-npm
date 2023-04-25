@@ -619,7 +619,7 @@ describe('PMIC 1300', () => {
                         _unique?: boolean
                     ) => {
                         if (onSuccess)
-                            onSuccess('app_version=0.0.0+12', command);
+                            onSuccess('app_version=0.0.0+14', command);
                         return Promise.resolve();
                     }
                 );
@@ -2422,7 +2422,7 @@ describe('PMIC 1300', () => {
                     },
                 ],
                 fuelGauge: true,
-                firmwareVersion: '0.0.0+12',
+                firmwareVersion: '0.0.0+14',
                 deviceType: 'npm1300',
             });
             verifyApplyConfig();
