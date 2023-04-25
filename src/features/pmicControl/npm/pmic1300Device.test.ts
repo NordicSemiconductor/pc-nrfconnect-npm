@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '../../../hooks/commandParser';
+import { ICallbacks, ShellParser } from '../../../hooks/commandParser';
 import { getNPM1300 } from './pmic1300Device';
 import {
     BatteryModel,
@@ -29,27 +29,24 @@ jest.setSystemTime(systemTime);
 const helpers = {
     registerCommandCallbackError: (
         _command: string,
-        _onSuccess?: (response: string, command: string) => void,
-        onError?: (message: string, command: string) => void,
+        callbacks?: ICallbacks,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _onTimeout?: (message: string, command: string) => void,
+        _timeout?: number,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _unique?: boolean
     ) => {
-        if (onError) onError('', '');
+        callbacks?.onError('', '');
         return Promise.resolve();
     },
     registerCommandCallbackSuccess: (
         _command: string,
-        onSuccess?: (response: string, command: string) => void,
+        callbacks?: ICallbacks,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _onError?: (message: string, command: string) => void,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _onTimeout?: (message: string, command: string) => void,
+        _timeout?: number,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _unique?: boolean
     ) => {
-        if (onSuccess) onSuccess('', '');
+        callbacks?.onSuccess('', '');
         return Promise.resolve();
     },
 };
@@ -181,11 +178,9 @@ const setupMocksWithShellParser = () => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             _command: string,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            _onSuccess?: (response: string, command: string) => void,
+            _callbacks?: ICallbacks,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            _onError?: (message: string, command: string) => void,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            _onTimeout?: (message: string, command: string) => void,
+            _timeout?: number,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             _unique?: boolean
         ) => Promise.resolve()
@@ -226,16 +221,14 @@ const setupMocksWithShellParser = () => {
     mockEnqueueRequest.mockImplementationOnce(
         (
             command: string,
-            onSuccess?: (response: string, command: string) => void,
+            callbacks?: ICallbacks,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            _onError?: (message: string, command: string) => void,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            _onTimeout?: (message: string, command: string) => void,
+            _timeout?: number,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             _unique?: boolean
         ) => {
             expect(command).toBe('kernel uptime');
-            if (onSuccess) onSuccess('Uptime: 0 ms', command);
+            callbacks?.onSuccess('Uptime: 0 ms', command);
             return Promise.resolve();
         }
     );
@@ -281,8 +274,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         'npmx charger status get',
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -297,8 +289,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         'npmx charger termination_voltage normal get',
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -313,8 +304,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         'npmx charger charger_current get',
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -329,8 +319,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         'npmx charger module charger get',
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -372,8 +361,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         `npmx buck voltage get ${index}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -397,8 +385,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         `npmx buck vout select get ${index}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -458,8 +445,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         `npmx ldsw get ${index}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -481,8 +467,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `fuel_gauge get`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -494,8 +479,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `fuel_gauge model get`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -507,8 +491,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `fuel_gauge model list`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -517,25 +500,22 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         _command: string,
-                        onSuccess?: (response: string, command: string) => void,
+                        callbacks?: ICallbacks,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        _onError?: (message: string, command: string) => void,
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        _onTimeout?: (message: string, command: string) => void,
+                        _timeout?: number,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        if (onSuccess)
-                            onSuccess(
-                                `Currently active battery model:
+                        callbacks?.onSuccess(
+                            `Currently active battery model:
                             name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
                     Default battery models:
                             name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
                             name="LP502540",T={25.00 C},Q={563.08 mAh}
                     Battery model stored in database:
                             name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}`,
-                                'fuel_gauge model list'
-                            );
+                            'fuel_gauge model list'
+                        );
                         return Promise.resolve();
                     }
                 );
@@ -575,8 +555,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `fuel_gauge model list`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -588,8 +567,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     'npm_adc sample 1000 2000',
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -601,8 +579,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     'npm_adc sample 1000 0',
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -611,15 +588,13 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         command: string,
-                        onSuccess?: (response: string, command: string) => void,
+                        callbacks?: ICallbacks,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        _onError?: (message: string, command: string) => void,
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        _onTimeout?: (message: string, command: string) => void,
+                        _timeout?: number,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        if (onSuccess) onSuccess('Uptime: 2945165 ms', command);
+                        callbacks?.onSuccess('Uptime: 2945165 ms', command);
                         return Promise.resolve();
                     }
                 );
@@ -630,8 +605,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     'kernel uptime',
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -640,16 +614,13 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         command: string,
-                        onSuccess?: (response: string, command: string) => void,
+                        callbacks?: ICallbacks,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        _onError?: (message: string, command: string) => void,
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        _onTimeout?: (message: string, command: string) => void,
+                        _timeout?: number,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        if (onSuccess)
-                            onSuccess('app_version=0.0.0+14', command);
+                        callbacks?.onSuccess('app_version=0.0.0+14', command);
                         return Promise.resolve();
                     }
                 );
@@ -660,8 +631,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     'app_version',
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -670,16 +640,13 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         command: string,
-                        onSuccess?: (response: string, command: string) => void,
+                        callbacks?: ICallbacks,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        _onError?: (message: string, command: string) => void,
-                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        _onTimeout?: (message: string, command: string) => void,
+                        _timeout?: number,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        if (onSuccess)
-                            onSuccess('app_version=0.0.0+9', command);
+                        callbacks?.onSuccess('app_version=0.0.0+9', command);
                         return Promise.resolve();
                     }
                 );
@@ -690,8 +657,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     'app_version',
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
             });
@@ -722,16 +688,14 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx charger module charger set 0`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
                         `npmx charger termination_voltage normal set 3200`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -754,16 +718,14 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx charger module charger set 0`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
                         `npmx charger charger_current set 32`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -843,8 +805,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `npmx charger module charger set ${enabled ? '1' : '0'}`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -862,8 +823,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx buck voltage set ${index} 1800`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -872,8 +832,7 @@ describe('PMIC 1300', () => {
                         2,
                         `npmx buck vout select set ${index} 1`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -897,8 +856,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `npmx buck voltage get 0`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -921,8 +879,7 @@ describe('PMIC 1300', () => {
                     1,
                     `npmx buck voltage set 0 1700`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -931,8 +888,7 @@ describe('PMIC 1300', () => {
                     2,
                     `npmx buck vout select set 0 1`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -955,8 +911,7 @@ describe('PMIC 1300', () => {
                     1,
                     `npmx buck voltage set 0 1700`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -965,8 +920,7 @@ describe('PMIC 1300', () => {
                     2,
                     `npmx buck vout select set 0 1`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -999,8 +953,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx buck vout select set ${index} 0`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1009,8 +962,7 @@ describe('PMIC 1300', () => {
                         2,
                         `npmx buck voltage get ${index}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1034,8 +986,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `npmx buck voltage get 0`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1059,8 +1010,7 @@ describe('PMIC 1300', () => {
                     1,
                     `npmx buck vout select set 0 1`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1069,8 +1019,7 @@ describe('PMIC 1300', () => {
                     2,
                     `npmx buck voltage get 0`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1094,8 +1043,7 @@ describe('PMIC 1300', () => {
                     1,
                     `npmx buck vout select set 0 1`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1104,8 +1052,7 @@ describe('PMIC 1300', () => {
                     2,
                     `npmx buck voltage get 0`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1172,8 +1119,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx buck set ${index} 1`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1216,8 +1162,7 @@ describe('PMIC 1300', () => {
                     1,
                     `npmx buck set 0 0`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1242,8 +1187,7 @@ describe('PMIC 1300', () => {
                     1,
                     `npmx buck set 0 0`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1281,8 +1225,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `npmx ldsw set ${index} ${enabled ? '1' : '0'}`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1308,8 +1251,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         `fuel_gauge set ${enabled ? '1' : '0'}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1325,8 +1267,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `fuel_gauge model set someProfileName`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1343,8 +1284,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         `npm_chg_status_check set ${enabled ? '1' : '0'}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -1357,8 +1297,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     'fuel_gauge model store',
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1393,8 +1332,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx charger module charger set 0`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1403,16 +1341,14 @@ describe('PMIC 1300', () => {
                         2,
                         `npmx charger module charger get`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         3,
                         `npmx charger termination_voltage normal get`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -1441,16 +1377,14 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx charger module charger set 0`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
                         `npmx charger termination_voltage normal set 3200`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1459,8 +1393,7 @@ describe('PMIC 1300', () => {
                         3,
                         `npmx charger termination_voltage normal get`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -1484,8 +1417,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx charger module charger set 0`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1494,16 +1426,14 @@ describe('PMIC 1300', () => {
                         2,
                         `npmx charger module charger get`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         3,
                         `npmx charger charger_current get`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -1532,16 +1462,14 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx charger module charger set 0`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
                         `npmx charger charger_current set 32`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1550,8 +1478,7 @@ describe('PMIC 1300', () => {
                         3,
                         `npmx charger charger_current get`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
                 }
@@ -1642,8 +1569,7 @@ describe('PMIC 1300', () => {
                             enabled ? '1' : '0'
                         }`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1652,8 +1578,7 @@ describe('PMIC 1300', () => {
                         2,
                         'npmx charger module charger get',
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1674,8 +1599,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx buck voltage set ${index} 1800`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1684,8 +1608,7 @@ describe('PMIC 1300', () => {
                         2,
                         `npmx buck voltage get ${index}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1710,8 +1633,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx buck voltage set ${index} 1800`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1720,8 +1642,7 @@ describe('PMIC 1300', () => {
                         2,
                         `npmx buck vout select set ${index} 1`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1730,8 +1651,7 @@ describe('PMIC 1300', () => {
                         3,
                         `npmx buck vout select get ${index}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1769,8 +1689,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx buck vout select set ${index} 0`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1779,8 +1698,7 @@ describe('PMIC 1300', () => {
                         2,
                         `npmx buck vout select get ${index}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1856,8 +1774,7 @@ describe('PMIC 1300', () => {
                         1,
                         `npmx buck set ${index} 1`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1867,7 +1784,7 @@ describe('PMIC 1300', () => {
                     //     2,
                     //     `npmx buck get ${index}`,
                     //     expect.anything(),
-                    //     expect.anything(),
+                    //     undefined,
                     //     true
                     // );
 
@@ -1912,8 +1829,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         `npmx ldsw set ${index} ${enabled ? '1' : '0'}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1922,8 +1838,7 @@ describe('PMIC 1300', () => {
                         2,
                         `npmx ldsw get ${index}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1954,8 +1869,7 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledWith(
                         `fuel_gauge set ${enabled ? '1' : '0'}`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1964,8 +1878,7 @@ describe('PMIC 1300', () => {
                         2,
                         `fuel_gauge get`,
                         expect.anything(),
-                        expect.anything(),
-                        expect.anything(),
+                        undefined,
                         true
                     );
 
@@ -1983,8 +1896,7 @@ describe('PMIC 1300', () => {
                 expect(mockEnqueueRequest).toBeCalledWith(
                     `fuel_gauge model set someProfileName`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -1993,8 +1905,7 @@ describe('PMIC 1300', () => {
                     2,
                     `fuel_gauge model get`,
                     expect.anything(),
-                    expect.anything(),
-                    expect.anything(),
+                    undefined,
                     true
                 );
 
@@ -2918,16 +2829,14 @@ describe('PMIC 1300', () => {
                 1,
                 'fuel_gauge model list',
                 expect.anything(),
-                expect.anything(),
-                expect.anything(),
+                undefined,
                 true
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
                 'fuel_gauge model get',
                 expect.anything(),
-                expect.anything(),
-                expect.anything(),
+                undefined,
                 true
             );
         });
@@ -3328,8 +3237,7 @@ describe('PMIC 1300', () => {
             expect(mockEnqueueRequest).toBeCalledWith(
                 `delayed_reboot 100`,
                 expect.anything(),
-                expect.anything(),
-                expect.anything(),
+                undefined,
                 true
             );
         });

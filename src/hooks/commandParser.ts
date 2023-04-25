@@ -8,7 +8,7 @@ import EventEmitter from 'events';
 import { SerialPort } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
-interface ICallbacks {
+export interface ICallbacks {
     onSuccess: (response: string, command: string) => void;
     onError: (message: string, command: string) => void;
     onTimeout?: (message: string, command: string) => void;
@@ -26,6 +26,7 @@ type CommandEnqueue = {
     callbacks: ICallbacks[];
     sent: boolean;
     sentTime: number;
+    timeout?: number;
 };
 
 export type ShellParser = Awaited<ReturnType<typeof hookModemToShellParser>>;
@@ -126,7 +127,7 @@ export const hookModemToShellParser = async (
 
                     commandQueue.shift();
                     sendCommands();
-                }, settings.timeout);
+                }, command.timeout ?? settings.timeout);
                 command.callbacks.push({
                     onSuccess: () => clearTimeout(t),
                     onError: () => clearTimeout(t),
@@ -387,9 +388,8 @@ export const hookModemToShellParser = async (
         },
         enqueueRequest: async (
             command: string,
-            onSuccess: (response: string, command: string) => void = () => {},
-            onError: (message: string, command: string) => void = () => {},
-            onTimeout: (message: string, command: string) => void = () => {},
+            callbacks?: ICallbacks,
+            timeout?: number,
             unique = false
         ) => {
             command = command.trim();
@@ -399,11 +399,20 @@ export const hookModemToShellParser = async (
                     item => item.command === command
                 );
                 if (existingCommand) {
-                    existingCommand.callbacks.push({
-                        onSuccess,
-                        onError,
-                        onTimeout,
-                    });
+                    if (callbacks) existingCommand.callbacks.push(callbacks);
+
+                    if (timeout !== undefined && existingCommand.sent) {
+                        console.warn(
+                            `Timeout of ${timeout} for command ${command} has been ignored as command 
+                            has already been sent. Timeout of ${existingCommand.timeout} was used.`
+                        );
+                    } else if (timeout !== undefined) {
+                        console.warn(
+                            `Timeout for command ${command} has been updated to ${timeout}`
+                        );
+                        existingCommand.timeout = timeout;
+                    }
+
                     // init sending of commands
                     await initDataSend();
                     return;
@@ -412,15 +421,10 @@ export const hookModemToShellParser = async (
 
             commandQueue.push({
                 command,
-                callbacks: [
-                    {
-                        onSuccess,
-                        onError,
-                        onTimeout,
-                    },
-                ],
+                callbacks: callbacks ? [callbacks] : [],
                 sent: false,
                 sentTime: -1,
+                timeout,
             });
 
             // init sending of commands

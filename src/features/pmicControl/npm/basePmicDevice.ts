@@ -42,11 +42,14 @@ export const baseNpmDevice: IBaseNpmDevice = (
         new Promise<number>((resolve, reject) => {
             shellParser?.enqueueRequest(
                 'kernel uptime',
-                res => {
-                    resolve(parseToNumber(res));
+                {
+                    onSuccess: res => {
+                        resolve(parseToNumber(res));
+                    },
+                    onError: reject,
+                    onTimeout: console.warn,
                 },
-                reject,
-                console.warn,
+                undefined,
                 true
             );
         });
@@ -58,11 +61,14 @@ export const baseNpmDevice: IBaseNpmDevice = (
         eventEmitter.emit('onBeforeReboot', 100);
         shellParser.enqueueRequest(
             'delayed_reboot 100',
-            () => {},
-            () => {
-                rebooting = false;
+            {
+                onSuccess: () => {},
+                onError: () => {
+                    rebooting = false;
+                },
+                onTimeout: console.warn,
             },
-            console.warn,
+            undefined,
             true
         );
     };
@@ -224,11 +230,16 @@ export const baseNpmDevice: IBaseNpmDevice = (
             new Promise<boolean>((resolve, reject) => {
                 shellParser?.enqueueRequest(
                     'app_version',
-                    result => {
-                        resolve(`app_version=${supportsVersion}` === result);
+                    {
+                        onSuccess: result => {
+                            resolve(
+                                `app_version=${supportsVersion}` === result
+                            );
+                        },
+                        onError: reject,
+                        onTimeout: console.warn,
                     },
-                    reject,
-                    console.warn,
+                    undefined,
                     true
                 );
             }),

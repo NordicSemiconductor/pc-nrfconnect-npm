@@ -43,39 +43,33 @@ export const BatteryProfiler: IBatteryProfiler = (
                             profile.iRest
                         }${profile.vCutoff ? `,${profile.vCutoff}` : ''}`
                 )}`,
-                () => {
-                    resolve();
-                },
-                () => {
-                    reject();
+                {
+                    onSuccess: () => {
+                        resolve();
+                    },
+                    onError: reject,
                 }
             );
         });
 
     const startProfiling = () =>
         new Promise<void>((resolve, reject) => {
-            shellParser?.enqueueRequest(
-                'cc_profile start',
-                () => {
+            shellParser?.enqueueRequest('cc_profile start', {
+                onSuccess: () => {
                     resolve();
                 },
-                () => {
-                    reject();
-                }
-            );
+                onError: reject,
+            });
         });
 
     const stopProfiling = () =>
         new Promise<void>((resolve, reject) => {
-            shellParser?.enqueueRequest(
-                'cc_profile stop',
-                () => {
+            shellParser?.enqueueRequest('cc_profile stop', {
+                onSuccess: () => {
                     resolve();
                 },
-                () => {
-                    reject();
-                }
-            );
+                onError: reject,
+            });
         });
 
     const isProfiling = () =>

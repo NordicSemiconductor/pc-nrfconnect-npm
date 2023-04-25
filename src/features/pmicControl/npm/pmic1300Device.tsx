@@ -522,19 +522,18 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const sendCommand = (
         command: string,
         onSuccess: (response: string, command: string) => void = noop,
-        onFail: (response: string, command: string) => void = noop,
+        onError: (response: string, command: string) => void = noop,
         unique = true
     ) => {
         if (pmicState !== 'ek-disconnected') {
             shellParser?.enqueueRequest(
                 command,
-                onSuccess,
-                onFail,
-                console.warn,
+                { onSuccess, onError, onTimeout: console.warn },
+                undefined,
                 unique
             );
         } else {
-            onFail('No Shell connection', command);
+            onError('No Shell connection', command);
         }
     };
 
@@ -1228,15 +1227,18 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             new Promise<BatteryModel[]>((resolve, reject) => {
                 shellParser?.enqueueRequest(
                     'fuel_gauge model list',
-                    result => {
-                        const models = result.split(':');
-                        if (models.length < 3) reject();
-                        const stringModels = models[2].trim().split('\n');
-                        const list = stringModels.map(parseBatteryModel);
-                        resolve(list.filter(item => item.name !== ''));
+                    {
+                        onSuccess: result => {
+                            const models = result.split(':');
+                            if (models.length < 3) reject();
+                            const stringModels = models[2].trim().split('\n');
+                            const list = stringModels.map(parseBatteryModel);
+                            resolve(list.filter(item => item.name !== ''));
+                        },
+                        onError: reject,
+                        onTimeout: console.warn,
                     },
-                    reject,
-                    console.warn,
+                    undefined,
                     true
                 );
             }),
