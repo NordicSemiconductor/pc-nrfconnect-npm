@@ -4,17 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import EventEmitter from 'events';
-import { getPersistentStore, logger } from 'pc-nrfconnect-shared';
+import { getPersistentStore } from 'pc-nrfconnect-shared';
 import { v4 as uuid } from 'uuid';
 
-import { ShellParser } from '../../../hooks/commandParser';
 import { TDispatch } from '../../../thunk';
 import { dequeueDialog, requestDialog } from '../pmicControlSlice';
 import {
     BatteryModel,
     BatteryModelCharacterization,
-    LoggingEvent,
     PmicDialog,
 } from './types';
 
@@ -141,45 +138,6 @@ export const dialogHandler =
 
         dispatch(requestDialog(pmicDialog));
     };
-
-export const registerCommandCallbackLoggerWrapper = (
-    command: string,
-    onSuccess: (data: string, command: string) => void,
-    onError: (error: string, command: string) => void,
-    eventEmitter: EventEmitter,
-    shellParser: ShellParser
-) => {
-    const loggerWrapper = (
-        cmd: string,
-        error: boolean,
-        result: string,
-        action: () => void
-    ) => {
-        const event: LoggingEvent = {
-            timestamp: Date.now(),
-            module: 'shell_commands',
-            logLevel: error ? 'err' : 'inf',
-            message: `command: "${cmd}" response: "${result}"`,
-        };
-
-        eventEmitter.emit('onLoggingEvent', {
-            loggingEvent: event,
-            dataPair: false,
-        });
-
-        if (action) action();
-    };
-
-    return shellParser.registerCommandCallback(
-        command,
-        (response, cmd) =>
-            loggerWrapper(cmd, false, response, () => onSuccess(response, cmd)),
-        (error, cmd) => {
-            logger.error(error);
-            loggerWrapper(cmd, true, error, () => onError(error, cmd));
-        }
-    );
-};
 
 export const MAX_TIMESTAMP = 359999999; // 99hrs 59min 59sec 999ms
 export const DOWNLOAD_BATTERY_PROFILE_DIALOG_ID = 'downloadBatteryProfile';

@@ -7,35 +7,27 @@
 import EventEmitter from 'events';
 
 import { ShellParser } from '../../../hooks/commandParser';
-import {
-    noop,
-    registerCommandCallbackLoggerWrapper,
-    toRegex,
-} from './pmicHelpers';
+import { noop, toRegex } from './pmicHelpers';
 import { IBatteryProfiler, Profile } from './types';
 
 export const BatteryProfiler: IBatteryProfiler = (
     shellParser: ShellParser,
     eventEmitter: EventEmitter
 ) => {
-    registerCommandCallbackLoggerWrapper(
+    shellParser?.registerCommandCallback(
         toRegex('cc_profile start'),
         () => {
             eventEmitter.emit('onProfilingStateChange', true);
         },
-        noop,
-        eventEmitter,
-        shellParser
+        noop
     );
 
-    registerCommandCallbackLoggerWrapper(
+    shellParser?.registerCommandCallback(
         toRegex('cc_profile stop'),
         () => {
             eventEmitter.emit('onProfilingStateChange', false);
         },
-        noop,
-        eventEmitter,
-        shellParser
+        noop
     );
 
     const setProfile = (

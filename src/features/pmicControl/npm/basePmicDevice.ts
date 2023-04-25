@@ -7,12 +7,7 @@
 import EventEmitter from 'events';
 
 import { ShellParser } from '../../../hooks/commandParser';
-import {
-    MAX_TIMESTAMP,
-    parseToNumber,
-    registerCommandCallbackLoggerWrapper,
-    toRegex,
-} from './pmicHelpers';
+import { MAX_TIMESTAMP, parseToNumber, toRegex } from './pmicHelpers';
 import {
     AdcSample,
     BatteryModel,
@@ -40,6 +35,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
     supportsVersion: string
 ) => {
     let rebooting = false;
+    let deviceUptimeToSystemDelta = 0;
     let uptimeOverflowCounter = 0;
 
     const getKernelUptime = () =>
@@ -73,25 +69,36 @@ export const baseNpmDevice: IBaseNpmDevice = (
 
     const updateUptimeOverflowCounter = () => {
         getKernelUptime().then(milliseconds => {
+            deviceUptimeToSystemDelta = Date.now() - milliseconds;
             uptimeOverflowCounter = Math.floor(milliseconds / MAX_TIMESTAMP);
         });
     };
 
-    if (shellParser) {
-        registerCommandCallbackLoggerWrapper(
-            toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
-            () => {
-                rebooting = true;
-                eventEmitter.emit('onReboot', true);
-            },
-            error => {
-                rebooting = false;
-                eventEmitter.emit('onReboot', false, error);
-            },
-            eventEmitter,
-            shellParser
-        );
-    }
+    shellParser?.registerCommandCallback(
+        toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
+        () => {
+            rebooting = true;
+            eventEmitter.emit('onReboot', true);
+        },
+        error => {
+            rebooting = false;
+            eventEmitter.emit('onReboot', false, error);
+        }
+    );
+
+    shellParser?.onAnyCommandResponse(({ command, response, error }) => {
+        const event: LoggingEvent = {
+            timestamp: Date.now() - deviceUptimeToSystemDelta,
+            module: 'shell_commands',
+            logLevel: error ? 'err' : 'inf',
+            message: `command: "${command}" response: "${response}"`,
+        };
+
+        eventEmitter.emit('onLoggingEvent', {
+            loggingEvent: event,
+            dataPair: false,
+        });
+    });
 
     updateUptimeOverflowCounter();
 
@@ -226,8 +233,6 @@ export const baseNpmDevice: IBaseNpmDevice = (
                 );
             }),
         getSupportedVersion: () => supportsVersion,
-
-        registerCommandCallbackLoggerWrapper,
 
         getUptimeOverflowCounter: () => uptimeOverflowCounter,
         setUptimeOverflowCounter: (value: number) => {

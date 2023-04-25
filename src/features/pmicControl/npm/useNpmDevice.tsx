@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, existsSync } from 'fs';
 import {
@@ -50,8 +50,6 @@ import {
 import { Buck, Charger, Ldo, PmicDialog } from './types';
 
 export default () => {
-    const [deviceUptimeToSystemDelta, setDeviceUptimeToSystemDelta] =
-        useState(0);
     const shellParser = useSelector(getShellParser);
     const npmDevice = useSelector(getNpmDeviceSlice);
     const dispatch = useDispatch();
@@ -94,9 +92,6 @@ export default () => {
         npmDevice.requestUpdate.fuelGauge();
         npmDevice.requestUpdate.activeBatteryModel();
         npmDevice.requestUpdate.storedBatteryModel();
-        npmDevice.getKernelUptime().then(milliseconds => {
-            setDeviceUptimeToSystemDelta(Date.now() - milliseconds);
-        });
 
         npmDevice.getDefaultBatteryModels().then(models => {
             dispatch(setDefaultBatterModels(models));
@@ -439,9 +434,7 @@ export default () => {
                             .map(p => p.split('=')[0])
                             .join(','))}\r\n`;
                     }
-                    data += `${
-                        e.loggingEvent.timestamp - deviceUptimeToSystemDelta
-                    },${valuePairs
+                    data += `${e.loggingEvent.timestamp},${valuePairs
                         .map(p => p.split('=')[1] ?? 'NaN')
                         .join(',')}\r\n`;
                     appendFile(path, data, () => {});
@@ -455,5 +448,5 @@ export default () => {
             }
         });
         return () => releaseOnLoggingEvent();
-    }, [deviceUptimeToSystemDelta, npmDevice, recordEvents, recordEventsPath]);
+    }, [npmDevice, recordEvents, recordEventsPath]);
 };

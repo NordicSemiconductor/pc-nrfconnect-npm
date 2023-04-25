@@ -75,6 +75,7 @@ const setupMocks = () => {
     const mockUpdate = jest.fn(() => '');
     const mockSet = jest.fn(() => '');
 
+    const mockOnAnyCommandResponse = jest.fn(() => '');
     const mockOnShellLogging = jest.fn(() => '');
     const mockOnUnknown = jest.fn(() => '');
 
@@ -137,6 +138,7 @@ const setupMocks = () => {
         mockModem,
         mockOnError,
         mockOnResponse: mockOnData,
+        mockOnAnyCommandResponse,
         mockOnShellLogging,
         mockOnSuccess,
         mockOnUnknown,
@@ -152,6 +154,7 @@ const {
     mockIsOpen,
     mockModem,
     mockOnError,
+    mockOnAnyCommandResponse,
     mockOnShellLogging,
     mockOnSuccess,
     mockOnUnknown,
@@ -579,6 +582,52 @@ describe('shell command parser', () => {
         expect(mockOnError).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
         expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify onAnyCommand is called with success when we have a response', async () => {
+        const shellParser = await hookModemToShellParser(
+            mockModem(),
+            mockTerminal(),
+            settings
+        );
+
+        shellParser.onAnyCommandResponse(mockOnAnyCommandResponse);
+
+        await shellParser.enqueueRequest('Test Command');
+
+        onResponseCallback(
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
+        );
+
+        expect(mockOnAnyCommandResponse).toBeCalledTimes(1);
+        expect(mockOnAnyCommandResponse).toBeCalledWith({
+            response: 'Response Value',
+            command: 'Test Command',
+            error: false,
+        });
+    });
+
+    test('Verify onAnyCommand is called with error when we have a response', async () => {
+        const shellParser = await hookModemToShellParser(
+            mockModem(),
+            mockTerminal(),
+            settings
+        );
+
+        shellParser.onAnyCommandResponse(mockOnAnyCommandResponse);
+
+        await shellParser.enqueueRequest('Test Command');
+
+        onResponseCallback(
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
+        );
+
+        expect(mockOnAnyCommandResponse).toBeCalledTimes(1);
+        expect(mockOnAnyCommandResponse).toBeCalledWith({
+            response: 'Response Value',
+            command: 'Test Command',
+            error: false,
+        });
     });
 
     test('Verify permanent onFail callback is called when we have a response in one stream', async () => {

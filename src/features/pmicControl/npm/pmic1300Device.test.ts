@@ -122,6 +122,16 @@ type CommandCallback = {
     onError: (error: string, command: string) => void;
 };
 
+type AnyCommandHandler = ({
+    command,
+    response,
+    error,
+}: {
+    command: string;
+    response: string;
+    error: boolean;
+}) => void;
+
 const setupMocksWithShellParser = () => {
     const mockOnPausedChange = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,6 +142,7 @@ const setupMocksWithShellParser = () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         mockOnShellLoggingEventHandler: (_state: string) => {},
         mockRegisterCommandCallbackHandlers: [] as CommandCallback[],
+        mockAnyCommandResponseHandlers: [] as AnyCommandHandler[],
         mockRegisterCommandCallbackHandler: (command: string) =>
             eventHandlers.mockRegisterCommandCallbackHandlers.find(element =>
                 command.match(`^(${element.command})`)
@@ -144,10 +155,27 @@ const setupMocksWithShellParser = () => {
             return () => {};
         }
     );
+    const mockOnAnyCommandResponse = jest.fn(
+        (
+            handler: ({
+                command,
+                response,
+                error,
+            }: {
+                command: string;
+                response: string;
+                error: boolean;
+            }) => void
+        ) => {
+            eventHandlers.mockAnyCommandResponseHandlers.push(handler);
+            return () => {};
+        }
+    );
     const mockOnUnknownCommand = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_handler: (state: string) => void) => () => {}
     );
+
     const mockEnqueueRequest = jest.fn(
         (
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -176,6 +204,7 @@ const setupMocksWithShellParser = () => {
             return () => {};
         }
     );
+
     const mockUnregister = jest.fn(() => {});
     const mockIsPause = jest.fn(() => false);
     const mockUnPause = jest.fn(() => {});
@@ -184,6 +213,7 @@ const setupMocksWithShellParser = () => {
     const mockShellParser = jest.fn<ShellParser, []>(() => ({
         onPausedChange: mockOnPausedChange,
         onShellLoggingEvent: mockOnShellLoggingEvent,
+        onAnyCommandResponse: mockOnAnyCommandResponse,
         onUnknownCommand: mockOnUnknownCommand,
         enqueueRequest: mockEnqueueRequest,
         registerCommandCallback: mockRegisterCommandCallback,
@@ -2606,21 +2636,9 @@ describe('PMIC 1300', () => {
         });
     });
 
-    describe('Command callbacks', () => {
-        const {
-            eventHandlers,
-            mockOnChargerUpdate,
-            mockOnChargingStatusUpdate,
-            mockOnFuelGaugeUpdate,
-            mockOnActiveBatteryModelUpdate,
-            mockEnqueueRequest,
-            mockOnStoredBatteryModelUpdate,
-            mockOnUsbPowered,
-            mockOnBuckUpdate,
-            mockOnLdoUpdate,
-            mockOnReboot,
-            mockOnLoggingEvent,
-        } = setupMocksWithShellParser();
+    describe('Logging Event on any command callback', () => {
+        const { eventHandlers, mockOnLoggingEvent } =
+            setupMocksWithShellParser();
 
         beforeEach(() => {
             jest.clearAllMocks();
@@ -2643,6 +2661,50 @@ describe('PMIC 1300', () => {
             });
         };
 
+        test('Any Command callback error type', () => {
+            eventHandlers.mockAnyCommandResponseHandlers.forEach(handler =>
+                handler({
+                    command: 'command',
+                    response: 'response',
+                    error: true,
+                })
+            );
+
+            verifyLogging('err', 'command', 'response');
+        });
+
+        test('Any Command callback error type', () => {
+            eventHandlers.mockAnyCommandResponseHandlers.forEach(handler =>
+                handler({
+                    command: 'command',
+                    response: 'response',
+                    error: false,
+                })
+            );
+
+            verifyLogging('inf', 'command', 'response');
+        });
+    });
+
+    describe('Command callbacks', () => {
+        const {
+            eventHandlers,
+            mockOnChargerUpdate,
+            mockOnChargingStatusUpdate,
+            mockOnFuelGaugeUpdate,
+            mockOnActiveBatteryModelUpdate,
+            mockEnqueueRequest,
+            mockOnStoredBatteryModelUpdate,
+            mockOnUsbPowered,
+            mockOnBuckUpdate,
+            mockOnLdoUpdate,
+            mockOnReboot,
+        } = setupMocksWithShellParser();
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+
         test('kernel reboot - success', () => {
             const command = `delayed_reboot 100`;
             const callback =
@@ -2652,8 +2714,6 @@ describe('PMIC 1300', () => {
 
             expect(mockOnReboot).toBeCalledTimes(1);
             expect(mockOnReboot).toBeCalledWith(true);
-
-            verifyLogging('inf', command, 'Success:');
         });
 
         test('kernel reboot - error', () => {
@@ -2665,8 +2725,6 @@ describe('PMIC 1300', () => {
 
             expect(mockOnReboot).toBeCalledTimes(1);
             expect(mockOnReboot).toBeCalledWith(false, 'Error: some message');
-
-            verifyLogging('err', command, 'Error: some message');
         });
 
         test.each(
@@ -2692,8 +2750,6 @@ describe('PMIC 1300', () => {
                 data: { vTerm: 2.3 },
                 index,
             });
-
-            verifyLogging('inf', command, 'Value: 2300 mv');
         });
 
         test.each(
@@ -2719,8 +2775,6 @@ describe('PMIC 1300', () => {
                 data: { iChg: 400 },
                 index,
             });
-
-            verifyLogging('inf', command, 'Value: 400 mA');
         });
 
         test.each(
@@ -2762,8 +2816,6 @@ describe('PMIC 1300', () => {
                 // eslint-disable-next-line no-bitwise
                 supplementModeActive: (value & 0x80) > 0,
             } as PmicChargingState);
-
-            verifyLogging('inf', command, `Value: ${value}`);
         });
 
         test.each(
@@ -2795,8 +2847,6 @@ describe('PMIC 1300', () => {
                 data: { enabled },
                 index,
             });
-
-            verifyLogging('inf', command, `Value: ${enabled ? '1' : '0'}`);
         });
 
         test.each(
@@ -2821,8 +2871,6 @@ describe('PMIC 1300', () => {
 
             expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
             expect(mockOnFuelGaugeUpdate).toBeCalledWith(enabled);
-
-            verifyLogging('inf', command, `Value: ${enabled ? '1' : '0'}`);
         });
 
         test.each(['get', 'set LP803448'])('fuel_gauge model %p', append => {
@@ -2853,12 +2901,6 @@ describe('PMIC 1300', () => {
                     },
                 ],
             } as BatteryModel);
-
-            verifyLogging(
-                'inf',
-                command,
-                `Value: name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}`
-            );
         });
 
         test('fuel_gauge model store', () => {
@@ -2887,12 +2929,6 @@ describe('PMIC 1300', () => {
                 expect.anything(),
                 expect.anything(),
                 true
-            );
-
-            verifyLogging(
-                'inf',
-                command,
-                `Success: Model stored to persistent memory.`
             );
         });
 
@@ -2933,8 +2969,6 @@ describe('PMIC 1300', () => {
                     },
                 ],
             } as BatteryModel);
-
-            verifyLogging('inf', command, response);
         });
 
         test('fuel_gauge model list no stored battery', () => {
@@ -2955,8 +2989,6 @@ describe('PMIC 1300', () => {
 
             expect(mockOnStoredBatteryModelUpdate).toBeCalledTimes(1);
             expect(mockOnStoredBatteryModelUpdate).toBeCalledWith(undefined);
-
-            verifyLogging('inf', command, response);
         });
 
         test.each([true, false])('npmx vbusin vbus status get %p', value => {
@@ -2968,8 +3000,6 @@ describe('PMIC 1300', () => {
 
             expect(mockOnUsbPowered).toBeCalledTimes(1);
             expect(mockOnUsbPowered).toBeCalledWith(value);
-
-            verifyLogging('inf', command, `Value: ${value ? '1' : '0'}`);
         });
 
         test.each(
@@ -2995,8 +3025,6 @@ describe('PMIC 1300', () => {
                 data: { vOut: 2.3 },
                 index,
             });
-
-            verifyLogging('inf', command, 'Value: 2300 mv');
         });
 
         test.each(
@@ -3028,8 +3056,6 @@ describe('PMIC 1300', () => {
                 data: { mode: value === 0 ? 'vSet' : 'software' },
                 index,
             });
-
-            verifyLogging('inf', command, `Value: ${value}`);
         });
 
         test.each(
@@ -3061,8 +3087,6 @@ describe('PMIC 1300', () => {
                 data: { enabled },
                 index,
             });
-
-            verifyLogging('inf', command, `Value: ${enabled ? '1' : '0'}`);
         });
 
         test.each(
@@ -3094,8 +3118,6 @@ describe('PMIC 1300', () => {
                 data: { enabled },
                 index,
             });
-
-            verifyLogging('inf', command, `Value: ${enabled ? '1' : '0'}`);
         });
     });
 
