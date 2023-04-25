@@ -951,6 +951,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     },
                     res => {
                         () => {
+                            if (profileDownloadInProgress) {
+                                profileDownloadInProgress = false;
+                                profileDownloadAborting = false;
                             const profileDownload: ProfileDownload = {
                                 state: 'failed',
                                 alertMessage: parseColonBasedAnswer('res'),
@@ -959,6 +962,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                 'onProfileDownloadUpdate',
                                 profileDownload
                             );
+                            }
                             reject(res);
                         };
                     },
