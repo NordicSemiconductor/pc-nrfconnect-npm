@@ -67,7 +67,7 @@ export const hookModemToShellParser = async (
     settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$',
         logRegex:
-            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): /,
+            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
         errorRegex: /Error /,
         timeout: 1000,
     },
@@ -265,7 +265,10 @@ export const hookModemToShellParser = async (
         xTerminalShellParser.clear();
 
         if (commandBuffer.match(settings.logRegex)) {
-            eventEmitter.emit('shellLogging', commandBuffer.trim());
+            eventEmitter.emit(
+                'shellLogging',
+                commandBuffer.replace(settings.shellPromptUart, '').trim()
+            );
             commandBuffer = '';
             return;
         }

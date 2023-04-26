@@ -84,7 +84,8 @@ const setupMocks = () => {
 
     const settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$',
-        logRegex: /<inf> /,
+        logRegex:
+            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
         errorRegex: /error: /,
         timeout: 1000,
     };
@@ -787,12 +788,14 @@ describe('shell command parser', () => {
         shellParser.onUnknownCommand(mockOnUnknown);
 
         onResponseCallback(
-            Buffer.from('<inf> main: v=3.595881,i=0.176776\r\n')
+            Buffer.from(
+                '[00:01:46.862,640] <inf> main: v=3.595881,i=0.176776\r\n'
+            )
         );
 
         expect(mockOnShellLogging).toBeCalledTimes(1);
         expect(mockOnShellLogging).toBeCalledWith(
-            'uart:~$<inf> main: v=3.595881,i=0.176776'
+            '[00:01:46.862,640] <inf> main: v=3.595881,i=0.176776'
         );
 
         expect(mockOnError).toBeCalledTimes(0);
@@ -810,7 +813,9 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        onResponseCallback(Buffer.from('<inf> main: v=3.595881,i=0'));
+        onResponseCallback(
+            Buffer.from('[00:00:01.114,532] <inf> main: v=3.595881,i=0')
+        );
 
         expect(mockOnShellLogging).toBeCalledTimes(0);
 
@@ -818,7 +823,7 @@ describe('shell command parser', () => {
 
         expect(mockOnShellLogging).toBeCalledTimes(1);
         expect(mockOnShellLogging).toBeCalledWith(
-            'uart:~$<inf> main: v=3.595881,i=0.176776'
+            '[00:00:01.114,532] <inf> main: v=3.595881,i=0.176776'
         );
 
         expect(mockOnError).toBeCalledTimes(0);
