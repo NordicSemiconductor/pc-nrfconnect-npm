@@ -74,13 +74,12 @@ export default () => {
         }
 
         for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
-            npmDevice.requestUpdate.buckVOut(i);
-            npmDevice.requestUpdate.buckRetentionVOut(i);
+            npmDevice.requestUpdate.buckVOutNormal(i);
+            npmDevice.requestUpdate.buckVOutRetention(i);
             npmDevice.requestUpdate.buckMode(i);
             npmDevice.requestUpdate.buckEnabled(i);
             npmDevice.requestUpdate.buckModeControl(i);
             npmDevice.requestUpdate.buckOnOffControl(i);
-            npmDevice.requestUpdate.buckRetentionVOut(i);
         }
 
         for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
@@ -120,8 +119,8 @@ export default () => {
         const emptyBuck: Buck[] = [];
         for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
             emptyBuck.push({
-                vOut: npmDevice.getBuckVoltageRange(i).min,
-                retentionVOut: 1,
+                vOutNormal: npmDevice.getBuckVoltageRange(i).min,
+                vOutRetention: 1,
                 mode: 'vSet',
                 enabled: true,
                 modeControl: 'Auto',

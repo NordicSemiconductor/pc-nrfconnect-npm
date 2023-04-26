@@ -55,8 +55,8 @@ export type Charger = {
 };
 
 export type Buck = {
-    vOut: number;
-    retentionVOut: number;
+    vOutNormal: number;
+    vOutRetention: number;
     mode: BuckMode;
     modeControl: BuckModeControl;
     onOffControl: BuckOnOffControl;
@@ -227,8 +227,8 @@ export type NpmDevice = {
         chargerITerm: (index: number) => void;
         chargerEnabledRecharging: (index: number) => void;
 
-        buckVOut: (index: number) => void;
-        buckRetentionVOut: (index: number) => void;
+        buckVOutNormal: (index: number) => void;
+        buckVOutRetention: (index: number) => void;
         buckMode: (index: number) => void;
         buckModeControl: (index: number) => void;
         buckOnOffControl: (index: number) => void;
@@ -260,8 +260,8 @@ export type NpmDevice = {
         enabled: boolean
     ) => Promise<void>;
 
-    setBuckVOut: (index: number, value: number) => Promise<void>;
-    setBuckRetentionVOut: (index: number, value: number) => Promise<void>;
+    setBuckVOutNormal: (index: number, value: number) => Promise<void>;
+    setBuckVOutRetention: (index: number, value: number) => Promise<void>;
     setBuckMode: (index: number, mode: BuckMode) => Promise<void>;
     setBuckModeControl: (index: number, mode: BuckModeControl) => Promise<void>;
     setBuckOnOffControl: (

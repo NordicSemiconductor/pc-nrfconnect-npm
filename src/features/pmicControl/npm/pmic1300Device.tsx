@@ -359,6 +359,34 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     );
 
     shellParser?.registerCommandCallback(
+        toRegex('npmx charger trickle', true, undefined, '(2500|2900)'),
+        res => {
+            const result = parseToNumber(res) / 1000;
+
+            if (result === 2.5 || result === 2.9) {
+                emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                    vTrickleFast: result,
+                });
+            }
+        },
+        noop
+    );
+
+    shellParser?.registerCommandCallback(
+        toRegex('npmx charger termination_current', true, undefined, '(10|20)'),
+        res => {
+            const result = parseToNumber(res) / 1000;
+
+            if (result === 10 || result === 20) {
+                emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                    iTerm: `${result}%`,
+                });
+            }
+        },
+        noop
+    );
+
+    shellParser?.registerCommandCallback(
         toRegex('fuel_gauge', true, undefined, '(1|0)'),
 
         res => {
@@ -475,11 +503,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     for (let i = 0; i < devices.noOfBucks; i += 1) {
         shellParser?.registerCommandCallback(
-            toRegex('npmx buck voltage', true, i),
+            toRegex('npmx buck voltage normal', true, i),
             res => {
                 const value = parseToNumber(res);
                 emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    vOut: value / 1000, // mV to V
+                    vOutNormal: value / 1000, // mV to V
+                });
+            },
+            noop
+        );
+
+        shellParser?.registerCommandCallback(
+            toRegex('npmx buck voltage retention', true, i),
+            res => {
+                const value = parseToNumber(res);
+                emitPartialEvent<Buck>('onBuckUpdate', i, {
+                    vOutRetention: value / 1000, // mV to V
                 });
             },
             noop
@@ -594,25 +633,60 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         });
 
     const setChargerVTrickleFast = (index: number, value: VTrickleFast) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
-
+        new Promise<void>((resolve, reject) => {
             emitPartialEvent<Charger>('onChargerUpdate', index, {
                 vTrickleFast: value,
             });
 
-            resolve();
+            if (pmicState === 'ek-disconnected') {
+                resolve();
+            } else {
+                setChargerEnabled(index, false)
+                    .then(() => {
+                        sendCommand(
+                            `npmx charger trickle set ${value * 1000}`,
+                            () => resolve(),
+                            () => {
+                                requestUpdate.chargerVTrickleFast(index);
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
+                        requestUpdate.chargerVTrickleFast(index);
+                        reject();
+                    });
+            }
         });
 
     const setChargerITerm = (index: number, iTerm: ITerm) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
-
+        new Promise<void>((resolve, reject) => {
             emitPartialEvent<Charger>('onChargerUpdate', index, {
                 iTerm,
             });
 
-            resolve();
+            if (pmicState === 'ek-disconnected') {
+                resolve();
+            } else {
+                setChargerEnabled(index, false)
+                    .then(() => {
+                        sendCommand(
+                            `npmx charger termination_current set ${Number.parseInt(
+                                iTerm,
+                                10
+                            )}`,
+                            () => resolve(),
+                            () => {
+                                requestUpdate.chargerITerm(index);
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
+                        requestUpdate.chargerITerm(index);
+                        reject();
+                    });
+            }
         });
 
     const setChargerEnabledRecharging = (index: number, enabled: boolean) =>
@@ -645,12 +719,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
-    const setBuckVOut = (index: number, value: number) => {
+    const setBuckVOutNormal = (index: number, value: number) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
                     emitPartialEvent<Buck>('onBuckUpdate', index, {
-                        vOut: value,
+                        vOutNormal: value,
                     });
 
                     emitPartialEvent<Buck>('onBuckUpdate', index, {
@@ -660,7 +734,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     resolve();
                 } else {
                     sendCommand(
-                        `npmx buck voltage set ${index} ${value * 1000}`,
+                        `npmx buck voltage normal set ${index} ${value * 1000}`,
                         () =>
                             sendCommand(
                                 `npmx buck vout select set ${index} 1`,
@@ -671,7 +745,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                 }
                             ),
                         () => {
-                            requestUpdate.buckVOut(index);
+                            requestUpdate.buckVOutNormal(index);
                             reject();
                         }
                     );
@@ -691,7 +765,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
                     onCancel: () => {
-                        requestUpdate.buckVOut(index);
+                        requestUpdate.buckVOutNormal(index);
                         resolve();
                     },
                     onOptional: () => action().then(resolve).catch(reject),
@@ -704,13 +778,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         return action();
     };
 
-    const setBuckRetentionVOut = (index: number, value: number) =>
+    const setBuckVOutRetention = (index: number, value: number) =>
         new Promise<void>(resolve => {
             console.warn('Not implemented');
 
             if (pmicState === 'ek-disconnected')
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    retentionVOut: value,
+                    vOutRetention: value,
                 });
 
             resolve();
@@ -730,7 +804,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             mode === 'software' ? 1 : 0
                         }`,
                         () => {
-                            requestUpdate.buckVOut(index);
+                            requestUpdate.buckVOutNormal(index);
                             resolve();
                         },
                         () => {
@@ -759,7 +833,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
                     onCancel: () => {
-                        requestUpdate.buckVOut(index);
+                        requestUpdate.buckVOutNormal(index);
                         resolve();
                     },
                     onOptional: () => action().then(resolve).catch(reject),
@@ -1055,26 +1129,27 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerEnabled: (index: number) =>
             sendCommand('npmx charger module charger get'),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerVTrickleFast: (index: number) => console.warn('Not implemented'),
+        chargerVTrickleFast: (index: number) =>
+            sendCommand('npmx charger trickle get'),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerITerm: (index: number) => console.warn('Not implemented'),
+        chargerITerm: (index: number) =>
+            sendCommand('npmx charger termination_current get'),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerEnabledRecharging: (index: number) =>
             console.warn('Not implemented'),
 
-        buckVOut: (index: number) =>
-            sendCommand(`npmx buck voltage get ${index}`),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        buckRetentionVOut: (index: number) => console.warn('Not implemented'),
+        buckVOutNormal: (index: number) =>
+            sendCommand(`npmx buck voltage normal get ${index}`),
+        buckVOutRetention: (index: number) =>
+            sendCommand(`npmx buck voltage retention get ${index}`),
         buckMode: (index: number) =>
             sendCommand(`npmx buck vout select get ${index}`),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        buckModeControl: (index: number) => console.warn('Not implemented'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        buckOnOffControl: (index: number) => console.warn('Not implemented'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        buckModeControl: (index: number) =>
+            sendCommand(`npmx buck gpio pwm_force get ${index}`),
+        buckOnOffControl: (index: number) =>
+            sendCommand(`npmx buck gpio on_off get ${index}`),
         buckRetentionControl: (index: number) =>
-            console.warn('Not implemented'),
+            sendCommand(`npmx buck gpio retention get ${index}`),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckEnabled: (index: number) => console.warn('Not implemented'),
 
@@ -1112,11 +1187,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
 
                 config.bucks.forEach((buck, index) => {
-                    setBuckVOut(index, buck.vOut);
+                    setBuckVOutNormal(index, buck.vOutNormal);
                     setBuckMode(index, buck.mode);
                     setBuckEnabled(index, buck.enabled);
                     setBuckModeControl(index, buck.modeControl);
-                    setBuckRetentionVOut(index, buck.retentionVOut);
+                    setBuckVOutRetention(index, buck.vOutRetention);
                     setBuckRetentionControl(index, buck.retentionControl);
                     setBuckOnOffControl(index, buck.onOffControl);
                 });
@@ -1206,8 +1281,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setChargerVTrickleFast,
         setChargerITerm,
         setChargerEnabledRecharging,
-        setBuckVOut,
-        setBuckRetentionVOut,
+        setBuckVOutNormal,
+        setBuckVOutRetention,
         setBuckMode,
         setBuckEnabled,
         setBuckModeControl,

@@ -48,10 +48,11 @@ export default ({
 }: BuckCardProperties) => {
     const [summary, setSummary] = useState(defaultSummary);
 
-    const onVOutChange = (value: number) => npmDevice.setBuckVOut(index, value);
+    const onVOutChange = (value: number) =>
+        npmDevice.setBuckVOutNormal(index, value);
 
     const onRetVOutChange = (value: number) => {
-        npmDevice.setBuckRetentionVOut(index, value);
+        npmDevice.setBuckVOutRetention(index, value);
     };
 
     const onModeToggle = (mode: BuckMode) => npmDevice.setBuckMode(index, mode);
@@ -89,11 +90,11 @@ export default ({
 
     const vSetItems = ['Software', 'Vset'];
 
-    const [internalVOut, setInternalVOut] = useState(buck?.vOut ?? 0);
+    const [internalVOut, setInternalVOut] = useState(buck?.vOutNormal ?? 0);
     const [internalRetVOut, setInternalRetVOut] = useState(1); // TODO
 
     useEffect(() => {
-        if (buck) setInternalVOut(buck.vOut);
+        if (buck) setInternalVOut(buck.vOutNormal);
     }, [buck]);
 
     return npmDevice && buck ? (

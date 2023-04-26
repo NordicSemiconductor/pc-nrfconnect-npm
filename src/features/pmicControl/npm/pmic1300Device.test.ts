@@ -325,21 +325,33 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_CHARGERS)(
+            test.each(PMIC_1300_CHARGERS)(
                 'Request update chargerVTrickleFast index: %p',
                 index => {
                     pmic.requestUpdate.chargerVTrickleFast(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        'npmx charger trickle get',
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
-            test.skip.each(PMIC_1300_CHARGERS)(
+            test.each(PMIC_1300_CHARGERS)(
                 'Request update chargerITerm index: %p',
                 index => {
                     pmic.requestUpdate.chargerITerm(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        'npmx charger termination_current get',
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -355,11 +367,11 @@ describe('PMIC 1300', () => {
             test.each(PMIC_1300_BUCKS)(
                 'Request update buckVOut index: %p',
                 index => {
-                    pmic.requestUpdate.buckVOut(index);
+                    pmic.requestUpdate.buckVOutNormal(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
                     expect(mockEnqueueRequest).toBeCalledWith(
-                        `npmx buck voltage get ${index}`,
+                        `npmx buck voltage normal get ${index}`,
                         expect.anything(),
                         undefined,
                         true
@@ -367,12 +379,18 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Request update buckRetentionVOut index: %p',
                 index => {
-                    pmic.requestUpdate.buckRetentionVOut(index);
+                    pmic.requestUpdate.buckVOutRetention(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx buck voltage retention get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -391,30 +409,48 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Request update buckModeControl index: %p',
                 index => {
                     pmic.requestUpdate.buckModeControl(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx buck gpio pwm_force get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Request update buckOnOffControl index: %p',
                 index => {
                     pmic.requestUpdate.buckOnOffControl(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx buck gpio on_off get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Request update buckRetentionControl index: %p',
                 index => {
                     pmic.requestUpdate.buckRetentionControl(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx buck gpio retention get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -731,33 +767,31 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_CHARGERS)(
+            test.each(PMIC_1300_CHARGERS)(
                 'Set setChargerVTrickleFast index: %p',
                 async index => {
                     await pmic.setChargerVTrickleFast(index, 2.5);
 
-                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                    expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { vTrickleFast: 2.5 },
-                        index,
-                    });
-
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx charger trickle set 2500`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
-            test.skip.each(PMIC_1300_CHARGERS)(
+            test.each(PMIC_1300_CHARGERS)(
                 'Set setChargerITerm index: %p',
                 async index => {
                     await pmic.setChargerITerm(index, '10%');
 
-                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                    expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { iTerm: '10%' },
-                        index,
-                    });
-
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx charger termination_current set 10`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -816,12 +850,12 @@ describe('PMIC 1300', () => {
             test.each(PMIC_1300_CHARGERS)(
                 'Set setBuckVOut index: %p',
                 async index => {
-                    await pmic.setBuckVOut(index, 1.8);
+                    await pmic.setBuckVOutNormal(index, 1.8);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(2);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
-                        `npmx buck voltage set ${index} 1800`,
+                        `npmx buck voltage normal set ${index} 1800`,
                         expect.anything(),
                         undefined,
                         true
@@ -848,13 +882,13 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckVOut(0, 1.7);
+                await pmic.setBuckVOutNormal(0, 1.7);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck voltage get 0`,
+                    `npmx buck voltage normal get 0`,
                     expect.anything(),
                     undefined,
                     true
@@ -871,13 +905,13 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckVOut(0, 1.7);
+                await pmic.setBuckVOutNormal(0, 1.7);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck voltage set 0 1700`,
+                    `npmx buck voltage normal set 0 1700`,
                     expect.anything(),
                     undefined,
                     true
@@ -903,13 +937,13 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckVOut(0, 1.7);
+                await pmic.setBuckVOutNormal(0, 1.7);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck voltage set 0 1700`,
+                    `npmx buck voltage normal set 0 1700`,
                     expect.anything(),
                     undefined,
                     true
@@ -931,11 +965,11 @@ describe('PMIC 1300', () => {
             test.skip.each(PMIC_1300_BUCKS)(
                 'Set setBuckRetentionVOut index: %p',
                 async index => {
-                    await pmic.setBuckRetentionVOut(index, 1.7);
+                    await pmic.setBuckVOutRetention(index, 1.7);
 
                     expect(mockOnChargerUpdate).toBeCalledTimes(1);
                     expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { retentionVOut: 1.7 },
+                        data: { vOutRetention: 1.7 },
                         index,
                     });
 
@@ -960,7 +994,7 @@ describe('PMIC 1300', () => {
                     // We need to request the buckVOut
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
-                        `npmx buck voltage get ${index}`,
+                        `npmx buck voltage normal get ${index}`,
                         expect.anything(),
                         undefined,
                         true
@@ -984,7 +1018,7 @@ describe('PMIC 1300', () => {
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck voltage get 0`,
+                    `npmx buck voltage normal get 0`,
                     expect.anything(),
                     undefined,
                     true
@@ -1017,7 +1051,7 @@ describe('PMIC 1300', () => {
                 // We need to request the buckVOut
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx buck voltage get 0`,
+                    `npmx buck voltage normal get 0`,
                     expect.anything(),
                     undefined,
                     true
@@ -1050,7 +1084,7 @@ describe('PMIC 1300', () => {
                 // We need to request the buckVOut
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx buck voltage get 0`,
+                    `npmx buck voltage normal get 0`,
                     expect.anything(),
                     undefined,
                     true
@@ -1484,8 +1518,8 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_CHARGERS)(
-                'Set setChargerVTrickleFast - Fail immediately -  index: %p',
+            test.each(PMIC_1300_CHARGERS)(
+                'Set setChargerVTrickleFast onError case 1 - Fail immediately -  index: %p',
                 async index => {
                     await expect(
                         pmic.setChargerVTrickleFast(index, 2.5)
@@ -1497,12 +1531,79 @@ describe('PMIC 1300', () => {
                         index,
                     });
 
-                    // TODO
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx charger module charger set 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx charger module charger get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
+                        `npmx charger trickle get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
-            test.skip.each(PMIC_1300_CHARGERS)(
-                'Set setChargerITerm - Fail immediately - index: %p',
+            test.each(PMIC_1300_CHARGERS)(
+                'Set setChargerVTrickleFast onError case 2 - Fail immediately -  index: %p',
+                async index => {
+                    mockEnqueueRequest.mockImplementationOnce(
+                        helpers.registerCommandCallbackSuccess
+                    );
+
+                    await expect(
+                        pmic.setChargerVTrickleFast(index, 2.5)
+                    ).rejects.toBeUndefined();
+
+                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
+                    expect(mockOnChargerUpdate).toBeCalledWith({
+                        data: { vTrickleFast: 2.5 },
+                        index,
+                    });
+
+                    // turn off charging
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx charger module charger set 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx charger trickle set 2500`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
+                        `npmx charger trickle get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                }
+            );
+
+            test.each(PMIC_1300_CHARGERS)(
+                'Set setChargerITerm  onError case 1 - Fail immediately - index: %p',
                 async index => {
                     await expect(
                         pmic.setChargerITerm(index, '10%')
@@ -1514,7 +1615,74 @@ describe('PMIC 1300', () => {
                         index,
                     });
 
-                    // TODO
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx charger module charger set 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx charger module charger get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
+                        `npmx charger termination_current get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                }
+            );
+
+            test.each(PMIC_1300_CHARGERS)(
+                'Set setChargerITerm  onError case 2 - Fail immediately - index: %p',
+                async index => {
+                    mockEnqueueRequest.mockImplementationOnce(
+                        helpers.registerCommandCallbackSuccess
+                    );
+
+                    await expect(
+                        pmic.setChargerITerm(index, '10%')
+                    ).rejects.toBeUndefined();
+
+                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
+                    expect(mockOnChargerUpdate).toBeCalledWith({
+                        data: { iTerm: '10%' },
+                        index,
+                    });
+
+                    // turn off charging
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx charger module charger set 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx charger termination_current set 10`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
+                        `npmx charger termination_current get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -1591,13 +1759,13 @@ describe('PMIC 1300', () => {
                 'Set setBuckVOut - Fail immediately - index: %p',
                 async index => {
                     await expect(
-                        pmic.setBuckVOut(index, 1.8)
+                        pmic.setBuckVOutNormal(index, 1.8)
                     ).rejects.toBeUndefined();
 
                     expect(mockEnqueueRequest).toBeCalledTimes(2);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
-                        `npmx buck voltage set ${index} 1800`,
+                        `npmx buck voltage normal set ${index} 1800`,
                         expect.anything(),
                         undefined,
                         true
@@ -1606,7 +1774,7 @@ describe('PMIC 1300', () => {
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
-                        `npmx buck voltage get ${index}`,
+                        `npmx buck voltage normal get ${index}`,
                         expect.anything(),
                         undefined,
                         true
@@ -1625,13 +1793,13 @@ describe('PMIC 1300', () => {
                     );
 
                     await expect(
-                        pmic.setBuckVOut(index, 1.8)
+                        pmic.setBuckVOutNormal(index, 1.8)
                     ).rejects.toBeUndefined();
 
                     expect(mockEnqueueRequest).toBeCalledTimes(3);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
-                        `npmx buck voltage set ${index} 1800`,
+                        `npmx buck voltage normal set ${index} 1800`,
                         expect.anything(),
                         undefined,
                         true
@@ -1664,12 +1832,12 @@ describe('PMIC 1300', () => {
                 'Set setBuckRetentionVOut - Fail immediately - index: %p',
                 async index => {
                     await expect(
-                        pmic.setBuckRetentionVOut(index, 1.7)
+                        pmic.setBuckVOutRetention(index, 1.7)
                     ).rejects.toBeUndefined();
 
                     expect(mockOnChargerUpdate).toBeCalledTimes(1);
                     expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { retentionVOut: 1.7 },
+                        data: { vOutRetention: 1.7 },
                         index,
                     });
 
@@ -2005,11 +2173,11 @@ describe('PMIC 1300', () => {
         );
 
         test.each(PMIC_1300_BUCKS)('Set setBuckVOut index: %p', async index => {
-            await pmic.setBuckVOut(index, 1.2);
+            await pmic.setBuckVOutNormal(index, 1.2);
 
             expect(mockOnBuckUpdate).toBeCalledTimes(2);
             expect(mockOnBuckUpdate).nthCalledWith(1, {
-                data: { vOut: 1.2 },
+                data: { vOutNormal: 1.2 },
                 index,
             });
             expect(mockOnBuckUpdate).nthCalledWith(2, {
@@ -2021,11 +2189,11 @@ describe('PMIC 1300', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckRetentionVOut  index: %p',
             index => {
-                pmic.setBuckRetentionVOut(index, 1.2);
+                pmic.setBuckVOutRetention(index, 1.2);
 
                 expect(mockOnBuckUpdate).toBeCalledTimes(1);
                 expect(mockOnBuckUpdate).nthCalledWith(1, {
-                    data: { retentionVOut: 1.2 },
+                    data: { vOutRetention: 1.2 },
                     index,
                 });
             }
@@ -2210,8 +2378,8 @@ describe('PMIC 1300', () => {
         };
 
         const initBuck: Buck = {
-            vOut: -1,
-            retentionVOut: -1,
+            vOutNormal: -1,
+            vOutRetention: -1,
             mode: 'software',
             enabled: false,
             modeControl: 'GPIO0',
@@ -2278,8 +2446,8 @@ describe('PMIC 1300', () => {
 
             expect(bucks).toStrictEqual([
                 {
-                    vOut: 1,
-                    retentionVOut: 1,
+                    vOutNormal: 1,
+                    vOutRetention: 1,
                     mode: 'vSet',
                     enabled: true,
                     modeControl: 'GPIO0',
@@ -2287,8 +2455,8 @@ describe('PMIC 1300', () => {
                     retentionControl: 'GPIO2',
                 },
                 {
-                    vOut: 2,
-                    retentionVOut: 2,
+                    vOutNormal: 2,
+                    vOutRetention: 2,
                     mode: 'vSet',
                     enabled: true,
                     modeControl: 'GPIO1',
@@ -2332,8 +2500,8 @@ describe('PMIC 1300', () => {
                 ],
                 bucks: [
                     {
-                        vOut: 1,
-                        retentionVOut: 1,
+                        vOutNormal: 1,
+                        vOutRetention: 1,
                         mode: 'vSet',
                         enabled: true,
                         modeControl: 'GPIO0',
@@ -2341,8 +2509,8 @@ describe('PMIC 1300', () => {
                         retentionControl: 'GPIO2',
                     },
                     {
-                        vOut: 2,
-                        retentionVOut: 2,
+                        vOutNormal: 2,
+                        vOutRetention: 2,
                         mode: 'vSet',
                         enabled: true,
                         modeControl: 'GPIO1',
@@ -2387,8 +2555,8 @@ describe('PMIC 1300', () => {
                 ],
                 bucks: [
                     {
-                        vOut: 1,
-                        retentionVOut: 1,
+                        vOutNormal: 1,
+                        vOutRetention: 1,
                         mode: 'vSet',
                         enabled: true,
                         modeControl: 'GPIO0',
@@ -2396,8 +2564,8 @@ describe('PMIC 1300', () => {
                         retentionControl: 'GPIO2',
                     },
                     {
-                        vOut: 2,
-                        retentionVOut: 2,
+                        vOutNormal: 2,
+                        vOutRetention: 2,
                         mode: 'vSet',
                         enabled: true,
                         modeControl: 'GPIO1',
@@ -2445,8 +2613,8 @@ describe('PMIC 1300', () => {
                 ],
                 bucks: [
                     {
-                        vOut: 1,
-                        retentionVOut: 1,
+                        vOutNormal: 1,
+                        vOutRetention: 1,
                         mode: 'vSet',
                         enabled: true,
                         modeControl: 'GPIO0',
@@ -2454,8 +2622,8 @@ describe('PMIC 1300', () => {
                         retentionControl: 'GPIO2',
                     },
                     {
-                        vOut: 2,
-                        retentionVOut: 2,
+                        vOutNormal: 2,
+                        vOutRetention: 2,
                         mode: 'vSet',
                         enabled: true,
                         modeControl: 'GPIO1',
@@ -2503,8 +2671,8 @@ describe('PMIC 1300', () => {
                 ],
                 bucks: [
                     {
-                        vOut: 1,
-                        retentionVOut: 1,
+                        vOutNormal: 1,
+                        vOutRetention: 1,
                         mode: 'vSet',
                         enabled: true,
                         modeControl: 'GPIO0',
@@ -2512,8 +2680,8 @@ describe('PMIC 1300', () => {
                         retentionControl: 'GPIO2',
                     },
                     {
-                        vOut: 2,
-                        retentionVOut: 2,
+                        vOutNormal: 2,
+                        vOutRetention: 2,
                         mode: 'vSet',
                         enabled: true,
                         modeControl: 'GPIO1',
@@ -2922,8 +3090,8 @@ describe('PMIC 1300', () => {
                     append: `set ${index} 2300`,
                 },
             ]).flat()
-        )('npmx buck voltage %p', ({ index, append }) => {
-            const command = `npmx buck voltage ${append}`;
+        )('npmx buck voltage normal %p', ({ index, append }) => {
+            const command = `npmx buck voltage normal ${append}`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -2931,7 +3099,7 @@ describe('PMIC 1300', () => {
 
             expect(mockOnBuckUpdate).toBeCalledTimes(1);
             expect(mockOnBuckUpdate).toBeCalledWith({
-                data: { vOut: 2.3 },
+                data: { vOutNormal: 2.3 },
                 index,
             });
         });
