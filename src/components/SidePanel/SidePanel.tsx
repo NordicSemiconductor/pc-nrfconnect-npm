@@ -312,9 +312,7 @@ export default () => {
                         onClick={() => {
                             dispatch(setShowProfilingWizard(true));
                         }}
-                        disabled={
-                            pmicConnection === 'ek-disconnected' || profiling
-                        }
+                        disabled
                     >
                         Profile Battery
                     </Button>
