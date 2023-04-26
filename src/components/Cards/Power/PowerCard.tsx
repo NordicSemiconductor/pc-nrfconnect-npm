@@ -14,11 +14,8 @@ import {
     Slider,
     Toggle,
 } from 'pc-nrfconnect-shared';
-import {
-    Range,
-    Values,
-} from 'pc-nrfconnect-shared/typings/generated/src/Slider/range';
 
+import { noop } from '../../../features/pmicControl/npm/pmicHelpers';
 import {
     Charger,
     ITerm,
@@ -30,7 +27,7 @@ import {
 
 interface PowerCardProperties {
     index: number;
-    npmDevice?: NpmDevice;
+    npmDevice: NpmDevice;
     charger?: Charger;
     cardLabel?: string;
     disabled: boolean;
@@ -46,17 +43,17 @@ export default ({
     defaultSummary = false,
 }: PowerCardProperties) => {
     const [summary, setSummary] = useState(defaultSummary);
-    const currentRange = npmDevice?.getChargerCurrentRange(index);
-    const currentVoltage = npmDevice?.getChargerVoltageRange(index) as Values;
+    const currentRange = npmDevice.getChargerCurrentRange(index);
+    const currentVoltage = npmDevice.getChargerVoltageRange(index);
 
     const onVTermChange = (value: number) =>
-        npmDevice?.setChargerVTerm(index, value);
+        npmDevice.setChargerVTerm(index, value);
 
     const onEnableChargingToggle = (value: boolean) =>
-        npmDevice?.setChargerEnabled(index, value);
+        npmDevice.setChargerEnabled(index, value);
 
     const onIChgChange = (value: number) =>
-        npmDevice?.setChargerIChg(index, value);
+        npmDevice.setChargerIChg(index, value);
 
     const [internalVTerm, setInternalVTerm] = useState(charger?.vTerm ?? 0);
     const [internalIChg, setInternalIChg] = useState(charger?.iChg ?? 0);
@@ -151,7 +148,7 @@ export default ({
                     <div className="flex-row">
                         <NumberInlineInput
                             value={internalIChg}
-                            range={currentRange as Range}
+                            range={currentRange}
                             onChange={value => setInternalIChg(value)}
                             onChangeComplete={() => onIChgChange(internalIChg)}
                             disabled={disabled}
@@ -163,7 +160,7 @@ export default ({
                     values={[internalIChg]}
                     onChange={[value => setInternalIChg(value)]}
                     onChangeComplete={() => onIChgChange(internalIChg)}
-                    range={currentRange as Range}
+                    range={currentRange}
                     disabled={disabled}
                 />
             </div>
@@ -173,7 +170,7 @@ export default ({
                         label="iTerm"
                         items={iTermItems}
                         onSelect={item =>
-                            npmDevice?.setChargerITerm(
+                            npmDevice.setChargerITerm(
                                 index,
                                 item.value as ITerm
                             )
@@ -194,7 +191,7 @@ export default ({
                         label="V Trickle Fast"
                         items={vTrickleFastItems}
                         onSelect={item =>
-                            npmDevice?.setChargerVTrickleFast(
+                            npmDevice.setChargerVTrickleFast(
                                 index,
                                 Number.parseFloat(item.value) as VTrickleFast
                             )
@@ -217,7 +214,7 @@ export default ({
                     <Toggle
                         label="Enable Recharging"
                         isToggled={charger.enableRecharging}
-                        onToggle={() => {}}
+                        onToggle={noop}
                         disabled={disabled}
                     />
                 </>

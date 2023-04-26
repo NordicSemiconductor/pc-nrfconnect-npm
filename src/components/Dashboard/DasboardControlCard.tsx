@@ -33,36 +33,39 @@ export default ({ disabled }: DashboardControlCardProps) => {
         <MasonryLayout minWidth={300}>
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
-            {chargers.map((charger, index) => (
-                <PowerCard
-                    npmDevice={npmDevice}
-                    charger={charger}
-                    key={`Charger${1 + index}`}
-                    index={index}
-                    cardLabel="Charger"
-                    disabled={disabled}
-                    defaultSummary
-                />
-            ))}
-            {bucks.map((buck, index) => (
-                <BuckCard
-                    buck={buck}
-                    npmDevice={npmDevice}
-                    key={`Buck${1 + index}`}
-                    index={index}
-                    disabled={disabled}
-                    defaultSummary
-                />
-            ))}
-            {ldos.map((ldo, index) => (
-                <LDOCard
-                    ldo={ldo}
-                    npmDevice={npmDevice}
-                    key={`Buck${1 + index}`}
-                    index={index}
-                    disabled={disabled}
-                />
-            ))}
+            {npmDevice &&
+                chargers.map((charger, index) => (
+                    <PowerCard
+                        npmDevice={npmDevice}
+                        charger={charger}
+                        key={`Charger${1 + index}`}
+                        index={index}
+                        cardLabel="Charger"
+                        disabled={disabled}
+                        defaultSummary
+                    />
+                ))}
+            {npmDevice &&
+                bucks.map((buck, index) => (
+                    <BuckCard
+                        buck={buck}
+                        npmDevice={npmDevice}
+                        key={`Buck${1 + index}`}
+                        index={index}
+                        disabled={disabled}
+                        defaultSummary
+                    />
+                ))}
+            {npmDevice &&
+                ldos.map((ldo, index) => (
+                    <LDOCard
+                        ldo={ldo}
+                        npmDevice={npmDevice}
+                        key={`Buck${1 + index}`}
+                        index={index}
+                        disabled={disabled}
+                    />
+                ))}
         </MasonryLayout>
     );
 };

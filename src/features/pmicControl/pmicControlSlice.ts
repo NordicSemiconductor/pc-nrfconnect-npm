@@ -38,6 +38,8 @@ interface pmicControlState {
     defaultBatterModels: BatteryModel[];
     storedBatterModel?: BatteryModel;
     usbPowered: boolean;
+    isProfiling?: boolean;
+    showProfilingWizard?: boolean;
 }
 
 const initialState: pmicControlState = {
@@ -66,7 +68,7 @@ const pmicControlSlice = createSlice({
     name: 'pmicControl',
     initialState,
     reducers: {
-        setNpmDevice(_, action: PayloadAction<NpmDevice | undefined>) {
+        setNpmDevice(_, action: PayloadAction<NpmDevice>) {
             return {
                 ...initialState,
                 npmDevice: action.payload,
@@ -161,6 +163,12 @@ const pmicControlSlice = createSlice({
         setUsbPowered(state, action: PayloadAction<boolean>) {
             state.usbPowered = action.payload;
         },
+        setProfiling(state, action: PayloadAction<boolean>) {
+            state.isProfiling = action.payload;
+        },
+        setShowProfilingWizard(state, action: PayloadAction<boolean>) {
+            state.showProfilingWizard = action.payload;
+        },
     },
 });
 
@@ -211,6 +219,12 @@ export const getStoredBatterModel = (state: RootState) =>
     state.app.pmicControl.storedBatterModel;
 export const isUsbPowered = (state: RootState) =>
     state.app.pmicControl.usbPowered;
+export const isProfiling = (state: RootState) =>
+    state.app.pmicControl.isProfiling;
+export const canProfile = (state: RootState) =>
+    state.app.pmicControl.npmDevice?.getBatteryProfiler() !== undefined;
+export const showProfilingWizard = (state: RootState) =>
+    state.app.pmicControl.showProfilingWizard;
 export const isSupportedVersion = (state: RootState) =>
     state.app.pmicControl.pmicState !== 'ek-disconnected'
         ? state.app.pmicControl.supportedVersion
@@ -247,5 +261,7 @@ export const {
     dequeueDialog,
     setEventRecordingPath,
     setUsbPowered,
+    setProfiling,
+    setShowProfilingWizard,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;

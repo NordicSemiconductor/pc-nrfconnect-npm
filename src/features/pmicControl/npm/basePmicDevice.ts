@@ -5,7 +5,6 @@
  */
 
 import EventEmitter from 'events';
-import { logger } from 'pc-nrfconnect-shared';
 
 import { ShellParser } from '../../../hooks/commandParser';
 import { MAX_TIMESTAMP, parseToNumber, toRegex } from './pmicHelpers';
@@ -43,11 +42,14 @@ export const baseNpmDevice: IBaseNpmDevice = (
         new Promise<number>((resolve, reject) => {
             shellParser?.enqueueRequest(
                 'kernel uptime',
-                res => {
-                    resolve(parseToNumber(res));
+                {
+                    onSuccess: res => {
+                        resolve(parseToNumber(res));
+                    },
+                    onError: reject,
+                    onTimeout: console.warn,
                 },
-                reject,
-                console.warn,
+                undefined,
                 true
             );
         });
@@ -59,11 +61,14 @@ export const baseNpmDevice: IBaseNpmDevice = (
         eventEmitter.emit('onBeforeReboot', 100);
         shellParser.enqueueRequest(
             'delayed_reboot 100',
-            () => {},
-            () => {
-                rebooting = false;
+            {
+                onSuccess: () => {},
+                onError: () => {
+                    rebooting = false;
+                },
+                onTimeout: console.warn,
             },
-            console.warn,
+            undefined,
             true
         );
     };
@@ -75,46 +80,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         });
     };
 
-    const registerCommandCallbackLoggerWrapper = (
-        command: string,
-        onSuccess: (data: string, command: string) => void,
-        onError: (error: string, command: string) => void
-    ) => {
-        const loggerWrapper = (
-            cmd: string,
-            error: boolean,
-            result: string,
-            action: () => void
-        ) => {
-            const event: LoggingEvent = {
-                timestamp: Date.now() - deviceUptimeToSystemDelta,
-                module: 'shell_commands',
-                logLevel: error ? 'err' : 'inf',
-                message: `command: "${cmd}" response: "${result}"`,
-            };
-
-            eventEmitter.emit('onLoggingEvent', {
-                loggingEvent: event,
-                dataPair: false,
-            });
-
-            if (action) action();
-        };
-
-        return shellParser?.registerCommandCallback(
-            command,
-            (response, cmd) =>
-                loggerWrapper(cmd, false, response, () =>
-                    onSuccess(response, cmd)
-                ),
-            (error, cmd) => {
-                logger.error(error);
-                loggerWrapper(cmd, true, error, () => onError(error, cmd));
-            }
-        );
-    };
-
-    registerCommandCallbackLoggerWrapper(
+    shellParser?.registerCommandCallback(
         toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
         () => {
             rebooting = true;
@@ -125,6 +91,20 @@ export const baseNpmDevice: IBaseNpmDevice = (
             eventEmitter.emit('onReboot', false, error);
         }
     );
+
+    shellParser?.onAnyCommandResponse(({ command, response, error }) => {
+        const event: LoggingEvent = {
+            timestamp: Date.now() - deviceUptimeToSystemDelta,
+            module: 'shell_commands',
+            logLevel: error ? 'err' : 'inf',
+            message: `command: "${command}" response: "${response}"`,
+        };
+
+        eventEmitter.emit('onLoggingEvent', {
+            loggingEvent: event,
+            dataPair: false,
+        });
+    });
 
     updateUptimeOverflowCounter();
 
@@ -250,17 +230,20 @@ export const baseNpmDevice: IBaseNpmDevice = (
             new Promise<boolean>((resolve, reject) => {
                 shellParser?.enqueueRequest(
                     'app_version',
-                    result => {
-                        resolve(`app_version=${supportsVersion}` === result);
+                    {
+                        onSuccess: result => {
+                            resolve(
+                                `app_version=${supportsVersion}` === result
+                            );
+                        },
+                        onError: reject,
+                        onTimeout: console.warn,
                     },
-                    reject,
-                    console.warn,
+                    undefined,
                     true
                 );
             }),
         getSupportedVersion: () => supportsVersion,
-
-        registerCommandCallbackLoggerWrapper,
 
         getUptimeOverflowCounter: () => uptimeOverflowCounter,
         setUptimeOverflowCounter: (value: number) => {

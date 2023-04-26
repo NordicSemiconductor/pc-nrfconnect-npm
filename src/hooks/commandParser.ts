@@ -8,7 +8,7 @@ import EventEmitter from 'events';
 import { SerialPort } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
-interface ICallbacks {
+export interface ICallbacks {
     onSuccess: (response: string, command: string) => void;
     onError: (message: string, command: string) => void;
     onTimeout?: (message: string, command: string) => void;
@@ -26,6 +26,7 @@ type CommandEnqueue = {
     callbacks: ICallbacks[];
     sent: boolean;
     sentTime: number;
+    timeout?: number;
 };
 
 export type ShellParser = Awaited<ReturnType<typeof hookModemToShellParser>>;
@@ -66,7 +67,7 @@ export const hookModemToShellParser = async (
     settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$',
         logRegex:
-            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): /,
+            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
         errorRegex: /Error /,
         timeout: 1000,
     },
@@ -126,7 +127,7 @@ export const hookModemToShellParser = async (
 
                     commandQueue.shift();
                     sendCommands();
-                }, settings.timeout);
+                }, command.timeout ?? settings.timeout);
                 command.callbacks.push({
                     onSuccess: () => clearTimeout(t),
                     onError: () => clearTimeout(t),
@@ -160,10 +161,10 @@ export const hookModemToShellParser = async (
         return data;
     };
 
-    const responseCallback = (response: string) => {
+    const responseCallback = (commandAndResponse: string) => {
         let callbackFound = false;
 
-        response = response.trim();
+        commandAndResponse = commandAndResponse.trim();
 
         if (bufferedDataWrittenData.includes('\r')) {
             const splitDataWrittenData = bufferedDataWrittenData
@@ -171,9 +172,9 @@ export const hookModemToShellParser = async (
                 .filter(v => v.trim() !== '');
 
             if (splitDataWrittenData) {
-                response = `${
+                commandAndResponse = `${
                     splitDataWrittenData[0]?.trim() ?? ''
-                }\r\n${response}`;
+                }\r\n${commandAndResponse}`;
 
                 bufferedDataWrittenData = splitDataWrittenData
                     .splice(1)
@@ -183,6 +184,16 @@ export const hookModemToShellParser = async (
             }
         }
 
+        const commandEndIndex = commandAndResponse.indexOf('\r');
+        const receivedCommand = commandAndResponse.substring(
+            0,
+            commandEndIndex
+        );
+        const receivedResponse = commandAndResponse
+            .substring(commandEndIndex, commandAndResponse.length)
+            .trim();
+        const isError = receivedResponse.match(settings.errorRegex) !== null;
+
         // Trigger one time callbacks
         if (commandQueue.length > 0) {
             const regex = `^(${commandQueue[0].command.replace(
@@ -191,21 +202,19 @@ export const hookModemToShellParser = async (
             )})`;
 
             // we need to replace \r and \n as shell might add \r \n when shell wraps
-            const matched = response
+            const matched = receivedCommand
                 .replaceAll('\r', '')
                 .replaceAll('\n', '')
                 .match(regex);
             if (matched && commandQueue[0].sent) {
-                const command = commandQueue[0].command;
-                const commandResponse = response.replace(command, '').trim();
-                if (commandResponse.match(settings.errorRegex)) {
+                if (isError) {
                     commandQueue[0].callbacks.forEach(callback =>
-                        callback.onError(commandResponse, command)
+                        callback.onError(receivedResponse, receivedCommand)
                     );
                     callbackFound = true;
                 } else {
                     commandQueue[0].callbacks.forEach(callback =>
-                        callback.onSuccess(commandResponse, command)
+                        callback.onSuccess(receivedResponse, receivedCommand)
                     );
                     callbackFound = true;
                 }
@@ -222,19 +231,15 @@ export const hookModemToShellParser = async (
 
         // Trigger permanent time callbacks
         commandQueueCallbacks.forEach((callbacks, key) => {
-            const commandMatch = response.match(`^(${key})`);
+            const commandMatch = receivedCommand.match(`^(${key})`);
             if (commandMatch) {
-                const commandResponse = response
-                    .replace(new RegExp(`^(${key})\r\n`), '')
-                    .trim();
-                const match = commandResponse.match(settings.errorRegex);
-                if (match) {
+                if (isError) {
                     callbacks.forEach(callback => {
-                        callback.onError(commandResponse, commandMatch[0]);
+                        callback.onError(receivedResponse, commandMatch[0]);
                     });
                 } else {
                     callbacks.forEach(callback => {
-                        callback.onSuccess(commandResponse, commandMatch[0]);
+                        callback.onSuccess(receivedResponse, commandMatch[0]);
                     });
                 }
 
@@ -242,8 +247,14 @@ export const hookModemToShellParser = async (
             }
         });
 
-        if (!callbackFound && response !== '') {
-            eventEmitter.emit('unknownCommand', response);
+        eventEmitter.emit('anyCommandResponse', {
+            command: receivedCommand,
+            response: receivedResponse,
+            error: isError,
+        });
+
+        if (!callbackFound && commandAndResponse !== '') {
+            eventEmitter.emit('unknownCommand', commandAndResponse);
         }
     };
 
@@ -254,7 +265,10 @@ export const hookModemToShellParser = async (
         xTerminalShellParser.clear();
 
         if (commandBuffer.match(settings.logRegex)) {
-            eventEmitter.emit('shellLogging', commandBuffer.trim());
+            eventEmitter.emit(
+                'shellLogging',
+                commandBuffer.replace(settings.shellPromptUart, '').trim()
+            );
             commandBuffer = '';
             return;
         }
@@ -353,6 +367,22 @@ export const hookModemToShellParser = async (
                 eventEmitter.removeListener('shellLogging', handler);
             };
         },
+        onAnyCommandResponse: (
+            handler: ({
+                command,
+                response,
+                error,
+            }: {
+                command: string;
+                response: string;
+                error: boolean;
+            }) => void
+        ) => {
+            eventEmitter.on('anyCommandResponse', handler);
+            return () => {
+                eventEmitter.removeListener('anyCommandResponse', handler);
+            };
+        },
         onUnknownCommand: (handler: (state: string) => void) => {
             eventEmitter.on('unknownCommand', handler);
             return () => {
@@ -361,21 +391,31 @@ export const hookModemToShellParser = async (
         },
         enqueueRequest: async (
             command: string,
-            onSuccess: (response: string, command: string) => void = () => {},
-            onError: (message: string, command: string) => void = () => {},
-            onTimeout: (message: string, command: string) => void = () => {},
+            callbacks?: ICallbacks,
+            timeout?: number,
             unique = false
         ) => {
+            command = command.trim();
+
             if (unique) {
                 const existingCommand = commandQueue.find(
                     item => item.command === command
                 );
                 if (existingCommand) {
-                    existingCommand.callbacks.push({
-                        onSuccess,
-                        onError,
-                        onTimeout,
-                    });
+                    if (callbacks) existingCommand.callbacks.push(callbacks);
+
+                    if (timeout !== undefined && existingCommand.sent) {
+                        console.warn(
+                            `Timeout of ${timeout} for command ${command} has been ignored as command 
+                            has already been sent. Timeout of ${existingCommand.timeout} was used.`
+                        );
+                    } else if (timeout !== undefined) {
+                        console.warn(
+                            `Timeout for command ${command} has been updated to ${timeout}`
+                        );
+                        existingCommand.timeout = timeout;
+                    }
+
                     // init sending of commands
                     await initDataSend();
                     return;
@@ -384,15 +424,10 @@ export const hookModemToShellParser = async (
 
             commandQueue.push({
                 command,
-                callbacks: [
-                    {
-                        onSuccess,
-                        onError,
-                        onTimeout,
-                    },
-                ],
+                callbacks: callbacks ? [callbacks] : [],
                 sent: false,
                 sentTime: -1,
+                timeout,
             });
 
             // init sending of commands

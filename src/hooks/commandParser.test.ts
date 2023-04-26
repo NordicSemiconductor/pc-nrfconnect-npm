@@ -75,6 +75,7 @@ const setupMocks = () => {
     const mockUpdate = jest.fn(() => '');
     const mockSet = jest.fn(() => '');
 
+    const mockOnAnyCommandResponse = jest.fn(() => '');
     const mockOnShellLogging = jest.fn(() => '');
     const mockOnUnknown = jest.fn(() => '');
 
@@ -83,7 +84,8 @@ const setupMocks = () => {
 
     const settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$',
-        logRegex: /<inf> /,
+        logRegex:
+            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
         errorRegex: /error: /,
         timeout: 1000,
     };
@@ -137,6 +139,7 @@ const setupMocks = () => {
         mockModem,
         mockOnError,
         mockOnResponse: mockOnData,
+        mockOnAnyCommandResponse,
         mockOnShellLogging,
         mockOnSuccess,
         mockOnUnknown,
@@ -152,6 +155,7 @@ const {
     mockIsOpen,
     mockModem,
     mockOnError,
+    mockOnAnyCommandResponse,
     mockOnShellLogging,
     mockOnSuccess,
     mockOnUnknown,
@@ -238,11 +242,10 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await shellParser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -268,11 +271,10 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await shellParser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -300,11 +302,10 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await shellParser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -333,11 +334,10 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await shellParser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -370,17 +370,15 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await shellParser.enqueueRequest(
-            'Test Command 1',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command 1', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
-        await shellParser.enqueueRequest(
-            'Test Command 2',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command 2', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -422,17 +420,15 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await shellParser.enqueueRequest(
-            'Test Command 1',
-            mockOnSuccess1,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command 1', {
+            onSuccess: mockOnSuccess1,
+            onError: mockOnError,
+        });
 
-        await shellParser.enqueueRequest(
-            'Test Command 2',
-            mockOnSuccess2,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command 2', {
+            onSuccess: mockOnSuccess2,
+            onError: mockOnError,
+        });
 
         expect(mockOnSuccess1).toBeCalledTimes(0);
 
@@ -469,17 +465,15 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        await shellParser.enqueueRequest(
-            'Test Command 1',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command 1', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
-        await shellParser.enqueueRequest(
-            'Test Command 2',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command 2', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -579,6 +573,52 @@ describe('shell command parser', () => {
         expect(mockOnError).toBeCalledTimes(0);
         expect(mockOnShellLogging).toBeCalledTimes(0);
         expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify onAnyCommand is called with success when we have a response', async () => {
+        const shellParser = await hookModemToShellParser(
+            mockModem(),
+            mockTerminal(),
+            settings
+        );
+
+        shellParser.onAnyCommandResponse(mockOnAnyCommandResponse);
+
+        await shellParser.enqueueRequest('Test Command');
+
+        onResponseCallback(
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
+        );
+
+        expect(mockOnAnyCommandResponse).toBeCalledTimes(1);
+        expect(mockOnAnyCommandResponse).toBeCalledWith({
+            response: 'Response Value',
+            command: 'Test Command',
+            error: false,
+        });
+    });
+
+    test('Verify onAnyCommand is called with error when we have a response', async () => {
+        const shellParser = await hookModemToShellParser(
+            mockModem(),
+            mockTerminal(),
+            settings
+        );
+
+        shellParser.onAnyCommandResponse(mockOnAnyCommandResponse);
+
+        await shellParser.enqueueRequest('Test Command');
+
+        onResponseCallback(
+            Buffer.from('Test Command\r\nResponse Value\r\nuart:~$')
+        );
+
+        expect(mockOnAnyCommandResponse).toBeCalledTimes(1);
+        expect(mockOnAnyCommandResponse).toBeCalledWith({
+            response: 'Response Value',
+            command: 'Test Command',
+            error: false,
+        });
     });
 
     test('Verify permanent onFail callback is called when we have a response in one stream', async () => {
@@ -681,11 +721,10 @@ describe('shell command parser', () => {
             mockOnError
         );
 
-        await shellParser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
         expect(mockOnSuccess).toBeCalledTimes(0);
 
@@ -716,11 +755,10 @@ describe('shell command parser', () => {
             mockOnSuccess,
             mockOnError
         );
-        await shellParser.enqueueRequest(
-            'Test Command',
-            mockOnSuccess,
-            mockOnError
-        );
+        await shellParser.enqueueRequest('Test Command', {
+            onSuccess: mockOnSuccess,
+            onError: mockOnError,
+        });
 
         expect(mockOnError).toBeCalledTimes(0);
 
@@ -750,12 +788,14 @@ describe('shell command parser', () => {
         shellParser.onUnknownCommand(mockOnUnknown);
 
         onResponseCallback(
-            Buffer.from('<inf> main: v=3.595881,i=0.176776\r\n')
+            Buffer.from(
+                '[00:01:46.862,640] <inf> main: v=3.595881,i=0.176776\r\n'
+            )
         );
 
         expect(mockOnShellLogging).toBeCalledTimes(1);
         expect(mockOnShellLogging).toBeCalledWith(
-            'uart:~$<inf> main: v=3.595881,i=0.176776'
+            '[00:01:46.862,640] <inf> main: v=3.595881,i=0.176776'
         );
 
         expect(mockOnError).toBeCalledTimes(0);
@@ -773,7 +813,9 @@ describe('shell command parser', () => {
         shellParser.onShellLoggingEvent(mockOnShellLogging);
         shellParser.onUnknownCommand(mockOnUnknown);
 
-        onResponseCallback(Buffer.from('<inf> main: v=3.595881,i=0'));
+        onResponseCallback(
+            Buffer.from('[00:00:01.114,532] <inf> main: v=3.595881,i=0')
+        );
 
         expect(mockOnShellLogging).toBeCalledTimes(0);
 
@@ -781,7 +823,7 @@ describe('shell command parser', () => {
 
         expect(mockOnShellLogging).toBeCalledTimes(1);
         expect(mockOnShellLogging).toBeCalledWith(
-            'uart:~$<inf> main: v=3.595881,i=0.176776'
+            '[00:00:01.114,532] <inf> main: v=3.595881,i=0.176776'
         );
 
         expect(mockOnError).toBeCalledTimes(0);

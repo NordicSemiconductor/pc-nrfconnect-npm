@@ -55,8 +55,8 @@ export type Charger = {
 };
 
 export type Buck = {
-    vOut: number;
-    retentionVOut: number;
+    vOutNormal: number;
+    vOutRetention: number;
     mode: BuckMode;
     modeControl: BuckModeControl;
     onOffControl: BuckOnOffControl;
@@ -189,12 +189,6 @@ export type BaseNpmDevice = {
     isSupportedVersion: () => Promise<boolean>;
     getSupportedVersion: () => string;
 
-    registerCommandCallbackLoggerWrapper: (
-        command: string,
-        onSuccess: (data: string, command: string) => void,
-        onError: (error: string, command: string) => void
-    ) => (() => void) | undefined;
-
     getUptimeOverflowCounter: () => number;
     setUptimeOverflowCounter: (value: number) => void;
 };
@@ -233,8 +227,8 @@ export type NpmDevice = {
         chargerITerm: (index: number) => void;
         chargerEnabledRecharging: (index: number) => void;
 
-        buckVOut: (index: number) => void;
-        buckRetentionVOut: (index: number) => void;
+        buckVOutNormal: (index: number) => void;
+        buckVOutRetention: (index: number) => void;
         buckMode: (index: number) => void;
         buckModeControl: (index: number) => void;
         buckOnOffControl: (index: number) => void;
@@ -266,8 +260,8 @@ export type NpmDevice = {
         enabled: boolean
     ) => Promise<void>;
 
-    setBuckVOut: (index: number, value: number) => Promise<void>;
-    setBuckRetentionVOut: (index: number, value: number) => Promise<void>;
+    setBuckVOutNormal: (index: number, value: number) => Promise<void>;
+    setBuckVOutRetention: (index: number, value: number) => Promise<void>;
     setBuckMode: (index: number, mode: BuckMode) => Promise<void>;
     setBuckModeControl: (index: number, mode: BuckModeControl) => Promise<void>;
     setBuckOnOffControl: (
@@ -293,6 +287,8 @@ export type NpmDevice = {
     storeBattery: () => Promise<void>;
 
     setBatteryStatusCheckEnabled: (enabled: boolean) => void;
+
+    getBatteryProfiler: () => BatteryProfiler | undefined;
 } & BaseNpmDevice;
 
 export interface PmicDialog {
@@ -333,3 +329,30 @@ export interface LoggingEvent {
     module: string;
     message: string;
 }
+
+export interface Profile {
+    tLoad: number;
+    tRest: number;
+    iLoad: number;
+    iRest: number;
+    cycles: number;
+    vCutoff?: number;
+}
+
+export interface IBatteryProfiler {
+    (shellParser: ShellParser, eventEmitter: EventEmitter): BatteryProfiler;
+}
+
+export type BatteryProfiler = {
+    setProfile: (
+        reportInterval: number,
+        vCutoff: number,
+        profiles: Profile[]
+    ) => Promise<void>;
+    startProfiling: () => Promise<void>;
+    stopProfiling: () => Promise<void>;
+    isProfiling: () => Promise<boolean>;
+    onProfilingStateChange: (
+        handler: (state: boolean, error?: string) => void
+    ) => () => void;
+};

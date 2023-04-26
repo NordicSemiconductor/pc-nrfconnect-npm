@@ -15,7 +15,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
-import { ShellParser } from '../../../hooks/commandParser';
+import { getShellParser } from '../../serial/serialSlice';
 import {
     getEventRecording,
     getEventRecordingPath,
@@ -33,6 +33,7 @@ import {
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
+    setProfiling,
     setStoredBatterModel,
     setSupportedVersion,
     setUsbPowered,
@@ -44,10 +45,12 @@ import { getNpmDevice } from './npmFactory';
 import {
     dialogHandler,
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+    noop,
 } from './pmicHelpers';
 import { Buck, Charger, Ldo, PmicDialog } from './types';
 
-export default (shellParser: ShellParser | undefined) => {
+export default () => {
+    const shellParser = useSelector(getShellParser);
     const npmDevice = useSelector(getNpmDeviceSlice);
     const dispatch = useDispatch();
     const supportedVersion = useSelector(isSupportedVersion);
@@ -71,13 +74,12 @@ export default (shellParser: ShellParser | undefined) => {
         }
 
         for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
-            npmDevice.requestUpdate.buckVOut(i);
-            npmDevice.requestUpdate.buckRetentionVOut(i);
+            npmDevice.requestUpdate.buckVOutNormal(i);
+            npmDevice.requestUpdate.buckVOutRetention(i);
             npmDevice.requestUpdate.buckMode(i);
             npmDevice.requestUpdate.buckEnabled(i);
             npmDevice.requestUpdate.buckModeControl(i);
             npmDevice.requestUpdate.buckOnOffControl(i);
-            npmDevice.requestUpdate.buckRetentionVOut(i);
         }
 
         for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
@@ -117,8 +119,8 @@ export default (shellParser: ShellParser | undefined) => {
         const emptyBuck: Buck[] = [];
         for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
             emptyBuck.push({
-                vOut: npmDevice.getBuckVoltageRange(i).min,
-                retentionVOut: 1,
+                vOutNormal: npmDevice.getBuckVoltageRange(i).min,
+                vOutRetention: 1,
                 mode: 'vSet',
                 enabled: true,
                 modeControl: 'Auto',
@@ -372,6 +374,13 @@ export default (shellParser: ShellParser | undefined) => {
                 }
             });
 
+            const releaseOnBatteryProfiler =
+                npmDevice
+                    .getBatteryProfiler()
+                    ?.onProfilingStateChange(profiling => {
+                        dispatch(setProfiling(profiling));
+                    }) ?? noop;
+
             dispatch(setPmicState(npmDevice.getConnectionState()));
 
             initComponents();
@@ -390,6 +399,7 @@ export default (shellParser: ShellParser | undefined) => {
                 releaseOnReboot();
                 releaseOnUsbPowered();
                 releaseOnProfileDownloadUpdate();
+                releaseOnBatteryProfiler();
             };
         }
     }, [dispatch, initComponents, npmDevice]);

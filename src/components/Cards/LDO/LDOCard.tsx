@@ -19,11 +19,10 @@ import {
     LdoMode,
     NpmDevice,
 } from '../../../features/pmicControl/npm/types';
-import { RangeType } from '../../../utils/helpers';
 
 interface LdoCardProperties {
     index: number;
-    npmDevice?: NpmDevice;
+    npmDevice: NpmDevice;
     ldo: Ldo;
     cardLabel?: string;
     disabled: boolean;
@@ -36,14 +35,14 @@ export default ({
     cardLabel = `LDO/Load Switch ${index + 1}`,
     disabled,
 }: LdoCardProperties) => {
-    const range = npmDevice?.getLdoVoltageRange(index);
+    const range = npmDevice.getLdoVoltageRange(index);
 
-    const onEnable = (value: boolean) => npmDevice?.setLdoEnabled(index, value);
+    const onEnable = (value: boolean) => npmDevice.setLdoEnabled(index, value);
 
-    const onModeChange = (mode: LdoMode) => npmDevice?.setLdoMode(index, mode);
+    const onModeChange = (mode: LdoMode) => npmDevice.setLdoMode(index, mode);
 
     const onVoltageChange = (value: number) =>
-        npmDevice?.setLdoVoltage(index, value);
+        npmDevice.setLdoVoltage(index, value);
 
     const [internalVLdo, setInternalVLdo] = useState(ldo?.voltage ?? 0);
 
@@ -89,7 +88,7 @@ export default ({
                         <NumberInlineInput
                             disabled
                             value={internalVLdo}
-                            range={range as RangeType}
+                            range={range}
                             onChange={value => setInternalVLdo(value)}
                             onChangeComplete={() =>
                                 onVoltageChange(internalVLdo)
@@ -103,7 +102,7 @@ export default ({
                     values={[internalVLdo]}
                     onChange={[value => setInternalVLdo(value)]}
                     onChangeComplete={() => onVoltageChange(internalVLdo)}
-                    range={range as RangeType}
+                    range={range}
                 />
             </div>
         </Card>

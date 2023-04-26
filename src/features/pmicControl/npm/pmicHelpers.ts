@@ -15,6 +15,8 @@ import {
     PmicDialog,
 } from './types';
 
+export const noop = () => {};
+
 // parse strings like value is: XXX mV
 export const parseColonBasedAnswer = (message: string) =>
     message.split(':')[1]?.trim();
@@ -139,3 +141,4 @@ export const dialogHandler =
 
 export const MAX_TIMESTAMP = 359999999; // 99hrs 59min 59sec 999ms
 export const DOWNLOAD_BATTERY_PROFILE_DIALOG_ID = 'downloadBatteryProfile';
+export const GENERATE_BATTERY_PROFILE_DIALOG_ID = 'generateBatteryProfile';

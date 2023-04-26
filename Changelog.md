@@ -10,8 +10,10 @@ and this project adheres to
 
 ### Added
 
--   PMIC1300 FP1 Support FW Version 0.0.0+12
+-   PMIC1300 FP2 Support FW Version 0.0.0+14
 -   Upload Profile
+-   Charger iTerm support
+-   Charger V Trickle Fast support
 
 ### Changed
 
