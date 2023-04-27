@@ -22,7 +22,7 @@ export default ({ active }: PaneProps) => {
     const pmicState = useSelector(getPmicState);
     const profiling = useSelector(isProfiling);
 
-    const [pauseFor100Ms, setPauseFor1Second] = useState(paused);
+    const [pauseFor100Ms, setPauseFor100Ms] = useState(paused);
     const disabled =
         (!supportedVersion && pmicState !== 'ek-disconnected') ||
         pmicState === 'pmic-disconnected' ||
@@ -32,7 +32,7 @@ export default ({ active }: PaneProps) => {
 
     useEffect(() => {
         const t = setTimeout(() => {
-            setPauseFor1Second(paused);
+            setPauseFor100Ms(paused);
         }, 100);
 
         return () => clearTimeout(t);
