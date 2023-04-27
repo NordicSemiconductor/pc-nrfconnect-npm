@@ -40,6 +40,18 @@ export type ITerm = (typeof ITermValues)[number];
 export const VTrickleFastValues = [2.5, 2.9] as const;
 export type VTrickleFast = (typeof VTrickleFastValues)[number];
 
+export type ProfilingEvent = {
+    iLoad: number;
+    vLoad: number;
+    tBat: number;
+    cycle: number;
+    seq: number;
+    chg: number;
+    rep: number;
+    t0: number;
+    t1: number;
+};
+
 export type IrqEvent = {
     type: string;
     event: string;
@@ -335,7 +347,7 @@ export interface Profile {
     tRest: number;
     iLoad: number;
     iRest: number;
-    cycles: number;
+    cycles?: number;
     vCutoff?: number;
 }
 
@@ -345,7 +357,8 @@ export interface IBatteryProfiler {
 
 export type BatteryProfiler = {
     setProfile: (
-        reportInterval: number,
+        reportIntervalCc: number,
+        reportIntervalNtc: number,
         vCutoff: number,
         profiles: Profile[]
     ) => Promise<void>;
@@ -354,5 +367,8 @@ export type BatteryProfiler = {
     isProfiling: () => Promise<boolean>;
     onProfilingStateChange: (
         handler: (state: boolean, error?: string) => void
+    ) => () => void;
+    onProfilingEvent: (
+        handler: (state: ProfilingEvent, error?: string) => void
     ) => () => void;
 };

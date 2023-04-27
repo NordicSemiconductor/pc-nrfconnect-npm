@@ -12,10 +12,51 @@ import { dequeueDialog, requestDialog } from '../pmicControlSlice';
 import {
     BatteryModel,
     BatteryModelCharacterization,
+    LoggingEvent,
     PmicDialog,
 } from './types';
 
 export const noop = () => {};
+
+const parseTime = (timeString: string) => {
+    const time = timeString.trim().split(',')[0].replace('.', ':').split(':');
+    const msec = Number(time[3]);
+    const sec = Number(time[2]) * 1000;
+    const min = Number(time[1]) * 1000 * 60;
+    const hr = Number(time[0]) * 1000 * 60 * 60;
+
+    return msec + sec + min + hr;
+};
+
+export const isModuleDataPair = (module: string) =>
+    module === 'module_pmic_adc' ||
+    module === 'module_pmic_irq' ||
+    module === 'module_cc_profiling';
+
+export const parseLogData = (
+    logMessage: string,
+    callback: (loggingEvent: LoggingEvent) => void
+) => {
+    const endOfTimestamp = logMessage.indexOf(']');
+
+    const strTimeStamp = logMessage.substring(1, endOfTimestamp);
+
+    const endOfLogLevel = logMessage.indexOf('>');
+
+    const logLevel = logMessage.substring(
+        logMessage.indexOf('<') + 1,
+        endOfLogLevel
+    );
+    const module = logMessage.substring(
+        endOfLogLevel + 2,
+        logMessage.indexOf(':', endOfLogLevel)
+    );
+    const message = logMessage
+        .substring(logMessage.indexOf(':', endOfLogLevel) + 2)
+        .trim();
+
+    callback({ timestamp: parseTime(strTimeStamp), logLevel, module, message });
+};
 
 // parse strings like value is: XXX mV
 export const parseColonBasedAnswer = (message: string) =>
