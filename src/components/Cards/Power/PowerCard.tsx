@@ -10,6 +10,7 @@ import {
     Card,
     classNames,
     Dropdown,
+    Group,
     NumberInlineInput,
     Slider,
     Toggle,
@@ -165,7 +166,7 @@ export default ({
                 />
             </div>
             {!summary && (
-                <>
+                <Group className={`${disabled ? 'disabled' : ''}`}>
                     <Dropdown
                         label="iTerm"
                         items={iTermItems}
@@ -210,14 +211,13 @@ export default ({
                         }
                         disabled={disabled}
                     />
-
                     <Toggle
                         label="Enable Recharging"
                         isToggled={charger.enableRecharging}
                         onToggle={noop}
                         disabled={disabled}
                     />
-                </>
+                </Group>
             )}
         </Card>
     ) : null;
