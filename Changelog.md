@@ -6,7 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.0.11 - UNRELEASED
+## 0.0.12 - 2023-04-27
+
+### Added
+
+-   Battery Profiling (Alpha)
+-   Buck GPIO Retention control support
+-   Buck GPIO On/Off control support
+-   Buck GPIO Buck Mode Control control support
+-   Buck Retention voltage
+
+### Changed
+
+-   Moved warning dialogs of bucks and I2C to buck 2
+
+### Fixed
+
+-   UI Improvements
+
+## 0.0.11 - 2023-04-26
 
 ### Added
 
