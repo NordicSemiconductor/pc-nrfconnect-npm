@@ -324,7 +324,6 @@ export default () => {
                                                                 5 /
                                                                 1000, // mAh
                                                             iRest: 0,
-                                                            cycles: 1,
                                                             vCutoff: 3.9,
                                                         },
                                                         {

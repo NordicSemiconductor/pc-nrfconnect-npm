@@ -15,6 +15,7 @@ and this project adheres to
 ### Fixed
 
 -   UI Improvements
+-   Battery Profiling cycle count
 
 ## 0.0.12 - 2023-04-27
 
