@@ -506,10 +506,10 @@ export default () => {
                 (!latestProfilingEvent || latestProfilingEvent.seq === 0) && (
                     <>
                         <div>
-                            <ProfilingMessage />
                             <p>
                                 <span>Resting Battery</span>
                             </p>
+                            <ProfilingMessage />
                         </div>
                         <Form.Group>
                             <TimeComponent
