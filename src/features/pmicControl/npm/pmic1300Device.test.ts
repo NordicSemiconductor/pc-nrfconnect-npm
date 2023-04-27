@@ -380,7 +380,7 @@ describe('PMIC 1300', () => {
             );
 
             test.each(PMIC_1300_BUCKS)(
-                'Request update buckRetentionVOut index: %p',
+                'Request update buckVOutRetention index: %p',
                 index => {
                     pmic.requestUpdate.buckVOutRetention(index);
 
@@ -875,20 +875,20 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test('Set setBuckVOut index: 0 with warning - cancel', async () => {
+            test('Set setBuckVOut index: 1 with warning - cancel', async () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onCancel();
                     }
                 );
 
-                await pmic.setBuckVOutNormal(0, 1.7);
+                await pmic.setBuckVOutNormal(1, 1.7);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck voltage normal get 0`,
+                    `npmx buck voltage normal get 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -898,20 +898,20 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test('Set setBuckVOut index: 0 with warning - confirm', async () => {
+            test('Set setBuckVOut index: 1 with warning - confirm', async () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
                     }
                 );
 
-                await pmic.setBuckVOutNormal(0, 1.7);
+                await pmic.setBuckVOutNormal(1, 1.7);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck voltage normal set 0 1700`,
+                    `npmx buck voltage normal set 1 1700`,
                     expect.anything(),
                     undefined,
                     true
@@ -920,7 +920,7 @@ describe('PMIC 1300', () => {
                 // change from vSet to Software
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx buck vout select set 0 1`,
+                    `npmx buck vout select set 1 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -930,20 +930,20 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test("Set setBuckVOut index: 0 with warning - yes, don't ask", async () => {
+            test("Set setBuckVOut index: 1 with warning - yes, don't ask", async () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         if (dialog?.onOptional) dialog.onOptional();
                     }
                 );
 
-                await pmic.setBuckVOutNormal(0, 1.7);
+                await pmic.setBuckVOutNormal(1, 1.7);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck voltage normal set 0 1700`,
+                    `npmx buck voltage normal set 1 1700`,
                     expect.anything(),
                     undefined,
                     true
@@ -952,7 +952,7 @@ describe('PMIC 1300', () => {
                 // change from vSet to Software
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx buck vout select set 0 1`,
+                    `npmx buck vout select set 1 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -962,18 +962,21 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckRetentionVOut index: %p',
                 async index => {
-                    await pmic.setBuckVOutRetention(index, 1.7);
+                    await pmic.setBuckVOutRetention(index, 1.8);
 
-                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                    expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { vOutRetention: 1.7 },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx buck voltage retention set ${index} 1800`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Updates should only be emitted when we get response
+                    expect(mockOnBuckUpdate).toBeCalledTimes(0);
                 }
             );
 
@@ -1005,20 +1008,20 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test('Set setBuckMode index: 0 with software - cancel', async () => {
+            test('Set setBuckMode index: 1 with software - cancel', async () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onCancel();
                     }
                 );
 
-                await pmic.setBuckMode(0, 'software');
+                await pmic.setBuckMode(1, 'software');
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck voltage normal get 0`,
+                    `npmx buck voltage normal get 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -1028,21 +1031,21 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test('Set setBuckMode index: 0 with software - confirm', async () => {
+            test('Set setBuckMode index: 1 with software - confirm', async () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
                     }
                 );
 
-                await pmic.setBuckMode(0, 'software');
+                await pmic.setBuckMode(1, 'software');
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck vout select set 0 1`,
+                    `npmx buck vout select set 1 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -1051,7 +1054,7 @@ describe('PMIC 1300', () => {
                 // We need to request the buckVOut
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx buck voltage normal get 0`,
+                    `npmx buck voltage normal get 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -1061,21 +1064,21 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test("Set setBuckMode index: 0 with software - yes, don't ask", async () => {
+            test("Set setBuckMode index: 1 with software - yes, don't ask", async () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         if (dialog.onOptional) dialog.onOptional();
                     }
                 );
 
-                await pmic.setBuckMode(0, 'software');
+                await pmic.setBuckMode(1, 'software');
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck vout select set 0 1`,
+                    `npmx buck vout select set 1 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -1084,7 +1087,7 @@ describe('PMIC 1300', () => {
                 // We need to request the buckVOut
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx buck voltage normal get 0`,
+                    `npmx buck voltage normal get 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -1094,52 +1097,57 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckModeControl index: %p',
                 async index => {
-                    await pmic.setBuckModeControl(index, 'Auto');
+                    await pmic.setBuckModeControl(index, 'GPIO2');
 
-                    expect(mockOnBuckUpdate).toBeCalledTimes(1);
-                    expect(mockOnBuckUpdate).toBeCalledWith({
-                        data: { modeControl: 'Auto' },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx buck gpio pwm_force set ${index} 2 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckOnOffControl index: %p',
                 async index => {
-                    await pmic.setBuckOnOffControl(index, 'Off');
+                    await pmic.setBuckOnOffControl(index, 'GPIO2');
 
-                    expect(mockOnBuckUpdate).toBeCalledTimes(1);
-                    expect(mockOnBuckUpdate).toBeCalledWith({
-                        data: { onOffControl: 'Auto' },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx buck gpio on_off set ${index} 2 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckRetentionControl index: %p',
                 async index => {
-                    await pmic.setBuckRetentionControl(index, 'Off');
+                    await pmic.setBuckRetentionControl(index, 'GPIO2');
 
-                    expect(mockOnBuckUpdate).toBeCalledTimes(1);
-                    expect(mockOnBuckUpdate).toBeCalledWith({
-                        data: { retentionControl: 'Off' },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx buck gpio retention set ${index} 2 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Updates should only be emitted when we get response
+                    expect(mockOnBuckUpdate).toBeCalledTimes(0);
                 }
             );
 
@@ -1162,14 +1170,14 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test('Set setBuckEnabled index: 0 false - cancel', async () => {
+            test('Set setBuckEnabled index: 1 false - cancel', async () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onCancel();
                     }
                 );
 
-                await pmic.setBuckEnabled(0, false);
+                await pmic.setBuckEnabled(1, false);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // No need to request UI update
@@ -1179,7 +1187,7 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test("Set setBuckEnabled index: 0 false -  yes, don't ask", async () => {
+            test("Set setBuckEnabled index: 1 false -  yes, don't ask", async () => {
                 mockEnqueueRequest.mockClear();
 
                 mockDialogHandler.mockImplementationOnce(
@@ -1188,13 +1196,13 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckEnabled(0, false);
+                await pmic.setBuckEnabled(1, false);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck set 0 0`,
+                    `npmx buck set 1 0`,
                     expect.anything(),
                     undefined,
                     true
@@ -1204,7 +1212,7 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test('Set setBuckEnabled index: 0 false - confirm', async () => {
+            test('Set setBuckEnabled index: 1 false - confirm', async () => {
                 mockEnqueueRequest.mockClear();
 
                 mockDialogHandler.mockImplementationOnce(
@@ -1213,13 +1221,13 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckEnabled(0, false);
+                await pmic.setBuckEnabled(1, false);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck set 0 0`,
+                    `npmx buck set 1 0`,
                     expect.anything(),
                     undefined,
                     true
@@ -1828,20 +1836,33 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckRetentionVOut - Fail immediately - index: %p',
                 async index => {
                     await expect(
                         pmic.setBuckVOutRetention(index, 1.7)
                     ).rejects.toBeUndefined();
 
-                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                    expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { vOutRetention: 1.7 },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx buck voltage retention set ${index} 1700`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx buck voltage retention get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Updates should only be emitted when we get response
+                    expect(mockOnBuckUpdate).toBeCalledTimes(0);
                 }
             );
 
@@ -1875,58 +1896,93 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckModeControl - Fail immediately - index: %p',
                 async index => {
                     await expect(
-                        pmic.setBuckModeControl(index, 'Auto')
+                        pmic.setBuckModeControl(index, 'GPIO2')
                     ).rejects.toBeUndefined();
 
-                    expect(mockOnBuckUpdate).toBeCalledTimes(1);
-                    expect(mockOnBuckUpdate).toBeCalledWith({
-                        data: { modeControl: 'Auto' },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx buck gpio pwm_force set ${index} 2 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx buck gpio pwm_force get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckOnOffControl - Fail immediately - index: %p',
                 async index => {
                     await expect(
-                        pmic.setBuckOnOffControl(index, 'Off')
+                        pmic.setBuckOnOffControl(index, 'GPIO2')
                     ).rejects.toBeUndefined();
 
-                    expect(mockOnBuckUpdate).toBeCalledTimes(1);
-                    expect(mockOnBuckUpdate).toBeCalledWith({
-                        data: { onOffControl: 'Auto' },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx buck gpio on_off set ${index} 2 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx buck gpio on_off get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckRetentionControl - Fail immediately - index: %p',
                 async index => {
                     await expect(
-                        pmic.setBuckRetentionControl(index, 'Off')
+                        pmic.setBuckRetentionControl(index, 'GPIO2')
                     ).rejects.toBeUndefined();
 
-                    expect(mockOnBuckUpdate).toBeCalledTimes(1);
-                    expect(mockOnBuckUpdate).toBeCalledWith({
-                        data: { retentionControl: 'Off' },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx buck gpio retention set ${index} 2 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx buck gpio retention get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Updates should only be emitted when we get response
+                    expect(mockOnBuckUpdate).toBeCalledTimes(0);
                 }
             );
 

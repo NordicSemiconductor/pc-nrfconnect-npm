@@ -10,10 +10,12 @@ import { getRange } from '../../../utils/helpers';
 import { baseNpmDevice } from './basePmicDevice';
 import { BatteryProfiler } from './batteryProfiler';
 import {
+    isModuleDataPair,
     MAX_TIMESTAMP,
     noop,
     parseBatteryModel,
     parseColonBasedAnswer,
+    parseLogData,
     parseToBoolean,
     parseToNumber,
     toRegex,
@@ -27,6 +29,7 @@ import {
     BuckOnOffControl,
     BuckRetentionControl,
     Charger,
+    GPIOValues,
     INpmDevice,
     IrqEvent,
     ITerm,
@@ -40,41 +43,6 @@ import {
     ProfileDownload,
     VTrickleFast,
 } from './types';
-
-const parseTime = (timeString: string) => {
-    const time = timeString.trim().split(',')[0].replace('.', ':').split(':');
-    const msec = Number(time[3]);
-    const sec = Number(time[2]) * 1000;
-    const min = Number(time[1]) * 1000 * 60;
-    const hr = Number(time[0]) * 1000 * 60 * 60;
-
-    return msec + sec + min + hr;
-};
-
-const parseLogData = (
-    logMessage: string,
-    callback: (loggingEvent: LoggingEvent) => void
-) => {
-    const endOfTimestamp = logMessage.indexOf(']');
-
-    const strTimeStamp = logMessage.substring(1, endOfTimestamp);
-
-    const endOfLogLevel = logMessage.indexOf('>');
-
-    const logLevel = logMessage.substring(
-        logMessage.indexOf('<') + 1,
-        endOfLogLevel
-    );
-    const module = logMessage.substring(
-        endOfLogLevel + 2,
-        logMessage.indexOf(':', endOfLogLevel)
-    );
-    const message = logMessage
-        .substring(logMessage.indexOf(':', endOfLogLevel) + 2)
-        .trim();
-
-    callback({ timestamp: parseTime(strTimeStamp), logLevel, module, message });
-};
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();
@@ -257,18 +225,15 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     shellParser?.onShellLoggingEvent(logEvent => {
         parseLogData(logEvent, loggingEvent => {
-            let dataPair = false;
             switch (loggingEvent.module) {
                 case 'module_pmic':
                     processModulePmic(loggingEvent);
                     break;
                 case 'module_pmic_adc':
                     processModulePmicAdc(loggingEvent);
-                    dataPair = true;
                     break;
                 case 'module_pmic_irq':
                     processModulePmicIrq(loggingEvent);
-                    dataPair = true;
                     break;
                 case 'module_pmic_charger':
                     processModulePmicCharger(loggingEvent);
@@ -280,7 +245,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             eventEmitter.emit('onLoggingEvent', {
                 loggingEvent,
-                dataPair,
+                dataPair: isModuleDataPair(loggingEvent.module),
             });
         });
     });
@@ -544,6 +509,40 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             },
             noop
         );
+
+        shellParser?.registerCommandCallback(
+            toRegex('npmx buck gpio on_off', true, i, '(-?[0-9]+) (0)'),
+            res => {
+                const result = parseToNumber(res);
+                emitPartialEvent<Buck>('onBuckUpdate', i, {
+                    onOffControl: result === -1 ? 'Off' : GPIOValues[result],
+                });
+            },
+            noop
+        );
+
+        shellParser?.registerCommandCallback(
+            toRegex('npmx buck gpio retention', true, i, '(-?[0-9]+) (0)'),
+            res => {
+                const result = parseToNumber(res);
+                emitPartialEvent<Buck>('onBuckUpdate', i, {
+                    retentionControl:
+                        result === -1 ? 'Off' : GPIOValues[result],
+                });
+            },
+            noop
+        );
+
+        shellParser?.registerCommandCallback(
+            toRegex('npmx buck gpio pwm_force', true, i, '(-?[0-9]+) (0)'),
+            res => {
+                const result = parseToNumber(res);
+                emitPartialEvent<Buck>('onBuckUpdate', i, {
+                    modeControl: result === -1 ? 'Auto' : GPIOValues[result],
+                });
+            },
+            noop
+        );
     }
 
     for (let i = 0; i < devices.noOfLdos; i += 1) {
@@ -752,12 +751,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
             });
 
-        if (pmicState !== 'ek-disconnected' && index === 0 && value <= 1.7) {
+        if (pmicState !== 'ek-disconnected' && index === 1 && value <= 1.7) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
-                    doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
-                    message: `Buck 1 Powers the I2C communications that are needed for this app. 
+                    doNotAskAgainStoreID: 'pmic1300-setBuckVOut-1',
+                    message: `Buck 2 Powers the I2C communications that are needed for this app. 
                     Any voltage lower that 1.7v Might cause issues with the Connection to the app. Are you sure you want to continue`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, Don't ask again",
@@ -779,15 +778,23 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     };
 
     const setBuckVOutRetention = (index: number, value: number) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
-
-            if (pmicState === 'ek-disconnected')
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     vOutRetention: value,
                 });
 
-            resolve();
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx buck voltage retention set ${index} ${value * 1000}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.buckVOutRetention(index);
+                        reject();
+                    }
+                );
+            }
         });
 
     const setBuckMode = (index: number, mode: BuckMode) => {
@@ -818,14 +825,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         // TODO Check software voltage as well
         if (
             pmicState !== 'ek-disconnected' &&
-            index === 0 &&
+            index === 1 &&
             mode === 'software'
         ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
-                    message: `Buck 1 Powers the I2C communications that are needed for this app. 
+                    message: `Buck 2 Powers the I2C communications that are needed for this app. 
                     Software voltage might be already set to less then 1.7V . Are you sure you want to continue`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, Don't ask again",
@@ -847,45 +854,75 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     };
 
     const setBuckModeControl = (index: number, modeControl: BuckModeControl) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
-
-            if (pmicState === 'ek-disconnected')
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     modeControl,
                 });
 
-            resolve();
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx buck gpio pwm_force set ${index} ${GPIOValues.findIndex(
+                        v => v === modeControl
+                    )} 0`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.buckModeControl(index);
+                        reject();
+                    }
+                );
+            }
         });
 
     const setBuckOnOffControl = (
         index: number,
         onOffControl: BuckOnOffControl
     ) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
-
-            if (pmicState === 'ek-disconnected')
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     onOffControl,
                 });
 
-            resolve();
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx buck gpio on_off set ${index} ${GPIOValues.findIndex(
+                        v => v === onOffControl
+                    )} 0`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.buckOnOffControl(index);
+                        reject();
+                    }
+                );
+            }
         });
 
     const setBuckRetentionControl = (
         index: number,
         retentionControl: BuckRetentionControl
     ) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
-
-            if (pmicState === 'ek-disconnected')
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
                 emitPartialEvent<Buck>('onBuckUpdate', index, {
                     retentionControl,
                 });
 
-            resolve();
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx buck gpio retention set ${index} ${GPIOValues.findIndex(
+                        v => v === retentionControl
+                    )} 0`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.buckRetentionControl(index);
+                        reject();
+                    }
+                );
+            }
         });
 
     const setBuckEnabled = (index: number, enabled: boolean) => {
@@ -908,12 +945,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
             });
 
-        if (pmicState !== 'ek-disconnected' && index === 0 && !enabled) {
+        if (pmicState !== 'ek-disconnected' && index === 1 && !enabled) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
-                    doNotAskAgainStoreID: 'pmic1300-setBuckEnabled-0',
-                    message: `Disabling the buck 1 might effect I2C communications to the PMIC 1300 chip and hance you might get 
+                    doNotAskAgainStoreID: 'pmic1300-setBuckEnabled-1',
+                    message: `Disabling the buck 2 might effect I2C communications to the PMIC 1300 chip and hance you might get 
                 disconnected from the app. Are you sure you want to proceed?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, Don't ask again",
