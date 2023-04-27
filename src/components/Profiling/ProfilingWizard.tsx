@@ -135,7 +135,7 @@ const TimeComponent = ({
     } = splitMS(eta.current);
 
     if (progress > 0) {
-        const alpha = 0.1;
+        const alpha = 0.2;
         const newEta = (100 / progress) * time - time;
         eta.current = alpha * newEta + (1.0 - alpha) * eta.current;
     } else {
