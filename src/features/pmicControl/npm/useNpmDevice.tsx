@@ -442,7 +442,12 @@ export default () => {
                 const path = `${recordEventsPath}/all_events.csv`;
                 const addHeaders = !existsSync(path);
                 if (addHeaders) data += `timestamp,logLevel,module,message\r\n`;
-                data += `${e.loggingEvent.timestamp},${e.loggingEvent.logLevel},${e.loggingEvent.module},"${e.loggingEvent.message}"\r\n`;
+                data += `${e.loggingEvent.timestamp},${
+                    e.loggingEvent.logLevel
+                },${e.loggingEvent.module},"${e.loggingEvent.message.replaceAll(
+                    /(\r\n|\r|\n)/g,
+                    ' '
+                )}"\r\n`; // TODO look for escaping new lines in csvs
                 appendFile(path, data, () => {});
             }
         });

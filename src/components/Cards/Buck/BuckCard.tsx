@@ -10,6 +10,7 @@ import {
     Card,
     classNames,
     Dropdown,
+    Group,
     NumberInlineInput,
     Slider,
     StateSelector,
@@ -164,7 +165,7 @@ export default ({
                 />
             </div>
             {!summary && (
-                <>
+                <div className={`${disabled ? 'disabled' : ''}`}>
                     <Dropdown
                         label="Buck Mode Control"
                         items={modeControlItems}
@@ -229,11 +230,7 @@ export default ({
                         }
                         disabled={disabled}
                     />
-                    <div
-                        className={`slider-container ${
-                            disabled ? 'disabled' : ''
-                        }`}
-                    >
+                    <Group className="slider-container">
                         <FormLabel className="flex-row">
                             <div>
                                 <span>RET</span>
@@ -263,8 +260,8 @@ export default ({
                             range={retVOutRange}
                             disabled={disabled}
                         />
-                    </div>
-                </>
+                    </Group>
+                </div>
             )}
         </Card>
     ) : null;

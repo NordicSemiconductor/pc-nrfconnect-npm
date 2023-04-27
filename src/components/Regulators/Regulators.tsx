@@ -10,6 +10,7 @@ import { Alert, PaneProps } from 'pc-nrfconnect-shared';
 
 import {
     getPmicState,
+    isProfiling,
     isSupportedVersion,
 } from '../../features/pmicControl/pmicControlSlice';
 import { isPaused } from '../../features/serial/serialSlice';
@@ -19,24 +20,22 @@ export default ({ active }: PaneProps) => {
     const paused = useSelector(isPaused);
     const supportedVersion = useSelector(isSupportedVersion);
     const pmicState = useSelector(getPmicState);
+    const profiling = useSelector(isProfiling);
 
-    const [pauseFor1Second, setPauseFor1Second] = useState(paused);
+    const [pauseFor100Ms, setPauseFor1Second] = useState(paused);
     const disabled =
         (!supportedVersion && pmicState !== 'ek-disconnected') ||
         pmicState === 'pmic-disconnected' ||
         pmicState === 'pmic-unknown' ||
-        pauseFor1Second;
+        profiling ||
+        pauseFor100Ms;
 
     useEffect(() => {
-        if (!paused) {
+        const t = setTimeout(() => {
             setPauseFor1Second(paused);
-        } else {
-            const t = setTimeout(() => {
-                setPauseFor1Second(paused);
-            }, 1000);
+        }, 100);
 
-            return () => clearTimeout(t);
-        }
+        return () => clearTimeout(t);
     }, [paused]);
 
     return !active ? null : (

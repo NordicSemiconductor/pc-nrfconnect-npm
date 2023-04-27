@@ -5,6 +5,7 @@
  */
 
 import EventEmitter from 'events';
+import { logger } from 'pc-nrfconnect-shared';
 
 import { ShellParser } from '../../../hooks/commandParser';
 import { MAX_TIMESTAMP, parseToNumber, toRegex } from './pmicHelpers';
@@ -98,6 +99,24 @@ export const baseNpmDevice: IBaseNpmDevice = (
             module: 'shell_commands',
             logLevel: error ? 'err' : 'inf',
             message: `command: "${command}" response: "${response}"`,
+        };
+
+        eventEmitter.emit('onLoggingEvent', {
+            loggingEvent: event,
+            dataPair: false,
+        });
+
+        if (error) {
+            logger.error(response.replaceAll(/(\r\n|\r|\n)/g, ' '));
+        }
+    });
+
+    shellParser?.onUnknownCommand(command => {
+        const event: LoggingEvent = {
+            timestamp: Date.now() - deviceUptimeToSystemDelta,
+            module: 'shell_commands',
+            logLevel: 'wrn',
+            message: `unknown command: "${command}"`,
         };
 
         eventEmitter.emit('onLoggingEvent', {

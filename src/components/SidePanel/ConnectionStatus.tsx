@@ -9,19 +9,22 @@ import { useSelector } from 'react-redux';
 import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
 
 import {
+    getNpmDevice,
     getPmicState,
+    isProfiling,
     isSupportedVersion,
     isUsbPowered,
 } from '../../features/pmicControl/pmicControlSlice';
 import { getShellParser, isPaused } from '../../features/serial/serialSlice';
 
 export default () => {
-    // Handle trace state
     const shellParser = useSelector(getShellParser);
     const pmicState = useSelector(getPmicState);
     const supportedVersion = useSelector(isSupportedVersion);
     const usbPowered = useSelector(isUsbPowered);
     const paused = useSelector(isPaused);
+    const profiling = useSelector(isProfiling);
+    const npmDevice = useSelector(getNpmDevice);
 
     const connectionStep: Step = {
         id: '1',
@@ -55,8 +58,21 @@ export default () => {
                 },
             ];
 
-            pmicStep.caption = 'Waiting on shell';
-            pmicStep.state = 'active';
+            if (!profiling) {
+                pmicStep.caption = 'Waiting on shell';
+                pmicStep.state = 'active';
+            } else {
+                pmicStep.caption = [
+                    { id: '1', caption: 'Profiling Battery' },
+                    {
+                        id: '2',
+                        caption: 'stop profiling',
+                        action: () =>
+                            npmDevice?.getBatteryProfiler()?.stopProfiling(),
+                    },
+                ];
+                pmicStep.state = 'warning';
+            }
         } else if (!supportedVersion) {
             shellStep.state = 'failure';
             shellStep.caption = 'Wrong firmware';
@@ -66,6 +82,17 @@ export default () => {
         } else if (pmicState === 'pmic-disconnected') {
             pmicStep.caption = 'Not powered';
             pmicStep.state = 'failure';
+        } else if (profiling) {
+            pmicStep.caption = [
+                { id: '1', caption: 'Profiling Battery' },
+                {
+                    id: '2',
+                    caption: 'stop profiling',
+                    action: () =>
+                        npmDevice?.getBatteryProfiler()?.stopProfiling(),
+                },
+            ];
+            pmicStep.state = 'warning';
         } else if (!usbPowered) {
             pmicStep.caption = 'Not powered with USB';
             pmicStep.state = 'warning';

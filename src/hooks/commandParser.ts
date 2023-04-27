@@ -184,15 +184,7 @@ export const hookModemToShellParser = async (
             }
         }
 
-        const commandEndIndex = commandAndResponse.indexOf('\r');
-        const receivedCommand = commandAndResponse.substring(
-            0,
-            commandEndIndex
-        );
-        const receivedResponse = commandAndResponse
-            .substring(commandEndIndex, commandAndResponse.length)
-            .trim();
-        const isError = receivedResponse.match(settings.errorRegex) !== null;
+        const isError = commandAndResponse.match(settings.errorRegex) !== null;
 
         // Trigger one time callbacks
         if (commandQueue.length > 0) {
@@ -202,22 +194,31 @@ export const hookModemToShellParser = async (
             )})`;
 
             // we need to replace \r and \n as shell might add \r \n when shell wraps
-            const matched = receivedCommand
+            const matched = commandAndResponse
                 .replaceAll('\r', '')
                 .replaceAll('\n', '')
                 .match(regex);
             if (matched && commandQueue[0].sent) {
+                const response = commandAndResponse
+                    .replace(commandQueue[0].command, '')
+                    .trim();
                 if (isError) {
                     commandQueue[0].callbacks.forEach(callback =>
-                        callback.onError(receivedResponse, receivedCommand)
+                        callback.onError(response, commandQueue[0].command)
                     );
                     callbackFound = true;
                 } else {
                     commandQueue[0].callbacks.forEach(callback =>
-                        callback.onSuccess(receivedResponse, receivedCommand)
+                        callback.onSuccess(response, commandQueue[0].command)
                     );
                     callbackFound = true;
                 }
+
+                eventEmitter.emit('anyCommandResponse', {
+                    command: commandQueue[0].command,
+                    response,
+                    error: isError,
+                });
 
                 commandQueue.shift();
 
@@ -231,26 +232,31 @@ export const hookModemToShellParser = async (
 
         // Trigger permanent time callbacks
         commandQueueCallbacks.forEach((callbacks, key) => {
-            const commandMatch = receivedCommand.match(`^(${key})`);
+            const commandMatch = commandAndResponse.match(`^(${key})`);
             if (commandMatch) {
+                const response = commandAndResponse
+                    .replace(new RegExp(`^(${key})\r\n`), '')
+                    .trim();
                 if (isError) {
                     callbacks.forEach(callback => {
-                        callback.onError(receivedResponse, commandMatch[0]);
+                        callback.onError(response, commandMatch[0]);
                     });
                 } else {
                     callbacks.forEach(callback => {
-                        callback.onSuccess(receivedResponse, commandMatch[0]);
+                        callback.onSuccess(response, commandMatch[0]);
+                    });
+                }
+
+                if (!callbackFound) {
+                    eventEmitter.emit('anyCommandResponse', {
+                        command: commandMatch[0],
+                        response,
+                        error: isError,
                     });
                 }
 
                 callbackFound = true;
             }
-        });
-
-        eventEmitter.emit('anyCommandResponse', {
-            command: receivedCommand,
-            response: receivedResponse,
-            error: isError,
         });
 
         if (!callbackFound && commandAndResponse !== '') {
@@ -268,7 +274,7 @@ export const hookModemToShellParser = async (
             eventEmitter.emit(
                 'shellLogging',
                 commandBuffer.replace(settings.shellPromptUart, '').trim()
-            );
+            ); // TODO Consider improving tests instead of cleaning this here
             commandBuffer = '';
             return;
         }
