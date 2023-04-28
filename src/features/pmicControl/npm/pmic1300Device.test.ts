@@ -3280,7 +3280,7 @@ describe('PMIC 1300', () => {
 
             expect(mockOnBeforeReboot).toBeCalledTimes(1);
             expect(mockOnBeforeReboot).toBeCalledWith(expect.anything());
-        }); // TODO fix promise of profiler
+        });
 
         test('Adc Sample Logging event once', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
