@@ -134,10 +134,9 @@ const TimeComponent = ({
         days: etaDays,
         hours: etaHours,
         minutes: etaMinutes,
-        seconds: etaSeconds,
     } = splitMS(eta.current);
 
-    if (progress > 0) {
+    if (progress >= 0 && progress <= 100) {
         const alpha = 0.2;
         const newEta = (100 / progress) * time - time;
         eta.current = alpha * newEta + (1.0 - alpha) * eta.current;
@@ -148,18 +147,31 @@ const TimeComponent = ({
     return (
         <>
             <span>
-                {`Elapsed time ${days ? `${days} days ` : ''}${
-                    hours ? `${hours} hrs ` : ''
-                }${minutes ? `${minutes} min ` : ''}${
-                    seconds ? `${seconds} sec ` : ''
+                {`Elapsed time ${days > 0 ? `${days} days ` : ''}${
+                    days > 0 || hours > 0 ? `${hours} hrs ` : ''
+                }${
+                    days > 0 || hours > 0 || minutes > 0
+                        ? `${minutes} min `
+                        : ''
+                }${
+                    hours > 0 || minutes > 0 || seconds > 0
+                        ? `${seconds} sec `
+                        : ''
                 }`}
-                {eta.current > 0
-                    ? `- ETA ${etaDays ? `${etaDays} days ` : ''}${
-                          etaHours ? `${etaHours} hrs ` : ''
-                      }${etaMinutes ? `${etaMinutes} min ` : ''}${
-                          etaSeconds ? `${etaSeconds} sec ` : ''
+                {progress >= 0 &&
+                progress <= 100 &&
+                (etaDays > 0 || etaHours > 0 || etaMinutes > 0)
+                    ? `- ETA ${etaDays > 0 ? `${etaDays} days ` : ''}${
+                          etaDays > 0 || etaHours > 0 ? `${etaHours} hrs ` : ''
+                      }${
+                          etaDays > 0 || etaHours > 0 || etaMinutes > 0
+                              ? `${etaMinutes} min `
+                              : ''
                       }`
-                    : '- ETA Calculating'}
+                    : ''}
+                {progress >= 0 && progress <= 100 ? '- ETA few seconds' : ''}
+                {progress > 100 ? '- ETA few seconds' : ''}
+                {progress < 0 ? '- ETA Calculating' : ''}
             </span>
             <br />
             <ProgressBar now={progress} style={{ height: '4px' }} />
@@ -191,12 +203,13 @@ const splitMS = (ms: number) => {
     };
 };
 
-const restDuration = 900; // seconds
+const restDuration = 10; // seconds
 const reportingRate = 1000;
 
 export default () => {
     const capacityConsumed = useRef(0);
     const timeOffset = useRef(-1);
+    const profilingFilePath = useRef('');
     const [capacityConsumedState, setCapacityConsumedState] = useState(0);
     const [profilingStep, setProfilingStep] =
         useState<ProfileStage>('Configuration');
@@ -244,28 +257,27 @@ export default () => {
         if (latestProfilingEvent && profilingStep === 'Profiling') {
             if (timeOffset.current === -1) {
                 timeOffset.current = Date.now();
+                profilingFilePath.current = `${eventRecordingPath}/battery_raw_${batteryCapacity}mAh_${Math.round(
+                    latestProfilingEvent?.tBat ?? 0
+                )}.csv`;
             }
-            const path = `${eventRecordingPath}/battery_raw_${batteryCapacity}mAh_${Math.round(
-                latestProfilingEvent?.tBat ?? 0
-            )}.csv`;
-            const addHeaders = !existsSync(path);
+
+            const addHeaders = !existsSync(profilingFilePath.current);
             if (addHeaders) {
                 appendFile(
-                    path,
-                    `${latestProfilingEvent.iLoad},${
-                        latestProfilingEvent.vLoad
-                    },${latestProfilingEvent.tBat},${
-                        (Date.now() - timeOffset.current) / 1000
-                    }\r\n`,
+                    profilingFilePath.current,
+                    `Seconds,Current(A),Voltage(V),Temperature(C)\r\n`,
                     () => {}
                 );
             }
 
             appendFile(
-                path,
-                `${latestProfilingEvent.iLoad},${latestProfilingEvent.vLoad},${
+                profilingFilePath.current,
+                `${(Date.now() - timeOffset.current) / 1000},${
+                    latestProfilingEvent.iLoad
+                },${latestProfilingEvent.vLoad},${
                     latestProfilingEvent.tBat
-                },${(Date.now() - timeOffset.current) / 1000}\r\n`,
+                }\r\n`,
                 () => {}
             );
         }
@@ -313,7 +325,10 @@ export default () => {
 
     useEffect(() => {
         const mAhConsumed =
-            (latestProfilingEvent?.iLoad ?? 0 * 1000 * reportingRate) / 3600000;
+            (Math.abs(latestProfilingEvent?.iLoad ?? 0) *
+                1000 *
+                reportingRate) /
+            3600000;
         capacityConsumed.current += mAhConsumed;
         setCapacityConsumedState(capacityConsumed.current);
     }, [latestProfilingEvent]);
@@ -412,7 +427,7 @@ export default () => {
                                                             tRest: 500,
                                                             iLoad: 0,
                                                             iRest: 0,
-                                                            cycles: 300000, // 5Min
+                                                            cycles: restDuration, // 300000, // 5Min
                                                         },
                                                         {
                                                             tLoad: 600000, // 10Min
