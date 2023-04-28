@@ -169,7 +169,11 @@ const TimeComponent = ({
                               : ''
                       }`
                     : ''}
-                {progress >= 0 && progress <= 100 ? '- ETA few seconds' : ''}
+                {progress >= 0 &&
+                progress <= 100 &&
+                !(etaDays > 0 || etaHours > 0 || etaMinutes > 0)
+                    ? '- ETA few seconds'
+                    : ''}
                 {progress > 100 ? '- ETA few seconds' : ''}
                 {progress < 0 ? '- ETA Calculating' : ''}
             </span>
