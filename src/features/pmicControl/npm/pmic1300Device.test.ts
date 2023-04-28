@@ -3273,8 +3273,8 @@ describe('PMIC 1300', () => {
             mockOnChargingStatusUpdate = setupMock.mockOnChargingStatusUpdate;
         });
 
-        test.skip('Reboot when device PMIC is available', () => {
-            eventHandlers.mockOnShellLoggingEventHandler(
+        test('Reboot when device PMIC is available', async () => {
+            await eventHandlers.mockOnShellLoggingEventHandler(
                 '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
             );
 
