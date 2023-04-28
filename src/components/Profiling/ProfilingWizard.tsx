@@ -422,7 +422,7 @@ export default () => {
                                                             tRest: 500,
                                                             iLoad: 0,
                                                             iRest: 0,
-                                                            cycles: 300000, // 5Min
+                                                            cycles: 300, // 5Min
                                                         },
                                                         {
                                                             tLoad: 600000, // 10Min
