@@ -50,13 +50,13 @@ export const BatteryProfiler: IBatteryProfiler = (
                 const pair = part.split('=');
                 switch (pair[0]) {
                     case 'iload':
-                        event.iLoad = Number.parseInt(pair[1], 10);
+                        event.iLoad = Number.parseFloat(pair[1]);
                         break;
                     case 'vload':
-                        event.vLoad = Number.parseInt(pair[1], 10);
+                        event.vLoad = Number.parseFloat(pair[1]);
                         break;
                     case 'tbat':
-                        event.tBat = Number.parseInt(pair[1], 10);
+                        event.tBat = Number.parseFloat(pair[1]);
                         break;
                     case 'cycle':
                         event.cycle = Number.parseInt(pair[1], 10);
@@ -65,16 +65,16 @@ export const BatteryProfiler: IBatteryProfiler = (
                         event.seq = Number.parseInt(pair[1], 10);
                         break;
                     case 'chg':
-                        event.chg = Number.parseInt(pair[1], 10);
+                        event.chg = Number.parseFloat(pair[1]);
                         break;
                     case 'rep':
                         event.rep = Number.parseInt(pair[1], 10);
                         break;
                     case 't0':
-                        event.t0 = Number.parseInt(pair[1], 10);
+                        event.t0 = Number.parseFloat(pair[1]);
                         break;
                     case 't1':
-                        event.t1 = Number.parseInt(pair[1], 10);
+                        event.t1 = Number.parseFloat(pair[1]);
                         break;
                 }
             });
