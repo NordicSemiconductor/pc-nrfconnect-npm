@@ -20,7 +20,7 @@ export const BatteryProfiler: IBatteryProfiler = (
     shellParser: ShellParser,
     eventEmitter: EventEmitter
 ) => {
-    let profiling: ProfilingState;
+    let profiling: ProfilingState = 'Off';
     const processModuleCcProfiling = ({ message }: LoggingEvent) => {
         if (message.includes('Success: Profiling sequence completed')) {
             profiling = 'Ready';

@@ -11,6 +11,7 @@ and this project adheres to
 ### Fixed
 
 -   Fix second rest cycle count
+-   Fixed reboot device when PIMC become available
 
 ## 0.0.13 - 2023-04-28
 
