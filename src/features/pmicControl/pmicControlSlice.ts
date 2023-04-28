@@ -39,7 +39,7 @@ interface pmicControlState {
     defaultBatterModels: BatteryModel[];
     storedBatterModel?: BatteryModel;
     usbPowered: boolean;
-    profilingState?: ProfilingState;
+    profilingState: ProfilingState;
     showProfilingWizard?: boolean;
 }
 
@@ -63,6 +63,7 @@ const initialState: pmicControlState = {
     dialog: [],
     eventRecording: false,
     usbPowered: false,
+    profilingState: 'Off',
 };
 
 const pmicControlSlice = createSlice({

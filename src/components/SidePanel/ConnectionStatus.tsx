@@ -23,7 +23,7 @@ export default () => {
     const supportedVersion = useSelector(isSupportedVersion);
     const usbPowered = useSelector(isUsbPowered);
     const paused = useSelector(isPaused);
-    const profiling = useSelector(getProfilingState);
+    const profilingState = useSelector(getProfilingState);
     const npmDevice = useSelector(getNpmDevice);
 
     const [pauseFor10Ms, setPauseFor10ms] = useState(paused);
@@ -68,7 +68,7 @@ export default () => {
                 },
             ];
 
-            if (!profiling) {
+            if (profilingState === 'Off') {
                 pmicStep.caption = 'Waiting on shell';
                 pmicStep.state = 'active';
             } else {
@@ -92,7 +92,7 @@ export default () => {
         } else if (pmicState === 'pmic-disconnected') {
             pmicStep.caption = 'Not powered';
             pmicStep.state = 'failure';
-        } else if (profiling) {
+        } else if (profilingState !== 'Off') {
             pmicStep.caption = [
                 { id: '1', caption: 'Profiling Battery' },
                 {
