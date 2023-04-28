@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
 
@@ -25,6 +25,16 @@ export default () => {
     const paused = useSelector(isPaused);
     const profiling = useSelector(isProfiling);
     const npmDevice = useSelector(getNpmDevice);
+
+    const [pauseFor100Ms, setPauseFor100ms] = useState(paused);
+
+    useEffect(() => {
+        const t = setTimeout(() => {
+            setPauseFor100ms(paused);
+        }, 100);
+
+        return () => clearTimeout(t);
+    }, [paused]);
 
     const connectionStep: Step = {
         id: '1',
@@ -47,7 +57,7 @@ export default () => {
         shellStep.caption = 'Shell is free';
         shellStep.state = 'success';
 
-        if (paused) {
+        if (pauseFor100Ms) {
             shellStep.state = 'warning';
             shellStep.caption = [
                 { id: '1', caption: 'Shell is busy' },
