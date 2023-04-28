@@ -139,6 +139,10 @@ export const BatteryProfiler: IBatteryProfiler = (
                         resolve();
                     },
                     onError: reject,
+                    onTimeout: error => {
+                        reject(error);
+                        console.warn(error);
+                    },
                 }
             );
         });
@@ -150,6 +154,10 @@ export const BatteryProfiler: IBatteryProfiler = (
                     resolve();
                 },
                 onError: reject,
+                onTimeout: error => {
+                    reject(error);
+                    console.warn(error);
+                },
             });
         });
 
@@ -160,6 +168,10 @@ export const BatteryProfiler: IBatteryProfiler = (
                     resolve();
                 },
                 onError: reject,
+                onTimeout: error => {
+                    reject(error);
+                    console.warn(error);
+                },
             });
         });
 
