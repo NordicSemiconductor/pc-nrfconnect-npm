@@ -203,7 +203,7 @@ const splitMS = (ms: number) => {
     };
 };
 
-const restDuration = 10; // seconds
+const restDuration = 900; // seconds
 const reportingRate = 1000;
 
 export default () => {
@@ -263,23 +263,14 @@ export default () => {
             }
 
             const addHeaders = !existsSync(profilingFilePath.current);
+            let data = `${(Date.now() - timeOffset.current) / 1000},${
+                latestProfilingEvent.iLoad
+            },${latestProfilingEvent.vLoad},${latestProfilingEvent.tBat}\r\n`;
             if (addHeaders) {
-                appendFile(
-                    profilingFilePath.current,
-                    `Seconds,Current(A),Voltage(V),Temperature(C)\r\n`,
-                    () => {}
-                );
+                data = `Seconds,Current(A),Voltage(V),Temperature(C)\r\n${data}`;
             }
 
-            appendFile(
-                profilingFilePath.current,
-                `${(Date.now() - timeOffset.current) / 1000},${
-                    latestProfilingEvent.iLoad
-                },${latestProfilingEvent.vLoad},${
-                    latestProfilingEvent.tBat
-                }\r\n`,
-                () => {}
-            );
+            appendFile(profilingFilePath.current, data, () => {});
         }
     }, [
         batteryCapacity,
@@ -427,7 +418,7 @@ export default () => {
                                                             tRest: 500,
                                                             iLoad: 0,
                                                             iRest: 0,
-                                                            cycles: restDuration, // 300000, // 5Min
+                                                            cycles: 300000, // 5Min
                                                         },
                                                         {
                                                             tLoad: 600000, // 10Min
