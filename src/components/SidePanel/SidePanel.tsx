@@ -40,8 +40,8 @@ import {
     getEventRecordingPath,
     getLatestAdcSample,
     getNpmDevice,
+    getProfilingState,
     getStoredBatterModel,
-    isProfiling,
     setEventRecordingPath,
     setShowProfilingWizard,
     showProfilingWizard,
@@ -78,7 +78,7 @@ export default () => {
     const storedBatterModel = useSelector(getStoredBatterModel);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
-    const profiling = useSelector(isProfiling);
+    const profilingState = useSelector(getProfilingState);
     const profilingWizard = useSelector(showProfilingWizard);
 
     const getClosest = (
@@ -141,11 +141,12 @@ export default () => {
                         new Terminal({ allowProposedApi: true, cols: 999 })
                     ),
                     {
-                        shellPromptUart: 'shell:~$',
+                        shellPromptUart: 'shell:~$ ',
                         logRegex:
                             /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
                         errorRegex: /Error: /,
                         timeout: 1000,
+                        columnWidth: 80,
                     }
                 );
 
@@ -315,7 +316,7 @@ export default () => {
                         disabled={
                             !profilingSupported ||
                             pmicConnection === 'ek-disconnected' ||
-                            profiling
+                            profilingState !== 'Off'
                         }
                     >
                         Profile Battery

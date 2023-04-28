@@ -48,7 +48,10 @@ export const baseNpmDevice: IBaseNpmDevice = (
                         resolve(parseToNumber(res));
                     },
                     onError: reject,
-                    onTimeout: console.warn,
+                    onTimeout: error => {
+                        reject(error);
+                        console.warn(error);
+                    },
                 },
                 undefined,
                 true
@@ -67,7 +70,10 @@ export const baseNpmDevice: IBaseNpmDevice = (
                 onError: () => {
                     rebooting = false;
                 },
-                onTimeout: console.warn,
+                onTimeout: error => {
+                    rebooting = false;
+                    console.warn(error);
+                },
             },
             undefined,
             true
@@ -256,7 +262,10 @@ export const baseNpmDevice: IBaseNpmDevice = (
                             );
                         },
                         onError: reject,
-                        onTimeout: console.warn,
+                        onTimeout: error => {
+                            reject(error);
+                            console.warn(error);
+                        },
                     },
                     undefined,
                     true

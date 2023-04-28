@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
 
 import {
     getNpmDevice,
     getPmicState,
-    isProfiling,
+    getProfilingState,
     isSupportedVersion,
     isUsbPowered,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -23,8 +23,18 @@ export default () => {
     const supportedVersion = useSelector(isSupportedVersion);
     const usbPowered = useSelector(isUsbPowered);
     const paused = useSelector(isPaused);
-    const profiling = useSelector(isProfiling);
+    const profilingState = useSelector(getProfilingState);
     const npmDevice = useSelector(getNpmDevice);
+
+    const [pauseFor10Ms, setPauseFor10ms] = useState(paused);
+
+    useEffect(() => {
+        const t = setTimeout(() => {
+            setPauseFor10ms(paused);
+        }, 100);
+
+        return () => clearTimeout(t);
+    }, [paused]);
 
     const connectionStep: Step = {
         id: '1',
@@ -47,7 +57,7 @@ export default () => {
         shellStep.caption = 'Shell is free';
         shellStep.state = 'success';
 
-        if (paused) {
+        if (pauseFor10Ms) {
             shellStep.state = 'warning';
             shellStep.caption = [
                 { id: '1', caption: 'Shell is busy' },
@@ -58,7 +68,7 @@ export default () => {
                 },
             ];
 
-            if (!profiling) {
+            if (profilingState === 'Off') {
                 pmicStep.caption = 'Waiting on shell';
                 pmicStep.state = 'active';
             } else {
@@ -82,7 +92,7 @@ export default () => {
         } else if (pmicState === 'pmic-disconnected') {
             pmicStep.caption = 'Not powered';
             pmicStep.state = 'failure';
-        } else if (profiling) {
+        } else if (profilingState !== 'Off') {
             pmicStep.caption = [
                 { id: '1', caption: 'Profiling Battery' },
                 {

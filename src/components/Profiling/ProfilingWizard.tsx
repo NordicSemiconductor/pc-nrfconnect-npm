@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Form, ProgressBar } from 'react-bootstrap';
 import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch, useSelector } from 'react-redux';
+import { appendFile, existsSync } from 'fs';
 import {
     Alert,
     Button,
@@ -38,7 +39,9 @@ type ProfileStage =
     | 'Configuration'
     | 'Charging'
     | 'Charged'
+    | 'Resting'
     | 'Profiling'
+    | 'Complete'
     | 'Error';
 
 const ChargingWarnings = () => {
@@ -124,39 +127,55 @@ const TimeComponent = ({
     time: number;
     progress: number;
 }) => {
-    const eta = useRef(-1);
+    const eta = useRef(0);
     const { days, hours, minutes, seconds } = splitMS(time);
 
     const {
         days: etaDays,
         hours: etaHours,
         minutes: etaMinutes,
-        seconds: etaSeconds,
     } = splitMS(eta.current);
 
-    if (progress > 0) {
+    if (progress > 0 && progress <= 100) {
         const alpha = 0.2;
         const newEta = (100 / progress) * time - time;
         eta.current = alpha * newEta + (1.0 - alpha) * eta.current;
     } else {
-        eta.current = -1;
+        eta.current = 0;
     }
 
     return (
         <>
             <span>
-                {`Elapsed time ${days ? `${days} days ` : ''}${
-                    hours ? `${hours} hrs ` : ''
-                }${minutes ? `${minutes} min ` : ''}${
-                    seconds ? `${seconds} sec ` : ''
+                {`Elapsed time ${days > 0 ? `${days} days ` : ''}${
+                    days > 0 || hours > 0 ? `${hours} hrs ` : ''
+                }${
+                    days > 0 || hours > 0 || minutes > 0
+                        ? `${minutes} min `
+                        : ''
+                }${
+                    hours > 0 || minutes > 0 || seconds > 0
+                        ? `${seconds} sec `
+                        : ''
                 }`}
-                {eta.current > 0
-                    ? `- ETA ${etaDays ? `${etaDays} days ` : ''}${
-                          etaHours ? `${etaHours} hrs ` : ''
-                      }${etaMinutes ? `${etaMinutes} min ` : ''}${
-                          etaSeconds ? `${etaSeconds} sec ` : ''
+                {progress >= 0 &&
+                progress <= 100 &&
+                (etaDays > 0 || etaHours > 0 || etaMinutes > 0)
+                    ? `- ETA ${etaDays > 0 ? `${etaDays} days ` : ''}${
+                          etaDays > 0 || etaHours > 0 ? `${etaHours} hrs ` : ''
+                      }${
+                          etaDays > 0 || etaHours > 0 || etaMinutes > 0
+                              ? `${etaMinutes} min `
+                              : ''
                       }`
-                    : '- ETA Calculating'}
+                    : ''}
+                {progress >= 0 &&
+                progress <= 100 &&
+                !(etaDays > 0 || etaHours > 0 || etaMinutes > 0)
+                    ? '- ETA few seconds'
+                    : ''}
+                {progress > 100 ? '- ETA few seconds' : ''}
+                {progress < 0 ? '- ETA Calculating' : ''}
             </span>
             <br />
             <ProgressBar now={progress} style={{ height: '4px' }} />
@@ -188,13 +207,22 @@ const splitMS = (ms: number) => {
     };
 };
 
+const restDuration = 900; // seconds
+const reportingRate = 1000;
+
 export default () => {
+    const capacityConsumed = useRef(0);
+    const timeOffset = useRef(-1);
+    const profilingFilePath = useRef('');
+    const [capacityConsumedState, setCapacityConsumedState] = useState(0);
     const [profilingStep, setProfilingStep] =
         useState<ProfileStage>('Configuration');
     const [initialBatteryVoltage, setInitialBatteryVoltage] = useState(0);
     const [latestProfilingEvent, setLatestProfilingEvent] =
         useState<ProfilingEvent | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
+    const [completeMessage, setCompleteMessage] = useState('');
+    const [batteryVoltageRunningArg, setBatteryVoltageRunningArg] = useState(0);
 
     const [vLowerCutOff, setLowerVCutOff] = useState(3.1);
     const [vUpperCutOff, setUpperVCutOff] = useState(4);
@@ -210,9 +238,16 @@ export default () => {
     const adcSample = useSelector(getLatestAdcSample);
     const pmicChargingState = useSelector(getPmicChargingState);
     const eventRecordingPath = useSelector(getEventRecordingPath);
-    const restDuration = 900; // seconds
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        const alpha = 0.2;
+        setBatteryVoltageRunningArg(
+            alpha * (adcSample?.vBat ?? 0) +
+                (1.0 - alpha) * batteryVoltageRunningArg
+        );
+    }, [adcSample, batteryVoltageRunningArg]);
 
     useEffect(() => {
         const profiler = npmDevice?.getBatteryProfiler();
@@ -221,6 +256,84 @@ export default () => {
             return profiler.onProfilingEvent(setLatestProfilingEvent);
         }
     }, [npmDevice]);
+
+    useEffect(() => {
+        if (latestProfilingEvent && profilingStep === 'Profiling') {
+            if (timeOffset.current === -1) {
+                timeOffset.current = Date.now();
+                profilingFilePath.current = `${eventRecordingPath}/battery_raw_${batteryCapacity}mAh_${Math.round(
+                    latestProfilingEvent?.tBat ?? 0
+                )}.csv`;
+            }
+
+            const addHeaders = !existsSync(profilingFilePath.current);
+            let data = `${(Date.now() - timeOffset.current) / 1000},${
+                latestProfilingEvent.iLoad
+            },${latestProfilingEvent.vLoad},${latestProfilingEvent.tBat}\r\n`;
+            if (addHeaders) {
+                data = `Seconds,Current(A),Voltage(V),Temperature(C)\r\n${data}`;
+            }
+
+            appendFile(profilingFilePath.current, data, () => {});
+        }
+    }, [
+        batteryCapacity,
+        eventRecordingPath,
+        latestProfilingEvent,
+        profilingStep,
+    ]);
+
+    useEffect(() => {
+        const profiler = npmDevice?.getBatteryProfiler();
+
+        if (profiler) {
+            return profiler.onProfilingStateChange(state => {
+                switch (state) {
+                    case 'Ready':
+                        setProfilingStep('Complete');
+                        setCompleteMessage(
+                            'Profiling is ready. Profiling cycles all complete'
+                        );
+                        break;
+                    case 'ThermalError':
+                        setProfilingStep('Complete');
+                        setCompleteMessage(
+                            'Profiling was stopped due to thermal error'
+                        );
+                        break;
+                    case 'vCutOff':
+                        setProfilingStep('Complete');
+                        setCompleteMessage(
+                            'Profiling is ready. vCutOff was reached.'
+                        );
+                        break;
+                    case 'POF':
+                        setProfilingStep('Complete');
+                        setCompleteMessage(
+                            'Profiling POF event occurred before reaching vCutOff'
+                        );
+                        break;
+                }
+            });
+        }
+    }, [npmDevice]);
+
+    useEffect(() => {
+        const mAhConsumed =
+            (Math.abs(latestProfilingEvent?.iLoad ?? 0) *
+                1000 *
+                reportingRate) /
+            3600000;
+        capacityConsumed.current += mAhConsumed;
+        setCapacityConsumedState(capacityConsumed.current);
+    }, [latestProfilingEvent]);
+
+    useEffect(() => {
+        if (latestProfilingEvent?.seq === 1 && profilingStep === 'Resting') {
+            reset();
+            setProfilingStep('Profiling');
+        }
+    }, [latestProfilingEvent?.seq, profilingStep, reset]);
 
     useEffect(() => {
         if (profilingStep === 'Charging' && pmicChargingState.batteryFull) {
@@ -232,7 +345,11 @@ export default () => {
         <GenericDialog
             title="Battery Profiling"
             isVisible
-            showSpinner={profilingStep !== 'Configuration'}
+            showSpinner={
+                profilingStep === 'Charging' ||
+                profilingStep === 'Resting' ||
+                profilingStep === 'Profiling'
+            }
             closeOnEsc={false}
             footer={
                 <>
@@ -243,6 +360,7 @@ export default () => {
                                 !eventRecordingPath) ||
                             profilingStep === 'Charging' ||
                             (profilingStep === 'Charged' && usbPowered) ||
+                            profilingStep === 'Resting' ||
                             profilingStep === 'Profiling'
                         }
                         onClick={async () => {
@@ -288,8 +406,8 @@ export default () => {
                                             await npmDevice
                                                 ?.getBatteryProfiler()
                                                 ?.setProfile(
-                                                    1000,
-                                                    8000,
+                                                    reportingRate, // iBat
+                                                    reportingRate * 8, // tBat
                                                     vLowerCutOff,
                                                     [
                                                         {
@@ -300,6 +418,13 @@ export default () => {
                                                             cycles: restDuration,
                                                         },
                                                         {
+                                                            tLoad: 500,
+                                                            tRest: 500,
+                                                            iLoad: 0,
+                                                            iRest: 0,
+                                                            cycles: 300000, // 5Min
+                                                        },
+                                                        {
                                                             tLoad: 600000, // 10Min
                                                             tRest: 2400000, // 40Min
                                                             iLoad:
@@ -307,7 +432,6 @@ export default () => {
                                                                 5 /
                                                                 1000, // mAh
                                                             iRest: 0,
-                                                            cycles: 1,
                                                             vCutoff: 3.9,
                                                         },
                                                         {
@@ -340,16 +464,25 @@ export default () => {
                                             setProfilingStep('Error');
                                         });
                                     reset();
-                                    setProfilingStep('Profiling');
+                                    setProfilingStep('Resting');
+                                    break;
+                                case 'Complete':
+                                    npmDevice
+                                        ?.getBatteryProfiler()
+                                        ?.stopProfiling();
+                                    dispatch(setShowProfilingWizard(false));
                                     break;
                             }
                         }}
                     >
-                        Continue
+                        {profilingStep === 'Complete' ? 'Close' : 'Continue'}
                     </DialogButton>
                     <DialogButton
                         onClick={() => {
-                            if (profilingStep === 'Profiling') {
+                            if (
+                                profilingStep === 'Resting' ||
+                                profilingStep === 'Profiling'
+                            ) {
                                 npmDevice
                                     ?.getBatteryProfiler()
                                     ?.stopProfiling()
@@ -482,13 +615,10 @@ export default () => {
                         <TimeComponent
                             time={time}
                             progress={
-                                adcSample?.vBat
-                                    ? ((adcSample.vBat -
-                                          initialBatteryVoltage) /
-                                          (vUpperCutOff -
-                                              initialBatteryVoltage)) *
-                                      100
-                                    : 0
+                                ((batteryVoltageRunningArg -
+                                    initialBatteryVoltage) /
+                                    (vUpperCutOff - initialBatteryVoltage)) *
+                                100
                             }
                         />
                     </Form.Group>
@@ -502,49 +632,51 @@ export default () => {
                     <ProfilingMessage />
                 </div>
             )}
-            {profilingStep === 'Profiling' &&
-                (!latestProfilingEvent || latestProfilingEvent.seq === 0) && (
-                    <>
-                        <div>
-                            <ProfilingMessage />
-                            <p>
-                                <span>Resting Battery</span>
-                            </p>
-                        </div>
-                        <Form.Group>
-                            <TimeComponent
-                                time={time}
-                                progress={
-                                    ((latestProfilingEvent?.cycle ?? 0) /
-                                        restDuration) *
-                                    100
-                                }
-                            />
-                        </Form.Group>
-                    </>
-                )}
-            {profilingStep === 'Profiling' &&
-                latestProfilingEvent &&
-                latestProfilingEvent.seq !== 0 && (
-                    <>
-                        <div>
-                            <ProfilingMessage />
-                            <p>
-                                <span>{`Profiling: used ${latestProfilingEvent.chg}mAh of ${batteryCapacity}mAh`}</span>
-                            </p>
-                        </div>
-                        <Form.Group>
-                            <TimeComponent
-                                time={time}
-                                progress={
-                                    (latestProfilingEvent.chg /
-                                        batteryCapacity) *
-                                    100
-                                }
-                            />
-                        </Form.Group>
-                    </>
-                )}
+            {profilingStep === 'Resting' && (
+                <>
+                    <div>
+                        <p>
+                            <span>Resting Battery</span>
+                        </p>
+                        <ProfilingMessage />
+                    </div>
+                    <Form.Group>
+                        <TimeComponent
+                            time={time}
+                            progress={
+                                ((latestProfilingEvent?.cycle ?? 0) /
+                                    restDuration) *
+                                100
+                            }
+                        />
+                    </Form.Group>
+                </>
+            )}
+            {profilingStep === 'Profiling' && (
+                <>
+                    <div>
+                        <ProfilingMessage />
+                        <p>
+                            <span>{`Profiling: used ${capacityConsumedState.toFixed(
+                                2
+                            )}mAh of ${batteryCapacity}mAh`}</span>
+                        </p>
+                    </div>
+                    <Form.Group>
+                        <TimeComponent
+                            time={time}
+                            progress={
+                                (capacityConsumedState / batteryCapacity) * 100
+                            }
+                        />
+                    </Form.Group>
+                </>
+            )}
+            {profilingStep === 'Complete' && (
+                <Alert label="Success " variant="success">
+                    {completeMessage}
+                </Alert>
+            )}
             {profilingStep === 'Error' && (
                 <Alert label="Error " variant="danger">
                     {`An error has occurred. Error message: ${errorMessage}`}

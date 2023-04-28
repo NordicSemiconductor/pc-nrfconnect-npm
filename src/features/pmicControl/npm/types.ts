@@ -40,6 +40,14 @@ export type ITerm = (typeof ITermValues)[number];
 export const VTrickleFastValues = [2.5, 2.9] as const;
 export type VTrickleFast = (typeof VTrickleFastValues)[number];
 
+export type ProfilingState =
+    | 'Off'
+    | 'Running'
+    | 'vCutOff'
+    | 'POF'
+    | 'ThermalError'
+    | 'Ready';
+
 export type ProfilingEvent = {
     iLoad: number;
     vLoad: number;
@@ -366,9 +374,10 @@ export type BatteryProfiler = {
     stopProfiling: () => Promise<void>;
     isProfiling: () => Promise<boolean>;
     onProfilingStateChange: (
-        handler: (state: boolean, error?: string) => void
+        handler: (state: ProfilingState, error?: string) => void
     ) => () => void;
     onProfilingEvent: (
         handler: (state: ProfilingEvent, error?: string) => void
     ) => () => void;
+    pofError: () => void;
 };

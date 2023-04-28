@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-npm",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "description": "EXPERIMENTAL: nPM PowerUP​",
     "displayName": "nPM PowerUP​",
     "repository": {
@@ -40,8 +40,6 @@
         "chartjs-adapter-date-fns": "^2.0.1",
         "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v35",
         "react-chartjs-2": "^5.0.1",
-        "xterm-addon-fit": "^0.5.0",
-        "xterm-for-react": "^1.0.4",
         "xterm-headless": "^5.1.0"
     },
     "eslintConfig": {

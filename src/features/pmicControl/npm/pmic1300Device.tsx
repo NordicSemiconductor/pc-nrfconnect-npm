@@ -99,7 +99,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
                 break;
             case 'PMIC available. Application can be restarted.':
-                baseDevice.kernelReset();
+                batteryProfiler
+                    ?.isProfiling()
+                    .then(profiling => {
+                        if (!profiling) {
+                            baseDevice.kernelReset();
+                        } else {
+                            batteryProfiler?.pofError(); // TODO Move to POF error?
+                        }
+                    })
+                    .catch(() => baseDevice.kernelReset());
                 break;
         }
     };
@@ -566,7 +575,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         if (pmicState !== 'ek-disconnected') {
             shellParser?.enqueueRequest(
                 command,
-                { onSuccess, onError, onTimeout: console.warn },
+                {
+                    onSuccess,
+                    onError,
+                    onTimeout: error => {
+                        if (onError) onError(error, command);
+                        console.warn(error);
+                    },
+                },
                 undefined,
                 unique
             );
@@ -1348,7 +1364,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             resolve(list.filter(item => item.name !== ''));
                         },
                         onError: reject,
-                        onTimeout: console.warn,
+                        onTimeout: error => {
+                            reject();
+                            console.warn(error);
+                        },
                     },
                     undefined,
                     true
