@@ -371,14 +371,14 @@ export default () => {
                                     );
                                     await npmDevice?.setFuelGaugeEnabled(false);
                                     await npmDevice
-                                        ?.setChargerVTerm(1, vUpperCutOff)
+                                        ?.setChargerVTerm(0, vUpperCutOff)
                                         .catch(res => {
                                             setErrorMessage(res);
                                             dispatch(setProfilingStep('Error'));
                                         });
                                     await npmDevice
                                         ?.setChargerIChg(
-                                            1,
+                                            0,
                                             Math.min(
                                                 800,
                                                 Math.floor(
@@ -391,7 +391,7 @@ export default () => {
                                             dispatch(setProfilingStep('Error'));
                                         });
                                     await npmDevice
-                                        ?.setChargerEnabled(1, true)
+                                        ?.setChargerEnabled(0, true)
                                         .catch(res => {
                                             setErrorMessage(res);
                                             dispatch(setProfilingStep('Error'));
@@ -401,7 +401,7 @@ export default () => {
                                     break;
                                 case 'Charged':
                                     npmDevice
-                                        ?.setChargerEnabled(1, false)
+                                        ?.setChargerEnabled(0, false)
                                         .then(async () => {
                                             await npmDevice
                                                 ?.getBatteryProfiler()
