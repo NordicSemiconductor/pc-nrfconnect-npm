@@ -11,7 +11,7 @@ import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
 import {
     getNpmDevice,
     getPmicState,
-    isProfiling,
+    getProfilingState,
     isSupportedVersion,
     isUsbPowered,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -23,14 +23,14 @@ export default () => {
     const supportedVersion = useSelector(isSupportedVersion);
     const usbPowered = useSelector(isUsbPowered);
     const paused = useSelector(isPaused);
-    const profiling = useSelector(isProfiling);
+    const profiling = useSelector(getProfilingState);
     const npmDevice = useSelector(getNpmDevice);
 
-    const [pauseFor100Ms, setPauseFor100ms] = useState(paused);
+    const [pauseFor10Ms, setPauseFor10ms] = useState(paused);
 
     useEffect(() => {
         const t = setTimeout(() => {
-            setPauseFor100ms(paused);
+            setPauseFor10ms(paused);
         }, 100);
 
         return () => clearTimeout(t);
@@ -57,7 +57,7 @@ export default () => {
         shellStep.caption = 'Shell is free';
         shellStep.state = 'success';
 
-        if (pauseFor100Ms) {
+        if (pauseFor10Ms) {
             shellStep.state = 'warning';
             shellStep.caption = [
                 { id: '1', caption: 'Shell is busy' },

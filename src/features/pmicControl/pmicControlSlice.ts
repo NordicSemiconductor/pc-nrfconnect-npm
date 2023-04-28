@@ -18,6 +18,7 @@ import {
     PmicChargingState,
     PmicDialog,
     PmicState,
+    ProfilingState,
 } from './npm/types';
 
 interface pmicControlState {
@@ -38,7 +39,7 @@ interface pmicControlState {
     defaultBatterModels: BatteryModel[];
     storedBatterModel?: BatteryModel;
     usbPowered: boolean;
-    isProfiling?: boolean;
+    profilingState?: ProfilingState;
     showProfilingWizard?: boolean;
 }
 
@@ -163,8 +164,8 @@ const pmicControlSlice = createSlice({
         setUsbPowered(state, action: PayloadAction<boolean>) {
             state.usbPowered = action.payload;
         },
-        setProfiling(state, action: PayloadAction<boolean>) {
-            state.isProfiling = action.payload;
+        setProfiling(state, action: PayloadAction<ProfilingState>) {
+            state.profilingState = action.payload;
         },
         setShowProfilingWizard(state, action: PayloadAction<boolean>) {
             state.showProfilingWizard = action.payload;
@@ -219,8 +220,8 @@ export const getStoredBatterModel = (state: RootState) =>
     state.app.pmicControl.storedBatterModel;
 export const isUsbPowered = (state: RootState) =>
     state.app.pmicControl.usbPowered;
-export const isProfiling = (state: RootState) =>
-    state.app.pmicControl.isProfiling;
+export const getProfilingState = (state: RootState) =>
+    state.app.pmicControl.profilingState;
 export const canProfile = (state: RootState) =>
     state.app.pmicControl.npmDevice?.getBatteryProfiler() !== undefined;
 export const showProfilingWizard = (state: RootState) =>

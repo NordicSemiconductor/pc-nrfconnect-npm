@@ -99,7 +99,15 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
                 break;
             case 'PMIC available. Application can be restarted.':
-                baseDevice.kernelReset();
+                batteryProfiler?.pofError(); // TODO Move to POF error?
+                batteryProfiler
+                    ?.isProfiling()
+                    .then(profiling => {
+                        if (!profiling) {
+                            baseDevice.kernelReset();
+                        }
+                    })
+                    .catch(() => baseDevice.kernelReset());
                 break;
         }
     };

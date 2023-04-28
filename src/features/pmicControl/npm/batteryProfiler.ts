@@ -13,65 +13,81 @@ import {
     LoggingEvent,
     Profile,
     ProfilingEvent,
+    ProfilingState,
 } from './types';
 
 export const BatteryProfiler: IBatteryProfiler = (
     shellParser: ShellParser,
     eventEmitter: EventEmitter
 ) => {
+    let profiling: ProfilingState;
     const processModuleCcProfiling = ({ message }: LoggingEvent) => {
-        const messageParts = message.split(',');
-        const event: ProfilingEvent = {
-            iLoad: 0,
-            vLoad: 0,
-            tBat: 0,
-            cycle: 0,
-            seq: 0,
-            chg: 0,
-            rep: 0,
-            t0: 0,
-            t1: 0,
-        };
-        messageParts.forEach(part => {
-            const pair = part.split('=');
-            switch (pair[0]) {
-                case 'iload':
-                    event.iLoad = Number.parseInt(pair[1], 10);
-                    break;
-                case 'vload':
-                    event.vLoad = Number.parseInt(pair[1], 10);
-                    break;
-                case 'tbat':
-                    event.tBat = Number.parseInt(pair[1], 10);
-                    break;
-                case 'cycle':
-                    event.cycle = Number.parseInt(pair[1], 10);
-                    break;
-                case 'seq':
-                    event.seq = Number.parseInt(pair[1], 10);
-                    break;
-                case 'chg':
-                    event.chg = Number.parseInt(pair[1], 10);
-                    break;
-                case 'rep':
-                    event.rep = Number.parseInt(pair[1], 10);
-                    break;
-                case 't0':
-                    event.t0 = Number.parseInt(pair[1], 10);
-                    break;
-                case 't1':
-                    event.t1 = Number.parseInt(pair[1], 10);
-                    break;
-            }
-        });
+        if (message.includes('Success: Profiling sequence completed')) {
+            profiling = 'Ready';
+            eventEmitter.emit('onProfilingStateChange', profiling);
+        } else if (message.includes('vcutoff reached')) {
+            profiling = 'vCutOff';
+            eventEmitter.emit('onProfilingStateChange', profiling);
+        } else if (
+            message.includes('Profiling stopped due to a thermal event')
+        ) {
+            profiling = 'ThermalError';
+            eventEmitter.emit('onProfilingStateChange', profiling);
+        } else {
+            const messageParts = message.split(',');
+            const event: ProfilingEvent = {
+                iLoad: 0,
+                vLoad: 0,
+                tBat: 0,
+                cycle: 0,
+                seq: 0,
+                chg: 0,
+                rep: 0,
+                t0: 0,
+                t1: 0,
+            };
+            messageParts.forEach(part => {
+                const pair = part.split('=');
+                switch (pair[0]) {
+                    case 'iload':
+                        event.iLoad = Number.parseInt(pair[1], 10);
+                        break;
+                    case 'vload':
+                        event.vLoad = Number.parseInt(pair[1], 10);
+                        break;
+                    case 'tbat':
+                        event.tBat = Number.parseInt(pair[1], 10);
+                        break;
+                    case 'cycle':
+                        event.cycle = Number.parseInt(pair[1], 10);
+                        break;
+                    case 'seq':
+                        event.seq = Number.parseInt(pair[1], 10);
+                        break;
+                    case 'chg':
+                        event.chg = Number.parseInt(pair[1], 10);
+                        break;
+                    case 'rep':
+                        event.rep = Number.parseInt(pair[1], 10);
+                        break;
+                    case 't0':
+                        event.t0 = Number.parseInt(pair[1], 10);
+                        break;
+                    case 't1':
+                        event.t1 = Number.parseInt(pair[1], 10);
+                        break;
+                }
+            });
 
-        eventEmitter.emit('onProfilingEvent', event);
+            eventEmitter.emit('onProfilingEvent', event);
+        }
     };
 
     shellParser?.registerCommandCallback(
         toRegex('cc_profile start'),
         () => {
-            eventEmitter.emit('onProfilingStateChange', true);
+            profiling = 'Running';
+            eventEmitter.emit('onProfilingStateChange', profiling);
         },
         noop
     );
@@ -79,9 +95,15 @@ export const BatteryProfiler: IBatteryProfiler = (
     shellParser?.registerCommandCallback(
         toRegex('cc_profile stop'),
         () => {
-            eventEmitter.emit('onProfilingStateChange', false);
+            profiling = 'Off';
+            eventEmitter.emit('onProfilingStateChange', profiling);
         },
-        noop
+        res => {
+            if (res.includes('No profiling ongoing')) {
+                profiling = 'Off';
+                eventEmitter.emit('onProfilingStateChange', profiling);
+            }
+        }
     );
 
     shellParser?.onShellLoggingEvent(logEvent => {
@@ -111,7 +133,7 @@ export const BatteryProfiler: IBatteryProfiler = (
             shellParser?.enqueueRequest(
                 `cc_profile profile set ${reportIntervalCc} ${reportIntervalNtc} ${vCutoff} ${profilesString.join(
                     ' '
-                )} --print`,
+                )}`,
                 {
                     onSuccess: () => {
                         resolve();
@@ -143,7 +165,7 @@ export const BatteryProfiler: IBatteryProfiler = (
 
     const isProfiling = () =>
         new Promise<boolean>(resolve => {
-            resolve(true);
+            resolve(profiling !== 'Off');
         });
 
     return {
@@ -151,7 +173,7 @@ export const BatteryProfiler: IBatteryProfiler = (
         startProfiling,
         stopProfiling,
         isProfiling,
-        onProfilingStateChange: (handler: (state: boolean) => void) => {
+        onProfilingStateChange: (handler: (state: ProfilingState) => void) => {
             eventEmitter.on('onProfilingStateChange', handler);
             return () => {
                 eventEmitter.removeListener('onProfilingStateChange', handler);
@@ -162,6 +184,10 @@ export const BatteryProfiler: IBatteryProfiler = (
             return () => {
                 eventEmitter.removeListener('onProfilingEvent', handler);
             };
+        },
+        pofError: () => {
+            profiling = 'POF';
+            eventEmitter.emit('onProfilingStateChange', profiling);
         },
     };
 };

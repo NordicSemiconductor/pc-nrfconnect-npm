@@ -40,6 +40,7 @@ type ProfileStage =
     | 'Charged'
     | 'Resting'
     | 'Profiling'
+    | 'Complete'
     | 'Error';
 
 const ChargingWarnings = () => {
@@ -199,6 +200,7 @@ export default () => {
     const [latestProfilingEvent, setLatestProfilingEvent] =
         useState<ProfilingEvent | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
+    const [completeMessage, setCompleteMessage] = useState('');
 
     const [vLowerCutOff, setLowerVCutOff] = useState(3.1);
     const [vUpperCutOff, setUpperVCutOff] = useState(4);
@@ -225,6 +227,41 @@ export default () => {
         }
     }, [npmDevice]);
 
+    useEffect(() => {
+        const profiler = npmDevice?.getBatteryProfiler();
+
+        if (profiler) {
+            return profiler.onProfilingStateChange(state => {
+                switch (state) {
+                    case 'Ready':
+                        setProfilingStep('Complete');
+                        setCompleteMessage(
+                            'Profiling is ready. Profiling cycles all complete'
+                        );
+                        break;
+                    case 'ThermalError':
+                        setProfilingStep('Complete');
+                        setCompleteMessage(
+                            'Profiling was stopped due to thermal error'
+                        );
+                        break;
+                    case 'vCutOff':
+                        setProfilingStep('Complete');
+                        setCompleteMessage(
+                            'Profiling is ready. vCutOff was reached.'
+                        );
+                        break;
+                    case 'POF':
+                        setProfilingStep('Complete');
+                        setCompleteMessage(
+                            'Profiling POF event occurred before reaching vCutOff'
+                        );
+                        break;
+                }
+            });
+        }
+    }, [npmDevice]);
+
     const capacityConsumed: number = useMemo(() => {
         const mAhConsumed =
             (latestProfilingEvent?.iLoad ?? 0 * 1000 * reportingRate) / 3600000;
@@ -248,7 +285,11 @@ export default () => {
         <GenericDialog
             title="Battery Profiling"
             isVisible
-            showSpinner={profilingStep !== 'Configuration'}
+            showSpinner={
+                profilingStep === 'Charging' ||
+                profilingStep === 'Resting' ||
+                profilingStep === 'Profiling'
+            }
             closeOnEsc={false}
             footer={
                 <>
@@ -358,10 +399,16 @@ export default () => {
                                     reset();
                                     setProfilingStep('Resting');
                                     break;
+                                case 'Complete':
+                                    npmDevice
+                                        ?.getBatteryProfiler()
+                                        ?.stopProfiling();
+                                    dispatch(setShowProfilingWizard(false));
+                                    break;
                             }
                         }}
                     >
-                        Continue
+                        {profilingStep === 'Complete' ? 'Close' : 'Continue'}
                     </DialogButton>
                     <DialogButton
                         onClick={() => {
@@ -560,6 +607,11 @@ export default () => {
                         />
                     </Form.Group>
                 </>
+            )}
+            {profilingStep === 'Complete' && (
+                <Alert label="Success " variant="success">
+                    {completeMessage}
+                </Alert>
             )}
             {profilingStep === 'Error' && (
                 <Alert label="Error " variant="danger">

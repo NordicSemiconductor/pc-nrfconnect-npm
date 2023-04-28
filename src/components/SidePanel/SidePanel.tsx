@@ -40,8 +40,8 @@ import {
     getEventRecordingPath,
     getLatestAdcSample,
     getNpmDevice,
+    getProfilingState,
     getStoredBatterModel,
-    isProfiling,
     setEventRecordingPath,
     setShowProfilingWizard,
     showProfilingWizard,
@@ -78,7 +78,7 @@ export default () => {
     const storedBatterModel = useSelector(getStoredBatterModel);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
-    const profiling = useSelector(isProfiling);
+    const profilingState = useSelector(getProfilingState);
     const profilingWizard = useSelector(showProfilingWizard);
 
     const getClosest = (
@@ -315,7 +315,7 @@ export default () => {
                         disabled={
                             !profilingSupported ||
                             pmicConnection === 'ek-disconnected' ||
-                            profiling
+                            profilingState !== 'Off'
                         }
                     >
                         Profile Battery
