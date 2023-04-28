@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Form, ProgressBar } from 'react-bootstrap';
 import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch, useSelector } from 'react-redux';
+import { appendFile, existsSync } from 'fs';
 import {
     Alert,
     Button,
@@ -194,6 +195,9 @@ const restDuration = 900; // seconds
 const reportingRate = 1000;
 
 export default () => {
+    const capacityConsumed = useRef(0);
+    const timeOffset = useRef(-1);
+    const [capacityConsumedState, setCapacityConsumedState] = useState(0);
     const [profilingStep, setProfilingStep] =
         useState<ProfileStage>('Configuration');
     const [initialBatteryVoltage, setInitialBatteryVoltage] = useState(0);
@@ -201,6 +205,7 @@ export default () => {
         useState<ProfilingEvent | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [completeMessage, setCompleteMessage] = useState('');
+    const [batteryVoltageRunningArg, setBatteryVoltageRunningArg] = useState(0);
 
     const [vLowerCutOff, setLowerVCutOff] = useState(3.1);
     const [vUpperCutOff, setUpperVCutOff] = useState(4);
@@ -220,12 +225,56 @@ export default () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        const alpha = 0.2;
+        setBatteryVoltageRunningArg(
+            alpha * (adcSample?.vBat ?? 0) +
+                (1.0 - alpha) * batteryVoltageRunningArg
+        );
+    }, [adcSample, batteryVoltageRunningArg]);
+
+    useEffect(() => {
         const profiler = npmDevice?.getBatteryProfiler();
 
         if (profiler) {
             return profiler.onProfilingEvent(setLatestProfilingEvent);
         }
     }, [npmDevice]);
+
+    useEffect(() => {
+        if (latestProfilingEvent && profilingStep === 'Profiling') {
+            if (timeOffset.current === -1) {
+                timeOffset.current = Date.now();
+            }
+            const path = `${eventRecordingPath}/battery_raw_${batteryCapacity}mAh_${Math.round(
+                latestProfilingEvent?.tBat ?? 0
+            )}.csv`;
+            const addHeaders = !existsSync(path);
+            if (addHeaders) {
+                appendFile(
+                    path,
+                    `${latestProfilingEvent.iLoad},${
+                        latestProfilingEvent.vLoad
+                    },${latestProfilingEvent.tBat},${
+                        (Date.now() - timeOffset.current) / 1000
+                    }\r\n`,
+                    () => {}
+                );
+            }
+
+            appendFile(
+                path,
+                `${latestProfilingEvent.iLoad},${latestProfilingEvent.vLoad},${
+                    latestProfilingEvent.tBat
+                },${(Date.now() - timeOffset.current) / 1000}\r\n`,
+                () => {}
+            );
+        }
+    }, [
+        batteryCapacity,
+        eventRecordingPath,
+        latestProfilingEvent,
+        profilingStep,
+    ]);
 
     useEffect(() => {
         const profiler = npmDevice?.getBatteryProfiler();
@@ -262,10 +311,11 @@ export default () => {
         }
     }, [npmDevice]);
 
-    const capacityConsumed: number = useMemo(() => {
+    useEffect(() => {
         const mAhConsumed =
             (latestProfilingEvent?.iLoad ?? 0 * 1000 * reportingRate) / 3600000;
-        return capacityConsumed + mAhConsumed;
+        capacityConsumed.current += mAhConsumed;
+        setCapacityConsumedState(capacityConsumed.current);
     }, [latestProfilingEvent]);
 
     useEffect(() => {
@@ -356,6 +406,13 @@ export default () => {
                                                             iLoad: 0,
                                                             iRest: 0,
                                                             cycles: restDuration,
+                                                        },
+                                                        {
+                                                            tLoad: 500,
+                                                            tRest: 500,
+                                                            iLoad: 0,
+                                                            iRest: 0,
+                                                            cycles: 300000, // 5Min
                                                         },
                                                         {
                                                             tLoad: 600000, // 10Min
@@ -548,13 +605,10 @@ export default () => {
                         <TimeComponent
                             time={time}
                             progress={
-                                adcSample?.vBat
-                                    ? ((adcSample.vBat -
-                                          initialBatteryVoltage) /
-                                          (vUpperCutOff -
-                                              initialBatteryVoltage)) *
-                                      100
-                                    : 0
+                                ((batteryVoltageRunningArg -
+                                    initialBatteryVoltage) /
+                                    (vUpperCutOff - initialBatteryVoltage)) *
+                                100
                             }
                         />
                     </Form.Group>
@@ -593,7 +647,7 @@ export default () => {
                     <div>
                         <ProfilingMessage />
                         <p>
-                            <span>{`Profiling: used ${capacityConsumed.toFixed(
+                            <span>{`Profiling: used ${capacityConsumedState.toFixed(
                                 2
                             )}mAh of ${batteryCapacity}mAh`}</span>
                         </p>
@@ -602,7 +656,7 @@ export default () => {
                         <TimeComponent
                             time={time}
                             progress={
-                                (capacityConsumed / batteryCapacity) * 100
+                                (capacityConsumedState / batteryCapacity) * 100
                             }
                         />
                     </Form.Group>
