@@ -141,11 +141,12 @@ export default () => {
                         new Terminal({ allowProposedApi: true, cols: 999 })
                     ),
                     {
-                        shellPromptUart: 'shell:~$',
+                        shellPromptUart: 'shell:~$ ',
                         logRegex:
                             /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
                         errorRegex: /Error: /,
                         timeout: 1000,
+                        columnWidth: 80,
                     }
                 );
 
