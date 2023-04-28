@@ -211,7 +211,6 @@ const restDuration = 900; // seconds
 const reportingRate = 1000;
 
 export default () => {
-    const capacityConsumed = useRef(0);
     const timeOffset = useRef(-1);
     const profilingFilePath = useRef('');
     const [capacityConsumedState, setCapacityConsumedState] = useState(0);
@@ -254,12 +253,16 @@ export default () => {
 
         if (profiler) {
             return profiler.onProfilingEvent(event => {
-                const mAhConsumed =
-                    (Math.abs(event?.iLoad ?? 0) * 1000 * reportingRate) /
-                    3600000;
-                capacityConsumed.current += mAhConsumed;
-                setCapacityConsumedState(capacityConsumed.current);
-                setLatestProfilingEvent(event);
+                setLatestProfilingEvent(previousEvent => {
+                    const deltaT = previousEvent
+                        ? event.timestamp - previousEvent.timestamp
+                        : reportingRate;
+                    const mAhConsumed =
+                        (Math.abs(event?.data.iLoad ?? 0) * 1000 * deltaT) /
+                        3600000;
+                    setCapacityConsumedState(c => c + mAhConsumed);
+                    return event;
+                });
             });
         }
     }, [npmDevice]);
@@ -267,16 +270,18 @@ export default () => {
     useEffect(() => {
         if (latestProfilingEvent && profilingStep === 'Profiling') {
             if (timeOffset.current === -1) {
-                timeOffset.current = Date.now();
+                timeOffset.current = latestProfilingEvent.timestamp;
                 profilingFilePath.current = `${eventRecordingPath}/battery_raw_${batteryCapacity}mAh_${Math.round(
-                    latestProfilingEvent?.tBat ?? 0
-                )}.csv`;
+                    latestProfilingEvent?.data.tBat ?? 0
+                )}.csv`; // Temperature might change hance the file name
             }
 
             const addHeaders = !existsSync(profilingFilePath.current);
-            let data = `${(Date.now() - timeOffset.current) / 1000},${
-                latestProfilingEvent.iLoad
-            },${latestProfilingEvent.vLoad},${latestProfilingEvent.tBat}\r\n`;
+            let data = `${
+                (latestProfilingEvent.timestamp - timeOffset.current) / 1000
+            },${latestProfilingEvent.data.iLoad},${
+                latestProfilingEvent.data.vLoad
+            },${latestProfilingEvent.data.tBat}\r\n`;
             if (addHeaders) {
                 data = `Seconds,Current(A),Voltage(V),Temperature(C)\r\n${data}`;
             }
@@ -326,11 +331,14 @@ export default () => {
     }, [npmDevice]);
 
     useEffect(() => {
-        if (latestProfilingEvent?.seq === 1 && profilingStep === 'Resting') {
+        if (
+            latestProfilingEvent?.data.seq === 1 &&
+            profilingStep === 'Resting'
+        ) {
             reset();
             setProfilingStep('Profiling');
         }
-    }, [latestProfilingEvent?.seq, profilingStep, reset]);
+    }, [latestProfilingEvent?.data.seq, profilingStep, reset]);
 
     useEffect(() => {
         if (profilingStep === 'Charging' && pmicChargingState.batteryFull) {
@@ -641,7 +649,7 @@ export default () => {
                         <TimeComponent
                             time={time}
                             progress={
-                                ((latestProfilingEvent?.cycle ?? 0) /
+                                ((latestProfilingEvent?.data.cycle ?? 0) /
                                     restDuration) *
                                 100
                             }

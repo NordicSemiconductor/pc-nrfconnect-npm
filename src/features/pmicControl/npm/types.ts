@@ -49,6 +49,11 @@ export type ProfilingState =
     | 'Ready';
 
 export type ProfilingEvent = {
+    timestamp: number;
+    data: ProfilingEventData;
+};
+
+export type ProfilingEventData = {
     iLoad: number;
     vLoad: number;
     tBat: number;

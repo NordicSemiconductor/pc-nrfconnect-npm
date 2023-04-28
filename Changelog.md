@@ -8,6 +8,11 @@ and this project adheres to
 
 ## 0.0.15 - UNRELEASED
 
+### Changed
+
+-   Use profiling logging timestamp for mAh deltaT Calculation
+-   Use profiling logging timestamp for profiling file timestamp
+
 ### Fixed
 
 -   mAh Calculated at twice the rate
