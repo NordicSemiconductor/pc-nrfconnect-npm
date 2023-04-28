@@ -253,7 +253,14 @@ export default () => {
         const profiler = npmDevice?.getBatteryProfiler();
 
         if (profiler) {
-            return profiler.onProfilingEvent(setLatestProfilingEvent);
+            return profiler.onProfilingEvent(event => {
+                const mAhConsumed =
+                    (Math.abs(event?.iLoad ?? 0) * 1000 * reportingRate) /
+                    3600000;
+                capacityConsumed.current += mAhConsumed;
+                setCapacityConsumedState(capacityConsumed.current);
+                setLatestProfilingEvent(event);
+            });
         }
     }, [npmDevice]);
 
@@ -317,16 +324,6 @@ export default () => {
             });
         }
     }, [npmDevice]);
-
-    useEffect(() => {
-        const mAhConsumed =
-            (Math.abs(latestProfilingEvent?.iLoad ?? 0) *
-                1000 *
-                reportingRate) /
-            3600000;
-        capacityConsumed.current += mAhConsumed;
-        setCapacityConsumedState(capacityConsumed.current);
-    }, [latestProfilingEvent]);
 
     useEffect(() => {
         if (latestProfilingEvent?.seq === 1 && profilingStep === 'Resting') {
