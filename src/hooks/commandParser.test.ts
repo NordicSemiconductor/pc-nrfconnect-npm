@@ -88,6 +88,7 @@ const setupMocks = () => {
             /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
         errorRegex: /error: /,
         timeout: 1000,
+        columnWidth: 80,
     };
 
     const mockModem = jest.fn<SerialPort, []>(() => ({

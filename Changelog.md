@@ -16,6 +16,8 @@ and this project adheres to
 
 -   UI Improvements
 -   Battery Profiling cycle count
+-   Command timeout throws error
+-   Improved parsing for case when shell column length is reached
 
 ## 0.0.12 - 2023-04-27
 
