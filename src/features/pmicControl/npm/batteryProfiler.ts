@@ -200,8 +200,10 @@ export const BatteryProfiler: IBatteryProfiler = (
             };
         },
         pofError: () => {
-            profiling = 'POF';
-            eventEmitter.emit('onProfilingStateChange', profiling);
+            if (profiling !== 'Off' && profiling !== 'POF') {
+                profiling = 'POF';
+                eventEmitter.emit('onProfilingStateChange', profiling);
+            }
         },
     };
 };

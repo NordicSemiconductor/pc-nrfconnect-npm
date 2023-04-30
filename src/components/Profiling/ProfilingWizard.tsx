@@ -120,20 +120,36 @@ const ProfilingMessage = () => {
     );
 };
 
+const timeString = (
+    days: number,
+    hours: number,
+    minutes: number,
+    seconds: number
+) =>
+    `${days > 0 ? `${days} days ` : ''}${
+        days > 0 || hours > 0 ? `${hours} hrs ` : ''
+    }${days > 0 || hours > 0 || minutes > 0 ? `${minutes} min ` : ''}${
+        hours > 0 || minutes > 0 || seconds > 0 ? `${seconds} sec ` : ''
+    }`;
+
 const TimeComponent = ({
     time,
     progress,
+    ready = false,
 }: {
     time: number;
     progress: number;
+    ready?: boolean;
 }) => {
     const eta = useRef(0);
     const { days, hours, minutes, seconds } = splitMS(time);
+    if (ready) progress === 100;
 
     const {
         days: etaDays,
         hours: etaHours,
         minutes: etaMinutes,
+        seconds: etaSeconds,
     } = splitMS(eta.current);
 
     if (progress > 0 && progress <= 100) {
@@ -147,35 +163,17 @@ const TimeComponent = ({
     return (
         <>
             <span>
-                {`Elapsed time ${days > 0 ? `${days} days ` : ''}${
-                    days > 0 || hours > 0 ? `${hours} hrs ` : ''
-                }${
-                    days > 0 || hours > 0 || minutes > 0
-                        ? `${minutes} min `
-                        : ''
-                }${
-                    hours > 0 || minutes > 0 || seconds > 0
-                        ? `${seconds} sec `
-                        : ''
-                }`}
-                {progress >= 0 &&
-                progress <= 100 &&
-                (etaDays > 0 || etaHours > 0 || etaMinutes > 0)
-                    ? `- ETA ${etaDays > 0 ? `${etaDays} days ` : ''}${
-                          etaDays > 0 || etaHours > 0 ? `${etaHours} hrs ` : ''
-                      }${
-                          etaDays > 0 || etaHours > 0 || etaMinutes > 0
-                              ? `${etaMinutes} min `
-                              : ''
-                      }`
+                {`Elapsed time ${timeString(days, hours, minutes, seconds)}`}
+                {!ready && progress >= 0 && progress < 100
+                    ? `- ETA ${timeString(
+                          etaDays,
+                          etaHours,
+                          Math.round(etaMinutes + etaSeconds / 60),
+                          0
+                      )}` // don't show seconds
                     : ''}
-                {progress >= 0 &&
-                progress <= 100 &&
-                !(etaDays > 0 || etaHours > 0 || etaMinutes > 0)
-                    ? '- ETA few seconds'
-                    : ''}
-                {progress > 100 ? '- ETA few seconds' : ''}
-                {progress < 0 ? '- ETA Calculating' : ''}
+                {!ready && progress >= 100 ? '- ETA almost done' : ''}
+                {!ready && progress < 0 ? '- ETA Calculating' : ''}
             </span>
             <br />
             <ProgressBar now={progress} style={{ height: '4px' }} />
@@ -227,7 +225,7 @@ export default () => {
     const [vUpperCutOff, setUpperVCutOff] = useState(4);
 
     const [batteryCapacity, setBatteryCapacity] = useState(800);
-    const { reset, start, time } = useStopwatch({
+    const { reset, start, pause, time } = useStopwatch({
         autoStart: false,
         resolution: 1000,
     });
@@ -302,24 +300,28 @@ export default () => {
             return profiler.onProfilingStateChange(state => {
                 switch (state) {
                     case 'Ready':
+                        pause();
                         setProfilingStep('Complete');
                         setCompleteMessage(
                             'Profiling is ready. Profiling cycles all complete'
                         );
                         break;
                     case 'ThermalError':
-                        setProfilingStep('Complete');
+                        pause();
+                        setProfilingStep('Error');
                         setCompleteMessage(
                             'Profiling was stopped due to thermal error'
                         );
                         break;
                     case 'vCutOff':
+                        pause();
                         setProfilingStep('Complete');
                         setCompleteMessage(
                             'Profiling is ready. vCutOff was reached.'
                         );
                         break;
                     case 'POF':
+                        pause();
                         setProfilingStep('Complete');
                         setCompleteMessage(
                             'Profiling POF event occurred before reaching vCutOff'
@@ -328,7 +330,7 @@ export default () => {
                 }
             });
         }
-    }, [npmDevice]);
+    }, [npmDevice, pause]);
 
     useEffect(() => {
         if (
@@ -472,7 +474,8 @@ export default () => {
                                     setProfilingStep('Resting');
                                     break;
                                 case 'Complete':
-                                    npmDevice
+                                case 'Error':
+                                    await npmDevice
                                         ?.getBatteryProfiler()
                                         ?.stopProfiling();
                                     dispatch(setShowProfilingWizard(false));
@@ -480,31 +483,43 @@ export default () => {
                             }
                         }}
                     >
-                        {profilingStep === 'Complete' ? 'Close' : 'Continue'}
+                        {profilingStep === 'Complete' ||
+                        profilingStep === 'Error'
+                            ? 'Close'
+                            : 'Continue'}
                     </DialogButton>
-                    <DialogButton
-                        onClick={() => {
-                            if (
-                                profilingStep === 'Resting' ||
-                                profilingStep === 'Profiling'
-                            ) {
-                                npmDevice
-                                    ?.getBatteryProfiler()
-                                    ?.stopProfiling()
-                                    .then(() =>
-                                        dispatch(setShowProfilingWizard(false))
-                                    )
-                                    .catch(res => {
-                                        setErrorMessage(res);
-                                        dispatch(setProfilingStep('Error'));
-                                    });
-                            } else {
-                                dispatch(setShowProfilingWizard(false));
-                            }
-                        }}
-                    >
-                        Cancel
-                    </DialogButton>
+                    {profilingStep !== 'Complete' &&
+                        profilingStep !== 'Error' && (
+                            <DialogButton
+                                onClick={() => {
+                                    if (
+                                        profilingStep === 'Resting' ||
+                                        profilingStep === 'Profiling'
+                                    ) {
+                                        npmDevice
+                                            ?.getBatteryProfiler()
+                                            ?.stopProfiling()
+                                            .then(() =>
+                                                dispatch(
+                                                    setShowProfilingWizard(
+                                                        false
+                                                    )
+                                                )
+                                            )
+                                            .catch(res => {
+                                                setErrorMessage(res);
+                                                dispatch(
+                                                    setProfilingStep('Error')
+                                                );
+                                            });
+                                    } else {
+                                        dispatch(setShowProfilingWizard(false));
+                                    }
+                                }}
+                            >
+                                Cancel
+                            </DialogButton>
+                        )}
                 </>
             }
         >
@@ -660,12 +675,12 @@ export default () => {
             {profilingStep === 'Profiling' && (
                 <>
                     <div>
-                        <ProfilingMessage />
                         <p>
                             <span>{`Profiling: used ${capacityConsumedState.toFixed(
                                 2
                             )}mAh of ${batteryCapacity}mAh`}</span>
                         </p>
+                        <ProfilingMessage />
                     </div>
                     <Form.Group>
                         <TimeComponent
@@ -678,9 +693,27 @@ export default () => {
                 </>
             )}
             {profilingStep === 'Complete' && (
-                <Alert label="Success " variant="success">
-                    {completeMessage}
-                </Alert>
+                <>
+                    <div>
+                        <p>
+                            <span>{`Capacity consumed: ${capacityConsumedState.toFixed(
+                                2
+                            )}mAh`}</span>
+                        </p>
+                        <Alert label="Success " variant="success">
+                            {completeMessage}
+                        </Alert>
+                    </div>
+                    <Form.Group>
+                        <TimeComponent
+                            ready
+                            time={time}
+                            progress={
+                                (capacityConsumedState / batteryCapacity) * 100
+                            }
+                        />
+                    </Form.Group>
+                </>
             )}
             {profilingStep === 'Error' && (
                 <Alert label="Error " variant="danger">

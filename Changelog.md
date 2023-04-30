@@ -16,6 +16,7 @@ and this project adheres to
 ### Fixed
 
 -   mAh Calculated at twice the rate
+-   POF Error when not profiling
 
 ## 0.0.14 - 2023-04-28
 

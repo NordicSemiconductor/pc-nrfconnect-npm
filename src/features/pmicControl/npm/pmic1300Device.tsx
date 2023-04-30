@@ -97,6 +97,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     pmicState = 'pmic-disconnected';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 }
+                batteryProfiler?.pofError(); // TODO Move to POF error?
                 break;
             case 'PMIC available. Application can be restarted.':
                 batteryProfiler
