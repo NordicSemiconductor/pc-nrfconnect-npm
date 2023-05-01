@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
 
 import {
@@ -15,7 +15,11 @@ import {
     isSupportedVersion,
     isUsbPowered,
 } from '../../features/pmicControl/pmicControlSlice';
-import { getShellParser, isPaused } from '../../features/serial/serialSlice';
+import {
+    getShellParser,
+    isPaused,
+    setIsPaused,
+} from '../../features/serial/serialSlice';
 
 export default () => {
     const shellParser = useSelector(getShellParser);
@@ -25,6 +29,7 @@ export default () => {
     const paused = useSelector(isPaused);
     const profilingState = useSelector(getProfilingState);
     const npmDevice = useSelector(getNpmDevice);
+    const dispatch = useDispatch();
 
     const [pauseFor10Ms, setPauseFor10ms] = useState(paused);
 
@@ -83,9 +88,22 @@ export default () => {
                 ];
                 pmicStep.state = 'warning';
             }
-        } else if (!supportedVersion) {
+        } else if (supportedVersion === false) {
             shellStep.state = 'failure';
             shellStep.caption = 'Wrong firmware';
+        } else if (supportedVersion === undefined) {
+            shellStep.state = 'warning';
+            shellStep.caption = [
+                { id: '1', caption: 'Unknown firmware' },
+                {
+                    id: '2',
+                    caption: 'check again',
+                    action: () =>
+                        npmDevice
+                            ?.isSupportedVersion()
+                            .then(result => dispatch(setIsPaused(result))),
+                },
+            ];
         } else if (pmicState === 'pmic-unknown') {
             pmicStep.caption = 'Connecting...';
             pmicStep.state = 'active';
