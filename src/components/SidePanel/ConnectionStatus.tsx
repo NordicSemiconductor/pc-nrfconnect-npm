@@ -73,7 +73,7 @@ export default () => {
                 },
             ];
 
-            if (profilingState === 'Off') {
+            if (profilingState !== 'Running') {
                 pmicStep.caption = 'Waiting on shell';
                 pmicStep.state = 'active';
             } else {

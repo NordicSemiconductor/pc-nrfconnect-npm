@@ -7,7 +7,7 @@
 import EventEmitter from 'events';
 
 import { ShellParser } from '../../../hooks/commandParser';
-import { noop, parseLogData, toRegex } from './pmicHelpers';
+import { noop, parseLogData, parseToBoolean, toRegex } from './pmicHelpers';
 import {
     IBatteryProfiler,
     LoggingEvent,
@@ -88,8 +88,21 @@ export const BatteryProfiler: IBatteryProfiler = (
     shellParser?.registerCommandCallback(
         toRegex('cc_profile start'),
         () => {
-            profiling = 'Running';
-            eventEmitter.emit('onProfilingStateChange', profiling);
+            if (profiling !== 'Running') {
+                profiling = 'Running';
+                eventEmitter.emit('onProfilingStateChange', profiling);
+            }
+        },
+        noop
+    );
+
+    shellParser?.registerCommandCallback(
+        toRegex('cc_profile active'),
+        res => {
+            const newState = parseToBoolean(res) ? 'Running' : 'Off';
+            if (newState !== profiling) {
+                eventEmitter.emit('onProfilingStateChange', newState);
+            }
         },
         noop
     );
@@ -97,13 +110,17 @@ export const BatteryProfiler: IBatteryProfiler = (
     shellParser?.registerCommandCallback(
         toRegex('cc_profile stop'),
         () => {
-            profiling = 'Off';
-            eventEmitter.emit('onProfilingStateChange', profiling);
+            if (profiling !== 'Off') {
+                profiling = 'Off';
+                eventEmitter.emit('onProfilingStateChange', profiling);
+            }
         },
         res => {
             if (res.includes('No profiling ongoing')) {
-                profiling = 'Off';
-                eventEmitter.emit('onProfilingStateChange', profiling);
+                if (profiling !== 'Off') {
+                    profiling = 'Off';
+                    eventEmitter.emit('onProfilingStateChange', profiling);
+                }
             }
         }
     );
@@ -178,8 +195,17 @@ export const BatteryProfiler: IBatteryProfiler = (
         });
 
     const isProfiling = () =>
-        new Promise<boolean>(resolve => {
-            resolve(profiling !== 'Off');
+        new Promise<boolean>((resolve, reject) => {
+            shellParser?.enqueueRequest('cc_profile active', {
+                onSuccess: res => {
+                    resolve(parseToBoolean(res));
+                },
+                onError: reject,
+                onTimeout: error => {
+                    reject(error);
+                    console.warn(error);
+                },
+            });
         });
 
     return {

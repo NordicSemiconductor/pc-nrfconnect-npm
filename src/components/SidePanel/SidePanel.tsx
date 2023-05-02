@@ -318,7 +318,7 @@ export default () => {
                         disabled={
                             !profilingSupported ||
                             pmicConnection === 'ek-disconnected' ||
-                            profilingState !== 'Off'
+                            profilingState === 'Running'
                         }
                     >
                         Profile Battery
