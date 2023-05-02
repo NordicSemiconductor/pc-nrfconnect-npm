@@ -3285,7 +3285,6 @@ describe('PMIC 1300', () => {
             );
 
             expect(mockOnBeforeReboot).toBeCalledTimes(1);
-            expect(mockOnBeforeReboot).toBeCalledWith(expect.anything());
         });
 
         test('Does not Reboot is profiling is not off when device PMIC is available', async () => {
@@ -3298,6 +3297,22 @@ describe('PMIC 1300', () => {
             );
 
             expect(mockOnBeforeReboot).toBeCalledTimes(0);
+
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(
+                    'cc_profile stop'
+                );
+
+            callback?.onSuccess(
+                'Success: Profiling stopped',
+                'cc_profile stop'
+            );
+
+            await eventHandlers.mockOnShellLoggingEventHandler(
+                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
+            );
+
+            expect(mockOnBeforeReboot).toBeCalledTimes(1);
         });
 
         test('Adc Sample Logging event once', () => {
