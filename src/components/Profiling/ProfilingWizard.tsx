@@ -20,7 +20,7 @@ import {
     useStopwatch,
 } from 'pc-nrfconnect-shared';
 
-import { openDirectoryDialog } from '../../actions/fileActions';
+import { selectDirectoryDialog } from '../../actions/fileActions';
 import { ProfilingEvent } from '../../features/pmicControl/npm/types';
 import {
     getChargers,
@@ -32,6 +32,7 @@ import {
     getPmicChargingState,
     isBatteryConnected,
     isUsbPowered,
+    setEventRecordingPath,
     setShowProfilingWizard,
 } from '../../features/pmicControl/pmicControlSlice';
 

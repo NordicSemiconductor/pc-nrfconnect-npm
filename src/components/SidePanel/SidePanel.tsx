@@ -23,8 +23,8 @@ import { Terminal } from 'xterm-headless';
 import {
     getProfileBuffer,
     loadConfiguration,
-    openDirectoryDialog,
     saveFileDialog,
+    selectDirectoryDialog,
 } from '../../actions/fileActions';
 import {
     dialogHandler,
@@ -215,7 +215,9 @@ export default () => {
                             eventRecordingPath === undefined ||
                             eventRecordingPath.length === 0
                         ) {
-                            dispatch(openDirectoryDialog());
+                            selectDirectoryDialog().then(filePath =>
+                                dispatch(setEventRecordingPath(filePath))
+                            );
                         } else {
                             dispatch(setEventRecordingPath(''));
                         }
