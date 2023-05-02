@@ -10,7 +10,6 @@ import {
     Card,
     classNames,
     Dropdown,
-    Group,
     NumberInlineInput,
     Slider,
     StateSelector,
@@ -165,7 +164,42 @@ export default ({
                 />
             </div>
             {!summary && (
-                <div className={`${disabled ? 'disabled' : ''}`}>
+                <>
+                    <div
+                        className={`slider-container ${
+                            disabled ? 'disabled' : ''
+                        }`}
+                    >
+                        <FormLabel className="flex-row">
+                            <div>
+                                <span>RET</span>
+                                <span className="subscript">VOUT</span>
+                            </div>
+                            <div className="flex-row">
+                                <NumberInlineInput
+                                    value={internalRetVOut}
+                                    range={retVOutRange}
+                                    onChange={value =>
+                                        setInternalRetVOut(value)
+                                    }
+                                    onChangeComplete={() =>
+                                        onRetVOutChange(internalRetVOut)
+                                    }
+                                    disabled={disabled}
+                                />
+                                <span>V</span>
+                            </div>
+                        </FormLabel>
+                        <Slider
+                            values={[internalRetVOut]}
+                            onChange={[value => setInternalRetVOut(value)]}
+                            onChangeComplete={() =>
+                                onRetVOutChange(internalRetVOut)
+                            }
+                            range={retVOutRange}
+                            disabled={disabled}
+                        />
+                    </div>
                     <Dropdown
                         label="Buck Mode Control"
                         items={modeControlItems}
@@ -230,38 +264,7 @@ export default ({
                         }
                         disabled={disabled}
                     />
-                    <Group className="slider-container">
-                        <FormLabel className="flex-row">
-                            <div>
-                                <span>RET</span>
-                                <span className="subscript">VOUT</span>
-                            </div>
-                            <div className="flex-row">
-                                <NumberInlineInput
-                                    value={internalRetVOut}
-                                    range={retVOutRange}
-                                    onChange={value =>
-                                        setInternalRetVOut(value)
-                                    }
-                                    onChangeComplete={() =>
-                                        onRetVOutChange(internalRetVOut)
-                                    }
-                                    disabled={disabled}
-                                />
-                                <span>V</span>
-                            </div>
-                        </FormLabel>
-                        <Slider
-                            values={[internalRetVOut]}
-                            onChange={[value => setInternalRetVOut(value)]}
-                            onChangeComplete={() =>
-                                onRetVOutChange(internalRetVOut)
-                            }
-                            range={retVOutRange}
-                            disabled={disabled}
-                        />
-                    </Group>
-                </div>
+                </>
             )}
         </Card>
     ) : null;
