@@ -97,19 +97,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     pmicState = 'pmic-disconnected';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 }
-                batteryProfiler?.pofError(); // TODO Move to POF error?
+                batteryProfiler?.pofError();
                 break;
             case 'PMIC available. Application can be restarted.':
-                batteryProfiler
-                    ?.isProfiling()
-                    .then(profiling => {
-                        if (!profiling) {
-                            baseDevice.kernelReset();
-                        } else {
-                            batteryProfiler?.pofError(); // TODO Move to POF error?
-                        }
-                    })
-                    .catch(() => baseDevice.kernelReset());
+                if (batteryProfiler?.getProfilingState() === 'Off') {
+                    baseDevice.kernelReset();
+                } else {
+                    batteryProfiler?.pofError();
+                }
                 break;
         }
     };

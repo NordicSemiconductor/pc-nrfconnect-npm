@@ -213,6 +213,7 @@ export const BatteryProfiler: IBatteryProfiler = (
         startProfiling,
         stopProfiling,
         isProfiling,
+        getProfilingState: () => profiling,
         onProfilingStateChange: (handler: (state: ProfilingState) => void) => {
             eventEmitter.on('onProfilingStateChange', handler);
             return () => {

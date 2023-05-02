@@ -378,6 +378,7 @@ export type BatteryProfiler = {
     startProfiling: () => Promise<void>;
     stopProfiling: () => Promise<void>;
     isProfiling: () => Promise<boolean>;
+    getProfilingState: () => ProfilingState;
     onProfilingStateChange: (
         handler: (state: ProfilingState, error?: string) => void
     ) => () => void;
