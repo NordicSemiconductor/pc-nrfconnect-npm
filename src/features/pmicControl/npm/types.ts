@@ -117,12 +117,14 @@ export type BatteryModel = {
 
 // 'pmic-connected' -> Shell ok - PMIC Online
 // 'pmic-disconnected' -> Shell ok - PMIC disconnected
+// 'pmic-pending-reboot' -> Shell ok - PMIC disconnected need restart to proceed
 // 'pmic-unknown' -> Shell ok - PMIC unknown
 // 'ek-disconnected' -> Shell off - PMIC disconnected
 export type PmicState =
     | 'ek-disconnected'
     | 'pmic-connected'
     | 'pmic-disconnected'
+    | 'pmic-pending-reboot'
     | 'pmic-unknown';
 
 export type PmicChargingState = {

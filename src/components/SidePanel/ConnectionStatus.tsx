@@ -121,6 +121,16 @@ export default () => {
                 },
             ];
             pmicStep.state = 'warning';
+        } else if (pmicState === 'pmic-pending-reboot') {
+            pmicStep.caption = [
+                { id: '1', caption: 'Pending device restart' },
+                {
+                    id: '2',
+                    caption: 'reset device',
+                    action: () => npmDevice?.kernelReset(),
+                },
+            ];
+            pmicStep.state = 'warning';
         } else if (!usbPowered) {
             pmicStep.caption = 'Not powered with USB';
             pmicStep.state = 'warning';

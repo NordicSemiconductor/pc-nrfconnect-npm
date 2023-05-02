@@ -103,6 +103,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 if (batteryProfiler?.getProfilingState() === 'Off') {
                     baseDevice.kernelReset();
                 } else {
+                    if (pmicState !== 'pmic-pending-reboot') {
+                        pmicState = 'pmic-pending-reboot';
+                        eventEmitter.emit('onPmicStateChange', pmicState);
+                    }
                     batteryProfiler?.pofError();
                 }
                 break;
