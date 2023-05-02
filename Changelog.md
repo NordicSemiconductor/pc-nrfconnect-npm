@@ -8,16 +8,22 @@ and this project adheres to
 
 ## 0.0.15 - UNRELEASED
 
+### Added
+
+-   PMIC1300 FP2 Support FW Version 0.0.0+15
+
 ### Changed
 
 -   Use profiling logging timestamp for mAh deltaT Calculation
 -   Use profiling logging timestamp for profiling file timestamp
 -   Distinguish between an invalid firmware and when app is still to read it
+-   Auto continue when fully charged and USB PMIC is disconnected
 
 ### Fixed
 
 -   mAh Calculated at twice the rate
 -   POF Error when not profiling
+-   UI Improvements
 
 ## 0.0.14 - 2023-04-28
 
