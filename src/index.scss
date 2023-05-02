@@ -34,38 +34,27 @@
     align-items: center;
 }
 
-label {
-    margin-bottom: 8px;
+.card {
+    min-height: 185px;
 }
 
-.card {
-    .form-label {
-        font-size: 14px;
-    }
+label {
+    // margin-bottom: 8px;
+    font-size: 12px;
+}
 
-    .slider-container {
-        .form-label {
-            height: 24px;
-        }
+.slider-container {
+    label {
+        margin-bottom: 4px;
     }
+}
 
-    .show-more-toggle {
-        font-size: 20px;
-        line-height: 0;
-        top: 8px;
-        position: relative;
-    }
+.number-inline-input {
+    font-size: 12px;
 }
 
 .channel-selection {
-    .btn {
-        padding: 8px !important;
-        line-height: 1 !important;
-    }
-}
-
-.card-title {
-    min-height: 16px;
+    margin-bottom: 11px !important;
 }
 
 .alert {
