@@ -36,7 +36,7 @@ export default () => {
     useEffect(() => {
         const t = setTimeout(() => {
             setPauseFor10ms(paused);
-        }, 100);
+        }, 10);
 
         return () => clearTimeout(t);
     }, [paused]);
