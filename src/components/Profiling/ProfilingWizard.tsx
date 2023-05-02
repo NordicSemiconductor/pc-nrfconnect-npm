@@ -35,6 +35,7 @@ import {
     setEventRecordingPath,
     setShowProfilingWizard,
 } from '../../features/pmicControl/pmicControlSlice';
+import { noop } from '../../features/pmicControl/npm/pmicHelpers';
 
 type ProfileStage =
     | 'Configuration'
@@ -46,6 +47,7 @@ type ProfileStage =
     | 'Error';
 
 const ChargingWarnings = () => {
+    const npmDevice = useSelector(getNpmDevice);
     const batteryConnected = useSelector(isBatteryConnected);
     const usbPowered = useSelector(isUsbPowered);
     const chargers = useSelector(getChargers);
@@ -54,18 +56,29 @@ const ChargingWarnings = () => {
         <>
             {!batteryConnected ? (
                 <Alert label="Warning " variant="warning">
-                    Connect Battery to the EK
+                    Did not detect battery. Ensure battery is connected.
                 </Alert>
             ) : null}
             {!usbPowered ? (
                 <Alert label="Warning " variant="warning">
-                    Not charging: Connect a USB PMIC cable
+                    Connect a USB PMIC cable
                 </Alert>
             ) : null}
             {!chargers[0]?.enabled ? (
                 <Alert label="Warning " variant="warning">
-                    Not charging: charging has been disabled. Cancel and restart
-                    profiling
+                    <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
+                        Charging has been turned off.
+                        <Button
+                            variant="custom"
+                            onClick={() => {
+                                chargers.forEach((_, index) =>
+                                    npmDevice?.setChargerEnabled(index, false)
+                                );
+                            }}
+                        >
+                            Turn on
+                        </Button>
+                    </div>
                 </Alert>
             ) : null}
         </>
@@ -83,7 +96,7 @@ const ProfilingMessage = () => {
         <>
             {!batteryConnected ? (
                 <Alert label="Warning " variant="warning">
-                    Connect Battery to the EK
+                    Did not detect battery. Ensure battery is connected.
                 </Alert>
             ) : null}
             {usbPowered ? (
@@ -93,28 +106,34 @@ const ProfilingMessage = () => {
             ) : null}
             {fuelGauge ? (
                 <Alert label="Warning " variant="warning">
-                    Fuel gauge is on this might effect profiling{' '}
-                    <Button
-                        variant="link"
-                        onClick={() => npmDevice?.setFuelGaugeEnabled(false)}
-                    >
-                        Turn off
-                    </Button>
+                    <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
+                        Fuel gauge is on this might effect profiling.
+                        <Button
+                            variant="custom"
+                            onClick={() =>
+                                npmDevice?.setFuelGaugeEnabled(false)
+                            }
+                        >
+                            Turn off
+                        </Button>
+                    </div>
                 </Alert>
             ) : null}
             {ldos.filter(ldo => ldo.enabled).length > 0 ? (
                 <Alert label="Warning " variant="warning">
-                    One or more LDOs are on this will effect profiling{' '}
-                    <Button
-                        variant="link"
-                        onClick={() =>
-                            ldos.forEach((_, index) =>
-                                npmDevice?.setLdoEnabled(index, false)
-                            )
-                        }
-                    >
-                        Turn all off
-                    </Button>
+                    <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
+                        One or more LDOs are on this will effect profiling.
+                        <Button
+                            variant="custom"
+                            onClick={() =>
+                                ldos.forEach((_, index) =>
+                                    npmDevice?.setLdoEnabled(index, false)
+                                )
+                            }
+                        >
+                            Turn all off
+                        </Button>
+                    </div>
                 </Alert>
             ) : null}
         </>
@@ -163,18 +182,25 @@ const TimeComponent = ({
 
     return (
         <>
+            {!ready && (
+                <>
+                    <span>
+                        {progress >= 0 && progress < 100
+                            ? `Remaining time ${timeString(
+                                  etaDays,
+                                  etaHours,
+                                  Math.round(etaMinutes + etaSeconds / 60),
+                                  0
+                              )}` // don't show seconds
+                            : ''}
+                        {progress >= 100 ? 'Remaining time almost done' : ''}
+                        {progress < 0 ? 'Remaining time calculating' : ''}
+                    </span>
+                    <br />
+                </>
+            )}
             <span>
                 {`Elapsed time ${timeString(days, hours, minutes, seconds)}`}
-                {!ready && progress >= 0 && progress < 100
-                    ? `- ETA ${timeString(
-                          etaDays,
-                          etaHours,
-                          Math.round(etaMinutes + etaSeconds / 60),
-                          0
-                      )}` // don't show seconds
-                    : ''}
-                {!ready && progress >= 100 ? '- ETA almost done' : ''}
-                {!ready && progress < 0 ? '- ETA Calculating' : ''}
             </span>
             <br />
             <ProgressBar now={progress} style={{ height: '4px' }} />
@@ -347,7 +373,83 @@ export default () => {
         if (profilingStep === 'Charging' && pmicChargingState.batteryFull) {
             setProfilingStep('Charged');
         }
-    }, [pmicChargingState.batteryFull, profilingStep]);
+    }, [pmicChargingState, profilingStep]);
+
+    useEffect(() => {
+        if (profilingStep === 'Charged' && !usbPowered) {
+            npmDevice
+                ?.setChargerEnabled(0, false)
+                .then(() => {
+                    npmDevice
+                        ?.getBatteryProfiler()
+                        ?.setProfile(
+                            reportingRate, // iBat
+                            reportingRate * 8, // tBat
+                            vLowerCutOff,
+                            [
+                                {
+                                    tLoad: 500,
+                                    tRest: 500,
+                                    iLoad: 0,
+                                    iRest: 0,
+                                    cycles: restDuration,
+                                },
+                                {
+                                    tLoad: 500,
+                                    tRest: 500,
+                                    iLoad: 0,
+                                    iRest: 0,
+                                    cycles: 300, // 5Min
+                                },
+                                {
+                                    tLoad: 600000, // 10Min
+                                    tRest: 2400000, // 40Min
+                                    iLoad: batteryCapacity / 5 / 1000, // mAh
+                                    iRest: 0,
+                                    vCutoff: 3.9,
+                                },
+                                {
+                                    tLoad: 300000, // 5Min
+                                    tRest: 1800000, // 30Min
+                                    iLoad: batteryCapacity / 5 / 1000, // mAh
+                                    iRest: 0,
+                                    vCutoff: 3.5,
+                                },
+                                {
+                                    tLoad: 300000, // 5Min
+                                    tRest: 1800000, // 30Min
+                                    iLoad: batteryCapacity / 10 / 1000, // mAh
+                                    iRest: 0,
+                                },
+                            ]
+                        )
+                        .then(() => {
+                            npmDevice
+                                ?.getBatteryProfiler()
+                                ?.startProfiling()
+                                .then(() => {
+                                    reset();
+                                    setProfilingStep('Resting');
+                                });
+                        })
+                        .catch(res => {
+                            setErrorMessage(res);
+                            setProfilingStep('Error');
+                        });
+                })
+                .catch(res => {
+                    setErrorMessage(res);
+                    setProfilingStep('Error');
+                });
+        }
+    }, [
+        batteryCapacity,
+        npmDevice,
+        profilingStep,
+        reset,
+        usbPowered,
+        vLowerCutOff,
+    ]);
 
     return (
         <GenericDialog
@@ -361,19 +463,12 @@ export default () => {
             closeOnEsc={false}
             footer={
                 <>
-                    <DialogButton
-                        variant="primary"
-                        disabled={
-                            (profilingStep === 'Configuration' &&
-                                !eventRecordingPath) ||
-                            profilingStep === 'Charging' ||
-                            (profilingStep === 'Charged' && usbPowered) ||
-                            profilingStep === 'Resting' ||
-                            profilingStep === 'Profiling'
-                        }
-                        onClick={async () => {
-                            switch (profilingStep) {
-                                case 'Configuration':
+                    {profilingStep === 'Configuration' && (
+                        <DialogButton
+                            variant="primary"
+                            onClick={() => {
+                                selectDirectoryDialog().then(async filePath => {
+                                    dispatch(setEventRecordingPath(filePath));
                                     setInitialBatteryVoltage(
                                         adcSample?.vBat ?? 0
                                     );
@@ -406,89 +501,47 @@ export default () => {
                                         });
                                     setProfilingStep('Charging');
                                     start();
-                                    break;
-                                case 'Charged':
-                                    npmDevice
-                                        ?.setChargerEnabled(0, false)
-                                        .then(async () => {
-                                            await npmDevice
-                                                ?.getBatteryProfiler()
-                                                ?.setProfile(
-                                                    reportingRate, // iBat
-                                                    reportingRate * 8, // tBat
-                                                    vLowerCutOff,
-                                                    [
-                                                        {
-                                                            tLoad: 500,
-                                                            tRest: 500,
-                                                            iLoad: 0,
-                                                            iRest: 0,
-                                                            cycles: restDuration,
-                                                        },
-                                                        {
-                                                            tLoad: 500,
-                                                            tRest: 500,
-                                                            iLoad: 0,
-                                                            iRest: 0,
-                                                            cycles: 300, // 5Min
-                                                        },
-                                                        {
-                                                            tLoad: 600000, // 10Min
-                                                            tRest: 2400000, // 40Min
-                                                            iLoad:
-                                                                batteryCapacity /
-                                                                5 /
-                                                                1000, // mAh
-                                                            iRest: 0,
-                                                            vCutoff: 3.9,
-                                                        },
-                                                        {
-                                                            tLoad: 300000, // 5Min
-                                                            tRest: 1800000, // 30Min
-                                                            iLoad:
-                                                                batteryCapacity /
-                                                                5 /
-                                                                1000, // mAh
-                                                            iRest: 0,
-                                                            vCutoff: 3.5,
-                                                        },
-                                                        {
-                                                            tLoad: 300000, // 5Min
-                                                            tRest: 1800000, // 30Min
-                                                            iLoad:
-                                                                batteryCapacity /
-                                                                10 /
-                                                                1000, // mAh
-                                                            iRest: 0,
-                                                        },
-                                                    ]
-                                                );
-                                            npmDevice
-                                                ?.getBatteryProfiler()
-                                                ?.startProfiling();
-                                        })
-                                        .catch(res => {
-                                            setErrorMessage(res);
-                                            setProfilingStep('Error');
-                                        });
-                                    reset();
-                                    setProfilingStep('Resting');
-                                    break;
-                                case 'Complete':
-                                case 'Error':
-                                    await npmDevice
-                                        ?.getBatteryProfiler()
-                                        ?.stopProfiling();
-                                    dispatch(setShowProfilingWizard(false));
-                                    break;
-                            }
-                        }}
-                    >
-                        {profilingStep === 'Complete' ||
-                        profilingStep === 'Error'
-                            ? 'Close'
-                            : 'Continue'}
-                    </DialogButton>
+                                });
+                            }}
+                        >
+                            Continue
+                        </DialogButton>
+                    )}
+                    {(profilingStep === 'Charged' ||
+                        profilingStep === 'Charging' ||
+                        profilingStep === 'Resting' ||
+                        profilingStep === 'Profiling') && (
+                        <DialogButton variant="primary" disabled onClick={noop}>
+                            Continue
+                        </DialogButton>
+                    )}
+                    {profilingStep === 'Complete' && (
+                        <DialogButton
+                            variant="primary"
+                            onClick={async () => {
+                                await npmDevice
+                                    ?.getBatteryProfiler()
+                                    ?.stopProfiling();
+                                dispatch(setShowProfilingWizard(false));
+                            }}
+                        >
+                            Finish
+                        </DialogButton>
+                    )}
+                    {profilingStep === 'Error' && (
+                        <DialogButton
+                            variant="primary"
+                            onClick={async () => {
+                                await npmDevice
+                                    ?.getBatteryProfiler()
+                                    ?.stopProfiling();
+                                dispatch(setShowProfilingWizard(false));
+                            }}
+                        >
+                            Close
+                        </DialogButton>
+                    )}
+
                     {profilingStep !== 'Complete' &&
                         profilingStep !== 'Error' && (
                             <DialogButton
@@ -527,110 +580,99 @@ export default () => {
             {profilingStep === 'Configuration' && (
                 <Group>
                     <p>Configuration</p>
-                    <div>
-                        <div className="slider-container">
-                            <FormLabel className="flex-row">
-                                <div>
-                                    <span>Upper V</span>{' '}
-                                    <span className="subscript">CUTOFF</span>
-                                </div>
-                                <div className="flex-row">
-                                    <NumberInlineInput
-                                        value={vUpperCutOff}
-                                        range={{
-                                            min: 4,
-                                            max: 4.4,
-                                            step: 0.05,
-                                            decimals: 2,
-                                        }}
-                                        onChange={setUpperVCutOff}
-                                    />
-                                    <span>V</span>
-                                </div>
-                            </FormLabel>
-                            <Slider
-                                values={[vUpperCutOff]}
-                                onChange={[setUpperVCutOff]}
-                                range={{
-                                    min: 4,
-                                    max: 4.4,
-                                    step: 0.05,
-                                    decimals: 2,
-                                }}
-                            />
-                        </div>
-                        <div className="slider-container">
-                            <FormLabel className="flex-row">
-                                <div>
-                                    <span>Lower V</span>{' '}
-                                    <span className="subscript">CUTOFF</span>
-                                </div>
-                                <div className="flex-row">
-                                    <NumberInlineInput
-                                        value={vLowerCutOff}
-                                        range={{
-                                            min: 2.7,
-                                            max: 3.1,
-                                            step: 0.05,
-                                            decimals: 2,
-                                        }}
-                                        onChange={setLowerVCutOff}
-                                    />
-                                    <span>V</span>
-                                </div>
-                            </FormLabel>
-                            <Slider
-                                values={[vLowerCutOff]}
-                                onChange={[setLowerVCutOff]}
-                                range={{
-                                    min: 2.7,
-                                    max: 3.1,
-                                    step: 0.05,
-                                    decimals: 2,
-                                }}
-                            />
-                        </div>
+                    <div className="slider-container">
+                        <FormLabel className="flex-row">
+                            <div>
+                                <span>Upper V</span>{' '}
+                                <span className="subscript">CUTOFF</span>
+                            </div>
+                            <div className="flex-row">
+                                <NumberInlineInput
+                                    value={vUpperCutOff}
+                                    range={{
+                                        min: 4,
+                                        max: 4.4,
+                                        step: 0.05,
+                                        decimals: 2,
+                                    }}
+                                    onChange={setUpperVCutOff}
+                                />
+                                <span>V</span>
+                            </div>
+                        </FormLabel>
+                        <Slider
+                            values={[vUpperCutOff]}
+                            onChange={[setUpperVCutOff]}
+                            range={{
+                                min: 4,
+                                max: 4.4,
+                                step: 0.05,
+                                decimals: 2,
+                            }}
+                        />
                     </div>
-                    <div>
-                        <div className="slider-container">
-                            <FormLabel className="flex-row">
-                                <div>
-                                    <span>Capacity</span>
-                                </div>
-                                <div className="flex-row">
-                                    <NumberInlineInput
-                                        value={batteryCapacity}
-                                        range={{ min: 32, max: 3000 }}
-                                        onChange={setBatteryCapacity}
-                                    />
-                                    <span>mAH</span>
-                                </div>
-                            </FormLabel>
-                            <Slider
-                                values={[batteryCapacity]}
-                                onChange={[setBatteryCapacity]}
-                                range={{ min: 32, max: 3000 }}
-                            />
-                        </div>
+                    <div className="slider-container">
+                        <FormLabel className="flex-row">
+                            <div>
+                                <span>Lower V</span>{' '}
+                                <span className="subscript">CUTOFF</span>
+                            </div>
+                            <div className="flex-row">
+                                <NumberInlineInput
+                                    value={vLowerCutOff}
+                                    range={{
+                                        min: 2.7,
+                                        max: 3.1,
+                                        step: 0.05,
+                                        decimals: 2,
+                                    }}
+                                    onChange={setLowerVCutOff}
+                                />
+                                <span>V</span>
+                            </div>
+                        </FormLabel>
+                        <Slider
+                            values={[vLowerCutOff]}
+                            onChange={[setLowerVCutOff]}
+                            range={{
+                                min: 2.7,
+                                max: 3.1,
+                                step: 0.05,
+                                decimals: 2,
+                            }}
+                        />
                     </div>
-                    <div>
-                        <Button
-                            variant="secondary"
-                            onClick={() => dispatch(openDirectoryDialog())}
-                        >
-                            Select output folder
-                        </Button>
-                        <span> {eventRecordingPath}</span>
+                    <div className="slider-container">
+                        <FormLabel className="flex-row">
+                            <div>
+                                <span>Capacity</span>
+                            </div>
+                            <div className="flex-row">
+                                <NumberInlineInput
+                                    value={batteryCapacity}
+                                    range={{ min: 32, max: 3000, step: 2 }}
+                                    onChange={setBatteryCapacity}
+                                />
+                                <span>mAH</span>
+                            </div>
+                        </FormLabel>
+                        <Slider
+                            values={[batteryCapacity]}
+                            onChange={[setBatteryCapacity]}
+                            range={{ min: 32, max: 3000, step: 2 }}
+                        />
                     </div>
                 </Group>
             )}
             {profilingStep === 'Charging' && (
                 <>
                     <div>
-                        <p>
-                            <span>Charging</span>
-                        </p>
                         <ChargingWarnings />
+                        <p>
+                            <span>
+                                {usbPowered ? 'Charging' : 'No charging'}
+                            </span>
+                        </p>
                     </div>
                     <Form.Group>
                         <TimeComponent
@@ -645,21 +687,14 @@ export default () => {
                     </Form.Group>
                 </>
             )}
-            {profilingStep === 'Charged' && (
-                <div>
-                    <p>
-                        <span>Battery fully charged</span>
-                    </p>
-                    <ProfilingMessage />
-                </div>
-            )}
+            {profilingStep === 'Charged' && <ProfilingMessage />}
             {profilingStep === 'Resting' && (
                 <>
                     <div>
+                        <ProfilingMessage />
                         <p>
                             <span>Resting Battery</span>
                         </p>
-                        <ProfilingMessage />
                     </div>
                     <Form.Group>
                         <TimeComponent
@@ -676,12 +711,12 @@ export default () => {
             {profilingStep === 'Profiling' && (
                 <>
                     <div>
+                        <ProfilingMessage />
                         <p>
                             <span>{`Profiling: used ${capacityConsumedState.toFixed(
                                 2
                             )}mAh of ${batteryCapacity}mAh`}</span>
                         </p>
-                        <ProfilingMessage />
                     </div>
                     <Form.Group>
                         <TimeComponent
@@ -696,14 +731,14 @@ export default () => {
             {profilingStep === 'Complete' && (
                 <>
                     <div>
+                        <Alert label="Success " variant="success">
+                            {completeMessage}
+                        </Alert>
                         <p>
                             <span>{`Capacity consumed: ${capacityConsumedState.toFixed(
                                 2
                             )}mAh`}</span>
                         </p>
-                        <Alert label="Success " variant="success">
-                            {completeMessage}
-                        </Alert>
                     </div>
                     <Form.Group>
                         <TimeComponent

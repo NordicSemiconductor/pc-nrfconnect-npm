@@ -6,6 +6,8 @@
 
 // This file is imported by index.jsx, and may contain styles for the app.
 
+@use 'sass:color';
+
 .subscript {
     vertical-align: sub;
     font-size: 80%;
@@ -57,9 +59,27 @@ label {
     margin-bottom: 11px !important;
 }
 
-.alert {
+.alert .alert-warning-with-button {
+    gap: 8px;
+
     button {
-        color: white !important;
-        text-decoration: underline;
+        border: 1px solid #b75300;
+        color: #b75300;
+        background-color: white;
+
+        &:hover:not([disabled]) {
+            color: #b75300;
+            background-color: white;
+            border-color: #b75300;
+        }
+
+        &:focus:not([disabled]) {
+            background-color: white;
+            border-color: #b75300 !important;
+        }
+
+        &:active:not([disabled]) {
+            background-color: color.scale(white, $lightness: -10%);
+        }
     }
 }
