@@ -21,6 +21,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { selectDirectoryDialog } from '../../actions/fileActions';
+import { noop } from '../../features/pmicControl/npm/pmicHelpers';
 import { ProfilingEvent } from '../../features/pmicControl/npm/types';
 import {
     getChargers,
@@ -35,7 +36,6 @@ import {
     setEventRecordingPath,
     setShowProfilingWizard,
 } from '../../features/pmicControl/pmicControlSlice';
-import { noop } from '../../features/pmicControl/npm/pmicHelpers';
 
 type ProfileStage =
     | 'Configuration'
