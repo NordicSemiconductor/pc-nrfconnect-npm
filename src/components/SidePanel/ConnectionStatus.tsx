@@ -31,12 +31,12 @@ export default () => {
     const npmDevice = useSelector(getNpmDevice);
     const dispatch = useDispatch();
 
-    const [pauseFor10Ms, setPauseFor10ms] = useState(paused);
+    const [pauseFor100Ms, setPauseFor100ms] = useState(paused);
 
     useEffect(() => {
         const t = setTimeout(() => {
-            setPauseFor10ms(paused);
-        }, 10);
+            setPauseFor100ms(paused);
+        }, 100);
 
         return () => clearTimeout(t);
     }, [paused]);
@@ -62,7 +62,7 @@ export default () => {
         shellStep.caption = 'Shell is free';
         shellStep.state = 'success';
 
-        if (pauseFor10Ms) {
+        if (pauseFor100Ms) {
             shellStep.state = 'warning';
             shellStep.caption = [
                 { id: '1', caption: 'Shell is busy' },
