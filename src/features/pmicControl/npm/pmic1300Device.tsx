@@ -1073,6 +1073,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             downloadData(chunk + 1);
                         } else {
                             resolve();
+                            requestUpdate.activeBatteryModel();
                         }
                     },
                     res => {

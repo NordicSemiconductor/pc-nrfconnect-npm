@@ -94,6 +94,14 @@ export default () => {
 
     const batteryModelItems: DropdownItem[] = useMemo(() => {
         const items = [...defaultBatterModels];
+        if (activeBatteryModel) {
+            if (
+                defaultBatterModels.filter(
+                    v => v.name !== activeBatteryModel.name
+                ).length > 0
+            )
+                items.push(activeBatteryModel);
+        }
         if (storedBatterModel) items.push(storedBatterModel);
 
         const keys = new Set(items.map(item => item.name));
@@ -106,7 +114,12 @@ export default () => {
             } mAh)`,
             value: key,
         }));
-    }, [defaultBatterModels, latestAdcSample?.tBat, storedBatterModel]);
+    }, [
+        activeBatteryModel,
+        defaultBatterModels,
+        latestAdcSample?.tBat,
+        storedBatterModel,
+    ]);
 
     const selectedActiveItemBatteryMode = useMemo(
         () =>
