@@ -770,7 +770,11 @@ export default () => {
                 <>
                     <div>
                         <Alert
-                            label="Success "
+                            label={
+                                completeMessage?.level === 'success'
+                                    ? 'Success '
+                                    : 'Warning '
+                            }
                             variant={completeMessage?.level ?? 'success'}
                         >
                             {completeMessage?.message ?? ''}
