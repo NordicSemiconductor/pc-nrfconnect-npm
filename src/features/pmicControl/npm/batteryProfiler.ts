@@ -101,6 +101,7 @@ export const BatteryProfiler: IBatteryProfiler = (
         res => {
             const newState = parseToBoolean(res) ? 'Running' : 'Off';
             if (newState !== profiling) {
+                profiling = newState;
                 eventEmitter.emit('onProfilingStateChange', newState);
             }
         },

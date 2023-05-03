@@ -96,6 +96,7 @@ export default () => {
             dispatch(setDefaultBatterModels(models));
         });
 
+        npmDevice.getBatteryProfiler()?.isProfiling();
         npmDevice.startAdcSample(2000);
         npmDevice.setBatteryStatusCheckEnabled(true);
     }, [dispatch, npmDevice]);
