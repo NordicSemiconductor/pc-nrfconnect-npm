@@ -57,7 +57,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         dialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+14'
+        '0.0.0+15'
     );
     const batteryProfiler = shellParser
         ? BatteryProfiler(shellParser, eventEmitter)
@@ -97,18 +97,18 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     pmicState = 'pmic-disconnected';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 }
+                batteryProfiler?.pofError();
                 break;
             case 'PMIC available. Application can be restarted.':
-                batteryProfiler
-                    ?.isProfiling()
-                    .then(profiling => {
-                        if (!profiling) {
-                            baseDevice.kernelReset();
-                        } else {
-                            batteryProfiler?.pofError(); // TODO Move to POF error?
-                        }
-                    })
-                    .catch(() => baseDevice.kernelReset());
+                if (batteryProfiler?.getProfilingState() === 'Off') {
+                    baseDevice.kernelReset();
+                } else {
+                    if (pmicState !== 'pmic-pending-reboot') {
+                        pmicState = 'pmic-pending-reboot';
+                        eventEmitter.emit('onPmicStateChange', pmicState);
+                    }
+                    batteryProfiler?.pofError();
+                }
                 break;
         }
     };
@@ -1073,6 +1073,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             downloadData(chunk + 1);
                         } else {
                             resolve();
+                            requestUpdate.activeBatteryModel();
                         }
                     },
                     res => {

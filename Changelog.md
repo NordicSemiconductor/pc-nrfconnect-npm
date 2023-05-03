@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.0.15 - UNRELEASED
+
+### Added
+
+-   PMIC1300 FP2 Support FW Version 0.0.0+15
+
+### Changed
+
+-   Distinguish between an invalid firmware and when app is still to read it
+-   Auto continue when fully charged and USB PMIC is disconnected
+
+### Fixed
+
+-   mAh Calculated at twice the rate
+-   POF Error when not profiling
+-   UI Improvements
+-   Update active battery profile after download
+
 ## 0.0.14 - 2023-04-28
 
 ### Fixed

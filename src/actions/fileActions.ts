@@ -12,7 +12,6 @@ import path from 'path';
 
 import { RootState } from '../appReducer';
 import { NpmExport } from '../features/pmicControl/npm/types';
-import { setEventRecordingPath } from '../features/pmicControl/pmicControlSlice';
 import { TDispatch } from '../thunk';
 
 const saveSettings =
@@ -119,20 +118,22 @@ export const getProfileBuffer = () =>
             });
     });
 
-export const openDirectoryDialog = () => (dispatch: TDispatch) => {
-    const dialogOptions = {
-        title: 'Select a Directory for events',
-        properties: ['openDirectory'],
-        // eslint-disable-next-line no-undef
-    } as Electron.OpenDialogOptions;
-    dialog
-        .showOpenDialog(dialogOptions)
-        .then(
-            ({ filePaths }: { filePaths: string[] }) =>
-                filePaths.length === 1 &&
-                dispatch(setEventRecordingPath(filePaths[0]))
-        );
-};
+export const selectDirectoryDialog = () =>
+    new Promise<string>((resolve, reject) => {
+        const dialogOptions = {
+            title: 'Select a Directory',
+            properties: ['openDirectory'],
+            // eslint-disable-next-line no-undef
+        } as Electron.OpenDialogOptions;
+        dialog
+            .showOpenDialog(dialogOptions)
+            .then(({ filePaths }: { filePaths: string[] }) => {
+                if (filePaths.length === 1) {
+                    resolve(filePaths[0]);
+                }
+            })
+            .catch(reject);
+    });
 
 export const saveFileDialog = () => (dispatch: TDispatch) => {
     const dialogOptions = {

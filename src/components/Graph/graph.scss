@@ -38,17 +38,13 @@
         margin-right: 10px;
     }
 
-    div:not(:first-child):not(:last-child) {
-        width: 60%;
-    }
-
     .range-buttons {
         display: flex;
-        justify-content: space-between;
+        flex-wrap: wrap;
 
         & button {
             min-width: 70px;
-            margin: 0 2px;
+            margin: 2px;
         }
     }
 }

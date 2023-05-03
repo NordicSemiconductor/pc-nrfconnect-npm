@@ -40,7 +40,7 @@ export default ({ disabled }: { disabled: boolean }) => {
     return (
         <div className={`${disabled ? 'disabled' : ''}`}>
             <div className="line-wrapper">
-                <span className="line-title">Voltage:</span>
+                <span className="line-title">Voltage</span>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.vBat.toFixed(2)}v`
@@ -48,7 +48,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <span className="line-title">Current:</span>
+                <span className="line-title">Current</span>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
                         ? `${Math.round(latestAdcSample?.iBat)}mA`
@@ -56,7 +56,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <span className="line-title">Temperature:</span>
+                <span className="line-title">Temperature</span>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.tBat.toFixed(2)}°C`
@@ -64,7 +64,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <span className="line-title">Charging Mode:</span>
+                <span className="line-title">Charging Mode</span>
                 <span className="line-data">{mode}</span>
             </div>
         </div>

@@ -23,8 +23,8 @@ import { Terminal } from 'xterm-headless';
 import {
     getProfileBuffer,
     loadConfiguration,
-    openDirectoryDialog,
     saveFileDialog,
+    selectDirectoryDialog,
 } from '../../actions/fileActions';
 import {
     dialogHandler,
@@ -40,7 +40,6 @@ import {
     getEventRecordingPath,
     getLatestAdcSample,
     getNpmDevice,
-    getProfilingState,
     getStoredBatterModel,
     setEventRecordingPath,
     setShowProfilingWizard,
@@ -52,6 +51,7 @@ import {
     setIsPaused,
     setShellParser,
 } from '../../features/serial/serialSlice';
+import useIsUIDisabled from '../../features/useIsUIDisabled';
 import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
@@ -78,8 +78,8 @@ export default () => {
     const storedBatterModel = useSelector(getStoredBatterModel);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
-    const profilingState = useSelector(getProfilingState);
     const profilingWizard = useSelector(showProfilingWizard);
+    const uiDisabled = useIsUIDisabled();
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
@@ -94,6 +94,14 @@ export default () => {
 
     const batteryModelItems: DropdownItem[] = useMemo(() => {
         const items = [...defaultBatterModels];
+        if (activeBatteryModel) {
+            if (
+                defaultBatterModels.filter(
+                    v => v.name !== activeBatteryModel.name
+                ).length > 0
+            )
+                items.push(activeBatteryModel);
+        }
         if (storedBatterModel) items.push(storedBatterModel);
 
         const keys = new Set(items.map(item => item.name));
@@ -106,7 +114,12 @@ export default () => {
             } mAh)`,
             value: key,
         }));
-    }, [defaultBatterModels, latestAdcSample?.tBat, storedBatterModel]);
+    }, [
+        activeBatteryModel,
+        defaultBatterModels,
+        latestAdcSample?.tBat,
+        storedBatterModel,
+    ]);
 
     const selectedActiveItemBatteryMode = useMemo(
         () =>
@@ -215,7 +228,9 @@ export default () => {
                             eventRecordingPath === undefined ||
                             eventRecordingPath.length === 0
                         ) {
-                            dispatch(openDirectoryDialog());
+                            selectDirectoryDialog().then(filePath =>
+                                dispatch(setEventRecordingPath(filePath))
+                            );
                         } else {
                             dispatch(setEventRecordingPath(''));
                         }
@@ -232,16 +247,18 @@ export default () => {
                 heading="Fuel Gauge Profiles"
             >
                 <Dropdown
-                    label="Active profile"
+                    label="Active Battery Model"
                     items={batteryModelItems}
                     onSelect={(item: DropdownItem) => {
                         npmDevice?.setActiveBatteryModel(item.value);
                     }}
                     selectedItem={selectedActiveItemBatteryMode}
-                    disabled={selectedActiveItemBatteryMode.value === ''}
+                    disabled={
+                        selectedActiveItemBatteryMode.value === '' || uiDisabled
+                    }
                 />
                 <Dropdown
-                    label="Default profile"
+                    label="Default Battery Model"
                     items={batteryModelItems}
                     onSelect={(item: DropdownItem) => {
                         if (item.value) {
@@ -250,7 +267,7 @@ export default () => {
                         }
                     }}
                     selectedItem={selectedDefaultItemBatteryMode}
-                    disabled={batteryModelItems.length === 0}
+                    disabled={batteryModelItems.length === 0 || uiDisabled}
                 />
                 <Button
                     variant="secondary"
@@ -302,9 +319,11 @@ export default () => {
                                 );
                             });
                     }}
-                    disabled={pmicConnection === 'ek-disconnected'}
+                    disabled={
+                        pmicConnection === 'ek-disconnected' || uiDisabled
+                    }
                 >
-                    Load profile
+                    Load Battery Model
                 </Button>
                 {profilingSupported && (
                     <Button
@@ -316,7 +335,7 @@ export default () => {
                         disabled={
                             !profilingSupported ||
                             pmicConnection === 'ek-disconnected' ||
-                            profilingState !== 'Off'
+                            uiDisabled
                         }
                     >
                         Profile Battery

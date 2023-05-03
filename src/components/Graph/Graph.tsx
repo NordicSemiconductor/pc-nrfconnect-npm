@@ -418,7 +418,6 @@ export default ({ active }: PaneProps) => {
                         variant={
                             resolution === 300000 ? 'primary' : 'secondary'
                         }
-                        className="w-100"
                         onClick={() => zoom(300000)}
                     >
                         5min
@@ -427,7 +426,6 @@ export default ({ active }: PaneProps) => {
                         variant={
                             resolution === 1800000 ? 'primary' : 'secondary'
                         }
-                        className="w-100"
                         onClick={() => zoom(1800000)}
                     >
                         30min
@@ -436,7 +434,6 @@ export default ({ active }: PaneProps) => {
                         variant={
                             resolution === 3600000 ? 'primary' : 'secondary'
                         }
-                        className="w-100"
                         onClick={() => zoom(3600000)}
                     >
                         1hr
@@ -445,7 +442,6 @@ export default ({ active }: PaneProps) => {
                         variant={
                             resolution === 21600000 ? 'primary' : 'secondary'
                         }
-                        className="w-100"
                         onClick={() => zoom(21600000)}
                     >
                         6hr
@@ -454,7 +450,6 @@ export default ({ active }: PaneProps) => {
                         variant={
                             resolution === 86400000 ? 'primary' : 'secondary'
                         }
-                        className="w-100"
                         onClick={() => zoom(86400000)}
                     >
                         1 Day
@@ -463,7 +458,6 @@ export default ({ active }: PaneProps) => {
                         variant={
                             resolution === 604800000 ? 'primary' : 'secondary'
                         }
-                        className="w-100"
                         onClick={() => zoom(604800000)}
                     >
                         1 Week

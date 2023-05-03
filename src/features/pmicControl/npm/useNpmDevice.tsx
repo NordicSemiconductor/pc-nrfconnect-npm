@@ -96,6 +96,7 @@ export default () => {
             dispatch(setDefaultBatterModels(models));
         });
 
+        npmDevice.getBatteryProfiler()?.isProfiling();
         npmDevice.startAdcSample(2000);
         npmDevice.setBatteryStatusCheckEnabled(true);
     }, [dispatch, npmDevice]);
@@ -347,7 +348,7 @@ export default () => {
                     setWaitForDevice({
                         when: 'applicationMode',
                         once: true,
-                        timeout: 3000,
+                        timeout: 10000,
                         onSuccess: device => {
                             dispatch(closeDevice());
                             dispatch(openDevice(device));
@@ -364,7 +365,7 @@ export default () => {
                         setWaitForDevice({
                             when: 'applicationMode',
                             once: true,
-                            timeout: 3000,
+                            timeout: 10000,
                             onSuccess: device => {
                                 dispatch(closeDevice());
                                 dispatch(openDevice(device));

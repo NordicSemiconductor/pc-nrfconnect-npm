@@ -49,12 +49,16 @@ export type ProfilingState =
     | 'Ready';
 
 export type ProfilingEvent = {
+    timestamp: number;
+    data: ProfilingEventData;
+};
+
+export type ProfilingEventData = {
     iLoad: number;
     vLoad: number;
     tBat: number;
     cycle: number;
     seq: number;
-    chg: number;
     rep: number;
     t0: number;
     t1: number;
@@ -112,12 +116,14 @@ export type BatteryModel = {
 
 // 'pmic-connected' -> Shell ok - PMIC Online
 // 'pmic-disconnected' -> Shell ok - PMIC disconnected
+// 'pmic-pending-reboot' -> Shell ok - PMIC disconnected need restart to proceed
 // 'pmic-unknown' -> Shell ok - PMIC unknown
 // 'ek-disconnected' -> Shell off - PMIC disconnected
 export type PmicState =
     | 'ek-disconnected'
     | 'pmic-connected'
     | 'pmic-disconnected'
+    | 'pmic-pending-reboot'
     | 'pmic-unknown';
 
 export type PmicChargingState = {
@@ -373,6 +379,7 @@ export type BatteryProfiler = {
     startProfiling: () => Promise<void>;
     stopProfiling: () => Promise<void>;
     isProfiling: () => Promise<boolean>;
+    getProfilingState: () => ProfilingState;
     onProfilingStateChange: (
         handler: (state: ProfilingState, error?: string) => void
     ) => () => void;

@@ -135,9 +135,15 @@ const setupMocksWithShellParser = () => {
         (_handler: (state: boolean) => void) => () => {}
     );
 
+    const mockOnShellLoggingEventHandler = (state: string) => {
+        eventHandlers.mockOnShellLoggingEventHandlers.forEach(handler =>
+            handler(state)
+        );
+    };
+
     const eventHandlers = {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        mockOnShellLoggingEventHandler: (_state: string) => {},
+        mockOnShellLoggingEventHandlers: [] as ((_state: string) => void)[],
+        mockOnShellLoggingEventHandler,
         mockRegisterCommandCallbackHandlers: [] as CommandCallback[],
         mockAnyCommandResponseHandlers: [] as AnyCommandHandler[],
         mockRegisterCommandCallbackHandler: (command: string) =>
@@ -148,7 +154,7 @@ const setupMocksWithShellParser = () => {
 
     const mockOnShellLoggingEvent = jest.fn(
         (handler: (state: string) => void) => {
-            eventHandlers.mockOnShellLoggingEventHandler = handler;
+            eventHandlers.mockOnShellLoggingEventHandlers.push(handler);
             return () => {};
         }
     );
@@ -656,7 +662,7 @@ describe('PMIC 1300', () => {
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        callbacks?.onSuccess('app_version=0.0.0+14', command);
+                        callbacks?.onSuccess('app_version=0.0.0+15', command);
                         return Promise.resolve();
                     }
                 );
@@ -2587,7 +2593,7 @@ describe('PMIC 1300', () => {
                     },
                 ],
                 fuelGauge: true,
-                firmwareVersion: '0.0.0+14',
+                firmwareVersion: '0.0.0+15',
                 deviceType: 'npm1300',
             });
             verifyApplyConfig();
@@ -3273,13 +3279,40 @@ describe('PMIC 1300', () => {
             mockOnChargingStatusUpdate = setupMock.mockOnChargingStatusUpdate;
         });
 
-        test('Reboot when device PMIC is available', async () => {
+        test('Reboot when device PMIC is available', () => {
+            eventHandlers.mockOnShellLoggingEventHandler(
+                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
+            );
+
+            expect(mockOnBeforeReboot).toBeCalledTimes(1);
+        });
+
+        test('Does not Reboot is profiling is not off when device PMIC is available', async () => {
+            await eventHandlers.mockOnShellLoggingEventHandler(
+                '[00:00:01.019,531] <wrn> module_cc_profiling: vcutoff reached'
+            );
+
+            await eventHandlers.mockOnShellLoggingEventHandler(
+                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
+            );
+
+            expect(mockOnBeforeReboot).toBeCalledTimes(0);
+
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(
+                    'cc_profile stop'
+                );
+
+            callback?.onSuccess(
+                'Success: Profiling stopped',
+                'cc_profile stop'
+            );
+
             await eventHandlers.mockOnShellLoggingEventHandler(
                 '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
             );
 
             expect(mockOnBeforeReboot).toBeCalledTimes(1);
-            expect(mockOnBeforeReboot).toBeCalledWith(expect.anything());
         });
 
         test('Adc Sample Logging event once', () => {
