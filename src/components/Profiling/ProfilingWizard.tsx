@@ -31,6 +31,7 @@ import {
     getLdos,
     getNpmDevice,
     getPmicChargingState,
+    getProfilingState,
     isBatteryConnected,
     isUsbPowered,
     setEventRecordingPath,
@@ -65,14 +66,17 @@ const ChargingWarnings = () => {
                 </Alert>
             ) : null}
             {!chargers[0]?.enabled ? (
-                <Alert label="Warning " variant="warning">
+                <Alert label="" variant="warning">
                     <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
-                        Charging has been turned off.
+                        <span>
+                            <strong>Warning</strong> Charging has been turned
+                            off.
+                        </span>
                         <Button
                             variant="custom"
                             onClick={() => {
                                 chargers.forEach((_, index) =>
-                                    npmDevice?.setChargerEnabled(index, false)
+                                    npmDevice?.setChargerEnabled(index, true)
                                 );
                             }}
                         >
@@ -91,6 +95,7 @@ const ProfilingMessage = () => {
     const usbPowered = useSelector(isUsbPowered);
     const fuelGauge = useSelector(getFuelGauge);
     const ldos = useSelector(getLdos);
+    const profilingState = useSelector(getProfilingState);
 
     return (
         <>
@@ -99,15 +104,23 @@ const ProfilingMessage = () => {
                     Did not detect battery. Ensure battery is connected.
                 </Alert>
             ) : null}
-            {usbPowered ? (
+            {profilingState === 'Off' && usbPowered ? (
                 <Alert label="Charging complete " variant="info">
                     Disconnect USB PMIC
                 </Alert>
             ) : null}
+            {profilingState !== 'Off' && usbPowered ? (
+                <Alert label="Charging " variant="info">
+                    Disconnect USB PMIC
+                </Alert>
+            ) : null}
             {fuelGauge ? (
-                <Alert label="Warning " variant="warning">
+                <Alert label="" variant="warning">
                     <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
-                        Fuel gauge is on this might effect profiling.
+                        <span>
+                            <strong>Warning</strong> Fuel gauge is on this might
+                            effect profiling.
+                        </span>
                         <Button
                             variant="custom"
                             onClick={() =>
@@ -120,9 +133,12 @@ const ProfilingMessage = () => {
                 </Alert>
             ) : null}
             {ldos.filter(ldo => ldo.enabled).length > 0 ? (
-                <Alert label="Warning " variant="warning">
+                <Alert label="" variant="warning">
                     <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
-                        One or more LDOs are on this will effect profiling.
+                        <span>
+                            <strong>Warning</strong> One or more LDOs are on
+                            this will effect profiling.
+                        </span>
                         <Button
                             variant="custom"
                             onClick={() =>
@@ -144,12 +160,14 @@ const timeString = (
     days: number,
     hours: number,
     minutes: number,
-    seconds: number
+    seconds?: number
 ) =>
     `${days > 0 ? `${days} days ` : ''}${
         days > 0 || hours > 0 ? `${hours} hrs ` : ''
     }${days > 0 || hours > 0 || minutes > 0 ? `${minutes} min ` : ''}${
-        hours > 0 || minutes > 0 || seconds > 0 ? `${seconds} sec ` : ''
+        seconds !== undefined && (hours > 0 || minutes > 0 || seconds > 0)
+            ? `${seconds} sec `
+            : ''
     }`;
 
 const TimeComponent = ({
@@ -165,13 +183,6 @@ const TimeComponent = ({
     const { days, hours, minutes, seconds } = splitMS(time);
     if (ready) progress === 100;
 
-    const {
-        days: etaDays,
-        hours: etaHours,
-        minutes: etaMinutes,
-        seconds: etaSeconds,
-    } = splitMS(eta.current);
-
     if (progress > 0 && progress <= 100) {
         const alpha = 0.2;
         const newEta = (100 / progress) * time - time;
@@ -180,27 +191,41 @@ const TimeComponent = ({
         eta.current = 0;
     }
 
+    const {
+        days: etaDays,
+        hours: etaHours,
+        minutes: etaMinutes,
+        seconds: etaSeconds,
+    } = splitMS(eta.current);
+
+    if (etaDays > 5) {
+        progress = 0;
+    }
+
+    if (etaDays <= 0 && etaHours <= 0 && etaMinutes <= 0) {
+        progress = 100;
+    }
+
     return (
         <>
             {!ready && (
                 <>
                     <span>
-                        {progress >= 0 && progress < 100
-                            ? `Remaining time ${timeString(
+                        {progress > 0 && progress < 100
+                            ? `Remaining time: ${timeString(
                                   etaDays,
                                   etaHours,
-                                  Math.round(etaMinutes + etaSeconds / 60),
-                                  0
+                                  Math.round(etaMinutes + etaSeconds / 60)
                               )}` // don't show seconds
                             : ''}
-                        {progress >= 100 ? 'Remaining time almost done' : ''}
-                        {progress < 0 ? 'Remaining time calculating' : ''}
+                        {progress >= 100 ? 'Remaining time: almost done' : ''}
+                        {progress <= 0 ? 'Remaining time: calculating' : ''}
                     </span>
                     <br />
                 </>
             )}
             <span>
-                {`Elapsed time ${timeString(days, hours, minutes, seconds)}`}
+                {`Elapsed time: ${timeString(days, hours, minutes, seconds)}`}
             </span>
             <br />
             <ProgressBar now={progress} style={{ height: '4px' }} />
@@ -245,7 +270,10 @@ export default () => {
     const [latestProfilingEvent, setLatestProfilingEvent] =
         useState<ProfilingEvent | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
-    const [completeMessage, setCompleteMessage] = useState('');
+    const [completeMessage, setCompleteMessage] = useState<{
+        message: string;
+        level: 'warning' | 'success';
+    } | null>();
     const [batteryVoltageRunningArg, setBatteryVoltageRunningArg] = useState(0);
 
     const [vLowerCutOff, setLowerVCutOff] = useState(3.1);
@@ -259,9 +287,11 @@ export default () => {
 
     const npmDevice = useSelector(getNpmDevice);
     const usbPowered = useSelector(isUsbPowered);
+    const chargers = useSelector(getChargers);
     const adcSample = useSelector(getLatestAdcSample);
     const pmicChargingState = useSelector(getPmicChargingState);
     const eventRecordingPath = useSelector(getEventRecordingPath);
+    const batteryConnected = useSelector(isBatteryConnected);
 
     const dispatch = useDispatch();
 
@@ -278,15 +308,14 @@ export default () => {
 
         if (profiler) {
             return profiler.onProfilingEvent(event => {
-                setLatestProfilingEvent(previousEvent => {
-                    const deltaT = previousEvent
-                        ? event.timestamp - previousEvent.timestamp
-                        : reportingRate;
+                setLatestProfilingEvent(event);
+                setCapacityConsumedState(c => {
                     const mAhConsumed =
-                        (Math.abs(event?.data.iLoad ?? 0) * 1000 * deltaT) /
+                        (Math.abs(event?.data.iLoad ?? 0) *
+                            1000 *
+                            reportingRate) /
                         3600000;
-                    setCapacityConsumedState(c => c + mAhConsumed);
-                    return event;
+                    return c + mAhConsumed;
                 });
             });
         }
@@ -298,7 +327,7 @@ export default () => {
                 timeOffset.current = latestProfilingEvent.timestamp;
                 profilingFilePath.current = `${eventRecordingPath}/battery_raw_${batteryCapacity}mAh_${Math.round(
                     latestProfilingEvent?.data.tBat ?? 0
-                )}.csv`; // Temperature might change hance the file name
+                )}c.csv`; // Temperature might change hance the file name
             }
 
             const addHeaders = !existsSync(profilingFilePath.current);
@@ -329,30 +358,35 @@ export default () => {
                     case 'Ready':
                         pause();
                         setProfilingStep('Complete');
-                        setCompleteMessage(
-                            'Profiling is ready. Profiling cycles all complete'
-                        );
+                        setCompleteMessage({
+                            message:
+                                'Profiling is ready. Profiling cycles all complete.',
+                            level: 'success',
+                        });
                         break;
                     case 'ThermalError':
                         pause();
                         setProfilingStep('Error');
-                        setCompleteMessage(
-                            'Profiling was stopped due to thermal error'
+                        setErrorMessage(
+                            'Profiling was stopped due to thermal error.'
                         );
                         break;
                     case 'vCutOff':
                         pause();
                         setProfilingStep('Complete');
-                        setCompleteMessage(
-                            'Profiling is ready. vCutOff was reached.'
-                        );
+                        setCompleteMessage({
+                            message: 'Profiling is ready. vCutOff was reached.',
+                            level: 'success',
+                        });
                         break;
                     case 'POF':
                         pause();
                         setProfilingStep('Complete');
-                        setCompleteMessage(
-                            'Profiling POF event occurred before reaching vCutOff'
-                        );
+                        setCompleteMessage({
+                            message:
+                                'Profiling POF event occurred before reaching vCutOff.',
+                            level: 'warning',
+                        });
                         break;
                 }
             });
@@ -377,6 +411,7 @@ export default () => {
 
     useEffect(() => {
         if (profilingStep === 'Charged' && !usbPowered) {
+            setProfilingStep('Resting');
             npmDevice
                 ?.setChargerEnabled(0, false)
                 .then(() => {
@@ -429,7 +464,6 @@ export default () => {
                                 ?.startProfiling()
                                 .then(() => {
                                     reset();
-                                    setProfilingStep('Resting');
                                 });
                         })
                         .catch(res => {
@@ -518,8 +552,8 @@ export default () => {
                     {profilingStep === 'Complete' && (
                         <DialogButton
                             variant="primary"
-                            onClick={async () => {
-                                await npmDevice
+                            onClick={() => {
+                                npmDevice
                                     ?.getBatteryProfiler()
                                     ?.stopProfiling();
                                 dispatch(setShowProfilingWizard(false));
@@ -650,7 +684,7 @@ export default () => {
                             <div className="flex-row">
                                 <NumberInlineInput
                                     value={batteryCapacity}
-                                    range={{ min: 32, max: 3000, step: 2 }}
+                                    range={{ min: 32, max: 3000 }}
                                     onChange={setBatteryCapacity}
                                 />
                                 <span>mAH</span>
@@ -659,7 +693,7 @@ export default () => {
                         <Slider
                             values={[batteryCapacity]}
                             onChange={[setBatteryCapacity]}
-                            range={{ min: 32, max: 3000, step: 2 }}
+                            range={{ min: 32, max: 3000 }}
                         />
                     </div>
                 </Group>
@@ -670,7 +704,11 @@ export default () => {
                         <ChargingWarnings />
                         <p>
                             <span>
-                                {usbPowered ? 'Charging' : 'No charging'}
+                                {usbPowered &&
+                                batteryConnected &&
+                                chargers[0].enabled
+                                    ? 'Charging'
+                                    : 'Not charging'}
                             </span>
                         </p>
                     </div>
@@ -731,8 +769,11 @@ export default () => {
             {profilingStep === 'Complete' && (
                 <>
                     <div>
-                        <Alert label="Success " variant="success">
-                            {completeMessage}
+                        <Alert
+                            label="Success "
+                            variant={completeMessage?.level ?? 'success'}
+                        >
+                            {completeMessage?.message ?? ''}
                         </Alert>
                         <p>
                             <span>{`Capacity consumed: ${capacityConsumedState.toFixed(
