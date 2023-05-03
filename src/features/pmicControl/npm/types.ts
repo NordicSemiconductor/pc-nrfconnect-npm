@@ -59,7 +59,6 @@ export type ProfilingEventData = {
     tBat: number;
     cycle: number;
     seq: number;
-    chg: number;
     rep: number;
     t0: number;
     t1: number;

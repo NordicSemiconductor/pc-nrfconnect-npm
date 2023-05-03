@@ -42,7 +42,6 @@ export const BatteryProfiler: IBatteryProfiler = (
                 tBat: 0,
                 cycle: 0,
                 seq: 0,
-                chg: 0,
                 rep: 0,
                 t0: 0,
                 t1: 0,
@@ -64,9 +63,6 @@ export const BatteryProfiler: IBatteryProfiler = (
                         break;
                     case 'seq':
                         data.seq = Number.parseInt(pair[1], 10);
-                        break;
-                    case 'chg':
-                        data.chg = Number.parseFloat(pair[1]);
                         break;
                     case 'rep':
                         data.rep = Number.parseInt(pair[1], 10);
