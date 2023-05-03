@@ -14,8 +14,6 @@ and this project adheres to
 
 ### Changed
 
--   Use profiling logging timestamp for mAh deltaT Calculation
--   Use profiling logging timestamp for profiling file timestamp
 -   Distinguish between an invalid firmware and when app is still to read it
 -   Auto continue when fully charged and USB PMIC is disconnected
 
