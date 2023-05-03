@@ -111,15 +111,15 @@ export default () => {
             pmicStep.caption = 'Not powered';
             pmicStep.state = 'failure';
         } else if (profilingState !== 'Off') {
-            pmicStep.caption = [
-                { id: '1', caption: 'Profiling Battery' },
-                {
+            pmicStep.caption = [{ id: '1', caption: 'Profiling Battery' }];
+
+            if (!pauseFor10Ms)
+                pmicStep.caption.push({
                     id: '2',
                     caption: 'stop profiling',
                     action: () =>
                         npmDevice?.getBatteryProfiler()?.stopProfiling(),
-                },
-            ];
+                });
             pmicStep.state = 'warning';
         } else if (pmicState === 'pmic-pending-reboot') {
             pmicStep.caption = [

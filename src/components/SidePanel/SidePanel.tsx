@@ -40,7 +40,6 @@ import {
     getEventRecordingPath,
     getLatestAdcSample,
     getNpmDevice,
-    getProfilingState,
     getStoredBatterModel,
     setEventRecordingPath,
     setShowProfilingWizard,
@@ -52,6 +51,7 @@ import {
     setIsPaused,
     setShellParser,
 } from '../../features/serial/serialSlice';
+import useIsUIDisabled from '../../features/useIsUIDisabled';
 import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
@@ -78,8 +78,8 @@ export default () => {
     const storedBatterModel = useSelector(getStoredBatterModel);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
-    const profilingState = useSelector(getProfilingState);
     const profilingWizard = useSelector(showProfilingWizard);
+    const uiDisabled = useIsUIDisabled();
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
@@ -247,16 +247,18 @@ export default () => {
                 heading="Fuel Gauge Profiles"
             >
                 <Dropdown
-                    label="Active profile"
+                    label="Active Battery Model"
                     items={batteryModelItems}
                     onSelect={(item: DropdownItem) => {
                         npmDevice?.setActiveBatteryModel(item.value);
                     }}
                     selectedItem={selectedActiveItemBatteryMode}
-                    disabled={selectedActiveItemBatteryMode.value === ''}
+                    disabled={
+                        selectedActiveItemBatteryMode.value === '' || uiDisabled
+                    }
                 />
                 <Dropdown
-                    label="Default profile"
+                    label="Default Battery Model"
                     items={batteryModelItems}
                     onSelect={(item: DropdownItem) => {
                         if (item.value) {
@@ -265,7 +267,7 @@ export default () => {
                         }
                     }}
                     selectedItem={selectedDefaultItemBatteryMode}
-                    disabled={batteryModelItems.length === 0}
+                    disabled={batteryModelItems.length === 0 || uiDisabled}
                 />
                 <Button
                     variant="secondary"
@@ -317,9 +319,11 @@ export default () => {
                                 );
                             });
                     }}
-                    disabled={pmicConnection === 'ek-disconnected'}
+                    disabled={
+                        pmicConnection === 'ek-disconnected' || uiDisabled
+                    }
                 >
-                    Load profile
+                    Load Battery Model
                 </Button>
                 {profilingSupported && (
                     <Button
@@ -331,7 +335,7 @@ export default () => {
                         disabled={
                             !profilingSupported ||
                             pmicConnection === 'ek-disconnected' ||
-                            profilingState === 'Running'
+                            uiDisabled
                         }
                     >
                         Profile Battery
