@@ -347,7 +347,7 @@ export default () => {
                     setWaitForDevice({
                         when: 'applicationMode',
                         once: true,
-                        timeout: 3000,
+                        timeout: 10000,
                         onSuccess: device => {
                             dispatch(closeDevice());
                             dispatch(openDevice(device));
@@ -364,7 +364,7 @@ export default () => {
                         setWaitForDevice({
                             when: 'applicationMode',
                             once: true,
-                            timeout: 3000,
+                            timeout: 10000,
                             onSuccess: device => {
                                 dispatch(closeDevice());
                                 dispatch(openDevice(device));
