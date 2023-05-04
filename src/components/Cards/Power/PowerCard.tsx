@@ -15,6 +15,7 @@ import {
     Toggle,
 } from 'pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import { noop } from '../../../features/pmicControl/npm/pmicHelpers';
 import {
     Charger,
@@ -42,6 +43,7 @@ export default ({
     disabled,
     defaultSummary = false,
 }: PowerCardProperties) => {
+    const card = 'charger';
     const [summary, setSummary] = useState(defaultSummary);
     const currentRange = npmDevice.getChargerCurrentRange(index);
     const currentVoltage = npmDevice.getChargerVoltageRange(index);
@@ -83,7 +85,9 @@ export default ({
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <span>{cardLabel}</span>
+                    <DocumentationTooltip card={card} title="Charger">
+                        <span>{cardLabel}</span>
+                    </DocumentationTooltip>
 
                     <div className="d-flex">
                         <Toggle
@@ -111,10 +115,21 @@ export default ({
         >
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">TERM</span>
-                    </div>
+                    <DocumentationTooltip
+                        card="charger"
+                        title="VTERM"
+                        titleNode={
+                            <>
+                                <span>V</span>
+                                <span className="subscript">TERM</span>
+                            </>
+                        }
+                    >
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">TERM</span>
+                        </div>
+                    </DocumentationTooltip>
                     <div className="flex-row">
                         <NumberInlineInput
                             value={internalVTerm}
@@ -141,10 +156,21 @@ export default ({
             </div>
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <div>
-                        <span>I</span>
-                        <span className="subscript">CHG</span>
-                    </div>
+                    <DocumentationTooltip
+                        card="charger"
+                        title="ICHG"
+                        titleNode={
+                            <>
+                                <span>I</span>
+                                <span className="subscript">CHG</span>
+                            </>
+                        }
+                    >
+                        <div>
+                            <span>I</span>
+                            <span className="subscript">CHG</span>
+                        </div>
+                    </DocumentationTooltip>
                     <div className="flex-row">
                         <NumberInlineInput
                             value={internalIChg}

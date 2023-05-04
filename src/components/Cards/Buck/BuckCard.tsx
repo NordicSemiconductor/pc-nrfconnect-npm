@@ -16,6 +16,7 @@ import {
     Toggle,
 } from 'pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Buck,
     BuckMode,
@@ -46,6 +47,7 @@ export default ({
     disabled,
     defaultSummary = false,
 }: BuckCardProperties) => {
+    const card = `buck ${index + 1}`;
     const [summary, setSummary] = useState(defaultSummary);
 
     const onVOutChange = (value: number) =>
@@ -105,7 +107,10 @@ export default ({
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <span>{cardLabel}</span>
+                    <DocumentationTooltip card={card} title="Buck">
+                        <span>{cardLabel}</span>
+                    </DocumentationTooltip>
+
                     <div className="d-flex">
                         <Toggle
                             label="Enable"
@@ -138,12 +143,25 @@ export default ({
                 }
                 disabled={disabled}
             />
+
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">OUT</span>
-                    </div>
+                    <DocumentationTooltip
+                        card={card}
+                        title="VOUT"
+                        titleNode={
+                            <>
+                                <span>V</span>
+                                <span className="subscript">OUT</span>
+                            </>
+                        }
+                    >
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">OUT</span>
+                        </div>
+                    </DocumentationTooltip>
+
                     <div className="flex-row">
                         <NumberInlineInput
                             value={internalVOut}

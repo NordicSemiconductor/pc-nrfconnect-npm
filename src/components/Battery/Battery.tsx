@@ -7,6 +7,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     AdcSample,
     PmicChargingState,
@@ -77,57 +78,73 @@ const SideText = ({
     batteryConnected,
     latestAdcSample,
     fuelGauge,
-}: BatterySideTextProperties) => (
-    <div className="battery-side-panel">
-        {!batteryConnected && (
-            <h2>
-                No battery
-                <br />
-                connected
-            </h2>
-        )}
+}: BatterySideTextProperties) => {
+    const card = 'battery';
 
-        {batteryConnected && (
-            <>
+    return (
+        <div className="battery-side-panel">
+            {!batteryConnected && (
                 <h2>
-                    {fuelGauge &&
-                    latestAdcSample &&
-                    !Number.isNaN(latestAdcSample.soc)
-                        ? `${Math.min(
-                              100,
-                              Math.max(latestAdcSample.soc ?? 0, 0)
-                          ).toFixed(1)}%`
-                        : 'N/A %'}
+                    No battery
+                    <br />
+                    connected
                 </h2>
-                {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) ? (
-                    <div className="line-wrapper">
-                        <span className="line-title">Time to full</span>
-                        <span className="line-data">
-                            {latestAdcSample &&
-                            !Number.isNaN(latestAdcSample.ttf)
-                                ? `${formatSecondsToString(
-                                      latestAdcSample.ttf
-                                  )}`
-                                : 'N/A'}
-                        </span>
-                    </div>
-                ) : (
-                    <div className="line-wrapper">
-                        <span className="line-title">Time to empty</span>
-                        <span className="line-data">
-                            {latestAdcSample &&
-                            !Number.isNaN(latestAdcSample.tte)
-                                ? `${formatSecondsToString(
-                                      latestAdcSample.tte
-                                  )}`
-                                : 'N/A'}
-                        </span>
-                    </div>
-                )}
-            </>
-        )}
-    </div>
-);
+            )}
+
+            {batteryConnected && (
+                <>
+                    <h2>
+                        {fuelGauge &&
+                        latestAdcSample &&
+                        !Number.isNaN(latestAdcSample.soc)
+                            ? `${Math.min(
+                                  100,
+                                  Math.max(latestAdcSample.soc ?? 0, 0)
+                              ).toFixed(1)}%`
+                            : 'N/A %'}
+                    </h2>
+                    {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) ? (
+                        <div className="line-wrapper">
+                            <DocumentationTooltip
+                                card={card}
+                                title="Time to full"
+                            >
+                                <span className="line-title">Time to full</span>
+                            </DocumentationTooltip>
+                            <span className="line-data">
+                                {latestAdcSample &&
+                                !Number.isNaN(latestAdcSample.ttf)
+                                    ? `${formatSecondsToString(
+                                          latestAdcSample.ttf
+                                      )}`
+                                    : 'N/A'}
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="line-wrapper">
+                            <DocumentationTooltip
+                                card={card}
+                                title="Time to empty"
+                            >
+                                <span className="line-title">
+                                    Time to empty
+                                </span>
+                            </DocumentationTooltip>
+                            <span className="line-data">
+                                {latestAdcSample &&
+                                !Number.isNaN(latestAdcSample.tte)
+                                    ? `${formatSecondsToString(
+                                          latestAdcSample.tte
+                                      )}`
+                                    : 'N/A'}
+                            </span>
+                        </div>
+                    )}
+                </>
+            )}
+        </div>
+    );
+};
 
 export interface BatteryProperties {
     disabled: boolean;
