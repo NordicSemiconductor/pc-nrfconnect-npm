@@ -14,6 +14,7 @@ import {
     Toggle,
 } from 'pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Ldo,
     LdoMode,
@@ -35,6 +36,7 @@ export default ({
     cardLabel = `LDO/Load Switch ${index + 1}`,
     disabled,
 }: LdoCardProperties) => {
+    const card = `ldo ${index + 1}`;
     const range = npmDevice.getLdoVoltageRange(index);
 
     const onEnable = (value: boolean) => npmDevice.setLdoEnabled(index, value);
@@ -60,7 +62,10 @@ export default ({
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <span>{cardLabel}</span>
+                    <DocumentationTooltip card={card} title="LDO/Load Switch">
+                        <span>{cardLabel}</span>
+                    </DocumentationTooltip>
+
                     <Toggle
                         label="Enable"
                         isToggled={ldo.enabled}
@@ -78,12 +83,25 @@ export default ({
                     ldo.mode === 'ldoSwitch' ? modeItems[1] : modeItems[0]
                 }
             />
+
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">LDO</span>
-                    </div>
+                    <DocumentationTooltip
+                        card={card}
+                        title="VOUTLDO"
+                        titleNode={
+                            <>
+                                <span>V</span>
+                                <span className="subscript">OUT_LDO</span>
+                            </>
+                        }
+                    >
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">OUT_LDO</span>
+                        </div>
+                    </DocumentationTooltip>
+
                     <div className="flex-row">
                         <NumberInlineInput
                             disabled

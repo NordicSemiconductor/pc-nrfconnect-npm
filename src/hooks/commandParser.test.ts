@@ -72,6 +72,9 @@ const setupMocks = () => {
                 resolve(true);
             })
     );
+    const mockGetOptions = jest.fn(
+        () => new Promise<SerialPortOpenOptions<AutoDetectTypes>>(() => {})
+    );
     const mockUpdate = jest.fn(() => '');
     const mockSet = jest.fn(() => '');
 
@@ -96,6 +99,7 @@ const setupMocks = () => {
         write: mockWrite,
         close: mockClose,
         isOpen: mockIsOpen,
+        getOptions: mockGetOptions,
         update: mockUpdate,
         set: mockSet,
         onData: mockOnData,

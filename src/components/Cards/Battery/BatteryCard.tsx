@@ -8,6 +8,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Card, Toggle } from 'pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     getFuelGauge,
     getNpmDevice,
@@ -28,7 +29,9 @@ export default ({ disabled }: BatteryCardProperties) => {
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <span>Fuel Gauge</span>
+                    <DocumentationTooltip card="battery" title="Fuel Gauge">
+                        <span>Fuel Gauge</span>
+                    </DocumentationTooltip>
                     <Toggle
                         label="Enable"
                         isToggled={fuelGauge}

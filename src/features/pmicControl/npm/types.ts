@@ -388,3 +388,11 @@ export type BatteryProfiler = {
     ) => () => void;
     pofError: () => void;
 };
+
+export type Documentation = {
+    [key: string]: {
+        [key: string]: {
+            description?: React.ReactNode | string;
+        };
+    };
+};

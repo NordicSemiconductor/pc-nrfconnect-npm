@@ -7,6 +7,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     getLatestAdcSample,
     getPmicChargingState,
@@ -17,6 +18,7 @@ import './battery.scss';
 export default ({ disabled }: { disabled: boolean }) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
+    const card = 'batteryStatus';
 
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
@@ -40,7 +42,9 @@ export default ({ disabled }: { disabled: boolean }) => {
     return (
         <div className={`${disabled ? 'disabled' : ''}`}>
             <div className="line-wrapper">
-                <span className="line-title">Voltage</span>
+                <DocumentationTooltip card={card} title="Voltage">
+                    <span className="line-title">Voltage</span>
+                </DocumentationTooltip>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.vBat.toFixed(2)}v`
@@ -48,7 +52,9 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <span className="line-title">Current</span>
+                <DocumentationTooltip card={card} title="Current">
+                    <span className="line-title">Current</span>
+                </DocumentationTooltip>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
                         ? `${Math.round(latestAdcSample?.iBat)}mA`
@@ -56,7 +62,9 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <span className="line-title">Temperature</span>
+                <DocumentationTooltip card={card} title="Temperature">
+                    <span className="line-title">Temperature</span>
+                </DocumentationTooltip>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.tBat.toFixed(2)}°C`
@@ -64,7 +72,9 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <span className="line-title">Charging Mode</span>
+                <DocumentationTooltip card={card} title="Charging Mode">
+                    <span className="line-title">Charging Mode</span>
+                </DocumentationTooltip>
                 <span className="line-data">{mode}</span>
             </div>
         </div>
