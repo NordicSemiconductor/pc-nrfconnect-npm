@@ -40,7 +40,7 @@ export const DocumentationTooltip = ({
                 <Tooltip id="tooltip-voltage">
                     <div className="info">
                         <h4>{titleNode}</h4>
-                        <p> {documentation.description}</p>
+                        <div> {documentation.description}</div>
                     </div>
                 </Tooltip>
             }
