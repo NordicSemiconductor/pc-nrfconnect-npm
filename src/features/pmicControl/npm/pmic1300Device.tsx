@@ -124,20 +124,24 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             tte: NaN,
             ttf: NaN,
         };
+
+        const fixed = (dp: number, value?: string) =>
+            Number(Number(value ?? 0).toFixed(dp));
+
         messageParts.forEach(part => {
             const pair = part.split('=');
             switch (pair[0]) {
                 case 'vbat':
-                    adcSample.vBat = Number(pair[1] ?? 0);
+                    adcSample.vBat = fixed(2, pair[1]);
                     break;
                 case 'ibat':
-                    adcSample.iBat = Number(pair[1] ?? 0) * 1000;
+                    adcSample.iBat = fixed(2, pair[1]) * 1000;
                     break;
                 case 'tbat':
-                    adcSample.tBat = Number(pair[1] ?? 0);
+                    adcSample.tBat = fixed(1, pair[1]);
                     break;
                 case 'soc':
-                    adcSample.soc = Number(pair[1] ?? NaN);
+                    adcSample.soc = fixed(1, pair[1]);
                     break;
                 case 'tte':
                     adcSample.tte = Number(pair[1] ?? NaN);

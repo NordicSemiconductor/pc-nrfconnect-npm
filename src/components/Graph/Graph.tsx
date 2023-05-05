@@ -202,8 +202,6 @@ export default ({ active }: PaneProps) => {
                         drawBorder: true,
                         drawOnChartArea: true,
                     },
-                    suggestedMin: 0,
-                    suggestedMax: 100,
                     afterFit: scale => {
                         scale.width = yAxisWidth;
                     },
@@ -232,8 +230,6 @@ export default ({ active }: PaneProps) => {
                         drawBorder: true,
                         drawOnChartArea: true,
                     },
-                    suggestedMin: 0,
-                    suggestedMax: 150,
                     afterFit: scale => {
                         scale.width = yAxisWidth;
                     },
@@ -262,8 +258,6 @@ export default ({ active }: PaneProps) => {
                         drawBorder: true,
                         drawOnChartArea: true,
                     },
-                    suggestedMin: 3,
-                    suggestedMax: 5,
                     afterFit: scale => {
                         scale.width = yAxisWidth;
                     },
@@ -292,8 +286,6 @@ export default ({ active }: PaneProps) => {
                         drawBorder: true,
                         drawOnChartArea: true,
                     },
-                    suggestedMin: -800,
-                    suggestedMax: 100,
                     afterFit: scale => {
                         scale.width = yAxisWidth;
                     },
@@ -474,7 +466,11 @@ export default ({ active }: PaneProps) => {
             {chartMetaData.charts.map((_, index) => (
                 <Fragment key={chartMetaData.labels[index]}>
                     <div className="text-center">
-                        <span>{chartMetaData.labels[index]}</span>
+                        <span>
+                            <strong>
+                                <u>{chartMetaData.labels[index]}</u>
+                            </strong>
+                        </span>
                     </div>
                     <div className="graph-container">
                         <Line
