@@ -81,12 +81,7 @@ const stream2buffer = (stream: fs.ReadStream) =>
         });
         stream.on('end', () =>
             resolve(
-                Buffer.from(
-                    buf
-                        .replaceAll('"', '\\"')
-                        .replaceAll('\\s', '')
-                        .replaceAll('\r\n', '')
-                )
+                Buffer.from(buf.replaceAll('\\s', '').replaceAll('\r\n', ''))
             )
         );
         stream.on('error', err =>

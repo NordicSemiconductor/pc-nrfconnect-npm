@@ -1052,10 +1052,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         return new Promise<void>((resolve, reject) => {
             const downloadData = (chunk = 0) => {
                 sendCommand(
-                    `fuel_gauge model download "${profile.subarray(
-                        chunk * chunkSize,
-                        (chunk + 1) * chunkSize
-                    )}"`,
+                    `fuel_gauge model download "${profile
+                        .subarray(chunk * chunkSize, (chunk + 1) * chunkSize)
+                        .toString()
+                        .replaceAll('"', '\\"')}"`,
                     () => {
                         const profileDownload: ProfileDownload = {
                             state: 'downloading',
