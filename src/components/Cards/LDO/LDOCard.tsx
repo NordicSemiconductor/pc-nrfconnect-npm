@@ -33,7 +33,7 @@ export default ({
     index,
     npmDevice,
     ldo,
-    cardLabel = `LDO/Load Switch ${index + 1}`,
+    cardLabel = `Load Switch/LDO ${index + 1}`,
     disabled,
 }: LdoCardProperties) => {
     const card = `ldo ${index + 1}`;
@@ -62,7 +62,7 @@ export default ({
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <DocumentationTooltip card={card} title="LDO/Load Switch">
+                    <DocumentationTooltip card={card} title="Load Switch/LDO">
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
 

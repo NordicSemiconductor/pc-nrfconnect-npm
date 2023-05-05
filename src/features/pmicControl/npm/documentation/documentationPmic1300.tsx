@@ -162,7 +162,7 @@ export const documentation: Documentation = {
         },
     },
     'ldo 1': {
-        'LDO/Load Switch': {
+        'Load Switch/LDO': {
             description: (
                 <p>
                     The load switch can either function as a switch or LDO. As a
@@ -183,7 +183,7 @@ export const documentation: Documentation = {
         },
     },
     'ldo 2': {
-        'LDO/Load Switch': {
+        'Load Switch/LDO': {
             description: (
                 <p>
                     The load switch can either function as a switch or LDO. As a
