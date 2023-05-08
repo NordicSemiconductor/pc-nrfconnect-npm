@@ -22,6 +22,10 @@
         contain: size;
         position: relative;
         flex: 1;
+
+        &:not(:last-child) {
+            margin-bottom: 16px;
+        }
     }
 }
 

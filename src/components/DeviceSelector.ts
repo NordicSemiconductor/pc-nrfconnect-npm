@@ -19,6 +19,7 @@ import {
     deviceDisconnected,
     openDevice,
 } from '../actions/deviceActions';
+import { closeProfiling } from '../features/pmicControl/profilingSlice';
 import { TDispatch } from '../thunk';
 
 /**
@@ -67,6 +68,7 @@ const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
     onDeviceDeselected: () => {
         logger.info('Deselected device');
         dispatch(closeDevice());
+        dispatch(closeProfiling());
     },
     onDeviceConnected: (device: Device) => {
         logger.info(`Device Connected SN:${device.serialNumber}`);

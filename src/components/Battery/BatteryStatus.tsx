@@ -47,7 +47,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </DocumentationTooltip>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
-                        ? `${latestAdcSample?.vBat.toFixed(2)}v`
+                        ? `${latestAdcSample?.vBat.toFixed(2)} V`
                         : 'N/A'}
                 </span>
             </div>
@@ -57,7 +57,9 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </DocumentationTooltip>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
-                        ? `${Math.round(latestAdcSample?.iBat)}mA`
+                        ? `${latestAdcSample?.iBat < 0 ? '—' : ''}${Math.round(
+                              Math.abs(latestAdcSample?.iBat ?? 0)
+                          )} mA`
                         : 'N/A'}
                 </span>
             </div>
@@ -67,7 +69,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </DocumentationTooltip>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
-                        ? `${latestAdcSample?.tBat.toFixed(2)}°C`
+                        ? `${latestAdcSample?.tBat.toFixed(2)} °C`
                         : 'N/A'}
                 </span>
             </div>

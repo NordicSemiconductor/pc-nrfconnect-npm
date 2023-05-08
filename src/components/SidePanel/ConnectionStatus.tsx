@@ -11,10 +11,10 @@ import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
 import {
     getNpmDevice,
     getPmicState,
-    getProfilingState,
     isSupportedVersion,
     isUsbPowered,
 } from '../../features/pmicControl/pmicControlSlice';
+import { getCcProfilingState } from '../../features/pmicControl/profilingSlice';
 import {
     getShellParser,
     isPaused,
@@ -27,7 +27,7 @@ export default () => {
     const supportedVersion = useSelector(isSupportedVersion);
     const usbPowered = useSelector(isUsbPowered);
     const paused = useSelector(isPaused);
-    const profilingState = useSelector(getProfilingState);
+    const ccProfilingState = useSelector(getCcProfilingState);
     const npmDevice = useSelector(getNpmDevice);
     const dispatch = useDispatch();
 
@@ -73,7 +73,7 @@ export default () => {
                 },
             ];
 
-            if (profilingState !== 'Running') {
+            if (ccProfilingState !== 'Running') {
                 pmicStep.caption = 'Waiting on shell';
                 pmicStep.state = 'active';
             } else {
@@ -110,7 +110,7 @@ export default () => {
         } else if (pmicState === 'pmic-disconnected') {
             pmicStep.caption = 'Not powered';
             pmicStep.state = 'failure';
-        } else if (profilingState !== 'Off') {
+        } else if (ccProfilingState !== 'Off') {
             pmicStep.caption = [{ id: '1', caption: 'Profiling Battery' }];
 
             if (!pauseFor10Ms)

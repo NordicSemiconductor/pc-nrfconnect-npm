@@ -9,19 +9,19 @@ import EventEmitter from 'events';
 import { ShellParser } from '../../../hooks/commandParser';
 import { noop, parseLogData, parseToBoolean, toRegex } from './pmicHelpers';
 import {
+    CCProfile,
+    CCProfilingState,
     IBatteryProfiler,
     LoggingEvent,
-    Profile,
     ProfilingEvent,
     ProfilingEventData,
-    ProfilingState,
 } from './types';
 
 export const BatteryProfiler: IBatteryProfiler = (
     shellParser: ShellParser,
     eventEmitter: EventEmitter
 ) => {
-    let profiling: ProfilingState = 'Off';
+    let profiling: CCProfilingState = 'Off';
     const processModuleCcProfiling = ({ timestamp, message }: LoggingEvent) => {
         if (message.includes('Success: Profiling sequence completed')) {
             profiling = 'Ready';
@@ -134,7 +134,7 @@ export const BatteryProfiler: IBatteryProfiler = (
         reportIntervalCc: number,
         reportIntervalNtc: number,
         vCutoff: number,
-        profiles: Profile[]
+        profiles: CCProfile[]
     ) =>
         new Promise<void>((resolve, reject) => {
             const profilesString = profiles.map(
@@ -205,13 +205,30 @@ export const BatteryProfiler: IBatteryProfiler = (
             });
         });
 
+    const canProfile = () =>
+        new Promise<boolean>((resolve, reject) => {
+            shellParser?.enqueueRequest('cc_sink available', {
+                onSuccess: res => {
+                    resolve(parseToBoolean(res));
+                },
+                onError: reject,
+                onTimeout: error => {
+                    reject(error);
+                    console.warn(error);
+                },
+            });
+        });
+
     return {
         setProfile,
         startProfiling,
         stopProfiling,
         isProfiling,
+        canProfile,
         getProfilingState: () => profiling,
-        onProfilingStateChange: (handler: (state: ProfilingState) => void) => {
+        onProfilingStateChange: (
+            handler: (state: CCProfilingState) => void
+        ) => {
             eventEmitter.on('onProfilingStateChange', handler);
             return () => {
                 eventEmitter.removeListener('onProfilingStateChange', handler);

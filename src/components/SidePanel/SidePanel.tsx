@@ -42,9 +42,8 @@ import {
     getNpmDevice,
     getStoredBatterModel,
     setEventRecordingPath,
-    setShowProfilingWizard,
-    showProfilingWizard,
 } from '../../features/pmicControl/pmicControlSlice';
+import { setProfilingStage } from '../../features/pmicControl/profilingSlice';
 import {
     getSerialPort,
     getShellParser,
@@ -78,7 +77,6 @@ export default () => {
     const storedBatterModel = useSelector(getStoredBatterModel);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
-    const profilingWizard = useSelector(showProfilingWizard);
     const uiDisabled = useIsUIDisabled();
 
     const getClosest = (
@@ -242,10 +240,7 @@ export default () => {
                     }
                 />
             </CollapsibleGroup>
-            <CollapsibleGroup
-                defaultCollapsed={false}
-                heading="Fuel Gauge Profiles"
-            >
+            <CollapsibleGroup defaultCollapsed={false} heading="Fuel Profiles">
                 <Dropdown
                     label="Active Battery Model"
                     items={batteryModelItems}
@@ -330,7 +325,7 @@ export default () => {
                         variant="secondary"
                         className="w-100"
                         onClick={() => {
-                            dispatch(setShowProfilingWizard(true));
+                            dispatch(setProfilingStage('Configuration'));
                         }}
                         disabled={
                             !profilingSupported ||
@@ -394,7 +389,7 @@ export default () => {
                     )}
                 </GenericDialog>
             )}
-            {profilingWizard && <ProfilingWizard />}
+            <ProfilingWizard />
         </SidePanel>
     );
 };
