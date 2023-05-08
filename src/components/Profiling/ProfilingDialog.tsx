@@ -45,11 +45,11 @@ export default () => {
             l += profiler.iLoad * 1000; // A to mA;
             t += profiler.tLoad / 1000; // ms to s
             l += profiler.iRest * 1000; // A to mA;
-            t += profiler.tLoad / 1000; // ms to s
+            t += profiler.tRest / 1000; // ms to s
         });
 
         const average = l / t;
-        const averageMAhConsumed = (Math.abs(average) * 1000 * 1000) / 3600000;
+        const averageMAhConsumed = (Math.abs(average) * 1000) / 3600000;
         return averageMAhConsumed;
     }, [profile.profilingProfiles]);
 
