@@ -6,11 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.0.16 - UNRELEASED
+## 0.0.16 - 2023-05-08
 
 ### Added
 
 -   Tooltips
+-   PMIC1300 FP2 Support FW Version 0.0.0+16
+
+### Fixed
+
+-   Download Profile no longer fails with specific profiles
 
 ## 0.0.15 - 2023-05-03
 
