@@ -3267,6 +3267,7 @@ describe('PMIC 1300', () => {
             mockOnBeforeReboot,
             mockOnUsbPowered,
             mockOnChargingStatusUpdate,
+            pmic,
         } = setupMocksWithShellParser();
 
         beforeEach(() => {
@@ -3277,6 +3278,7 @@ describe('PMIC 1300', () => {
             mockOnBeforeReboot = setupMock.mockOnBeforeReboot;
             mockOnUsbPowered = setupMock.mockOnUsbPowered;
             mockOnChargingStatusUpdate = setupMock.mockOnChargingStatusUpdate;
+            pmic = setupMock.pmic;
         });
 
         test('Reboot when device PMIC is available', () => {
@@ -3287,30 +3289,15 @@ describe('PMIC 1300', () => {
             expect(mockOnBeforeReboot).toBeCalledTimes(1);
         });
 
-        test('Does not Reboot is profiling is not off when device PMIC is available', async () => {
-            await eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:01.019,531] <wrn> module_cc_profiling: vcutoff reached'
-            );
-
+        test('Does not Reboot if auto reboot is off PMIC is available', async () => {
+            pmic.setAutoRebootDevice(false);
             await eventHandlers.mockOnShellLoggingEventHandler(
                 '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
             );
 
             expect(mockOnBeforeReboot).toBeCalledTimes(0);
 
-            const callback =
-                eventHandlers.mockRegisterCommandCallbackHandler(
-                    'cc_profile stop'
-                );
-
-            callback?.onSuccess(
-                'Success: Profiling stopped',
-                'cc_profile stop'
-            );
-
-            await eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
-            );
+            pmic.setAutoRebootDevice(true);
 
             expect(mockOnBeforeReboot).toBeCalledTimes(1);
         });
@@ -3323,10 +3310,10 @@ describe('PMIC 1300', () => {
             expect(mockOnAdcSample).toBeCalledTimes(1);
             expect(mockOnAdcSample).toBeCalledWith({
                 timestamp: 17525,
-                vBat: 4.248,
-                iBat: 0.617, // converted to mA
-                tBat: 26.656051,
-                soc: 98.705001,
+                vBat: 4.25,
+                iBat: 0.62, // converted to mA
+                tBat: 26.7,
+                soc: 98.7,
                 tte: 312,
                 ttf: 514,
             });
@@ -3348,30 +3335,30 @@ describe('PMIC 1300', () => {
             expect(mockOnAdcSample).toBeCalledTimes(3);
             expect(mockOnAdcSample).nthCalledWith(1, {
                 timestamp: 16525,
-                vBat: 4.248,
-                iBat: 0.617, // converted to mA
-                tBat: 26.656051,
-                soc: 98.705001,
+                vBat: 4.25,
+                iBat: 0.62, // converted to mA
+                tBat: 26.7,
+                soc: 98.7,
                 tte: 312,
                 ttf: 514,
             });
 
             expect(mockOnAdcSample).nthCalledWith(2, {
                 timestamp: 359999999 + 10525, // 99hrs 59min 59sec 999ms + 10.525 sec
-                vBat: 4.248,
-                iBat: 0.617, // converted to mA
-                tBat: 26.656051,
-                soc: 98.705001,
+                vBat: 4.25,
+                iBat: 0.62, // converted to mA
+                tBat: 26.7,
+                soc: 98.7,
                 tte: 312,
                 ttf: 514,
             });
 
             expect(mockOnAdcSample).nthCalledWith(3, {
                 timestamp: 359999999 + 359999999 + 8525, // 99hrs 59min 59sec 999ms + 8.525 sec
-                vBat: 4.248,
-                iBat: 0.617, // converted to mA
-                tBat: 26.656051,
-                soc: 98.705001,
+                vBat: 4.25,
+                iBat: 0.62, // converted to mA
+                tBat: 26.7,
+                soc: 98.7,
                 tte: 312,
                 ttf: 514,
             });

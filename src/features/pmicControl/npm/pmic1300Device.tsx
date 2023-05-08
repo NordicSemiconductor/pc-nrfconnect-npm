@@ -65,6 +65,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     let lastUptime = 0;
     let profileDownloadInProgress = false;
     let profileDownloadAborting = false;
+    let autoReboot = true;
 
     // can only change from:
     //  - 'pmic-unknown' --> 'pmic-connected' --> 'pmic-disconnected'
@@ -91,23 +92,24 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const processModulePmic = ({ message }: LoggingEvent) => {
         switch (message) {
+            case 'Power Failure Warning':
+                batteryProfiler?.pofError();
+                break;
             case 'No response from PMIC.':
                 clearConnectionTimeout();
                 if (pmicState !== 'pmic-disconnected') {
                     pmicState = 'pmic-disconnected';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 }
-                batteryProfiler?.pofError();
                 break;
             case 'PMIC available. Application can be restarted.':
-                if (batteryProfiler?.getProfilingState() === 'Off') {
+                if (autoReboot) {
                     baseDevice.kernelReset();
-                } else {
-                    if (pmicState !== 'pmic-pending-reboot') {
-                        pmicState = 'pmic-pending-reboot';
-                        eventEmitter.emit('onPmicStateChange', pmicState);
-                    }
-                    batteryProfiler?.pofError();
+                    pmicState = 'pmic-unknown';
+                    eventEmitter.emit('onPmicStateChange', pmicState);
+                } else if (pmicState !== 'pmic-pending-reboot') {
+                    pmicState = 'pmic-pending-reboot';
+                    eventEmitter.emit('onPmicStateChange', pmicState);
                 }
                 break;
         }
@@ -125,7 +127,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             ttf: NaN,
         };
 
-        const fixed = (dp: number, value?: string) =>
+        const fixed = (dp: number, value?: string | number) =>
             Number(Number(value ?? 0).toFixed(dp));
 
         messageParts.forEach(part => {
@@ -135,7 +137,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     adcSample.vBat = fixed(2, pair[1]);
                     break;
                 case 'ibat':
-                    adcSample.iBat = fixed(2, pair[1]) * 1000;
+                    adcSample.iBat = fixed(2, Number(pair[1]) * 1000);
                     break;
                 case 'tbat':
                     adcSample.tBat = fixed(1, pair[1]);
@@ -1394,5 +1396,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         applyDownloadFuelGaugeProfile,
 
         getBatteryProfiler: () => batteryProfiler,
+        setAutoRebootDevice: v => {
+            if (v && v !== autoReboot && pmicState === 'pmic-pending-reboot') {
+                baseDevice.kernelReset();
+                pmicState = 'pmic-unknown';
+                eventEmitter.emit('onPmicStateChange', pmicState);
+            }
+            autoReboot = v;
+        },
     };
 };

@@ -9,16 +9,16 @@ import { useSelector } from 'react-redux';
 
 import {
     getPmicState,
-    getProfilingState,
     isSupportedVersion,
 } from './pmicControl/pmicControlSlice';
+import { getCcProfilingState } from './pmicControl/profilingSlice';
 import { isPaused } from './serial/serialSlice';
 
 export default () => {
     const paused = useSelector(isPaused);
     const supportedVersion = useSelector(isSupportedVersion);
     const pmicState = useSelector(getPmicState);
-    const profilingState = useSelector(getProfilingState);
+    const profilingState = useSelector(getCcProfilingState);
 
     const [pauseFor100Ms, setPauseFor100Ms] = useState(paused);
     const disabled =

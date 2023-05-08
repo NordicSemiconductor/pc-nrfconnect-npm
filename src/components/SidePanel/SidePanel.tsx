@@ -42,8 +42,8 @@ import {
     getNpmDevice,
     getStoredBatterModel,
     setEventRecordingPath,
-    setShowProfilingWizard,
 } from '../../features/pmicControl/pmicControlSlice';
+import { setProfilingStage } from '../../features/pmicControl/profilingSlice';
 import {
     getSerialPort,
     getShellParser,
@@ -325,7 +325,7 @@ export default () => {
                         variant="secondary"
                         className="w-100"
                         onClick={() => {
-                            dispatch(setShowProfilingWizard(true));
+                            dispatch(setProfilingStage('Configuration'));
                         }}
                         disabled={
                             !profilingSupported ||

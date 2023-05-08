@@ -40,7 +40,7 @@ export type ITerm = (typeof ITermValues)[number];
 export const VTrickleFastValues = [2.5, 2.9] as const;
 export type VTrickleFast = (typeof VTrickleFastValues)[number];
 
-export type ProfilingState =
+export type CCProfilingState =
     | 'Off'
     | 'Running'
     | 'vCutOff'
@@ -315,6 +315,7 @@ export type NpmDevice = {
     setBatteryStatusCheckEnabled: (enabled: boolean) => void;
 
     getBatteryProfiler: () => BatteryProfiler | undefined;
+    setAutoRebootDevice: (autoReboot: boolean) => void;
 } & BaseNpmDevice;
 
 export interface PmicDialog {
@@ -356,7 +357,7 @@ export interface LoggingEvent {
     message: string;
 }
 
-export interface Profile {
+export interface CCProfile {
     tLoad: number;
     tRest: number;
     iLoad: number;
@@ -374,14 +375,15 @@ export type BatteryProfiler = {
         reportIntervalCc: number,
         reportIntervalNtc: number,
         vCutoff: number,
-        profiles: Profile[]
+        profiles: CCProfile[]
     ) => Promise<void>;
+    canProfile: () => Promise<boolean>;
     startProfiling: () => Promise<void>;
     stopProfiling: () => Promise<void>;
     isProfiling: () => Promise<boolean>;
-    getProfilingState: () => ProfilingState;
+    getProfilingState: () => CCProfilingState;
     onProfilingStateChange: (
-        handler: (state: ProfilingState, error?: string) => void
+        handler: (state: CCProfilingState, error?: string) => void
     ) => () => void;
     onProfilingEvent: (
         handler: (state: ProfilingEvent, error?: string) => void

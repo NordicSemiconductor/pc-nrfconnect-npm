@@ -33,7 +33,6 @@ import {
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
-    setProfiling,
     setStoredBatterModel,
     setSupportedVersion,
     setUsbPowered,
@@ -41,6 +40,7 @@ import {
     updateCharger,
     updateLdo,
 } from '../pmicControlSlice';
+import { setCcProfiling } from '../profilingSlice';
 import { getNpmDevice } from './npmFactory';
 import {
     dialogHandler,
@@ -379,7 +379,7 @@ export default () => {
                 npmDevice
                     .getBatteryProfiler()
                     ?.onProfilingStateChange(profiling => {
-                        dispatch(setProfiling(profiling));
+                        dispatch(setCcProfiling(profiling));
                     }) ?? noop;
 
             dispatch(setPmicState(npmDevice.getConnectionState()));
