@@ -86,7 +86,7 @@ export default () => {
                         profile.baseDirector
                     }/${PROFILE_FOLDER_PREFIX}${index + 1}`;
 
-                    const path = `${baseDirector}${profile.capacity}mAh_T${
+                    const path = `${baseDirector}/${profile.capacity}mAh_T${
                         profile.temperatures[index] < 0 ? 'n' : 'p'
                     }${profile.temperatures[index]}.csv`;
 
