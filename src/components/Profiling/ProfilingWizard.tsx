@@ -86,9 +86,11 @@ export default () => {
                         profile.baseDirector
                     }/${PROFILE_FOLDER_PREFIX}${index + 1}`;
 
-                    const path = `${baseDirector}/${profile.capacity}mAh_T${
-                        profile.temperatures[index] < 0 ? 'n' : 'p'
-                    }${profile.temperatures[index]}.csv`;
+                    const path = `${baseDirector}/${profile.name}_${
+                        profile.capacity
+                    }mAh_T${profile.temperatures[index] < 0 ? 'n' : 'p'}${
+                        profile.temperatures[index]
+                    }.csv`;
 
                     const addHeaders = !existsSync(path);
                     let data = `${
