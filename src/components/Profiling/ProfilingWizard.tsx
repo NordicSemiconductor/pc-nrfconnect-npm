@@ -76,12 +76,13 @@ export default () => {
             npmDevice?.getBatteryProfiler()?.onProfilingEvent(event => {
                 if (event.data.seq === 1 && profilingStage === 'Resting') {
                     dispatch(setProfilingStage('Profiling'));
+                    timeOffset.current = event.timestamp;
+                } else if (profilingStage === 'Profiling') {
                     const mAhConsumed =
                         (Math.abs(event.data.iLoad) * 1000 * REPORTING_RATE) /
                         3600000;
                     dispatch(incrementCapacityConsumed(mAhConsumed));
-                    timeOffset.current = event.timestamp;
-                } else if (profilingStage === 'Profiling') {
+
                     const baseDirector = `${
                         profile.baseDirector
                     }/${PROFILE_FOLDER_PREFIX}${index + 1}`;
