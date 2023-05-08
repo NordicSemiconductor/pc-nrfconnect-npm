@@ -60,6 +60,7 @@ const RestartProfileButton = ({
         <DialogButton
             variant={variant}
             onClick={() => {
+                // TODO clean up old files?
                 npmDevice?.setAutoRebootDevice(true);
                 dispatch(restartProfile());
             }}
