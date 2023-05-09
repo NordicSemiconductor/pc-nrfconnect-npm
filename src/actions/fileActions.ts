@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { dialog } from '@electron/remote';
-import { OpenDialogReturnValue } from 'electron';
+import { BrowserWindow, dialog } from '@electron/remote';
+import { OpenDialogOptions, OpenDialogReturnValue } from 'electron';
 import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
@@ -54,22 +54,29 @@ const parseFile =
         }
     };
 
+const showOpenDialog = (options: OpenDialogOptions) => {
+    const window = BrowserWindow.getFocusedWindow();
+    if (window) {
+        return dialog.showOpenDialog(window, options);
+    }
+
+    return dialog.showOpenDialog(options);
+};
+
 export const loadConfiguration = () => (dispatch: TDispatch) => {
-    dialog
-        .showOpenDialog({
-            title: 'Select a JSON file',
-            filters: [
-                {
-                    name: 'JSON',
-                    extensions: ['json'],
-                },
-            ],
-            properties: ['openFile'],
-        })
-        .then(
-            ({ filePaths }: OpenDialogReturnValue) =>
-                filePaths.length === 1 && dispatch(parseFile(filePaths[0]))
-        );
+    showOpenDialog({
+        title: 'Select a JSON file',
+        filters: [
+            {
+                name: 'JSON',
+                extensions: ['json'],
+            },
+        ],
+        properties: ['openFile'],
+    }).then(
+        ({ filePaths }: OpenDialogReturnValue) =>
+            filePaths.length === 1 && dispatch(parseFile(filePaths[0]))
+    );
 };
 
 const stream2buffer = (stream: fs.ReadStream) =>
@@ -99,23 +106,19 @@ const loadBatteryProfile = (filePath: string) =>
 
 export const getProfileBuffer = () =>
     new Promise<Buffer>((resolve, reject) => {
-        dialog
-            .showOpenDialog({
-                title: 'Select a JSON file',
-                filters: [
-                    {
-                        name: 'JSON',
-                        extensions: ['json'],
-                    },
-                ],
-                properties: ['openFile'],
-            })
-            .then(({ filePaths }: OpenDialogReturnValue) => {
-                filePaths.length === 1 &&
-                    loadBatteryProfile(filePaths[0])
-                        .then(resolve)
-                        .catch(reject);
-            });
+        showOpenDialog({
+            title: 'Select a JSON file',
+            filters: [
+                {
+                    name: 'JSON',
+                    extensions: ['json'],
+                },
+            ],
+            properties: ['openFile'],
+        }).then(({ filePaths }: OpenDialogReturnValue) => {
+            filePaths.length === 1 &&
+                loadBatteryProfile(filePaths[0]).then(resolve).catch(reject);
+        });
     });
 
 export const selectDirectoryDialog = () =>
@@ -125,8 +128,7 @@ export const selectDirectoryDialog = () =>
             properties: ['openDirectory'],
             // eslint-disable-next-line no-undef
         } as Electron.OpenDialogOptions;
-        dialog
-            .showOpenDialog(dialogOptions)
+        showOpenDialog(dialogOptions)
             .then(({ filePaths }: { filePaths: string[] }) => {
                 if (filePaths.length === 1) {
                     resolve(filePaths[0]);
