@@ -30,11 +30,9 @@ import ChargingDialog from './ChargingDialog';
 import ChecklistDialog from './ChecklistDialog';
 import CompleteDialog from './CompleteDialog';
 import ConfigurationDialog from './ConfigurationDialog';
-import { REPORTING_RATE } from './helpers';
+import { PROFILE_FOLDER_PREFIX, REPORTING_RATE } from './helpers';
 import ProfilingDialog from './ProfilingDialog';
 import RestingDialog from './RestingDialog';
-
-const PROFILE_FOLDER_PREFIX = 'profile_';
 
 export default () => {
     const timeOffset = useRef(-1);
