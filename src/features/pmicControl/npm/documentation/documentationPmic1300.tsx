@@ -17,10 +17,10 @@ export const documentation: Documentation = {
                         Battery voltage, V<span className="subscript">BAT</span>
                         , measured by nPM1300’s ADC.
                     </p>
-                    <p>
-                        Range (V<span className="subscript">BATOP</span>): 2.3V
-                        to 4.45V
+                    <p className="title font-weight-bold">
+                        Range (V<span className="subscript">BATOP</span>):
                     </p>
+                    <p>2.3V to 4.45V</p>
                 </>
             ),
         },
@@ -36,12 +36,10 @@ export const documentation: Documentation = {
                         while a negative value indicates the battery is being
                         charged.
                     </p>
-                    <p>
-                        Range discharging: 0mA to -1340mA (I
-                        <span className="subscript">BATLIM</span>) Range
-                        charging (I<span className="subscript">CHG</span>): 32mA
-                        – 800mA
-                    </p>
+                    <p className="title font-weight-bold">Range discharging</p>
+                    <p>0mA to -1340mA</p>
+                    <p className="title font-weight-bold">Range charging</p>
+                    <p>32mA – 800mA</p>
                 </>
             ),
         },
@@ -53,7 +51,8 @@ export const documentation: Documentation = {
                         <span className="subscript">BAT</span>, measured by
                         nPM1300’s ADC.
                     </p>
-                    <p>Range: -40°C to 85°C</p>
+                    <p className="title font-weight-bold">Range</p>
+                    <p>-40°C to 85°C</p>
                 </>
             ),
         },
@@ -61,23 +60,24 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>Shows the charger’s charging mode.</p>
+                    <p className="title font-weight-bold">Trickle</p>
                     <p>
-                        Trickle: Charging mode for batteries at low voltage, V
+                        Charging mode for batteries at low voltage, V
                         <span className="subscript">BAT</span> &lt; V
                         <span className="subscript">TRICKLE_FAST</span> (default
                         2.9V). Charging current is 10% of configured I
                         <span className="subscript">CHG</span>.
                     </p>
+                    <p className="title font-weight-bold">Constant Current</p>
                     <p>
-                        Constant Current: When V
-                        <span className="subscript">BAT</span> goes above V
-                        <span className="subscript">TRICKLE_FAST </span>
+                        When V<span className="subscript">BAT</span> goes above
+                        V<span className="subscript">TRICKLE_FAST </span>
                         constant current charging at configured I
                         <span className="subscript">CHG</span> starts.
                     </p>
+                    <p className="title font-weight-bold">Constant Voltage</p>
                     <p>
-                        Constant Voltage: When V
-                        <span className="subscript">BAT</span> reaches V
+                        When V<span className="subscript">BAT</span> reaches V
                         <span className="subscript">TERM </span>
                         constant voltage charging starts. The battery voltage is
                         maintained at V<span className="subscript">TERM </span>
@@ -115,7 +115,8 @@ export const documentation: Documentation = {
                         Battery voltage, current and temperature is used to
                         accurately calculate the battery state-of-charge.
                     </p>
-                    <p>Range: 0% to 100%, in 0.1% steps</p>
+                    <p className="title font-weight-bold">Range</p>
+                    <p>0% to 100%, in 0.1% steps</p>
                 </>
             ),
         },
@@ -142,9 +143,8 @@ export const documentation: Documentation = {
                         <span className="subscript">TERM</span> should be
                         configured according to specification of battery used.
                     </p>
-                    <p>
-                        Range: 3.50V to 3.65V, and 4.00V to 4.45V in 50mV step
-                    </p>
+                    <p className="title font-weight-bold">Range</p>
+                    <p>3.50V to 3.65V, and 4.00V to 4.45V in 50mV step</p>
                 </>
             ),
         },
@@ -156,7 +156,8 @@ export const documentation: Documentation = {
                         <span className="subscript">CHG</span> should be
                         configured according to specification of battery used.
                     </p>
-                    <p>Range: 32mA to 800mA in 2mA steps</p>
+                    <p className="title font-weight-bold">Range</p>
+                    <p>32mA to 800mA in 2mA steps</p>
                 </>
             ),
         },
@@ -164,20 +165,28 @@ export const documentation: Documentation = {
     'ldo 1': {
         'Load Switch/LDO': {
             description: (
-                <p>
-                    The load switch can either function as a switch or LDO. As a
-                    switch it supports an input voltage range from 1.0V to 5.5V
-                    and up to 100mA. As a LDO it supports an input voltage range
-                    from 2.6V to 5.5V, and output voltage range from 1.0V and
-                    3.3V in 100mV steps up to 50mA.
-                </p>
+                <>
+                    <p>
+                        The load switch can either function as a switch or LDO.
+                    </p>
+                    <p>
+                        As a switch it supports an input voltage range from 1.0V
+                        to 5.5V and up to 100mA.
+                    </p>
+                    <p>
+                        As a LDO it supports an input voltage range from 2.6V to
+                        5.5V, and output voltage range from 1.0V and 3.3V in
+                        100mV steps up to 50mA.
+                    </p>
+                </>
             ),
         },
         VOUTLDO: {
             description: (
                 <>
                     <p>LDO output voltage level.</p>
-                    <p>Range: 1.0V to 3.3V in 100mV steps</p>
+                    <p className="title font-weight-bold">Range</p>
+                    <p>1.0V to 3.3V in 100mV steps</p>
                 </>
             ),
         },
@@ -185,20 +194,28 @@ export const documentation: Documentation = {
     'ldo 2': {
         'Load Switch/LDO': {
             description: (
-                <p>
-                    The load switch can either function as a switch or LDO. As a
-                    switch it supports an input voltage range from 1.0V to 5.5V
-                    and up to 100mA. As a LDO it supports an input voltage range
-                    from 2.6V to 5.5V, and output voltage range from 1.0V and
-                    3.3V in 100mV steps up to 50mA.
-                </p>
+                <>
+                    <p>
+                        The load switch can either function as a switch or LDO.
+                    </p>
+                    <p>
+                        As a switch it supports an input voltage range from 1.0V
+                        to 5.5V and up to 100mA.
+                    </p>
+                    <p>
+                        As a LDO it supports an input voltage range from 2.6V to
+                        5.5V, and output voltage range from 1.0V and 3.3V in
+                        100mV steps up to 50mA.
+                    </p>
+                </>
             ),
         },
         VOUTLDO: {
             description: (
                 <>
                     <p>LDO output voltage level.</p>
-                    <p>Range: 1.0V to 3.3V in 100mV steps</p>
+                    <p className="title font-weight-bold">Range</p>
+                    <p>1.0V to 3.3V in 100mV steps</p>
                 </>
             ),
         },
@@ -214,14 +231,18 @@ export const documentation: Documentation = {
         },
         VOUT: {
             description: (
-                <p>
-                    BUCK output voltage level. When V
-                    <span className="subscript">SET</span> pin is used to set
-                    voltage level this indicates the voltage level at V
-                    <span className="subscript">OUT</span> (read only). When
-                    software is used to set voltage level the range is 1.0V to
-                    3.3V in 100mV steps.
-                </p>
+                <>
+                    <p>BUCK output voltage level.</p>
+                    <p>
+                        When V<span className="subscript">SET</span> pin is used
+                        to set voltage level this indicates the voltage level at
+                        V<span className="subscript">OUT</span> (read only).
+                    </p>
+                    <p>
+                        When software is used to set voltage level the range is
+                        1.0V to 3.3V in 100mV steps.
+                    </p>
+                </>
             ),
         },
     },
@@ -236,14 +257,18 @@ export const documentation: Documentation = {
         },
         VOUT: {
             description: (
-                <p>
-                    BUCK output voltage level. When V
-                    <span className="subscript">SET</span> pin is used to set
-                    voltage level this indicates the voltage level at V
-                    <span className="subscript">OUT</span> (read only). When
-                    software is used to set voltage level the range is 1.0V to
-                    3.3V in 100mV steps.
-                </p>
+                <>
+                    <p>BUCK output voltage level.</p>
+                    <p>
+                        When V<span className="subscript">SET</span> pin is used
+                        to set voltage level this indicates the voltage level at
+                        V<span className="subscript">OUT</span> (read only).
+                    </p>
+                    <p>
+                        When software is used to set voltage level the range is
+                        1.0V to 3.3V in 100mV steps.
+                    </p>
+                </>
             ),
         },
     },

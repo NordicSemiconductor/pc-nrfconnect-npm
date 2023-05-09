@@ -38,8 +38,8 @@ export const DocumentationTooltip = ({
             delay={500}
             overlay={
                 <Tooltip id="tooltip-voltage">
-                    <div className="info">
-                        <h4>{titleNode}</h4>
+                    <div className="documentation-tooltip info">
+                        <p className="title font-weight-bold">{titleNode}</p>
                         <div> {documentation.description}</div>
                     </div>
                 </Tooltip>
