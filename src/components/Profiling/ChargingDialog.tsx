@@ -32,7 +32,7 @@ import {
     setCompleteStep,
     setProfilingStage,
 } from '../../features/pmicControl/profilingSlice';
-import { REST_DURATION } from './helpers';
+import { REPORTING_RATE, REST_DURATION } from './helpers';
 import { ElapsedTime } from './TimeComponent';
 
 export default () => {
@@ -126,8 +126,8 @@ export default () => {
                                     npmDevice
                                         ?.getBatteryProfiler()
                                         ?.setProfile(
-                                            REST_DURATION, // iBat
-                                            REST_DURATION * 8, // tBat
+                                            REPORTING_RATE, // iBat
+                                            REPORTING_RATE * 8, // tBat
                                             profile.vLowerCutOff,
                                             [
                                                 ...restingProfiles,
