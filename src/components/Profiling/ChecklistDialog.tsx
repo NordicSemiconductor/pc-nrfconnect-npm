@@ -171,7 +171,7 @@ export default () => {
                         <>
                             {!usbPowered && (
                                 <Alert label="Warning " variant="warning">
-                                    Connect USB PMIC to continue
+                                    Please connect USB PMIC to continue
                                 </Alert>
                             )}
                             {!batteryConnected && (
