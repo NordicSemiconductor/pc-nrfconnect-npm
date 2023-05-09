@@ -79,8 +79,7 @@ export default () => {
                     timeOffset.current = event.timestamp;
                 } else if (profilingStage === 'Profiling') {
                     const mAhConsumed =
-                        (Math.abs(event.data.iLoad) * 1000 * REPORTING_RATE) /
-                        3600000;
+                        (Math.abs(event.data.iLoad) * REPORTING_RATE) / 3600;
                     dispatch(incrementCapacityConsumed(mAhConsumed));
 
                     const baseDirector = `${
