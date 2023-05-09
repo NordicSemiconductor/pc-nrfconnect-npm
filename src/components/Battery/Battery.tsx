@@ -85,9 +85,9 @@ const SideText = ({
         <div className="battery-side-panel">
             {!batteryConnected && (
                 <h2>
-                    No battery
+                    Battery not
                     <br />
-                    connected
+                    detected
                 </h2>
             )}
 
