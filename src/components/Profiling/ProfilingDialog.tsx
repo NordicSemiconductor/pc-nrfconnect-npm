@@ -37,21 +37,42 @@ export default () => {
 
     const dispatch = useDispatch();
 
-    const averageConsumption = useMemo(() => {
-        let l = 0;
-        let t = 0;
+    const progress = useMemo(() => {
+        let average = 0;
+        let lastCutOff = profile.vUpperCutOff;
+        const deltaCutOff = profile.vUpperCutOff - profile.vLowerCutOff;
 
         profile.profilingProfiles.forEach(profiler => {
-            l += profiler.iLoad * 1000; // A to mA;
-            t += profiler.tLoad / 1000; // ms to s
-            l += profiler.iRest * 1000; // A to mA;
-            t += profiler.tRest / 1000; // ms to s
+            if (profiler.iLoad !== 0) {
+                // skip first 2 profile as these is the Profiling Rest of 5 min
+
+                let l = 0;
+                let t = 0;
+
+                l += profiler.iLoad * profiler.tLoad; // A to mA;
+                t += profiler.tLoad / 1000; // ms to s
+                l += profiler.iRest * profiler.tRest; // A to mA;
+                t += profiler.tRest / 1000; // ms to s
+
+                average +=
+                    (l / t) *
+                    ((lastCutOff - (profiler.vCutoff ?? profile.vLowerCutOff)) /
+                        deltaCutOff);
+                lastCutOff = profiler.vCutoff ?? profile.vLowerCutOff;
+            }
         });
 
-        const average = l / t;
-        const averageMAhConsumed = (Math.abs(average) * 1000) / 3600000;
-        return averageMAhConsumed;
-    }, [profile.profilingProfiles]);
+        const averageConsumption = Math.abs(average) / 3600;
+        const theoreticalProgress =
+            (averageConsumption * (time / 1000)) / profile.capacity;
+        const actualProgress = capacityConsumed / profile.capacity;
+
+        const alpha = 1 - actualProgress;
+        return (
+            (theoreticalProgress * alpha + actualProgress * actualProgress) *
+            100
+        );
+    }, [capacityConsumed, profile, time]);
 
     return (
         <GenericDialog
@@ -86,14 +107,7 @@ export default () => {
                         profile.capacity
                     }mAh`}</span>
                 </div>
-                <TimeComponent
-                    time={time}
-                    progress={
-                        ((averageConsumption * (time / 1000)) /
-                            profile.capacity) *
-                        100
-                    }
-                />
+                <TimeComponent time={time} progress={progress} />
             </Group>
         </GenericDialog>
     );
