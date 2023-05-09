@@ -6,6 +6,7 @@
 
 import React, { useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { existsSync, mkdirSync, rmSync } from 'fs';
 import {
     Alert,
     ButtonVariants,
@@ -25,6 +26,7 @@ import {
     nextProfile,
     restartProfile,
 } from '../../features/pmicControl/profilingSlice';
+import { PROFILE_FOLDER_PREFIX } from './helpers';
 import { ElapsedTime } from './TimeComponent';
 
 const FinishButton = ({
@@ -66,12 +68,23 @@ const RestartProfileButton = ({
 }) => {
     const dispatch = useDispatch();
     const npmDevice = useSelector(getNpmDevice);
+    const profile = useSelector(getProfile);
+    const index = useSelector(getProfileIndex);
 
     return (
         <DialogButton
             variant={variant}
             onClick={() => {
-                // TODO clean up old files?
+                const baseDirector = `${
+                    profile.baseDirector
+                }/${PROFILE_FOLDER_PREFIX}${index + 1}/`;
+
+                if (existsSync(baseDirector)) {
+                    rmSync(baseDirector, { recursive: true, force: true });
+                }
+
+                mkdirSync(baseDirector);
+
                 npmDevice?.setAutoRebootDevice(true);
                 npmDevice
                     ?.getBatteryProfiler()
