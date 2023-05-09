@@ -40,7 +40,18 @@ const FinishButton = ({
             variant={variant}
             onClick={() => {
                 npmDevice?.setAutoRebootDevice(true);
-                dispatch(closeProfiling());
+                npmDevice
+                    ?.getBatteryProfiler()
+                    ?.isProfiling()
+                    .then(result => {
+                        if (result) {
+                            npmDevice.getBatteryProfiler()?.stopProfiling();
+                        }
+                        dispatch(closeProfiling());
+                    })
+                    .catch(() => {
+                        dispatch(closeProfiling());
+                    });
             }}
         >
             Finish
@@ -62,7 +73,18 @@ const RestartProfileButton = ({
             onClick={() => {
                 // TODO clean up old files?
                 npmDevice?.setAutoRebootDevice(true);
-                dispatch(restartProfile());
+                npmDevice
+                    ?.getBatteryProfiler()
+                    ?.isProfiling()
+                    .then(result => {
+                        if (result) {
+                            npmDevice.getBatteryProfiler()?.stopProfiling();
+                        }
+                        dispatch(restartProfile());
+                    })
+                    .catch(() => {
+                        dispatch(restartProfile());
+                    });
             }}
         >
             Restart Profile
@@ -83,7 +105,18 @@ const NextProfileButton = ({
             variant={variant}
             onClick={() => {
                 npmDevice?.setAutoRebootDevice(true);
-                dispatch(nextProfile());
+                npmDevice
+                    ?.getBatteryProfiler()
+                    ?.isProfiling()
+                    .then(result => {
+                        if (result) {
+                            npmDevice.getBatteryProfiler()?.stopProfiling();
+                        }
+                        dispatch(nextProfile());
+                    })
+                    .catch(() => {
+                        dispatch(nextProfile());
+                    });
             }}
         >
             Next Profile
@@ -100,7 +133,18 @@ const AbortProfileButton = () => {
             variant="secondary"
             onClick={() => {
                 npmDevice?.setAutoRebootDevice(true);
-                dispatch(closeProfiling());
+                npmDevice
+                    ?.getBatteryProfiler()
+                    ?.isProfiling()
+                    .then(result => {
+                        if (result) {
+                            npmDevice.getBatteryProfiler()?.stopProfiling();
+                        }
+                        dispatch(closeProfiling());
+                    })
+                    .catch(() => {
+                        dispatch(closeProfiling());
+                    });
             }}
         >
             Abort
