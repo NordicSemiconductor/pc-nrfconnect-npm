@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.0.17 - 2023-05-09
+
+### Added
+
+-   Stop PC from sleeping when connected to device
+
+### Fixed
+
+-   Profiling sampling rate
+-   Estimated time when profiling
+
 ## 0.0.16 - 2023-05-08
 
 ### Added
