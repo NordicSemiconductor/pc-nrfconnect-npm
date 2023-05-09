@@ -7,6 +7,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    Alert,
     DialogButton,
     GenericDialog,
     Group,
@@ -62,6 +63,15 @@ export default () => {
             }
         >
             <Group>
+                <Alert variant="warning" label="Warning ">
+                    Modifying device configuration during profiling will abort
+                    the process.
+                </Alert>
+                <Alert variant="info" label="Info ">
+                    Profiling takes a long time to complete (~48hrs). Please
+                    make sure that the computer does not go into sleep or
+                    hibernate during this process.
+                </Alert>
                 <div>
                     <strong>Status: </strong>
                     <span>Resting Battery</span>
