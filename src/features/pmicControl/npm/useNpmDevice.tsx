@@ -6,6 +6,7 @@
 
 import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ipcRenderer } from 'electron';
 import { appendFile, existsSync } from 'fs';
 import {
     Alert,
@@ -163,6 +164,10 @@ export default () => {
     useEffect(() => {
         if (pmicState === 'pmic-connected' && supportedVersion) {
             initDevice();
+            ipcRenderer.invoke('prevent-sleep:start');
+            return () => {
+                ipcRenderer.invoke('prevent-sleep:end');
+            };
         }
     }, [initDevice, pmicState, supportedVersion]);
 
