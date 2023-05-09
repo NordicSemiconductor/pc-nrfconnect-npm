@@ -41,6 +41,7 @@ export default () => {
         <GenericDialog
             title={`Battery Profiling ${name.length > 0 ? `- ${name}` : ''}`}
             isVisible
+            size="sm"
             closeOnEsc={false}
             footer={
                 <>
@@ -104,7 +105,7 @@ export default () => {
                             });
                         }}
                     >
-                        Continue
+                        Select folder
                     </DialogButton>
 
                     <DialogButton
@@ -118,7 +119,6 @@ export default () => {
             }
         >
             <Group>
-                <div>Configuration</div>
                 <div className="name-input">
                     <div className="max-length">{`${name.length}/${maxLength}`}</div>
                     <input
@@ -217,19 +217,6 @@ export default () => {
                                 <FormLabel className="flex-row">
                                     <div>
                                         <span>Temperature</span>
-                                        {temperatures.length > 1 && (
-                                            <Button
-                                                className="ml-1"
-                                                onClick={() => {
-                                                    const t = [...temperatures];
-                                                    t.splice(index, 1);
-                                                    setTemperatures(t);
-                                                }}
-                                                variant="secondary"
-                                            >
-                                                x
-                                            </Button>
-                                        )}
                                     </div>
 
                                     <div className="flex-row">
@@ -262,21 +249,33 @@ export default () => {
                                         max: 85,
                                     }}
                                 />
-                                {index + 1 === temperatures.length && (
+                            </div>
+                            <div>
+                                {temperatures.length > 1 && (
                                     <Button
+                                        className="ml-1"
                                         onClick={() => {
-                                            setTemperatures([
-                                                ...temperatures,
-                                                0,
-                                            ]);
+                                            const t = [...temperatures];
+                                            t.splice(index, 1);
+                                            setTemperatures(t);
                                         }}
                                         variant="secondary"
                                     >
-                                        + Add
+                                        Remove
                                     </Button>
                                 )}
                             </div>
                         </div>
+                        {index + 1 === temperatures.length && (
+                            <Button
+                                onClick={() => {
+                                    setTemperatures([...temperatures, 0]);
+                                }}
+                                variant="secondary"
+                            >
+                                + Add Temperature
+                            </Button>
+                        )}
                     </React.Fragment>
                 ))}
             </Group>

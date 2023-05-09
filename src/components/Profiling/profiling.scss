@@ -12,14 +12,17 @@
     .max-length {
         align-self: flex-end;
         font-size: 12px;
+        line-height: 1;
     }
 
     input {
-        height: 32px;
+        height: 24px;
         border: none;
-        border-bottom: 1px solid $gray-300;
+        border-bottom: 1px solid #90a4ae;
         padding: 8px 0px;
         margin-bottom: 8px;
+        padding-top: 0px;
+
         &:focus {
             outline: none !important;
         }
