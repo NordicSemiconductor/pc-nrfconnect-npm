@@ -90,10 +90,20 @@ export default ({
         value: item,
     }));
 
-    const vSetItems = ['Software', 'Vset'];
+    const vSetItems = [
+        { key: 'Software', renderItem: <span>Software</span> },
+        {
+            key: 'Vset',
+            renderItem: (
+                <>
+                    V<span className="subscript">SET</span>
+                </>
+            ),
+        },
+    ];
 
     const [internalVOut, setInternalVOut] = useState(buck?.vOutNormal ?? 0);
-    const [internalRetVOut, setInternalRetVOut] = useState(1); // TODO
+    const [internalRetVOut, setInternalRetVOut] = useState(1);
 
     useEffect(() => {
         if (buck) setInternalVOut(buck.vOutNormal);
