@@ -11,9 +11,12 @@ and this project adheres to
 ### Added
 
 -   Stop PC from sleeping when connected to device
+-   Clean up old results if profile is restarted
+-   File dialogs are now modal
 
 ### Fixed
 
+-   UI Improvements
 -   Profiling sampling rate
 -   Estimated time when profiling
 
