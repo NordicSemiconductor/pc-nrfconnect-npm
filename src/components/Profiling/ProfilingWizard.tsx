@@ -52,22 +52,22 @@ export default () => {
 
     useEffect(() => {
         if (profilingStage === 'Checklist') {
-            const baseDirector = `${
-                profile.baseDirector
+            const baseDirector = `${profile.baseDirector}/${
+                profile.name
             }/${PROFILE_FOLDER_PREFIX}${index + 1}/`;
 
             if (!existsSync(baseDirector)) {
-                mkdirSync(baseDirector);
+                mkdirSync(baseDirector, { recursive: true });
             }
 
             const debugFolder = `${baseDirector}/debug/`;
 
             if (!existsSync(debugFolder)) {
-                mkdirSync(debugFolder);
+                mkdirSync(debugFolder, { recursive: true });
             }
             dispatch(setEventRecordingPath(debugFolder));
         }
-    }, [dispatch, index, profile.baseDirector, profilingStage]);
+    }, [dispatch, index, profile, profilingStage]);
 
     useEffect(
         () =>
@@ -80,8 +80,8 @@ export default () => {
                         (Math.abs(event.data.iLoad) * REPORTING_RATE) / 3600;
                     dispatch(incrementCapacityConsumed(mAhConsumed));
 
-                    const baseDirector = `${
-                        profile.baseDirector
+                    const baseDirector = `${profile.baseDirector}/${
+                        profile.name
                     }/${PROFILE_FOLDER_PREFIX}${index + 1}`;
 
                     const path = `${baseDirector}/${profile.name}_${

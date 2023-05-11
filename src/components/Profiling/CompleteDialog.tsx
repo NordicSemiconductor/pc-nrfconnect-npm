@@ -75,15 +75,15 @@ const RestartProfileButton = ({
         <DialogButton
             variant={variant}
             onClick={() => {
-                const baseDirector = `${
-                    profile.baseDirector
+                const baseDirector = `${profile.baseDirector}/${
+                    profile.name
                 }/${PROFILE_FOLDER_PREFIX}${index + 1}/`;
 
                 if (existsSync(baseDirector)) {
                     rmSync(baseDirector, { recursive: true, force: true });
                 }
 
-                mkdirSync(baseDirector);
+                mkdirSync(baseDirector, { recursive: true });
 
                 npmDevice?.setAutoRebootDevice(true);
                 npmDevice
