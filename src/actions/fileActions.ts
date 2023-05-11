@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { BrowserWindow, dialog } from '@electron/remote';
+import { dialog, getCurrentWindow } from '@electron/remote';
 import { OpenDialogOptions, OpenDialogReturnValue } from 'electron';
 import Store from 'electron-store';
 import fs from 'fs';
@@ -54,14 +54,8 @@ const parseFile =
         }
     };
 
-const showOpenDialog = (options: OpenDialogOptions) => {
-    const window = BrowserWindow.getFocusedWindow();
-    if (window) {
-        return dialog.showOpenDialog(window, options);
-    }
-
-    return dialog.showOpenDialog(options);
-};
+const showOpenDialog = (options: OpenDialogOptions) =>
+    dialog.showOpenDialog(getCurrentWindow(), options);
 
 export const loadConfiguration = () => (dispatch: TDispatch) => {
     showOpenDialog({
@@ -149,7 +143,7 @@ export const saveFileDialog = () => (dispatch: TDispatch) => {
         // eslint-disable-next-line no-undef
     } as Electron.SaveDialogOptions;
     dialog
-        .showSaveDialog(dialogOptions)
+        .showSaveDialog(getCurrentWindow(), dialogOptions)
         .then(
             result =>
                 !result.canceled &&
