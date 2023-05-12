@@ -98,7 +98,7 @@ export default () => {
                                         Math.min(
                                             800,
                                             Math.floor(
-                                                profile.capacity ?? 0 / 2
+                                                (profile.capacity ?? 0) / 2
                                             ) * 2 // even numbers only are allowed
                                         )
                                     )
