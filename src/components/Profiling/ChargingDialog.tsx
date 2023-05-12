@@ -15,7 +15,6 @@ import {
     useStopwatch,
 } from 'pc-nrfconnect-shared';
 
-import { CCProfile } from '../../features/pmicControl/npm/types';
 import {
     getChargers,
     getLatestAdcSample,
@@ -32,7 +31,7 @@ import {
     setCompleteStep,
     setProfilingStage,
 } from '../../features/pmicControl/profilingSlice';
-import { REPORTING_RATE, REST_DURATION } from './helpers';
+import { REPORTING_RATE } from './helpers';
 import { ElapsedTime } from './TimeComponent';
 
 export default () => {
@@ -79,45 +78,6 @@ export default () => {
                             !batteryFull || usbPowered || !batteryConnected
                         }
                         onClick={() => {
-                            const restingProfiles: CCProfile[] = [
-                                {
-                                    tLoad: 500,
-                                    tRest: 500,
-                                    iLoad: 0,
-                                    iRest: 0,
-                                    cycles: REST_DURATION,
-                                },
-                            ];
-                            const profilingProfiles: CCProfile[] = [
-                                {
-                                    tLoad: 500,
-                                    tRest: 500,
-                                    iLoad: 0,
-                                    iRest: 0,
-                                    cycles: 300, // 5Min
-                                },
-                                {
-                                    tLoad: 600000, // 10Min
-                                    tRest: 2400000, // 40Min
-                                    iLoad: profile.capacity / 5 / 1000, // A
-                                    iRest: 0,
-                                    vCutoff: 3.9,
-                                },
-                                {
-                                    tLoad: 300000, // 5Min
-                                    tRest: 1800000, // 30Min
-                                    iLoad: profile.capacity / 5 / 1000, // A
-                                    iRest: 0,
-                                    vCutoff: 3.5,
-                                },
-                                {
-                                    tLoad: 300000, // 5Min
-                                    tRest: 1800000, // 30Min
-                                    iLoad: profile.capacity / 10 / 1000, // A
-                                    iRest: 0,
-                                },
-                            ];
-
                             dispatch(setProfilingStage('Resting'));
                             npmDevice?.setAutoRebootDevice(false);
                             npmDevice
@@ -130,8 +90,8 @@ export default () => {
                                             REPORTING_RATE * 8, // tBat
                                             profile.vLowerCutOff,
                                             [
-                                                ...restingProfiles,
-                                                ...profilingProfiles,
+                                                ...profile.restingProfiles,
+                                                ...profile.profilingProfiles,
                                             ]
                                         )
                                         .then(() => {
