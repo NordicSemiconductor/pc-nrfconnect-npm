@@ -68,6 +68,9 @@ const profilingSlice = createSlice({
         },
         setProfilingStage(state, action: PayloadAction<ProfileStage>) {
             state.stage = action.payload;
+            if (action.payload === 'Checklist') {
+                state.startTime = Date.now();
+            }
         },
         setCompleteStep(state, action: PayloadAction<ProfileComplete>) {
             state.completeStep = action.payload;
