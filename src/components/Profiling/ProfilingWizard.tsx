@@ -51,7 +51,7 @@ export default () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (profilingStage === 'Checklist') {
+        if (profilingStage === 'Charging') {
             const baseDirector = `${profile.baseDirector}/${
                 profile.name
             }/${PROFILE_FOLDER_PREFIX}${index + 1}/`;
@@ -66,6 +66,8 @@ export default () => {
                 mkdirSync(debugFolder, { recursive: true });
             }
             dispatch(setEventRecordingPath(debugFolder));
+        } else if (profilingStage === 'Complete') {
+            dispatch(setEventRecordingPath(''));
         }
     }, [dispatch, index, profile, profilingStage]);
 
