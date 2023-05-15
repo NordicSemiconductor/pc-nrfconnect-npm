@@ -8,6 +8,12 @@ and this project adheres to
 
 ## 0.0.17 - 2023-05-09
 
+### Fixed
+
+-   Not able to click continue if battery is to low to be detected
+
+## 0.0.17 - 2023-05-09
+
 ### Added
 
 -   Stop PC from sleeping when connected to device

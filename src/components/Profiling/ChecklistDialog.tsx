@@ -69,7 +69,6 @@ export default () => {
                             disabled={
                                 pmicConnectionState !== 'pmic-connected' ||
                                 !usbPowered ||
-                                !batteryConnected ||
                                 !syncBoardConnected
                             }
                             variant="primary"
@@ -177,7 +176,7 @@ export default () => {
                             {!batteryConnected && (
                                 <Alert label="Warning " variant="warning">
                                     Battery is not detected. Make sure it is
-                                    connected to the EK to continue
+                                    connected to the EK before you continue
                                 </Alert>
                             )}
                             <Alert
