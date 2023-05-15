@@ -12,14 +12,9 @@ import './systemFeatures.scss';
 export default () => (
     <div className="systemFeatures-container">
         <div className="graph">
-            <Alert variant="info" label="nPM PowerUP​ 0.1​ - Preview release! ">
-                This is an unsupported, experimental preview and it is subject
-                to major redesigns in the future.
+            <Alert variant="info" label="Coming Soon! -​ ">
+                Keep a lookout for updates. This is coming your way soon
             </Alert>
-
-            <div className="systemFeatures-cards">
-                <p>TODO Placeholder</p>
-            </div>
         </div>
     </div>
 );
