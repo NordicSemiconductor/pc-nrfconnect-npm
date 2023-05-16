@@ -13,6 +13,7 @@ and this project adheres to
 -   Charger recharge support
 -   LDO VOut support
 -   LDO Mode Support
+-   Support batter models with space in the name
 -   PMIC1300 FP2 Support FW Version 0.0.0+17
 
 ### Changed

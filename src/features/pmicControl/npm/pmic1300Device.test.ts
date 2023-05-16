@@ -1381,7 +1381,7 @@ describe('PMIC 1300', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `fuel_gauge model set someProfileName`,
+                    `fuel_gauge model set "someProfileName"`,
                     expect.anything(),
                     undefined,
                     true
@@ -2279,7 +2279,7 @@ describe('PMIC 1300', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `fuel_gauge model set someProfileName`,
+                    `fuel_gauge model set "someProfileName"`,
                     expect.anything(),
                     undefined,
                     true

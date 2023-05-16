@@ -1204,7 +1204,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setActiveBatteryModel = (name: string) =>
         new Promise<void>((resolve, reject) => {
             sendCommand(
-                `fuel_gauge model set ${name}`,
+                `fuel_gauge model set "${name}"`,
                 () => resolve(),
                 () => {
                     requestUpdate.activeBatteryModel();
