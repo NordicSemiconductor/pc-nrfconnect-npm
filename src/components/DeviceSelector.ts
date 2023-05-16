@@ -77,11 +77,14 @@ export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
                         device.id,
                         'NRFDL_FW_FILE',
                         'NRFDL_FW_INTEL_HEX',
-                        firmware.hex as string,
+                        firmware.hex,
                         err => {
                             if (err) {
                                 reject(err.message);
+                                return;
                             }
+
+                            onProgress(100, 'Rebooting Device');
                         },
                         progress => {
                             onProgress(
@@ -131,13 +134,17 @@ export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
                             npmDevice
                                 .isSupportedVersion()
                                 .then(result => {
-                                    resolve({
-                                        device,
-                                        validFirmware: result,
-                                    });
+                                    port.close().finally(() =>
+                                        resolve({
+                                            device,
+                                            validFirmware: result,
+                                        })
+                                    );
                                 })
-                                .catch(reject)
-                                .finally(() => port.close());
+                                .catch(error =>
+                                    port.close().finally(() => reject(error))
+                                )
+                                .finally();
                         })
                         .catch(error => {
                             port.close();
@@ -157,7 +164,7 @@ const deviceSetup: DeviceSetup = {
         npmDeviceSetup({
             key: 'nPM1300',
             description: '',
-            hex: getAppFile('fw/app_signed_0.0.0+15'),
+            hex: getAppFile('fw/app_signed_0.0.0+17.hex'),
         }),
     ],
     needSerialport: true,
