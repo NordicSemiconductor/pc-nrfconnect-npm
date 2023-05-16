@@ -5,12 +5,17 @@
  */
 
 import { connect } from 'react-redux';
-import { DeviceTraits } from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfDeviceLib, {
+    DeviceTraits,
+} from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Device,
     DeviceSelector,
     DeviceSelectorProps,
+    getDeviceLibContext,
+    IDeviceSetup,
     logger,
+    setWaitForDevice,
 } from 'pc-nrfconnect-shared';
 
 import {
@@ -19,8 +24,8 @@ import {
     deviceDisconnected,
     openDevice,
 } from '../actions/deviceActions';
+import { RootState } from '../appReducer';
 import { closeProfiling } from '../features/pmicControl/profilingSlice';
-import { TDispatch } from '../thunk';
 
 /**
  * Configures which device types to show in the device selector.
@@ -28,29 +33,86 @@ import { TDispatch } from '../thunk';
  * https://github.com/NordicSemiconductor/nrf-device-lister-js.
  */
 const deviceListing: DeviceTraits = {
-    nordicUsb: true,
+    mcuBoot: true,
     serialPorts: true,
 };
 
-/**
- * Configures how devices should be set up (programmed) when selected.
- * The config format is described on
- * https://github.com/NordicSemiconductor/nrf-device-setup-js.
- *
- * Currently no setup is done. If you need one, set deviceSetup appropriately
- * and add it in mapState below.
- *
- * To refer to files provided by your app, use getAppFile exported by
- * pc-nrfconnect-shared
- */
-// const deviceSetup = {
-// dfu: {},
-// jprog: {},
-// };
+type NpmFirmware = {
+    key: string;
+    description: string;
+    hex: string;
+};
+
+export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
+    supportsProgrammingMode: (device: Device) =>
+        device.traits.mcuBoot !== undefined &&
+        device.usb?.device.descriptor.idProduct === 0x53ab &&
+        device.usb?.device.descriptor.idVendor === 0x1915,
+    getFirmwareOptions: device => [
+        {
+            key: firmware.key,
+            description: firmware.description,
+            programDevice: onProgress => dispatch =>
+                new Promise<Device>((resolve, reject) => {
+                    dispatch(
+                        setWaitForDevice({
+                            timeout: 60000,
+                            when: 'always',
+                            once: true,
+                            onSuccess: resolve,
+                            onFail: reject,
+                        })
+                    );
+                    nrfDeviceLib.firmwareProgram(
+                        getDeviceLibContext(),
+                        device.id,
+                        'NRFDL_FW_FILE',
+                        'NRFDL_FW_INTEL_HEX',
+                        firmware.hex as string,
+                        err => {
+                            if (err) {
+                                reject(err.message);
+                            }
+                        },
+                        progress => {
+                            onProgress(
+                                progress.progressJson.progressPercentage,
+                                progress.progressJson.message
+                            );
+                        }
+                    );
+                    logger.debug('firmware updated finished');
+                }),
+        },
+    ],
+    isExpectedFirmware: (device: Device) => (dispatch, getState) =>
+        new Promise<{
+            device: Device;
+            validFirmware: boolean;
+        }>(resolve => {
+            (getState() as RootState).app.pmicControl.npmDevice
+                ?.isSupportedVersion()
+                .then(result => {
+                    resolve({
+                        device,
+                        validFirmware: result,
+                    });
+                });
+        }),
+    tryToSwitchToApplicationMode: device => () =>
+        new Promise<Device>(resolve => {
+            resolve(device);
+        }),
+});
+
+const deviceSetup = {
+    dfu: {},
+    jprog: {},
+};
 
 const mapState = () => ({
     deviceListing,
-    // deviceSetup,
+    deviceSetup,
 });
 
 /*
