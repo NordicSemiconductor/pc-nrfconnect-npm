@@ -935,7 +935,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
             });
 
-        if (pmicState !== 'ek-disconnected' && index === 1 && value <= 1.7) {
+        if (
+            dialogHandler &&
+            pmicState !== 'ek-disconnected' &&
+            index === 1 &&
+            value <= 1.7
+        ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
@@ -1008,6 +1013,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         // TODO Check software voltage as well
         if (
+            dialogHandler &&
             pmicState !== 'ek-disconnected' &&
             index === 1 &&
             mode === 'software'
@@ -1126,7 +1132,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
             });
 
-        if (pmicState !== 'ek-disconnected' && index === 1 && !enabled) {
+        if (
+            dialogHandler &&
+            pmicState !== 'ek-disconnected' &&
+            index === 1 &&
+            !enabled
+        ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
@@ -1472,7 +1483,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 setFuelGaugeEnabled(config.fuelGauge);
             };
 
-            if (config.firmwareVersion !== baseDevice.getSupportedVersion()) {
+            if (
+                dialogHandler &&
+                config.firmwareVersion !== baseDevice.getSupportedVersion()
+            ) {
                 const warningDialog: PmicDialog = {
                     doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
                     message: `The configuration was intended for firmware version ${
