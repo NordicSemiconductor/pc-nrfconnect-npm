@@ -361,12 +361,18 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_CHARGERS)(
+            test.each(PMIC_1300_CHARGERS)(
                 'Request update chargerEnabledRecharging index: %p',
                 index => {
                     pmic.requestUpdate.chargerEnabledRecharging(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        'npmx charger module recharge get',
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -469,12 +475,18 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(PMIC_1300_LDOS)(
                 'Request update ldoVoltage index: %p',
                 index => {
                     pmic.requestUpdate.ldoVoltage(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw ldo_voltage get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -493,12 +505,18 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(PMIC_1300_LDOS)(
                 'Request update ldoMode index: %p',
                 index => {
                     pmic.requestUpdate.ldoMode(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw mode get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -662,7 +680,7 @@ describe('PMIC 1300', () => {
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        callbacks?.onSuccess('app_version=0.0.0+16', command);
+                        callbacks?.onSuccess('app_version=0.0.0+17', command);
                         return Promise.resolve();
                     }
                 );
@@ -801,7 +819,7 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(
+            test.each(
                 PMIC_1300_CHARGERS.map(index => [
                     {
                         index,
@@ -817,13 +835,18 @@ describe('PMIC 1300', () => {
                 async ({ index, enabled }) => {
                     await pmic.setChargerEnabledRecharging(index, enabled);
 
-                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                    expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { enableRecharging: enabled },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx charger module recharge set ${
+                            enabled ? '1' : '0'
+                        }`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Updates should only be emitted when we get response
+                    expect(mockOnChargerUpdate).toBeCalledTimes(0);
                 }
             );
 
@@ -1243,12 +1266,18 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(PMIC_1300_LDOS)(
                 'Set setLdoVoltage index: %p',
                 async index => {
-                    await pmic.setLdoVoltage(index, 3);
+                    await pmic.setLdoVoltage(index, 1);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw ldo_voltage set ${index} ${1000}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
                     // Updates should only be emitted when we get response
                     expect(mockOnLdoUpdate).toBeCalledTimes(0);
@@ -1281,14 +1310,31 @@ describe('PMIC 1300', () => {
                 expect(mockOnLdoUpdate).toBeCalledTimes(0);
             });
 
-            test.skip.each(PMIC_1300_LDOS)(
-                'Set setLdoMode index: %p',
-                async index => {
-                    await pmic.setLdoMode(index, 'LDO');
+            test.each(
+                PMIC_1300_LDOS.map(index => [
+                    {
+                        index,
+                        mode: 0,
+                    },
+                    {
+                        index,
+                        mode: 1,
+                    },
+                ]).flat()
+            )('Set setLdoMode index: %p', async ({ index, mode }) => {
+                await pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO');
 
-                    // TODO
-                }
-            );
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx ldsw mode set ${index} ${mode}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            });
 
             test.each([true, false])(
                 'Set setFuelGaugeEnabled enabled: %p',
@@ -1700,7 +1746,7 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(
+            test.each(
                 PMIC_1300_CHARGERS.map(index => [
                     {
                         index,
@@ -1714,15 +1760,30 @@ describe('PMIC 1300', () => {
             )(
                 'Set setChargerEnabledRecharging - Fail immediately -  %p',
                 async ({ index, enabled }) => {
-                    await pmic.setChargerEnabledRecharging(index, enabled);
+                    await expect(
+                        pmic.setChargerEnabledRecharging(index, enabled)
+                    ).rejects.toBeUndefined();
 
-                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                    expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { enableRecharging: enabled },
-                        index,
-                    });
+                    // turn off recharge
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx charger module recharge set ${
+                            enabled ? '1' : '0'
+                        }`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx charger module recharge get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -2023,14 +2084,29 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(PMIC_1300_LDOS)(
                 'Set setLdoVoltage - Fail immediately - index: %p',
                 async index => {
                     await expect(
                         pmic.setLdoVoltage(index, 3)
                     ).rejects.toBeUndefined();
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw ldo_voltage set ${index} 3000`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx ldsw ldo_voltage get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
                     // Updates should only be emitted when we get response
                     expect(mockOnLdoUpdate).toBeCalledTimes(0);
@@ -2077,14 +2153,43 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(
+                PMIC_1300_LDOS.map(index => [
+                    {
+                        index,
+                        mode: 0,
+                    },
+                    {
+                        index,
+                        mode: 1,
+                    },
+                ]).flat()
+            )(
                 'Set setLdoMode - Fail immediately - index: %p',
-                async index => {
+                async ({ index, mode }) => {
                     await expect(
-                        pmic.setLdoMode(index, 'LDO')
+                        pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO')
                     ).rejects.toBeUndefined();
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw mode set ${index} ${mode}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx ldsw mode get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Updates should only be emitted when we get response
+                    expect(mockOnLdoUpdate).toBeCalledTimes(0);
                 }
             );
 
@@ -2593,7 +2698,7 @@ describe('PMIC 1300', () => {
                     },
                 ],
                 fuelGauge: true,
-                firmwareVersion: '0.0.0+16',
+                firmwareVersion: '0.0.0+17',
                 deviceType: 'npm1300',
             });
             verifyApplyConfig();

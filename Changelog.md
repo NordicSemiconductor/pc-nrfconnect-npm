@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.0.18 - 2023-05-09
+
+### Added
+
+-   Charger recharge support
+-   LDO VOut support
+-   LDO Mode Support
+-   PMIC1300 FP2 Support FW Version 0.0.0+17
+
 ## 0.0.17 - 2023-05-09
 
 ### Fixed

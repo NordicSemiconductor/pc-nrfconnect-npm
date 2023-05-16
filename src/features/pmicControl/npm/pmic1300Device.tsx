@@ -57,7 +57,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         dialogHandler,
         eventEmitter,
         devices,
-        '0.0.0+16'
+        '0.0.0+17'
     );
     const batteryProfiler = shellParser
         ? BatteryProfiler(shellParser, eventEmitter)
@@ -329,6 +329,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     );
 
     shellParser?.registerCommandCallback(
+        toRegex('npmx charger module recharge', true, undefined, '(1|0)'),
+        res => {
+            emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                enableRecharging: parseToBoolean(res),
+            });
+        },
+        noop
+    );
+
+    shellParser?.registerCommandCallback(
         toRegex('npmx charger module charger', true, undefined, '(1|0)'),
         res => {
             emitPartialEvent<Charger>('onChargerUpdate', 0, {
@@ -570,6 +580,26 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             },
             noop
         );
+
+        shellParser?.registerCommandCallback(
+            toRegex('npmx ldsw mode', true, i),
+            res => {
+                emitPartialEvent<Ldo>('onLdoUpdate', i, {
+                    mode: parseToNumber(res) === 0 ? 'ldoSwitch' : 'LDO',
+                });
+            },
+            noop
+        );
+
+        shellParser?.registerCommandCallback(
+            toRegex('npmx ldsw ldo_voltage', true, i),
+            res => {
+                emitPartialEvent<Ldo>('onLdoUpdate', i, {
+                    voltage: parseToNumber(res) / 1000, // mV to V
+                });
+            },
+            noop
+        );
     }
 
     const sendCommand = (
@@ -711,14 +741,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         });
 
     const setChargerEnabledRecharging = (index: number, enabled: boolean) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
-
-            emitPartialEvent<Charger>('onChargerUpdate', index, {
-                enableRecharging: enabled,
-            });
-
-            resolve();
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', index, {
+                    enableRecharging: enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx charger module recharge set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerEnabledRecharging(index);
+                        reject();
+                    }
+                );
+            }
         });
 
     const setChargerEnabled = (index: number, enabled: boolean) =>
@@ -991,14 +1029,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     };
 
     const setLdoVoltage = (index: number, voltage: number) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
+        new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
                 emitPartialEvent<Ldo>('onLdoUpdate', index, {
                     voltage,
                 });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw ldo_voltage set ${index} ${voltage * 1000}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ldoVoltage(index);
+                        reject();
+                    }
+                );
             }
-            resolve();
         });
     const setLdoEnabled = (index: number, enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
@@ -1019,15 +1065,24 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
     const setLdoMode = (index: number, mode: LdoMode) =>
-        new Promise<void>(resolve => {
-            console.warn('Not implemented');
-
+        new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
                 emitPartialEvent<Ldo>('onLdoUpdate', index, {
                     mode,
                 });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw mode set ${index} ${
+                        mode === 'ldoSwitch' ? '0' : '1'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ldoMode(index);
+                        reject();
+                    }
+                );
             }
-            resolve();
         });
 
     const setFuelGaugeEnabled = (enabled: boolean) =>
@@ -1196,7 +1251,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sendCommand('npmx charger termination_current get'),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerEnabledRecharging: (index: number) =>
-            console.warn('Not implemented'),
+            sendCommand('npmx charger module recharge get'),
 
         buckVOutNormal: (index: number) =>
             sendCommand(`npmx buck voltage normal get ${index}`),
@@ -1213,11 +1268,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckEnabled: (index: number) => console.warn('Not implemented'),
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ldoVoltage: (index: number) => console.warn('Not implemented'),
+        ldoVoltage: (index: number) =>
+            sendCommand(`npmx ldsw ldo_voltage get ${index}`),
         ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ldoMode: (index: number) => console.warn('Not implemented'),
+        ldoMode: (index: number) => sendCommand(`npmx ldsw mode get ${index}`),
 
         fuelGauge: () => sendCommand('fuel_gauge get'),
         activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
