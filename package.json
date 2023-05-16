@@ -14,6 +14,7 @@
     },
     "main": "dist/bundle.js",
     "files": [
+        "fw/*.hex",
         "dist/",
         "resources/*",
         "LICENSE",
@@ -46,5 +47,8 @@
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
     },
     "prettier": "./node_modules/pc-nrfconnect-shared/config/prettier.config.js",
-    "bundleDependencies": []
+    "bundleDependencies": [],
+    "dependencies": {
+        "@nordicsemiconductor/nrf-device-lib-js": "^0.6.9"
+    }
 }

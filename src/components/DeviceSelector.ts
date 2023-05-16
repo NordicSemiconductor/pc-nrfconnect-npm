@@ -9,14 +9,18 @@ import nrfDeviceLib, {
     DeviceTraits,
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
+    createSerialPort,
     Device,
     DeviceSelector,
     DeviceSelectorProps,
+    DeviceSetup,
+    getAppFile,
     getDeviceLibContext,
     IDeviceSetup,
     logger,
     setWaitForDevice,
 } from 'pc-nrfconnect-shared';
+import { Terminal } from 'xterm-headless';
 
 import {
     closeDevice,
@@ -24,8 +28,13 @@ import {
     deviceDisconnected,
     openDevice,
 } from '../actions/deviceActions';
-import { RootState } from '../appReducer';
+import { getNpmDevice } from '../features/pmicControl/npm/npmFactory';
 import { closeProfiling } from '../features/pmicControl/profilingSlice';
+import {
+    hookModemToShellParser,
+    xTerminalShellParserWrapper,
+} from '../hooks/commandParser';
+import { TDispatch } from '../thunk';
 
 /**
  * Configures which device types to show in the device selector.
@@ -85,19 +94,57 @@ export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
                 }),
         },
     ],
-    isExpectedFirmware: (device: Device) => (dispatch, getState) =>
+    isExpectedFirmware: (device: Device) => () =>
         new Promise<{
             device: Device;
             validFirmware: boolean;
-        }>(resolve => {
-            (getState() as RootState).app.pmicControl.npmDevice
-                ?.isSupportedVersion()
-                .then(result => {
-                    resolve({
-                        device,
-                        validFirmware: result,
-                    });
-                });
+        }>((resolve, reject) => {
+            if (!(device.serialPorts && device.serialPorts[0].comName)) {
+                reject(new Error('device does not have a serial port'));
+                return;
+            }
+
+            createSerialPort(
+                {
+                    path: device.serialPorts[0].comName,
+                    baudRate: 115200,
+                },
+                { overwrite: true, settingsLocked: true }
+            )
+                .then(port => {
+                    hookModemToShellParser(
+                        port,
+                        xTerminalShellParserWrapper(
+                            new Terminal({ allowProposedApi: true, cols: 999 })
+                        ),
+                        {
+                            shellPromptUart: 'shell:~$ ',
+                            logRegex:
+                                /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
+                            errorRegex: /Error: /,
+                            timeout: 5000,
+                            columnWidth: 80,
+                        }
+                    )
+                        .then(shellParser => {
+                            const npmDevice = getNpmDevice(shellParser, null);
+                            npmDevice
+                                .isSupportedVersion()
+                                .then(result => {
+                                    resolve({
+                                        device,
+                                        validFirmware: result,
+                                    });
+                                })
+                                .catch(reject)
+                                .finally(() => port.close());
+                        })
+                        .catch(error => {
+                            port.close();
+                            reject(error);
+                        });
+                })
+                .catch(reject);
         }),
     tryToSwitchToApplicationMode: device => () =>
         new Promise<Device>(resolve => {
@@ -105,9 +152,15 @@ export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
         }),
 });
 
-const deviceSetup = {
-    dfu: {},
-    jprog: {},
+const deviceSetup: DeviceSetup = {
+    deviceSetups: [
+        npmDeviceSetup({
+            key: 'nPM1300',
+            description: '',
+            hex: getAppFile('fw/app_signed_0.0.0+15'),
+        }),
+    ],
+    needSerialport: true,
 };
 
 const mapState = () => ({
@@ -125,12 +178,17 @@ const mapState = () => ({
 const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
     onDeviceSelected: (device: Device) => {
         logger.info(`Selected device with s/n ${device.serialNumber}`);
-        dispatch(openDevice(device));
     },
     onDeviceDeselected: () => {
         logger.info('Deselected device');
         dispatch(closeDevice());
         dispatch(closeProfiling());
+    },
+    onDeviceIsReady: (device: Device) => {
+        logger.info(
+            `Device setup ready for device with s/n ${device.serialNumber}`
+        );
+        dispatch(openDevice(device));
     },
     onDeviceConnected: (device: Device) => {
         logger.info(`Device Connected SN:${device.serialNumber}`);
