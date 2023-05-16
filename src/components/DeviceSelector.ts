@@ -68,7 +68,9 @@ export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
                             timeout: 60000,
                             when: 'always',
                             once: true,
-                            onSuccess: resolve,
+                            onSuccess: dev => {
+                                device = dev;
+                            },
                             onFail: reject,
                         })
                     );
@@ -84,7 +86,7 @@ export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
                                 return;
                             }
 
-                            onProgress(100, 'Rebooting Device');
+                            resolve(device);
                         },
                         progress => {
                             onProgress(
