@@ -130,21 +130,26 @@ export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
                         }
                     )
                         .then(shellParser => {
-                            const npmDevice = getNpmDevice(shellParser, null);
-                            npmDevice
-                                .isSupportedVersion()
-                                .then(result => {
-                                    port.close().finally(() =>
-                                        resolve({
-                                            device,
-                                            validFirmware: result,
+                            getNpmDevice(shellParser, null)
+                                .then(npmDevice => {
+                                    npmDevice
+                                        .isSupportedVersion()
+                                        .then(result => {
+                                            port.close().finally(() =>
+                                                resolve({
+                                                    device,
+                                                    validFirmware: result,
+                                                })
+                                            );
                                         })
-                                    );
+                                        .catch(error =>
+                                            port
+                                                .close()
+                                                .finally(() => reject(error))
+                                        )
+                                        .finally();
                                 })
-                                .catch(error =>
-                                    port.close().finally(() => reject(error))
-                                )
-                                .finally();
+                                .catch(reject);
                         })
                         .catch(error => {
                             port.close();
