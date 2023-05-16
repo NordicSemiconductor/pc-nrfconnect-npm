@@ -144,13 +144,9 @@ export default () => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        dispatch(
-            setNpmDevice(
-                getNpmDevice(shellParser, pmicDialog =>
-                    dispatch(dialogHandler(pmicDialog))
-                )
-            )
-        );
+        getNpmDevice(shellParser, pmicDialog =>
+            dispatch(dialogHandler(pmicDialog))
+        ).then(dev => dispatch(setNpmDevice(dev)));
     }, [dispatch, shellParser]);
 
     useEffect(() => {
