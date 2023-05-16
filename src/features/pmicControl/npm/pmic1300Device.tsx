@@ -230,12 +230,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         emitOnChargingStatusUpdate(value);
     };
 
-    const startAdcSample = (samplingRate: number) => {
-        sendCommand(`npm_adc sample 1000 ${samplingRate}`);
+    const startAdcSample = (intervalMs: number, samplingRate: number) => {
+        sendCommand(`npm_adc sample ${samplingRate} ${intervalMs}`);
     };
 
     const stopAdcSample = () => {
-        startAdcSample(0);
+        sendCommand(`npm_adc sample 0`);
     };
 
     shellParser?.onShellLoggingEvent(logEvent => {
@@ -769,7 +769,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             } else {
                 sendCommand(
                     `npmx charger module charger set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
+                    () => {
+                        resolve();
+                        startAdcSample(2000, enabled ? 500 : 1000);
+                    },
                     () => {
                         requestUpdate.chargerEnabled(index);
                         reject();

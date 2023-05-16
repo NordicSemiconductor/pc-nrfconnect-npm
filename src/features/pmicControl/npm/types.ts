@@ -235,7 +235,7 @@ export type NpmDevice = {
         handler: (success: ProfileDownload, error?: string) => void
     ) => () => void;
 
-    startAdcSample: (intervalMs: number) => void;
+    startAdcSample: (intervalMs: number, profilingRateMs: number) => void;
     stopAdcSample: () => void;
 
     getChargerCurrentRange: (index: number) => RangeType;

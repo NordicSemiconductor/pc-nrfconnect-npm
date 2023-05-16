@@ -98,7 +98,7 @@ export default () => {
         });
 
         npmDevice.getBatteryProfiler()?.isProfiling();
-        npmDevice.startAdcSample(2000);
+        npmDevice.startAdcSample(2000, 1000);
         npmDevice.setBatteryStatusCheckEnabled(true);
     }, [dispatch, npmDevice]);
 

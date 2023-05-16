@@ -15,6 +15,11 @@ and this project adheres to
 -   LDO Mode Support
 -   PMIC1300 FP2 Support FW Version 0.0.0+17
 
+### Changed
+
+-   ADC Sampling rate is now set automatically to 500ms when charging and 1000ms
+    when not charging
+
 ## 0.0.17 - 2023-05-09
 
 ### Fixed
