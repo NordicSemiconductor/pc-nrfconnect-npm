@@ -20,6 +20,7 @@ and this project adheres to
 
 -   ADC Sampling rate is now set automatically to 500ms when charging and 1000ms
     when not charging
+-   Default/Active battery profile are now merged into one item
 
 ## 0.0.17 - 2023-05-09
 

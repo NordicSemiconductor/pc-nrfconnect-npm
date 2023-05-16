@@ -27,8 +27,8 @@ import {
     setBatteryConnected,
     setBucks,
     setChargers,
-    setDefaultBatterModels,
     setFuelGauge,
+    setHardcodedBatterModels,
     setLatestAdcSample,
     setLdos,
     setNpmDevice,
@@ -93,8 +93,8 @@ export default () => {
         npmDevice.requestUpdate.activeBatteryModel();
         npmDevice.requestUpdate.storedBatteryModel();
 
-        npmDevice.getDefaultBatteryModels().then(models => {
-            dispatch(setDefaultBatterModels(models));
+        npmDevice.getHardcodedBatteryModels().then(models => {
+            dispatch(setHardcodedBatterModels(models));
         });
 
         npmDevice.getBatteryProfiler()?.isProfiling();

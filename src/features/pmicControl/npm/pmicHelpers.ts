@@ -69,14 +69,23 @@ export const parseToBoolean = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10) === 1;
 
 export const parseBatteryModel = (message: string) => {
+    const slot = message.split(':')[1];
+    if (slot && slot.trim() === 'Empty') return null;
+    if (slot) {
+        message = slot;
+    }
+
     const valuePairs = message
         .trim()
         .replaceAll(/("|}),/g, ';')
         .split(';');
+
     const characterizations: BatteryModelCharacterization[] = [];
     let temperature: number[] = [];
     let capacity: number[] = [];
     let name = '';
+
+    if (valuePairs.length !== 3) return null;
 
     valuePairs.forEach(value => {
         const pair = value.split('=');

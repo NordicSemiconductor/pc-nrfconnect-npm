@@ -446,7 +446,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     );
 
     shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge model', true, undefined, '[A-Za-z0-9]+'),
+        toRegex('fuel_gauge model', true, undefined, '"[A-Za-z0-9]+"'),
         res => {
             eventEmitter.emit(
                 'onActiveBatteryModelUpdate',
@@ -468,16 +468,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     shellParser?.registerCommandCallback(
         toRegex('fuel_gauge model list'),
         res => {
-            const models = res.split('Battery model stored in database:');
+            const models = res.split('Battery models stored in database:');
             if (models.length < 2) {
                 eventEmitter.emit('onStoredBatteryModelUpdate', undefined);
                 return;
             }
-            const stringModels = models[1].trim().split('\r\n');
+            const stringModels = models[1].trim().split('\n');
             const list = stringModels.map(parseBatteryModel);
             eventEmitter.emit(
                 'onStoredBatteryModelUpdate',
-                list.length !== 0 ? list[0] : undefined
+                list.length !== 0 ? list : undefined
             );
         },
         noop
@@ -1193,7 +1193,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const applyDownloadFuelGaugeProfile = () =>
         new Promise<void>((resolve, reject) => {
             sendCommand(
-                `fuel_gauge model download apply`,
+                `fuel_gauge model download apply 0`,
                 () => {
                     resolve();
                 },
@@ -1217,15 +1217,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         new Promise<void>((resolve, reject) => {
             sendCommand(
                 `npm_chg_status_check set ${enabled ? '1' : '0'}`,
-                () => resolve(),
-                () => reject()
-            );
-        });
-
-    const storeBattery = () =>
-        new Promise<void>((resolve, reject) => {
-            sendCommand(
-                `fuel_gauge model store`,
                 () => resolve(),
                 () => reject()
             );
@@ -1413,9 +1404,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         downloadFuelGaugeProfile,
 
         setActiveBatteryModel,
-        storeBattery,
 
-        getDefaultBatteryModels: () =>
+        getHardcodedBatteryModels: () =>
             new Promise<BatteryModel[]>((resolve, reject) => {
                 shellParser?.enqueueRequest(
                     'fuel_gauge model list',
@@ -1425,7 +1415,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             if (models.length < 3) reject();
                             const stringModels = models[2].trim().split('\n');
                             const list = stringModels.map(parseBatteryModel);
-                            resolve(list.filter(item => item.name !== ''));
+                            resolve(
+                                list.filter(
+                                    item => item !== null
+                                ) as BatteryModel[]
+                            );
                         },
                         onError: reject,
                         onTimeout: error => {
