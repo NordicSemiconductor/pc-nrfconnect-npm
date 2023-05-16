@@ -35,12 +35,12 @@ import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
 import {
     canProfile,
     getActiveBatterModel,
-    getDefaultBatterModels,
     getDialog,
     getEventRecordingPath,
+    getHardcodedBatterModels,
     getLatestAdcSample,
     getNpmDevice,
-    getStoredBatterModel,
+    getStoredBatterModels,
     setEventRecordingPath,
 } from '../../features/pmicControl/pmicControlSlice';
 import { setProfilingStage } from '../../features/pmicControl/profilingSlice';
@@ -73,8 +73,8 @@ export default () => {
     const pmicConnection = npmDevice?.getConnectionState();
 
     const activeBatteryModel = useSelector(getActiveBatterModel);
-    const defaultBatterModels = useSelector(getDefaultBatterModels);
-    const storedBatterModel = useSelector(getStoredBatterModel);
+    const hardcodedBatterModels = useSelector(getHardcodedBatterModels);
+    const storedBatterModels = useSelector(getStoredBatterModels);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
     const uiDisabled = useIsUIDisabled();
@@ -91,16 +91,19 @@ export default () => {
         ) ?? undefined;
 
     const batteryModelItems: DropdownItem[] = useMemo(() => {
-        const items = [...defaultBatterModels];
+        const items = [...hardcodedBatterModels];
         if (activeBatteryModel) {
             if (
-                defaultBatterModels.filter(
-                    v => v.name !== activeBatteryModel.name
+                hardcodedBatterModels.filter(
+                    v => v && v.name !== activeBatteryModel.name
                 ).length > 0
             )
                 items.push(activeBatteryModel);
         }
-        if (storedBatterModel) items.push(storedBatterModel);
+
+        storedBatterModels?.forEach(storedBatterModel => {
+            if (storedBatterModel) items.push(storedBatterModel);
+        });
 
         const keys = new Set(items.map(item => item.name));
         return Array.from(keys).map(key => ({
@@ -114,9 +117,9 @@ export default () => {
         }));
     }, [
         activeBatteryModel,
-        defaultBatterModels,
+        hardcodedBatterModels,
         latestAdcSample?.tBat,
-        storedBatterModel,
+        storedBatterModels,
     ]);
 
     const selectedActiveItemBatteryMode = useMemo(
@@ -128,17 +131,6 @@ export default () => {
                 value: '',
             },
         [activeBatteryModel, batteryModelItems]
-    );
-
-    const selectedDefaultItemBatteryMode = useMemo(
-        () =>
-            batteryModelItems.find(
-                item => item.value === storedBatterModel?.name
-            ) ?? {
-                label: 'N/A',
-                value: '',
-            },
-        [storedBatterModel, batteryModelItems]
     );
 
     // init shell parser
@@ -251,18 +243,6 @@ export default () => {
                     disabled={
                         selectedActiveItemBatteryMode.value === '' || uiDisabled
                     }
-                />
-                <Dropdown
-                    label="Default Battery Model"
-                    items={batteryModelItems}
-                    onSelect={(item: DropdownItem) => {
-                        if (item.value) {
-                            npmDevice?.setActiveBatteryModel(item.value);
-                            npmDevice?.storeBattery();
-                        }
-                    }}
-                    selectedItem={selectedDefaultItemBatteryMode}
-                    disabled={batteryModelItems.length === 0 || uiDisabled}
                 />
                 <Button
                     variant="secondary"

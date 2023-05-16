@@ -36,8 +36,8 @@ interface pmicControlState {
     eventRecording: boolean;
     eventRecordingPath?: string;
     activeBatterModel?: BatteryModel;
-    defaultBatterModels: BatteryModel[];
-    storedBatterModel?: BatteryModel;
+    hardcodedBatterModels: BatteryModel[];
+    storedBatterModel?: (BatteryModel | null)[];
     usbPowered: boolean;
     profilingState: CCProfilingState;
 }
@@ -58,7 +58,7 @@ const initialState: pmicControlState = {
     pmicState: 'ek-disconnected',
     batteryConnected: false,
     fuelGauge: false,
-    defaultBatterModels: [],
+    hardcodedBatterModels: [],
     dialog: [],
     eventRecording: false,
     usbPowered: false,
@@ -129,12 +129,12 @@ const pmicControlSlice = createSlice({
         setActiveBatterModel(state, action: PayloadAction<BatteryModel>) {
             state.activeBatterModel = action.payload;
         },
-        setDefaultBatterModels(state, action: PayloadAction<BatteryModel[]>) {
-            state.defaultBatterModels = action.payload;
+        setHardcodedBatterModels(state, action: PayloadAction<BatteryModel[]>) {
+            state.hardcodedBatterModels = action.payload;
         },
         setStoredBatterModel(
             state,
-            action: PayloadAction<BatteryModel | undefined>
+            action: PayloadAction<(BatteryModel | null)[]>
         ) {
             state.storedBatterModel = action.payload;
         },
@@ -208,9 +208,9 @@ export const getFuelGauge = (state: RootState) =>
     state.app.pmicControl.fuelGauge;
 export const getActiveBatterModel = (state: RootState) =>
     state.app.pmicControl.activeBatterModel;
-export const getDefaultBatterModels = (state: RootState) =>
-    state.app.pmicControl.defaultBatterModels;
-export const getStoredBatterModel = (state: RootState) =>
+export const getHardcodedBatterModels = (state: RootState) =>
+    state.app.pmicControl.hardcodedBatterModels;
+export const getStoredBatterModels = (state: RootState) =>
     state.app.pmicControl.storedBatterModel;
 export const isUsbPowered = (state: RootState) =>
     state.app.pmicControl.usbPowered;
@@ -245,7 +245,7 @@ export const {
     setBatteryConnected,
     setFuelGauge,
     setActiveBatterModel,
-    setDefaultBatterModels,
+    setHardcodedBatterModels,
     setStoredBatterModel,
     setSupportedVersion,
     requestDialog,
