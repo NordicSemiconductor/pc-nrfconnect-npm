@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.0.18 - 2023-05-09
+## 0.0.18 - 2023-05-16
 
 ### Added
 
@@ -21,12 +21,13 @@ and this project adheres to
 -   ADC Sampling rate is now set automatically to 500ms when charging and 1000ms
     when not charging
 -   Default/Active battery profile are now merged into one item
-
-## 0.0.17 - 2023-05-09
+-   Profiling folder structure
+-   Stop recording between profiles
 
 ### Fixed
 
 -   Not able to click continue if battery is to low to be detected
+-   When profiling, charging was wrongly set to 2X battery capacity
 
 ## 0.0.17 - 2023-05-09
 
