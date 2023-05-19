@@ -828,7 +828,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     onConfirm: () => action().then(resolve).catch(reject),
                     onCancel: () => {
                         requestUpdate.buckVOutNormal(index);
-                        resolve();
+                        reject();
                     },
                     onOptional: () => action().then(resolve).catch(reject),
                 };
@@ -902,10 +902,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     cancelLabel: 'No',
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: () => {
-                        requestUpdate.buckVOutNormal(index);
-                        resolve();
-                    },
+                    onCancel: reject,
                     onOptional: () => action().then(resolve).catch(reject),
                 };
 
@@ -1020,7 +1017,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     cancelLabel: 'No',
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: resolve,
+                    onCancel: reject,
                     onOptional: () => action().then(resolve).catch(reject),
                 };
 
@@ -1111,7 +1108,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     cancelLabel: 'Cancel',
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: resolve,
+                    onCancel: reject,
                     onOptional: () => action().then(resolve).catch(reject),
                 };
 

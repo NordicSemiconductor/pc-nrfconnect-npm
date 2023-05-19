@@ -935,7 +935,10 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckVOutNormal(1, 1.7);
+                await expect(
+                    pmic.setBuckVOutNormal(1, 1.7)
+                ).rejects.toBeUndefined();
+
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // on cancel we should update ui
@@ -1068,17 +1071,11 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckMode(1, 'software');
-                expect(mockDialogHandler).toBeCalledTimes(1);
+                await expect(
+                    pmic.setBuckMode(1, 'software')
+                ).rejects.toBeUndefined();
 
-                // on cancel we should update ui
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck voltage normal get 1`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+                expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
@@ -1230,7 +1227,9 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckEnabled(1, false);
+                await expect(
+                    pmic.setBuckEnabled(1, false)
+                ).rejects.toBeUndefined();
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 // No need to request UI update
@@ -1435,7 +1434,9 @@ describe('PMIC 1300', () => {
                             dialog.onCancel();
                         }
                     );
-                    await pmic.setLdoMode(index, 'LDO');
+                    await expect(
+                        pmic.setLdoMode(index, 'LDO')
+                    ).rejects.toBeUndefined();
 
                     expect(mockEnqueueRequest).toBeCalledTimes(0);
                     expect(mockOnLdoUpdate).toBeCalledTimes(0);
