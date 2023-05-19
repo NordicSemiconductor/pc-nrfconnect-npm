@@ -1295,16 +1295,24 @@ describe('PMIC 1300', () => {
                 async index => {
                     await pmic.setLdoVoltage(index, 1);
 
-                    expect(mockEnqueueRequest).toBeCalledTimes(1);
-                    expect(mockEnqueueRequest).toBeCalledWith(
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx ldsw mode set ${index} 1`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
                         `npmx ldsw ldo_voltage set ${index} ${1000}`,
                         expect.anything(),
                         undefined,
                         true
                     );
 
-                    // Updates should only be emitted when we get response
-                    expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                    expect(mockOnLdoUpdate).toBeCalledTimes(1);
                 }
             );
 
@@ -2122,14 +2130,63 @@ describe('PMIC 1300', () => {
             );
 
             test.each(PMIC_1300_LDOS)(
-                'Set setLdoVoltage - Fail immediately - index: %p',
+                'Set setLdoVoltage onError case 1  - Fail immediately - index: %p',
                 async index => {
                     await expect(
                         pmic.setLdoVoltage(index, 3)
                     ).rejects.toBeUndefined();
 
-                    expect(mockEnqueueRequest).toBeCalledTimes(2);
-                    expect(mockEnqueueRequest).toBeCalledWith(
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx ldsw mode set ${index} 1`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx ldsw mode get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
+                        `npmx ldsw ldo_voltage get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    expect(mockOnLdoUpdate).toBeCalledTimes(1);
+                }
+            );
+
+            test.each(PMIC_1300_LDOS)(
+                'Set setLdoVoltage onError case 2  - Fail immediately - index: %p',
+                async index => {
+                    mockEnqueueRequest.mockImplementationOnce(
+                        helpers.registerCommandCallbackSuccess
+                    );
+
+                    await expect(
+                        pmic.setLdoVoltage(index, 3)
+                    ).rejects.toBeUndefined();
+
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx ldsw mode set ${index} 1`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
                         `npmx ldsw ldo_voltage set ${index} 3000`,
                         expect.anything(),
                         undefined,
@@ -2138,15 +2195,14 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        2,
+                        3,
                         `npmx ldsw ldo_voltage get ${index}`,
                         expect.anything(),
                         undefined,
                         true
                     );
 
-                    // Updates should only be emitted when we get response
-                    expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                    expect(mockOnLdoUpdate).toBeCalledTimes(1);
                 }
             );
 

@@ -1033,22 +1033,33 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const setLdoVoltage = (index: number, voltage: number) =>
         new Promise<void>((resolve, reject) => {
+            emitPartialEvent<Ldo>('onLdoUpdate', index, {
+                voltage,
+            });
+
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Ldo>('onLdoUpdate', index, {
-                    voltage,
-                });
                 resolve();
             } else {
-                sendCommand(
-                    `npmx ldsw ldo_voltage set ${index} ${voltage * 1000}`,
-                    () => resolve(),
-                    () => {
+                setLdoMode(index, 'LDO')
+                    .then(() => {
+                        sendCommand(
+                            `npmx ldsw ldo_voltage set ${index} ${
+                                voltage * 1000
+                            }`,
+                            () => resolve(),
+                            () => {
+                                requestUpdate.ldoVoltage(index);
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
                         requestUpdate.ldoVoltage(index);
                         reject();
-                    }
-                );
+                    });
             }
         });
+
     const setLdoEnabled = (index: number, enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
