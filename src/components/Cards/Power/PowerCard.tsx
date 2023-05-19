@@ -16,7 +16,6 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
-import { noop } from '../../../features/pmicControl/npm/pmicHelpers';
 import {
     Charger,
     ITerm,
@@ -195,7 +194,9 @@ export default ({
                     <Toggle
                         label="Enable Recharging"
                         isToggled={charger.enableRecharging}
-                        onToggle={noop}
+                        onToggle={value =>
+                            npmDevice.setChargerEnabledRecharging(index, value)
+                        }
                         disabled={disabled}
                     />
                     <Dropdown

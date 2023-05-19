@@ -27,8 +27,8 @@ import {
     setBatteryConnected,
     setBucks,
     setChargers,
-    setDefaultBatterModels,
     setFuelGauge,
+    setHardcodedBatterModels,
     setLatestAdcSample,
     setLdos,
     setNpmDevice,
@@ -93,12 +93,12 @@ export default () => {
         npmDevice.requestUpdate.activeBatteryModel();
         npmDevice.requestUpdate.storedBatteryModel();
 
-        npmDevice.getDefaultBatteryModels().then(models => {
-            dispatch(setDefaultBatterModels(models));
+        npmDevice.getHardcodedBatteryModels().then(models => {
+            dispatch(setHardcodedBatterModels(models));
         });
 
         npmDevice.getBatteryProfiler()?.isProfiling();
-        npmDevice.startAdcSample(2000);
+        npmDevice.startAdcSample(2000, 1000);
         npmDevice.setBatteryStatusCheckEnabled(true);
     }, [dispatch, npmDevice]);
 
@@ -144,13 +144,9 @@ export default () => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        dispatch(
-            setNpmDevice(
-                getNpmDevice(shellParser, pmicDialog =>
-                    dispatch(dialogHandler(pmicDialog))
-                )
-            )
-        );
+        getNpmDevice(shellParser, pmicDialog =>
+            dispatch(dialogHandler(pmicDialog))
+        ).then(dev => dispatch(setNpmDevice(dev)));
     }, [dispatch, shellParser]);
 
     useEffect(() => {

@@ -214,7 +214,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         },
 
         onStoredBatteryModelUpdate: (
-            handler: (payload: BatteryModel | undefined) => void
+            handler: (payload: (BatteryModel | null)[]) => void
         ) => {
             eventEmitter.on('onStoredBatteryModelUpdate', handler);
             return () => {

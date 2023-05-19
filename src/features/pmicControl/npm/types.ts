@@ -194,7 +194,7 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     onStoredBatteryModelUpdate: (
-        handler: (payload: BatteryModel | undefined) => void
+        handler: (payload: (BatteryModel | null)[]) => void
     ) => () => void;
 
     onLoggingEvent: (
@@ -235,7 +235,7 @@ export type NpmDevice = {
         handler: (success: ProfileDownload, error?: string) => void
     ) => () => void;
 
-    startAdcSample: (intervalMs: number) => void;
+    startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
 
     getChargerCurrentRange: (index: number) => RangeType;
@@ -308,9 +308,8 @@ export type NpmDevice = {
     downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
     abortDownloadFuelGaugeProfile: () => Promise<void>;
     applyDownloadFuelGaugeProfile: () => Promise<void>;
-    getDefaultBatteryModels: () => Promise<BatteryModel[]>;
+    getHardcodedBatteryModels: () => Promise<BatteryModel[]>;
     setActiveBatteryModel: (name: string) => Promise<void>;
-    storeBattery: () => Promise<void>;
 
     setBatteryStatusCheckEnabled: (enabled: boolean) => void;
 

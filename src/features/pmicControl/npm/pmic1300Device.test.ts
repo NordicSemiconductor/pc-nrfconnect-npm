@@ -361,12 +361,18 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_CHARGERS)(
+            test.each(PMIC_1300_CHARGERS)(
                 'Request update chargerEnabledRecharging index: %p',
                 index => {
                     pmic.requestUpdate.chargerEnabledRecharging(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        'npmx charger module recharge get',
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -469,12 +475,18 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(PMIC_1300_LDOS)(
                 'Request update ldoVoltage index: %p',
                 index => {
                     pmic.requestUpdate.ldoVoltage(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw ldo_voltage get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -493,12 +505,18 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(PMIC_1300_LDOS)(
                 'Request update ldoMode index: %p',
                 index => {
                     pmic.requestUpdate.ldoMode(index);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw mode get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -538,7 +556,7 @@ describe('PMIC 1300', () => {
                 );
             });
 
-            test('Request getDefaultBatteryModels success', async () => {
+            test('Request getHardcodedBatteryModels success', async () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         _command: string,
@@ -551,11 +569,13 @@ describe('PMIC 1300', () => {
                         callbacks?.onSuccess(
                             `Currently active battery model:
                             name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
-                    Default battery models:
+                    Hardcoded battery models:
                             name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
                             name="LP502540",T={25.00 C},Q={563.08 mAh}
-                    Battery model stored in database:
-                            name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}`,
+                    Battery models stored in database:
+                            Slot 0: Empty
+                            Slot 1: Empty
+                            Slot 2: Empty`,
                             'fuel_gauge model list'
                         );
                         return Promise.resolve();
@@ -563,7 +583,7 @@ describe('PMIC 1300', () => {
                 );
 
                 await expect(
-                    pmic.getDefaultBatteryModels()
+                    pmic.getHardcodedBatteryModels()
                 ).resolves.toStrictEqual([
                     {
                         name: 'LP803448',
@@ -603,7 +623,7 @@ describe('PMIC 1300', () => {
             });
 
             test('Request startAdcSample', () => {
-                pmic.startAdcSample(2000);
+                pmic.startAdcSample(2000, 1000);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -619,7 +639,7 @@ describe('PMIC 1300', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    'npm_adc sample 1000 0',
+                    'npm_adc sample 0',
                     expect.anything(),
                     undefined,
                     true
@@ -662,7 +682,7 @@ describe('PMIC 1300', () => {
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        callbacks?.onSuccess('app_version=0.0.0+16', command);
+                        callbacks?.onSuccess('app_version=0.0.0+17', command);
                         return Promise.resolve();
                     }
                 );
@@ -725,7 +745,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -735,6 +755,13 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
+                        `npm_adc sample 1000 2000`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
                         `npmx charger termination_voltage normal set 3200`,
                         expect.anything(),
                         undefined,
@@ -755,7 +782,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -765,6 +792,13 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
+                        `npm_adc sample 1000 2000`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
                         `npmx charger charger_current set 32`,
                         expect.anything(),
                         undefined,
@@ -801,7 +835,7 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(
+            test.each(
                 PMIC_1300_CHARGERS.map(index => [
                     {
                         index,
@@ -817,13 +851,18 @@ describe('PMIC 1300', () => {
                 async ({ index, enabled }) => {
                     await pmic.setChargerEnabledRecharging(index, enabled);
 
-                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                    expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { enableRecharging: enabled },
-                        index,
-                    });
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx charger module recharge set ${
+                            enabled ? '1' : '0'
+                        }`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Updates should only be emitted when we get response
+                    expect(mockOnChargerUpdate).toBeCalledTimes(0);
                 }
             );
 
@@ -841,9 +880,17 @@ describe('PMIC 1300', () => {
             )('Set setChargerEnabled %p', async ({ index, enabled }) => {
                 await pmic.setChargerEnabled(index, enabled);
 
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
                     `npmx charger module charger set ${enabled ? '1' : '0'}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npm_adc sample ${enabled ? '500' : '1000'} 2000`,
                     expect.anything(),
                     undefined,
                     true
@@ -1243,12 +1290,18 @@ describe('PMIC 1300', () => {
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
             });
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(PMIC_1300_LDOS)(
                 'Set setLdoVoltage index: %p',
                 async index => {
-                    await pmic.setLdoVoltage(index, 3);
+                    await pmic.setLdoVoltage(index, 1);
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw ldo_voltage set ${index} ${1000}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
                     // Updates should only be emitted when we get response
                     expect(mockOnLdoUpdate).toBeCalledTimes(0);
@@ -1281,14 +1334,31 @@ describe('PMIC 1300', () => {
                 expect(mockOnLdoUpdate).toBeCalledTimes(0);
             });
 
-            test.skip.each(PMIC_1300_LDOS)(
-                'Set setLdoMode index: %p',
-                async index => {
-                    await pmic.setLdoMode(index, 'LDO');
+            test.each(
+                PMIC_1300_LDOS.map(index => [
+                    {
+                        index,
+                        mode: 0,
+                    },
+                    {
+                        index,
+                        mode: 1,
+                    },
+                ]).flat()
+            )('Set setLdoMode index: %p', async ({ index, mode }) => {
+                await pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO');
 
-                    // TODO
-                }
-            );
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx ldsw mode set ${index} ${mode}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            });
 
             test.each([true, false])(
                 'Set setFuelGaugeEnabled enabled: %p',
@@ -1313,7 +1383,7 @@ describe('PMIC 1300', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `fuel_gauge model set someProfileName`,
+                    `fuel_gauge model set "someProfileName"`,
                     expect.anything(),
                     undefined,
                     true
@@ -1337,21 +1407,6 @@ describe('PMIC 1300', () => {
                     );
                 }
             );
-
-            test('storeBattery', async () => {
-                await pmic.storeBattery();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    'fuel_gauge model store',
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnActiveBatteryModelUpdate).toBeCalledTimes(0);
-            });
         });
 
         describe('Setters and effects state - error', () => {
@@ -1420,7 +1475,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).toBeCalledTimes(4);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -1430,6 +1485,13 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
+                        `npm_adc sample 1000 2000`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
                         `npmx charger termination_voltage normal set 3200`,
                         expect.anything(),
                         undefined,
@@ -1438,7 +1500,7 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        3,
+                        4,
                         `npmx charger termination_voltage normal get`,
                         expect.anything(),
                         undefined,
@@ -1505,7 +1567,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).toBeCalledTimes(4);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -1515,6 +1577,13 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
+                        `npm_adc sample 1000 2000`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
                         `npmx charger charger_current set 32`,
                         expect.anything(),
                         undefined,
@@ -1523,7 +1592,7 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        3,
+                        4,
                         `npmx charger charger_current get`,
                         expect.anything(),
                         undefined,
@@ -1589,7 +1658,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).toBeCalledTimes(4);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -1599,6 +1668,13 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
+                        `npm_adc sample 1000 2000`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
                         `npmx charger trickle set 2500`,
                         expect.anything(),
                         undefined,
@@ -1607,7 +1683,7 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        3,
+                        4,
                         `npmx charger trickle get`,
                         expect.anything(),
                         undefined,
@@ -1673,7 +1749,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).toBeCalledTimes(4);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -1683,6 +1759,13 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
+                        `npm_adc sample 1000 2000`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
                         `npmx charger termination_current set 10`,
                         expect.anything(),
                         undefined,
@@ -1691,7 +1774,7 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        3,
+                        4,
                         `npmx charger termination_current get`,
                         expect.anything(),
                         undefined,
@@ -1700,7 +1783,7 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(
+            test.each(
                 PMIC_1300_CHARGERS.map(index => [
                     {
                         index,
@@ -1714,15 +1797,30 @@ describe('PMIC 1300', () => {
             )(
                 'Set setChargerEnabledRecharging - Fail immediately -  %p',
                 async ({ index, enabled }) => {
-                    await pmic.setChargerEnabledRecharging(index, enabled);
+                    await expect(
+                        pmic.setChargerEnabledRecharging(index, enabled)
+                    ).rejects.toBeUndefined();
 
-                    expect(mockOnChargerUpdate).toBeCalledTimes(1);
-                    expect(mockOnChargerUpdate).toBeCalledWith({
-                        data: { enableRecharging: enabled },
-                        index,
-                    });
+                    // turn off recharge
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx charger module recharge set ${
+                            enabled ? '1' : '0'
+                        }`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                    // TODO
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx charger module recharge get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
                 }
             );
 
@@ -2023,14 +2121,29 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(PMIC_1300_LDOS)(
                 'Set setLdoVoltage - Fail immediately - index: %p',
                 async index => {
                     await expect(
                         pmic.setLdoVoltage(index, 3)
                     ).rejects.toBeUndefined();
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw ldo_voltage set ${index} 3000`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx ldsw ldo_voltage get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
                     // Updates should only be emitted when we get response
                     expect(mockOnLdoUpdate).toBeCalledTimes(0);
@@ -2077,14 +2190,43 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_LDOS)(
+            test.each(
+                PMIC_1300_LDOS.map(index => [
+                    {
+                        index,
+                        mode: 0,
+                    },
+                    {
+                        index,
+                        mode: 1,
+                    },
+                ]).flat()
+            )(
                 'Set setLdoMode - Fail immediately - index: %p',
-                async index => {
+                async ({ index, mode }) => {
                     await expect(
-                        pmic.setLdoMode(index, 'LDO')
+                        pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO')
                     ).rejects.toBeUndefined();
 
-                    // TODO
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw mode set ${index} ${mode}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx ldsw mode get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Updates should only be emitted when we get response
+                    expect(mockOnLdoUpdate).toBeCalledTimes(0);
                 }
             );
 
@@ -2124,7 +2266,7 @@ describe('PMIC 1300', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `fuel_gauge model set someProfileName`,
+                    `fuel_gauge model set "someProfileName"`,
                     expect.anything(),
                     undefined,
                     true
@@ -2593,7 +2735,7 @@ describe('PMIC 1300', () => {
                     },
                 ],
                 fuelGauge: true,
-                firmwareVersion: '0.0.0+16',
+                firmwareVersion: '0.0.0+17',
                 deviceType: 'npm1300',
             });
             verifyApplyConfig();
@@ -3014,7 +3156,7 @@ describe('PMIC 1300', () => {
             expect(mockOnFuelGaugeUpdate).toBeCalledWith(enabled);
         });
 
-        test.each(['get', 'set LP803448'])('fuel_gauge model %p', append => {
+        test.each(['get', 'set "LP803448"'])('fuel_gauge model %p', append => {
             const command = `fuel_gauge model ${append}`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
@@ -3078,36 +3220,42 @@ describe('PMIC 1300', () => {
 
             const response = `Currently active battery model:
             name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
-    Default battery models:
+    Hardcoded battery models:
             name="LP302535",T={5.00 C,25.00 C,45.00 C},Q={273.95 mAh,272.80 mAh,269.23 mAh}
             name="LP353035",T={5.00 C,25.00 C,45.00 C},Q={406.15 mAh,422.98 mAh,420.56 mAh}
             name="LP301226",T={5.00 C,25.00 C,45.00 C},Q={68.99 mAh,70.43 mAh,65.50 mAh}
             name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
             name="LP502540",T={25.00 C},Q={563.08 mAh}
             name="LP503030",T={25.00 C},Q={495.98 mAh}
-    Battery model stored in database:
-            name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}`;
+    Battery models stored in database:
+            Slot 0: Empty
+            Slot 1: name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
+            Slot 2: Empty`;
 
             callback?.onSuccess(response, command);
 
             expect(mockOnStoredBatteryModelUpdate).toBeCalledTimes(1);
-            expect(mockOnStoredBatteryModelUpdate).toBeCalledWith({
-                name: 'LP803448',
-                characterizations: [
-                    {
-                        temperature: 45,
-                        capacity: 1500.11,
-                    },
-                    {
-                        temperature: 25,
-                        capacity: 1518.28,
-                    },
-                    {
-                        temperature: 5,
-                        capacity: 1413.4,
-                    },
-                ],
-            } as BatteryModel);
+            expect(mockOnStoredBatteryModelUpdate).toBeCalledWith([
+                null,
+                {
+                    name: 'LP803448',
+                    characterizations: [
+                        {
+                            temperature: 45,
+                            capacity: 1500.11,
+                        },
+                        {
+                            temperature: 25,
+                            capacity: 1518.28,
+                        },
+                        {
+                            temperature: 5,
+                            capacity: 1413.4,
+                        },
+                    ],
+                },
+                null,
+            ] as (BatteryModel | null)[]);
         });
 
         test('fuel_gauge model list no stored battery', () => {
@@ -3117,17 +3265,25 @@ describe('PMIC 1300', () => {
 
             const response = `Currently active battery model:
                 name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
-        Default battery models:
+            Hardcoded battery models:
                 name="LP302535",T={5.00 C,25.00 C,45.00 C},Q={273.95 mAh,272.80 mAh,269.23 mAh}
                 name="LP353035",T={5.00 C,25.00 C,45.00 C},Q={406.15 mAh,422.98 mAh,420.56 mAh}
                 name="LP301226",T={5.00 C,25.00 C,45.00 C},Q={68.99 mAh,70.43 mAh,65.50 mAh}
                 name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
                 name="LP502540",T={25.00 C},Q={563.08 mAh}
-                name="LP503030",T={25.00 C},Q={495.98 mAh}`;
+                name="LP503030",T={25.00 C},Q={495.98 mAh}
+            Battery models stored in database:
+                Slot 0: Empty
+                Slot 1: Empty
+                Slot 2: Empty`;
             callback?.onSuccess(response, command);
 
             expect(mockOnStoredBatteryModelUpdate).toBeCalledTimes(1);
-            expect(mockOnStoredBatteryModelUpdate).toBeCalledWith(undefined);
+            expect(mockOnStoredBatteryModelUpdate).toBeCalledWith([
+                null,
+                null,
+                null,
+            ]);
         });
 
         test.each([true, false])('npmx vbusin vbus status get %p', value => {

@@ -76,7 +76,7 @@ export default ({
             }
         >
             <StateSelector
-                disabled
+                disabled={disabled}
                 items={modeItems}
                 onSelect={i => onModeChange(i === 0 ? 'LDO' : 'ldoSwitch')}
                 selectedItem={
@@ -104,7 +104,7 @@ export default ({
 
                     <div className="flex-row">
                         <NumberInlineInput
-                            disabled
+                            disabled={disabled}
                             value={internalVLdo}
                             range={range}
                             onChange={value => setInternalVLdo(value)}
@@ -116,7 +116,7 @@ export default ({
                     </div>
                 </FormLabel>
                 <Slider
-                    disabled
+                    disabled={disabled}
                     values={[internalVLdo]}
                     onChange={[value => setInternalVLdo(value)]}
                     onChangeComplete={() => onVoltageChange(internalVLdo)}
