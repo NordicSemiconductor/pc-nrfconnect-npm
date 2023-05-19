@@ -1293,6 +1293,12 @@ describe('PMIC 1300', () => {
             test.each(PMIC_1300_LDOS)(
                 'Set setLdoVoltage index: %p',
                 async index => {
+                    mockDialogHandler.mockImplementationOnce(
+                        (dialog: PmicDialog) => {
+                            dialog.onConfirm();
+                        }
+                    );
+
                     await pmic.setLdoVoltage(index, 1);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1354,6 +1360,13 @@ describe('PMIC 1300', () => {
                     },
                 ]).flat()
             )('Set setLdoMode index: %p', async ({ index, mode }) => {
+                if (mode === 1)
+                    mockDialogHandler.mockImplementationOnce(
+                        (dialog: PmicDialog) => {
+                            dialog.onConfirm();
+                        }
+                    );
+
                 await pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -1367,6 +1380,67 @@ describe('PMIC 1300', () => {
                 // Updates should only be emitted when we get response
                 expect(mockOnLdoUpdate).toBeCalledTimes(0);
             });
+
+            test.each(PMIC_1300_LDOS)(
+                'Set setLdoMode index: %p - confirm',
+                async index => {
+                    mockDialogHandler.mockImplementationOnce(
+                        (dialog: PmicDialog) => {
+                            dialog.onConfirm();
+                        }
+                    );
+                    await pmic.setLdoMode(index, 'LDO');
+
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw mode set ${index} 1`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Updates should only be emitted when we get response
+                    expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                }
+            );
+
+            test.each(PMIC_1300_LDOS)(
+                "Set setLdoMode index: %p - Yes, Don' ask again",
+                async index => {
+                    mockDialogHandler.mockImplementationOnce(
+                        (dialog: PmicDialog) => {
+                            if (dialog.onOptional) dialog.onOptional();
+                        }
+                    );
+                    await pmic.setLdoMode(index, 'LDO');
+
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx ldsw mode set ${index} 1`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Updates should only be emitted when we get response
+                    expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                }
+            );
+
+            test.each(PMIC_1300_LDOS)(
+                'Set setLdoMode index: %p - Cancel',
+                async index => {
+                    mockDialogHandler.mockImplementationOnce(
+                        (dialog: PmicDialog) => {
+                            dialog.onCancel();
+                        }
+                    );
+                    await pmic.setLdoMode(index, 'LDO');
+
+                    expect(mockEnqueueRequest).toBeCalledTimes(0);
+                    expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                }
+            );
 
             test.each([true, false])(
                 'Set setFuelGaugeEnabled enabled: %p',
@@ -2132,6 +2206,12 @@ describe('PMIC 1300', () => {
             test.each(PMIC_1300_LDOS)(
                 'Set setLdoVoltage onError case 1  - Fail immediately - index: %p',
                 async index => {
+                    mockDialogHandler.mockImplementationOnce(
+                        (dialog: PmicDialog) => {
+                            dialog.onConfirm();
+                        }
+                    );
+
                     await expect(
                         pmic.setLdoVoltage(index, 3)
                     ).rejects.toBeUndefined();
@@ -2168,6 +2248,12 @@ describe('PMIC 1300', () => {
             test.each(PMIC_1300_LDOS)(
                 'Set setLdoVoltage onError case 2  - Fail immediately - index: %p',
                 async index => {
+                    mockDialogHandler.mockImplementationOnce(
+                        (dialog: PmicDialog) => {
+                            dialog.onConfirm();
+                        }
+                    );
+
                     mockEnqueueRequest.mockImplementationOnce(
                         helpers.registerCommandCallbackSuccess
                     );
@@ -2260,6 +2346,12 @@ describe('PMIC 1300', () => {
             )(
                 'Set setLdoMode - Fail immediately - index: %p',
                 async ({ index, mode }) => {
+                    mockDialogHandler.mockImplementationOnce(
+                        (dialog: PmicDialog) => {
+                            dialog.onConfirm();
+                        }
+                    );
+
                     await expect(
                         pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO')
                     ).rejects.toBeUndefined();
@@ -2346,6 +2438,7 @@ describe('PMIC 1300', () => {
     // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell
     describe('Setters and effects ek_disconnected', () => {
         const {
+            mockDialogHandler,
             mockOnChargerUpdate,
             mockOnBuckUpdate,
             mockOnFuelGaugeUpdate,
@@ -2524,6 +2617,12 @@ describe('PMIC 1300', () => {
         test.each(PMIC_1300_LDOS)(
             'Set setLdoVoltage index: %p',
             async index => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
                 await pmic.setLdoVoltage(index, 1.2);
 
                 expect(mockOnLdoUpdate).toBeCalledTimes(1);
@@ -2546,16 +2645,6 @@ describe('PMIC 1300', () => {
                 });
             }
         );
-
-        test.each(PMIC_1300_LDOS)('Set setLdoMode index: %p', async index => {
-            await pmic.setLdoMode(index, 'LDO');
-
-            expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { mode: 'LDO' },
-                index,
-            });
-        });
 
         test('Set setFuelGaugeEnabled', async () => {
             await pmic.setFuelGaugeEnabled(false);

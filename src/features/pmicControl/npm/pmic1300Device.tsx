@@ -1078,26 +1078,49 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 );
             }
         });
-    const setLdoMode = (index: number, mode: LdoMode) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Ldo>('onLdoUpdate', index, {
-                    mode,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx ldsw mode set ${index} ${
-                        mode === 'ldoSwitch' ? '0' : '1'
-                    }`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.ldoMode(index);
-                        reject();
-                    }
-                );
-            }
-        });
+    const setLdoMode = (index: number, mode: LdoMode) => {
+        const action = () =>
+            new Promise<void>((resolve, reject) => {
+                if (pmicState === 'ek-disconnected') {
+                    emitPartialEvent<Ldo>('onLdoUpdate', index, {
+                        mode,
+                    });
+                    resolve();
+                } else {
+                    sendCommand(
+                        `npmx ldsw mode set ${index} ${
+                            mode === 'ldoSwitch' ? '0' : '1'
+                        }`,
+                        () => resolve(),
+                        () => {
+                            requestUpdate.ldoMode(index);
+                            reject();
+                        }
+                    );
+                }
+            });
+
+        if (pmicState !== 'ek-disconnected' && mode === 'LDO') {
+            return new Promise<void>((resolve, reject) => {
+                const warningDialog: PmicDialog = {
+                    type: 'alert',
+                    doNotAskAgainStoreID: `pmic1300-setLdoMode-all`,
+                    message: `Please make sure to connect the LDO bypass capacitors by connecting a jumper on P16`,
+                    confirmLabel: 'Ok',
+                    optionalLabel: "Ok, Don't ask again",
+                    cancelLabel: 'Cancel',
+                    title: 'Warning',
+                    onConfirm: () => action().then(resolve).catch(reject),
+                    onCancel: resolve,
+                    onOptional: () => action().then(resolve).catch(reject),
+                };
+
+                dialogHandler(warningDialog);
+            });
+        }
+
+        return action();
+    };
 
     const setFuelGaugeEnabled = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {

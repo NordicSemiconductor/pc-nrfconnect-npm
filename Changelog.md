@@ -11,6 +11,8 @@ and this project adheres to
 ### Added
 
 -   Changing LDO Vout automatically changed the mode to LDO
+-   Dialog when changing to LDO mode prompting user to confirm adding jumper on
+    EK
 
 ## 0.0.19 - 2023-05-16
 
