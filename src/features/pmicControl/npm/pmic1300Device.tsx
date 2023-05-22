@@ -446,7 +446,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     );
 
     shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge model', true, undefined, '"[A-Za-z0-9]+"'),
+        toRegex('fuel_gauge model', true, undefined, '"[A-Za-z0-9\\s]+"'),
         res => {
             eventEmitter.emit(
                 'onActiveBatteryModelUpdate',
