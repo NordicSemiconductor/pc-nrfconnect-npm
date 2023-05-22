@@ -15,7 +15,7 @@ import {
     Group,
 } from 'pc-nrfconnect-shared';
 
-import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
+import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
     getCapacityConsumed,
@@ -25,8 +25,13 @@ import {
     getProfileStartTime,
     nextProfile,
     restartProfile,
-} from '../../features/pmicControl/profilingSlice';
-import { PROFILE_FOLDER_PREFIX } from './helpers';
+} from '../../../features/pmicControl/profilingSlice';
+import {
+    loadProjectSettings,
+    PROFILE_FOLDER_PREFIX,
+    reloadRecentProjects,
+    saveProjectSettings,
+} from '../helpers';
 import { ElapsedTime } from './TimeComponent';
 
 const FinishButton = ({
@@ -81,6 +86,16 @@ const RestartProfileButton = ({
 
                 if (existsSync(baseDirector)) {
                     rmSync(baseDirector, { recursive: true, force: true });
+                }
+
+                const profileSettings = loadProjectSettings(
+                    profile.baseDirector
+                );
+
+                if (profileSettings) {
+                    profileSettings?.profiles.splice(index, 1);
+                    saveProjectSettings(baseDirector, profileSettings);
+                    dispatch(reloadRecentProjects());
                 }
 
                 mkdirSync(baseDirector, { recursive: true });

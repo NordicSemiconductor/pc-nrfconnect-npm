@@ -55,7 +55,7 @@ import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
 } from '../../hooks/commandParser';
-import ProfilingWizard from '../Profiling/ProfilingWizard';
+import ProfilingWizard from '../Profiling/Dialog/ProfilingWizard';
 import ConnectionStatus from './ConnectionStatus';
 
 export default () => {

@@ -7,7 +7,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../appReducer';
-import { CCProfile, CCProfilingState } from './npm/types';
+import { CCProfilingState, Profile, ProfilingProject } from './npm/types';
 
 type ProfileStage =
     | 'Configuration'
@@ -15,17 +15,6 @@ type ProfileStage =
     | 'Charging'
     | 'Resting'
     | 'Profiling';
-
-interface Profile {
-    name: string;
-    vLowerCutOff: number;
-    vUpperCutOff: number;
-    capacity: number;
-    temperatures: number[];
-    baseDirector: string;
-    restingProfiles: CCProfile[];
-    profilingProfiles: CCProfile[];
-}
 
 interface ProfileComplete {
     message: string;
@@ -40,6 +29,10 @@ interface profilingState {
     capacityConsumed: number;
     completeStep?: ProfileComplete;
     ccProfilingState: CCProfilingState;
+    profilingProjects: {
+        path: string;
+        settings: ProfilingProject | undefined;
+    }[];
 }
 
 const initialState: profilingState = {
@@ -57,6 +50,7 @@ const initialState: profilingState = {
     },
     capacityConsumed: 0,
     ccProfilingState: 'Off',
+    profilingProjects: [],
 };
 
 const profilingSlice = createSlice({
@@ -77,6 +71,17 @@ const profilingSlice = createSlice({
         },
         setProfile(state, action: PayloadAction<Profile>) {
             state.profile = action.payload;
+        },
+        setProfilingProjects(
+            state,
+            action: PayloadAction<
+                {
+                    path: string;
+                    settings: ProfilingProject | undefined;
+                }[]
+            >
+        ) {
+            state.profilingProjects = action.payload;
         },
         nextProfile(state) {
             state.completeStep = undefined;
@@ -105,6 +110,8 @@ const profilingSlice = createSlice({
 export const getProfilingStage = (state: RootState) =>
     state.app.profiling.completeStep ? 'Complete' : state.app.profiling.stage;
 export const getProfile = (state: RootState) => state.app.profiling.profile;
+export const getProfileProjects = (state: RootState) =>
+    state.app.profiling.profilingProjects;
 export const getProfileIndex = (state: RootState) => state.app.profiling.index;
 export const getProfileStartTime = (state: RootState) =>
     state.app.profiling.startTime;
@@ -119,6 +126,7 @@ export const {
     closeProfiling,
     setProfilingStage,
     setCompleteStep,
+    setProfilingProjects,
     setProfile,
     nextProfile,
     restartProfile,

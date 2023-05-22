@@ -364,6 +364,32 @@ export interface CCProfile {
     vCutoff?: number;
 }
 
+export interface Profile {
+    name: string;
+    vLowerCutOff: number;
+    vUpperCutOff: number;
+    capacity: number;
+    temperatures: number[];
+    baseDirector: string;
+    restingProfiles: CCProfile[];
+    profilingProfiles: CCProfile[];
+}
+
+export interface ProfilingProjectProfile {
+    vLowerCutOff: number;
+    vUpperCutOff: number;
+    temperature: number;
+    csvPath?: string;
+    csvReady: boolean;
+    paramsJson?: string;
+    exclude?: boolean;
+}
+export interface ProfilingProject {
+    name: string;
+    capacity: number;
+    profiles: ProfilingProjectProfile[];
+}
+
 export interface IBatteryProfiler {
     (shellParser: ShellParser, eventEmitter: EventEmitter): BatteryProfiler;
 }

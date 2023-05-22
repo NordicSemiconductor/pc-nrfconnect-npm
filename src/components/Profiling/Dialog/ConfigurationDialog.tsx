@@ -16,14 +16,23 @@ import {
     Slider,
 } from 'pc-nrfconnect-shared';
 
-import { selectDirectoryDialog } from '../../actions/fileActions';
-import { CCProfile } from '../../features/pmicControl/npm/types';
+import { selectDirectoryDialog } from '../../../actions/fileActions';
+import {
+    CCProfile,
+    Profile,
+    ProfilingProject,
+} from '../../../features/pmicControl/npm/types';
 import {
     closeProfiling,
     setProfile,
     setProfilingStage,
-} from '../../features/pmicControl/profilingSlice';
-import { REST_DURATION } from './helpers';
+} from '../../../features/pmicControl/profilingSlice';
+import {
+    loadRecentProject,
+    REST_DURATION,
+    saveProjectSettings,
+    updateRecentProjects,
+} from '../helpers';
 
 import './profiling.scss';
 
@@ -49,7 +58,7 @@ export default () => {
                         variant="primary"
                         disabled={name.length === 0}
                         onClick={() => {
-                            selectDirectoryDialog().then(filePath => {
+                            selectDirectoryDialog().then(dirPath => {
                                 const restingProfiles: CCProfile[] = [
                                     {
                                         tLoad: 500,
@@ -89,19 +98,45 @@ export default () => {
                                     },
                                 ];
 
-                                dispatch(
-                                    setProfile({
-                                        name,
-                                        vLowerCutOff,
-                                        vUpperCutOff,
-                                        capacity,
-                                        temperatures,
-                                        baseDirector: filePath,
-                                        restingProfiles,
-                                        profilingProfiles,
-                                    })
-                                );
+                                const profile: Profile = {
+                                    name,
+                                    vLowerCutOff,
+                                    vUpperCutOff,
+                                    capacity,
+                                    temperatures,
+                                    baseDirector: dirPath,
+                                    restingProfiles,
+                                    profilingProfiles,
+                                };
+
+                                const project: ProfilingProject = {
+                                    name,
+                                    capacity,
+                                    profiles: profile.temperatures.map(
+                                        temperature => ({
+                                            vLowerCutOff,
+                                            vUpperCutOff,
+                                            temperature,
+                                            csvReady: false,
+                                        })
+                                    ),
+                                };
+
+                                dispatch(setProfile(profile));
                                 dispatch(setProfilingStage('Checklist'));
+
+                                const profileSettingsPath = saveProjectSettings(
+                                    `${dirPath}/${profile.name}`,
+                                    project
+                                );
+
+                                const existingProjects = loadRecentProject();
+                                dispatch(
+                                    updateRecentProjects([
+                                        ...existingProjects,
+                                        profileSettingsPath,
+                                    ])
+                                );
                             });
                         }}
                     >

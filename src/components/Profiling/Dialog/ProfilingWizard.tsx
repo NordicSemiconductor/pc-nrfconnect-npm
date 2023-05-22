@@ -16,7 +16,7 @@ import {
     isBatteryConnected,
     isUsbPowered,
     setEventRecordingPath,
-} from '../../features/pmicControl/pmicControlSlice';
+} from '../../../features/pmicControl/pmicControlSlice';
 import {
     getCcProfilingState,
     getProfile,
@@ -25,12 +25,18 @@ import {
     incrementCapacityConsumed,
     setCompleteStep,
     setProfilingStage,
-} from '../../features/pmicControl/profilingSlice';
+} from '../../../features/pmicControl/profilingSlice';
+import {
+    loadProjectSettings,
+    PROFILE_FOLDER_PREFIX,
+    reloadRecentProjects,
+    REPORTING_RATE,
+    saveProjectSettings,
+} from '../helpers';
 import ChargingDialog from './ChargingDialog';
 import ChecklistDialog from './ChecklistDialog';
 import CompleteDialog from './CompleteDialog';
 import ConfigurationDialog from './ConfigurationDialog';
-import { PROFILE_FOLDER_PREFIX, REPORTING_RATE } from './helpers';
 import ProfilingDialog from './ProfilingDialog';
 import RestingDialog from './RestingDialog';
 
@@ -68,6 +74,11 @@ export default () => {
             dispatch(setEventRecordingPath(debugFolder));
         } else if (profilingStage === 'Complete') {
             dispatch(setEventRecordingPath(''));
+            const profileSettings = loadProjectSettings(profile.baseDirector);
+            if (profileSettings) {
+                profileSettings.profiles[index].csvReady = true;
+                saveProjectSettings(profile.baseDirector, profileSettings);
+            }
         }
     }, [dispatch, index, profile, profilingStage]);
 
@@ -92,14 +103,32 @@ export default () => {
                         profile.temperatures[index]
                     }.csv`;
 
-                    const addHeaders = !existsSync(path);
+                    const newFile = !existsSync(path);
                     let data = `${
                         (event.timestamp - timeOffset.current) / 1000
                     },${event.data.iLoad},${event.data.vLoad},${
                         event.data.tBat
                     }\r\n`;
-                    if (addHeaders) {
+                    if (newFile) {
                         data = `Seconds,Current(A),Voltage(V),Temperature(C)\r\n${data}`;
+                        const profileSettings = loadProjectSettings(
+                            profile.baseDirector
+                        );
+                        if (profileSettings) {
+                            profileSettings.profiles.push({
+                                vLowerCutOff: profile.vUpperCutOff,
+                                vUpperCutOff: profile.vUpperCutOff,
+                                temperature: profile.temperatures[index],
+                                csvPath: path,
+                                csvReady: true,
+                                paramsJson: undefined,
+                            });
+                            saveProjectSettings(
+                                profile.baseDirector,
+                                profileSettings
+                            );
+                            dispatch(reloadRecentProjects());
+                        }
                     }
 
                     appendFile(path, data, () => {});

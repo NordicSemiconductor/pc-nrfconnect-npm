@@ -20,14 +20,14 @@ import {
     getPmicState,
     isBatteryConnected,
     isUsbPowered,
-} from '../../features/pmicControl/pmicControlSlice';
+} from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
     getProfile,
     getProfileIndex,
     setCompleteStep,
     setProfilingStage,
-} from '../../features/pmicControl/profilingSlice';
+} from '../../../features/pmicControl/profilingSlice';
 
 export default () => {
     const adcSample = useSelector(getLatestAdcSample);

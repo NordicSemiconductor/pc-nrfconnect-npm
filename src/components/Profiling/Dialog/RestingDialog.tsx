@@ -14,14 +14,14 @@ import {
     useStopwatch,
 } from 'pc-nrfconnect-shared';
 
-import { noop } from '../../features/pmicControl/npm/pmicHelpers';
-import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
+import { noop } from '../../../features/pmicControl/npm/pmicHelpers';
+import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
     getProfile,
     getProfileIndex,
-} from '../../features/pmicControl/profilingSlice';
-import { REST_DURATION } from './helpers';
+} from '../../../features/pmicControl/profilingSlice';
+import { REST_DURATION } from '../helpers';
 import TimeComponent from './TimeComponent';
 
 export default () => {

@@ -22,7 +22,7 @@ import {
     getPmicChargingState,
     isBatteryConnected,
     isUsbPowered,
-} from '../../features/pmicControl/pmicControlSlice';
+} from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
     getProfile,
@@ -30,8 +30,8 @@ import {
     getProfilingStage,
     setCompleteStep,
     setProfilingStage,
-} from '../../features/pmicControl/profilingSlice';
-import { REPORTING_RATE } from './helpers';
+} from '../../../features/pmicControl/profilingSlice';
+import { REPORTING_RATE } from '../helpers';
 import { ElapsedTime } from './TimeComponent';
 
 export default () => {
