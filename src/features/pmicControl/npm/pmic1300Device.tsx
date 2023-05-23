@@ -1111,11 +1111,15 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             });
 
         if (pmicState !== 'ek-disconnected' && mode === 'LDO') {
+            const ldo1Message =
+                'Please ensure correct nPM1300-EK configuration before enabling LDO1. Connect LDO bypass capacitors by connecting the LDO1 jumper on P16. Disconnect VOUT1-LSIN1 and HIGH-LSOUT1 jumpers on P15. Ensure IN1, on P8, is connected to a source that is between 2.6V and 5.5V, for example Vsys.';
+            const ldo2Message =
+                'Please ensure correct nPM1300-EK configuration before enabling LDO2. Connect LDO bypass capacitors by connecting the LDO2 jumper on P16. Disconnect VOUT2-LSIN2 and LOW-LSOUT2 jumpers on P15. Ensure IN2, on P8, is connected to a source that is between 2.6V and 5.5V, for example Vsys.';
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
-                    doNotAskAgainStoreID: `pmic1300-setLdoMode-all`,
-                    message: `Please make sure to connect the LDO bypass capacitors by connecting a jumper on P16`,
+                    doNotAskAgainStoreID: `pmic1300-setLdoMode-${index}`,
+                    message: index === 0 ? ldo1Message : ldo2Message,
                     confirmLabel: 'Ok',
                     optionalLabel: "Ok, Don't ask again",
                     cancelLabel: 'Cancel',
