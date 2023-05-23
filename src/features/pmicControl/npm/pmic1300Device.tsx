@@ -493,6 +493,19 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     for (let i = 0; i < devices.noOfBucks; i += 1) {
         shellParser?.registerCommandCallback(
+            toRegex('npm1300_reg NPM_BUCK BUCKSTATUS'),
+            res => {
+                const value = Number.parseInt(res.split('=')[1], 16);
+
+                emitPartialEvent<Buck>('onBuckUpdate', i, {
+                    // eslint-disable-next-line no-bitwise
+                    enabled: (value & (i === 0 ? 0x4 : 0x64)) !== 0, // mV to V
+                });
+            },
+            noop
+        );
+
+        shellParser?.registerCommandCallback(
             toRegex('npmx buck voltage normal', true, i),
             res => {
                 const value = parseToNumber(res);
@@ -1291,7 +1304,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         buckRetentionControl: (index: number) =>
             sendCommand(`npmx buck gpio retention get ${index}`),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        buckEnabled: (index: number) => console.warn('Not implemented'),
+        buckEnabled: (index: number) =>
+            sendCommand(`npm1300_reg NPM_BUCK BUCKSTATUS`),
 
         ldoVoltage: (index: number) =>
             sendCommand(`npmx ldsw ldo_voltage get ${index}`),

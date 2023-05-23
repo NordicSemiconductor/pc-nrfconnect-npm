@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 -   Changing LDO Vout automatically changed the mode to LDO
+-   Buck read enable support
 -   Dialog when changing to LDO mode prompting user to confirm adding jumper on
     EK
 
