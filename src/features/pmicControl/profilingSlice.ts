@@ -57,8 +57,11 @@ const profilingSlice = createSlice({
     name: 'profiling',
     initialState,
     reducers: {
-        closeProfiling() {
-            return { ...initialState };
+        closeProfiling(state) {
+            return {
+                ...initialState,
+                profilingProjects: state.profilingProjects,
+            };
         },
         setProfilingStage(state, action: PayloadAction<ProfileStage>) {
             state.stage = action.payload;
@@ -82,6 +85,20 @@ const profilingSlice = createSlice({
             >
         ) {
             state.profilingProjects = action.payload;
+        },
+        updateProfilingProject(
+            state,
+            action: PayloadAction<{
+                path: string;
+                settings: ProfilingProject | undefined;
+            }>
+        ) {
+            const index = state.profilingProjects.findIndex(
+                profile => profile.path === action.payload.path
+            );
+            if (index !== -1) {
+                state.profilingProjects[index] = action.payload;
+            }
         },
         nextProfile(state) {
             state.completeStep = undefined;
@@ -127,6 +144,7 @@ export const {
     setProfilingStage,
     setCompleteStep,
     setProfilingProjects,
+    updateProfilingProject,
     setProfile,
     nextProfile,
     restartProfile,

@@ -7,6 +7,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, existsSync, mkdirSync } from 'fs';
+import path from 'path';
 
 import {
     getBucks,
@@ -27,11 +28,11 @@ import {
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import {
-    loadProjectSettings,
+    generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
-    reloadRecentProjects,
+    readProjectSettingsFromFile,
     REPORTING_RATE,
-    saveProjectSettings,
+    updateProjectSettings,
 } from '../helpers';
 import ChargingDialog from './ChargingDialog';
 import ChecklistDialog from './ChecklistDialog';
@@ -74,11 +75,6 @@ export default () => {
             dispatch(setEventRecordingPath(debugFolder));
         } else if (profilingStage === 'Complete') {
             dispatch(setEventRecordingPath(''));
-            const profileSettings = loadProjectSettings(profile.baseDirector);
-            if (profileSettings) {
-                profileSettings.profiles[index].csvReady = true;
-                saveProjectSettings(profile.baseDirector, profileSettings);
-            }
         }
     }, [dispatch, index, profile, profilingStage]);
 
@@ -97,13 +93,13 @@ export default () => {
                         profile.name
                     }/${PROFILE_FOLDER_PREFIX}${index + 1}`;
 
-                    const path = `${baseDirector}/${profile.name}_${
+                    const profilingCsvPath = `${baseDirector}/${profile.name}_${
                         profile.capacity
                     }mAh_T${profile.temperatures[index] < 0 ? 'n' : 'p'}${
                         profile.temperatures[index]
                     }.csv`;
 
-                    const newFile = !existsSync(path);
+                    const newFile = !existsSync(profilingCsvPath);
                     let data = `${
                         (event.timestamp - timeOffset.current) / 1000
                     },${event.data.iLoad},${event.data.vLoad},${
@@ -111,27 +107,31 @@ export default () => {
                     }\r\n`;
                     if (newFile) {
                         data = `Seconds,Current(A),Voltage(V),Temperature(C)\r\n${data}`;
-                        const profileSettings = loadProjectSettings(
-                            profile.baseDirector
+                        const projectFilePath = generateDefaultProjectPath(
+                            `${profile.baseDirector}/${profile.name}`
                         );
+                        const profileSettings =
+                            readProjectSettingsFromFile(projectFilePath);
                         if (profileSettings) {
-                            profileSettings.profiles.push({
-                                vLowerCutOff: profile.vUpperCutOff,
-                                vUpperCutOff: profile.vUpperCutOff,
-                                temperature: profile.temperatures[index],
-                                csvPath: path,
-                                csvReady: true,
-                                paramsJson: undefined,
-                            });
-                            saveProjectSettings(
-                                profile.baseDirector,
-                                profileSettings
+                            profileSettings.profiles[index].csvReady = false;
+                            profileSettings.profiles[index].csvPath =
+                                path.relative(
+                                    projectFilePath,
+                                    profilingCsvPath
+                                );
+
+                            dispatch(
+                                updateProjectSettings(
+                                    generateDefaultProjectPath(
+                                        `${profile.baseDirector}/${profile.name}`
+                                    ),
+                                    profileSettings
+                                )
                             );
-                            dispatch(reloadRecentProjects());
                         }
                     }
 
-                    appendFile(path, data, () => {});
+                    appendFile(profilingCsvPath, data, () => {});
                 }
             }),
         [dispatch, index, npmDevice, profile, profilingStage]

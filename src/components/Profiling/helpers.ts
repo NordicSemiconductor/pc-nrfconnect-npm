@@ -10,32 +10,45 @@ import path from 'path';
 import { getPersistentStore } from 'pc-nrfconnect-shared';
 
 import { ProfilingProject } from '../../features/pmicControl/npm/types';
-import { setProfilingProjects } from '../../features/pmicControl/profilingSlice';
+import {
+    setProfilingProjects,
+    updateProfilingProject,
+} from '../../features/pmicControl/profilingSlice';
 import { TDispatch } from '../../thunk';
 
 export const REST_DURATION = 900; // seconds
 export const REPORTING_RATE = 1000;
 export const PROFILE_FOLDER_PREFIX = 'profile_';
 
-export const saveProjectSettings = (
-    filePath: string,
-    project: ProfilingProject
-) => {
-    const profileSettingsPath = `${filePath}/profileSettings.json`;
-    const pathObject = path.parse(profileSettingsPath);
-    const store = new Store<ProfilingProject>({
-        cwd: pathObject.dir,
-        name: pathObject.name,
-    });
+export const generateDefaultProjectPath = (dir: string) =>
+    `${dir}/profileSettings.json`;
 
-    store.set(project);
+const loadRecentProject = (): string[] =>
+    (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
 
-    return profileSettingsPath;
-};
+const updateRecentProjects =
+    (projectPaths: string[]) => (dispatch: TDispatch) => {
+        const projects = Array.from(new Set(projectPaths));
+        getPersistentStore().set(`profiling_projects`, projects);
+        dispatch(reloadRecentProjects());
+    };
 
-export const loadProjectSettings = (filePath: string) => {
-    const profileSettingsPath = `${filePath}/profileSettings.json`;
-    const pathObject = path.parse(profileSettingsPath);
+export const removeRecentProject =
+    (projectPath: string) => (dispatch: TDispatch) => {
+        const projects = loadRecentProject().filter(dir => dir !== projectPath);
+        getPersistentStore().set(`profiling_projects`, projects);
+        dispatch(reloadRecentProjects());
+    };
+
+export const addRecentProject =
+    (projectPath: string) => (dispatch: TDispatch) => {
+        const projects = loadRecentProject();
+        projects.push(projectPath);
+        getPersistentStore().set(`profiling_projects`, projects);
+        dispatch(reloadRecentProjects());
+    };
+export const readProjectSettingsFromFile = (filePath: string) => {
+    const pathObject = path.parse(filePath);
     if (pathObject.ext === '.json') {
         const store = new Store<ProfilingProject>({
             cwd: pathObject.dir,
@@ -48,22 +61,30 @@ export const loadProjectSettings = (filePath: string) => {
     return undefined;
 };
 
-export const loadRecentProject = (): string[] =>
-    (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
+export const updateProjectSettings =
+    (filePath: string, project: ProfilingProject) => (dispatch: TDispatch) => {
+        const pathObject = path.parse(filePath);
+        const store = new Store<ProfilingProject>({
+            cwd: pathObject.dir,
+            name: pathObject.name,
+        });
 
-export const updateRecentProjects =
-    (projectPaths: string[]) => (dispatch: TDispatch) => {
-        const projects = Array.from(new Set(projectPaths));
-        getPersistentStore().set(`profiling_projects`, projects);
+        store.set(project);
 
-        dispatch(reloadRecentProjects());
+        dispatch(updateProfilingProject({ path: filePath, settings: project }));
     };
 
-export const removeRecentProject =
-    (projectPath: string) => (dispatch: TDispatch) => {
-        const projects = loadRecentProject().filter(dir => dir !== projectPath);
-        getPersistentStore().set(`profiling_projects`, projects);
+export const saveProjectSettings =
+    (filePath: string, project: ProfilingProject) => (dispatch: TDispatch) => {
+        const pathObject = path.parse(filePath);
+        const store = new Store<ProfilingProject>({
+            cwd: pathObject.dir,
+            name: pathObject.name,
+        });
 
+        store.set(project);
+
+        dispatch(updateRecentProjects([...loadRecentProject(), filePath]));
         dispatch(reloadRecentProjects());
     };
 
@@ -74,7 +95,7 @@ export const reloadRecentProjects = () => (dispatch: TDispatch) =>
                 if (fs.existsSync(filePath)) {
                     return {
                         path: filePath,
-                        settings: loadProjectSettings(path.parse(filePath).dir),
+                        settings: readProjectSettingsFromFile(filePath),
                     };
                 }
 

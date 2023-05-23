@@ -54,7 +54,7 @@ const parseFile =
         }
     };
 
-const showOpenDialog = (options: OpenDialogOptions) =>
+export const showOpenDialog = (options: OpenDialogOptions) =>
     dialog.showOpenDialog(getCurrentWindow(), options);
 
 export const loadConfiguration = () => (dispatch: TDispatch) => {

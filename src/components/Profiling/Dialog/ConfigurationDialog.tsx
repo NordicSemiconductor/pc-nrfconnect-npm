@@ -28,10 +28,9 @@ import {
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import {
-    loadRecentProject,
+    generateDefaultProjectPath,
     REST_DURATION,
     saveProjectSettings,
-    updateRecentProjects,
 } from '../helpers';
 
 import './profiling.scss';
@@ -125,17 +124,11 @@ export default () => {
                                 dispatch(setProfile(profile));
                                 dispatch(setProfilingStage('Checklist'));
 
-                                const profileSettingsPath = saveProjectSettings(
-                                    `${dirPath}/${profile.name}`,
-                                    project
+                                const fileName = generateDefaultProjectPath(
+                                    `${profile.baseDirector}/${profile.name}`
                                 );
-
-                                const existingProjects = loadRecentProject();
                                 dispatch(
-                                    updateRecentProjects([
-                                        ...existingProjects,
-                                        profileSettingsPath,
-                                    ])
+                                    saveProjectSettings(fileName, project)
                                 );
                             });
                         }}

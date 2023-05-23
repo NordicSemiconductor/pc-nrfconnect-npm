@@ -15,6 +15,7 @@ import {
     Group,
 } from 'pc-nrfconnect-shared';
 
+import { RootState } from '../../../appReducer';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
@@ -26,11 +27,12 @@ import {
     nextProfile,
     restartProfile,
 } from '../../../features/pmicControl/profilingSlice';
+import { TDispatch } from '../../../thunk';
 import {
-    loadProjectSettings,
+    generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
-    reloadRecentProjects,
-    saveProjectSettings,
+    readProjectSettingsFromFile,
+    updateProjectSettings,
 } from '../helpers';
 import { ElapsedTime } from './TimeComponent';
 
@@ -54,9 +56,11 @@ const FinishButton = ({
                         if (result) {
                             npmDevice.getBatteryProfiler()?.stopProfiling();
                         }
+                        dispatch(markProfilersAsReady());
                         dispatch(closeProfiling());
                     })
                     .catch(() => {
+                        dispatch(markProfilersAsReady());
                         dispatch(closeProfiling());
                     });
             }}
@@ -88,14 +92,13 @@ const RestartProfileButton = ({
                     rmSync(baseDirector, { recursive: true, force: true });
                 }
 
-                const profileSettings = loadProjectSettings(
-                    profile.baseDirector
+                const filePath = generateDefaultProjectPath(
+                    `${profile.baseDirector}/${profile.name}`
                 );
-
+                const profileSettings = readProjectSettingsFromFile(filePath);
                 if (profileSettings) {
                     profileSettings?.profiles.splice(index, 1);
-                    saveProjectSettings(baseDirector, profileSettings);
-                    dispatch(reloadRecentProjects());
+                    dispatch(updateProjectSettings(filePath, profileSettings));
                 }
 
                 mkdirSync(baseDirector, { recursive: true });
@@ -120,6 +123,21 @@ const RestartProfileButton = ({
     );
 };
 
+const markProfilersAsReady =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        const profile = getState().app.profiling.profile;
+        const index = getState().app.profiling.index;
+
+        const fileName = generateDefaultProjectPath(
+            `${profile.baseDirector}/${profile.name}`
+        );
+        const profileSettings = readProjectSettingsFromFile(fileName);
+        if (profileSettings && profileSettings.profiles[index].csvPath) {
+            profileSettings.profiles[index].csvReady = true;
+            dispatch(updateProjectSettings(fileName, profileSettings));
+        }
+    };
+
 const NextProfileButton = ({
     variant = 'primary',
 }: {
@@ -140,9 +158,11 @@ const NextProfileButton = ({
                         if (result) {
                             npmDevice.getBatteryProfiler()?.stopProfiling();
                         }
+                        dispatch(markProfilersAsReady());
                         dispatch(nextProfile());
                     })
                     .catch(() => {
+                        dispatch(markProfilersAsReady());
                         dispatch(nextProfile());
                     });
             }}
