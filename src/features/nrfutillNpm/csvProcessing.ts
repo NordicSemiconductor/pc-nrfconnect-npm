@@ -6,67 +6,239 @@
 
 import { spawn } from 'child_process';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
-import { v4 as uuidV4 } from 'uuid';
 
-import { ProfilingProject } from '../pmicControl/npm/types';
+import { atomicUpdateProjectSettings } from '../../components/Profiling/helpers';
+import { ProfilingProject } from '../../components/Profiling/types';
+import { TDispatch } from '../../thunk';
+import { generateTempFolder, stringToFile } from '../helpers';
+import { setProjectProfileProgress } from '../pmicControl/profilingProjectsSlice.';
 
-const generateTempFolder = (): string => {
-    const tempFolder = `${os.tmpdir()}/${uuidV4()}`;
-    if (fs.existsSync(tempFolder)) {
-        return generateTempFolder();
-    }
+const generateProfileName = (project: ProfilingProject, index: number) =>
+    `${project.name}_${project.capacity}mAh_T${
+        project.profiles[index].temperature < 0 ? 'n' : 'p'
+    }${project.profiles[index].temperature}`;
 
-    fs.mkdirSync(tempFolder);
-    return tempFolder;
-};
+export const generateParamsFromCSV =
+    (projectAbsolutePath: string, index: number) => (dispatch: TDispatch) => {
+        dispatch(
+            atomicUpdateProjectSettings(projectAbsolutePath, project => {
+                const profile = project.profiles[index];
 
-export const generateParamsFromCSV = (
-    projectAbsolutePath: string,
-    profiles: ProfilingProject,
-    index: number
-) =>
-    new Promise<number | null>((resolve, reject) => {
-        const profile = profiles.profiles[index];
+                if (!profile.csvPath) {
+                    throw new Error('no csv path');
+                }
 
-        if (!profile.csvPath) {
-            throw new Error('no csv path');
-        }
+                const csvPathAbsolute = path.resolve(
+                    projectAbsolutePath,
+                    profile.csvPath
+                );
 
-        const csvPathAbsolute = path.resolve(
-            projectAbsolutePath,
-            profile.csvPath
+                if (!fs.existsSync(csvPathAbsolute)) {
+                    throw new Error('csv file does not exists');
+                }
+
+                const tempFolder = generateTempFolder();
+
+                const newCSVFileName = `${generateProfileName(
+                    project,
+                    index
+                )}.csv`;
+
+                const inputFile = path.join(tempFolder, newCSVFileName);
+                fs.copyFileSync(csvPathAbsolute, inputFile);
+
+                const resultsFolder = path.join(tempFolder, 'Results');
+
+                fs.mkdirSync(resultsFolder);
+
+                const processProgress = (data: string) => {
+                    const progressMatch = data.match(
+                        /Processing cycle [0-9]+ \/ [0-9]+/
+                    );
+                    if (progressMatch) {
+                        const fraction = progressMatch[0].replace(
+                            'Processing cycle',
+                            ''
+                        );
+                        const denominator = Number.parseInt(
+                            fraction.split('/')[1],
+                            10
+                        );
+                        const nominator = Number.parseInt(
+                            fraction.split('/')[0],
+                            10
+                        );
+                        dispatch(
+                            setProjectProfileProgress({
+                                path: projectAbsolutePath,
+                                index,
+                                message: `Processing cycle ${nominator} / ${denominator}`,
+                                progress: (nominator / denominator) * 100,
+                            })
+                        );
+                    }
+                };
+
+                const processCSV = spawn(
+                    'nrfutil.exe',
+                    [
+                        'npm',
+                        'generate',
+                        '--input-file',
+                        inputFile,
+                        '--output-directory',
+                        resultsFolder,
+                        '--v-cutoff-high',
+                        profile.vUpperCutOff.toString(),
+                        '--v-cutoff-low',
+                        profile.vLowerCutOff.toString(),
+                    ],
+                    {
+                        cwd: 'C:\\Workspace',
+                    }
+                );
+
+                dispatch(
+                    setProjectProfileProgress({
+                        path: projectAbsolutePath,
+                        index,
+                        message: 'Processing has started',
+                        progress: 0,
+                    })
+                );
+
+                processCSV.stdout.on('data', data => {
+                    processProgress(data.toString());
+                });
+
+                processCSV.stderr.on('data', data => {
+                    processProgress(data.toString());
+                });
+
+                processCSV.on('close', () => {
+                    dispatch(
+                        atomicUpdateProjectSettings(
+                            projectAbsolutePath,
+                            proj => {
+                                const batteryModelPath = path.join(
+                                    resultsFolder,
+                                    'battery_model.json'
+                                );
+                                const paramsPath = path.join(
+                                    resultsFolder,
+                                    `${generateProfileName(
+                                        proj,
+                                        index
+                                    )}_params.json`
+                                );
+
+                                if (fs.existsSync(batteryModelPath)) {
+                                    proj.profiles[index].batteryJson =
+                                        fs.readFileSync(
+                                            batteryModelPath,
+                                            'utf8'
+                                        );
+                                }
+
+                                if (fs.existsSync(paramsPath)) {
+                                    proj.profiles[index].paramsJson =
+                                        fs.readFileSync(paramsPath, 'utf8');
+                                }
+
+                                return proj;
+                            }
+                        )
+                    ).finally(() => {
+                        if (fs.existsSync(tempFolder)) {
+                            fs.rmSync(tempFolder, {
+                                recursive: true,
+                                force: true,
+                            });
+                        }
+
+                        dispatch(
+                            setProjectProfileProgress({
+                                path: projectAbsolutePath,
+                                index,
+                                message: 'Processing Complete',
+                                progress: 100,
+                                ready: true,
+                            })
+                        );
+                    });
+                });
+
+                return project;
+            })
         );
+    };
 
-        if (!fs.existsSync(csvPathAbsolute)) {
-            throw new Error('csv file does not exists');
+export const mergeBatteryParams = (
+    project: ProfilingProject,
+    indexes: number[]
+) =>
+    new Promise<string>((resolve, reject) => {
+        if (indexes.length === 0) {
+            return;
         }
 
         const tempFolder = generateTempFolder();
+        const resultsFolder = path.join(tempFolder, 'Results');
+        fs.mkdirSync(resultsFolder);
 
-        const newCSVFileName = `${profiles.name}_${profiles.capacity}mAh_T${
-            profile.temperature < 0 ? 'n' : 'p'
-        }${profile.temperature}.csv`;
-        fs.copyFileSync(csvPathAbsolute, `${tempFolder}/${newCSVFileName}`);
+        const args = [
+            'npm',
+            'merge',
+            '--output-directory',
+            resultsFolder,
+            '--v-cutoff-high',
+            '0',
+            '--v-cutoff-low',
+            '0',
+        ];
 
-        const processCSV = spawn('TODO', ['args TODO']);
+        indexes.forEach(index => {
+            const profile = project.profiles[index];
 
-        // TODO save pid to project settings
+            if (profile.paramsJson) {
+                const paramsPath = path.join(
+                    tempFolder,
+                    `${generateProfileName(project, index)}_params.json`
+                );
+                stringToFile(
+                    path.join(
+                        tempFolder,
+                        `${generateProfileName(project, index)}_params.json`
+                    ),
+                    profile.paramsJson
+                );
 
-        processCSV.stdout.on('data', data => {
-            // TODO process and update progress
-            console.log(`stdout: ${data}`);
+                args.push('--input-file', paramsPath);
+            }
         });
 
-        processCSV.stderr.on('data', data => {
-            // TODO Clean up temp file
-            reject(data);
+        const processCSV = spawn('nrfutil.exe', args, {
+            cwd: 'C:\\Workspace',
         });
 
-        processCSV.on('close', code => {
-            // TODO Read params and save to project
-            // TODO Clean up temp file
-            resolve(code);
+        processCSV.on('close', () => {
+            const batteryModelPath = path.join(
+                resultsFolder,
+                'battery_model.json'
+            );
+
+            if (fs.existsSync(batteryModelPath)) {
+                resolve(fs.readFileSync(batteryModelPath, 'utf8'));
+            } else {
+                reject();
+            }
+
+            if (fs.existsSync(tempFolder)) {
+                fs.rmSync(tempFolder, {
+                    recursive: true,
+                    force: true,
+                });
+            }
         });
     });

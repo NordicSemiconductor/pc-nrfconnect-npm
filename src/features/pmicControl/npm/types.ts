@@ -370,24 +370,9 @@ export interface Profile {
     vUpperCutOff: number;
     capacity: number;
     temperatures: number[];
-    baseDirector: string;
+    baseDirectory: string;
     restingProfiles: CCProfile[];
     profilingProfiles: CCProfile[];
-}
-
-export interface ProfilingProjectProfile {
-    vLowerCutOff: number;
-    vUpperCutOff: number;
-    temperature: number;
-    csvPath?: string;
-    csvReady: boolean;
-    paramsJson?: string;
-    exclude?: boolean;
-}
-export interface ProfilingProject {
-    name: string;
-    capacity: number;
-    profiles: ProfilingProjectProfile[];
 }
 
 export interface IBatteryProfiler {

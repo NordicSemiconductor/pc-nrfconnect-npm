@@ -17,11 +17,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { selectDirectoryDialog } from '../../../actions/fileActions';
-import {
-    CCProfile,
-    Profile,
-    ProfilingProject,
-} from '../../../features/pmicControl/npm/types';
+import { CCProfile, Profile } from '../../../features/pmicControl/npm/types';
 import {
     closeProfiling,
     setProfile,
@@ -32,6 +28,7 @@ import {
     REST_DURATION,
     saveProjectSettings,
 } from '../helpers';
+import { ProfilingProject } from '../types';
 
 import './profiling.scss';
 
@@ -103,7 +100,7 @@ export default () => {
                                     vUpperCutOff,
                                     capacity,
                                     temperatures,
-                                    baseDirector: dirPath,
+                                    baseDirectory: dirPath,
                                     restingProfiles,
                                     profilingProfiles,
                                 };
@@ -124,9 +121,8 @@ export default () => {
                                 dispatch(setProfile(profile));
                                 dispatch(setProfilingStage('Checklist'));
 
-                                const fileName = generateDefaultProjectPath(
-                                    `${profile.baseDirector}/${profile.name}`
-                                );
+                                const fileName =
+                                    generateDefaultProjectPath(profile);
                                 dispatch(
                                     saveProjectSettings(fileName, project)
                                 );

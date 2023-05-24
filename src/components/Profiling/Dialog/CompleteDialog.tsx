@@ -29,10 +29,9 @@ import {
 } from '../../../features/pmicControl/profilingSlice';
 import { TDispatch } from '../../../thunk';
 import {
+    atomicUpdateProjectSettings,
     generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
-    readProjectSettingsFromFile,
-    updateProjectSettings,
 } from '../helpers';
 import { ElapsedTime } from './TimeComponent';
 
@@ -84,7 +83,7 @@ const RestartProfileButton = ({
         <DialogButton
             variant={variant}
             onClick={() => {
-                const baseDirector = `${profile.baseDirector}/${
+                const baseDirector = `${profile.baseDirectory}/${
                     profile.name
                 }/${PROFILE_FOLDER_PREFIX}${index + 1}/`;
 
@@ -92,14 +91,15 @@ const RestartProfileButton = ({
                     rmSync(baseDirector, { recursive: true, force: true });
                 }
 
-                const filePath = generateDefaultProjectPath(
-                    `${profile.baseDirector}/${profile.name}`
+                const filePath = generateDefaultProjectPath(profile);
+
+                dispatch(
+                    atomicUpdateProjectSettings(filePath, profileSettings => {
+                        profileSettings.profiles[index].csvReady = false;
+                        profileSettings.profiles[index].csvPath = undefined;
+                        return profileSettings;
+                    })
                 );
-                const profileSettings = readProjectSettingsFromFile(filePath);
-                if (profileSettings) {
-                    profileSettings?.profiles.splice(index, 1);
-                    dispatch(updateProjectSettings(filePath, profileSettings));
-                }
 
                 mkdirSync(baseDirector, { recursive: true });
 
@@ -128,14 +128,13 @@ const markProfilersAsReady =
         const profile = getState().app.profiling.profile;
         const index = getState().app.profiling.index;
 
-        const fileName = generateDefaultProjectPath(
-            `${profile.baseDirector}/${profile.name}`
+        const fileName = generateDefaultProjectPath(profile);
+        dispatch(
+            atomicUpdateProjectSettings(fileName, profileSettings => {
+                profileSettings.profiles[index].csvReady = true;
+                return profileSettings;
+            })
         );
-        const profileSettings = readProjectSettingsFromFile(fileName);
-        if (profileSettings && profileSettings.profiles[index].csvPath) {
-            profileSettings.profiles[index].csvReady = true;
-            dispatch(updateProjectSettings(fileName, profileSettings));
-        }
     };
 
 const NextProfileButton = ({

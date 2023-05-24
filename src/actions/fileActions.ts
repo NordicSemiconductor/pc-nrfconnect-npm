@@ -5,7 +5,11 @@
  */
 
 import { dialog, getCurrentWindow } from '@electron/remote';
-import { OpenDialogOptions, OpenDialogReturnValue } from 'electron';
+import {
+    OpenDialogOptions,
+    OpenDialogReturnValue,
+    SaveDialogOptions,
+} from 'electron';
 import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
@@ -56,6 +60,9 @@ const parseFile =
 
 export const showOpenDialog = (options: OpenDialogOptions) =>
     dialog.showOpenDialog(getCurrentWindow(), options);
+
+export const showSaveDialog = (options: SaveDialogOptions) =>
+    dialog.showSaveDialog(getCurrentWindow(), options);
 
 export const loadConfiguration = () => (dispatch: TDispatch) => {
     showOpenDialog({
@@ -132,7 +139,7 @@ export const selectDirectoryDialog = () =>
     });
 
 export const saveFileDialog = () => (dispatch: TDispatch) => {
-    const dialogOptions = {
+    showSaveDialog({
         title: 'Save Device Settings',
         filters: [
             {
@@ -140,14 +147,10 @@ export const saveFileDialog = () => (dispatch: TDispatch) => {
                 extensions: ['json'],
             },
         ],
-        // eslint-disable-next-line no-undef
-    } as Electron.SaveDialogOptions;
-    dialog
-        .showSaveDialog(getCurrentWindow(), dialogOptions)
-        .then(
-            result =>
-                !result.canceled &&
-                result.filePath &&
-                dispatch(saveSettings(result.filePath))
-        );
+    }).then(
+        result =>
+            !result.canceled &&
+            result.filePath &&
+            dispatch(saveSettings(result.filePath))
+    );
 };

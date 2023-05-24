@@ -4,35 +4,40 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
+import { ProgressBar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenDialogReturnValue } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import { Alert, Button, Card, PaneProps, Toggle } from 'pc-nrfconnect-shared';
+import { Alert, Button, Card, Toggle } from 'pc-nrfconnect-shared';
 
-import { showOpenDialog } from '../../../actions/fileActions';
+import { showOpenDialog, showSaveDialog } from '../../../actions/fileActions';
+import { stringToFile } from '../../../features/helpers';
 import {
-    ProfilingProject,
-    ProfilingProjectProfile,
-} from '../../../features/pmicControl/npm/types';
+    generateParamsFromCSV,
+    mergeBatteryParams,
+} from '../../../features/nrfutillNpm/csvProcessing';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
-import { getProfileProjects } from '../../../features/pmicControl/profilingSlice';
+import {
+    getProfileProjects,
+    getProjectProfileProgress,
+} from '../../../features/pmicControl/profilingProjectsSlice.';
 import useIsUIDisabled from '../../../features/useIsUIDisabled';
 import {
     addRecentProject,
-    readProjectSettingsFromFile,
+    atomicUpdateProjectSettings,
     reloadRecentProjects,
     removeRecentProject,
-    updateProjectSettings,
 } from '../helpers';
+import {
+    ProfilingProject,
+    ProfilingProjectProfile,
+    ProjectPathPair,
+} from '../types';
+import { useProfilingProjects } from './useProfilingProjects';
 
 import './profilingProjects.scss';
-
-type projectPathPair = {
-    path: string;
-    settings: ProfilingProject | undefined;
-};
 
 const isProfileReadyForProcessing = (
     projectSettingsPath: string,
@@ -80,130 +85,144 @@ const ProfileComponent = ({
     const csvReadyExists =
         !!profile.csvPath &&
         fs.existsSync(path.resolve(projectSettingsPath, profile.csvPath));
+    const progress = useSelector(getProjectProfileProgress).find(
+        prog => prog.path === projectSettingsPath && prog.index === index
+    );
 
     return (
-        <div className="d-flex flex-row justify-content-between mt-2 mb-2">
-            <div className="flex-grow-1 mr-4">
-                {!complete ? (
-                    <Alert variant="info">
-                        <strong>Profile is incomplete.</strong>
-                        <span>{` Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V.`}</span>
-                    </Alert>
-                ) : (
-                    <div className="mb-2">
-                        <strong>Profile</strong>
-                        <span>{` - Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V`}</span>
-                    </div>
-                )}
+        <div className="profile pb-2">
+            <div className="d-flex flex-row justify-content-between mt-2 mb-2">
+                <div className="flex-grow-1 mr-4">
+                    {!complete ? (
+                        <Alert variant="info">
+                            <strong>Profile is incomplete.</strong>
+                            <span>{` Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V.`}</span>
+                        </Alert>
+                    ) : (
+                        <div className="mb-2">
+                            <strong>Profile</strong>
+                            <span>{` - Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V`}</span>
+                        </div>
+                    )}
 
-                {complete && !csvReadyExists && (
-                    <Alert variant="danger" label="Error ">
-                        {`File ${path.resolve(
-                            projectSettingsPath,
-                            profile?.csvPath ?? ''
-                        )} no longer exists!`}
-                    </Alert>
-                )}
-            </div>
-            <div className="d-flex flex-column justify-content-between  align-items-end float-right">
-                <div>
-                    <Toggle
-                        label="Exclude"
-                        onToggle={value => {
-                            const projectSettings =
-                                readProjectSettingsFromFile(
-                                    projectSettingsPath
+                    {complete && !csvReadyExists && (
+                        <Alert variant="danger" label="Error ">
+                            {`File ${path.resolve(
+                                projectSettingsPath,
+                                profile?.csvPath ?? ''
+                            )} no longer exists!`}
+                        </Alert>
+                    )}
+                </div>
+                <div className="d-flex flex-column justify-content-between  align-items-end float-right">
+                    <div>
+                        <Toggle
+                            label="Exclude"
+                            onToggle={value => {
+                                dispatch(
+                                    atomicUpdateProjectSettings(
+                                        projectSettingsPath,
+                                        projectSettings => {
+                                            if (projectSettings)
+                                                projectSettings.profiles[
+                                                    index
+                                                ].exclude = value;
+
+                                            return projectSettings;
+                                        }
+                                    )
                                 );
-                            if (!projectSettings) {
-                                return;
-                            }
-
-                            projectSettings.profiles[index].exclude = value;
-                            dispatch(
-                                updateProjectSettings(
+                            }}
+                            isToggled={!!profile.exclude || !complete}
+                            disabled={!complete}
+                        />
+                    </div>
+                    <div className="mt-2">
+                        <Button
+                            onClick={() => {
+                                dispatch(
+                                    generateParamsFromCSV(
+                                        projectSettingsPath,
+                                        index
+                                    )
+                                );
+                            }}
+                            variant="secondary"
+                            disabled={
+                                !!progress ||
+                                !isProfileReadyForProcessing(
                                     projectSettingsPath,
-                                    projectSettings
+                                    profile
                                 )
-                            );
-                        }}
-                        isToggled={!!profile.exclude || !complete}
-                        disabled={!complete}
+                            }
+                        >
+                            Process CSV
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                showSaveDialog({
+                                    title: 'Battery Profile',
+                                    filters: [
+                                        {
+                                            name: 'JSON',
+                                            extensions: ['json'],
+                                        },
+                                    ],
+                                }).then(result => {
+                                    if (
+                                        !result.canceled &&
+                                        result.filePath &&
+                                        profile.batteryJson
+                                    ) {
+                                        stringToFile(
+                                            result.filePath,
+                                            profile.batteryJson
+                                        );
+                                    }
+                                });
+                            }}
+                            variant="secondary"
+                            disabled={profile.batteryJson === undefined}
+                        >
+                            Export battery model
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                if (profile.batteryJson) {
+                                    npmDevice?.downloadFuelGaugeProfile(
+                                        Buffer.from(profile.batteryJson)
+                                    );
+                                }
+                            }}
+                            variant="secondary"
+                            disabled={
+                                uiDisabled ||
+                                pmicConnection === 'ek-disconnected' ||
+                                profile.batteryJson === undefined
+                            }
+                        >
+                            Load battery model
+                        </Button>
+                    </div>
+                </div>
+            </div>
+            {progress && (
+                <div className="mt-2 mb-2">
+                    <div>{progress.message}</div>
+                    <ProgressBar
+                        now={progress.progress}
+                        style={{ height: '4px' }}
                     />
                 </div>
-                <div className="mt-2">
-                    <Button
-                        onClick={() => {}}
-                        variant="secondary"
-                        disabled={
-                            !isProfileReadyForProcessing(
-                                projectSettingsPath,
-                                profile
-                            )
-                        }
-                    >
-                        Process CSV
-                    </Button>
-                    <Button
-                        onClick={() => {}}
-                        variant="secondary"
-                        disabled={
-                            profile.paramsJson === undefined ||
-                            !isProfileReadyForProcessing(
-                                projectSettingsPath,
-                                profile
-                            )
-                        }
-                    >
-                        Export battery model
-                    </Button>
-                    <Button
-                        onClick={() => {}}
-                        variant="secondary"
-                        disabled={
-                            uiDisabled ||
-                            pmicConnection === 'ek-disconnected' ||
-                            !isProfileReadyForProcessing(
-                                projectSettingsPath,
-                                profile
-                            )
-                        }
-                    >
-                        Load battery model
-                    </Button>
-                </div>
-            </div>
+            )}
         </div>
     );
 };
 
-const MissingProjectSettings = ({ project }: { project: projectPathPair }) => (
-    <>
-        <div className="d-flex justify-content-between">
-            <div>
-                <span>{project.path}</span>
-            </div>
-            <div className="d-flex justify-content-between">
-                <div>
-                    <Button onClick={() => {}} variant="secondary" disabled>
-                        Export battery model
-                    </Button>
-                    <Button onClick={() => {}} variant="secondary" disabled>
-                        Load battery model
-                    </Button>
-                    <RemoveButton projectSettingsPath={project.path} />
-                </div>
-            </div>
-        </div>
-        <Alert label="Error " variant="danger">
-            Project settings could not be found
-        </Alert>
-    </>
-);
-
 const MissingProjectSettingsCard = ({
     project,
 }: {
-    project: projectPathPair;
+    project: ProjectPathPair;
 }) => (
     <Card
         title={
@@ -212,18 +231,21 @@ const MissingProjectSettingsCard = ({
                     <span>{project.path}</span>
                 </div>
                 <div>
-                    <Button onClick={() => {}} variant="secondary" disabled>
-                        Export battery model
-                    </Button>
-                    <Button onClick={() => {}} variant="secondary" disabled>
-                        Load battery model
-                    </Button>
                     <RemoveButton projectSettingsPath={project.path} />
                 </div>
             </div>
         }
     >
-        <MissingProjectSettings project={project} />
+        {project.settings === 'fileMissing' && (
+            <Alert label="Error " variant="danger">
+                Project settings could not be found
+            </Alert>
+        )}
+        {project.settings === 'fileCorrupted' && (
+            <Alert label="Error " variant="danger">
+                Project settings are corrupt or not valid format
+            </Alert>
+        )}
     </Card>
 );
 
@@ -264,9 +286,18 @@ const ProjectSettingsCard = ({
     projectSettingsPath: string;
     settings: ProfilingProject;
 }) => {
+    const dispatch = useDispatch();
     const uiDisabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
     const pmicConnection = npmDevice?.getConnectionState();
+    const allProgress = useSelector(getProjectProfileProgress).filter(
+        prog => prog.path === projectSettingsPath
+    );
+
+    const notExcludedProfiles = settings.profiles.filter(
+        profile => !profile.exclude
+    );
+
     return (
         <Card
             title={
@@ -279,23 +310,72 @@ const ProjectSettingsCard = ({
                     </div>
                     <div>
                         <Button
-                            onClick={() => {}}
+                            onClick={() => {
+                                settings.profiles.forEach((setting, index) => {
+                                    if (
+                                        !setting.exclude &&
+                                        allProgress.findIndex(
+                                            progress => progress.index === index
+                                        ) === -1
+                                    ) {
+                                        dispatch(
+                                            generateParamsFromCSV(
+                                                projectSettingsPath,
+                                                index
+                                            )
+                                        );
+                                    }
+                                });
+                            }}
                             variant="secondary"
                             disabled={
                                 settings.profiles.length === 0 ||
-                                settings.profiles.filter(
-                                    profile =>
-                                        !isProfileReadyForProcessing(
-                                            projectSettingsPath,
-                                            profile
-                                        )
-                                ).length > 0
+                                notExcludedProfiles.length === 0 ||
+                                allProgress.filter(
+                                    progress =>
+                                        !settings.profiles[progress.index]
+                                            .exclude
+                                ).length ===
+                                    settings.profiles.filter(
+                                        profile => !profile.exclude
+                                    ).length ||
+                                settings.profiles.filter(profile =>
+                                    isProfileReadyForProcessing(
+                                        projectSettingsPath,
+                                        profile
+                                    )
+                                ).length === 0
                             }
                         >
-                            Process All CSV
+                            Process all CSVs
                         </Button>
                         <Button
-                            onClick={() => {}}
+                            onClick={() => {
+                                showSaveDialog({
+                                    title: 'Battery Profile',
+                                    filters: [
+                                        {
+                                            name: 'JSON',
+                                            extensions: ['json'],
+                                        },
+                                    ],
+                                }).then(result => {
+                                    if (!result.canceled && result.filePath) {
+                                        mergeBatteryParams(
+                                            settings,
+                                            notExcludedProfiles.map(
+                                                (_, index) => index
+                                            )
+                                        ).then(data => {
+                                            if (result.filePath)
+                                                stringToFile(
+                                                    result.filePath,
+                                                    data
+                                                );
+                                        });
+                                    }
+                                });
+                            }}
                             variant="secondary"
                             disabled={
                                 settings.profiles.length === 0 ||
@@ -312,7 +392,16 @@ const ProjectSettingsCard = ({
                             Export battery model
                         </Button>
                         <Button
-                            onClick={() => {}}
+                            onClick={() => {
+                                mergeBatteryParams(
+                                    settings,
+                                    notExcludedProfiles.map((_, index) => index)
+                                ).then(data =>
+                                    npmDevice?.downloadFuelGaugeProfile(
+                                        Buffer.from(data)
+                                    )
+                                );
+                            }}
                             variant="secondary"
                             disabled={
                                 uiDisabled ||
@@ -345,15 +434,11 @@ const ProjectSettingsCard = ({
     );
 };
 
-export default ({ active }: PaneProps) => {
+export default () => {
     const dispatch = useDispatch();
     const profiles = useSelector(getProfileProjects);
 
-    useEffect(() => {
-        if (active) {
-            dispatch(reloadRecentProjects());
-        }
-    }, [active, dispatch]);
+    useProfilingProjects();
 
     return (
         <div className="profiles-container">
@@ -388,10 +473,13 @@ export default ({ active }: PaneProps) => {
                 <div className="d-flex flex-column-reverse">
                     {profiles.map(project => (
                         <React.Fragment key={project.path}>
-                            {!project.settings && (
-                                <MissingProjectSettingsCard project={project} />
-                            )}
-                            {project.settings && (
+                            {project.settings === 'fileMissing' ||
+                                (project.settings === 'fileCorrupted' && (
+                                    <MissingProjectSettingsCard
+                                        project={project}
+                                    />
+                                ))}
+                            {typeof project.settings === 'object' && (
                                 <ProjectSettingsCard
                                     projectSettingsPath={project.path}
                                     settings={project.settings}

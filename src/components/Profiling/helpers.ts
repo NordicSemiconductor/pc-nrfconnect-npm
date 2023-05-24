@@ -7,37 +7,54 @@
 import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
-import { getPersistentStore } from 'pc-nrfconnect-shared';
-
-import { ProfilingProject } from '../../features/pmicControl/npm/types';
 import {
-    setProfilingProjects,
+    describeError,
+    getAppDir,
+    getPersistentStore,
+    logger,
+} from 'pc-nrfconnect-shared';
+
+import { Profile } from '../../features/pmicControl/npm/types';
+import {
+    setRecentProjects,
     updateProfilingProject,
-} from '../../features/pmicControl/profilingSlice';
+} from '../../features/pmicControl/profilingProjectsSlice.';
 import { TDispatch } from '../../thunk';
+import { ProfilingProject } from './types';
 
 export const REST_DURATION = 900; // seconds
 export const REPORTING_RATE = 1000;
 export const PROFILE_FOLDER_PREFIX = 'profile_';
+const LOCK_FILE = path.join(getAppDir(), 'profiling.lock');
 
-export const generateDefaultProjectPath = (dir: string) =>
-    `${dir}/profileSettings.json`;
+const acquireFileLock = (lockFile: string): Promise<() => void> =>
+    new Promise((resolve, reject) => {
+        fs.open(lockFile, 'w', (err, fd) => {
+            if (err) {
+                setTimeout(
+                    () => acquireFileLock(lockFile).then(resolve, reject),
+                    10
+                );
+            } else {
+                resolve(() => {
+                    fs.closeSync(fd);
+                    fs.unlinkSync(lockFile);
+                });
+            }
+        });
+    });
+
+export const generateDefaultProjectPath = (profile: Profile) =>
+    path.join(profile.baseDirectory, profile.name, 'profileSettings.json');
 
 const loadRecentProject = (): string[] =>
     (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
-
-const updateRecentProjects =
-    (projectPaths: string[]) => (dispatch: TDispatch) => {
-        const projects = Array.from(new Set(projectPaths));
-        getPersistentStore().set(`profiling_projects`, projects);
-        dispatch(reloadRecentProjects());
-    };
 
 export const removeRecentProject =
     (projectPath: string) => (dispatch: TDispatch) => {
         const projects = loadRecentProject().filter(dir => dir !== projectPath);
         getPersistentStore().set(`profiling_projects`, projects);
-        dispatch(reloadRecentProjects());
+        dispatch(setRecentProjects(projects));
     };
 
 export const addRecentProject =
@@ -45,33 +62,60 @@ export const addRecentProject =
         const projects = loadRecentProject();
         projects.push(projectPath);
         getPersistentStore().set(`profiling_projects`, projects);
-        dispatch(reloadRecentProjects());
+        dispatch(setRecentProjects(projects));
     };
-export const readProjectSettingsFromFile = (filePath: string) => {
-    const pathObject = path.parse(filePath);
-    if (pathObject.ext === '.json') {
-        const store = new Store<ProfilingProject>({
-            cwd: pathObject.dir,
-            name: pathObject.name,
-        });
 
-        return store.store;
+export const readProjectSettingsFromFile = (filePath: string) => {
+    if (!fs.existsSync(filePath)) {
+        return 'fileMissing';
     }
 
-    return undefined;
+    try {
+        const pathObject = path.parse(filePath);
+        if (pathObject.ext === '.json') {
+            const store = new Store<ProfilingProject>({
+                cwd: pathObject.dir,
+                name: pathObject.name,
+            });
+
+            return store.store;
+        }
+    } catch (error) {
+        return 'fileCorrupted';
+    }
+
+    return 'fileCorrupted';
 };
 
-export const updateProjectSettings =
-    (filePath: string, project: ProfilingProject) => (dispatch: TDispatch) => {
+export const atomicUpdateProjectSettings =
+    (
+        filePath: string,
+        updateProject: (currentProject: ProfilingProject) => ProfilingProject
+    ) =>
+    async (dispatch: TDispatch) => {
+        const releaseFileLock = await acquireFileLock(LOCK_FILE);
         const pathObject = path.parse(filePath);
         const store = new Store<ProfilingProject>({
             cwd: pathObject.dir,
             name: pathObject.name,
         });
 
-        store.set(project);
-
-        dispatch(updateProfilingProject({ path: filePath, settings: project }));
+        const oldProject = store.store;
+        if (oldProject) {
+            try {
+                const newProject = updateProject(oldProject);
+                store.set(newProject);
+                dispatch(
+                    updateProfilingProject({
+                        path: filePath,
+                        settings: newProject,
+                    })
+                );
+            } catch (error) {
+                logger.error(describeError(error));
+            }
+        }
+        releaseFileLock();
     };
 
 export const saveProjectSettings =
@@ -84,25 +128,8 @@ export const saveProjectSettings =
 
         store.set(project);
 
-        dispatch(updateRecentProjects([...loadRecentProject(), filePath]));
-        dispatch(reloadRecentProjects());
+        dispatch(addRecentProject(filePath));
     };
 
 export const reloadRecentProjects = () => (dispatch: TDispatch) =>
-    dispatch(
-        setProfilingProjects(
-            loadRecentProject().map(filePath => {
-                if (fs.existsSync(filePath)) {
-                    return {
-                        path: filePath,
-                        settings: readProjectSettingsFromFile(filePath),
-                    };
-                }
-
-                return {
-                    path: filePath,
-                    settings: undefined,
-                };
-            })
-        )
-    );
+    dispatch(setRecentProjects(loadRecentProject()));

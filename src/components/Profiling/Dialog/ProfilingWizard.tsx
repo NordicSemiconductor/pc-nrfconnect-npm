@@ -28,11 +28,10 @@ import {
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import {
+    atomicUpdateProjectSettings,
     generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
-    readProjectSettingsFromFile,
     REPORTING_RATE,
-    updateProjectSettings,
 } from '../helpers';
 import ChargingDialog from './ChargingDialog';
 import ChecklistDialog from './ChecklistDialog';
@@ -59,15 +58,17 @@ export default () => {
 
     useEffect(() => {
         if (profilingStage === 'Charging') {
-            const baseDirector = `${profile.baseDirector}/${
-                profile.name
-            }/${PROFILE_FOLDER_PREFIX}${index + 1}/`;
+            const baseDirectory = path.join(
+                profile.baseDirectory,
+                profile.name,
+                `${PROFILE_FOLDER_PREFIX}${index + 1}`
+            );
 
-            if (!existsSync(baseDirector)) {
-                mkdirSync(baseDirector, { recursive: true });
+            if (!existsSync(baseDirectory)) {
+                mkdirSync(baseDirectory, { recursive: true });
             }
 
-            const debugFolder = `${baseDirector}/debug/`;
+            const debugFolder = path.join(baseDirectory, 'debug');
 
             if (!existsSync(debugFolder)) {
                 mkdirSync(debugFolder, { recursive: true });
@@ -89,15 +90,18 @@ export default () => {
                         (Math.abs(event.data.iLoad) * REPORTING_RATE) / 3600;
                     dispatch(incrementCapacityConsumed(mAhConsumed));
 
-                    const baseDirector = `${profile.baseDirector}/${
-                        profile.name
-                    }/${PROFILE_FOLDER_PREFIX}${index + 1}`;
+                    const baseDirectory = path.join(
+                        profile.baseDirectory,
+                        profile.name,
+                        `${PROFILE_FOLDER_PREFIX}${index + 1}`
+                    );
 
-                    const profilingCsvPath = `${baseDirector}/${profile.name}_${
-                        profile.capacity
-                    }mAh_T${profile.temperatures[index] < 0 ? 'n' : 'p'}${
-                        profile.temperatures[index]
-                    }.csv`;
+                    const profilingCsvPath = path.join(
+                        baseDirectory,
+                        `${profile.name}_${profile.capacity}mAh_T${
+                            profile.temperatures[index] < 0 ? 'n' : 'p'
+                        }${profile.temperatures[index]}.csv`
+                    );
 
                     const newFile = !existsSync(profilingCsvPath);
                     let data = `${
@@ -107,28 +111,24 @@ export default () => {
                     }\r\n`;
                     if (newFile) {
                         data = `Seconds,Current(A),Voltage(V),Temperature(C)\r\n${data}`;
-                        const projectFilePath = generateDefaultProjectPath(
-                            `${profile.baseDirector}/${profile.name}`
-                        );
-                        const profileSettings =
-                            readProjectSettingsFromFile(projectFilePath);
-                        if (profileSettings) {
-                            profileSettings.profiles[index].csvReady = false;
-                            profileSettings.profiles[index].csvPath =
-                                path.relative(
-                                    projectFilePath,
-                                    profilingCsvPath
-                                );
+                        const projectFilePath =
+                            generateDefaultProjectPath(profile);
 
-                            dispatch(
-                                updateProjectSettings(
-                                    generateDefaultProjectPath(
-                                        `${profile.baseDirector}/${profile.name}`
-                                    ),
-                                    profileSettings
-                                )
-                            );
-                        }
+                        dispatch(
+                            atomicUpdateProjectSettings(
+                                generateDefaultProjectPath(profile),
+                                profileSettings => {
+                                    profileSettings.profiles[index].csvReady =
+                                        false;
+                                    profileSettings.profiles[index].csvPath =
+                                        path.relative(
+                                            projectFilePath,
+                                            profilingCsvPath
+                                        );
+                                    return profileSettings;
+                                }
+                            )
+                        );
                     }
 
                     appendFile(profilingCsvPath, data, () => {});

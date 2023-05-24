@@ -4,8 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+@import '~pc-nrfconnect-shared/src/variables';
+
 .profiles-container {
     padding: 16px;
+
+    .profile {
+        border-bottom: 1px solid $gray-200;
+    }
 
     .card {
         margin-top: 16px;
