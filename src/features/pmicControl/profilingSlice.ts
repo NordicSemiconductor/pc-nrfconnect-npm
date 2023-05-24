@@ -7,7 +7,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../appReducer';
-import { CCProfilingState, Profile, ProfilingProject } from './npm/types';
+import { CCProfilingState, Profile } from './npm/types';
 
 type ProfileStage =
     | 'Configuration'
@@ -29,10 +29,6 @@ interface profilingState {
     capacityConsumed: number;
     completeStep?: ProfileComplete;
     ccProfilingState: CCProfilingState;
-    profilingProjects: {
-        path: string;
-        settings: ProfilingProject | undefined;
-    }[];
 }
 
 const initialState: profilingState = {
@@ -44,23 +40,21 @@ const initialState: profilingState = {
         vLowerCutOff: 3.1,
         capacity: 400,
         temperatures: [25],
-        baseDirector: '~/',
+        baseDirectory: '~/',
         restingProfiles: [],
         profilingProfiles: [],
     },
     capacityConsumed: 0,
     ccProfilingState: 'Off',
-    profilingProjects: [],
 };
 
 const profilingSlice = createSlice({
     name: 'profiling',
     initialState,
     reducers: {
-        closeProfiling(state) {
+        closeProfiling() {
             return {
                 ...initialState,
-                profilingProjects: state.profilingProjects,
             };
         },
         setProfilingStage(state, action: PayloadAction<ProfileStage>) {
@@ -74,31 +68,6 @@ const profilingSlice = createSlice({
         },
         setProfile(state, action: PayloadAction<Profile>) {
             state.profile = action.payload;
-        },
-        setProfilingProjects(
-            state,
-            action: PayloadAction<
-                {
-                    path: string;
-                    settings: ProfilingProject | undefined;
-                }[]
-            >
-        ) {
-            state.profilingProjects = action.payload;
-        },
-        updateProfilingProject(
-            state,
-            action: PayloadAction<{
-                path: string;
-                settings: ProfilingProject | undefined;
-            }>
-        ) {
-            const index = state.profilingProjects.findIndex(
-                profile => profile.path === action.payload.path
-            );
-            if (index !== -1) {
-                state.profilingProjects[index] = action.payload;
-            }
         },
         nextProfile(state) {
             state.completeStep = undefined;
@@ -127,8 +96,6 @@ const profilingSlice = createSlice({
 export const getProfilingStage = (state: RootState) =>
     state.app.profiling.completeStep ? 'Complete' : state.app.profiling.stage;
 export const getProfile = (state: RootState) => state.app.profiling.profile;
-export const getProfileProjects = (state: RootState) =>
-    state.app.profiling.profilingProjects;
 export const getProfileIndex = (state: RootState) => state.app.profiling.index;
 export const getProfileStartTime = (state: RootState) =>
     state.app.profiling.startTime;
@@ -143,8 +110,6 @@ export const {
     closeProfiling,
     setProfilingStage,
     setCompleteStep,
-    setProfilingProjects,
-    updateProfilingProject,
     setProfile,
     nextProfile,
     restartProfile,
