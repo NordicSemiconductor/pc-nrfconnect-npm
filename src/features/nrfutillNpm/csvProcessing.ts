@@ -116,6 +116,9 @@ export const generateParamsFromCSV =
                     }
                 );
 
+                profile.paramsJson = undefined;
+                profile.batteryJson = undefined;
+
                 dispatch(
                     setProjectProfileProgress({
                         path: projectAbsolutePath,
