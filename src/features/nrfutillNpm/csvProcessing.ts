@@ -139,17 +139,40 @@ export const generateParamsFromCSV =
                                     )}_params.json`
                                 );
 
-                                if (fs.existsSync(batteryModelPath)) {
+                                if (
+                                    fs.existsSync(batteryModelPath) &&
+                                    fs.existsSync(paramsPath)
+                                ) {
                                     proj.profiles[index].batteryJson =
                                         fs.readFileSync(
                                             batteryModelPath,
                                             'utf8'
                                         );
-                                }
 
-                                if (fs.existsSync(paramsPath)) {
                                     proj.profiles[index].paramsJson =
                                         fs.readFileSync(paramsPath, 'utf8');
+
+                                    dispatch(
+                                        setProjectProfileProgress({
+                                            path: projectAbsolutePath,
+                                            index,
+                                            message: 'Processing Complete',
+                                            progress: 100,
+                                            ready: true,
+                                        })
+                                    );
+                                } else {
+                                    dispatch(
+                                        setProjectProfileProgress({
+                                            path: projectAbsolutePath,
+                                            index,
+                                            message:
+                                                'ERROR: Something went wrong while processing the data. Please try again.',
+                                            progress: 100,
+                                            error: true,
+                                            ready: true,
+                                        })
+                                    );
                                 }
 
                                 return proj;
@@ -162,16 +185,6 @@ export const generateParamsFromCSV =
                                 force: true,
                             });
                         }
-
-                        dispatch(
-                            setProjectProfileProgress({
-                                path: projectAbsolutePath,
-                                index,
-                                message: 'Processing Complete',
-                                progress: 100,
-                                ready: true,
-                            })
-                        );
                     });
                 });
 

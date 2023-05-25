@@ -120,7 +120,7 @@ export default ({
                     </div>
                 </div>
             </div>
-            {progress && (
+            {progress && (progress.error || !progress.ready) && (
                 <div className="mt-2 mb-2">
                     <div>{progress.message}</div>
                     <ProgressBar

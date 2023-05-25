@@ -15,6 +15,7 @@ export type ProfilingCSVProgress = {
     message: string;
     progress: number;
     ready?: boolean;
+    error?: boolean;
 };
 
 export interface ProfilingProjectProfile {
