@@ -8,13 +8,17 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-import { atomicUpdateProjectSettings } from '../../components/Profiling/helpers';
+import {
+    atomicUpdateProjectSettings,
+    generateDefaultProjectPath,
+} from '../../components/Profiling/helpers';
 import {
     ProfilingProject,
     ProfilingProjectProfile,
 } from '../../components/Profiling/types';
 import { TDispatch } from '../../thunk';
 import { generateTempFolder, stringToFile } from '../helpers';
+import { Profile } from '../pmicControl/npm/types';
 import { setProjectProfileProgress } from '../pmicControl/profilingProjectsSlice.';
 
 const generateProfileName = (
@@ -24,6 +28,13 @@ const generateProfileName = (
     `${project.name}_${project.capacity}mAh_T${
         profile.temperature < 0 ? 'n' : 'p'
     }${profile.temperature}`;
+
+export const startProcessingCsv =
+    (profile: Profile, index: number) => (dispatch: TDispatch) => {
+        const profilingProjectPath = generateDefaultProjectPath(profile);
+
+        dispatch(generateParamsFromCSV(profilingProjectPath, index));
+    };
 
 export const generateParamsFromCSV =
     (projectAbsolutePath: string, index: number) => (dispatch: TDispatch) => {

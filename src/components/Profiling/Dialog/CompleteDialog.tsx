@@ -16,6 +16,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../../appReducer';
+import { startProcessingCsv } from '../../../features/nrfutillNpm/csvProcessing';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
@@ -42,6 +43,8 @@ const FinishButton = ({
 }) => {
     const dispatch = useDispatch();
     const npmDevice = useSelector(getNpmDevice);
+    const profile = useSelector(getProfile);
+    const index = useSelector(getProfileIndex);
 
     return (
         <DialogButton
@@ -57,10 +60,12 @@ const FinishButton = ({
                         }
                         dispatch(markProfilersAsReady());
                         dispatch(closeProfiling());
+                        dispatch(startProcessingCsv(profile, index));
                     })
                     .catch(() => {
                         dispatch(markProfilersAsReady());
                         dispatch(closeProfiling());
+                        dispatch(startProcessingCsv(profile, index));
                     });
             }}
         >
@@ -144,6 +149,8 @@ const NextProfileButton = ({
 }) => {
     const dispatch = useDispatch();
     const npmDevice = useSelector(getNpmDevice);
+    const profile = useSelector(getProfile);
+    const index = useSelector(getProfileIndex);
 
     return (
         <DialogButton
@@ -159,10 +166,12 @@ const NextProfileButton = ({
                         }
                         dispatch(markProfilersAsReady());
                         dispatch(nextProfile());
+                        dispatch(startProcessingCsv(profile, index));
                     })
                     .catch(() => {
                         dispatch(markProfilersAsReady());
                         dispatch(nextProfile());
+                        dispatch(startProcessingCsv(profile, index));
                     });
             }}
         >
