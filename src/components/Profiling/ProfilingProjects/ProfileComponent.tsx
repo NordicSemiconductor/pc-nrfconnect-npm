@@ -11,16 +11,9 @@ import fs from 'fs';
 import path from 'path';
 import { Alert, Button, Toggle } from 'pc-nrfconnect-shared';
 
-import { showSaveDialog } from '../../../actions/fileActions';
-import { stringToFile } from '../../../features/helpers';
-import { generateParamsFromCSV } from '../../../features/nrfutillNpm/csvProcessing';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
-import useIsUIDisabled from '../../../features/useIsUIDisabled';
-import {
-    atomicUpdateProjectSettings,
-    isProfileReadyForProcessing,
-} from '../helpers';
+import { atomicUpdateProjectSettings } from '../helpers';
 import { ProfilingProject } from '../types';
 
 import './profilingProjects.scss';
@@ -35,9 +28,7 @@ export default ({
     index: number;
 }) => {
     const dispatch = useDispatch();
-    const uiDisabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
-    const pmicConnection = npmDevice?.getConnectionState();
 
     const profile = project.profiles[index];
 
@@ -98,71 +89,6 @@ export default ({
                         />
                     </div>
                     <div className="mt-2">
-                        <Button
-                            onClick={() => {
-                                dispatch(
-                                    generateParamsFromCSV(
-                                        projectSettingsPath,
-                                        index
-                                    )
-                                );
-                            }}
-                            variant="secondary"
-                            disabled={
-                                !!progress ||
-                                !isProfileReadyForProcessing(
-                                    projectSettingsPath,
-                                    profile
-                                )
-                            }
-                        >
-                            Process CSV
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                showSaveDialog({
-                                    title: 'Battery Profile',
-                                    filters: [
-                                        {
-                                            name: 'JSON',
-                                            extensions: ['json'],
-                                        },
-                                    ],
-                                }).then(result => {
-                                    if (
-                                        !result.canceled &&
-                                        result.filePath &&
-                                        profile.batteryJson
-                                    ) {
-                                        stringToFile(
-                                            result.filePath,
-                                            profile.batteryJson
-                                        );
-                                    }
-                                });
-                            }}
-                            variant="secondary"
-                            disabled={profile.batteryJson === undefined}
-                        >
-                            Export battery model
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                if (profile.batteryJson) {
-                                    npmDevice?.downloadFuelGaugeProfile(
-                                        Buffer.from(profile.batteryJson)
-                                    );
-                                }
-                            }}
-                            variant="secondary"
-                            disabled={
-                                uiDisabled ||
-                                pmicConnection === 'ek-disconnected' ||
-                                profile.batteryJson === undefined
-                            }
-                        >
-                            Load battery model
-                        </Button>
                         <Button onClick={() => {}} variant="secondary">
                             Edit
                         </Button>

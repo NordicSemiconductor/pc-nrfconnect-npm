@@ -136,7 +136,7 @@ export default ({
                                 ).length > 0
                             }
                         >
-                            Export battery model
+                            Save Model
                         </Button>
                         <Button
                             onClick={() => {
