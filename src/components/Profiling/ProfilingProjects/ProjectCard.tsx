@@ -103,8 +103,8 @@ export default ({
                                         },
                                     ],
                                 }).then(result => {
-                                    setGeneratingBatterModel(true);
                                     if (!result.canceled && result.filePath) {
+                                        setGeneratingBatterModel(true);
                                         mergeBatteryParams(
                                             settings,
                                             notExcludedProfiles
