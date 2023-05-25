@@ -53,11 +53,7 @@ const profilingProjectsSlice = createSlice({
             );
 
             if (index !== -1) {
-                if (!action.payload.ready) {
-                    state.profilingCSVProgress[index] = action.payload;
-                } else {
-                    state.profilingCSVProgress.splice(index, 1);
-                }
+                state.profilingCSVProgress[index] = action.payload;
             } else {
                 state.profilingCSVProgress.push(action.payload);
             }
