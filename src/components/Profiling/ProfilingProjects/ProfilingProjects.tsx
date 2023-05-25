@@ -370,6 +370,8 @@ const ProjectSettingsCard = ({
                                     if (!result.canceled && result.filePath) {
                                         mergeBatteryParams(
                                             settings,
+                                            notExcludedProfiles
+                                        )
                                             .then(data => {
                                                 if (result.filePath)
                                                     stringToFile(
@@ -404,6 +406,8 @@ const ProjectSettingsCard = ({
                                 setGeneratingBatterModel(true);
                                 mergeBatteryParams(
                                     settings,
+                                    notExcludedProfiles
+                                )
                                     .then(data =>
                                         npmDevice?.downloadFuelGaugeProfile(
                                             Buffer.from(data)

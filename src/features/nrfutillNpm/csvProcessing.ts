@@ -9,15 +9,21 @@ import fs from 'fs';
 import path from 'path';
 
 import { atomicUpdateProjectSettings } from '../../components/Profiling/helpers';
-import { ProfilingProject } from '../../components/Profiling/types';
+import {
+    ProfilingProject,
+    ProfilingProjectProfile,
+} from '../../components/Profiling/types';
 import { TDispatch } from '../../thunk';
 import { generateTempFolder, stringToFile } from '../helpers';
 import { setProjectProfileProgress } from '../pmicControl/profilingProjectsSlice.';
 
-const generateProfileName = (project: ProfilingProject, index: number) =>
+const generateProfileName = (
+    project: ProfilingProject,
+    profile: ProfilingProjectProfile
+) =>
     `${project.name}_${project.capacity}mAh_T${
-        project.profiles[index].temperature < 0 ? 'n' : 'p'
-    }${project.profiles[index].temperature}`;
+        profile.temperature < 0 ? 'n' : 'p'
+    }${profile.temperature}`;
 
 export const generateParamsFromCSV =
     (projectAbsolutePath: string, index: number) => (dispatch: TDispatch) => {
@@ -42,7 +48,7 @@ export const generateParamsFromCSV =
 
                 const newCSVFileName = `${generateProfileName(
                     project,
-                    index
+                    project.profiles[index]
                 )}.csv`;
 
                 const inputFile = path.join(tempFolder, newCSVFileName);
@@ -129,7 +135,7 @@ export const generateParamsFromCSV =
                                     resultsFolder,
                                     `${generateProfileName(
                                         proj,
-                                        index
+                                        project.profiles[index]
                                     )}_params.json`
                                 );
 
@@ -176,10 +182,15 @@ export const generateParamsFromCSV =
 
 export const mergeBatteryParams = (
     project: ProfilingProject,
-    indexes: number[]
+    profiles: ProfilingProjectProfile[]
 ) =>
     new Promise<string>((resolve, reject) => {
-        if (indexes.length === 0) {
+        if (profiles.length === 0) {
+            return;
+        }
+
+        if (profiles.length === 1 && profiles[0].batteryJson) {
+            resolve(profiles[0].batteryJson);
             return;
         }
 
@@ -198,18 +209,16 @@ export const mergeBatteryParams = (
             '0',
         ];
 
-        indexes.forEach(index => {
-            const profile = project.profiles[index];
-
+        profiles.forEach(profile => {
             if (profile.paramsJson) {
                 const paramsPath = path.join(
                     tempFolder,
-                    `${generateProfileName(project, index)}_params.json`
+                    `${generateProfileName(project, profile)}_params.json`
                 );
                 stringToFile(
                     path.join(
                         tempFolder,
-                        `${generateProfileName(project, index)}_params.json`
+                        `${generateProfileName(project, profile)}_params.json`
                     ),
                     profile.paramsJson
                 );
