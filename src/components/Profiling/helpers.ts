@@ -20,7 +20,7 @@ import {
     updateProfilingProject,
 } from '../../features/pmicControl/profilingProjectsSlice.';
 import { TDispatch } from '../../thunk';
-import { ProfilingProject } from './types';
+import { ProfilingProject, ProfilingProjectProfile } from './types';
 
 export const REST_DURATION = 900; // seconds
 export const REPORTING_RATE = 1000;
@@ -46,6 +46,16 @@ const acquireFileLock = (lockFile: string): Promise<() => void> =>
 
 export const generateDefaultProjectPath = (profile: Profile) =>
     path.join(profile.baseDirectory, profile.name, 'profileSettings.json');
+
+export const isProfileReadyForProcessing = (
+    projectSettingsPath: string,
+    profile: ProfilingProjectProfile
+) =>
+    !(
+        !profile.csvPath ||
+        !profile.csvReady ||
+        !fs.existsSync(path.resolve(projectSettingsPath, profile.csvPath))
+    );
 
 const loadRecentProject = (): string[] =>
     (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
