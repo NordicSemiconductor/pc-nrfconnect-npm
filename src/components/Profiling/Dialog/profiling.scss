@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+@import '~pc-nrfconnect-shared/src/variables';
+
 .name-input {
     display: flex;
     flex-direction: column;
@@ -17,13 +19,19 @@
     input {
         height: 24px;
         border: none;
-        border-bottom: 1px solid #90a4ae;
+        border-bottom: 1px solid $gray-300;
         padding: 8px 0px;
         margin-bottom: 8px;
         padding-top: 0px;
 
         &:focus {
             outline: none !important;
+        }
+    }
+
+    &.invalid {
+        input {
+            border-bottom: 1px solid $red;
         }
     }
 }

@@ -9,6 +9,7 @@ import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch } from 'react-redux';
 import {
     Button,
+    classNames,
     DialogButton,
     GenericDialog,
     Group,
@@ -35,6 +36,7 @@ import './profiling.scss';
 export default () => {
     const [vLowerCutOff, setLowerVCutOff] = useState(3.1);
     const [vUpperCutOff, setUpperVCutOff] = useState(4);
+    const [validName, setValidName] = useState(false);
     const [name, setName] = useState('');
 
     const [capacity, setCapacity] = useState(800);
@@ -52,7 +54,7 @@ export default () => {
                 <>
                     <DialogButton
                         variant="primary"
-                        disabled={name.length === 0}
+                        disabled={!validName}
                         onClick={() => {
                             selectDirectoryDialog().then(dirPath => {
                                 const restingProfiles: CCProfile[] = [
@@ -143,12 +145,22 @@ export default () => {
             }
         >
             <Group>
-                <div className="name-input">
+                <div
+                    className={classNames(
+                        'name-input',
+                        !validName && 'invalid'
+                    )}
+                >
                     <div className="max-length">{`${name.length}/${maxLength}`}</div>
                     <input
                         maxLength={maxLength}
                         placeholder="Name your battery"
-                        onChange={event => setName(event.target.value)}
+                        onChange={event => {
+                            setName(event.target.value);
+                            const match =
+                                event.target.value.match(/^[a-zA-Z0-9]+$/);
+                            setValidName(!!match);
+                        }}
                         value={name}
                     />
                 </div>
