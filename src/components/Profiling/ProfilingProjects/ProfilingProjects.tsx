@@ -386,6 +386,7 @@ const ProjectSettingsCard = ({
                             variant="secondary"
                             disabled={
                                 settings.profiles.length === 0 ||
+                                notExcludedProfiles.length === 0 ||
                                 settings.profiles.filter(
                                     profile =>
                                         profile.paramsJson === undefined ||
@@ -416,6 +417,7 @@ const ProjectSettingsCard = ({
                             disabled={
                                 uiDisabled ||
                                 pmicConnection === 'ek-disconnected' ||
+                                notExcludedProfiles.length === 0 ||
                                 settings.profiles.length === 0 ||
                                 settings.profiles.filter(
                                     profile =>
