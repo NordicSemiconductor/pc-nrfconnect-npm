@@ -60,12 +60,10 @@ export default () => {
                 <div className="d-flex flex-column-reverse">
                     {profiles.map(project => (
                         <React.Fragment key={project.path}>
-                            {project.settings === 'fileMissing' ||
-                                (project.settings === 'fileCorrupted' && (
-                                    <MissingProjectSettingsCard
-                                        project={project}
-                                    />
-                                ))}
+                            {(project.settings === 'fileMissing' ||
+                                project.settings === 'fileCorrupted') && (
+                                <MissingProjectSettingsCard project={project} />
+                            )}
                             {typeof project.settings === 'object' && (
                                 <ProjectCard
                                     projectSettingsPath={project.path}
