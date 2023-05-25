@@ -71,8 +71,9 @@ export const addRecentProject =
     (projectPath: string) => (dispatch: TDispatch) => {
         const projects = loadRecentProject();
         projects.push(projectPath);
-        getPersistentStore().set(`profiling_projects`, projects);
-        dispatch(setRecentProjects(projects));
+        const uniqueProjects = Array.from(new Set(projects));
+        getPersistentStore().set(`profiling_projects`, uniqueProjects);
+        dispatch(setRecentProjects(uniqueProjects));
     };
 
 export const readProjectSettingsFromFile = (filePath: string) => {
