@@ -4,13 +4,19 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ProgressBar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenDialogReturnValue } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import { Alert, Button, Card, Toggle } from 'pc-nrfconnect-shared';
+import {
+    Alert,
+    Button,
+    Card,
+    GenericDialog,
+    Toggle,
+} from 'pc-nrfconnect-shared';
 
 import { showOpenDialog, showSaveDialog } from '../../../actions/fileActions';
 import { stringToFile } from '../../../features/helpers';
@@ -293,7 +299,7 @@ const ProjectSettingsCard = ({
     const allProgress = useSelector(getProjectProfileProgress).filter(
         prog => prog.path === projectSettingsPath
     );
-
+    const [generatingBatterModel, setGeneratingBatterModel] = useState(false);
     const notExcludedProfiles = settings.profiles.filter(
         profile => !profile.exclude
     );
@@ -360,19 +366,20 @@ const ProjectSettingsCard = ({
                                         },
                                     ],
                                 }).then(result => {
+                                    setGeneratingBatterModel(true);
                                     if (!result.canceled && result.filePath) {
                                         mergeBatteryParams(
                                             settings,
-                                            notExcludedProfiles.map(
-                                                (_, index) => index
-                                            )
-                                        ).then(data => {
-                                            if (result.filePath)
-                                                stringToFile(
-                                                    result.filePath,
-                                                    data
-                                                );
-                                        });
+                                            .then(data => {
+                                                if (result.filePath)
+                                                    stringToFile(
+                                                        result.filePath,
+                                                        data
+                                                    );
+                                            })
+                                            .finally(() =>
+                                                setGeneratingBatterModel(false)
+                                            );
                                     }
                                 });
                             }}
@@ -393,14 +400,17 @@ const ProjectSettingsCard = ({
                         </Button>
                         <Button
                             onClick={() => {
+                                setGeneratingBatterModel(true);
                                 mergeBatteryParams(
                                     settings,
-                                    notExcludedProfiles.map((_, index) => index)
-                                ).then(data =>
-                                    npmDevice?.downloadFuelGaugeProfile(
-                                        Buffer.from(data)
+                                    .then(data =>
+                                        npmDevice?.downloadFuelGaugeProfile(
+                                            Buffer.from(data)
+                                        )
                                     )
-                                );
+                                    .finally(() =>
+                                        setGeneratingBatterModel(false)
+                                    );
                             }}
                             variant="secondary"
                             disabled={
@@ -430,6 +440,15 @@ const ProjectSettingsCard = ({
                 projectSettingsPath={projectSettingsPath}
                 settings={settings}
             />
+            <GenericDialog
+                title="Battery Model"
+                onHide={() => {}}
+                showSpinner
+                isVisible={generatingBatterModel}
+                footer={null}
+            >
+                Generating battery model...
+            </GenericDialog>
         </Card>
     );
 };
