@@ -209,6 +209,34 @@ const ProfileComponent = ({
                         >
                             Load battery model
                         </Button>
+                        <Button onClick={() => {}} variant="secondary">
+                            Edit
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                dispatch(
+                                    atomicUpdateProjectSettings(
+                                        projectSettingsPath,
+                                        projectSettings => {
+                                            projectSettings.profiles.splice(
+                                                index,
+                                                1
+                                            );
+
+                                            return projectSettings;
+                                        }
+                                    )
+                                );
+                                if (profile.batteryJson) {
+                                    npmDevice?.downloadFuelGaugeProfile(
+                                        Buffer.from(profile.batteryJson)
+                                    );
+                                }
+                            }}
+                            variant="secondary"
+                        >
+                            Remove
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -435,6 +463,12 @@ const ProjectSettingsCard = ({
                         >
                             Load battery model
                         </Button>
+                        <Button onClick={() => {}} variant="secondary">
+                            Edit
+                        </Button>
+                        <Button onClick={() => {}} variant="secondary">
+                            Add
+                        </Button>
                         <RemoveButton
                             projectSettingsPath={projectSettingsPath}
                         />
@@ -494,6 +528,9 @@ export default () => {
                     variant="secondary"
                 >
                     Add Existing Profile
+                </Button>
+                <Button onClick={() => {}} variant="secondary">
+                    Create new profile
                 </Button>
                 <div className="d-flex flex-column-reverse">
                     {profiles.map(project => (
