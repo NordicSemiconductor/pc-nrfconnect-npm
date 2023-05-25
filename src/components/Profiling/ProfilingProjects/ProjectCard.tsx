@@ -34,7 +34,7 @@ export default ({
     const npmDevice = useSelector(getNpmDevice);
     const pmicConnection = npmDevice?.getConnectionState();
     const allProgress = useSelector(getProjectProfileProgress).filter(
-        prog => prog.path === projectSettingsPath
+        prog => prog.path === projectSettingsPath && !prog.ready
     );
     const [generatingBatterModel, setGeneratingBatterModel] = useState(false);
     const notExcludedProfiles = settings.profiles.filter(
@@ -55,12 +55,12 @@ export default ({
                         <Button
                             onClick={() => {
                                 settings.profiles.forEach((setting, index) => {
-                                    if (
-                                        !setting.exclude &&
-                                        allProgress.findIndex(
+                                    const inProgress =
+                                        allProgress.find(
                                             progress => progress.index === index
-                                        ) === -1
-                                    ) {
+                                        ) !== undefined;
+
+                                    if (!setting.exclude && !inProgress) {
                                         dispatch(
                                             generateParamsFromCSV(
                                                 projectSettingsPath,
@@ -72,16 +72,12 @@ export default ({
                             }}
                             variant="secondary"
                             disabled={
-                                settings.profiles.length === 0 ||
                                 notExcludedProfiles.length === 0 ||
                                 allProgress.filter(
                                     progress =>
                                         !settings.profiles[progress.index]
                                             .exclude
-                                ).length ===
-                                    settings.profiles.filter(
-                                        profile => !profile.exclude
-                                    ).length ||
+                                ).length === notExcludedProfiles.length ||
                                 settings.profiles.filter(profile =>
                                     isProfileReadyForProcessing(
                                         projectSettingsPath,
@@ -90,7 +86,7 @@ export default ({
                                 ).length === 0
                             }
                         >
-                            Process all CSVs
+                            Process data
                         </Button>
                         <Button
                             onClick={() => {
