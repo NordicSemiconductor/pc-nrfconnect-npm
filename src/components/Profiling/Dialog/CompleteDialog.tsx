@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useMemo, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { existsSync, mkdirSync, rmSync } from 'fs';
 import {
-    Alert,
     ButtonVariants,
     DialogButton,
     GenericDialog,
@@ -34,6 +33,7 @@ import {
     generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
 } from '../helpers';
+import StepperProgress from './StepperProgress';
 import { ElapsedTime } from './TimeComponent';
 
 const FinishButton = ({
@@ -218,17 +218,6 @@ export default () => {
 
     const lastProfile = index + 1 === profile.temperatures.length;
 
-    const label = useMemo(() => {
-        switch (completeStep?.level) {
-            case 'success':
-                return 'Success ';
-            case 'danger':
-                return 'Error ';
-            case 'warning':
-                return 'Warning ';
-        }
-    }, [completeStep]);
-
     return (
         <GenericDialog
             title={`Battery Profiling ${
@@ -278,9 +267,7 @@ export default () => {
             }
         >
             <Group>
-                <Alert label={label} variant={completeStep?.level ?? 'success'}>
-                    {completeStep?.message ?? ''}
-                </Alert>
+                <StepperProgress />
                 <div>
                     <strong>Status: </strong>
                     <span>{`Results for profile at temperature ${

@@ -22,6 +22,7 @@ import {
     getProfile,
     getProfileIndex,
 } from '../../../features/pmicControl/profilingSlice';
+import StepperProgress from './StepperProgress';
 import TimeComponent from './TimeComponent';
 
 export default () => {
@@ -111,6 +112,7 @@ export default () => {
                     make sure that the computer does not go into sleep or
                     hibernate during this process.
                 </Alert>
+                <StepperProgress />
                 <div>
                     <strong>Status: </strong>
                     <span>{`Profiling. ${capacityConsumed.toFixed(2)}mAh of ${

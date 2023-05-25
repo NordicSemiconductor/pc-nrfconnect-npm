@@ -13,7 +13,7 @@ export type ProfilingCSVProgress = {
     path: string;
     index: number;
     message: string;
-    progress: number;
+    progress?: number;
     ready?: boolean;
     error?: boolean;
 };

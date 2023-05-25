@@ -8,10 +8,10 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
-    Button,
     DialogButton,
     GenericDialog,
     Group,
+    Step,
     useStopwatch,
 } from 'pc-nrfconnect-shared';
 
@@ -32,6 +32,7 @@ import {
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import { REPORTING_RATE } from '../helpers';
+import StepperProgress from './StepperProgress';
 import { ElapsedTime } from './TimeComponent';
 
 export default () => {
@@ -61,6 +62,50 @@ export default () => {
             pause();
         }
     }, [pause, pmicChargingState]);
+
+    let stepOverride: Partial<Step> | undefined;
+
+    if (!batteryConnected) {
+        stepOverride = {
+            caption:
+                'Did not detect battery. Please ensure battery is connected.',
+            state: 'warning',
+        };
+    } else if (!batteryFull && !usbPowered) {
+        stepOverride = {
+            caption: 'Please connect USB PMIC to continue',
+            state: 'warning',
+        };
+    } else if (batteryFull && usbPowered) {
+        stepOverride = {
+            caption: 'Please disconnect USB PMIC to continue',
+            state: 'warning',
+        };
+    } else if (!batteryFull && !chargers[0]?.enabled) {
+        stepOverride = {
+            caption: [
+                {
+                    id: '1',
+                    caption: 'Charging has been turned off',
+                },
+                {
+                    id: '2',
+                    caption: 'Try Again',
+                    action: () => {
+                        chargers.forEach((_, i) =>
+                            npmDevice?.setChargerEnabled(i, true)
+                        );
+                    },
+                },
+            ],
+            state: 'warning',
+        };
+    } else if (batteryFull) {
+        stepOverride = {
+            caption: 'Battery full click continue',
+            state: 'warning',
+        };
+    }
 
     return (
         <GenericDialog
@@ -131,48 +176,13 @@ export default () => {
             }
         >
             <Group>
-                {!batteryConnected && (
-                    <Alert label="Warning " variant="warning">
-                        Did not detect battery. Please ensure battery is
-                        connected.
-                    </Alert>
-                )}
-                {!batteryFull && !usbPowered && (
-                    <Alert label="Warning " variant="warning">
-                        Please connect USB PMIC to continue
-                    </Alert>
-                )}
-                {batteryFull && usbPowered && (
-                    <Alert label="Warning " variant="warning">
-                        Please disconnect USB PMIC to continue
-                    </Alert>
-                )}
-                {!batteryFull && !chargers[0]?.enabled && (
-                    <Alert label="" variant="warning">
-                        <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
-                            <span>
-                                <strong>Warning</strong> Charging has been
-                                turned off.
-                            </span>
-                            <Button
-                                variant="custom"
-                                onClick={() => {
-                                    chargers.forEach((_, i) =>
-                                        npmDevice?.setChargerEnabled(i, true)
-                                    );
-                                }}
-                            >
-                                Turn on
-                            </Button>
-                        </div>
-                    </Alert>
-                )}
                 {batteryFull && (
                     <Alert
                         label="Info "
                         variant="info"
                     >{`Make sure battery is in the oven with a temperature of ${profile.temperatures[index]} °C. Current NTC temperature ${adcSample?.tBat} °C`}</Alert>
                 )}
+                <StepperProgress currentProfilingStepOverride={stepOverride} />
                 <div>
                     <span>
                         <strong>Status: </strong>
