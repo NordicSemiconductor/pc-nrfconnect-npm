@@ -29,6 +29,7 @@ interface profilingState {
     capacityConsumed: number;
     completeStep?: ProfileComplete;
     ccProfilingState: CCProfilingState;
+    latestTBat?: number;
 }
 
 const initialState: profilingState = {
@@ -84,6 +85,9 @@ const profilingSlice = createSlice({
         setCcProfiling(state, action: PayloadAction<CCProfilingState>) {
             state.ccProfilingState = action.payload;
         },
+        setLatestTBat(state, action: PayloadAction<number | undefined>) {
+            state.latestTBat = action.payload;
+        },
     },
 });
 
@@ -97,11 +101,14 @@ export const getCapacityConsumed = (state: RootState) =>
     state.app.profiling.capacityConsumed;
 export const getCcProfilingState = (state: RootState) =>
     state.app.profiling.ccProfilingState;
+export const getLatestTBat = (state: RootState) =>
+    state.app.profiling.latestTBat;
 
 export const {
     closeProfiling,
     setProfilingStage,
     setCompleteStep,
+    setLatestTBat,
     setProfile,
     nextProfile,
     restartProfile,

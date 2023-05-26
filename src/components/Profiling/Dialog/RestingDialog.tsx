@@ -7,7 +7,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    Alert,
     DialogButton,
     GenericDialog,
     Group,
@@ -18,10 +17,15 @@ import { noop } from '../../../features/pmicControl/npm/pmicHelpers';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
+    getLatestTBat,
     getProfile,
     getProfileIndex,
 } from '../../../features/pmicControl/profilingSlice';
 import { REST_DURATION } from '../helpers';
+import {
+    ProfilingTemperatureAlert,
+    RestingProfilingAlerts,
+} from './CommonAlerts';
 import StepperProgress from './StepperProgress';
 import TimeComponent from './TimeComponent';
 
@@ -29,6 +33,7 @@ export default () => {
     const profile = useSelector(getProfile);
     const index = useSelector(getProfileIndex);
     const npmDevice = useSelector(getNpmDevice);
+    const latestTBat = useSelector(getLatestTBat);
 
     const { time } = useStopwatch({
         autoStart: true,
@@ -64,15 +69,12 @@ export default () => {
             }
         >
             <Group>
-                <Alert variant="warning" label="Warning ">
-                    Modifying device configuration during profiling will abort
-                    the process.
-                </Alert>
-                <Alert variant="info" label="Info ">
-                    Profiling takes a long time to complete (~48hrs per
-                    temperature). Please make sure that the computer does not go
-                    into sleep or hibernate during this process.
-                </Alert>
+                <RestingProfilingAlerts />
+                <ProfilingTemperatureAlert
+                    showOnWarning
+                    currentTemperature={latestTBat}
+                    expectedTemperature={profile.temperatures[index]}
+                />
                 <StepperProgress
                     currentProfilingStepOverride={{
                         caption: 'Resting Battery',

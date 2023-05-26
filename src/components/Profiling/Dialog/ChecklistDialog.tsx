@@ -28,6 +28,7 @@ import {
     setCompleteStep,
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
+import { ChargingTemperatureAlert } from './CommonAlerts';
 
 export default () => {
     const adcSample = useSelector(getLatestAdcSample);
@@ -160,12 +161,10 @@ export default () => {
                                 connected to the EK before you continue
                             </Alert>
                         )}
-                        <Alert
-                            label="Info "
-                            variant="info"
-                        >{`Make sure battery is at room temperature before charging (20 °C - 25 °C). Current NTC temperature ${
-                            adcSample?.tBat ?? NaN
-                        } °C`}</Alert>
+                        <ChargingTemperatureAlert
+                            expectedTemperature={22.5}
+                            currentTemperature={adcSample?.tBat}
+                        />
                     </>
                 )}
             </Group>

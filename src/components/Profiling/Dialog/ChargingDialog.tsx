@@ -7,7 +7,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    Alert,
     DialogButton,
     GenericDialog,
     Group,
@@ -32,6 +31,10 @@ import {
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import { REPORTING_RATE } from '../helpers';
+import {
+    ChargingTemperatureAlert,
+    ProfilingTemperatureAlert,
+} from './CommonAlerts';
 import StepperProgress from './StepperProgress';
 import { ElapsedTime } from './TimeComponent';
 
@@ -193,10 +196,17 @@ export default () => {
         >
             <Group>
                 {batteryFull && (
-                    <Alert
-                        label="Info "
-                        variant="info"
-                    >{`Make sure battery is in the oven with a temperature of ${profile.temperatures[index]} °C. Current NTC temperature ${adcSample?.tBat} °C`}</Alert>
+                    <ProfilingTemperatureAlert
+                        currentTemperature={adcSample?.tBat}
+                        expectedTemperature={profile.temperatures[index]}
+                    />
+                )}
+                {!batteryFull && (
+                    <ChargingTemperatureAlert
+                        showOnWarning
+                        currentTemperature={adcSample?.tBat}
+                        expectedTemperature={22.5}
+                    />
                 )}
                 <StepperProgress currentProfilingStepOverride={stepOverride} />
                 <ElapsedTime time={time} />

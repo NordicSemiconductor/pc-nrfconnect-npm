@@ -27,6 +27,7 @@ import {
     getProfilingStage,
     incrementCapacityConsumed,
     setCompleteStep,
+    setLatestTBat,
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import { TDispatch } from '../../../thunk';
@@ -103,6 +104,9 @@ export default () => {
     useEffect(
         () =>
             npmDevice?.getBatteryProfiler()?.onProfilingEvent(event => {
+                dispatch(
+                    setLatestTBat(Number.parseFloat(event.data.tBat.toFixed(2)))
+                );
                 if (event.data.seq === 1 && profilingStage === 'Resting') {
                     dispatch(setProfilingStage('Profiling'));
                     timeOffset.current = event.timestamp;
