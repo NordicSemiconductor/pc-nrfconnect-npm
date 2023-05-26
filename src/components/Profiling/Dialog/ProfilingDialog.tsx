@@ -112,13 +112,13 @@ export default () => {
                     temperature). Please make sure that the computer does not go
                     into sleep or hibernate during this process.
                 </Alert>
-                <StepperProgress />
-                <div>
-                    <strong>Status: </strong>
-                    <span>{`Profiling. ${capacityConsumed.toFixed(2)}mAh of ${
-                        profile.capacity
-                    }mAh`}</span>
-                </div>
+                <StepperProgress
+                    currentProfilingStepOverride={{
+                        caption: `Profiling. ${capacityConsumed.toFixed(
+                            2
+                        )}mAh of ${profile.capacity}mAh`,
+                    }}
+                />
                 <TimeComponent time={time} progress={progress} />
             </Group>
         </GenericDialog>
