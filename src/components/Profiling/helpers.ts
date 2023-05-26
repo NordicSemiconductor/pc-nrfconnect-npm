@@ -20,7 +20,11 @@ import {
     updateProfilingProject,
 } from '../../features/pmicControl/profilingProjectsSlice.';
 import { TDispatch } from '../../thunk';
-import { ProfilingProject, ProfilingProjectProfile } from './types';
+import {
+    ProfilingProject,
+    ProfilingProjectProfile,
+    ProjectPathPair,
+} from './types';
 
 export const REST_DURATION = 900; // seconds
 export const REPORTING_RATE = 1000;
@@ -76,9 +80,11 @@ export const addRecentProject =
         dispatch(setRecentProjects(uniqueProjects));
     };
 
-export const readProjectSettingsFromFile = (filePath: string) => {
+export const readProjectSettingsFromFile = (
+    filePath: string
+): Omit<ProjectPathPair, 'path'> => {
     if (!fs.existsSync(filePath)) {
-        return 'fileMissing';
+        return { settings: undefined, error: 'fileMissing' };
     }
 
     try {
@@ -89,13 +95,13 @@ export const readProjectSettingsFromFile = (filePath: string) => {
                 name: pathObject.name,
             });
 
-            return store.store;
+            return { settings: store.store };
         }
     } catch (error) {
-        return 'fileCorrupted';
+        return { settings: undefined, error: 'fileCorrupted' };
     }
 
-    return 'fileCorrupted';
+    return { settings: undefined, error: 'fileCorrupted' };
 };
 
 export const atomicUpdateProjectSettings =

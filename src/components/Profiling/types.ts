@@ -6,7 +6,8 @@
 
 export type ProjectPathPair = {
     path: string;
-    settings: ProfilingProject | 'fileMissing' | 'fileCorrupted';
+    settings: ProfilingProject | undefined;
+    error?: 'fileMissing' | 'fileCorrupted';
 };
 
 export type ProfilingCSVProgress = {

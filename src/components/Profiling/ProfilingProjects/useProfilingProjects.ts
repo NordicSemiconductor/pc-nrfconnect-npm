@@ -31,7 +31,7 @@ export const useProfilingProjects = () => {
             setProfilingProjects(
                 recentProjects.map(recentProject => ({
                     path: recentProject,
-                    settings: readProjectSettingsFromFile(recentProject),
+                    ...readProjectSettingsFromFile(recentProject),
                 }))
             )
         );
@@ -51,7 +51,11 @@ export const useProfilingProjects = () => {
                         dispatch(
                             updateProfilingProject({
                                 path: recentProject,
-                                settings: newSettings ?? 'fileMissing',
+                                settings: newSettings ?? undefined,
+                                error:
+                                    newSettings === undefined
+                                        ? 'fileMissing'
+                                        : undefined,
                             })
                         );
                     });
@@ -59,7 +63,8 @@ export const useProfilingProjects = () => {
                     dispatch(
                         updateProfilingProject({
                             path: recentProject,
-                            settings: 'fileCorrupted',
+                            settings: undefined,
+                            error: 'fileCorrupted',
                         })
                     );
 
@@ -70,7 +75,8 @@ export const useProfilingProjects = () => {
             dispatch(
                 updateProfilingProject({
                     path: recentProject,
-                    settings: 'fileMissing',
+                    settings: undefined,
+                    error: 'fileMissing',
                 })
             );
 
