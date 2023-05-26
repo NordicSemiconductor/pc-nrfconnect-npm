@@ -45,16 +45,15 @@ export default ({
             stepDataCollection.caption = 'Ready';
         } else if (index === currentProfilingIndex) {
             if (completeStep) {
-                switch (completeStep.level) {
-                    case 'success':
-                        stepDataCollection.state = 'success';
-                        break;
-                    case 'danger':
-                        stepDataCollection.state = 'failure';
-                        break;
-                    case 'warning':
-                        stepDataCollection.state = 'warning';
-                        break;
+                if (!currentProfilingStepOverride?.state) {
+                    switch (completeStep.level) {
+                        case 'success':
+                            stepDataCollection.state = 'success';
+                            break;
+                        case 'danger':
+                            stepDataCollection.state = 'failure';
+                            break;
+                    }
                 }
 
                 stepDataCollection.caption = completeStep.message;
