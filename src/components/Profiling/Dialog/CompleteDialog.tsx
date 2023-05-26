@@ -23,7 +23,6 @@ import {
     getCompleteStep,
     getProfile,
     getProfileIndex,
-    getProfileStartTime,
     nextProfile,
     restartProfile,
 } from '../../../features/pmicControl/profilingSlice';
@@ -34,7 +33,6 @@ import {
     PROFILE_FOLDER_PREFIX,
 } from '../helpers';
 import StepperProgress from './StepperProgress';
-import { ElapsedTime } from './TimeComponent';
 
 const FinishButton = ({
     variant = 'primary',
@@ -212,9 +210,8 @@ export default () => {
     const profile = useSelector(getProfile);
     const completeStep = useSelector(getCompleteStep);
     const index = useSelector(getProfileIndex);
-    const startTime = useSelector(getProfileStartTime);
     const capacityConsumed = useSelector(getCapacityConsumed);
-    const totalTime = useRef(Date.now() - startTime);
+
 
     const lastProfile = index + 1 === profile.temperatures.length;
 

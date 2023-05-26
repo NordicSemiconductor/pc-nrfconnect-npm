@@ -23,7 +23,6 @@ interface ProfileComplete {
 
 interface profilingState {
     index: number;
-    startTime: number;
     stage?: ProfileStage;
     profile: Profile;
     capacityConsumed: number;
@@ -33,7 +32,6 @@ interface profilingState {
 
 const initialState: profilingState = {
     index: 0,
-    startTime: 0,
     profile: {
         name: 'battery',
         vUpperCutOff: 4.2,
@@ -59,9 +57,6 @@ const profilingSlice = createSlice({
         },
         setProfilingStage(state, action: PayloadAction<ProfileStage>) {
             state.stage = action.payload;
-            if (action.payload === 'Checklist') {
-                state.startTime = Date.now();
-            }
         },
         setCompleteStep(state, action: PayloadAction<ProfileComplete>) {
             state.completeStep = action.payload;
@@ -72,14 +67,12 @@ const profilingSlice = createSlice({
         nextProfile(state) {
             state.completeStep = undefined;
             state.index += 1;
-            state.startTime = Date.now();
             state.stage = 'Checklist';
             state.capacityConsumed = 0;
             state.ccProfilingState = 'Off';
         },
         restartProfile(state) {
             state.completeStep = undefined;
-            state.startTime = Date.now();
             state.stage = 'Checklist';
             state.capacityConsumed = 0;
             state.ccProfilingState = 'Off';
@@ -97,8 +90,6 @@ export const getProfilingStage = (state: RootState) =>
     state.app.profiling.completeStep ? 'Complete' : state.app.profiling.stage;
 export const getProfile = (state: RootState) => state.app.profiling.profile;
 export const getProfileIndex = (state: RootState) => state.app.profiling.index;
-export const getProfileStartTime = (state: RootState) =>
-    state.app.profiling.startTime;
 export const getCompleteStep = (state: RootState) =>
     state.app.profiling.completeStep;
 export const getCapacityConsumed = (state: RootState) =>
