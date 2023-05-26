@@ -51,7 +51,7 @@ export const ElapsedTime = ({ time }: { time: number }) => {
         <div>
             <span>
                 {`Elapsed time: ${
-                    time > 0
+                    time > 1000
                         ? timeString(days, hours, minutes, seconds)
                         : '0 sec'
                 }`}
