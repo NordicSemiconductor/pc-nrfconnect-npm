@@ -73,12 +73,11 @@ export default () => {
                     temperature). Please make sure that the computer does not go
                     into sleep or hibernate during this process.
                 </Alert>
-                <StepperProgress />
-                <div>
-                    <strong>Status: </strong>
-                    <span>Resting Battery</span>
-                </div>
-
+                <StepperProgress
+                    currentProfilingStepOverride={{
+                        caption: 'Resting Battery',
+                    }}
+                />
                 <TimeComponent
                     time={time}
                     progress={(time / 1000 / REST_DURATION) * 100}
