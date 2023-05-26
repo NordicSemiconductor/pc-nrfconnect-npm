@@ -56,16 +56,17 @@ export default ({
                     }
                 }
 
-                stepDataCollection.caption = completeStep.message;
+                stepDataCollection.caption = `${completeStep.message}\r\n
+                    ${currentProfilingStepOverride?.caption ?? ''}`;
             } else {
                 stepDataCollection.state = 'active';
                 stepDataCollection.caption = `Step: ${profilingStage ?? ''}`;
-            }
 
-            stepDataCollection = {
-                ...stepDataCollection,
-                ...currentProfilingStepOverride,
-            };
+                stepDataCollection = {
+                    ...stepDataCollection,
+                    ...currentProfilingStepOverride,
+                };
+            }
         }
 
         steps.push(stepDataCollection);
@@ -77,7 +78,11 @@ export default ({
         const stepProcessing: Step = {
             id: `DataProcessing${index}`,
             title: `Data Processing for ${temp} °C`,
-            caption: processingCSVProgress?.message ?? '',
+            caption: `${
+                processingCSVProgress?.message
+                    ? `${processingCSVProgress?.message} - this can take a while...`
+                    : ''
+            } `,
         };
 
         if (processingCSVProgress?.ready && !processingCSVProgress.error) {
