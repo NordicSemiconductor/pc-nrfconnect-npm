@@ -102,8 +102,24 @@ export default () => {
         };
     } else if (batteryFull) {
         stepOverride = {
-            caption: 'Battery full click continue',
+            caption: 'Charging complete. Battery full click continue',
             state: 'warning',
+        };
+    } else if (!batteryFull) {
+        stepOverride = {
+            caption:
+                usbPowered && batteryConnected && chargers[0].enabled
+                    ? `Charging ${
+                          pmicChargingState.constantCurrentCharging
+                              ? '(Constant current)'
+                              : ''
+                      }${
+                          pmicChargingState.constantVoltageCharging
+                              ? '(Constant voltage)'
+                              : ''
+                      }`
+                    : 'Not charging',
+            state: 'active',
         };
     }
 
@@ -183,29 +199,6 @@ export default () => {
                     >{`Make sure battery is in the oven with a temperature of ${profile.temperatures[index]} °C. Current NTC temperature ${adcSample?.tBat} °C`}</Alert>
                 )}
                 <StepperProgress currentProfilingStepOverride={stepOverride} />
-                <div>
-                    <span>
-                        <strong>Status: </strong>
-                        {!batteryFull && (
-                            <span>
-                                {usbPowered &&
-                                batteryConnected &&
-                                chargers[0].enabled
-                                    ? `Charging ${
-                                          pmicChargingState.constantCurrentCharging
-                                              ? '(Constant current)'
-                                              : ''
-                                      }${
-                                          pmicChargingState.constantVoltageCharging
-                                              ? '(Constant voltage)'
-                                              : ''
-                                      }`
-                                    : 'Not charging'}
-                            </span>
-                        )}
-                        {batteryFull && <span>Charging complete</span>}
-                    </span>
-                </div>
                 <ElapsedTime time={time} />
             </Group>
         </GenericDialog>
