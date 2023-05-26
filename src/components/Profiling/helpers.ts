@@ -16,6 +16,7 @@ import {
 
 import { Profile } from '../../features/pmicControl/npm/types';
 import {
+    addRecentProject,
     setRecentProjects,
     updateProfilingProject,
 } from '../../features/pmicControl/profilingProjectsSlice.';
@@ -63,22 +64,6 @@ export const isProfileReadyForProcessing = (
 
 const loadRecentProject = (): string[] =>
     (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
-
-export const removeRecentProject =
-    (projectPath: string) => (dispatch: TDispatch) => {
-        const projects = loadRecentProject().filter(dir => dir !== projectPath);
-        getPersistentStore().set(`profiling_projects`, projects);
-        dispatch(setRecentProjects(projects));
-    };
-
-export const addRecentProject =
-    (projectPath: string) => (dispatch: TDispatch) => {
-        const projects = loadRecentProject();
-        projects.push(projectPath);
-        const uniqueProjects = Array.from(new Set(projects));
-        getPersistentStore().set(`profiling_projects`, uniqueProjects);
-        dispatch(setRecentProjects(uniqueProjects));
-    };
 
 export const readProjectSettingsFromFile = (
     filePath: string

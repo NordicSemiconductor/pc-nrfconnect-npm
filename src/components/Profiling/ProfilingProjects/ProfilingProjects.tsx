@@ -10,8 +10,11 @@ import { OpenDialogReturnValue } from 'electron';
 import { Button } from 'pc-nrfconnect-shared';
 
 import { showOpenDialog } from '../../../actions/fileActions';
-import { getProfileProjects } from '../../../features/pmicControl/profilingProjectsSlice.';
-import { addRecentProject, reloadRecentProjects } from '../helpers';
+import {
+    addRecentProject,
+    getProfileProjects,
+} from '../../../features/pmicControl/profilingProjectsSlice.';
+import { reloadRecentProjects } from '../helpers';
 import MissingProjectSettingsCard from './MissingProjectSettingsCard';
 import ProjectCard from './ProjectCard';
 import { useProfilingProjects } from './useProfilingProjects';

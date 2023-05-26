@@ -24,12 +24,45 @@ const initialState: profilingProjectState = {
     profilingCSVProgress: [],
 };
 
+const pathsAreEqual = (path1: string, path2: string) => {
+    path1 = path.resolve(path1);
+    path2 = path.resolve(path2);
+    if (process.platform === 'win32')
+        return path1.toLowerCase() === path2.toLowerCase();
+    return path1 === path2;
+};
+
 const profilingProjectsSlice = createSlice({
     name: 'profilingProjects',
     initialState,
     reducers: {
         setRecentProjects(state, action: PayloadAction<string[]>) {
             state.recentProjects = action.payload;
+        },
+        addRecentProject(state, action: PayloadAction<string>) {
+            const projects = loadRecentProject();
+
+            if (
+                projects.findIndex(p => pathsAreEqual(p, action.payload)) === -1
+            ) {
+                projects.push(action.payload);
+                getPersistentStore().set(`profiling_projects`, projects);
+                state.recentProjects = projects;
+                state.profilingCSVProgress = state.profilingCSVProgress.filter(
+                    progress => progress.path !== action.payload
+                );
+            }
+        },
+        removeRecentProject(state, action: PayloadAction<string>) {
+            const projects = loadRecentProject().filter(
+                dir => !pathsAreEqual(dir, action.payload)
+            );
+            getPersistentStore().set(`profiling_projects`, projects);
+
+            state.recentProjects = projects;
+            state.profilingCSVProgress = state.profilingCSVProgress.filter(
+                progress => progress.path !== action.payload
+            );
         },
         setProfilingProjects(state, action: PayloadAction<ProjectPathPair[]>) {
             state.profilingProjects = action.payload;
@@ -70,6 +103,8 @@ export const getProjectProfileProgress = (state: RootState) =>
 
 export const {
     setRecentProjects,
+    addRecentProject,
+    removeRecentProject,
     setProfilingProjects,
     updateProfilingProject,
     setProjectProfileProgress,

@@ -8,7 +8,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from 'pc-nrfconnect-shared';
 
-import { removeRecentProject } from '../helpers';
+import { removeRecentProject } from '../../../features/pmicControl/profilingProjectsSlice.';
 
 export default ({ projectSettingsPath }: { projectSettingsPath: string }) => {
     const dispatch = useDispatch();
