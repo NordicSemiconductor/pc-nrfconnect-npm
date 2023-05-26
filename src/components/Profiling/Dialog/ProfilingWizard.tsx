@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, existsSync, mkdirSync } from 'fs';
 import path from 'path';
 
+import { RootState } from '../../../appReducer';
+import { startProcessingCsv } from '../../../features/nrfutillNpm/csvProcessing';
 import {
     getBucks,
     getFuelGauge,
@@ -27,6 +29,7 @@ import {
     setCompleteStep,
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
+import { TDispatch } from '../../../thunk';
 import {
     atomicUpdateProjectSettings,
     generateDefaultProjectPath,
@@ -39,6 +42,23 @@ import CompleteDialog from './CompleteDialog';
 import ConfigurationDialog from './ConfigurationDialog';
 import ProfilingDialog from './ProfilingDialog';
 import RestingDialog from './RestingDialog';
+
+const markProfilersAsReady =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        const profile = getState().app.profiling.profile;
+        const index = getState().app.profiling.index;
+
+        const fileName = generateDefaultProjectPath(profile);
+        dispatch(
+            atomicUpdateProjectSettings(fileName, profileSettings => {
+                profileSettings.profiles[index].csvReady = true;
+
+                return profileSettings;
+            })
+        );
+
+        dispatch(startProcessingCsv(profile, index));
+    };
 
 export default () => {
     const timeOffset = useRef(-1);
@@ -207,6 +227,7 @@ export default () => {
                         level: 'success',
                     })
                 );
+                dispatch(markProfilersAsReady());
                 break;
             case 'ThermalError':
                 dispatch(
@@ -232,6 +253,7 @@ export default () => {
                             'Profiling POF event occurred before reaching vCutOff.',
                     })
                 );
+                dispatch(markProfilersAsReady());
                 break;
         }
     }, [ccProfilingState, dispatch, npmDevice]);
