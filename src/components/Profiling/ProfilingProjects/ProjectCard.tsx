@@ -37,7 +37,7 @@ export default ({
         prog => prog.path === projectSettingsPath && !prog.ready
     );
     const [generatingBatterModel, setGeneratingBatterModel] = useState(false);
-    const notExcludedProfiles = settings.profiles.filter(
+    const includedProfiles = settings.profiles.filter(
         profile => !profile.exclude
     );
 
@@ -72,12 +72,12 @@ export default ({
                             }}
                             variant="secondary"
                             disabled={
-                                notExcludedProfiles.length === 0 ||
+                                includedProfiles.length === 0 ||
                                 allProgress.filter(
                                     progress =>
                                         !settings.profiles[progress.index]
                                             .exclude
-                                ).length === notExcludedProfiles.length ||
+                                ).length === includedProfiles.length ||
                                 settings.profiles.filter(profile =>
                                     isProfileReadyForProcessing(
                                         projectSettingsPath,
@@ -103,7 +103,7 @@ export default ({
                                         setGeneratingBatterModel(true);
                                         mergeBatteryParams(
                                             settings,
-                                            notExcludedProfiles
+                                            includedProfiles
                                         )
                                             .then(data => {
                                                 if (result.filePath)
@@ -120,9 +120,8 @@ export default ({
                             }}
                             variant="secondary"
                             disabled={
-                                settings.profiles.length === 0 ||
-                                notExcludedProfiles.length === 0 ||
-                                settings.profiles.filter(
+                                includedProfiles.length === 0 ||
+                                includedProfiles.filter(
                                     profile =>
                                         profile.paramsJson === undefined ||
                                         !isProfileReadyForProcessing(
@@ -137,10 +136,7 @@ export default ({
                         <Button
                             onClick={() => {
                                 setGeneratingBatterModel(true);
-                                mergeBatteryParams(
-                                    settings,
-                                    notExcludedProfiles
-                                )
+                                mergeBatteryParams(settings, includedProfiles)
                                     .then(data =>
                                         npmDevice?.downloadFuelGaugeProfile(
                                             Buffer.from(data)
@@ -154,9 +150,8 @@ export default ({
                             disabled={
                                 uiDisabled ||
                                 pmicConnection === 'ek-disconnected' ||
-                                notExcludedProfiles.length === 0 ||
-                                settings.profiles.length === 0 ||
-                                settings.profiles.filter(
+                                includedProfiles.length === 0 ||
+                                includedProfiles.filter(
                                     profile =>
                                         profile.paramsJson === undefined ||
                                         !isProfileReadyForProcessing(
