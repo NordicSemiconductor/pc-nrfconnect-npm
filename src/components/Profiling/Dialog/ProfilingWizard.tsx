@@ -256,7 +256,7 @@ export default () => {
                 dispatch(markProfilersAsReady());
                 break;
         }
-    }, [ccProfilingState, dispatch, npmDevice]);
+    }, [ccProfilingState, dispatch]);
 
     return (
         <>
