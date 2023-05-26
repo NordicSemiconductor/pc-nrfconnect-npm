@@ -199,20 +199,6 @@ const RestartProfileButton = ({
     );
 };
 
-const markProfilersAsReady =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        const profile = getState().app.profiling.profile;
-        const index = getState().app.profiling.index;
-
-        const fileName = generateDefaultProjectPath(profile);
-        dispatch(
-            atomicUpdateProjectSettings(fileName, profileSettings => {
-                profileSettings.profiles[index].csvReady = true;
-                return profileSettings;
-            })
-        );
-    };
-
 const NextProfileButton = ({
     variant = 'primary',
 }: {
@@ -220,8 +206,6 @@ const NextProfileButton = ({
 }) => {
     const dispatch = useDispatch();
     const npmDevice = useSelector(getNpmDevice);
-    const profile = useSelector(getProfile);
-    const index = useSelector(getProfileIndex);
 
     return (
         <DialogButton
@@ -235,14 +219,10 @@ const NextProfileButton = ({
                         if (result) {
                             npmDevice.getBatteryProfiler()?.stopProfiling();
                         }
-                        dispatch(markProfilersAsReady());
                         dispatch(nextProfile());
-                        dispatch(startProcessingCsv(profile, index));
                     })
                     .catch(() => {
-                        dispatch(markProfilersAsReady());
                         dispatch(nextProfile());
-                        dispatch(startProcessingCsv(profile, index));
                     });
             }}
         >
