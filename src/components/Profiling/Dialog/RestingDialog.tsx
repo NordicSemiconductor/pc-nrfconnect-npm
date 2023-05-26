@@ -69,9 +69,9 @@ export default () => {
                     the process.
                 </Alert>
                 <Alert variant="info" label="Info ">
-                    Profiling takes a long time to complete (~48hrs). Please
-                    make sure that the computer does not go into sleep or
-                    hibernate during this process.
+                    Profiling takes a long time to complete (~48hrs per
+                    temperature). Please make sure that the computer does not go
+                    into sleep or hibernate during this process.
                 </Alert>
                 <StepperProgress />
                 <div>
