@@ -86,9 +86,11 @@ const RestartProfileButton = ({
         <DialogButton
             variant={variant}
             onClick={() => {
-                const baseDirector = `${profile.baseDirectory}/${
-                    profile.name
-                }/${PROFILE_FOLDER_PREFIX}${index + 1}/`;
+                const baseDirector = path.join(
+                    profile.baseDirectory,
+                    profile.name,
+                    `${PROFILE_FOLDER_PREFIX}${index + 1}`
+                );
 
                 if (existsSync(baseDirector)) {
                     rmSync(baseDirector, { recursive: true, force: true });
