@@ -10,6 +10,7 @@ import type { RootState } from '../../appReducer';
 import { CCProfilingState, Profile } from './npm/types';
 
 type ProfileStage =
+    | 'MissingSyncBoard'
     | 'Configuration'
     | 'Checklist'
     | 'Charging'

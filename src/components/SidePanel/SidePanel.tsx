@@ -305,7 +305,22 @@ export default () => {
                         variant="secondary"
                         className="w-100"
                         onClick={() => {
-                            dispatch(setProfilingStage('Configuration'));
+                            npmDevice
+                                ?.getBatteryProfiler()
+                                ?.canProfile()
+                                .then(result => {
+                                    if (result) {
+                                        dispatch(
+                                            setProfilingStage('Configuration')
+                                        );
+                                    } else {
+                                        dispatch(
+                                            setProfilingStage(
+                                                'MissingSyncBoard'
+                                            )
+                                        );
+                                    }
+                                });
                         }}
                         disabled={
                             !profilingSupported ||

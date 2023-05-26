@@ -40,6 +40,7 @@ import ChargingDialog from './ChargingDialog';
 import ChecklistDialog from './ChecklistDialog';
 import CompleteDialog from './CompleteDialog';
 import ConfigurationDialog from './ConfigurationDialog';
+import PreConfigurationDialog from './PreConfigurationDialog';
 import ProfilingDialog from './ProfilingDialog';
 import RestingDialog from './RestingDialog';
 
@@ -260,6 +261,9 @@ export default () => {
 
     return (
         <>
+            {profilingStage === 'MissingSyncBoard' && (
+                <PreConfigurationDialog />
+            )}
             {profilingStage === 'Configuration' && <ConfigurationDialog />}
             {profilingStage === 'Checklist' && <ChecklistDialog />}
             {profilingStage === 'Charging' && <ChargingDialog />}
