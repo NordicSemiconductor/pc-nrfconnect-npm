@@ -68,7 +68,7 @@ export default () => {
                         <DialogButton
                             disabled={
                                 pmicConnectionState !== 'pmic-connected' ||
-                                !usbPowered ||
+                                !usbPowered || // Do not add !batteryConnected as battery might be to low that it is not detected
                                 !syncBoardConnected
                             }
                             variant="primary"
