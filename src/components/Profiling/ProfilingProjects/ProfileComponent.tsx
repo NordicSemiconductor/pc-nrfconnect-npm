@@ -41,21 +41,15 @@ export default ({
     );
 
     return (
-        <div className="profile pb-2">
+        <div className="profile pt-2 pb-2">
             <div className="d-flex flex-row justify-content-between mt-2 mb-2">
                 <div className="flex-grow-1 mr-4">
-                    {!complete ? (
+                    {!complete && (
                         <Alert variant="info">
                             <strong>Profile is incomplete.</strong>
                             <span>{` Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V.`}</span>
                         </Alert>
-                    ) : (
-                        <div className="mb-2">
-                            <strong>Profile</strong>
-                            <span>{` - Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V`}</span>
-                        </div>
                     )}
-
                     {complete && !csvReadyExists && (
                         <Alert variant="danger" label="Error ">
                             {`File ${path.resolve(
@@ -64,6 +58,24 @@ export default ({
                             )} no longer exists!`}
                         </Alert>
                     )}
+                    {complete &&
+                        csvReadyExists &&
+                        !profile.batteryJson &&
+                        !profile.paramsJson && (
+                            <Alert variant="info">
+                                <strong>Requirers precessing</strong>
+                                <span>{` Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V.`}</span>
+                            </Alert>
+                        )}
+                    {complete &&
+                        csvReadyExists &&
+                        profile.batteryJson &&
+                        profile.paramsJson && (
+                            <div className="mb-2">
+                                <strong>Profile</strong>
+                                <span>{` - Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V`}</span>
+                            </div>
+                        )}
                 </div>
                 <div className="d-flex flex-column justify-content-between  align-items-end float-right">
                     <div>
