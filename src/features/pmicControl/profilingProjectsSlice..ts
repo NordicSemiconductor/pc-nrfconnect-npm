@@ -5,12 +5,17 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import path from 'path';
+import { getPersistentStore } from 'pc-nrfconnect-shared';
 
 import type { RootState } from '../../appReducer';
 import {
     ProfilingCSVProgress,
     ProjectPathPair,
 } from '../../components/Profiling/types';
+
+const loadRecentProject = (): string[] =>
+    (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
 
 interface profilingProjectState {
     recentProjects: string[];
