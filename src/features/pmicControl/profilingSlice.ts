@@ -18,7 +18,7 @@ type ProfileStage =
 
 interface ProfileComplete {
     message: string;
-    level: 'warning' | 'success' | 'danger';
+    level: 'success' | 'danger';
 }
 
 interface profilingState {

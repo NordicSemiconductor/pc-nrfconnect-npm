@@ -244,24 +244,6 @@ export default () => {
                             <AbortProfileButton />
                         </>
                     )}
-
-                    {completeStep?.level === 'warning' && (
-                        <>
-                            {lastProfile && (
-                                <>
-                                    <FinishButton />
-                                    <RestartProfileButton variant="secondary" />
-                                </>
-                            )}
-                            {!lastProfile && (
-                                <>
-                                    <NextProfileButton />
-                                    <RestartProfileButton variant="secondary" />
-                                    <AbortProfileButton />
-                                </>
-                            )}
-                        </>
-                    )}
                 </>
             }
         >

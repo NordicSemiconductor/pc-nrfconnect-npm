@@ -227,7 +227,7 @@ export default () => {
             case 'POF':
                 dispatch(
                     setCompleteStep({
-                        level: 'warning',
+                        level: 'danger',
                         message:
                             'Profiling POF event occurred before reaching vCutOff.',
                     })
