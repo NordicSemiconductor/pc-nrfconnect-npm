@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.0.21 - 2023-05-30
+
+### Added
+
+-   Polling for buck enable status when on/off control is set to GPIOx
+-   PMIC1300 FP2 Support FW Version 0.0.0+18
+
+### Changed
+
+-   Disable enable buck toggle control of bucks when on/off control is set to
+    GPIOx
+-   Add index to text such as Vset, Vout, Voutldo etc...
+
+### Fixed
+
+-   Charger Mode documentation tooltip
+
 ## 0.0.20 - 2023-05-23
 
 ### Added

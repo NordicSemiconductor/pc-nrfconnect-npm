@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-npm",
-    "version": "0.0.20",
+    "version": "0.0.21",
     "description": "EXPERIMENTAL: nPM PowerUP​",
     "displayName": "nPM PowerUP​",
     "repository": {
@@ -38,7 +38,7 @@
     "devDependencies": {
         "chart.js": "^4.0.1",
         "chartjs-adapter-date-fns": "^2.0.1",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v45",
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v48",
         "react-chartjs-2": "^5.0.1",
         "xterm-headless": "^5.1.0"
     },
