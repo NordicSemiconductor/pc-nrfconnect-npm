@@ -11,7 +11,6 @@ import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
 import DashboardControl from './components/Dashboard/DashboardControl';
 import DeviceSelector from './components/DeviceSelector';
-import DocumentationSections from './components/DocumentationSection';
 import Graph from './components/Graph/Graph';
 import Regulators from './components/Regulators/Regulators';
 import SidePanel from './components/SidePanel/SidePanel';
@@ -48,6 +47,5 @@ export default () => (
                 Main: Graph,
             },
         ]}
-        documentation={DocumentationSections}
     />
 );
