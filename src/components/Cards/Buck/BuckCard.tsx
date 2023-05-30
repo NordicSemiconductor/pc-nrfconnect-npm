@@ -76,10 +76,20 @@ export default ({
     );
 
     const buckOnOffControlItems = [...BuckOnOffControlValues, ...gpioNames].map(
-        item => ({
-            label: item,
-            value: item,
-        })
+        (item, i) => {
+            const label =
+                buck?.mode === 'software' ? (
+                    'Software'
+                ) : (
+                    <>
+                        V<span className="subscript">{`SET${index + 1}`}</span>
+                    </>
+                );
+            return {
+                label: i === 0 ? label : item,
+                value: item,
+            };
+        }
     );
 
     const buckRetentionControlItems = [
@@ -96,7 +106,7 @@ export default ({
             key: 'Vset',
             renderItem: (
                 <>
-                    V<span className="subscript">SET</span>
+                    V<span className="subscript">{`SET${index + 1}`}</span>
                 </>
             ),
         },
@@ -162,13 +172,17 @@ export default ({
                         titleNode={
                             <>
                                 <span>V</span>
-                                <span className="subscript">OUT</span>
+                                <span className="subscript">{`OUT${
+                                    index + 1
+                                }`}</span>
                             </>
                         }
                     >
                         <div>
                             <span>V</span>
-                            <span className="subscript">OUT</span>
+                            <span className="subscript">{`OUT${
+                                index + 1
+                            }`}</span>
                         </div>
                     </DocumentationTooltip>
 
@@ -201,7 +215,9 @@ export default ({
                         <FormLabel className="flex-row">
                             <div>
                                 <span>RET</span>
-                                <span className="subscript">VOUT</span>
+                                <span className="subscript">{`VOUT${
+                                    index + 1
+                                }`}</span>
                             </div>
                             <div className="flex-row">
                                 <NumberInlineInput

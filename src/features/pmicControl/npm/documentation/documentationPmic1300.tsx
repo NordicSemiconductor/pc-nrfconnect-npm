@@ -235,9 +235,10 @@ export const documentation: Documentation = {
                 <>
                     <p>BUCK output voltage level.</p>
                     <p>
-                        When V<span className="subscript">SET</span> pin is used
-                        to set voltage level this indicates the voltage level at
-                        V<span className="subscript">OUT</span> (read only).
+                        When V<span className="subscript">SET1</span> pin is
+                        used to set voltage level this indicates the voltage
+                        level at V<span className="subscript">OUT1</span> (read
+                        only).
                     </p>
                     <p>
                         When software is used to set voltage level the range is
@@ -261,9 +262,10 @@ export const documentation: Documentation = {
                 <>
                     <p>BUCK output voltage level.</p>
                     <p>
-                        When V<span className="subscript">SET</span> pin is used
-                        to set voltage level this indicates the voltage level at
-                        V<span className="subscript">OUT</span> (read only).
+                        When V<span className="subscript">SET2</span> pin is
+                        used to set voltage level this indicates the voltage
+                        level at V<span className="subscript">OUT2</span> (read
+                        only).
                     </p>
                     <p>
                         When software is used to set voltage level the range is

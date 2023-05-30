@@ -92,13 +92,17 @@ export default ({
                         titleNode={
                             <>
                                 <span>V</span>
-                                <span className="subscript">OUT_LDO</span>
+                                <span className="subscript">{`OUTLDO${
+                                    index + 1
+                                }`}</span>
                             </>
                         }
                     >
                         <div>
                             <span>V</span>
-                            <span className="subscript">OUT_LDO</span>
+                            <span className="subscript">{`OUTLDO${
+                                index + 1
+                            }`}</span>
                         </div>
                     </DocumentationTooltip>
 
