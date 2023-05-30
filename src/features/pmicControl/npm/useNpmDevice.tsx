@@ -18,6 +18,7 @@ import {
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { getShellParser } from '../../serial/serialSlice';
 import {
+    getBucks,
     getEventRecording,
     getEventRecordingPath,
     getNpmDevice as getNpmDeviceSlice,
@@ -58,6 +59,7 @@ export default () => {
     const pmicState = useSelector(getPmicState);
     const recordEvents = useSelector(getEventRecording);
     const recordEventsPath = useSelector(getEventRecordingPath);
+    const bucks = useSelector(getBucks);
 
     const initDevice = useCallback(() => {
         if (!npmDevice) return;
@@ -455,4 +457,18 @@ export default () => {
         });
         return () => releaseOnLoggingEvent();
     }, [npmDevice, recordEvents, recordEventsPath]);
+
+    useEffect(() => {
+        if (npmDevice) {
+            const t = setInterval(() => {
+                for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
+                    if (bucks[i].onOffControl !== 'Off') {
+                        npmDevice.requestUpdate.buckEnabled(i);
+                    }
+                }
+            }, 1000);
+
+            return () => clearInterval(t);
+        }
+    }, [bucks, npmDevice]);
 };
