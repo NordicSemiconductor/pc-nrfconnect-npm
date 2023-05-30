@@ -682,7 +682,7 @@ describe('PMIC 1300', () => {
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        callbacks?.onSuccess('app_version=0.0.0+17', command);
+                        callbacks?.onSuccess('app_version=0.0.0+18', command);
                         return Promise.resolve();
                     }
                 );
@@ -2881,7 +2881,7 @@ describe('PMIC 1300', () => {
                     },
                 ],
                 fuelGauge: true,
-                firmwareVersion: '0.0.0+17',
+                firmwareVersion: '0.0.0+18',
                 deviceType: 'npm1300',
             });
             verifyApplyConfig();
