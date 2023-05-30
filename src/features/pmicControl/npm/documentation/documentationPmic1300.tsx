@@ -85,8 +85,9 @@ export const documentation: Documentation = {
                         current into the battery drops below I
                         <span className="subscript">TERM</span> (default 10% of
                         I<span className="subscript">CHG</span>) charging is
-                        complete. N/A: Charger is not charging.
+                        complete.
                     </p>
+                    <p>N/A: Charger is not charging.</p>
                 </>
             ),
         },
