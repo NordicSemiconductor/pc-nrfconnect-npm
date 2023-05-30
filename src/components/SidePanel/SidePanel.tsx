@@ -232,7 +232,7 @@ export default () => {
                     }
                 />
             </CollapsibleGroup>
-            <CollapsibleGroup defaultCollapsed={false} heading="Fuel Profiles">
+            <CollapsibleGroup defaultCollapsed={false} heading="Fuel Gauge">
                 <Dropdown
                     label="Active Battery Model"
                     items={batteryModelItems}
