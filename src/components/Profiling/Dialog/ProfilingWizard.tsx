@@ -249,6 +249,7 @@ export default () => {
                         message: 'Profiling is ready. vCutOff was reached.',
                     })
                 );
+                dispatch(markProfilersAsReady());
                 break;
             case 'POF':
                 dispatch(
