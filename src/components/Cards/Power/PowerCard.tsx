@@ -200,7 +200,12 @@ export default ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="iTerm"
+                        label={
+                            <>
+                                <span>I</span>
+                                <span className="subscript">TERM</span>
+                            </>
+                        }
                         items={iTermItems}
                         onSelect={item =>
                             npmDevice.setChargerITerm(
@@ -221,7 +226,12 @@ export default ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="V Trickle Fast"
+                        label={
+                            <>
+                                <span>V</span>
+                                <span className="subscript">TRICKLE_FAST</span>
+                            </>
+                        }
                         items={vTrickleFastItems}
                         onSelect={item =>
                             npmDevice.setChargerVTrickleFast(
