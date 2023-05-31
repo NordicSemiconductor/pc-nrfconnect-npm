@@ -211,7 +211,7 @@ export default () => {
                     large={false}
                     variant="secondary"
                     className="w-100"
-                    startText="Recording Events"
+                    startText="Record Events"
                     stopText="Stop Recording"
                     onClick={() => {
                         if (
