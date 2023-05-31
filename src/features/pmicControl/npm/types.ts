@@ -60,8 +60,7 @@ export type ProfilingEventData = {
     cycle: number;
     seq: number;
     rep: number;
-    t0: number;
-    t1: number;
+    tload: number;
 };
 
 export type IrqEvent = {

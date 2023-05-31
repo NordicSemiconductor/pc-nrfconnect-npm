@@ -43,8 +43,7 @@ export const BatteryProfiler: IBatteryProfiler = (
                 cycle: 0,
                 seq: 0,
                 rep: 0,
-                t0: 0,
-                t1: 0,
+                tload: 0,
             };
             messageParts.forEach(part => {
                 const pair = part.split('=');
@@ -67,11 +66,8 @@ export const BatteryProfiler: IBatteryProfiler = (
                     case 'rep':
                         data.rep = Number.parseInt(pair[1], 10);
                         break;
-                    case 't0':
-                        data.t0 = Number.parseFloat(pair[1]);
-                        break;
-                    case 't1':
-                        data.t1 = Number.parseFloat(pair[1]);
+                    case 'tload':
+                        data.tload = Number.parseFloat(pair[1]);
                         break;
                 }
             });
