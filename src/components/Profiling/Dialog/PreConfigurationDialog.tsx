@@ -44,8 +44,8 @@ export default () => {
         >
             <Group>
                 <Alert label="Error " variant="danger">
-                    Sync board is not connected. Turn off EK and connect Sync
-                    board to the EK
+                    nPM-FG board is not connected. Turn off Evaluation Kit and
+                    connect nPM-FG to the Evaluation Kit
                 </Alert>
             </Group>
         </GenericDialog>

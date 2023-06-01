@@ -7,6 +7,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    Alert,
+    Button,
     DialogButton,
     GenericDialog,
     Group,
@@ -31,12 +33,12 @@ import {
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import { REPORTING_RATE } from '../helpers';
+import { ElapsedTime } from '../TimeComponent';
 import {
     ChargingTemperatureAlert,
     ProfilingTemperatureAlert,
 } from './CommonAlerts';
 import StepperProgress from './StepperProgress';
-import { ElapsedTime } from './TimeComponent';
 
 export default () => {
     const npmDevice = useSelector(getNpmDevice);
@@ -68,62 +70,32 @@ export default () => {
 
     let stepOverride: Partial<Step> | undefined;
 
-    if (!batteryConnected) {
+    if (batteryFull) {
         stepOverride = {
-            caption:
-                'Did not detect battery. Please ensure battery is connected.',
-            state: 'warning',
-        };
-    } else if (!batteryFull && !usbPowered) {
-        stepOverride = {
-            caption: 'Please connect USB PMIC to continue',
-            state: 'warning',
-        };
-    } else if (batteryFull && usbPowered) {
-        stepOverride = {
-            caption: 'Please disconnect USB PMIC to continue',
-            state: 'warning',
-        };
-    } else if (!batteryFull && !chargers[0]?.enabled) {
-        stepOverride = {
-            caption: [
-                {
-                    id: '1',
-                    caption: 'Charging has been turned off',
-                },
-                {
-                    id: '2',
-                    caption: 'Try Again',
-                    action: () => {
-                        chargers.forEach((_, i) =>
-                            npmDevice?.setChargerEnabled(i, true)
-                        );
-                    },
-                },
-            ],
-            state: 'warning',
-        };
-    } else if (batteryFull) {
-        stepOverride = {
-            caption: 'Charging complete. Battery full click continue',
-            state: 'warning',
-        };
-    } else if (!batteryFull) {
-        stepOverride = {
-            caption:
-                usbPowered && batteryConnected && chargers[0].enabled
-                    ? `Charging ${
-                          pmicChargingState.constantCurrentCharging
-                              ? '(Constant current)'
-                              : ''
-                      }${
-                          pmicChargingState.constantVoltageCharging
-                              ? '(Constant voltage)'
-                              : ''
-                      }`
-                    : 'Not charging',
+            caption: 'Charging complete.',
             state: 'active',
         };
+    } else if (!batteryFull) {
+        const charging = usbPowered && batteryConnected && chargers[0].enabled;
+        if (charging) {
+            stepOverride = {
+                caption: `Charging ${
+                    pmicChargingState.constantCurrentCharging
+                        ? '(Constant current)'
+                        : ''
+                }${
+                    pmicChargingState.constantVoltageCharging
+                        ? '(Constant voltage)'
+                        : ''
+                }`,
+                state: charging ? 'active' : 'warning',
+            };
+        } else {
+            stepOverride = {
+                caption: 'Not charging',
+                state: 'warning',
+            };
+        }
     }
 
     return (
@@ -195,6 +167,47 @@ export default () => {
             }
         >
             <Group>
+                {!batteryConnected && (
+                    <Alert label="Action: " variant="warning">
+                        Did not detect battery. Please ensure battery is
+                        connected.
+                    </Alert>
+                )}
+                {!batteryFull && !usbPowered && (
+                    <Alert label="Action: " variant="warning">
+                        Please connect USB PMIC to continue
+                    </Alert>
+                )}
+                {batteryFull && usbPowered && (
+                    <Alert label="Action: " variant="warning">
+                        Please disconnect USB PMIC to continue
+                    </Alert>
+                )}
+                {batteryFull && !usbPowered && (
+                    <Alert label="Action: " variant="warning">
+                        Please click continue
+                    </Alert>
+                )}
+                {!batteryFull && !chargers[0]?.enabled && (
+                    <Alert label="" variant="warning">
+                        <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
+                            <span>
+                                <strong>Action:</strong> Charging has been
+                                turned off.
+                            </span>
+                            <Button
+                                variant="custom"
+                                onClick={() => {
+                                    chargers.forEach((_, i) =>
+                                        npmDevice?.setChargerEnabled(i, true)
+                                    );
+                                }}
+                            >
+                                Turn on
+                            </Button>
+                        </div>
+                    </Alert>
+                )}
                 {batteryFull && (
                     <ProfilingTemperatureAlert
                         currentTemperature={adcSample?.tBat}
@@ -203,7 +216,6 @@ export default () => {
                 )}
                 {!batteryFull && (
                     <ChargingTemperatureAlert
-                        showOnWarning
                         currentTemperature={adcSample?.tBat}
                         expectedTemperature={22.5}
                     />

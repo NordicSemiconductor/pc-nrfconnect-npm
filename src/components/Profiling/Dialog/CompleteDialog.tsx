@@ -111,6 +111,7 @@ const SaveBatteryModelButton = ({
             onClick={() => {
                 showSaveDialog({
                     title: 'Battery Profile',
+                    defaultPath: `${profile.name}.json`,
                     filters: [
                         {
                             name: 'JSON',
@@ -138,7 +139,7 @@ const SaveBatteryModelButton = ({
                 });
             }}
         >
-            Save Model
+            Save Battery Model
         </DialogButton>
     );
 };
@@ -194,7 +195,7 @@ const RestartProfileButton = ({
                     });
             }}
         >
-            Restart Profile
+            Restart Profiling
         </DialogButton>
     );
 };
@@ -323,18 +324,18 @@ export default () => {
         >
             <Group>
                 {lastProfile && !allProcessedSuccessfully && (
-                    <Alert variant="warning" label="Warning ">
+                    <Alert variant="warning" label="Warning: ">
                         {successfullyProcessed.length > 0 &&
-                            `Models that failed to or are still processing will not be included when saving the battery model. `}
+                            `Models that failed to, or are still processing, will not be included when saving the battery model. `}
                         {successfullyProcessed.length === 0 &&
-                            `No models to be saved. Reprocess any failed models. `}
-                        Data will continue to be processed in the background
-                        when exiting this dialog and can be saved later from the
-                        Profiles tab.
+                            `Not able to save battery model. No battery profiles are available yet. Try reprocess any failed models. `}
+                        {`Data will continue to be processed in the background if
+                        you click finish. You can continue to work on theses
+                        profiles from the 'Profiles' tab`}
                     </Alert>
                 )}
                 {generatingBatteryModel && (
-                    <Alert variant="info" label="Info ">
+                    <Alert variant="info" label="Info: ">
                         Generating battery model
                     </Alert>
                 )}

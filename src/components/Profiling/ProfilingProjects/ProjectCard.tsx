@@ -91,7 +91,8 @@ export default ({
                         <Button
                             onClick={() => {
                                 showSaveDialog({
-                                    title: 'Battery Profile',
+                                    title: 'Battery Model',
+                                    defaultPath: `${settings.name}.json`,
                                     filters: [
                                         {
                                             name: 'JSON',

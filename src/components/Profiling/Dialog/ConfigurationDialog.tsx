@@ -34,8 +34,8 @@ import { ProfilingProject } from '../types';
 import './profiling.scss';
 
 export default () => {
-    const [vLowerCutOff, setLowerVCutOff] = useState(3.1);
-    const [vUpperCutOff, setUpperVCutOff] = useState(4);
+    const [vLowerCutOff, setLowerVCutOff] = useState(3);
+    const [vUpperCutOff, setUpperVCutOff] = useState(4.2);
     const [validName, setValidName] = useState(false);
     const [name, setName] = useState('');
 
@@ -237,7 +237,7 @@ export default () => {
                                 range={{ min: 32, max: 3000 }}
                                 onChange={setCapacity}
                             />
-                            <span>mAH</span>
+                            <span>mAh</span>
                         </div>
                     </FormLabel>
                     <Slider

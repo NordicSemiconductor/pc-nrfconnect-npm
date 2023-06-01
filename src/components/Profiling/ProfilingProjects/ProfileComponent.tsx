@@ -5,15 +5,15 @@
  */
 
 import React from 'react';
-import { ProgressBar } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import fs from 'fs';
 import path from 'path';
-import { Alert, Button, Toggle } from 'pc-nrfconnect-shared';
+import { Alert, Button, Toggle, useStopwatch } from 'pc-nrfconnect-shared';
 
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { atomicUpdateProjectSettings } from '../helpers';
+import TimeComponent from '../TimeComponent';
 import { ProfilingProject } from '../types';
 
 import './profilingProjects.scss';
@@ -39,6 +39,11 @@ export default ({
     const progress = useSelector(getProjectProfileProgress).find(
         prog => prog.path === projectSettingsPath && prog.index === index
     );
+
+    const { time } = useStopwatch({
+        autoStart: true,
+        resolution: 1000,
+    });
 
     return (
         <div className="profile pt-2 pb-2">
@@ -135,9 +140,9 @@ export default ({
             {progress && (progress.error || !progress.ready) && (
                 <div className="mt-2 mb-2">
                     <div>{progress.message}</div>
-                    <ProgressBar
-                        now={progress.progress}
-                        style={{ height: '4px' }}
+                    <TimeComponent
+                        time={time}
+                        progress={progress.progress ?? 0}
                     />
                 </div>
             )}

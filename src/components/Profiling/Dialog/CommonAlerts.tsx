@@ -9,11 +9,11 @@ import { Alert } from 'pc-nrfconnect-shared';
 
 export const RestingProfilingAlerts = () => (
     <>
-        <Alert variant="warning" label="Warning ">
+        <Alert variant="warning" label="Warning: ">
             Modifying device configuration during profiling will abort the
             process.
         </Alert>
-        <Alert variant="info" label="Info ">
+        <Alert variant="info" label="Info: ">
             Profiling takes a long time to complete (~48hrs per temperature).
             Please make sure that the computer does not go into sleep or
             hibernate during this process.
@@ -38,7 +38,7 @@ const TemperatureAlert = ({
     if (!showOnWarning || (showOnWarning && temperatureDelta > 2.5)) {
         return (
             <Alert
-                label={temperatureDelta > 2.5 ? 'Warning ' : 'Info '}
+                label={temperatureDelta > 2.5 ? 'Warning: ' : 'Info: '}
                 variant={temperatureDelta > 2.5 ? 'warning' : 'info'}
             >
                 {message}
@@ -80,7 +80,7 @@ export const ProfilingTemperatureAlert = ({
         showOnWarning={showOnWarning}
         expectedTemperature={expectedTemperature}
         currentTemperature={currentTemperature}
-        message={`Make sure battery is in the oven with a temperature of ${expectedTemperature} °C. Current NTC temperature ${
+        message={`Make sure battery is in a temperature chamber with a temperature of ${expectedTemperature} °C. Current NTC temperature ${
             currentTemperature ?? NaN
         } °C`}
     />

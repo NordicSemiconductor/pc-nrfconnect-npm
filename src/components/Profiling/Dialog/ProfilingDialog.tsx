@@ -22,12 +22,12 @@ import {
     getProfile,
     getProfileIndex,
 } from '../../../features/pmicControl/profilingSlice';
+import TimeComponent from '../TimeComponent';
 import {
     ProfilingTemperatureAlert,
     RestingProfilingAlerts,
 } from './CommonAlerts';
 import StepperProgress from './StepperProgress';
-import TimeComponent from './TimeComponent';
 
 export default () => {
     const profile = useSelector(getProfile);

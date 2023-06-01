@@ -121,7 +121,7 @@ export default () => {
         >
             <Group>
                 {pmicConnectionState === 'pmic-disconnected' && (
-                    <Alert label="Warning " variant="warning">
+                    <Alert label="Warning: " variant="warning">
                         PMIC is not powered.
                     </Alert>
                 )}
@@ -129,7 +129,7 @@ export default () => {
                     <Alert label="" variant="warning">
                         <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
                             <span>
-                                <strong>Warning </strong>PMIC Pending device
+                                <strong>Warning: </strong>PMIC Pending device
                                 restart.
                             </span>
                             <Button
@@ -144,21 +144,22 @@ export default () => {
                     </Alert>
                 )}
                 {pmicConnectionState === 'pmic-unknown' && (
-                    <Alert label="Info " variant="info">
+                    <Alert label="Info: " variant="info">
                         Waiting to connect to PMIC
                     </Alert>
                 )}
                 {pmicConnectionState === 'pmic-connected' && (
                     <>
                         {!usbPowered && (
-                            <Alert label="Warning " variant="warning">
+                            <Alert label="Action: " variant="warning">
                                 Please connect USB PMIC to continue
                             </Alert>
                         )}
                         {!batteryConnected && (
-                            <Alert label="Warning " variant="warning">
+                            <Alert label="Warning: " variant="warning">
                                 Battery is not detected. Make sure it is
-                                connected to the EK before you continue
+                                connected to the Evaluation Kit before you
+                                continue
                             </Alert>
                         )}
                         <ChargingTemperatureAlert
