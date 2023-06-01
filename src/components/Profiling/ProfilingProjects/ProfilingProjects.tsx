@@ -5,9 +5,10 @@
  */
 
 import React, { useState } from 'react';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenDialogReturnValue } from 'electron';
-import { Button } from 'pc-nrfconnect-shared';
 
 import { showOpenDialog } from '../../../actions/fileActions';
 import {
@@ -30,15 +31,21 @@ export default () => {
     useProfilingProjects();
 
     return (
-        <div className="profiles-container">
-            <div>
-                <Button
+        <div className="profiles-container d-flex flex-column">
+            <DropdownButton
+                className="align-self-end mr-3"
+                variant="secondary"
+                title="Projects"
+                alignRight
+            >
+                <Dropdown.Item
                     onClick={() => dispatch(reloadRecentProjects())}
                     variant="secondary"
                 >
-                    Reload
-                </Button>
-                <Button
+                    Reload Projects
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item
                     onClick={() => {
                         showOpenDialog({
                             title: 'Select a JSON file',
@@ -58,38 +65,39 @@ export default () => {
                     variant="secondary"
                 >
                     Add Existing Project
-                </Button>
-                <Button
+                </Dropdown.Item>
+                <Dropdown.Item
                     onClick={() => {
                         setShowAddProjectDialog(true);
                     }}
                     variant="secondary"
                 >
                     Create new project
-                </Button>
-                <div className="d-flex flex-column-reverse">
-                    {profiles.map(project => (
-                        <React.Fragment key={project.path}>
-                            {project.error && (
-                                <MissingProjectSettingsCard project={project} />
-                            )}
-                            {project.settings && (
-                                <ProjectCard
-                                    projectSettingsPath={project.path}
-                                    settings={project.settings}
-                                />
-                            )}
-                        </React.Fragment>
-                    ))}
-                </div>
-                {showAddProjectDialog && (
-                    <AddEditProjectDialog
-                        onClose={() => {
-                            setShowAddProjectDialog(false);
-                        }}
-                    />
-                )}
+                </Dropdown.Item>
+            </DropdownButton>
+
+            <div className="d-flex flex-column-reverse">
+                {profiles.map(project => (
+                    <React.Fragment key={project.path}>
+                        {project.error && (
+                            <MissingProjectSettingsCard project={project} />
+                        )}
+                        {project.settings && (
+                            <ProjectCard
+                                projectSettingsPath={project.path}
+                                settings={project.settings}
+                            />
+                        )}
+                    </React.Fragment>
+                ))}
             </div>
+            {showAddProjectDialog && (
+                <AddEditProjectDialog
+                    onClose={() => {
+                        setShowAddProjectDialog(false);
+                    }}
+                />
+            )}
         </div>
     );
 };

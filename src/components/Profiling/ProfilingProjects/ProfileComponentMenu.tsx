@@ -48,10 +48,9 @@ export default ({
     return (
         <>
             <DropdownButton
-                id={`environment-${project.name}-${index}`}
                 className="ml-2 mt-0"
                 variant="secondary"
-                title=""
+                title="Profile"
                 alignRight
             >
                 <Dropdown.Item

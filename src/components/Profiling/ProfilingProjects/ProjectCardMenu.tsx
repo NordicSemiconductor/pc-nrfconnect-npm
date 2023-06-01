@@ -60,10 +60,9 @@ export default ({
     return (
         <>
             <DropdownButton
-                id={`environment-${project.name}}`}
                 className="ml-2 mt-0"
                 variant="secondary"
-                title=""
+                title="Project"
                 alignRight
             >
                 <Dropdown.Item
