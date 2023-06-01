@@ -259,7 +259,6 @@ export default () => {
                             'Profiling POF event occurred before reaching vCutOff.',
                     })
                 );
-                dispatch(markProfilersAsReady());
                 break;
         }
     }, [ccProfilingState, dispatch]);
