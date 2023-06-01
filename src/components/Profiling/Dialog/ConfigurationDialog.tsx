@@ -31,7 +31,7 @@ import {
 } from '../helpers';
 import { ProfilingProject } from '../types';
 
-import './profiling.scss';
+import '../profiling.scss';
 
 export default () => {
     const [vLowerCutOff, setLowerVCutOff] = useState(3);
