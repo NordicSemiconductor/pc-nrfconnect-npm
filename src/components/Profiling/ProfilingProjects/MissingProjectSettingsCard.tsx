@@ -5,33 +5,44 @@
  */
 
 import React from 'react';
-import { Alert, Card } from 'pc-nrfconnect-shared';
+import { useDispatch } from 'react-redux';
+import { Alert, Button, Card } from 'pc-nrfconnect-shared';
 
+import { removeRecentProject } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { ProjectPathPair } from '../types';
-import RemoveProjectButton from './RemoveProjectButton';
 
-export default ({ project }: { project: ProjectPathPair }) => (
-    <Card
-        title={
-            <div className="d-flex justify-content-between">
-                <div>
-                    <span>{project.path}</span>
+export default ({ project }: { project: ProjectPathPair }) => {
+    const dispatch = useDispatch();
+    return (
+        <Card
+            title={
+                <div className="d-flex justify-content-between">
+                    <div>
+                        <span>{project.path}</span>
+                    </div>
+                    <div>
+                        <Button
+                            onClick={() =>
+                                dispatch(removeRecentProject(project.path))
+                            }
+                            variant="secondary"
+                        >
+                            Remove
+                        </Button>
+                    </div>
                 </div>
-                <div>
-                    <RemoveProjectButton projectSettingsPath={project.path} />
-                </div>
-            </div>
-        }
-    >
-        {project.error === 'fileMissing' && (
-            <Alert label="Error " variant="danger">
-                Project settings could not be found
-            </Alert>
-        )}
-        {project.error === 'fileCorrupted' && (
-            <Alert label="Error " variant="danger">
-                Project settings are corrupt or not valid format
-            </Alert>
-        )}
-    </Card>
-);
+            }
+        >
+            {project.error === 'fileMissing' && (
+                <Alert label="Error " variant="danger">
+                    Project settings could not be found
+                </Alert>
+            )}
+            {project.error === 'fileCorrupted' && (
+                <Alert label="Error " variant="danger">
+                    Project settings are corrupt or not valid format
+                </Alert>
+            )}
+        </Card>
+    );
+};

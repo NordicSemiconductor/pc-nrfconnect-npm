@@ -4,17 +4,17 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import fs from 'fs';
 import path from 'path';
 import { Alert, Button, Toggle, useStopwatch } from 'pc-nrfconnect-shared';
 
-import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { atomicUpdateProjectSettings } from '../helpers';
 import TimeComponent from '../TimeComponent';
 import { ProfilingProject } from '../types';
+import ProfileComponentMenu from './ProfileComponentMenu';
 
 import './profilingProjects.scss';
 
@@ -28,34 +28,48 @@ export default ({
     index: number;
 }) => {
     const dispatch = useDispatch();
-    const npmDevice = useSelector(getNpmDevice);
 
     const profile = project.profiles[index];
 
-    const complete = !!profile.csvPath && profile.csvReady;
+    const dataCollected = !!profile.csvPath && profile.csvReady;
     const csvReadyExists =
         !!profile.csvPath &&
         fs.existsSync(path.resolve(projectSettingsPath, profile.csvPath));
-    const progress = useSelector(getProjectProfileProgress).find(
-        prog => prog.path === projectSettingsPath && prog.index === index
+    const allProgress = useSelector(getProjectProfileProgress);
+
+    const progress = useMemo(
+        () =>
+            allProgress.find(
+                prog =>
+                    prog.path === projectSettingsPath && prog.index === index
+            ),
+        [allProgress, index, projectSettingsPath]
     );
 
-    const { time } = useStopwatch({
-        autoStart: true,
+    const { time, reset, pause, isRunning } = useStopwatch({
+        autoStart: false,
         resolution: 1000,
     });
+
+    useEffect(() => {
+        if (!isRunning && progress?.progress === 0 && !progress.errorLevel) {
+            reset();
+        } else if (isRunning && (!progress || progress.errorLevel)) {
+            pause();
+        }
+    }, [progress, reset, pause, isRunning]);
 
     return (
         <div className="profile pt-2 pb-2">
             <div className="d-flex flex-row justify-content-between mt-2 mb-2">
                 <div className="flex-grow-1 mr-4">
-                    {!complete && (
+                    {!dataCollected && (
                         <Alert variant="info">
                             <strong>Profile is incomplete.</strong>
                             <span>{` Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V.`}</span>
                         </Alert>
                     )}
-                    {complete && !csvReadyExists && (
+                    {dataCollected && !csvReadyExists && (
                         <Alert variant="danger" label="Error ">
                             {`File ${path.resolve(
                                 projectSettingsPath,
@@ -63,26 +77,27 @@ export default ({
                             )} no longer exists!`}
                         </Alert>
                     )}
-                    {complete &&
+                    {dataCollected &&
                         csvReadyExists &&
                         !profile.batteryJson &&
-                        !profile.paramsJson && (
+                        !profile.paramsJson &&
+                        !progress && (
                             <Alert variant="info">
-                                <strong>Requirers precessing</strong>
+                                <strong>Requirers processing</strong>
                                 <span>{` Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V.`}</span>
                             </Alert>
                         )}
-                    {complete &&
+                    {dataCollected &&
                         csvReadyExists &&
-                        profile.batteryJson &&
-                        profile.paramsJson && (
+                        ((profile.batteryJson && profile.paramsJson) ||
+                            progress) && (
                             <div className="mb-2">
                                 <strong>Profile</strong>
                                 <span>{` - Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V`}</span>
                             </div>
                         )}
                 </div>
-                <div className="d-flex flex-column justify-content-between  align-items-end float-right">
+                <div className="d-flex flex-row justify-content-between  align-items-center float-right">
                     <div>
                         <Toggle
                             label="Exclude"
@@ -101,50 +116,63 @@ export default ({
                                     )
                                 );
                             }}
-                            isToggled={!!profile.exclude || !complete}
-                            disabled={!complete}
+                            isToggled={!!profile.exclude || !dataCollected}
+                            disabled={!dataCollected}
                         />
                     </div>
-                    <div className="mt-2">
-                        <Button onClick={() => {}} variant="secondary">
-                            Edit
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                dispatch(
-                                    atomicUpdateProjectSettings(
-                                        projectSettingsPath,
-                                        projectSettings => {
-                                            projectSettings.profiles.splice(
-                                                index,
-                                                1
-                                            );
-
-                                            return projectSettings;
-                                        }
-                                    )
-                                );
-                                if (profile.batteryJson) {
-                                    npmDevice?.downloadFuelGaugeProfile(
-                                        Buffer.from(profile.batteryJson)
-                                    );
-                                }
-                            }}
-                            variant="secondary"
-                        >
-                            Remove
-                        </Button>
-                    </div>
-                </div>
-            </div>
-            {progress && (progress.error || !progress.ready) && (
-                <div className="mt-2 mb-2">
-                    <div>{progress.message}</div>
-                    <TimeComponent
-                        time={time}
-                        progress={progress.progress ?? 0}
+                    <ProfileComponentMenu
+                        projectSettingsPath={projectSettingsPath}
+                        project={project}
+                        index={index}
                     />
                 </div>
+            </div>
+            {progress && !progress.errorLevel && (
+                <div className="mt-2 mb-2">
+                    <div>{progress.message}</div>
+                    <div className="d-flex align-items-end">
+                        <TimeComponent
+                            time={time}
+                            progress={progress.progress ?? 0}
+                        />
+                        {/* <Button --> TODO once NRF UTIL terminates all child processes
+                            className="ml-2"
+                            variant="secondary"
+                            onClick={() => {
+                                progress.cancel();
+                            }}
+                        >
+                            Cancel
+                        </Button> */}
+                    </div>
+                </div>
+            )}
+            {progress && progress.errorLevel && (
+                <Alert
+                    label=""
+                    variant={
+                        progress.errorLevel === 'warning' ? 'warning' : 'danger'
+                    }
+                >
+                    <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
+                        <span>
+                            <strong>{`${
+                                progress.errorLevel === 'warning'
+                                    ? 'Warning'
+                                    : 'Danger'
+                            }:`}</strong>{' '}
+                            {progress.message}
+                        </span>
+                        <Button
+                            variant="custom"
+                            onClick={() => {
+                                progress.cancel();
+                            }}
+                        >
+                            Close
+                        </Button>
+                    </div>
+                </Alert>
             )}
         </div>
     );

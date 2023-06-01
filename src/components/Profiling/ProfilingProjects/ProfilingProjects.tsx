@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenDialogReturnValue } from 'electron';
 import { Button } from 'pc-nrfconnect-shared';
@@ -15,6 +15,7 @@ import {
     getProfileProjects,
 } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { reloadRecentProjects } from '../helpers';
+import AddEditProjectDialog from './AddEditProjectDialog';
 import MissingProjectSettingsCard from './MissingProjectSettingsCard';
 import ProjectCard from './ProjectCard';
 import { useProfilingProjects } from './useProfilingProjects';
@@ -25,6 +26,7 @@ export default () => {
     const dispatch = useDispatch();
     const profiles = useSelector(getProfileProjects);
 
+    const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
     useProfilingProjects();
 
     return (
@@ -55,10 +57,15 @@ export default () => {
                     }}
                     variant="secondary"
                 >
-                    Add Existing Profile
+                    Add Existing Project
                 </Button>
-                <Button onClick={() => {}} variant="secondary">
-                    Create new profile
+                <Button
+                    onClick={() => {
+                        setShowAddProjectDialog(true);
+                    }}
+                    variant="secondary"
+                >
+                    Create new project
                 </Button>
                 <div className="d-flex flex-column-reverse">
                     {profiles.map(project => (
@@ -75,6 +82,13 @@ export default () => {
                         </React.Fragment>
                     ))}
                 </div>
+                {showAddProjectDialog && (
+                    <AddEditProjectDialog
+                        onClose={() => {
+                            setShowAddProjectDialog(false);
+                        }}
+                    />
+                )}
             </div>
         </div>
     );
