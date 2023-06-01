@@ -42,7 +42,6 @@ export default ({
     const [csvPath, setCsvPath] = useState<string | undefined>(
         profile?.csvPath
     );
-    const [csvFileChanged, setCsvFileChanged] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -63,6 +62,8 @@ export default ({
                                     projectSettingsPath,
                                     project => {
                                         if (profile) {
+                                            const csvPathChanged =
+                                                csvPath !== profile?.csvPath;
                                             project.profiles[profile.index] = {
                                                 ...project.profiles[
                                                     profile.index
@@ -71,12 +72,12 @@ export default ({
                                                 vUpperCutOff,
                                                 temperature,
                                                 csvPath,
-                                                batteryJson: csvFileChanged
+                                                batteryJson: csvPathChanged
                                                     ? undefined
                                                     : project.profiles[
                                                           profile.index
                                                       ].batteryJson,
-                                                paramsJson: csvFileChanged
+                                                paramsJson: csvPathChanged
                                                     ? undefined
                                                     : project.profiles[
                                                           profile.index
@@ -221,9 +222,6 @@ export default ({
                                     const newPath = path.relative(
                                         projectSettingsPath,
                                         result.filePaths[0]
-                                    );
-                                    setCsvFileChanged(
-                                        csvFileChanged || newPath !== csvPath
                                     );
                                     setCsvPath(newPath);
                                 }
