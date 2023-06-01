@@ -6,7 +6,9 @@
 
 import { spawn } from 'child_process';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
+import { getAppDir } from 'pc-nrfconnect-shared';
 
 import {
     atomicUpdateProjectSettings,
@@ -19,7 +21,11 @@ import {
 import { TDispatch } from '../../thunk';
 import { generateTempFolder, stringToFile } from '../helpers';
 import { Profile } from '../pmicControl/npm/types';
-import { setProjectProfileProgress } from '../pmicControl/profilingProjectsSlice.';
+import {
+    addProjectProfileProgress,
+    removeProjectProfileProgress,
+    updateProjectProfileProgress,
+} from '../pmicControl/profilingProjectsSlice.';
 
 const generateProfileName = (
     project: ProfilingProject,
@@ -29,15 +35,51 @@ const generateProfileName = (
         profile.temperature < 0 ? 'n' : 'p'
     }${profile.temperature}`;
 
+const NRFUTIL_HOME = path.join(
+    getAppDir(),
+    'resources',
+    'nrfutil-npm',
+    os.platform()
+);
+
+const BINARY_DIR = path.join(
+    getAppDir(),
+    'resources',
+    'nrfutil-npm',
+    os.platform(),
+    'bin'
+);
+
 export const startProcessingCsv =
     (profile: Profile, index: number) => (dispatch: TDispatch) => {
         const profilingProjectPath = generateDefaultProjectPath(profile);
 
         dispatch(generateParamsFromCSV(profilingProjectPath, index));
     };
-
 export const generateParamsFromCSV =
     (projectAbsolutePath: string, index: number) => (dispatch: TDispatch) => {
+        if (!fs.existsSync(BINARY_DIR)) {
+            dispatch(
+                addProjectProfileProgress({
+                    path: projectAbsolutePath,
+                    index,
+                    message:
+                        'Warning: OS not supported. Try this profile on Windows or Linux',
+                    progress: 100,
+                    errorLevel: 'warning',
+                    cancel: () => {
+                        dispatch(
+                            removeProjectProfileProgress({
+                                path: projectAbsolutePath,
+                                index,
+                            })
+                        );
+                    },
+                })
+            );
+            return;
+        }
+
         dispatch(
             atomicUpdateProjectSettings(projectAbsolutePath, project => {
                 const profile = project.profiles[index];
@@ -70,6 +112,7 @@ export const generateParamsFromCSV =
                 fs.mkdirSync(resultsFolder);
 
                 const processProgress = (data: string) => {
+                    console.log(data);
                     const progressMatch = data.match(
                         /Processing cycle [0-9]+ \/ [0-9]+/
                     );
@@ -87,7 +130,7 @@ export const generateParamsFromCSV =
                             10
                         );
                         dispatch(
-                            setProjectProfileProgress({
+                            updateProjectProfileProgress({
                                 path: projectAbsolutePath,
                                 index,
                                 message: `Processing cycle ${nominator} / ${denominator}`,
@@ -97,10 +140,12 @@ export const generateParamsFromCSV =
                     }
                 };
 
+                const env = { ...process.env };
+                env.NRFUTIL_HOME = NRFUTIL_HOME;
+
                 const processCSV = spawn(
-                    'nrfutil.exe',
+                    'nrfutil-npm',
                     [
-                        'npm',
                         'generate',
                         '--input-file',
                         inputFile,
@@ -112,7 +157,8 @@ export const generateParamsFromCSV =
                         profile.vLowerCutOff.toString(),
                     ],
                     {
-                        cwd: 'C:\\Workspace',
+                        cwd: BINARY_DIR,
+                        env,
                     }
                 );
 
@@ -120,11 +166,21 @@ export const generateParamsFromCSV =
                 profile.batteryJson = undefined;
 
                 dispatch(
-                    setProjectProfileProgress({
+                    addProjectProfileProgress({
                         path: projectAbsolutePath,
                         index,
                         message: 'Processing has started',
                         progress: 0,
+                        cancel: () => {
+                            // TODO Ask for fix in NRF UTIL
+                            processCSV.kill('SIGKILL');
+                            dispatch(
+                                removeProjectProfileProgress({
+                                    path: projectAbsolutePath,
+                                    index,
+                                })
+                            );
+                        },
                     })
                 );
 
@@ -167,24 +223,29 @@ export const generateParamsFromCSV =
                                         fs.readFileSync(paramsPath, 'utf8');
 
                                     dispatch(
-                                        setProjectProfileProgress({
+                                        removeProjectProfileProgress({
                                             path: projectAbsolutePath,
                                             index,
-                                            message: 'Processing Complete',
-                                            progress: 100,
-                                            ready: true,
                                         })
                                     );
                                 } else {
                                     dispatch(
-                                        setProjectProfileProgress({
+                                        updateProjectProfileProgress({
                                             path: projectAbsolutePath,
                                             index,
                                             message:
-                                                'ERROR: Something went wrong while processing the data. Please try again.',
-                                            progress: 100,
-                                            error: true,
-                                            ready: true,
+                                                'Something went wrong while processing the data. Please try again.',
+                                            errorLevel: 'error',
+                                            cancel: () => {
+                                                dispatch(
+                                                    removeProjectProfileProgress(
+                                                        {
+                                                            path: projectAbsolutePath,
+                                                            index,
+                                                        }
+                                                    )
+                                                );
+                                            },
                                         })
                                     );
                                 }
@@ -212,6 +273,11 @@ export const mergeBatteryParams = (
     profiles: ProfilingProjectProfile[]
 ) =>
     new Promise<string>((resolve, reject) => {
+        if (!fs.existsSync(BINARY_DIR)) {
+            reject(new Error('OS not supported'));
+            return;
+        }
+
         if (profiles.length === 0) {
             return;
         }
@@ -226,7 +292,6 @@ export const mergeBatteryParams = (
         fs.mkdirSync(resultsFolder);
 
         const args = [
-            'npm',
             'merge',
             '--output-directory',
             resultsFolder,
@@ -254,8 +319,20 @@ export const mergeBatteryParams = (
             }
         });
 
-        const processCSV = spawn('nrfutil.exe', args, {
-            cwd: 'C:\\Workspace',
+        const env = { ...process.env };
+        env.NRFUTIL_HOME = NRFUTIL_HOME;
+
+        const processCSV = spawn('nrfutil-npm', args, {
+            cwd: BINARY_DIR,
+            env,
+        });
+
+        processCSV.stdout.on('data', data => {
+            console.log(`stdout: ${data}`);
+        });
+
+        processCSV.stderr.on('data', data => {
+            console.error(`stderr: ${data}`);
         });
 
         processCSV.on('close', () => {

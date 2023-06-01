@@ -91,7 +91,7 @@ const SaveBatteryModelButton = ({
         p => p.path === generateDefaultProjectPath(profile)
     );
     const successfulIndexes = profileProgress
-        .filter(p => !p.error && p.ready)
+        .filter(p => !p.errorLevel)
         .map(p => p.index);
     const project = useSelector(getProfileProjects).find(
         proj => proj.path === generateDefaultProjectPath(profile) && !proj.error
@@ -271,9 +271,7 @@ export default () => {
         p => p.path === generateDefaultProjectPath(profile)
     );
 
-    const successfullyProcessed = profileProgress.filter(
-        p => !p.error && p.ready
-    );
+    const successfullyProcessed = profileProgress.filter(p => !p.errorLevel);
     const allProcessedSuccessfully =
         successfullyProcessed.length === profile.temperatures.length;
 

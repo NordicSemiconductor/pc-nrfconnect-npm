@@ -15,8 +15,8 @@ export type ProfilingCSVProgress = {
     index: number;
     message: string;
     progress?: number;
-    ready?: boolean;
-    error?: boolean;
+    errorLevel?: 'warning' | 'error';
+    cancel: () => void;
 };
 
 export interface ProfilingProjectProfile {

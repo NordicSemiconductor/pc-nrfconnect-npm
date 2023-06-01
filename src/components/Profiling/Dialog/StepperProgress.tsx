@@ -85,11 +85,11 @@ export default ({
             } `,
         };
 
-        if (processingCSVProgress?.ready && !processingCSVProgress.error) {
+        if (processingCSVProgress === undefined) {
             stepProcessing.state = 'success';
-        } else if (processingCSVProgress && !processingCSVProgress?.ready) {
+        } else if (processingCSVProgress && !processingCSVProgress.errorLevel) {
             stepProcessing.state = 'active';
-        } else if (processingCSVProgress && processingCSVProgress.error) {
+        } else if (processingCSVProgress && processingCSVProgress.errorLevel) {
             stepProcessing.state = 'failure';
             stepProcessing.caption = [
                 {

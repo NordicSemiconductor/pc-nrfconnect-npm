@@ -80,7 +80,7 @@ const profilingProjectsSlice = createSlice({
                 state.profilingProjects[index] = action.payload;
             }
         },
-        setProjectProfileProgress(
+        addProjectProfileProgress(
             state,
             action: PayloadAction<ProfilingCSVProgress>
         ) {
@@ -94,6 +94,40 @@ const profilingProjectsSlice = createSlice({
                 state.profilingCSVProgress[index] = action.payload;
             } else {
                 state.profilingCSVProgress.push(action.payload);
+            }
+        },
+        updateProjectProfileProgress(
+            state,
+            action: PayloadAction<
+                Partial<ProfilingCSVProgress> &
+                    Pick<ProfilingCSVProgress, 'path' | 'index'>
+            >
+        ) {
+            const index = state.profilingCSVProgress.findIndex(
+                progress =>
+                    progress.path === action.payload.path &&
+                    progress.index === action.payload.index
+            );
+
+            if (index !== -1) {
+                state.profilingCSVProgress[index] = {
+                    ...state.profilingCSVProgress[index],
+                    ...action.payload,
+                };
+            }
+        },
+        removeProjectProfileProgress(
+            state,
+            action: PayloadAction<Pick<ProfilingCSVProgress, 'path' | 'index'>>
+        ) {
+            const index = state.profilingCSVProgress.findIndex(
+                progress =>
+                    progress.path === action.payload.path &&
+                    progress.index === action.payload.index
+            );
+
+            if (index !== -1) {
+                state.profilingCSVProgress.splice(index, 1);
             }
         },
     },
@@ -112,6 +146,8 @@ export const {
     removeRecentProject,
     setProfilingProjects,
     updateProfilingProject,
-    setProjectProfileProgress,
+    addProjectProfileProgress,
+    updateProjectProfileProgress,
+    removeProjectProfileProgress,
 } = profilingProjectsSlice.actions;
 export default profilingProjectsSlice.reducer;
