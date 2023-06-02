@@ -132,7 +132,7 @@ export default () => {
                     currentProfilingStepOverride={{
                         caption: `Profiling. ${capacityConsumed.toFixed(
                             2
-                        )}mAh of ${profile.capacity}mAh`,
+                        )} mAh of ${profile.capacity} mAh`,
                     }}
                 />
                 <TimeComponent time={time} progress={progress} />
