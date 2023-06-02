@@ -12,7 +12,7 @@ import Charger from './components/Charger/Charger';
 import DashboardControl from './components/Dashboard/DashboardControl';
 import DeviceSelector from './components/DeviceSelector';
 import Graph from './components/Graph/Graph';
-import ProfilingProjects from './components/Profiling/ProfilingProjects/ProfilingProjects';
+import Profiles from './components/Profiling/ProfilingProjects/Profiles';
 import Regulators from './components/Regulators/Regulators';
 import SidePanel from './components/SidePanel/SidePanel';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
@@ -44,7 +44,7 @@ export default () => (
             },
             {
                 name: 'Profiles',
-                Main: ProfilingProjects,
+                Main: Profiles,
             },
             {
                 name: 'Graph',
