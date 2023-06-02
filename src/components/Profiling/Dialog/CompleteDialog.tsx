@@ -105,7 +105,7 @@ const SaveBatteryModelButton = ({
                     title: 'Battery Profile',
                     defaultPath: `${profile.name}_${finishedProfiles
                         .map(p => p.temperature)
-                        .join('_')}C)}.json`,
+                        .join('_')}C.json`,
                     filters: [
                         {
                             name: 'JSON',
