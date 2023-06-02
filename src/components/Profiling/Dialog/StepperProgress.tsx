@@ -40,15 +40,19 @@ export default ({
             title: `Profiling ${temp} °C`,
         };
 
+        let dataCollected = false;
+
         if (currentProfilingIndex > index) {
             stepDataCollection.state = 'success';
             stepDataCollection.caption = 'Ready';
+            dataCollected = true;
         } else if (index === currentProfilingIndex) {
             if (completeStep) {
                 if (!currentProfilingStepOverride?.state) {
                     switch (completeStep.level) {
                         case 'success':
                             stepDataCollection.state = 'success';
+                            dataCollected = true;
                             break;
                         case 'danger':
                             stepDataCollection.state = 'failure';
@@ -85,7 +89,11 @@ export default ({
             } `,
         };
 
-        if (processingCSVProgress === undefined) {
+        if (
+            processingCSVProgress === undefined &&
+            currentProfilingIndex >= index &&
+            dataCollected
+        ) {
             stepProcessing.state = 'success';
         } else if (processingCSVProgress && !processingCSVProgress.errorLevel) {
             stepProcessing.state = 'active';

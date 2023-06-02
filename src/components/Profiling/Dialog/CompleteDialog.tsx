@@ -40,7 +40,6 @@ import {
     generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
 } from '../helpers';
-import { ProfilingProjectProfile } from '../types';
 import StepperProgress from './StepperProgress';
 
 const finishProfiling =
@@ -87,31 +86,26 @@ const SaveBatteryModelButton = ({
 }) => {
     const dispatch = useDispatch();
     const profile = useSelector(getProfile);
-    const profileProgress = useSelector(getProjectProfileProgress).filter(
+
+    const project = useSelector(getProfileProjects).find(
         p => p.path === generateDefaultProjectPath(profile)
     );
-    const successfulIndexes = profileProgress
-        .filter(p => !p.errorLevel)
-        .map(p => p.index);
-    const project = useSelector(getProfileProjects).find(
-        proj => proj.path === generateDefaultProjectPath(profile) && !proj.error
-    );
 
-    const successfulProfiles: ProfilingProjectProfile[] = [];
-    successfulIndexes.forEach(i => {
-        if (project?.settings?.profiles[i]) {
-            successfulProfiles.push(project.settings.profiles[i]);
-        }
-    });
+    const finishedProfiles =
+        project?.settings?.profiles.filter(
+            prof => prof.batteryJson && prof.paramsJson
+        ) ?? [];
 
     return (
         <DialogButton
             variant="primary"
-            disabled={successfulProfiles.length === 0 || disabled}
+            disabled={finishedProfiles.length === 0 || disabled}
             onClick={() => {
                 showSaveDialog({
                     title: 'Battery Profile',
-                    defaultPath: `${profile.name}.json`,
+                    defaultPath: `${profile.name}_${finishedProfiles
+                        .map(p => p.temperature)
+                        .join('_')}C)}.json`,
                     filters: [
                         {
                             name: 'JSON',
@@ -120,13 +114,12 @@ const SaveBatteryModelButton = ({
                     ],
                 }).then(result => {
                     if (
-                        successfulProfiles.length > 0 &&
                         project?.settings &&
                         !result.canceled &&
                         result.filePath
                     ) {
                         onGeneratingBatteryModel(true);
-                        mergeBatteryParams(project.settings, successfulProfiles)
+                        mergeBatteryParams(project.settings, finishedProfiles)
                             .then(data => {
                                 if (result.filePath)
                                     stringToFile(result.filePath, data);
@@ -271,9 +264,9 @@ export default () => {
         p => p.path === generateDefaultProjectPath(profile)
     );
 
-    const successfullyProcessed = profileProgress.filter(p => !p.errorLevel);
-    const allProcessedSuccessfully =
-        successfullyProcessed.length === profile.temperatures.length;
+    const allProcessedSuccessfully = profileProgress.length === 0;
+    const allAreProcessing =
+        profileProgress.length === profile.temperatures.length;
 
     const lastProfile = index + 1 === profile.temperatures.length;
 
@@ -323,9 +316,9 @@ export default () => {
             <Group>
                 {lastProfile && !allProcessedSuccessfully && (
                     <Alert variant="warning" label="Warning: ">
-                        {successfullyProcessed.length > 0 &&
+                        {!allAreProcessing &&
                             `Models that failed to, or are still processing, will not be included when saving the battery model. `}
-                        {successfullyProcessed.length === 0 &&
+                        {allAreProcessing &&
                             `Not able to save battery model. No battery profiles are available yet. Try reprocess any failed models. `}
                         {`Data will continue to be processed in the background if
                         you click finish. You can continue to work on theses
