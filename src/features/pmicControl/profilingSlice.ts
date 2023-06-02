@@ -30,6 +30,7 @@ interface profilingState {
     completeStep?: ProfileComplete;
     ccProfilingState: CCProfilingState;
     latestTBat?: number;
+    latestVLoad?: number;
 }
 
 const initialState: profilingState = {
@@ -88,6 +89,9 @@ const profilingSlice = createSlice({
         setLatestTBat(state, action: PayloadAction<number | undefined>) {
             state.latestTBat = action.payload;
         },
+        setLatestVLoad(state, action: PayloadAction<number | undefined>) {
+            state.latestVLoad = action.payload;
+        },
     },
 });
 
@@ -103,12 +107,15 @@ export const getCcProfilingState = (state: RootState) =>
     state.app.profiling.ccProfilingState;
 export const getLatestTBat = (state: RootState) =>
     state.app.profiling.latestTBat;
+export const getLatestVLoad = (state: RootState) =>
+    state.app.profiling.latestVLoad;
 
 export const {
     closeProfiling,
     setProfilingStage,
     setCompleteStep,
     setLatestTBat,
+    setLatestVLoad,
     setProfile,
     nextProfile,
     restartProfile,

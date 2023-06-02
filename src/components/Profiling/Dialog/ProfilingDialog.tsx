@@ -19,6 +19,7 @@ import {
     closeProfiling,
     getCapacityConsumed,
     getLatestTBat,
+    getLatestVLoad,
     getProfile,
     getProfileIndex,
 } from '../../../features/pmicControl/profilingSlice';
@@ -34,6 +35,7 @@ export default () => {
     const capacityConsumed = useSelector(getCapacityConsumed);
     const index = useSelector(getProfileIndex);
     const latestTBat = useSelector(getLatestTBat);
+    const latestVLoad = useSelector(getLatestVLoad);
 
     const { time } = useStopwatch({
         autoStart: true,
@@ -69,17 +71,29 @@ export default () => {
             }
         });
 
-        const averageConsumption = Math.abs(average) / 3600;
-        const theoreticalProgress =
-            (averageConsumption * (time / 1000)) / profile.capacity;
-        const actualProgress = capacityConsumed / profile.capacity;
+        const averageConsumptionMillAmpHr = Math.abs(average) / 3600;
+        const theoreticalProgressMillAmpHr =
+            (averageConsumptionMillAmpHr * (time / 1000)) / profile.capacity;
+        const actualProgressMillAmpHr = capacityConsumed / profile.capacity;
 
-        const alpha = 1 - actualProgress;
-        return (
-            (theoreticalProgress * alpha + actualProgress * actualProgress) *
+        const alpha = 1 - actualProgressMillAmpHr;
+
+        const vDelta = Math.min(
+            profile.vUpperCutOff - (latestVLoad ?? profile.vLowerCutOff),
+            0
+        );
+        const maxVDelta = profile.vUpperCutOff - profile.vLowerCutOff;
+        const voltageProgress = Math.min((vDelta / maxVDelta) * 100, 100);
+
+        const millAmpHrProgress = Math.min(
+            (theoreticalProgressMillAmpHr * alpha +
+                actualProgressMillAmpHr * actualProgressMillAmpHr) *
+                100,
             100
         );
-    }, [capacityConsumed, profile, time]);
+
+        return voltageProgress * 0.05 + millAmpHrProgress * 0.95;
+    }, [capacityConsumed, latestVLoad, profile, time]);
 
     return (
         <GenericDialog

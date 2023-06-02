@@ -28,6 +28,7 @@ import {
     incrementCapacityConsumed,
     setCompleteStep,
     setLatestTBat,
+    setLatestVLoad,
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import { TDispatch } from '../../../thunk';
@@ -106,6 +107,11 @@ export default () => {
             npmDevice?.getBatteryProfiler()?.onProfilingEvent(event => {
                 dispatch(
                     setLatestTBat(Number.parseFloat(event.data.tBat.toFixed(2)))
+                );
+                dispatch(
+                    setLatestVLoad(
+                        Number.parseFloat(event.data.vLoad.toFixed(2))
+                    )
                 );
                 if (event.data.seq === 1 && profilingStage === 'Resting') {
                     dispatch(setProfilingStage('Profiling'));
