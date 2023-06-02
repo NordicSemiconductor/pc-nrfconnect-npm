@@ -51,7 +51,11 @@ export default ({
     );
 
     const includedProfiles = useMemo(
-        () => project.profiles.filter(profile => !profile.exclude),
+        () =>
+            project.profiles.filter(
+                profile =>
+                    !profile.exclude && profile.csvReady && profile.csvPath
+            ),
         [project]
     );
     const [showAddProfileDialog, setShowAddProfileDialog] = useState(false);
@@ -80,7 +84,7 @@ export default ({
                         ).length === 0
                     }
                     onClick={() => {
-                        project.profiles.forEach((setting, index) => {
+                        includedProfiles.forEach((setting, index) => {
                             const inProgress =
                                 projectProgress.find(
                                     progress => progress.index === index
