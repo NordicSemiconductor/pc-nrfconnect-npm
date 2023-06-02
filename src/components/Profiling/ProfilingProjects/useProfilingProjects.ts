@@ -11,6 +11,11 @@ import fs from 'fs';
 import path from 'path';
 
 import {
+    addConfirmBeforeClose,
+    clearConfirmBeforeClose,
+} from '../../../features/confirmBeforeClose/confirmBeforeCloseSlice';
+import {
+    getProjectProfileProgress,
     getRecentProjects,
     setProfilingProjects,
     updateProfilingProject,
@@ -21,6 +26,30 @@ import { ProfilingProject } from '../types';
 export const useProfilingProjects = () => {
     const dispatch = useDispatch();
     const recentProjects = useSelector(getRecentProjects);
+    const progress = useSelector(getProjectProfileProgress);
+
+    useEffect(() => {
+        const processingOngoing =
+            progress.filter(prog => !prog.errorLevel).length > 0;
+
+        if (processingOngoing) {
+            dispatch(
+                addConfirmBeforeClose({
+                    id: 'NRF_UTIL_PROCESSING',
+                    message: 'Processing ongoing.',
+                    onClose() {
+                        progress.forEach(() => {
+                            // TODO uncomment when we can cancel spawned process
+                            // prog.cancel()
+                        });
+                    },
+                })
+            );
+            return () => {
+                dispatch(clearConfirmBeforeClose('NRF_UTIL_PROCESSING'));
+            };
+        }
+    }, [dispatch, progress]);
 
     useEffect(() => {
         dispatch(reloadRecentProjects());

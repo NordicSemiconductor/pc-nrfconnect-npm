@@ -10,6 +10,10 @@ import { appendFile, existsSync, mkdirSync } from 'fs';
 import path from 'path';
 
 import { RootState } from '../../../appReducer';
+import {
+    addConfirmBeforeClose,
+    clearConfirmBeforeClose,
+} from '../../../features/confirmBeforeClose/confirmBeforeCloseSlice';
 import { startProcessingCsv } from '../../../features/nrfutillNpm/csvProcessing';
 import {
     getBucks,
@@ -78,6 +82,23 @@ export default () => {
     const ccProfilingState = useSelector(getCcProfilingState);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (profilingStage) {
+            dispatch(
+                addConfirmBeforeClose({
+                    id: 'PROFILING_WIZARD',
+                    message: 'Profiling is currently ongoing.',
+                    onClose() {
+                        dispatch(closeProfiling());
+                    },
+                })
+            );
+            return () => {
+                dispatch(clearConfirmBeforeClose('PROFILING_WIZARD'));
+            };
+        }
+    }, [dispatch, profilingStage]);
 
     useEffect(() => {
         if (profilingStage === 'Charging') {

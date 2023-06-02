@@ -16,6 +16,7 @@ import Profiles from './components/Profiling/ProfilingProjects/Profiles';
 import Regulators from './components/Regulators/Regulators';
 import SidePanel from './components/SidePanel/SidePanel';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
+import ConfirmCloseDialog from './features/confirmBeforeClose/ConfirmCloseDialog';
 
 import './index.scss';
 
@@ -24,7 +25,12 @@ export default () => (
         reportUsageData
         appReducer={appReducer}
         deviceSelect={<DeviceSelector />}
-        sidePanel={<SidePanel />}
+        sidePanel={
+            <>
+                <SidePanel />
+                <ConfirmCloseDialog />
+            </>
+        }
         panes={[
             {
                 name: 'Dashboard',
