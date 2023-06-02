@@ -80,7 +80,7 @@ export default ({
             title: `Data Processing for ${temp} °C`,
             caption: `${
                 processingCSVProgress?.message
-                    ? `${processingCSVProgress?.message} - this can take a while...`
+                    ? `${processingCSVProgress?.message}`
                     : ''
             } `,
         };

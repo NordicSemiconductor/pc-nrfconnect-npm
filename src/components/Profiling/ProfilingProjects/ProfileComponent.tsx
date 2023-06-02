@@ -70,7 +70,7 @@ export default ({
                         </Alert>
                     )}
                     {dataCollected && !csvReadyExists && (
-                        <Alert variant="danger" label="Error ">
+                        <Alert variant="danger" label="Error: ">
                             {`File ${path.resolve(
                                 projectSettingsPath,
                                 profile?.csvPath ?? ''
@@ -159,7 +159,7 @@ export default ({
                             <strong>{`${
                                 progress.errorLevel === 'warning'
                                     ? 'Warning'
-                                    : 'Danger'
+                                    : 'Error'
                             }:`}</strong>{' '}
                             {progress.message}
                         </span>
