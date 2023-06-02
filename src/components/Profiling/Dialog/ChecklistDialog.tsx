@@ -25,6 +25,7 @@ import {
     closeProfiling,
     getProfile,
     getProfileIndex,
+    setAbortAction,
     setCompleteStep,
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
@@ -111,7 +112,11 @@ export default () => {
 
                     <DialogButton
                         onClick={() => {
-                            dispatch(closeProfiling());
+                            dispatch(
+                                setAbortAction(() => {
+                                    dispatch(closeProfiling());
+                                })
+                            );
                         }}
                     >
                         Abort

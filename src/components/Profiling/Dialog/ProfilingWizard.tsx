@@ -8,6 +8,7 @@ import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, existsSync, mkdirSync } from 'fs';
 import path from 'path';
+import { ConfirmationDialog } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../../appReducer';
 import {
@@ -25,6 +26,9 @@ import {
     setEventRecordingPath,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
+    clearAbortAction,
+    closeProfiling,
+    getAbort,
     getCcProfilingState,
     getProfile,
     getProfileIndex,
@@ -80,6 +84,7 @@ export default () => {
     const fuelGauge = useSelector(getFuelGauge);
     const index = useSelector(getProfileIndex);
     const ccProfilingState = useSelector(getCcProfilingState);
+    const abortAction = useSelector(getAbort);
 
     const dispatch = useDispatch();
 
@@ -291,16 +296,37 @@ export default () => {
     }, [ccProfilingState, dispatch]);
 
     return (
-        <>
-            {profilingStage === 'MissingSyncBoard' && (
-                <PreConfigurationDialog />
+        <div>
+            {abortAction ? (
+                <ConfirmationDialog
+                    title="Aborting profiling"
+                    isVisible
+                    onConfirm={() => {
+                        abortAction();
+                        dispatch(clearAbortAction());
+                    }}
+                    onCancel={() => {
+                        dispatch(clearAbortAction());
+                    }}
+                >
+                    Any unfinished processes will be lost. Are you sure you want
+                    to abort profiling?
+                </ConfirmationDialog>
+            ) : (
+                <>
+                    {profilingStage === 'MissingSyncBoard' && (
+                        <PreConfigurationDialog />
+                    )}
+                    {profilingStage === 'Configuration' && (
+                        <ConfigurationDialog />
+                    )}
+                    {profilingStage === 'Checklist' && <ChecklistDialog />}
+                    {profilingStage === 'Charging' && <ChargingDialog />}
+                    {profilingStage === 'Resting' && <RestingDialog />}
+                    {profilingStage === 'Profiling' && <ProfilingDialog />}
+                    {profilingStage === 'Complete' && <CompleteDialog />}
+                </>
             )}
-            {profilingStage === 'Configuration' && <ConfigurationDialog />}
-            {profilingStage === 'Checklist' && <ChecklistDialog />}
-            {profilingStage === 'Charging' && <ChargingDialog />}
-            {profilingStage === 'Resting' && <RestingDialog />}
-            {profilingStage === 'Profiling' && <ProfilingDialog />}
-            {profilingStage === 'Complete' && <CompleteDialog />}
-        </>
+        </div>
     );
 };
