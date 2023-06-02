@@ -7,51 +7,41 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../appReducer';
-import { CCProfile, CCProfilingState } from './npm/types';
+import { CCProfilingState, Profile } from './npm/types';
 
 type ProfileStage =
+    | 'MissingSyncBoard'
     | 'Configuration'
     | 'Checklist'
     | 'Charging'
     | 'Resting'
     | 'Profiling';
 
-interface Profile {
-    name: string;
-    vLowerCutOff: number;
-    vUpperCutOff: number;
-    capacity: number;
-    temperatures: number[];
-    baseDirector: string;
-    restingProfiles: CCProfile[];
-    profilingProfiles: CCProfile[];
-}
-
 interface ProfileComplete {
     message: string;
-    level: 'warning' | 'success' | 'danger';
+    level: 'success' | 'danger';
 }
 
 interface profilingState {
     index: number;
-    startTime: number;
     stage?: ProfileStage;
     profile: Profile;
     capacityConsumed: number;
     completeStep?: ProfileComplete;
     ccProfilingState: CCProfilingState;
+    latestTBat?: number;
+    latestVLoad?: number;
 }
 
 const initialState: profilingState = {
     index: 0,
-    startTime: 0,
     profile: {
         name: 'battery',
         vUpperCutOff: 4.2,
         vLowerCutOff: 3.1,
         capacity: 400,
         temperatures: [25],
-        baseDirector: '~/',
+        baseDirectory: '~/',
         restingProfiles: [],
         profilingProfiles: [],
     },
@@ -64,13 +54,12 @@ const profilingSlice = createSlice({
     initialState,
     reducers: {
         closeProfiling() {
-            return { ...initialState };
+            return {
+                ...initialState,
+            };
         },
         setProfilingStage(state, action: PayloadAction<ProfileStage>) {
             state.stage = action.payload;
-            if (action.payload === 'Checklist') {
-                state.startTime = Date.now();
-            }
         },
         setCompleteStep(state, action: PayloadAction<ProfileComplete>) {
             state.completeStep = action.payload;
@@ -81,14 +70,12 @@ const profilingSlice = createSlice({
         nextProfile(state) {
             state.completeStep = undefined;
             state.index += 1;
-            state.startTime = Date.now();
             state.stage = 'Checklist';
             state.capacityConsumed = 0;
             state.ccProfilingState = 'Off';
         },
         restartProfile(state) {
             state.completeStep = undefined;
-            state.startTime = Date.now();
             state.stage = 'Checklist';
             state.capacityConsumed = 0;
             state.ccProfilingState = 'Off';
@@ -99,6 +86,12 @@ const profilingSlice = createSlice({
         setCcProfiling(state, action: PayloadAction<CCProfilingState>) {
             state.ccProfilingState = action.payload;
         },
+        setLatestTBat(state, action: PayloadAction<number | undefined>) {
+            state.latestTBat = action.payload;
+        },
+        setLatestVLoad(state, action: PayloadAction<number | undefined>) {
+            state.latestVLoad = action.payload;
+        },
     },
 });
 
@@ -106,19 +99,23 @@ export const getProfilingStage = (state: RootState) =>
     state.app.profiling.completeStep ? 'Complete' : state.app.profiling.stage;
 export const getProfile = (state: RootState) => state.app.profiling.profile;
 export const getProfileIndex = (state: RootState) => state.app.profiling.index;
-export const getProfileStartTime = (state: RootState) =>
-    state.app.profiling.startTime;
 export const getCompleteStep = (state: RootState) =>
     state.app.profiling.completeStep;
 export const getCapacityConsumed = (state: RootState) =>
     state.app.profiling.capacityConsumed;
 export const getCcProfilingState = (state: RootState) =>
     state.app.profiling.ccProfilingState;
+export const getLatestTBat = (state: RootState) =>
+    state.app.profiling.latestTBat;
+export const getLatestVLoad = (state: RootState) =>
+    state.app.profiling.latestVLoad;
 
 export const {
     closeProfiling,
     setProfilingStage,
     setCompleteStep,
+    setLatestTBat,
+    setLatestVLoad,
     setProfile,
     nextProfile,
     restartProfile,

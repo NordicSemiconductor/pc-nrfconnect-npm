@@ -13,13 +13,17 @@ const timeString = (
     minutes: number,
     seconds?: number
 ) =>
-    `${days === 1 ? `${days} day ` : ''}${days > 1 ? `${days} days ` : ''}${
-        days > 0 || hours > 0 ? `${hours} hrs ` : ''
-    }${days > 0 || hours > 0 || minutes > 0 ? `${minutes} min ` : ''}${
-        seconds !== undefined && (hours > 0 || minutes > 0 || seconds > 0)
-            ? `${seconds} sec `
-            : ''
-    }`;
+    seconds !== undefined || days > 0 || hours > 0 || minutes > 0
+        ? `${days === 1 ? `${days} day ` : ''}${
+              days > 1 ? `${days} days ` : ''
+          }${days > 0 || hours > 0 ? `${hours} hrs ` : ''}${
+              days > 0 || hours > 0 || minutes > 0 ? `${minutes} min ` : ''
+          }${
+              seconds !== undefined && (hours > 0 || minutes > 0 || seconds > 0)
+                  ? `${seconds} sec`
+                  : ''
+          }`
+        : 'less than a minute';
 
 const splitMS = (ms: number) => {
     const time = ms;
@@ -51,7 +55,7 @@ export const ElapsedTime = ({ time }: { time: number }) => {
         <div>
             <span>
                 {`Elapsed time: ${
-                    time > 0
+                    time > 1000
                         ? timeString(days, hours, minutes, seconds)
                         : '0 sec'
                 }`}
@@ -87,16 +91,8 @@ export default ({
         seconds: etaSeconds,
     } = splitMS(eta.current);
 
-    if (etaDays > 5) {
-        progress = 0;
-    }
-
-    if (etaDays <= 0 && etaHours <= 0 && etaMinutes <= 0) {
-        progress = 100;
-    }
-
     return (
-        <>
+        <div className="w-100">
             <ElapsedTime time={time} />
             {!ready && (
                 <div>
@@ -115,6 +111,6 @@ export default ({
                 </div>
             )}
             <ProgressBar now={progress} style={{ height: '4px' }} />
-        </>
+        </div>
     );
 };

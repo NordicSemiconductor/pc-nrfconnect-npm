@@ -55,7 +55,7 @@ import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
 } from '../../hooks/commandParser';
-import ProfilingWizard from '../Profiling/ProfilingWizard';
+import ProfilingWizard from '../Profiling/Dialog/ProfilingWizard';
 import ConnectionStatus from './ConnectionStatus';
 
 export default () => {
@@ -305,7 +305,22 @@ export default () => {
                         variant="secondary"
                         className="w-100"
                         onClick={() => {
-                            dispatch(setProfilingStage('Configuration'));
+                            npmDevice
+                                ?.getBatteryProfiler()
+                                ?.canProfile()
+                                .then(result => {
+                                    if (result) {
+                                        dispatch(
+                                            setProfilingStage('Configuration')
+                                        );
+                                    } else {
+                                        dispatch(
+                                            setProfilingStage(
+                                                'MissingSyncBoard'
+                                            )
+                                        );
+                                    }
+                                });
                         }}
                         disabled={
                             !profilingSupported ||

@@ -8,6 +8,7 @@ import { NrfConnectState } from 'pc-nrfconnect-shared';
 import { combineReducers } from 'redux';
 
 import pmicControlReducer from './features/pmicControl/pmicControlSlice';
+import profilingProjectsReducer from './features/pmicControl/profilingProjectsSlice.';
 import profilingReducer from './features/pmicControl/profilingSlice';
 import serialReducer from './features/serial/serialSlice';
 
@@ -16,6 +17,7 @@ type AppState = ReturnType<typeof appReducer>;
 export type RootState = NrfConnectState<AppState>;
 
 const appReducer = combineReducers({
+    profilingProjects: profilingProjectsReducer,
     profiling: profilingReducer,
     pmicControl: pmicControlReducer,
     serial: serialReducer,

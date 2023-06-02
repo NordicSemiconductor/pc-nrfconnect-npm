@@ -30,7 +30,10 @@ export default ({ disabled }: DashboardControlCardProps) => {
     const ldos = useSelector(getLdos);
 
     return (
-        <MasonryLayout minWidth={300}>
+        <MasonryLayout
+            className="masonry-layout min-height-cards"
+            minWidth={300}
+        >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
             {npmDevice &&
