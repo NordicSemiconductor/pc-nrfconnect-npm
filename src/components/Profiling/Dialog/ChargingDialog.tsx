@@ -77,7 +77,7 @@ export default () => {
         };
     } else if (!batteryFull) {
         const charging = usbPowered && batteryConnected && chargers[0].enabled;
-        if (charging) {
+        if (charging && !pmicChargingState.dieTempHigh) {
             stepOverride = {
                 caption: `Charging ${
                     pmicChargingState.constantCurrentCharging
@@ -87,7 +87,12 @@ export default () => {
                     pmicChargingState.constantVoltageCharging
                         ? '(Constant voltage)'
                         : ''
-                }`,
+                }${pmicChargingState.trickleCharge ? '(Trickle Charge)' : ''}`,
+                state: charging ? 'active' : 'warning',
+            };
+        } else if (pmicChargingState.dieTempHigh) {
+            stepOverride = {
+                caption: `Not charging (Die Temp High)`,
                 state: charging ? 'active' : 'warning',
             };
         } else {
@@ -167,6 +172,11 @@ export default () => {
             }
         >
             <Group>
+                {batteryConnected && pmicChargingState.dieTempHigh && (
+                    <Alert label="Danger: " variant="danger">
+                        Die Temp High has been reached.
+                    </Alert>
+                )}
                 {!batteryConnected && (
                     <Alert label="Action: " variant="warning">
                         Did not detect battery. Please ensure battery is
