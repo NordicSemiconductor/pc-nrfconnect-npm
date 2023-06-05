@@ -15,6 +15,10 @@ and this project adheres to
 -   Confirm dialog before app closes while data is processing
 -   Tooltips for more UI Components
 
+### Fixed
+
+-   UI no longer allows processing on incomplete profiles
+
 ## 0.7.1 - 2023-06-02
 
 ### Added

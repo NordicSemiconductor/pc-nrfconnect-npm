@@ -15,7 +15,10 @@ import { generateParamsFromCSV } from '../../../features/nrfutillNpm/csvProcessi
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
 import useIsUIDisabled from '../../../features/useIsUIDisabled';
-import { atomicUpdateProjectSettings } from '../helpers';
+import {
+    atomicUpdateProjectSettings,
+    isProfileReadyForProcessing,
+} from '../helpers';
 import { ProfilingProject } from '../types';
 import AddEditProfileDialog from './AddEditProfileDialog';
 
@@ -54,7 +57,13 @@ export default ({
                 alignRight
             >
                 <Dropdown.Item
-                    disabled={isProcessing}
+                    disabled={
+                        isProcessing ||
+                        !isProfileReadyForProcessing(
+                            projectSettingsPath,
+                            profile
+                        )
+                    }
                     onClick={() => {
                         dispatch(
                             generateParamsFromCSV(projectSettingsPath, index)
