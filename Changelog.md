@@ -20,6 +20,10 @@ and this project adheres to
 -   UI no longer allows processing on incomplete profiles
 -   Profile Project does not get CSV path if file already exists
 
+### Changed
+
+-   POF while profiling will results in warning hence allowing user to continue
+    to next profiles
 
 ## 0.7.1 - 2023-06-02
 

@@ -54,6 +54,10 @@ export default ({
                             stepDataCollection.state = 'success';
                             dataCollected = true;
                             break;
+                        case 'warning':
+                            stepDataCollection.state = 'warning';
+                            dataCollected = true;
+                            break;
                         case 'danger':
                             stepDataCollection.state = 'failure';
                             break;
@@ -94,7 +98,28 @@ export default ({
             currentProfilingIndex >= index &&
             dataCollected
         ) {
-            stepProcessing.state = 'success';
+            if (completeStep?.level === 'success') {
+                stepProcessing.state = 'success';
+            } else if (completeStep?.level === 'warning') {
+                stepProcessing.state = 'warning';
+                if (index === profile.temperatures.length - 1) {
+                    stepProcessing.caption = [
+                        {
+                            id: '1',
+                            caption: 'Data collected might not be correct.',
+                        },
+                        {
+                            id: '2',
+                            caption: 'Process now',
+                            action: () =>
+                                dispatch(startProcessingCsv(profile, index)),
+                        },
+                    ];
+                } else {
+                    stepProcessing.caption =
+                        'Data collected might not be correct.';
+                }
+            }
         } else if (processingCSVProgress && !processingCSVProgress.errorLevel) {
             stepProcessing.state = 'active';
         } else if (processingCSVProgress && processingCSVProgress.errorLevel) {

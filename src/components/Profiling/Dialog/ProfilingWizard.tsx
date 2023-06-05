@@ -10,12 +10,10 @@ import { appendFile, existsSync, mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { ConfirmationDialog } from 'pc-nrfconnect-shared';
 
-import { RootState } from '../../../appReducer';
 import {
     addConfirmBeforeClose,
     clearConfirmBeforeClose,
 } from '../../../features/confirmBeforeClose/confirmBeforeCloseSlice';
-import { startProcessingCsv } from '../../../features/nrfutillNpm/csvProcessing';
 import { Profile } from '../../../features/pmicControl/npm/types';
 import {
     getBucks,
@@ -40,7 +38,6 @@ import {
     setLatestVLoad,
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
-import { TDispatch } from '../../../thunk';
 import {
     atomicUpdateProjectSettings,
     generateDefaultProjectPath,
@@ -49,7 +46,7 @@ import {
 } from '../helpers';
 import ChargingDialog from './ChargingDialog';
 import ChecklistDialog from './ChecklistDialog';
-import CompleteDialog from './CompleteDialog';
+import CompleteDialog, { markProfilersAsReady } from './CompleteDialog';
 import ConfigurationDialog from './ConfigurationDialog';
 import PreConfigurationDialog from './PreConfigurationDialog';
 import ProfilingDialog from './ProfilingDialog';
@@ -69,23 +66,6 @@ const generateCSVFileNamePath = (profile: Profile, index: number) => {
         }${profile.temperatures[index]}.csv`
     );
 };
-
-const markProfilersAsReady =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        const profile = getState().app.profiling.profile;
-        const index = getState().app.profiling.index;
-
-        const fileName = generateDefaultProjectPath(profile);
-        dispatch(
-            atomicUpdateProjectSettings(fileName, profileSettings => {
-                profileSettings.profiles[index].csvReady = true;
-
-                return profileSettings;
-            })
-        );
-
-        dispatch(startProcessingCsv(profile, index));
-    };
 
 export default () => {
     const timeOffset = useRef(-1);
@@ -297,16 +277,26 @@ export default () => {
                 dispatch(markProfilersAsReady());
                 break;
             case 'POF':
-                dispatch(
-                    setCompleteStep({
-                        level: 'danger',
-                        message:
-                            'Profiling POF event occurred before reaching vCutOff.',
-                    })
-                );
+                if (profilingStage === 'Profiling') {
+                    dispatch(
+                        setCompleteStep({
+                            level: 'warning',
+                            message:
+                                'Profiling POF event occurred before reaching vCutOff.',
+                        })
+                    );
+                } else if (profilingStage === 'Resting') {
+                    dispatch(
+                        setCompleteStep({
+                            level: 'danger',
+                            message:
+                                'Profiling POF event occurred before reaching vCutOff.',
+                        })
+                    );
+                }
                 break;
         }
-    }, [ccProfilingState, dispatch]);
+    }, [ccProfilingState, dispatch, profilingStage]);
 
     return (
         <div>

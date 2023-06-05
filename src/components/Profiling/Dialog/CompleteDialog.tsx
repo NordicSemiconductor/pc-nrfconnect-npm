@@ -19,7 +19,10 @@ import {
 import { showSaveDialog } from '../../../actions/fileActions';
 import { RootState } from '../../../appReducer';
 import { stringToFile } from '../../../features/helpers';
-import { mergeBatteryParams } from '../../../features/nrfutillNpm/csvProcessing';
+import {
+    mergeBatteryParams,
+    startProcessingCsv,
+} from '../../../features/nrfutillNpm/csvProcessing';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import {
     getProfileProjects,
@@ -42,6 +45,23 @@ import {
 } from '../helpers';
 import StepperProgress from './StepperProgress';
 
+export const markProfilersAsReady =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        const profile = getState().app.profiling.profile;
+        const index = getState().app.profiling.index;
+
+        const fileName = generateDefaultProjectPath(profile);
+        dispatch(
+            atomicUpdateProjectSettings(fileName, profileSettings => {
+                profileSettings.profiles[index].csvReady = true;
+
+                return profileSettings;
+            })
+        );
+
+        dispatch(startProcessingCsv(profile, index));
+    };
+
 const finishProfiling =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         const npmDevice = getState().app.pmicControl.npmDevice;
@@ -61,7 +81,13 @@ const finishProfiling =
             });
     };
 
-const FinishButton = ({ disabled }: { disabled: boolean }) => {
+const FinishButton = ({
+    disabled,
+    markAsComplete = false,
+}: {
+    disabled: boolean;
+    markAsComplete?: boolean;
+}) => {
     const dispatch = useDispatch();
 
     return (
@@ -69,6 +95,9 @@ const FinishButton = ({ disabled }: { disabled: boolean }) => {
             disabled={disabled}
             variant="secondary"
             onClick={() => {
+                if (markAsComplete) {
+                    dispatch(markProfilersAsReady());
+                }
                 dispatch(finishProfiling());
             }}
         >
@@ -79,9 +108,11 @@ const FinishButton = ({ disabled }: { disabled: boolean }) => {
 
 const SaveBatteryModelButton = ({
     disabled,
+    variant = 'primary',
     onGeneratingBatteryModel,
 }: {
     onGeneratingBatteryModel: (value: boolean) => void;
+    variant?: ButtonVariants;
     disabled: boolean;
 }) => {
     const dispatch = useDispatch();
@@ -98,7 +129,7 @@ const SaveBatteryModelButton = ({
 
     return (
         <DialogButton
-            variant="primary"
+            variant={variant}
             disabled={finishedProfiles.length === 0 || disabled}
             onClick={() => {
                 showSaveDialog({
@@ -195,8 +226,10 @@ const RestartProfileButton = ({
 
 const NextProfileButton = ({
     variant = 'primary',
+    markAsComplete = false,
 }: {
     variant?: ButtonVariants;
+    markAsComplete?: boolean;
 }) => {
     const dispatch = useDispatch();
     const npmDevice = useSelector(getNpmDevice);
@@ -205,6 +238,9 @@ const NextProfileButton = ({
         <DialogButton
             variant={variant}
             onClick={() => {
+                if (markAsComplete) {
+                    dispatch(markProfilersAsReady());
+                }
                 npmDevice?.setAutoRebootDevice(true);
                 npmDevice
                     ?.getBatteryProfiler()
@@ -308,6 +344,37 @@ export default () => {
                         <>
                             <RestartProfileButton variant="primary" />
                             <AbortProfileButton />
+                        </>
+                    )}
+
+                    {completeStep?.level === 'warning' && (
+                        <>
+                            {lastProfile && (
+                                <>
+                                    <RestartProfileButton variant="primary" />
+                                    <SaveBatteryModelButton
+                                        variant="secondary"
+                                        disabled={generatingBatteryModel}
+                                        onGeneratingBatteryModel={
+                                            setGeneratingBatterModel
+                                        }
+                                    />
+                                    <FinishButton
+                                        markAsComplete
+                                        disabled={generatingBatteryModel}
+                                    />
+                                </>
+                            )}
+                            {!lastProfile && (
+                                <>
+                                    <RestartProfileButton variant="primary" />
+                                    <NextProfileButton
+                                        markAsComplete
+                                        variant="secondary"
+                                    />
+                                    <AbortProfileButton />
+                                </>
+                            )}
                         </>
                     )}
                 </>

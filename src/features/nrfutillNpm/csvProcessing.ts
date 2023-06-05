@@ -10,6 +10,7 @@ import os from 'os';
 import path from 'path';
 import { getAppDir } from 'pc-nrfconnect-shared';
 
+import { RootState } from '../../appReducer';
 import {
     atomicUpdateProjectSettings,
     generateDefaultProjectPath,
@@ -51,8 +52,23 @@ const BINARY_DIR = path.join(
 );
 
 export const startProcessingCsv =
-    (profile: Profile, index: number) => (dispatch: TDispatch) => {
+    (profile: Profile, index: number) =>
+    (dispatch: TDispatch, getState: () => RootState) => {
         const profilingProjectPath = generateDefaultProjectPath(profile);
+
+        const progress =
+            getState().app.profilingProjects.profilingCSVProgress.find(
+                p => p.path === profilingProjectPath && p.index === index
+            );
+
+        if (progress && !progress.errorLevel) {
+            // Already Processing
+            return;
+        }
+
+        if (progress?.cancel) {
+            progress.cancel();
+        }
 
         dispatch(generateParamsFromCSV(profilingProjectPath, index));
     };
