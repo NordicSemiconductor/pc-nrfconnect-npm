@@ -177,11 +177,19 @@ const RestartProfileButton = ({
     const npmDevice = useSelector(getNpmDevice);
     const profile = useSelector(getProfile);
     const index = useSelector(getProfileIndex);
+    const progress = useSelector(getProjectProfileProgress);
 
     return (
         <DialogButton
             variant={variant}
             onClick={() => {
+                progress
+                    .filter(
+                        prog =>
+                            prog.path === generateDefaultProjectPath(profile) &&
+                            prog.index === index
+                    )
+                    .forEach(prog => prog.cancel());
                 const baseDirector = path.join(
                     profile.baseDirectory,
                     profile.name,
