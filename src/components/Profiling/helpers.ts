@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { describeError, getAppDir, logger } from 'pc-nrfconnect-shared';
 
+import { RootState } from '../../appReducer';
 import { Profile } from '../../features/pmicControl/npm/types';
 import {
     addRecentProject,
@@ -114,7 +115,8 @@ export const atomicUpdateProjectSettings =
     };
 
 export const saveProjectSettings =
-    (filePath: string, project: ProfilingProject) => (dispatch: TDispatch) => {
+    (filePath: string, project: ProfilingProject) =>
+    (dispatch: TDispatch, getState: () => RootState) => {
         const pathObject = path.parse(filePath);
         const store = new Store<ProfilingProject>({
             cwd: pathObject.dir,
@@ -122,6 +124,13 @@ export const saveProjectSettings =
         });
 
         store.set(project);
+
+        // Abort any ongoing processes with the same project file name
+        getState()
+            .app.profilingProjects.profilingCSVProgress.filter(
+                progress => progress.path === filePath
+            )
+            .forEach(progress => progress.cancel());
 
         dispatch(addRecentProject(filePath));
     };

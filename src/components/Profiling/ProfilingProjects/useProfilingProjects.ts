@@ -38,9 +38,8 @@ export const useProfilingProjects = () => {
                     id: 'NRF_UTIL_PROCESSING',
                     message: 'Processing ongoing.',
                     onClose() {
-                        progress.forEach(() => {
-                            // TODO uncomment when we can cancel spawned process
-                            // prog.cancel()
+                        progress.forEach(prog => {
+                            prog.cancel();
                         });
                     },
                 })
