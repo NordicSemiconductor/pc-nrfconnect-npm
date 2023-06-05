@@ -47,7 +47,7 @@ export default ({
     disabled,
     defaultSummary = false,
 }: BuckCardProperties) => {
-    const card = `buck ${index + 1}`;
+    const card = `buck${index + 1}`;
     const [summary, setSummary] = useState(defaultSummary);
 
     const onVOutChange = (value: number) =>
@@ -127,7 +127,7 @@ export default ({
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <DocumentationTooltip card={card} title="Buck">
+                    <DocumentationTooltip card={card} item="Buck">
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
 
@@ -166,18 +166,7 @@ export default ({
 
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <DocumentationTooltip
-                        card={card}
-                        title="VOUT"
-                        titleNode={
-                            <>
-                                <span>V</span>
-                                <span className="subscript">{`OUT${
-                                    index + 1
-                                }`}</span>
-                            </>
-                        }
-                    >
+                    <DocumentationTooltip card={card} item="VOUT">
                         <div>
                             <span>V</span>
                             <span className="subscript">{`OUT${
@@ -213,12 +202,15 @@ export default ({
                         }`}
                     >
                         <FormLabel className="flex-row">
-                            <div>
-                                <span>RET</span>
-                                <span className="subscript">{`VOUT${
-                                    index + 1
-                                }`}</span>
-                            </div>
+                            <DocumentationTooltip card={card} item="RETVOUT">
+                                <div>
+                                    <span>RET</span>
+                                    <span className="subscript">{`VOUT${
+                                        index + 1
+                                    }`}</span>
+                                </div>
+                            </DocumentationTooltip>
+
                             <div className="flex-row">
                                 <NumberInlineInput
                                     value={internalRetVOut}
@@ -245,7 +237,14 @@ export default ({
                         />
                     </div>
                     <Dropdown
-                        label="Buck Mode Control"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="ModeControl"
+                            >
+                                <span>ModeControl</span>
+                            </DocumentationTooltip>
+                        }
                         items={modeControlItems}
                         onSelect={item =>
                             npmDevice.setBuckModeControl(
@@ -266,7 +265,14 @@ export default ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="On/Off Control"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="OnOffControl"
+                            >
+                                <span>On/Off Control</span>
+                            </DocumentationTooltip>
+                        }
                         items={buckOnOffControlItems}
                         onSelect={item => {
                             npmDevice.setBuckOnOffControl(
@@ -287,7 +293,14 @@ export default ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="Retention control"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="RetentionControl"
+                            >
+                                <span>Retention control</span>
+                            </DocumentationTooltip>
+                        }
                         items={buckRetentionControlItems}
                         onSelect={item =>
                             npmDevice.setBuckRetentionControl(

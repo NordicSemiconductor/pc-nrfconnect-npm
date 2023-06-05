@@ -42,7 +42,7 @@ export default ({ disabled }: { disabled: boolean }) => {
     return (
         <div className={`${disabled ? 'disabled' : ''}`}>
             <div className="line-wrapper">
-                <DocumentationTooltip card={card} title="Voltage">
+                <DocumentationTooltip card={card} item="Voltage">
                     <span className="line-title">Voltage</span>
                 </DocumentationTooltip>
                 <span className="line-data">
@@ -52,7 +52,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <DocumentationTooltip card={card} title="Current">
+                <DocumentationTooltip card={card} item="Current">
                     <span className="line-title">Current</span>
                 </DocumentationTooltip>
                 <span className="line-data">
@@ -64,7 +64,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <DocumentationTooltip card={card} title="Temperature">
+                <DocumentationTooltip card={card} item="Temperature">
                     <span className="line-title">Temperature</span>
                 </DocumentationTooltip>
                 <span className="line-data">
@@ -74,7 +74,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </span>
             </div>
             <div className="line-wrapper">
-                <DocumentationTooltip card={card} title="Charging Mode">
+                <DocumentationTooltip card={card} item="ChargingMode">
                     <span className="line-title">Charging Mode</span>
                 </DocumentationTooltip>
                 <span className="line-data">{mode}</span>

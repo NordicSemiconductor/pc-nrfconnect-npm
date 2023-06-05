@@ -29,7 +29,7 @@ export default ({ disabled }: BatteryCardProperties) => {
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <DocumentationTooltip card="battery" title="Fuel Gauge">
+                    <DocumentationTooltip card="battery" item="FuelGauge">
                         <span>Fuel Gauge</span>
                     </DocumentationTooltip>
                     <Toggle

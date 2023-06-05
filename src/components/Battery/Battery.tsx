@@ -105,10 +105,7 @@ const SideText = ({
                     </h2>
                     {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) ? (
                         <div className="line-wrapper">
-                            <DocumentationTooltip
-                                card={card}
-                                title="Time to full"
-                            >
+                            <DocumentationTooltip card={card} item="TimeToFull">
                                 <span className="line-title">Time to full</span>
                             </DocumentationTooltip>
                             <span className="line-data">
@@ -124,7 +121,7 @@ const SideText = ({
                         <div className="line-wrapper">
                             <DocumentationTooltip
                                 card={card}
-                                title="Time to empty"
+                                item="TimeToEmpty"
                             >
                                 <span className="line-title">
                                     Time to empty

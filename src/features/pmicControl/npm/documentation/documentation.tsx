@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useSelector } from 'react-redux';
@@ -15,40 +15,55 @@ import { documentation as pmic1300Documentation } from './documentationPmic1300'
 
 export const DocumentationTooltip = ({
     card,
-    title,
+    item,
     children,
-    titleNode = title,
 }: {
     card: string;
-    title: string;
-    children: React.ReactElement;
-    titleNode?: React.ReactElement | string;
+    item: string;
+    children: React.ReactElement | string;
 }) => {
+    const [keepShowing, setKeepShowing] = useState<boolean>();
     const npmDevice = useSelector(getNpmDevice);
 
     const fullDocumentation = getDocumentation(npmDevice?.getDeviceType());
     const documentation = fullDocumentation
-        ? fullDocumentation[card][title]
+        ? fullDocumentation[card][item]
         : null;
 
     return documentation ? (
-        <OverlayTrigger
-            key="overlay-voltage"
-            placement="bottom-end"
-            delay={500}
-            overlay={
-                <Tooltip id="tooltip-voltage">
-                    <div className="documentation-tooltip info">
-                        <p className="title font-weight-bold">{titleNode}</p>
-                        <div> {documentation.description}</div>
-                    </div>
-                </Tooltip>
-            }
-        >
-            {children}
-        </OverlayTrigger>
+        <div className="tooltip-overlay-trigger-wrapper">
+            <OverlayTrigger
+                key="overlay"
+                placement="bottom-end"
+                show={keepShowing}
+                delay={500}
+                overlay={
+                    <Tooltip
+                        id={`tooltip-${card}-${item}`}
+                        className="tooltip"
+                        show={keepShowing}
+                        onMouseEnter={() => {
+                            setKeepShowing(true);
+                        }}
+                        onMouseLeave={() => {
+                            setKeepShowing(undefined);
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="documentation-tooltip info">
+                            <p className="title font-weight-bold">
+                                {documentation.title}
+                            </p>
+                            <div> {documentation.description}</div>
+                        </div>
+                    </Tooltip>
+                }
+            >
+                <div>{children}</div>
+            </OverlayTrigger>
+        </div>
     ) : (
-        <span className="line-title">{titleNode}</span>
+        <span className="line-title">{item}</span>
     );
 };
 

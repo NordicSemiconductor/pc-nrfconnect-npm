@@ -403,7 +403,8 @@ export type BatteryProfiler = {
 export type Documentation = {
     [key: string]: {
         [key: string]: {
-            description?: React.ReactNode | string;
+            title: React.ReactNode;
+            description?: React.ReactNode;
         };
     };
 };

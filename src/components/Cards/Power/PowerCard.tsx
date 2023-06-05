@@ -84,7 +84,7 @@ export default ({
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <DocumentationTooltip card={card} title="Charger">
+                    <DocumentationTooltip card={card} item="Charger">
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
 
@@ -114,16 +114,7 @@ export default ({
         >
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <DocumentationTooltip
-                        card="charger"
-                        title="VTERM"
-                        titleNode={
-                            <>
-                                <span>V</span>
-                                <span className="subscript">TERM</span>
-                            </>
-                        }
-                    >
+                    <DocumentationTooltip card="charger" item="VTERM">
                         <div>
                             <span>V</span>
                             <span className="subscript">TERM</span>
@@ -155,16 +146,7 @@ export default ({
             </div>
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <DocumentationTooltip
-                        card="charger"
-                        title="ICHG"
-                        titleNode={
-                            <>
-                                <span>I</span>
-                                <span className="subscript">CHG</span>
-                            </>
-                        }
-                    >
+                    <DocumentationTooltip card="charger" item="ICHG">
                         <div>
                             <span>I</span>
                             <span className="subscript">CHG</span>
@@ -192,7 +174,14 @@ export default ({
             {!summary && (
                 <>
                     <Toggle
-                        label="Enable Recharging"
+                        label={
+                            <DocumentationTooltip
+                                card="charger"
+                                item="EnableRecharging"
+                            >
+                                Enable Recharging
+                            </DocumentationTooltip>
+                        }
                         isToggled={charger.enableRecharging}
                         onToggle={value =>
                             npmDevice.setChargerEnabledRecharging(index, value)
@@ -201,10 +190,12 @@ export default ({
                     />
                     <Dropdown
                         label={
-                            <>
-                                <span>I</span>
-                                <span className="subscript">TERM</span>
-                            </>
+                            <DocumentationTooltip card="charger" item="ITERM">
+                                <>
+                                    <span>I</span>
+                                    <span className="subscript">TERM</span>
+                                </>
+                            </DocumentationTooltip>
                         }
                         items={iTermItems}
                         onSelect={item =>
@@ -227,10 +218,17 @@ export default ({
                     />
                     <Dropdown
                         label={
-                            <>
-                                <span>V</span>
-                                <span className="subscript">TRICKLE_FAST</span>
-                            </>
+                            <DocumentationTooltip
+                                card="charger"
+                                item="VTrickleFast"
+                            >
+                                <>
+                                    <span>V</span>
+                                    <span className="subscript">
+                                        TRICKLE_FAST
+                                    </span>
+                                </>
+                            </DocumentationTooltip>
                         }
                         items={vTrickleFastItems}
                         onSelect={item =>

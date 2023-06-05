@@ -13,6 +13,7 @@ and this project adheres to
 -   Confirm dialog aborting profiling
 -   Confirm dialog before app closes while profiling
 -   Confirm dialog before app closes while data is processing
+-   Tooltips for more UI Components
 
 ## 0.7.1 - 2023-06-02
 

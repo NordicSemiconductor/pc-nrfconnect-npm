@@ -26,6 +26,7 @@ import {
     saveFileDialog,
     selectDirectoryDialog,
 } from '../../actions/fileActions';
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     dialogHandler,
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
@@ -184,57 +185,78 @@ export default () => {
     return (
         <SidePanel className="side-panel">
             <CollapsibleGroup defaultCollapsed={false} heading="Settings">
-                <Button
-                    variant="secondary"
-                    className="w-100"
-                    onClick={() => dispatch(saveFileDialog())}
+                <DocumentationTooltip
+                    card="SidePanel"
+                    item="ExportConfiguration"
                 >
-                    Export Configuration
-                </Button>
-                <Button
-                    variant="secondary"
-                    disabled={pmicConnection !== 'pmic-connected'}
-                    className="w-100"
-                    onClick={() => dispatch(loadConfiguration())}
-                >
-                    Load Configuration
-                </Button>
-                <Button
-                    variant="secondary"
-                    disabled={pmicConnection === 'ek-disconnected'}
-                    className="w-100"
-                    onClick={() => npmDevice?.kernelReset()}
-                >
-                    Reset Device
-                </Button>
-                <StartStopButton
-                    large={false}
-                    variant="secondary"
-                    className="w-100"
-                    startText="Record Events"
-                    stopText="Stop Recording"
-                    onClick={() => {
-                        if (
-                            eventRecordingPath === undefined ||
-                            eventRecordingPath.length === 0
-                        ) {
-                            selectDirectoryDialog().then(filePath =>
-                                dispatch(setEventRecordingPath(filePath))
-                            );
-                        } else {
-                            dispatch(setEventRecordingPath(''));
+                    <Button
+                        disabled
+                        variant="secondary"
+                        className="w-100"
+                        onClick={() => dispatch(saveFileDialog())}
+                    >
+                        Export Configuration
+                    </Button>
+                </DocumentationTooltip>
+
+                <DocumentationTooltip card="SidePanel" item="LoadConfiguration">
+                    <Button
+                        disabled
+                        variant="secondary"
+                        // disabled={pmicConnection !== 'pmic-connected'}
+                        className="w-100"
+                        onClick={() => dispatch(loadConfiguration())}
+                    >
+                        Load Configuration
+                    </Button>
+                </DocumentationTooltip>
+                <DocumentationTooltip card="SidePanel" item="ResetDevice">
+                    <Button
+                        variant="secondary"
+                        disabled={pmicConnection === 'ek-disconnected'}
+                        className="w-100"
+                        onClick={() => npmDevice?.kernelReset()}
+                    >
+                        Reset Device
+                    </Button>
+                </DocumentationTooltip>
+                <DocumentationTooltip card="SidePanel" item="RecordEvents">
+                    <StartStopButton
+                        large={false}
+                        variant="secondary"
+                        className="w-100"
+                        startText="Record Events"
+                        stopText="Stop Recording"
+                        onClick={() => {
+                            if (
+                                eventRecordingPath === undefined ||
+                                eventRecordingPath.length === 0
+                            ) {
+                                selectDirectoryDialog().then(filePath =>
+                                    dispatch(setEventRecordingPath(filePath))
+                                );
+                            } else {
+                                dispatch(setEventRecordingPath(''));
+                            }
+                        }}
+                        disabled={shellParserO === undefined}
+                        started={
+                            eventRecordingPath !== undefined &&
+                            eventRecordingPath.length > 0
                         }
-                    }}
-                    disabled={shellParserO === undefined}
-                    started={
-                        eventRecordingPath !== undefined &&
-                        eventRecordingPath.length > 0
-                    }
-                />
+                    />
+                </DocumentationTooltip>
             </CollapsibleGroup>
             <CollapsibleGroup defaultCollapsed={false} heading="Fuel Gauge">
                 <Dropdown
-                    label="Active Battery Model"
+                    label={
+                        <DocumentationTooltip
+                            card="SidePanel"
+                            item="ActiveBatteryModel"
+                        >
+                            Active Battery Model
+                        </DocumentationTooltip>
+                    }
                     items={batteryModelItems}
                     onSelect={(item: DropdownItem) => {
                         npmDevice?.setActiveBatteryModel(item.value);
@@ -244,92 +266,103 @@ export default () => {
                         selectedActiveItemBatteryMode.value === '' || uiDisabled
                     }
                 />
-                <Button
-                    variant="secondary"
-                    className="w-100"
-                    onClick={() => {
-                        getProfileBuffer()
-                            .then(buffer => {
-                                dispatch(
-                                    dialogHandler({
-                                        uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-                                        message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
-                                        confirmLabel: 'Load',
-                                        confirmClosesDialog: false,
-                                        cancelLabel: 'Cancel',
-                                        title: 'Load',
-                                        onConfirm: () => {
-                                            npmDevice?.downloadFuelGaugeProfile(
-                                                buffer
-                                            );
-                                        },
-                                        onCancel: () => {},
-                                    })
-                                );
-                            })
-                            .catch(res => {
-                                dispatch(
-                                    dialogHandler({
-                                        uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-                                        message: (
-                                            <>
-                                                <div>Load battery profile.</div>
-                                                <br />
-                                                <Alert
-                                                    label="Error "
-                                                    variant="danger"
-                                                >
-                                                    {res}
-                                                </Alert>
-                                            </>
-                                        ),
-                                        type: 'alert',
-                                        confirmLabel: 'Load',
-                                        confirmDisabled: true,
-                                        cancelLabel: 'Cancel',
-                                        title: 'Load',
-                                        onConfirm: () => {},
-                                        onCancel: () => {},
-                                    })
-                                );
-                            });
-                    }}
-                    disabled={
-                        pmicConnection === 'ek-disconnected' || uiDisabled
-                    }
-                >
-                    Load Battery Model
-                </Button>
-                {profilingSupported && (
+                <DocumentationTooltip card="SidePanel" item="LoadBatteryModel">
                     <Button
                         variant="secondary"
                         className="w-100"
                         onClick={() => {
-                            npmDevice
-                                ?.getBatteryProfiler()
-                                ?.canProfile()
-                                .then(result => {
-                                    if (result) {
-                                        dispatch(
-                                            setProfilingStage('Configuration')
-                                        );
-                                    } else {
-                                        dispatch(
-                                            setProfilingStage(
-                                                'MissingSyncBoard'
-                                            )
-                                        );
-                                    }
+                            getProfileBuffer()
+                                .then(buffer => {
+                                    dispatch(
+                                        dialogHandler({
+                                            uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+                                            message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
+                                            confirmLabel: 'Load',
+                                            confirmClosesDialog: false,
+                                            cancelLabel: 'Cancel',
+                                            title: 'Load',
+                                            onConfirm: () => {
+                                                npmDevice?.downloadFuelGaugeProfile(
+                                                    buffer
+                                                );
+                                            },
+                                            onCancel: () => {},
+                                        })
+                                    );
+                                })
+                                .catch(res => {
+                                    dispatch(
+                                        dialogHandler({
+                                            uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+                                            message: (
+                                                <>
+                                                    <div>
+                                                        Load battery profile.
+                                                    </div>
+                                                    <br />
+                                                    <Alert
+                                                        label="Error "
+                                                        variant="danger"
+                                                    >
+                                                        {res}
+                                                    </Alert>
+                                                </>
+                                            ),
+                                            type: 'alert',
+                                            confirmLabel: 'Load',
+                                            confirmDisabled: true,
+                                            cancelLabel: 'Cancel',
+                                            title: 'Load',
+                                            onConfirm: () => {},
+                                            onCancel: () => {},
+                                        })
+                                    );
                                 });
                         }}
                         disabled={
-                            !profilingSupported ||
-                            pmicConnection === 'ek-disconnected' ||
-                            uiDisabled
+                            pmicConnection === 'ek-disconnected' || uiDisabled
                         }
                     >
-                        Profile Battery
+                        Load Battery Model
                     </Button>
+                </DocumentationTooltip>
+                {profilingSupported && (
+                    <DocumentationTooltip
+                        card="SidePanel"
+                        item="ProfileBattery"
+                    >
+                        <Button
+                            variant="secondary"
+                            className="w-100"
+                            onClick={() => {
+                                npmDevice
+                                    ?.getBatteryProfiler()
+                                    ?.canProfile()
+                                    .then(result => {
+                                        if (result) {
+                                            dispatch(
+                                                setProfilingStage(
+                                                    'Configuration'
+                                                )
+                                            );
+                                        } else {
+                                            dispatch(
+                                                setProfilingStage(
+                                                    'MissingSyncBoard'
+                                                )
+                                            );
+                                        }
+                                    });
+                            }}
+                            disabled={
+                                !profilingSupported ||
+                                pmicConnection === 'ek-disconnected' ||
+                                uiDisabled
+                            }
+                        >
+                            Profile Battery
+                        </Button>
+                    </DocumentationTooltip>
                 )}
             </CollapsibleGroup>
             <ConnectionStatus />

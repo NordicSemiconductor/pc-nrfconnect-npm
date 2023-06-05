@@ -36,7 +36,7 @@ export default ({
     cardLabel = `Load Switch/LDO ${index + 1}`,
     disabled,
 }: LdoCardProperties) => {
-    const card = `ldo ${index + 1}`;
+    const card = `ldo${index + 1}`;
     const range = npmDevice.getLdoVoltageRange(index);
 
     const onEnable = (value: boolean) => npmDevice.setLdoEnabled(index, value);
@@ -62,7 +62,7 @@ export default ({
                         disabled ? 'disabled' : ''
                     }`}
                 >
-                    <DocumentationTooltip card={card} title="Load Switch/LDO">
+                    <DocumentationTooltip card={card} item="LoadSwitchLDO">
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
 
@@ -86,18 +86,7 @@ export default ({
 
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <DocumentationTooltip
-                        card={card}
-                        title="VOUTLDO"
-                        titleNode={
-                            <>
-                                <span>V</span>
-                                <span className="subscript">{`OUTLDO${
-                                    index + 1
-                                }`}</span>
-                            </>
-                        }
-                    >
+                    <DocumentationTooltip card={card} item="VOUTLDO">
                         <div>
                             <span>V</span>
                             <span className="subscript">{`OUTLDO${

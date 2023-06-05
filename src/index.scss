@@ -39,7 +39,7 @@
 }
 
 .masonry-layout.min-height-cards .card {
-    min-height: 185px;
+    min-height: 193px;
 }
 
 label {
@@ -117,8 +117,8 @@ label {
     }
 }
 
-#tooltip {
-    position: relative;
-    background: $gray-900;
-    padding: 8px 16px;
+.tooltip-overlay-trigger-wrapper {
+    button[disabled] {
+        pointer-events: none;
+    }
 }
