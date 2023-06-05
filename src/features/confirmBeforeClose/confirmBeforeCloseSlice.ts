@@ -40,8 +40,8 @@ const confirmBeforeCloseSlice = createSlice({
                 state.confirmCloseApp[index] = action.payload;
             } else {
                 state.confirmCloseApp = [
-                    ...state.confirmCloseApp,
                     action.payload,
+                    ...state.confirmCloseApp,
                 ];
             }
         },
