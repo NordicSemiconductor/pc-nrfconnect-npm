@@ -20,6 +20,7 @@ import {
     getLatestTBat,
     getProfile,
     getProfileIndex,
+    setAbortAction,
 } from '../../../features/pmicControl/profilingSlice';
 import { REST_DURATION } from '../helpers';
 import TimeComponent from '../TimeComponent';
@@ -58,9 +59,15 @@ export default () => {
 
                     <DialogButton
                         onClick={() => {
-                            npmDevice?.setAutoRebootDevice(true);
-                            npmDevice?.getBatteryProfiler()?.stopProfiling();
-                            dispatch(closeProfiling());
+                            dispatch(
+                                setAbortAction(() => {
+                                    npmDevice?.setAutoRebootDevice(true);
+                                    npmDevice
+                                        ?.getBatteryProfiler()
+                                        ?.stopProfiling();
+                                    dispatch(closeProfiling());
+                                })
+                            );
                         }}
                     >
                         Abort
