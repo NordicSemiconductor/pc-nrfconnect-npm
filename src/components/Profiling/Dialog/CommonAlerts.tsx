@@ -11,7 +11,7 @@ export const RestingProfilingAlerts = () => (
     <>
         <Alert variant="warning" label="Warning: ">
             Modifying device configuration during profiling will abort the
-            process.
+            ongoing temperature profile.
         </Alert>
         <Alert variant="info" label="Info: ">
             Profiling takes a long time to complete (~48hrs per temperature).
