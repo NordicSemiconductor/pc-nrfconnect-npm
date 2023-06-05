@@ -14,7 +14,7 @@ import {
     ProjectPathPair,
 } from '../../components/Profiling/types';
 
-const loadRecentProject = (): string[] =>
+export const loadRecentProject = (): string[] =>
     (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
 
 interface profilingProjectState {

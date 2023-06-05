@@ -7,16 +7,12 @@
 import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
-import {
-    describeError,
-    getAppDir,
-    getPersistentStore,
-    logger,
-} from 'pc-nrfconnect-shared';
+import { describeError, getAppDir, logger } from 'pc-nrfconnect-shared';
 
 import { Profile } from '../../features/pmicControl/npm/types';
 import {
     addRecentProject,
+    loadRecentProject,
     setRecentProjects,
     updateProfilingProject,
 } from '../../features/pmicControl/profilingProjectsSlice.';
@@ -61,9 +57,6 @@ export const isProfileReadyForProcessing = (
         !profile.csvReady ||
         !fs.existsSync(path.resolve(projectSettingsPath, profile.csvPath))
     );
-
-const loadRecentProject = (): string[] =>
-    (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
 
 export const readProjectSettingsFromFile = (
     filePath: string
