@@ -18,6 +18,8 @@ and this project adheres to
 ### Fixed
 
 -   UI no longer allows processing on incomplete profiles
+-   Profile Project does not get CSV path if file already exists
+
 
 ## 0.7.1 - 2023-06-02
 

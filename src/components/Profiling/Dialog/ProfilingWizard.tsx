@@ -6,7 +6,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { appendFile, existsSync, mkdirSync } from 'fs';
+import { appendFile, existsSync, mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { ConfirmationDialog } from 'pc-nrfconnect-shared';
 
@@ -16,6 +16,7 @@ import {
     clearConfirmBeforeClose,
 } from '../../../features/confirmBeforeClose/confirmBeforeCloseSlice';
 import { startProcessingCsv } from '../../../features/nrfutillNpm/csvProcessing';
+import { Profile } from '../../../features/pmicControl/npm/types';
 import {
     getBucks,
     getFuelGauge,
@@ -53,6 +54,21 @@ import ConfigurationDialog from './ConfigurationDialog';
 import PreConfigurationDialog from './PreConfigurationDialog';
 import ProfilingDialog from './ProfilingDialog';
 import RestingDialog from './RestingDialog';
+
+const generateCSVFileNamePath = (profile: Profile, index: number) => {
+    const baseDirectory = path.join(
+        profile.baseDirectory,
+        profile.name,
+        `${PROFILE_FOLDER_PREFIX}${index + 1}`
+    );
+
+    return path.join(
+        baseDirectory,
+        `${profile.name}_${profile.capacity}mAh_T${
+            profile.temperatures[index] < 0 ? 'n' : 'p'
+        }${profile.temperatures[index]}.csv`
+    );
+};
 
 const markProfilersAsReady =
     () => (dispatch: TDispatch, getState: () => RootState) => {
@@ -140,6 +156,33 @@ export default () => {
                     )
                 );
                 if (event.data.seq === 1 && profilingStage === 'Resting') {
+                    const profilingCsvPath = generateCSVFileNamePath(
+                        profile,
+                        index
+                    );
+
+                    const projectFilePath = generateDefaultProjectPath(profile);
+                    writeFileSync(
+                        profilingCsvPath,
+                        `Seconds,Current(A),Voltage(V),Temperature(C)\r\n`
+                    );
+
+                    dispatch(
+                        atomicUpdateProjectSettings(
+                            generateDefaultProjectPath(profile),
+                            profileSettings => {
+                                profileSettings.profiles[index].csvReady =
+                                    false;
+                                profileSettings.profiles[index].csvPath =
+                                    path.relative(
+                                        projectFilePath,
+                                        profilingCsvPath
+                                    );
+                                return profileSettings;
+                            }
+                        )
+                    );
+
                     dispatch(setProfilingStage('Profiling'));
                     timeOffset.current = event.timestamp;
                 } else if (profilingStage === 'Profiling') {
@@ -147,46 +190,16 @@ export default () => {
                         (Math.abs(event.data.iLoad) * REPORTING_RATE) / 3600;
                     dispatch(incrementCapacityConsumed(mAhConsumed));
 
-                    const baseDirectory = path.join(
-                        profile.baseDirectory,
-                        profile.name,
-                        `${PROFILE_FOLDER_PREFIX}${index + 1}`
+                    const profilingCsvPath = generateCSVFileNamePath(
+                        profile,
+                        index
                     );
 
-                    const profilingCsvPath = path.join(
-                        baseDirectory,
-                        `${profile.name}_${profile.capacity}mAh_T${
-                            profile.temperatures[index] < 0 ? 'n' : 'p'
-                        }${profile.temperatures[index]}.csv`
-                    );
-
-                    const newFile = !existsSync(profilingCsvPath);
-                    let data = `${
+                    const data = `${
                         (event.timestamp - timeOffset.current) / 1000
                     },${event.data.iLoad},${event.data.vLoad},${
                         event.data.tBat
                     }\r\n`;
-                    if (newFile) {
-                        data = `Seconds,Current(A),Voltage(V),Temperature(C)\r\n${data}`;
-                        const projectFilePath =
-                            generateDefaultProjectPath(profile);
-
-                        dispatch(
-                            atomicUpdateProjectSettings(
-                                generateDefaultProjectPath(profile),
-                                profileSettings => {
-                                    profileSettings.profiles[index].csvReady =
-                                        false;
-                                    profileSettings.profiles[index].csvPath =
-                                        path.relative(
-                                            projectFilePath,
-                                            profilingCsvPath
-                                        );
-                                    return profileSettings;
-                                }
-                            )
-                        );
-                    }
 
                     appendFile(profilingCsvPath, data, () => {});
                 }
