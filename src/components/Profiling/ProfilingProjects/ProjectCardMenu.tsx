@@ -197,9 +197,12 @@ export default ({
                         projectProgress.filter(progress => !progress.errorLevel)
                             .length > 0
                     }
-                    onClick={() =>
-                        dispatch(removeRecentProject(projectSettingsPath))
-                    }
+                    onClick={() => {
+                        projectProgress.forEach(progress => {
+                            progress.cancel();
+                        });
+                        dispatch(removeRecentProject(projectSettingsPath));
+                    }}
                 >
                     Remove Project
                 </Dropdown.Item>

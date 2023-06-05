@@ -130,6 +130,7 @@ export default ({
                 <Dropdown.Item
                     disabled={isProcessing}
                     onClick={() => {
+                        progress?.cancel();
                         dispatch(
                             atomicUpdateProjectSettings(
                                 projectSettingsPath,
