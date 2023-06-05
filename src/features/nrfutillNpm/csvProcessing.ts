@@ -127,6 +127,8 @@ export const generateParamsFromCSV =
 
                 fs.mkdirSync(resultsFolder);
 
+                let knowFailure = false;
+
                 const processProgress = (data: string) => {
                     console.log(data);
                     const progressMatch = data.match(
@@ -151,6 +153,29 @@ export const generateParamsFromCSV =
                                 index,
                                 message: `Processing cycle ${nominator} / ${denominator}`,
                                 progress: (nominator / denominator) * 100,
+                            })
+                        );
+                    } else if (
+                        data.includes(
+                            'Battery voltage does not cross the defined low cut off voltage. Please define higher cut off level and run again.'
+                        )
+                    ) {
+                        knowFailure = true;
+                        dispatch(
+                            updateProjectProfileProgress({
+                                path: projectAbsolutePath,
+                                index,
+                                message:
+                                    'Battery voltage does not cross the defined low cut off voltage. Please define higher cut off level and run again.',
+                                errorLevel: 'error',
+                                cancel: () => {
+                                    dispatch(
+                                        removeProjectProfileProgress({
+                                            path: projectAbsolutePath,
+                                            index,
+                                        })
+                                    );
+                                },
                             })
                         );
                     }
@@ -244,7 +269,7 @@ export const generateParamsFromCSV =
                                             index,
                                         })
                                     );
-                                } else {
+                                } else if (!knowFailure) {
                                     dispatch(
                                         updateProjectProfileProgress({
                                             path: projectAbsolutePath,
