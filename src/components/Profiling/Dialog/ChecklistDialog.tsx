@@ -126,7 +126,7 @@ export default () => {
         >
             <Group>
                 {pmicConnectionState === 'pmic-disconnected' && (
-                    <Alert label="Warning: " variant="warning">
+                    <Alert label="Caution: " variant="warning">
                         PMIC is not powered.
                     </Alert>
                 )}
@@ -134,7 +134,7 @@ export default () => {
                     <Alert label="" variant="warning">
                         <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
                             <span>
-                                <strong>Warning: </strong>PMIC Pending device
+                                <strong>Caution: </strong>PMIC Pending device
                                 restart.
                             </span>
                             <Button
@@ -149,7 +149,7 @@ export default () => {
                     </Alert>
                 )}
                 {pmicConnectionState === 'pmic-unknown' && (
-                    <Alert label="Info: " variant="info">
+                    <Alert label="Note: " variant="info">
                         Waiting to connect to PMIC
                     </Alert>
                 )}
@@ -161,7 +161,7 @@ export default () => {
                             </Alert>
                         )}
                         {!batteryConnected && (
-                            <Alert label="Warning: " variant="warning">
+                            <Alert label="Caution: " variant="warning">
                                 Battery is not detected. Make sure it is
                                 connected to the Evaluation Kit before you
                                 continue

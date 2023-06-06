@@ -9,11 +9,11 @@ import { Alert } from 'pc-nrfconnect-shared';
 
 export const RestingProfilingAlerts = () => (
     <>
-        <Alert variant="warning" label="Warning: ">
+        <Alert variant="warning" label="Caution: ">
             Modifying device configuration during profiling will abort the
             ongoing temperature profile.
         </Alert>
-        <Alert variant="info" label="Info: ">
+        <Alert variant="info" label="Note: ">
             Profiling takes a long time to complete (~48hrs per temperature).
             Please make sure that the computer does not go into sleep or
             hibernate during this process.
@@ -38,7 +38,7 @@ const TemperatureAlert = ({
     if (!showOnWarning || (showOnWarning && temperatureDelta > 2.5)) {
         return (
             <Alert
-                label={temperatureDelta > 2.5 ? 'Warning: ' : 'Info: '}
+                label={temperatureDelta > 2.5 ? 'Caution: ' : 'Note: '}
                 variant={temperatureDelta > 2.5 ? 'warning' : 'info'}
             >
                 {message}

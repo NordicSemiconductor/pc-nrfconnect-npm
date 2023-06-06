@@ -390,7 +390,7 @@ export default () => {
         >
             <Group>
                 {lastProfile && !allProcessedSuccessfully && (
-                    <Alert variant="warning" label="Warning: ">
+                    <Alert variant="warning" label="Caution: ">
                         {!allAreProcessing &&
                             `Models that failed to, or are still processing, will not be included when saving the battery model. `}
                         {allAreProcessing &&
@@ -401,7 +401,7 @@ export default () => {
                     </Alert>
                 )}
                 {generatingBatteryModel && (
-                    <Alert variant="info" label="Info: ">
+                    <Alert variant="info" label="Note: ">
                         Generating battery model
                     </Alert>
                 )}

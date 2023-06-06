@@ -80,7 +80,7 @@ export const generateParamsFromCSV =
                     path: projectAbsolutePath,
                     index,
                     message:
-                        'Warning: OS not supported. Try this profile on Windows or Linux',
+                        'Caution: OS not supported. Try this profile on Windows or Linux',
                     progress: 100,
                     errorLevel: 'warning',
                     cancel: () => {
