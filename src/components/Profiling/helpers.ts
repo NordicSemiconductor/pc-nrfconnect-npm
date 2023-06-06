@@ -59,6 +59,21 @@ export const isProfileReadyForProcessing = (
         !fs.existsSync(path.resolve(projectSettingsPath, profile.csvPath))
     );
 
+const guaranteeValidCsvPath = (csvPath: string) =>
+    csvPath.replace(
+        new RegExp([`\\${path.win32.sep}`, path.posix.sep].join('|'), 'g'),
+        path.sep
+    );
+
+const updateStoreWithValidCsvPath = (store: Store<ProfilingProject>) =>
+    store.set({
+        ...store.store,
+        profiles: store.store.profiles.map(profile => ({
+            ...profile,
+            csvPath: guaranteeValidCsvPath(profile.csvPath as string),
+        })),
+    });
+
 export const readProjectSettingsFromFile = (
     filePath: string
 ): Omit<ProjectPathPair, 'path'> => {
@@ -73,6 +88,8 @@ export const readProjectSettingsFromFile = (
                 cwd: pathObject.dir,
                 name: pathObject.name,
             });
+
+            updateStoreWithValidCsvPath(store);
 
             return { settings: store.store };
         }
@@ -97,8 +114,10 @@ export const atomicUpdateProjectSettings =
         });
 
         const oldProject = store.store;
+
         if (oldProject) {
             try {
+                updateStoreWithValidCsvPath(store);
                 const newProject = updateProject(oldProject);
                 store.set(newProject);
                 dispatch(
