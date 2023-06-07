@@ -8,7 +8,7 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { getAppDir } from 'pc-nrfconnect-shared';
+import { getAppDir, getAppFile } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import {
@@ -43,12 +43,8 @@ const NRFUTIL_HOME = path.join(
     os.platform()
 );
 
-const BINARY_DIR = path.join(
-    getAppDir(),
-    'resources',
-    'nrfutil-npm',
-    os.platform(),
-    'bin'
+const NRFUTIL_BINARY = getAppFile(
+    path.join('resources', 'nrfutil-npm', os.platform(), 'bin', 'nrfutil-npm')
 );
 
 export const startProcessingCsv =
@@ -74,7 +70,7 @@ export const startProcessingCsv =
     };
 export const generateParamsFromCSV =
     (projectAbsolutePath: string, index: number) => (dispatch: TDispatch) => {
-        if (!fs.existsSync(BINARY_DIR)) {
+        if (!fs.existsSync(NRFUTIL_BINARY)) {
             dispatch(
                 addProjectProfileProgress({
                     path: projectAbsolutePath,
@@ -185,7 +181,7 @@ export const generateParamsFromCSV =
                 env.NRFUTIL_HOME = NRFUTIL_HOME;
 
                 const processCSV = spawn(
-                    'nrfutil-npm',
+                    NRFUTIL_BINARY,
                     [
                         'generate',
                         '--input-file',
@@ -198,7 +194,6 @@ export const generateParamsFromCSV =
                         profile.vLowerCutOff.toString(),
                     ],
                     {
-                        cwd: BINARY_DIR,
                         env,
                     }
                 );
@@ -314,7 +309,7 @@ export const mergeBatteryParams = (
     profiles: ProfilingProjectProfile[]
 ) =>
     new Promise<string>((resolve, reject) => {
-        if (!fs.existsSync(BINARY_DIR)) {
+        if (!fs.existsSync(NRFUTIL_BINARY)) {
             reject(new Error('OS not supported'));
             return;
         }
@@ -363,8 +358,7 @@ export const mergeBatteryParams = (
         const env = { ...process.env };
         env.NRFUTIL_HOME = NRFUTIL_HOME;
 
-        const processCSV = spawn('nrfutil-npm', args, {
-            cwd: BINARY_DIR,
+        const processCSV = spawn(NRFUTIL_BINARY, args, {
             env,
         });
 
