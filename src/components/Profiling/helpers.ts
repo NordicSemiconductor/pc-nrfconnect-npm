@@ -59,20 +59,27 @@ export const isProfileReadyForProcessing = (
         !fs.existsSync(path.resolve(projectSettingsPath, profile.csvPath))
     );
 
-const guaranteeValidCsvPath = (csvPath: string) =>
-    csvPath.replace(
-        new RegExp([`\\${path.win32.sep}`, path.posix.sep].join('|'), 'g'),
-        path.sep
-    );
+const guaranteeValidPath = (somePath?: string) =>
+    somePath
+        ? somePath.replace(
+              new RegExp(
+                  [`\\${path.win32.sep}`, path.posix.sep].join('|'),
+                  'g'
+              ),
+              path.sep
+          )
+        : undefined;
 
-const updateStoreWithValidCsvPath = (store: Store<ProfilingProject>) =>
-    store.set({
-        ...store.store,
-        profiles: store.store.profiles.map(profile => ({
-            ...profile,
-            csvPath: guaranteeValidCsvPath(profile.csvPath as string),
-        })),
-    });
+const updateSettingsWithValidPath = (project?: ProfilingProject) =>
+    project
+        ? {
+              ...project,
+              profiles: project.profiles.map(profile => ({
+                  ...profile,
+                  csvPath: guaranteeValidPath(profile.csvPath),
+              })),
+          }
+        : undefined;
 
 export const readProjectSettingsFromFile = (
     filePath: string
@@ -89,9 +96,7 @@ export const readProjectSettingsFromFile = (
                 name: pathObject.name,
             });
 
-            updateStoreWithValidCsvPath(store);
-
-            return { settings: store.store };
+            return { settings: updateSettingsWithValidPath(store.store) };
         }
     } catch (error) {
         return { settings: undefined, error: 'fileCorrupted' };
@@ -113,11 +118,10 @@ export const atomicUpdateProjectSettings =
             name: pathObject.name,
         });
 
-        const oldProject = store.store;
+        const oldProject = updateSettingsWithValidPath(store.store);
 
         if (oldProject) {
             try {
-                updateStoreWithValidCsvPath(store);
                 const newProject = updateProject(oldProject);
                 store.set(newProject);
                 dispatch(
