@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { App } from 'pc-nrfconnect-shared';
+import { App, FeedbackPane } from 'pc-nrfconnect-shared';
 
 import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
@@ -55,6 +55,10 @@ export default () => (
             {
                 name: 'Graph',
                 Main: Graph,
+            },
+            {
+                name: 'Feedback',
+                Main: FeedbackPane,
             },
         ]}
     />
