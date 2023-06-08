@@ -9,7 +9,10 @@ import { getNPM1300 } from './pmic1300Device';
 import {
     BatteryModel,
     Buck,
+    BuckModeControlValues,
+    BuckOnOffControlValues,
     Charger,
+    GPIOValues,
     Ldo,
     NTCMode,
     PartialUpdate,
@@ -3308,6 +3311,100 @@ describe('PMIC 1300', () => {
         });
 
         test.each(
+            PMIC_1300_CHARGERS.map(index => [
+                {
+                    index,
+                    append: 'get',
+                },
+                {
+                    index,
+                    append: 'set 1',
+                },
+            ]).flat()
+        )('npmx charger enable recharging %p', ({ index, append }) => {
+            const command = `npmx charger module recharge ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess('Value: 1.', command);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).nthCalledWith(1, {
+                data: { enableRecharging: true },
+                index,
+            });
+        });
+
+        test.each(
+            PMIC_1300_CHARGERS.map(index => [
+                {
+                    index,
+                    append: 'get',
+                },
+                {
+                    index,
+                    append: 'set 20',
+                },
+            ]).flat()
+        )('npmx charger iTerm %p', ({ index, append }) => {
+            const command = `npmx charger termination_current ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess('Value: 20%', command);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).nthCalledWith(1, {
+                data: { iTerm: '20%' },
+                index,
+            });
+        });
+
+        test.each(
+            PMIC_1300_CHARGERS.map(index => [
+                {
+                    index,
+                    append: 'get',
+                    successReturn: 'Value: 47k.',
+                    ntcMode: '47kΩ' as NTCMode,
+                },
+                {
+                    index,
+                    append: 'set ntc_47k',
+                    successReturn: 'Value: 47k.',
+                    ntcMode: '47kΩ' as NTCMode,
+                },
+                {
+                    index,
+                    append: 'set ntc_10k',
+                    successReturn: 'Value: 10k.',
+                    ntcMode: '10kΩ' as NTCMode,
+                },
+                {
+                    index,
+                    append: 'set ntc_100k',
+                    successReturn: 'Value: 100k.',
+                    ntcMode: '100kΩ' as NTCMode,
+                },
+            ]).flat()
+        )(
+            'npmx charger ntc mode %p',
+            ({ index, append, successReturn, ntcMode }) => {
+                const command = `npmx adc ntc ${append}`;
+                const callback =
+                    eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+                callback?.onSuccess(successReturn, command);
+
+                expect(mockOnChargerUpdate).toBeCalledTimes(1);
+                expect(mockOnChargerUpdate).nthCalledWith(1, {
+                    data: { ntcMode },
+                    index,
+                });
+            }
+        );
+
+        test.each(
             [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80]
                 .map(setValue => [
                     {
@@ -3571,6 +3668,31 @@ describe('PMIC 1300', () => {
 
         test.each(
             PMIC_1300_BUCKS.map(index => [
+                {
+                    index,
+                    append: `get ${index}`,
+                },
+                {
+                    index,
+                    append: `set ${index} 2300`,
+                },
+            ]).flat()
+        )('npmx buck voltage retention %p', ({ index, append }) => {
+            const command = `npmx buck voltage retention ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess('Value: 2300 mv', command);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: { vOutRetention: 2.3 },
+                index,
+            });
+        });
+
+        test.each(
+            PMIC_1300_BUCKS.map(index => [
                 ...[0, 1].map(value =>
                     [
                         {
@@ -3617,7 +3739,7 @@ describe('PMIC 1300', () => {
                     ].flat()
                 ),
             ]).flat()
-        )('npmx buck %p', ({ index, append, enabled }) => {
+        )('npmx buck enable %p', ({ index, append, enabled }) => {
             const command = `npmx buck ${append}`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
@@ -3627,6 +3749,114 @@ describe('PMIC 1300', () => {
             expect(mockOnBuckUpdate).toBeCalledTimes(1);
             expect(mockOnBuckUpdate).toBeCalledWith({
                 data: { enabled },
+                index,
+            });
+        });
+
+        test.each(
+            PMIC_1300_BUCKS.map(index => [
+                ...[-1, 0, 1, 2, 3, 4].map(value =>
+                    [
+                        {
+                            index,
+                            append: `get ${index}`,
+                            value,
+                        },
+                        {
+                            index,
+                            append: `set ${index} ${value} 0`,
+                            value,
+                        },
+                    ].flat()
+                ),
+            ]).flat()
+        )('npmx buck mode control %p', ({ index, append, value }) => {
+            const command = `npmx buck gpio pwm_force ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess(`Value: ${value} 0.`, command);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    modeControl:
+                        value === -1
+                            ? BuckModeControlValues[0]
+                            : GPIOValues[value],
+                },
+                index,
+            });
+        });
+
+        test.each(
+            PMIC_1300_BUCKS.map(index => [
+                ...[-1, 0, 1, 2, 3, 4].map(value =>
+                    [
+                        {
+                            index,
+                            append: `get ${index}`,
+                            value,
+                        },
+                        {
+                            index,
+                            append: `set ${index} ${value} 0`,
+                            value,
+                        },
+                    ].flat()
+                ),
+            ]).flat()
+        )('npmx buck on/off control %p', ({ index, append, value }) => {
+            const command = `npmx buck gpio on_off ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess(`Value: ${value} 0.`, command);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    onOffControl:
+                        value === -1
+                            ? BuckOnOffControlValues[0]
+                            : GPIOValues[value],
+                },
+                index,
+            });
+        });
+
+        test.each(
+            PMIC_1300_BUCKS.map(index => [
+                ...[-1, 0, 1, 2, 3, 4].map(value =>
+                    [
+                        {
+                            index,
+                            append: `get ${index}`,
+                            value,
+                        },
+                        {
+                            index,
+                            append: `set ${index} ${value} 0`,
+                            value,
+                        },
+                    ].flat()
+                ),
+            ]).flat()
+        )('npmx buck retention control %p', ({ index, append, value }) => {
+            const command = `npmx buck gpio retention ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess(`Value: ${value} 0.`, command);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    retentionControl:
+                        value === -1
+                            ? BuckOnOffControlValues[0]
+                            : GPIOValues[value],
+                },
                 index,
             });
         });
@@ -3658,6 +3888,69 @@ describe('PMIC 1300', () => {
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
                 data: { enabled },
+                index,
+            });
+        });
+
+        test.each(
+            PMIC_1300_LDOS.map(index => [
+                [
+                    {
+                        index,
+                        append: `get ${index}`,
+                    },
+                    {
+                        index,
+                        append: `set ${index} 1300`,
+                    },
+                ].flat(),
+            ]).flat()
+        )('npmx ldsw voltage %p', ({ index, append }) => {
+            const command = `npmx ldsw ldo_voltage ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess(`Value: 1300mV.`, command);
+
+            expect(mockOnLdoUpdate).toBeCalledTimes(1);
+            expect(mockOnLdoUpdate).toBeCalledWith({
+                data: { voltage: 1.3 },
+                index,
+            });
+        });
+
+        test.each(
+            PMIC_1300_LDOS.map(index => [
+                ...['LDO', 'ldoSwitch'].map(mode =>
+                    [
+                        {
+                            index,
+                            append: `get ${index}`,
+                            mode,
+                        },
+                        {
+                            index,
+                            append: `set ${index} ${
+                                mode === 'LDO' ? '1' : '0'
+                            } `,
+                            mode,
+                        },
+                    ].flat()
+                ),
+            ]).flat()
+        )('npmx ldsw mode %p', ({ index, append, mode }) => {
+            const command = `npmx ldsw mode ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess(
+                `Value:  ${mode === 'LDO' ? '1' : '0'}.`,
+                command
+            );
+
+            expect(mockOnLdoUpdate).toBeCalledTimes(1);
+            expect(mockOnLdoUpdate).toBeCalledWith({
+                data: { mode },
                 index,
             });
         });
