@@ -14,7 +14,7 @@ export const getNpmDevice = (
 ): Promise<NpmDevice> =>
     new Promise<NpmDevice>((resolve, reject) => {
         if (shellParser) {
-            shellParser?.enqueueRequest('hw_version', {
+            shellParser.enqueueRequest('hw_version', {
                 onSuccess: response => {
                     switch (response) {
                         case 'hw_version=npm1300ek_nrf5340_cpuapp':
@@ -27,6 +27,6 @@ export const getNpmDevice = (
                 onError: reject,
             });
         } else {
-            resolve(getNPM1300(shellParser, dialogHandler));
+            resolve(getNPM1300(undefined, dialogHandler));
         }
     });
