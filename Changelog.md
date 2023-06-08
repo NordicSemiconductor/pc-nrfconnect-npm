@@ -16,11 +16,23 @@ and this project adheres to
 -   Tooltips for more UI Components
 -   Handle error when processing "Battery voltage does not cross the defined low
     cut off voltage. Please define higher cut off level and run again."
+-   Rated charging current to profiling wizard
+-   NTC thermistor support for 10k, 47k, 100k
+-   NTC thermistor support for 10k, 47k, 100k in profiling wizard
+-   Feedback tab
 
 ### Fixed
 
 -   UI no longer allows processing on incomplete profiles
 -   Profile Project does not get CSV path if file already exists
+-   Linux nrfutil support was broken and never progressed
+-   Sharing profiling projects across OS lead to csv file relative paths not
+    working
+-   Case where when the Device is rebooted the UI is stuck with `Offline Mode`
+-   Performance Improvements
+-   Computer prevented from going to sleep even after you disconnect from the
+    device or close nPM Power UP.
+-   Charger Iterm does not sync with the read value from device
 
 ### Changed
 
