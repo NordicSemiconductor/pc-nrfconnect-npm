@@ -313,7 +313,7 @@ export default () => {
                     }}
                 >
                     Aborting profiling now will terminate the ongoing step and
-                    close this profiling session. Progress will be lost Are you
+                    close this profiling session. Progress will be lost. Are you
                     sure you want to abort profiling?
                 </ConfirmationDialog>
             ) : (
