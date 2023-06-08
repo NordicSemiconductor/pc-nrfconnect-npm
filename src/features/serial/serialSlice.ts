@@ -40,6 +40,9 @@ const serialSlice = createSlice({
             state,
             action: PayloadAction<ShellParser | undefined>
         ) => {
+            if (state.shellParser) {
+                state.shellParser.unregister();
+            }
             state.shellParser = action.payload;
         },
         setIsPaused: (state, action: PayloadAction<boolean>) => {
