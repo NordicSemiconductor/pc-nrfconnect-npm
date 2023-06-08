@@ -3721,51 +3721,28 @@ describe('PMIC 1300', () => {
         test('Initial State', () => {
             const { pmic } = setupMocksWithShellParser();
 
-            expect(pmic.getConnectionState()).toBe('pmic-unknown');
-            expect(setTimeout).toHaveBeenCalledTimes(1);
-            expect(setTimeout).toHaveBeenLastCalledWith(
-                expect.any(Function),
-                2000
-            );
-        });
-
-        test("Goes online if no 'response error' is received within timeout", () => {
-            const { mockOnPmicStateChange, pmic } = setupMocksWithShellParser();
-
-            expect(pmic.getConnectionState()).toBe('pmic-unknown');
-            jest.runAllTimers();
             expect(pmic.getConnectionState()).toBe('pmic-connected');
-
-            expect(mockOnPmicStateChange).toBeCalledTimes(1);
-            expect(mockOnPmicStateChange).toBeCalledWith('pmic-connected');
         });
 
         test("Goes from 'pmic-connected' to 'pmic-disconnected' if 'No response from PMIC.' is received", () => {
             const { eventHandlers, mockOnPmicStateChange } =
                 setupMocksWithShellParser();
 
-            jest.runAllTimers();
-
             eventHandlers.mockOnShellLoggingEventHandler(
                 '[00:00:02.019,531] <wrn> module_pmic: No response from PMIC.'
             );
 
-            expect(mockOnPmicStateChange).toBeCalledTimes(2);
-            expect(mockOnPmicStateChange).nthCalledWith(1, 'pmic-connected');
-            expect(mockOnPmicStateChange).nthCalledWith(2, 'pmic-disconnected');
+            expect(mockOnPmicStateChange).toBeCalledTimes(1);
+            expect(mockOnPmicStateChange).toBeCalledWith('pmic-disconnected');
         });
 
         test("Goes from 'pmic-unknown' to 'pmic-disconnected' if 'No response from PMIC.' is received", () => {
             const { eventHandlers, mockOnPmicStateChange } =
                 setupMocksWithShellParser();
 
-            expect(clearTimeout).toHaveBeenCalledTimes(0);
-
             eventHandlers.mockOnShellLoggingEventHandler(
                 '[00:00:02.019,531] <wrn> module_pmic: No response from PMIC.'
             );
-
-            expect(clearTimeout).toHaveBeenCalledTimes(1);
 
             expect(mockOnPmicStateChange).toBeCalledTimes(1);
             expect(mockOnPmicStateChange).toBeCalledWith('pmic-disconnected');
