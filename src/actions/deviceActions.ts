@@ -5,14 +5,19 @@
  */
 
 import type { AutoDetectTypes } from '@serialport/bindings-cpp';
-import { createSerialPort, Device } from 'pc-nrfconnect-shared';
+import { createSerialPort, describeError, Device } from 'pc-nrfconnect-shared';
 import type { SerialPortOpenOptions } from 'serialport';
 
-import { setSerialPort, setShellParser } from '../features/serial/serialSlice';
+import { setSerialPort } from '../features/serial/serialSlice';
 import { TAction } from '../thunk';
 
-export const closeDevice = (): TAction => dispatch => {
-    dispatch(setShellParser(undefined));
+export const closeDevice = (): TAction => async (dispatch, getState) => {
+    try {
+        await getState().app.serial.serialPort?.close();
+    } catch (e) {
+        console.error(describeError(e));
+    }
+
     dispatch(setSerialPort(undefined));
 };
 

@@ -33,7 +33,6 @@ const serialSlice = createSlice({
             state,
             action: PayloadAction<SerialPort | undefined>
         ) => {
-            state.serialPort?.close();
             state.serialPort = action.payload;
         },
         setShellParser: (

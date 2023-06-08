@@ -49,6 +49,7 @@ import {
     getSerialPort,
     getShellParser,
     setIsPaused,
+    setSerialPort,
     setShellParser,
 } from '../../features/serial/serialSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
@@ -137,7 +138,6 @@ export default () => {
     // init shell parser
     useEffect(() => {
         const init = async () => {
-            dispatch(setShellParser(undefined));
             if (serialPort) {
                 const shellParser = await hookModemToShellParser(
                     serialPort,
@@ -160,12 +160,19 @@ export default () => {
                     }
                 );
 
+                const onClosedRelease = serialPort.onClosed(() => {
+                    dispatch(setSerialPort(undefined));
+                });
+
                 dispatch(setShellParser(shellParser));
                 return () => {
                     releaseOnUnknownCommand();
+                    onClosedRelease();
                     shellParser.unregister();
                 };
             }
+
+            dispatch(setShellParser(undefined));
         };
         init().catch(console.error);
     }, [dispatch, serialPort]);
@@ -176,11 +183,13 @@ export default () => {
         }
     }, [dispatch, shellParserO]);
 
-    useEffect(() => {
-        shellParserO?.onPausedChange(state => {
-            dispatch(setIsPaused(state));
-        });
-    }, [dispatch, shellParserO]);
+    useEffect(
+        () =>
+            shellParserO?.onPausedChange(state => {
+                dispatch(setIsPaused(state));
+            }) ?? noop,
+        [dispatch, shellParserO]
+    );
 
     return (
         <SidePanel className="side-panel">
