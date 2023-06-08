@@ -935,7 +935,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
             });
 
-        if (pmicState !== 'ek-disconnected' && index === 1 && value <= 1.7) {
+        if (
+            dialogHandler &&
+            pmicState !== 'ek-disconnected' &&
+            index === 1 &&
+            value <= 1.7
+        ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
@@ -1008,6 +1013,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         // TODO Check software voltage as well
         if (
+            dialogHandler &&
             pmicState !== 'ek-disconnected' &&
             index === 1 &&
             mode === 'software'
@@ -1126,7 +1132,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
             });
 
-        if (pmicState !== 'ek-disconnected' && index === 1 && !enabled) {
+        if (
+            dialogHandler &&
+            pmicState !== 'ek-disconnected' &&
+            index === 1 &&
+            !enabled
+        ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
@@ -1218,7 +1229,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
             });
 
-        if (pmicState !== 'ek-disconnected' && mode === 'LDO') {
+        if (
+            dialogHandler &&
+            pmicState !== 'ek-disconnected' &&
+            mode === 'LDO'
+        ) {
             const ldo1Message =
                 'Please ensure correct nPM1300-EK configuration before enabling LDO1. Connect LDO bypass capacitors by connecting the LDO1 jumper on P16. Disconnect VOUT1-LSIN1 and HIGH-LSOUT1 jumpers on P15. Ensure IN1, on P8, is connected to a source that is between 2.6V and 5.5V, for example Vsys.';
             const ldo2Message =
@@ -1472,7 +1487,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 setFuelGaugeEnabled(config.fuelGauge);
             };
 
-            if (config.firmwareVersion !== baseDevice.getSupportedVersion()) {
+            if (
+                dialogHandler &&
+                config.firmwareVersion !== baseDevice.getSupportedVersion()
+            ) {
                 const warningDialog: PmicDialog = {
                     doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
                     message: `The configuration was intended for firmware version ${

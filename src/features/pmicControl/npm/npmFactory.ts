@@ -10,7 +10,7 @@ import { NpmDevice, PmicDialog } from './types';
 
 export const getNpmDevice = (
     shellParser: ShellParser | undefined,
-    dialogHandler: (pmicDialog: PmicDialog) => void
+    dialogHandler: ((pmicDialog: PmicDialog) => void) | null
 ): Promise<NpmDevice> =>
     new Promise<NpmDevice>((resolve, reject) => {
         if (shellParser) {
