@@ -278,323 +278,440 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         } as PartialUpdate<T>);
     };
 
+    const releaseAll: (() => void)[] = [];
+
     // TODO Add callback clean up
-    shellParser?.registerCommandCallback(
-        toRegex('npmx charger termination_voltage normal', true),
-        res => {
-            const value = parseToNumber(res);
-            emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                vTerm: value / 1000, // mv to V
-            });
-        },
-        noop
-    );
+    if (shellParser) {
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('delayed_reboot', false, undefined, '[0-9]+'),
+                () => {
+                    pmicState = 'pmic-pending-rebooting';
+                    eventEmitter.emit('onPmicStateChange', pmicState);
+                },
+                noop
+            )
+        );
 
-    shellParser?.registerCommandCallback(
-        toRegex('npmx charger charger_current', true),
-        res => {
-            const value = parseToNumber(res);
-            emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                iChg: value,
-            });
-        },
-        noop
-    );
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger termination_voltage normal', true),
+                res => {
+                    const value = parseToNumber(res);
+                    emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                        vTerm: value / 1000, // mv to V
+                    });
+                },
+                noop
+            )
+        );
 
-    shellParser?.registerCommandCallback(
-        toRegex('npmx charger status', true),
-        res => {
-            const value = parseToNumber(res);
-            emitOnChargingStatusUpdate(value);
-        },
-        noop
-    );
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger charger_current', true),
+                res => {
+                    const value = parseToNumber(res);
+                    emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                        iChg: value,
+                    });
+                },
+                noop
+            )
+        );
 
-    shellParser?.registerCommandCallback(
-        toRegex('npmx charger module recharge', true, undefined, '(1|0)'),
-        res => {
-            emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                enableRecharging: parseToBoolean(res),
-            });
-        },
-        noop
-    );
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger status', true),
+                res => {
+                    const value = parseToNumber(res);
+                    emitOnChargingStatusUpdate(value);
+                },
+                noop
+            )
+        );
 
-    shellParser?.registerCommandCallback(
-        toRegex('npmx charger module charger', true, undefined, '(1|0)'),
-        res => {
-            emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                enabled: parseToBoolean(res),
-            });
-        },
-        noop
-    );
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx charger module recharge',
+                    true,
+                    undefined,
+                    '(1|0)'
+                ),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                        enableRecharging: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
 
-    shellParser?.registerCommandCallback(
-        toRegex('npmx charger trickle', true, undefined, '(2500|2900)'),
-        res => {
-            const result = parseToNumber(res) / 1000;
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx charger module charger',
+                    true,
+                    undefined,
+                    '(1|0)'
+                ),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                        enabled: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
 
-            if (result === 2.5 || result === 2.9) {
-                emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                    vTrickleFast: result,
-                });
-            }
-        },
-        noop
-    );
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger trickle', true, undefined, '(2500|2900)'),
+                res => {
+                    const result = parseToNumber(res) / 1000;
 
-    shellParser?.registerCommandCallback(
-        toRegex('npmx charger termination_current', true, undefined, '(10|20)'),
-        res => {
-            const result = parseToNumber(res) / 1000;
+                    if (result === 2.5 || result === 2.9) {
+                        emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                            vTrickleFast: result,
+                        });
+                    }
+                },
+                noop
+            )
+        );
 
-            if (result === 10 || result === 20) {
-                emitPartialEvent<Charger>('onChargerUpdate', 0, {
-                    iTerm: `${result}%`,
-                });
-            }
-        },
-        noop
-    );
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx charger termination_current',
+                    true,
+                    undefined,
+                    '(10|20)'
+                ),
+                res => {
+                    const result = parseToNumber(res) / 1000;
 
-    shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge', true, undefined, '(1|0)'),
+                    if (result === 10 || result === 20) {
+                        emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                            iTerm: `${result}%`,
+                        });
+                    }
+                },
+                noop
+            )
+        );
 
-        res => {
-            eventEmitter.emit('onFuelGauge', parseToBoolean(res));
-        },
-        noop
-    );
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('fuel_gauge', true, undefined, '(1|0)'),
 
-    shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge model download begin'),
-        () => shellParser?.setShellEchos(false),
-        () => shellParser?.setShellEchos(true)
-    );
+                res => {
+                    eventEmitter.emit('onFuelGauge', parseToBoolean(res));
+                },
+                noop
+            )
+        );
 
-    shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge model download apply'),
-        res => {
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const profileDownload: ProfileDownload = {
-                    state: 'applied',
-                    alertMessage: parseColonBasedAnswer(res),
-                };
-                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-            }
-            shellParser?.setShellEchos(true);
-        },
-        res => {
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const profileDownload: ProfileDownload = {
-                    state: 'failed',
-                    alertMessage: parseColonBasedAnswer(res),
-                };
-                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-            }
-            shellParser?.setShellEchos(true);
-        }
-    );
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('fuel_gauge model download begin'),
+                () => shellParser?.setShellEchos(false),
+                () => shellParser?.setShellEchos(true)
+            )
+        );
 
-    shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge model download abort'),
-        res => {
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const profileDownload: ProfileDownload = {
-                    state: 'aborted',
-                    alertMessage: parseColonBasedAnswer(res),
-                };
-                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-            }
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('fuel_gauge model download apply'),
+                res => {
+                    if (profileDownloadInProgress) {
+                        profileDownloadInProgress = false;
+                        const profileDownload: ProfileDownload = {
+                            state: 'applied',
+                            alertMessage: parseColonBasedAnswer(res),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+                    }
+                    shellParser?.setShellEchos(true);
+                },
+                res => {
+                    if (profileDownloadInProgress) {
+                        profileDownloadInProgress = false;
+                        const profileDownload: ProfileDownload = {
+                            state: 'failed',
+                            alertMessage: parseColonBasedAnswer(res),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+                    }
+                    shellParser?.setShellEchos(true);
+                }
+            )
+        );
 
-            shellParser?.setShellEchos(true);
-        },
-        res => {
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const profileDownload: ProfileDownload = {
-                    state: 'failed',
-                    alertMessage: parseColonBasedAnswer(res),
-                };
-                eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-            }
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('fuel_gauge model download abort'),
+                res => {
+                    if (profileDownloadInProgress) {
+                        profileDownloadInProgress = false;
+                        const profileDownload: ProfileDownload = {
+                            state: 'aborted',
+                            alertMessage: parseColonBasedAnswer(res),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+                    }
 
-            shellParser?.setShellEchos(true);
-        }
-    );
+                    shellParser?.setShellEchos(true);
+                },
+                res => {
+                    if (profileDownloadInProgress) {
+                        profileDownloadInProgress = false;
+                        const profileDownload: ProfileDownload = {
+                            state: 'failed',
+                            alertMessage: parseColonBasedAnswer(res),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+                    }
 
-    shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge model', true, undefined, '"[A-Za-z0-9\\s]+"'),
-        res => {
-            eventEmitter.emit(
-                'onActiveBatteryModelUpdate',
-                parseBatteryModel(parseColonBasedAnswer(res))
+                    shellParser?.setShellEchos(true);
+                }
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'fuel_gauge model',
+                    true,
+                    undefined,
+                    '"[A-Za-z0-9\\s]+"'
+                ),
+                res => {
+                    eventEmitter.emit(
+                        'onActiveBatteryModelUpdate',
+                        parseBatteryModel(parseColonBasedAnswer(res))
+                    );
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('fuel_gauge model store'),
+                () => {
+                    requestUpdate.storedBatteryModel();
+                    requestUpdate.activeBatteryModel();
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('fuel_gauge model list'),
+                res => {
+                    const models = res.split(
+                        'Battery models stored in database:'
+                    );
+                    if (models.length < 2) {
+                        eventEmitter.emit(
+                            'onStoredBatteryModelUpdate',
+                            undefined
+                        );
+                        return;
+                    }
+                    const stringModels = models[1].trim().split('\n');
+                    const list = stringModels.map(parseBatteryModel);
+                    eventEmitter.emit(
+                        'onStoredBatteryModelUpdate',
+                        list.length !== 0 ? list : undefined
+                    );
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx vbusin vbus status get'),
+                res => {
+                    eventEmitter.emit('onUsbPowered', parseToBoolean(res));
+                },
+                noop
+            )
+        );
+
+        for (let i = 0; i < devices.noOfBucks; i += 1) {
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npm1300_reg NPM_BUCK BUCKSTATUS'),
+                    res => {
+                        const value = Number.parseInt(res.split('=')[1], 16);
+
+                        emitPartialEvent<Buck>('onBuckUpdate', i, {
+                            // eslint-disable-next-line no-bitwise
+                            enabled: (value & (i === 0 ? 0x4 : 0x64)) !== 0, // mV to V
+                        });
+                    },
+                    noop
+                )
             );
-        },
-        noop
-    );
 
-    shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge model store'),
-        () => {
-            requestUpdate.storedBatteryModel();
-            requestUpdate.activeBatteryModel();
-        },
-        noop
-    );
-
-    shellParser?.registerCommandCallback(
-        toRegex('fuel_gauge model list'),
-        res => {
-            const models = res.split('Battery models stored in database:');
-            if (models.length < 2) {
-                eventEmitter.emit('onStoredBatteryModelUpdate', undefined);
-                return;
-            }
-            const stringModels = models[1].trim().split('\n');
-            const list = stringModels.map(parseBatteryModel);
-            eventEmitter.emit(
-                'onStoredBatteryModelUpdate',
-                list.length !== 0 ? list : undefined
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx buck voltage normal', true, i),
+                    res => {
+                        const value = parseToNumber(res);
+                        emitPartialEvent<Buck>('onBuckUpdate', i, {
+                            vOutNormal: value / 1000, // mV to V
+                        });
+                    },
+                    noop
+                )
             );
-        },
-        noop
-    );
 
-    shellParser?.registerCommandCallback(
-        toRegex('npmx vbusin vbus status get'),
-        res => {
-            eventEmitter.emit('onUsbPowered', parseToBoolean(res));
-        },
-        noop
-    );
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx buck voltage retention', true, i),
+                    res => {
+                        const value = parseToNumber(res);
+                        emitPartialEvent<Buck>('onBuckUpdate', i, {
+                            vOutRetention: value / 1000, // mV to V
+                        });
+                    },
+                    noop
+                )
+            );
 
-    for (let i = 0; i < devices.noOfBucks; i += 1) {
-        shellParser?.registerCommandCallback(
-            toRegex('npm1300_reg NPM_BUCK BUCKSTATUS'),
-            res => {
-                const value = Number.parseInt(res.split('=')[1], 16);
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx buck vout select', true, i),
+                    res => {
+                        const value = parseToNumber(res);
+                        emitPartialEvent<Buck>('onBuckUpdate', i, {
+                            mode: value === 0 ? 'vSet' : 'software',
+                        });
+                    },
+                    noop
+                )
+            );
 
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    // eslint-disable-next-line no-bitwise
-                    enabled: (value & (i === 0 ? 0x4 : 0x64)) !== 0, // mV to V
-                });
-            },
-            noop
-        );
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx buck', true, i),
+                    res => {
+                        emitPartialEvent<Buck>('onBuckUpdate', i, {
+                            enabled: parseToBoolean(res),
+                        });
+                    },
+                    noop
+                )
+            );
 
-        shellParser?.registerCommandCallback(
-            toRegex('npmx buck voltage normal', true, i),
-            res => {
-                const value = parseToNumber(res);
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    vOutNormal: value / 1000, // mV to V
-                });
-            },
-            noop
-        );
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx buck gpio on_off', true, i, '(-?[0-9]+) (0)'),
+                    res => {
+                        const result = parseToNumber(res);
+                        emitPartialEvent<Buck>('onBuckUpdate', i, {
+                            onOffControl:
+                                result === -1 ? 'Off' : GPIOValues[result],
+                        });
+                    },
+                    noop
+                )
+            );
 
-        shellParser?.registerCommandCallback(
-            toRegex('npmx buck voltage retention', true, i),
-            res => {
-                const value = parseToNumber(res);
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    vOutRetention: value / 1000, // mV to V
-                });
-            },
-            noop
-        );
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex(
+                        'npmx buck gpio retention',
+                        true,
+                        i,
+                        '(-?[0-9]+) (0)'
+                    ),
+                    res => {
+                        const result = parseToNumber(res);
+                        emitPartialEvent<Buck>('onBuckUpdate', i, {
+                            retentionControl:
+                                result === -1 ? 'Off' : GPIOValues[result],
+                        });
+                    },
+                    noop
+                )
+            );
 
-        shellParser?.registerCommandCallback(
-            toRegex('npmx buck vout select', true, i),
-            res => {
-                const value = parseToNumber(res);
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    mode: value === 0 ? 'vSet' : 'software',
-                });
-            },
-            noop
-        );
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex(
+                        'npmx buck gpio pwm_force',
+                        true,
+                        i,
+                        '(-?[0-9]+) (0)'
+                    ),
+                    res => {
+                        const result = parseToNumber(res);
+                        emitPartialEvent<Buck>('onBuckUpdate', i, {
+                            modeControl:
+                                result === -1 ? 'Auto' : GPIOValues[result],
+                        });
+                    },
+                    noop
+                )
+            );
+        }
 
-        shellParser?.registerCommandCallback(
-            toRegex('npmx buck', true, i),
-            res => {
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    enabled: parseToBoolean(res),
-                });
-            },
-            noop
-        );
+        for (let i = 0; i < devices.noOfLdos; i += 1) {
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx ldsw', true, i),
+                    res => {
+                        emitPartialEvent<Ldo>('onLdoUpdate', i, {
+                            enabled: parseToBoolean(res),
+                        });
+                    },
+                    noop
+                )
+            );
 
-        shellParser?.registerCommandCallback(
-            toRegex('npmx buck gpio on_off', true, i, '(-?[0-9]+) (0)'),
-            res => {
-                const result = parseToNumber(res);
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    onOffControl: result === -1 ? 'Off' : GPIOValues[result],
-                });
-            },
-            noop
-        );
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx ldsw mode', true, i),
+                    res => {
+                        emitPartialEvent<Ldo>('onLdoUpdate', i, {
+                            mode:
+                                parseToNumber(res) === 0 ? 'ldoSwitch' : 'LDO',
+                        });
+                    },
+                    noop
+                )
+            );
 
-        shellParser?.registerCommandCallback(
-            toRegex('npmx buck gpio retention', true, i, '(-?[0-9]+) (0)'),
-            res => {
-                const result = parseToNumber(res);
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    retentionControl:
-                        result === -1 ? 'Off' : GPIOValues[result],
-                });
-            },
-            noop
-        );
-
-        shellParser?.registerCommandCallback(
-            toRegex('npmx buck gpio pwm_force', true, i, '(-?[0-9]+) (0)'),
-            res => {
-                const result = parseToNumber(res);
-                emitPartialEvent<Buck>('onBuckUpdate', i, {
-                    modeControl: result === -1 ? 'Auto' : GPIOValues[result],
-                });
-            },
-            noop
-        );
-    }
-
-    for (let i = 0; i < devices.noOfLdos; i += 1) {
-        shellParser?.registerCommandCallback(
-            toRegex('npmx ldsw', true, i),
-            res => {
-                emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                    enabled: parseToBoolean(res),
-                });
-            },
-            noop
-        );
-
-        shellParser?.registerCommandCallback(
-            toRegex('npmx ldsw mode', true, i),
-            res => {
-                emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                    mode: parseToNumber(res) === 0 ? 'ldoSwitch' : 'LDO',
-                });
-            },
-            noop
-        );
-
-        shellParser?.registerCommandCallback(
-            toRegex('npmx ldsw ldo_voltage', true, i),
-            res => {
-                emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                    voltage: parseToNumber(res) / 1000, // mV to V
-                });
-            },
-            noop
-        );
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx ldsw ldo_voltage', true, i),
+                    res => {
+                        emitPartialEvent<Ldo>('onLdoUpdate', i, {
+                            voltage: parseToNumber(res) / 1000, // mV to V
+                        });
+                    },
+                    noop
+                )
+            );
+        }
     }
 
     const sendCommand = (
@@ -1314,6 +1431,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     return {
         ...baseDevice,
+        release: () => {
+            baseDevice.release();
+            releaseAll.forEach(release => release());
+        },
         applyConfig: config => {
             if (config.deviceType !== 'npm1300') {
                 return;

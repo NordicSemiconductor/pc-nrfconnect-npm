@@ -87,49 +87,59 @@ export const baseNpmDevice: IBaseNpmDevice = (
         });
     };
 
-    shellParser?.registerCommandCallback(
-        toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
-        () => {
-            rebooting = true;
-            eventEmitter.emit('onReboot', true);
-        },
-        error => {
-            rebooting = false;
-            eventEmitter.emit('onReboot', false, error);
-        }
-    );
+    const releaseAll: (() => void)[] = [];
 
-    shellParser?.onAnyCommandResponse(({ command, response, error }) => {
-        const event: LoggingEvent = {
-            timestamp: Date.now() - deviceUptimeToSystemDelta,
-            module: 'shell_commands',
-            logLevel: error ? 'err' : 'inf',
-            message: `command: "${command}" response: "${response}"`,
-        };
+    if (shellParser) {
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'),
+                () => {
+                    rebooting = true;
+                    eventEmitter.emit('onReboot', true);
+                },
+                error => {
+                    rebooting = false;
+                    eventEmitter.emit('onReboot', false, error);
+                }
+            )
+        );
 
-        eventEmitter.emit('onLoggingEvent', {
-            loggingEvent: event,
-            dataPair: false,
-        });
+        releaseAll.push(
+            shellParser.onAnyCommandResponse(({ command, response, error }) => {
+                const event: LoggingEvent = {
+                    timestamp: Date.now() - deviceUptimeToSystemDelta,
+                    module: 'shell_commands',
+                    logLevel: error ? 'err' : 'inf',
+                    message: `command: "${command}" response: "${response}"`,
+                };
 
-        if (error) {
-            logger.error(response.replaceAll(/(\r\n|\r|\n)/g, ' '));
-        }
-    });
+                eventEmitter.emit('onLoggingEvent', {
+                    loggingEvent: event,
+                    dataPair: false,
+                });
 
-    shellParser?.onUnknownCommand(command => {
-        const event: LoggingEvent = {
-            timestamp: Date.now() - deviceUptimeToSystemDelta,
-            module: 'shell_commands',
-            logLevel: 'wrn',
-            message: `unknown command: "${command}"`,
-        };
+                if (error) {
+                    logger.error(response.replaceAll(/(\r\n|\r|\n)/g, ' '));
+                }
+            })
+        );
 
-        eventEmitter.emit('onLoggingEvent', {
-            loggingEvent: event,
-            dataPair: false,
-        });
-    });
+        releaseAll.push(
+            shellParser.onUnknownCommand(command => {
+                const event: LoggingEvent = {
+                    timestamp: Date.now() - deviceUptimeToSystemDelta,
+                    module: 'shell_commands',
+                    logLevel: 'wrn',
+                    message: `unknown command: "${command}"`,
+                };
+
+                eventEmitter.emit('onLoggingEvent', {
+                    loggingEvent: event,
+                    dataPair: false,
+                });
+            })
+        );
+    }
 
     updateUptimeOverflowCounter();
 
@@ -276,6 +286,9 @@ export const baseNpmDevice: IBaseNpmDevice = (
         getUptimeOverflowCounter: () => uptimeOverflowCounter,
         setUptimeOverflowCounter: (value: number) => {
             uptimeOverflowCounter = value;
+        },
+        release: () => {
+            releaseAll.forEach(release => release());
         },
     };
 };

@@ -69,7 +69,11 @@ const pmicControlSlice = createSlice({
     name: 'pmicControl',
     initialState,
     reducers: {
-        setNpmDevice(_, action: PayloadAction<NpmDevice>) {
+        setNpmDevice(state, action: PayloadAction<NpmDevice>) {
+            if (state.npmDevice) {
+                state.npmDevice.release();
+            }
+
             return {
                 ...initialState,
                 npmDevice: action.payload,
