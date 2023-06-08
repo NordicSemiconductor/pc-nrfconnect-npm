@@ -11,6 +11,7 @@ import {
     Button,
     classNames,
     DialogButton,
+    Dropdown,
     GenericDialog,
     Group,
     NumberInlineInput,
@@ -18,7 +19,12 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { selectDirectoryDialog } from '../../../actions/fileActions';
-import { CCProfile, Profile } from '../../../features/pmicControl/npm/types';
+import {
+    CCProfile,
+    NTCMode,
+    NTCValues,
+    Profile,
+} from '../../../features/pmicControl/npm/types';
 import {
     closeProfiling,
     setProfile,
@@ -40,12 +46,18 @@ export default () => {
     const [name, setName] = useState('');
 
     const [capacity, setCapacity] = useState(800);
+    const [ntcMode, setNTCMode] = useState<NTCMode>('10kΩ');
     const [temperatures, setTemperatures] = useState<number[]>([25]);
     const [ratedChargingCurrent, setRatedChargingCurrent] = useState(
         capacity / 2
     );
     const dispatch = useDispatch();
     const maxLength = 20;
+
+    const ntcModeItems = [...NTCValues].map(item => ({
+        label: `${item}`,
+        value: `${item}`,
+    }));
 
     return (
         <GenericDialog
@@ -105,6 +117,7 @@ export default () => {
                                     vUpperCutOff,
                                     capacity,
                                     ratedChargingCurrent,
+                                    ntcMode,
                                     temperatures,
                                     baseDirectory: dirPath,
                                     restingProfiles,
@@ -285,6 +298,21 @@ export default () => {
                         range={{ min: 32, max: Math.min(800, capacity) }}
                     />
                 </div>
+                <Dropdown
+                    label="NTC mode"
+                    items={ntcModeItems}
+                    onSelect={item => setNTCMode(item.value as NTCMode)}
+                    selectedItem={
+                        ntcModeItems[
+                            Math.max(
+                                0,
+                                ntcModeItems.findIndex(
+                                    item => item.value === ntcMode
+                                )
+                            ) ?? 0
+                        ]
+                    }
+                />
                 {temperatures.map((temp, index) => (
                     <React.Fragment key={`temp-${index + 1}`}>
                         <div className="flex-row">

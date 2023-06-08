@@ -376,6 +376,7 @@ export interface Profile {
     vUpperCutOff: number;
     capacity: number;
     ratedChargingCurrent: number;
+    ntcMode: NTCMode;
     temperatures: number[];
     baseDirectory: string;
     restingProfiles: CCProfile[];
