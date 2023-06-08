@@ -37,7 +37,7 @@ export default ({
         }
     >
         {settings.profiles.length === 0 && (
-            <Alert variant="info" label="Info: ">
+            <Alert variant="info" label="Note: ">
                 This profiles does not have any data
             </Alert>
         )}

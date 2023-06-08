@@ -11,6 +11,7 @@ import {
     Button,
     DialogButton,
     GenericDialog,
+    getWaitingForDeviceTimeout,
     Group,
 } from 'pc-nrfconnect-shared';
 
@@ -38,6 +39,7 @@ export default () => {
     const pmicConnectionState = useSelector(getPmicState);
     const usbPowered = useSelector(isUsbPowered);
     const batteryConnected = useSelector(isBatteryConnected);
+    const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
     const index = useSelector(getProfileIndex);
 
     const dispatch = useDispatch();
@@ -148,9 +150,10 @@ export default () => {
                         </div>
                     </Alert>
                 )}
-                {pmicConnectionState === 'pmic-unknown' && (
+                {(pmicConnectionState === 'pmic-pending-rebooting' ||
+                    waitingForDevice) && (
                     <Alert label="Note: " variant="info">
-                        Waiting to connect to PMIC
+                        Waiting to for PMIC to reboot
                     </Alert>
                 )}
                 {pmicConnectionState === 'pmic-connected' && (

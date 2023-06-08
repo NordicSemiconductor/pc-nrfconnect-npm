@@ -6,7 +6,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { CollapsibleGroup, Step, Stepper } from 'pc-nrfconnect-shared';
+import {
+    CollapsibleGroup,
+    getWaitingForDeviceTimeout,
+    Step,
+    Stepper,
+} from 'pc-nrfconnect-shared';
 
 import {
     getNpmDevice,
@@ -29,6 +34,7 @@ export default () => {
     const paused = useSelector(isPaused);
     const ccProfilingState = useSelector(getCcProfilingState);
     const npmDevice = useSelector(getNpmDevice);
+    const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
     const dispatch = useDispatch();
 
     const [pauseFor10Ms, setPauseFor100ms] = useState(paused);
@@ -55,7 +61,10 @@ export default () => {
         title: 'PMIC',
     };
 
-    if (pmicState !== 'ek-disconnected') {
+    if (waitingForDevice) {
+        connectionStep.caption = 'Rebooting...';
+        connectionStep.state = 'active';
+    } else if (pmicState !== 'ek-disconnected' || waitingForDevice) {
         connectionStep.caption = 'Connected to EK';
         connectionStep.state = 'success';
 
@@ -104,9 +113,6 @@ export default () => {
                             .then(result => dispatch(setIsPaused(result))),
                 },
             ];
-        } else if (pmicState === 'pmic-unknown') {
-            pmicStep.caption = 'Connecting...';
-            pmicStep.state = 'active';
         } else if (pmicState === 'pmic-disconnected') {
             pmicStep.caption = 'Not powered';
             pmicStep.state = 'failure';

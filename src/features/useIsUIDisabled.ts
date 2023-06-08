@@ -25,7 +25,7 @@ export default () => {
         (!supportedVersion && pmicState !== 'ek-disconnected') ||
         pmicState === 'pmic-disconnected' ||
         pmicState === 'pmic-pending-reboot' ||
-        pmicState === 'pmic-unknown' ||
+        pmicState === 'pmic-pending-rebooting' ||
         profilingState === 'Running' ||
         pauseFor100Ms;
 
