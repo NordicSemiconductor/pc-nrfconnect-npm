@@ -47,8 +47,5 @@
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
     },
     "prettier": "./node_modules/pc-nrfconnect-shared/config/prettier.config.js",
-    "bundleDependencies": [],
-    "dependencies": {
-        "@nordicsemiconductor/nrf-device-lib-js": "^0.6.11"
-    }
+    "bundleDependencies": []
 }
