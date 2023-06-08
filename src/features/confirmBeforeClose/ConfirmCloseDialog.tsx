@@ -11,7 +11,6 @@ import { ConfirmationDialog } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import { TDispatch } from '../../thunk';
-import useNpmDevice from '../pmicControl/npm/useNpmDevice';
 import {
     addConfirmBeforeClose,
     clearConfirmBeforeClose,
@@ -26,7 +25,6 @@ export default () => {
     const [confirmedDialogs, setConfirmedDialogs] = useState<
         ConfirmBeforeCloseApp[]
     >([]);
-    useNpmDevice();
 
     const showCloseDialog = useSelector(getShowConfirmCloseDialog);
     const nextConfirmDialog = useSelector(getNextConfirmDialog);
