@@ -21,7 +21,7 @@ import {
     ITerm,
     ITermValues,
     NpmDevice,
-    NTCMode,
+    NTCThermistor,
     NTCValues,
     VTrickleFast,
     VTrickleFastValues,
@@ -78,7 +78,7 @@ export default ({
         value: item,
     }));
 
-    const ntcModeItems = [...NTCValues].map(item => ({
+    const ntcThermistorItems = [...NTCValues].map(item => ({
         label: `${item}`,
         value: `${item}`,
     }));
@@ -260,26 +260,27 @@ export default ({
                     />
                     <Dropdown
                         label={
-                            // <DocumentationTooltip
-                            //     card="charger"
-                            //     item="VTrickleFast"
-                            // >
-                            <span>NTC mode</span>
-                            // </DocumentationTooltip>
+                            <DocumentationTooltip
+                                card="charger"
+                                item="NTCThermistor"
+                            >
+                                <span>NTC thermistor</span>
+                            </DocumentationTooltip>
                         }
-                        items={ntcModeItems}
+                        items={ntcThermistorItems}
                         onSelect={item =>
-                            npmDevice.setChargerNTCMode(
+                            npmDevice.setChargerNTCThermistor(
                                 index,
-                                item.value as NTCMode
+                                item.value as NTCThermistor
                             )
                         }
                         selectedItem={
-                            ntcModeItems[
+                            ntcThermistorItems[
                                 Math.max(
                                     0,
-                                    ntcModeItems.findIndex(
-                                        item => item.value === charger.ntcMode
+                                    ntcThermistorItems.findIndex(
+                                        item =>
+                                            item.value === charger.ntcThermistor
                                     )
                                 ) ?? 0
                             ]

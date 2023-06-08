@@ -40,7 +40,7 @@ export type ITerm = (typeof ITermValues)[number];
 export const VTrickleFastValues = [2.5, 2.9] as const;
 export const NTCValues = ['10kΩ', '47kΩ', '100kΩ'] as const;
 export type VTrickleFast = (typeof VTrickleFastValues)[number];
-export type NTCMode = (typeof NTCValues)[number];
+export type NTCThermistor = (typeof NTCValues)[number];
 
 export type CCProfilingState =
     | 'Off'
@@ -77,7 +77,7 @@ export type Charger = {
     enabled: boolean;
     enableRecharging: boolean;
     iTerm: ITerm;
-    ntcMode: NTCMode;
+    ntcThermistor: NTCThermistor;
 };
 
 export type Buck = {
@@ -255,7 +255,7 @@ export type NpmDevice = {
         chargerVTrickleFast: (index: number) => void;
         chargerITerm: (index: number) => void;
         chargerEnabledRecharging: (index: number) => void;
-        chargerNTCMode: (index: number) => void;
+        chargerNTCThermistor: (index: number) => void;
 
         buckVOutNormal: (index: number) => void;
         buckVOutRetention: (index: number) => void;
@@ -289,7 +289,10 @@ export type NpmDevice = {
         index: number,
         enabled: boolean
     ) => Promise<void>;
-    setChargerNTCMode: (index: number, mode: NTCMode) => Promise<void>;
+    setChargerNTCThermistor: (
+        index: number,
+        mode: NTCThermistor
+    ) => Promise<void>;
 
     setBuckVOutNormal: (index: number, value: number) => Promise<void>;
     setBuckVOutRetention: (index: number, value: number) => Promise<void>;
@@ -376,7 +379,7 @@ export interface Profile {
     vUpperCutOff: number;
     capacity: number;
     ratedChargingCurrent: number;
-    ntcMode: NTCMode;
+    ntcThermistor: NTCThermistor;
     temperatures: number[];
     baseDirectory: string;
     restingProfiles: CCProfile[];

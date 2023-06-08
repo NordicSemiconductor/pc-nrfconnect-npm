@@ -228,6 +228,18 @@ export const documentation: Documentation = {
                 </p>
             ),
         },
+        NTCThermistor: {
+            title: <span>NTC thermistor</span>,
+            description: (
+                <p>
+                    Charger supports three NTC thermistors for battery
+                    temperature monitoring. The available options are, 10 kΩ, 47
+                    kΩ, 100 kΩ or no NTC thermistor. If no NTC thermistor is
+                    chosen the NTC pin needs to be connected to GND and the
+                    battery pack needs to have a thermal fuse for safety.
+                </p>
+            ),
+        },
     },
     ldo1: {
         LoadSwitchLDO: {

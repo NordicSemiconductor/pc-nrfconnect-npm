@@ -68,9 +68,9 @@ export default () => {
                             await npmDevice?.setBuckEnabled(0, false);
 
                             await npmDevice?.setFuelGaugeEnabled(false);
-                            await npmDevice?.setChargerNTCMode(
+                            await npmDevice?.setChargerNTCThermistor(
                                 0,
-                                profile.ntcMode
+                                profile.ntcThermistor
                             );
                             await npmDevice
                                 ?.setChargerVTerm(0, profile.vUpperCutOff)

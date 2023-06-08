@@ -14,7 +14,7 @@ import {
     Charger,
     GPIOValues,
     Ldo,
-    NTCMode,
+    NTCThermistor,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
@@ -381,9 +381,9 @@ describe('PMIC 1300', () => {
             );
 
             test.each(PMIC_1300_CHARGERS)(
-                'Request update chargerNTCMode index: %p',
+                'Request update chargerNTCThermistor index: %p',
                 index => {
-                    pmic.requestUpdate.chargerNTCMode(index);
+                    pmic.requestUpdate.chargerNTCThermistor(index);
 
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
                     expect(mockEnqueueRequest).toBeCalledWith(
@@ -921,7 +921,7 @@ describe('PMIC 1300', () => {
 
             test.each(
                 PMIC_1300_CHARGERS.map<
-                    { index: number; mode: NTCMode; cliMode: string }[]
+                    { index: number; mode: NTCThermistor; cliMode: string }[]
                 >(index => [
                     {
                         index,
@@ -939,16 +939,19 @@ describe('PMIC 1300', () => {
                         cliMode: 'ntc_47k',
                     },
                 ]).flat()
-            )('Set setChargerNTCMode %p', async ({ index, mode, cliMode }) => {
-                await pmic.setChargerNTCMode(index, mode);
+            )(
+                'Set setChargerNTCThermistor %p',
+                async ({ index, mode, cliMode }) => {
+                    await pmic.setChargerNTCThermistor(index, mode);
 
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx adc ntc set ${cliMode}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-            });
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npmx adc ntc set ${cliMode}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                }
+            );
 
             test.each(PMIC_1300_CHARGERS)(
                 'Set setBuckVOut index: %p',
@@ -1959,7 +1962,7 @@ describe('PMIC 1300', () => {
 
             test.each(
                 PMIC_1300_CHARGERS.map<
-                    { index: number; mode: NTCMode; cliMode: string }[]
+                    { index: number; mode: NTCThermistor; cliMode: string }[]
                 >(index => [
                     {
                         index,
@@ -1978,13 +1981,13 @@ describe('PMIC 1300', () => {
                     },
                 ]).flat()
             )(
-                'Set setChargerNTCMode - Fail immediately -  %p',
+                'Set setChargerNTCThermistor - Fail immediately -  %p',
                 async ({ index, mode, cliMode }) => {
                     await expect(
-                        pmic.setChargerNTCMode(index, mode)
+                        pmic.setChargerNTCThermistor(index, mode)
                     ).rejects.toBeUndefined();
 
-                    // turn chance ntc mode
+                    // turn chance ntc thermistor
                     expect(mockEnqueueRequest).toBeCalledTimes(2);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
@@ -2823,7 +2826,7 @@ describe('PMIC 1300', () => {
             enabled: true,
             enableRecharging: true,
             iTerm: '20%',
-            ntcMode: '10kΩ',
+            ntcThermistor: '10kΩ',
         };
 
         const initBuck: Buck = {
@@ -2890,7 +2893,7 @@ describe('PMIC 1300', () => {
                     enabled: false,
                     iTerm: '10%',
                     enableRecharging: false,
-                    ntcMode: '10kΩ',
+                    ntcThermistor: '10kΩ',
                 },
             ]);
 
@@ -2946,7 +2949,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcMode: '10kΩ',
+                        ntcThermistor: '10kΩ',
                     },
                 ],
                 bucks: [
@@ -3002,7 +3005,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcMode: '10kΩ',
+                        ntcThermistor: '10kΩ',
                     },
                 ],
                 bucks: [
@@ -3061,7 +3064,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcMode: '10kΩ',
+                        ntcThermistor: '10kΩ',
                     },
                 ],
                 bucks: [
@@ -3120,7 +3123,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcMode: '10kΩ',
+                        ntcThermistor: '10kΩ',
                     },
                 ],
                 bucks: [
@@ -3366,30 +3369,30 @@ describe('PMIC 1300', () => {
                     index,
                     append: 'get',
                     successReturn: 'Value: 47k.',
-                    ntcMode: '47kΩ' as NTCMode,
+                    ntcThermistor: '47kΩ' as NTCThermistor,
                 },
                 {
                     index,
                     append: 'set ntc_47k',
                     successReturn: 'Value: 47k.',
-                    ntcMode: '47kΩ' as NTCMode,
+                    ntcThermistor: '47kΩ' as NTCThermistor,
                 },
                 {
                     index,
                     append: 'set ntc_10k',
                     successReturn: 'Value: 10k.',
-                    ntcMode: '10kΩ' as NTCMode,
+                    ntcThermistor: '10kΩ' as NTCThermistor,
                 },
                 {
                     index,
                     append: 'set ntc_100k',
                     successReturn: 'Value: 100k.',
-                    ntcMode: '100kΩ' as NTCMode,
+                    ntcThermistor: '100kΩ' as NTCThermistor,
                 },
             ]).flat()
         )(
-            'npmx charger ntc mode %p',
-            ({ index, append, successReturn, ntcMode }) => {
+            'npmx charger ntc thermistor %p',
+            ({ index, append, successReturn, ntcThermistor }) => {
                 const command = `npmx adc ntc ${append}`;
                 const callback =
                     eventHandlers.mockRegisterCommandCallbackHandler(command);
@@ -3398,7 +3401,7 @@ describe('PMIC 1300', () => {
 
                 expect(mockOnChargerUpdate).toBeCalledTimes(1);
                 expect(mockOnChargerUpdate).nthCalledWith(1, {
-                    data: { ntcMode },
+                    data: { ntcThermistor },
                     index,
                 });
             }

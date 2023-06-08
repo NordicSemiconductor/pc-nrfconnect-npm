@@ -21,7 +21,7 @@ import {
 import { selectDirectoryDialog } from '../../../actions/fileActions';
 import {
     CCProfile,
-    NTCMode,
+    NTCThermistor,
     NTCValues,
     Profile,
 } from '../../../features/pmicControl/npm/types';
@@ -46,7 +46,7 @@ export default () => {
     const [name, setName] = useState('');
 
     const [capacity, setCapacity] = useState(800);
-    const [ntcMode, setNTCMode] = useState<NTCMode>('10kΩ');
+    const [ntcThermistor, setNTCThermistor] = useState<NTCThermistor>('10kΩ');
     const [temperatures, setTemperatures] = useState<number[]>([25]);
     const [ratedChargingCurrent, setRatedChargingCurrent] = useState(
         capacity / 2
@@ -54,7 +54,7 @@ export default () => {
     const dispatch = useDispatch();
     const maxLength = 20;
 
-    const ntcModeItems = [...NTCValues].map(item => ({
+    const ntcThermistorItems = [...NTCValues].map(item => ({
         label: `${item}`,
         value: `${item}`,
     }));
@@ -117,7 +117,7 @@ export default () => {
                                     vUpperCutOff,
                                     capacity,
                                     ratedChargingCurrent,
-                                    ntcMode,
+                                    ntcThermistor,
                                     temperatures,
                                     baseDirectory: dirPath,
                                     restingProfiles,
@@ -299,15 +299,17 @@ export default () => {
                     />
                 </div>
                 <Dropdown
-                    label="NTC mode"
-                    items={ntcModeItems}
-                    onSelect={item => setNTCMode(item.value as NTCMode)}
+                    label="NTC thermistor"
+                    items={ntcThermistorItems}
+                    onSelect={item =>
+                        setNTCThermistor(item.value as NTCThermistor)
+                    }
                     selectedItem={
-                        ntcModeItems[
+                        ntcThermistorItems[
                             Math.max(
                                 0,
-                                ntcModeItems.findIndex(
-                                    item => item.value === ntcMode
+                                ntcThermistorItems.findIndex(
+                                    item => item.value === ntcThermistor
                                 )
                             ) ?? 0
                         ]

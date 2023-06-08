@@ -88,7 +88,7 @@ export default () => {
                 npmDevice.requestUpdate.chargerITerm(i);
                 npmDevice.requestUpdate.chargerEnabledRecharging(i);
                 npmDevice.requestUpdate.pmicChargingState(i);
-                npmDevice.requestUpdate.chargerNTCMode(i);
+                npmDevice.requestUpdate.chargerNTCThermistor(i);
             }
 
             for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
@@ -134,7 +134,7 @@ export default () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcMode: '10kΩ',
+                        ntcThermistor: '10kΩ',
                     });
                 }
                 dispatch(setChargers(emptyChargers));
