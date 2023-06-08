@@ -184,8 +184,8 @@ export default () => {
                 <div className="slider-container">
                     <FormLabel className="flex-row">
                         <div>
-                            <span>Upper V</span>
-                            <span className="subscript">CUTOFF</span>
+                            <span>V</span>
+                            <span className="subscript">TERM</span>
                         </div>
                         <div className="flex-row">
                             <NumberInlineInput
@@ -215,8 +215,7 @@ export default () => {
                 <div className="slider-container">
                     <FormLabel className="flex-row">
                         <div>
-                            <span>Lower V</span>
-                            <span className="subscript">CUTOFF</span>
+                            <span>Discharge Cut Off Voltage</span>
                         </div>
                         <div className="flex-row">
                             <NumberInlineInput
@@ -278,7 +277,8 @@ export default () => {
                 <div className="slider-container">
                     <FormLabel className="flex-row">
                         <div>
-                            <span>Rated charging current</span>
+                            <span>I</span>
+                            <span className="subscript">CHG</span>
                         </div>
                         <div className="flex-row">
                             <NumberInlineInput
