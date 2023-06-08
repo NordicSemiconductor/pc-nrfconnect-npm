@@ -1229,7 +1229,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
             });
 
-        if (pmicState !== 'ek-disconnected' && mode === 'LDO') {
+        if (
+            dialogHandler &&
+            pmicState !== 'ek-disconnected' &&
+            mode === 'LDO'
+        ) {
             const ldo1Message =
                 'Please ensure correct nPM1300-EK configuration before enabling LDO1. Connect LDO bypass capacitors by connecting the LDO1 jumper on P16. Disconnect VOUT1-LSIN1 and HIGH-LSOUT1 jumpers on P15. Ensure IN1, on P8, is connected to a source that is between 2.6V and 5.5V, for example Vsys.';
             const ldo2Message =

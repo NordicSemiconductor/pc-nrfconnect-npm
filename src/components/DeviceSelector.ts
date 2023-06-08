@@ -14,9 +14,9 @@ import {
     DeviceSelector,
     DeviceSelectorProps,
     DeviceSetup,
+    DeviceSetupConfig,
     getAppFile,
     getDeviceLibContext,
-    IDeviceSetup,
     logger,
     setWaitForDevice,
 } from 'pc-nrfconnect-shared';
@@ -52,9 +52,10 @@ type NpmFirmware = {
     hex: string;
 };
 
-export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
+export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
     supportsProgrammingMode: (device: Device) =>
-        device.traits.mcuBoot !== undefined &&
+        device.traits.mcuBoot === true &&
+        device.traits.serialPorts === true &&
         device.usb?.device.descriptor.idProduct === 0x53ab &&
         device.usb?.device.descriptor.idVendor === 0x1915,
     getFirmwareOptions: device => [
@@ -166,15 +167,14 @@ export const npmDeviceSetup = (firmware: NpmFirmware): IDeviceSetup => ({
         }),
 });
 
-const deviceSetup: DeviceSetup = {
+const deviceSetup: DeviceSetupConfig = {
     deviceSetups: [
         npmDeviceSetup({
             key: 'nPM1300',
             description: '',
-            hex: getAppFile('fw/app_signed_0.0.0+17.hex'),
+            hex: getAppFile('fw/app_signed_0.7.1+0.hex'),
         }),
     ],
-    needSerialport: true,
 };
 
 const mapState = () => ({
