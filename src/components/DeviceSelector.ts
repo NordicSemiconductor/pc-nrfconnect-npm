@@ -175,6 +175,8 @@ const deviceSetup: DeviceSetupConfig = {
             hex: getAppFile('fw/app_signed_0.7.1+0.hex'),
         }),
     ],
+    confirmMessage:
+        'The EK firmware is not compatible with this APP version. Do you want to program it?',
 };
 
 const mapState = () => ({
