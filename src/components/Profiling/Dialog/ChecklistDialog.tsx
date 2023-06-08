@@ -84,7 +84,7 @@ export default () => {
                                     Math.min(
                                         800,
                                         Math.floor(
-                                            (profile.capacity ?? 0) / 2
+                                            profile.ratedChargingCurrent / 2
                                         ) * 2 // even numbers only are allowed
                                     )
                                 )

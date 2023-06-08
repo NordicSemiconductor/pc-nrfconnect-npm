@@ -41,6 +41,7 @@ const initialState: profilingState = {
         vUpperCutOff: 4.2,
         vLowerCutOff: 3.1,
         capacity: 400,
+        ratedChargingCurrent: 200,
         temperatures: [25],
         baseDirectory: '~/',
         restingProfiles: [],

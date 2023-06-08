@@ -370,6 +370,7 @@ export interface Profile {
     vLowerCutOff: number;
     vUpperCutOff: number;
     capacity: number;
+    ratedChargingCurrent: number;
     temperatures: number[];
     baseDirectory: string;
     restingProfiles: CCProfile[];

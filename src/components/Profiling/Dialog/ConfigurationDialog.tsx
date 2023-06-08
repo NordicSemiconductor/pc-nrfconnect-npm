@@ -41,6 +41,9 @@ export default () => {
 
     const [capacity, setCapacity] = useState(800);
     const [temperatures, setTemperatures] = useState<number[]>([25]);
+    const [ratedChargingCurrent, setRatedChargingCurrent] = useState(
+        capacity / 2
+    );
     const dispatch = useDispatch();
     const maxLength = 20;
 
@@ -101,6 +104,7 @@ export default () => {
                                     vLowerCutOff,
                                     vUpperCutOff,
                                     capacity,
+                                    ratedChargingCurrent,
                                     temperatures,
                                     baseDirectory: dirPath,
                                     restingProfiles,
@@ -235,15 +239,50 @@ export default () => {
                             <NumberInlineInput
                                 value={capacity}
                                 range={{ min: 32, max: 3000 }}
-                                onChange={setCapacity}
+                                onChange={c => {
+                                    setCapacity(c);
+                                    if (ratedChargingCurrent > c) {
+                                        setRatedChargingCurrent(c);
+                                    }
+                                }}
                             />
                             <span>mAh</span>
                         </div>
                     </FormLabel>
                     <Slider
                         values={[capacity]}
-                        onChange={[setCapacity]}
+                        onChange={[
+                            c => {
+                                setCapacity(c);
+                                if (ratedChargingCurrent > c) {
+                                    setRatedChargingCurrent(c);
+                                }
+                            },
+                        ]}
                         range={{ min: 32, max: 3000 }}
+                    />
+                </div>
+                <div className="slider-container">
+                    <FormLabel className="flex-row">
+                        <div>
+                            <span>Rated charging current</span>
+                        </div>
+                        <div className="flex-row">
+                            <NumberInlineInput
+                                value={ratedChargingCurrent}
+                                range={{
+                                    min: 32,
+                                    max: Math.min(800, capacity),
+                                }}
+                                onChange={setRatedChargingCurrent}
+                            />
+                            <span>mAh</span>
+                        </div>
+                    </FormLabel>
+                    <Slider
+                        values={[ratedChargingCurrent]}
+                        onChange={[setRatedChargingCurrent]}
+                        range={{ min: 32, max: Math.min(800, capacity) }}
                     />
                 </div>
                 {temperatures.map((temp, index) => (
