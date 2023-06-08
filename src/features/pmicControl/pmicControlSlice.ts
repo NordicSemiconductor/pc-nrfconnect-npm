@@ -40,6 +40,9 @@ interface pmicControlState {
     storedBatterModel?: (BatteryModel | null)[];
     usbPowered: boolean;
     profilingState: CCProfilingState;
+    fuelGaugeChargingSamplingRate: number;
+    fuelGaugeNotChargingSamplingRate: number;
+    fuelGaugeReportingRate: number;
 }
 
 const initialState: pmicControlState = {
@@ -63,6 +66,9 @@ const initialState: pmicControlState = {
     eventRecording: false,
     usbPowered: false,
     profilingState: 'Off',
+    fuelGaugeChargingSamplingRate: 500,
+    fuelGaugeNotChargingSamplingRate: 1000,
+    fuelGaugeReportingRate: 2000,
 };
 
 const pmicControlSlice = createSlice({
@@ -168,6 +174,18 @@ const pmicControlSlice = createSlice({
         setUsbPowered(state, action: PayloadAction<boolean>) {
             state.usbPowered = action.payload;
         },
+        setFuelGaugeChargingSamplingRate(state, action: PayloadAction<number>) {
+            state.fuelGaugeChargingSamplingRate = action.payload;
+        },
+        setFuelGaugeNotChargingSamplingRate(
+            state,
+            action: PayloadAction<number>
+        ) {
+            state.fuelGaugeNotChargingSamplingRate = action.payload;
+        },
+        setFuelGaugeReportingRate(state, action: PayloadAction<number>) {
+            state.fuelGaugeReportingRate = action.payload;
+        },
     },
 });
 
@@ -234,6 +252,12 @@ export const getEventRecording = (state: RootState) =>
     state.app.pmicControl.eventRecordingPath.length > 0;
 export const getEventRecordingPath = (state: RootState) =>
     state.app.pmicControl.eventRecordingPath;
+export const getFuelGaugeChargingSamplingRate = (state: RootState) =>
+    state.app.pmicControl.fuelGaugeChargingSamplingRate;
+export const getFuelGaugeNotChargingSamplingRate = (state: RootState) =>
+    state.app.pmicControl.fuelGaugeNotChargingSamplingRate;
+export const getFuelGaugeReportingRate = (state: RootState) =>
+    state.app.pmicControl.fuelGaugeReportingRate;
 
 export const {
     setNpmDevice,
@@ -256,5 +280,8 @@ export const {
     dequeueDialog,
     setEventRecordingPath,
     setUsbPowered,
+    setFuelGaugeChargingSamplingRate,
+    setFuelGaugeNotChargingSamplingRate,
+    setFuelGaugeReportingRate,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;

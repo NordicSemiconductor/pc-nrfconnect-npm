@@ -169,6 +169,9 @@ export type BaseNpmDevice = {
     onAdcSample: (
         handler: (sample: AdcSample, error?: string) => void
     ) => () => void;
+    onAdcSettingsChange: (
+        handler: (payload: AdcSampleSettings) => void
+    ) => () => void;
     onChargingStatusUpdate: (
         handler: (payload: PmicChargingState, error?: string) => void
     ) => () => void;
@@ -209,6 +212,7 @@ export type BaseNpmDevice = {
     onLdoUpdate: (
         handler: (payload: PartialUpdate<Ldo>, error?: string) => void
     ) => () => void;
+
     getNumberOfChargers: () => number;
     getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
@@ -362,6 +366,11 @@ export interface LoggingEvent {
     logLevel: string;
     module: string;
     message: string;
+}
+
+export interface AdcSampleSettings {
+    samplingRate: number;
+    reportRate: number;
 }
 
 export interface CCProfile {

@@ -11,6 +11,7 @@ import { ShellParser } from '../../../hooks/commandParser';
 import { MAX_TIMESTAMP, parseToNumber, toRegex } from './pmicHelpers';
 import {
     AdcSample,
+    AdcSampleSettings,
     BatteryModel,
     Buck,
     Charger,
@@ -156,6 +157,14 @@ export const baseNpmDevice: IBaseNpmDevice = (
             eventEmitter.on('onAdcSample', handler);
             return () => {
                 eventEmitter.removeListener('onAdcSample', handler);
+            };
+        },
+        onAdcSettingsChange: (
+            handler: (adcSample: AdcSampleSettings) => void
+        ) => {
+            eventEmitter.on('onAdcSettingsChange', handler);
+            return () => {
+                eventEmitter.removeListener('onAdcSettingsChange', handler);
             };
         },
         onChargingStatusUpdate: (

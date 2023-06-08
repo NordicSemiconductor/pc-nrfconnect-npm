@@ -764,7 +764,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -774,13 +774,6 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
-                        `npm_adc sample 1000 2000`,
-                        expect.anything(),
-                        undefined,
-                        true
-                    );
-                    expect(mockEnqueueRequest).nthCalledWith(
-                        3,
                         `npmx charger termination_voltage normal set 3200`,
                         expect.anything(),
                         undefined,
@@ -801,7 +794,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -811,13 +804,6 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
-                        `npm_adc sample 1000 2000`,
-                        expect.anything(),
-                        undefined,
-                        true
-                    );
-                    expect(mockEnqueueRequest).nthCalledWith(
-                        3,
                         `npmx charger charger_current set 32`,
                         expect.anything(),
                         undefined,
@@ -899,17 +885,9 @@ describe('PMIC 1300', () => {
             )('Set setChargerEnabled %p', async ({ index, enabled }) => {
                 await pmic.setChargerEnabled(index, enabled);
 
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
                     `npmx charger module charger set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npm_adc sample ${enabled ? '500' : '1000'} 2000`,
                     expect.anything(),
                     undefined,
                     true
@@ -1611,7 +1589,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(4);
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -1621,13 +1599,6 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
-                        `npm_adc sample 1000 2000`,
-                        expect.anything(),
-                        undefined,
-                        true
-                    );
-                    expect(mockEnqueueRequest).nthCalledWith(
-                        3,
                         `npmx charger termination_voltage normal set 3200`,
                         expect.anything(),
                         undefined,
@@ -1636,7 +1607,7 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        4,
+                        3,
                         `npmx charger termination_voltage normal get`,
                         expect.anything(),
                         undefined,
@@ -1703,7 +1674,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(4);
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -1713,13 +1684,6 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
-                        `npm_adc sample 1000 2000`,
-                        expect.anything(),
-                        undefined,
-                        true
-                    );
-                    expect(mockEnqueueRequest).nthCalledWith(
-                        3,
                         `npmx charger charger_current set 32`,
                         expect.anything(),
                         undefined,
@@ -1728,7 +1692,7 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        4,
+                        3,
                         `npmx charger charger_current get`,
                         expect.anything(),
                         undefined,
@@ -1794,7 +1758,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(4);
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -1804,13 +1768,6 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
-                        `npm_adc sample 1000 2000`,
-                        expect.anything(),
-                        undefined,
-                        true
-                    );
-                    expect(mockEnqueueRequest).nthCalledWith(
-                        3,
                         `npmx charger trickle set 2500`,
                         expect.anything(),
                         undefined,
@@ -1819,7 +1776,7 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        4,
+                        3,
                         `npmx charger trickle get`,
                         expect.anything(),
                         undefined,
@@ -1885,7 +1842,7 @@ describe('PMIC 1300', () => {
                     });
 
                     // turn off charging
-                    expect(mockEnqueueRequest).toBeCalledTimes(4);
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx charger module charger set 0`,
@@ -1895,13 +1852,6 @@ describe('PMIC 1300', () => {
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
-                        `npm_adc sample 1000 2000`,
-                        expect.anything(),
-                        undefined,
-                        true
-                    );
-                    expect(mockEnqueueRequest).nthCalledWith(
-                        3,
                         `npmx charger termination_current set 10`,
                         expect.anything(),
                         undefined,
@@ -1910,7 +1860,7 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
-                        4,
+                        3,
                         `npmx charger termination_current get`,
                         expect.anything(),
                         undefined,

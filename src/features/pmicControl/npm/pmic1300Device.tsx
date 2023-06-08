@@ -22,6 +22,7 @@ import {
 } from './pmicHelpers';
 import {
     AdcSample,
+    AdcSampleSettings,
     BatteryModel,
     Buck,
     BuckMode,
@@ -281,8 +282,41 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const releaseAll: (() => void)[] = [];
 
-    // TODO Add callback clean up
     if (shellParser) {
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm_adc sample', false, undefined, '[0-9]+ [0-9]+'),
+                res => {
+                    const results = parseColonBasedAnswer(res).split(',');
+                    const settings: AdcSampleSettings = {
+                        samplingRate: 1000,
+                        reportRate: 2000,
+                    };
+                    results.forEach(result => {
+                        const pair = result.trim().split('=');
+                        if (pair.length === 2) {
+                            switch (pair[0]) {
+                                case 'sample interval':
+                                    settings.samplingRate = Number.parseInt(
+                                        pair[1],
+                                        10
+                                    );
+                                    break;
+                                case 'report interval':
+                                    settings.reportRate = Number.parseInt(
+                                        pair[1],
+                                        10
+                                    );
+                                    break;
+                            }
+                        }
+                    });
+                    eventEmitter.emit('onAdcSettingsChange', settings);
+                },
+                noop
+            )
+        );
+
         releaseAll.push(
             shellParser.registerCommandCallback(
                 toRegex('delayed_reboot', false, undefined, '[0-9]+'),
@@ -960,7 +994,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     `npmx charger module charger set ${enabled ? '1' : '0'}`,
                     () => {
                         resolve();
-                        startAdcSample(2000, enabled ? 500 : 1000);
                     },
                     () => {
                         requestUpdate.chargerEnabled(index);

@@ -16,6 +16,8 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
+import { RootState } from '../../../appReducer';
+import { TDispatch } from '../../../thunk';
 import { getShellParser } from '../../serial/serialSlice';
 import {
     getBucks,
@@ -29,6 +31,9 @@ import {
     setBucks,
     setChargers,
     setFuelGauge,
+    setFuelGaugeChargingSamplingRate,
+    setFuelGaugeNotChargingSamplingRate,
+    setFuelGaugeReportingRate,
     setHardcodedBatterModels,
     setLatestAdcSample,
     setLdos,
@@ -115,9 +120,27 @@ export default () => {
             });
 
             npmDevice.getBatteryProfiler()?.isProfiling();
-            npmDevice.startAdcSample(2000, 1000);
             npmDevice.setBatteryStatusCheckEnabled(true);
         }
+    }, [dispatch, npmDevice, pmicState, supportedVersion]);
+
+    useEffect(() => {
+        dispatch((_: TDispatch, getState: () => RootState) => {
+            if (
+                npmDevice &&
+                pmicState === 'pmic-connected' &&
+                supportedVersion
+            ) {
+                npmDevice.startAdcSample(
+                    getState().app.pmicControl.fuelGaugeReportingRate,
+                    getState().app.pmicControl.chargers[0].enabled
+                        ? getState().app.pmicControl
+                              .fuelGaugeChargingSamplingRate
+                        : getState().app.pmicControl
+                              .fuelGaugeNotChargingSamplingRate
+                );
+            }
+        });
     }, [dispatch, npmDevice, pmicState, supportedVersion]);
 
     useEffect(() => {
@@ -180,8 +203,42 @@ export default () => {
             );
 
             releaseAll.push(
+                npmDevice.onAdcSettingsChange(settings => {
+                    dispatch(setFuelGaugeReportingRate(settings.reportRate));
+                    dispatch((_: TDispatch, getState: () => RootState) => {
+                        if (getState().app.pmicControl.chargers[0].enabled) {
+                            dispatch(
+                                setFuelGaugeChargingSamplingRate(
+                                    settings.samplingRate
+                                )
+                            );
+                        } else {
+                            dispatch(
+                                setFuelGaugeNotChargingSamplingRate(
+                                    settings.samplingRate
+                                )
+                            );
+                        }
+                    });
+                })
+            );
+
+            releaseAll.push(
                 npmDevice.onChargerUpdate(payload => {
-                    dispatch(updateCharger(payload));
+                    dispatch((_: TDispatch, getState: () => RootState) => {
+                        dispatch(updateCharger(payload));
+                        if (payload.data.enabled != null) {
+                            npmDevice.startAdcSample(
+                                getState().app.pmicControl
+                                    .fuelGaugeReportingRate,
+                                payload.data.enabled
+                                    ? getState().app.pmicControl
+                                          .fuelGaugeChargingSamplingRate
+                                    : getState().app.pmicControl
+                                          .fuelGaugeNotChargingSamplingRate
+                            );
+                        }
+                    });
                 })
             );
 
