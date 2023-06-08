@@ -16,6 +16,8 @@ and this project adheres to
 -   Tooltips for more UI Components
 -   Handle error when processing "Battery voltage does not cross the defined low
     cut off voltage. Please define higher cut off level and run again."
+-   Integrated firmware updating from nPM PowerUP (requirers nrf connect for
+    desktop 4.1.2)
 
 ### Fixed
 
