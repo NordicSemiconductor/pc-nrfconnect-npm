@@ -115,15 +115,15 @@ export type BatteryModel = {
 
 // 'pmic-connected' -> Shell ok - PMIC Online
 // 'pmic-disconnected' -> Shell ok - PMIC disconnected
-// 'pmic-pending-reboot' -> Shell ok - PMIC disconnected need restart to proceed
-// 'pmic-unknown' -> Shell ok - PMIC unknown
+// 'pmic-pending-reboot' -> Shell ok - PMIC need restart to proceed
+// 'pmic-pending-rebooting' -> Shell ok - PMIC will reboot soon
 // 'ek-disconnected' -> Shell off - PMIC disconnected
 export type PmicState =
     | 'ek-disconnected'
     | 'pmic-connected'
     | 'pmic-disconnected'
     | 'pmic-pending-reboot'
-    | 'pmic-unknown';
+    | 'pmic-pending-rebooting';
 
 export type PmicChargingState = {
     toBeDefinedBetter?: boolean; // Documentation is wrong for this and should not be used to detected if battery is connected or not
@@ -216,6 +216,7 @@ export type BaseNpmDevice = {
 
     getUptimeOverflowCounter: () => number;
     setUptimeOverflowCounter: (value: number) => void;
+    release: () => void;
 };
 
 export interface INpmDevice extends IBaseNpmDevice {

@@ -67,28 +67,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     let profileDownloadAborting = false;
     let autoReboot = true;
 
-    // can only change from:
-    //  - 'pmic-unknown' --> 'pmic-connected' --> 'pmic-disconnected'
-    //  - 'ek-disconnected'
-    let pmicState: PmicState = shellParser ? 'pmic-unknown' : 'ek-disconnected';
-
-    let pmicStateUnknownTimeout: NodeJS.Timeout | undefined;
-
-    const initConnectionTimeout = () => {
-        clearConnectionTimeout();
-        if (pmicState === 'ek-disconnected') return;
-        pmicStateUnknownTimeout = setTimeout(() => {
-            pmicState = 'pmic-connected';
-            eventEmitter.emit('onPmicStateChange', pmicState);
-        }, 2000);
-    };
-
-    const clearConnectionTimeout = () => {
-        if (pmicStateUnknownTimeout) {
-            clearTimeout(pmicStateUnknownTimeout);
-            pmicStateUnknownTimeout = undefined;
-        }
-    };
+    let pmicState: PmicState = shellParser
+        ? 'pmic-connected'
+        : 'ek-disconnected';
 
     const processModulePmic = ({ message }: LoggingEvent) => {
         switch (message) {
@@ -96,16 +77,17 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 batteryProfiler?.pofError();
                 break;
             case 'No response from PMIC.':
-                clearConnectionTimeout();
                 if (pmicState !== 'pmic-disconnected') {
                     pmicState = 'pmic-disconnected';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 }
                 break;
             case 'PMIC available. Application can be restarted.':
+                if (pmicState === 'pmic-pending-rebooting') return;
+
                 if (autoReboot) {
                     baseDevice.kernelReset();
-                    pmicState = 'pmic-unknown';
+                    pmicState = 'pmic-pending-rebooting';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 } else if (pmicState !== 'pmic-pending-reboot') {
                     pmicState = 'pmic-pending-reboot';
@@ -626,7 +608,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 command,
                 {
                     onSuccess,
-                    onError,
+                    onError: (error, cmd) => {
+                        if (
+                            error.includes('IO error') &&
+                            pmicState === 'pmic-connected'
+                        ) {
+                            pmicState = 'pmic-disconnected';
+                            eventEmitter.emit('onPmicStateChange', pmicState);
+                        }
+                        onError(error, cmd);
+                    },
                     onTimeout: error => {
                         if (onError) onError(error, command);
                         console.warn(error);
@@ -1270,8 +1261,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             );
         });
 
-    initConnectionTimeout();
-
     const requestUpdate = {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         pmicChargingState: (index: number) =>
@@ -1499,7 +1488,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setAutoRebootDevice: v => {
             if (v && v !== autoReboot && pmicState === 'pmic-pending-reboot') {
                 baseDevice.kernelReset();
-                pmicState = 'pmic-unknown';
+                pmicState = 'pmic-pending-rebooting';
                 eventEmitter.emit('onPmicStateChange', pmicState);
             }
             autoReboot = v;
