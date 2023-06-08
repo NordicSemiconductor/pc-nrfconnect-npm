@@ -59,6 +59,28 @@ export const isProfileReadyForProcessing = (
         !fs.existsSync(path.resolve(projectSettingsPath, profile.csvPath))
     );
 
+const guaranteeValidPath = (somePath?: string) =>
+    somePath
+        ? somePath.replace(
+              new RegExp(
+                  [`\\${path.win32.sep}`, path.posix.sep].join('|'),
+                  'g'
+              ),
+              path.sep
+          )
+        : undefined;
+
+const updateSettingsWithValidPath = (project?: ProfilingProject) =>
+    project
+        ? {
+              ...project,
+              profiles: project.profiles.map(profile => ({
+                  ...profile,
+                  csvPath: guaranteeValidPath(profile.csvPath),
+              })),
+          }
+        : undefined;
+
 export const readProjectSettingsFromFile = (
     filePath: string
 ): Omit<ProjectPathPair, 'path'> => {
@@ -74,7 +96,7 @@ export const readProjectSettingsFromFile = (
                 name: pathObject.name,
             });
 
-            return { settings: store.store };
+            return { settings: updateSettingsWithValidPath(store.store) };
         }
     } catch (error) {
         return { settings: undefined, error: 'fileCorrupted' };
@@ -96,7 +118,8 @@ export const atomicUpdateProjectSettings =
             name: pathObject.name,
         });
 
-        const oldProject = store.store;
+        const oldProject = updateSettingsWithValidPath(store.store);
+
         if (oldProject) {
             try {
                 const newProject = updateProject(oldProject);
