@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Form, ProgressBar } from 'react-bootstrap';
+import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
@@ -15,7 +16,9 @@ import {
     Dropdown,
     DropdownItem,
     GenericDialog,
+    NumberInlineInput,
     SidePanel,
+    Slider,
     StartStopButton,
 } from 'pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
@@ -26,6 +29,7 @@ import {
     saveFileDialog,
     selectDirectoryDialog,
 } from '../../actions/fileActions';
+import { RootState } from '../../appReducer';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     dialogHandler,
@@ -38,6 +42,9 @@ import {
     getActiveBatterModel,
     getDialog,
     getEventRecordingPath,
+    getFuelGaugeChargingSamplingRate,
+    getFuelGaugeNotChargingSamplingRate,
+    getFuelGaugeReportingRate,
     getHardcodedBatterModels,
     getLatestAdcSample,
     getNpmDevice,
@@ -57,8 +64,31 @@ import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
 } from '../../hooks/commandParser';
+import { TDispatch } from '../../thunk';
 import ProfilingWizard from '../Profiling/Dialog/ProfilingWizard';
 import ConnectionStatus from './ConnectionStatus';
+
+const updateAdcTimings =
+    ({
+        samplingRate,
+        chargingSamplingRate,
+        reportInterval,
+    }: {
+        samplingRate?: number;
+        chargingSamplingRate?: number;
+        reportInterval?: number;
+    }) =>
+    (_: TDispatch, getState: () => RootState) => {
+        getState().app.pmicControl.npmDevice?.startAdcSample(
+            reportInterval ?? getState().app.pmicControl.fuelGaugeReportingRate,
+            getState().app.pmicControl.chargers[0].enabled
+                ? chargingSamplingRate ??
+                      getState().app.pmicControl.fuelGaugeChargingSamplingRate
+                : samplingRate ??
+                      getState().app.pmicControl
+                          .fuelGaugeNotChargingSamplingRate
+        );
+    };
 
 export default () => {
     const noop = () => {};
@@ -80,6 +110,37 @@ export default () => {
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
     const uiDisabled = useIsUIDisabled();
+
+    const fuelGaugeNotChargingSamplingRate = useSelector(
+        getFuelGaugeNotChargingSamplingRate
+    );
+    const [
+        fuelGaugeNotChargingSamplingRateInternal,
+        setFuelGaugeNotChargingSamplingRateInternal,
+    ] = useState(fuelGaugeNotChargingSamplingRate);
+    useEffect(() => {
+        setFuelGaugeNotChargingSamplingRateInternal(
+            fuelGaugeNotChargingSamplingRate
+        );
+    }, [dispatch, fuelGaugeNotChargingSamplingRate]);
+
+    const fuelGaugeChargingSamplingRate = useSelector(
+        getFuelGaugeChargingSamplingRate
+    );
+    const [
+        fuelGaugeChargingSamplingRateInternal,
+        setFuelGaugeChargingSamplingRateInternal,
+    ] = useState(fuelGaugeChargingSamplingRate);
+    useEffect(() => {
+        setFuelGaugeChargingSamplingRateInternal(fuelGaugeChargingSamplingRate);
+    }, [dispatch, fuelGaugeChargingSamplingRate]);
+
+    const fuelGaugeReportingRate = useSelector(getFuelGaugeReportingRate);
+    const [fuelGaugeReportingRateInternal, setFuelGaugeReportingRateInternal] =
+        useState(fuelGaugeReportingRate);
+    useEffect(() => {
+        setFuelGaugeReportingRateInternal(fuelGaugeReportingRate);
+    }, [dispatch, fuelGaugeReportingRate]);
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
@@ -373,6 +434,170 @@ export default () => {
                         </Button>
                     </DocumentationTooltip>
                 )}
+                <div
+                    className={`slider-container ${
+                        pmicConnection === 'ek-disconnected' || uiDisabled
+                            ? 'disabled'
+                            : ''
+                    }`}
+                >
+                    <FormLabel className="flex-row">
+                        <div>Sampling Rate</div>
+
+                        <div className="flex-row">
+                            <NumberInlineInput
+                                value={fuelGaugeNotChargingSamplingRateInternal}
+                                range={{ min: 500, max: 10000 }}
+                                onChange={value =>
+                                    setFuelGaugeNotChargingSamplingRateInternal(
+                                        value
+                                    )
+                                }
+                                onChangeComplete={() =>
+                                    dispatch(
+                                        updateAdcTimings({
+                                            samplingRate:
+                                                fuelGaugeNotChargingSamplingRateInternal,
+                                        })
+                                    )
+                                }
+                                disabled={
+                                    pmicConnection === 'ek-disconnected' ||
+                                    uiDisabled
+                                }
+                            />
+                            <span>ms</span>
+                        </div>
+                    </FormLabel>
+                    <Slider
+                        values={[fuelGaugeNotChargingSamplingRateInternal]}
+                        onChange={[
+                            value =>
+                                setFuelGaugeNotChargingSamplingRateInternal(
+                                    value
+                                ),
+                        ]}
+                        onChangeComplete={() =>
+                            dispatch(
+                                updateAdcTimings({
+                                    samplingRate:
+                                        fuelGaugeNotChargingSamplingRateInternal,
+                                })
+                            )
+                        }
+                        range={{ min: 500, max: 10000 }}
+                        disabled={
+                            pmicConnection === 'ek-disconnected' || uiDisabled
+                        }
+                    />
+                </div>
+                <div
+                    className={`slider-container ${
+                        pmicConnection === 'ek-disconnected' || uiDisabled
+                            ? 'disabled'
+                            : ''
+                    }`}
+                >
+                    <FormLabel className="flex-row">
+                        <div>Charging Sampling Rate</div>
+
+                        <div className="flex-row">
+                            <NumberInlineInput
+                                value={fuelGaugeChargingSamplingRateInternal}
+                                range={{ min: 500, max: 10000 }}
+                                onChange={value =>
+                                    setFuelGaugeChargingSamplingRateInternal(
+                                        value
+                                    )
+                                }
+                                onChangeComplete={() =>
+                                    dispatch(
+                                        updateAdcTimings({
+                                            chargingSamplingRate:
+                                                fuelGaugeChargingSamplingRateInternal,
+                                        })
+                                    )
+                                }
+                                disabled={
+                                    pmicConnection === 'ek-disconnected' ||
+                                    uiDisabled
+                                }
+                            />
+                            <span>ms</span>
+                        </div>
+                    </FormLabel>
+                    <Slider
+                        values={[fuelGaugeChargingSamplingRateInternal]}
+                        onChange={[
+                            value =>
+                                setFuelGaugeChargingSamplingRateInternal(value),
+                        ]}
+                        onChangeComplete={() =>
+                            dispatch(
+                                updateAdcTimings({
+                                    chargingSamplingRate:
+                                        fuelGaugeChargingSamplingRateInternal,
+                                })
+                            )
+                        }
+                        range={{ min: 500, max: 10000 }}
+                        disabled={
+                            pmicConnection === 'ek-disconnected' || uiDisabled
+                        }
+                    />
+                </div>
+                <div
+                    className={`slider-container ${
+                        pmicConnection === 'ek-disconnected' || uiDisabled
+                            ? 'disabled'
+                            : ''
+                    }`}
+                >
+                    <FormLabel className="flex-row">
+                        <div>Reporting Rate</div>
+
+                        <div className="flex-row">
+                            <NumberInlineInput
+                                value={fuelGaugeReportingRateInternal}
+                                range={{ min: 500, max: 10000 }}
+                                onChange={value =>
+                                    setFuelGaugeReportingRateInternal(value)
+                                }
+                                onChangeComplete={() =>
+                                    dispatch(
+                                        updateAdcTimings({
+                                            reportInterval:
+                                                fuelGaugeReportingRateInternal,
+                                        })
+                                    )
+                                }
+                                disabled={
+                                    pmicConnection === 'ek-disconnected' ||
+                                    uiDisabled
+                                }
+                            />
+                            <span>ms</span>
+                        </div>
+                    </FormLabel>
+                    <Slider
+                        values={[fuelGaugeReportingRateInternal]}
+                        onChange={[
+                            value => setFuelGaugeReportingRateInternal(value),
+                        ]}
+                        onChangeComplete={() =>
+                            dispatch(
+                                updateAdcTimings({
+                                    reportInterval:
+                                        fuelGaugeReportingRateInternal,
+                                })
+                            )
+                        }
+                        range={{ min: 500, max: 10000 }}
+                        disabled={
+                            pmicConnection === 'ek-disconnected' || uiDisabled
+                        }
+                    />
+                </div>
             </CollapsibleGroup>
             <ConnectionStatus />
 
