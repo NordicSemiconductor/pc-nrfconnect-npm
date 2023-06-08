@@ -36,6 +36,7 @@ import {
     Ldo,
     LdoMode,
     LoggingEvent,
+    NTCMode,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
@@ -389,11 +390,48 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '(10|20)'
                 ),
                 res => {
-                    const result = parseToNumber(res) / 1000;
+                    const result = parseToNumber(res);
 
                     if (result === 10 || result === 20) {
                         emitPartialEvent<Charger>('onChargerUpdate', 0, {
                             iTerm: `${result}%`,
+                        });
+                    }
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx adc ntc',
+                    true,
+                    undefined,
+                    '(ntc_hi_z|ntc_10k|ntc_47k|ntc_100k)'
+                ),
+                res => {
+                    const result = parseColonBasedAnswer(res);
+
+                    let mode: NTCMode | null = null;
+                    switch (result) {
+                        case '10k.':
+                        case 'ntc_10k.':
+                            mode = '10kΩ';
+                            break;
+                        case '47k.':
+                        case 'ntc_47k.':
+                            mode = '47kΩ';
+                            break;
+                        case '100k.':
+                        case 'ntc_100k.':
+                            mode = '100kΩ';
+                            break;
+                    }
+
+                    if (mode) {
+                        emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                            ntcMode: mode,
                         });
                     }
                 },
@@ -874,6 +912,36 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     () => resolve(),
                     () => {
                         requestUpdate.chargerEnabledRecharging(index);
+                        reject();
+                    }
+                );
+            }
+        });
+    const setChargerNTCMode = (index: number, mode: NTCMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', index, {
+                    ntcMode: mode,
+                });
+                resolve();
+            } else {
+                let value = '';
+                switch (mode) {
+                    case '100kΩ':
+                        value = 'ntc_100k';
+                        break;
+                    case '47kΩ':
+                        value = 'ntc_47k';
+                        break;
+                    case '10kΩ':
+                        value = 'ntc_10k';
+                        break;
+                }
+                sendCommand(
+                    `npmx adc ntc set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerNTCMode(index);
                         reject();
                     }
                 );
@@ -1400,6 +1468,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         chargerEnabledRecharging: (index: number) =>
             sendCommand('npmx charger module recharge get'),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        chargerNTCMode: (index: number) => sendCommand('npmx adc ntc get'),
 
         buckVOutNormal: (index: number) =>
             sendCommand(`npmx buck voltage normal get ${index}`),
@@ -1451,6 +1521,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         charger.enableRecharging
                     );
                     setChargerVTrickleFast(index, charger.vTrickleFast);
+                    setChargerNTCMode(index, charger.ntcMode);
                 });
 
                 config.bucks.forEach((buck, index) => {
@@ -1548,6 +1619,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setChargerVTrickleFast,
         setChargerITerm,
         setChargerEnabledRecharging,
+        setChargerNTCMode,
         setBuckVOutNormal,
         setBuckVOutRetention,
         setBuckMode,

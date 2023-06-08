@@ -11,6 +11,7 @@ import {
     Buck,
     Charger,
     Ldo,
+    NTCMode,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
@@ -369,6 +370,21 @@ describe('PMIC 1300', () => {
                     expect(mockEnqueueRequest).toBeCalledTimes(1);
                     expect(mockEnqueueRequest).toBeCalledWith(
                         'npmx charger module recharge get',
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                }
+            );
+
+            test.each(PMIC_1300_CHARGERS)(
+                'Request update chargerNTCMode index: %p',
+                index => {
+                    pmic.requestUpdate.chargerNTCMode(index);
+
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        'npmx adc ntc get',
                         expect.anything(),
                         undefined,
                         true
@@ -898,6 +914,37 @@ describe('PMIC 1300', () => {
 
                 // Updates should only be emitted when we get response
                 expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            });
+
+            test.each(
+                PMIC_1300_CHARGERS.map<
+                    { index: number; mode: NTCMode; cliMode: string }[]
+                >(index => [
+                    {
+                        index,
+                        mode: '100kΩ',
+                        cliMode: 'ntc_100k',
+                    },
+                    {
+                        index,
+                        mode: '10kΩ',
+                        cliMode: 'ntc_10k',
+                    },
+                    {
+                        index,
+                        mode: '47kΩ',
+                        cliMode: 'ntc_47k',
+                    },
+                ]).flat()
+            )('Set setChargerNTCMode %p', async ({ index, mode, cliMode }) => {
+                await pmic.setChargerNTCMode(index, mode);
+
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx adc ntc set ${cliMode}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
             });
 
             test.each(PMIC_1300_CHARGERS)(
@@ -1908,6 +1955,54 @@ describe('PMIC 1300', () => {
             );
 
             test.each(
+                PMIC_1300_CHARGERS.map<
+                    { index: number; mode: NTCMode; cliMode: string }[]
+                >(index => [
+                    {
+                        index,
+                        mode: '100kΩ',
+                        cliMode: 'ntc_100k',
+                    },
+                    {
+                        index,
+                        mode: '10kΩ',
+                        cliMode: 'ntc_10k',
+                    },
+                    {
+                        index,
+                        mode: '47kΩ',
+                        cliMode: 'ntc_47k',
+                    },
+                ]).flat()
+            )(
+                'Set setChargerNTCMode - Fail immediately -  %p',
+                async ({ index, mode, cliMode }) => {
+                    await expect(
+                        pmic.setChargerNTCMode(index, mode)
+                    ).rejects.toBeUndefined();
+
+                    // turn chance ntc mode
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx adc ntc set ${cliMode}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx adc ntc get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                }
+            );
+
+            test.each(
                 PMIC_1300_CHARGERS.map(index => [
                     {
                         index,
@@ -2725,6 +2820,7 @@ describe('PMIC 1300', () => {
             enabled: true,
             enableRecharging: true,
             iTerm: '20%',
+            ntcMode: '10kΩ',
         };
 
         const initBuck: Buck = {
@@ -2791,6 +2887,7 @@ describe('PMIC 1300', () => {
                     enabled: false,
                     iTerm: '10%',
                     enableRecharging: false,
+                    ntcMode: '10kΩ',
                 },
             ]);
 
@@ -2828,7 +2925,7 @@ describe('PMIC 1300', () => {
                 },
             ]);
 
-            expect(mockOnChargerUpdate).toBeCalledTimes(6);
+            expect(mockOnChargerUpdate).toBeCalledTimes(7);
             expect(mockOnBuckUpdate).toBeCalledTimes(16); // 7 states + 1 (mode change on vOut) * 2 Bucks
             expect(mockOnLdoUpdate).toBeCalledTimes(6);
 
@@ -2846,6 +2943,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
+                        ntcMode: '10kΩ',
                     },
                 ],
                 bucks: [
@@ -2901,6 +2999,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
+                        ntcMode: '10kΩ',
                     },
                 ],
                 bucks: [
@@ -2959,6 +3058,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
+                        ntcMode: '10kΩ',
                     },
                 ],
                 bucks: [
@@ -3017,6 +3117,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
+                        ntcMode: '10kΩ',
                     },
                 ],
                 bucks: [

@@ -21,6 +21,8 @@ import {
     ITerm,
     ITermValues,
     NpmDevice,
+    NTCMode,
+    NTCValues,
     VTrickleFast,
     VTrickleFastValues,
 } from '../../../features/pmicControl/npm/types';
@@ -74,6 +76,11 @@ export default ({
     const iTermItems = [...ITermValues].map(item => ({
         label: item,
         value: item,
+    }));
+
+    const ntcModeItems = [...NTCValues].map(item => ({
+        label: `${item}`,
+        value: `${item}`,
     }));
 
     return charger ? (
@@ -245,6 +252,34 @@ export default ({
                                         item =>
                                             Number.parseFloat(item.value) ===
                                             charger.vTrickleFast
+                                    )
+                                ) ?? 0
+                            ]
+                        }
+                        disabled={disabled}
+                    />
+                    <Dropdown
+                        label={
+                            // <DocumentationTooltip
+                            //     card="charger"
+                            //     item="VTrickleFast"
+                            // >
+                            <span>NTC mode</span>
+                            // </DocumentationTooltip>
+                        }
+                        items={ntcModeItems}
+                        onSelect={item =>
+                            npmDevice.setChargerNTCMode(
+                                index,
+                                item.value as NTCMode
+                            )
+                        }
+                        selectedItem={
+                            ntcModeItems[
+                                Math.max(
+                                    0,
+                                    ntcModeItems.findIndex(
+                                        item => item.value === charger.ntcMode
                                     )
                                 ) ?? 0
                             ]
