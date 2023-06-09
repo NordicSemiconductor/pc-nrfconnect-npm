@@ -81,6 +81,15 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                             once: true,
                             onSuccess: dev => {
                                 readyDevice = dev;
+
+                                if (
+                                    readyDevice.usb?.device.descriptor
+                                        .idProduct === 0x53ac &&
+                                    readyDevice.usb?.device.descriptor
+                                        .idVendor === 0x1915
+                                ) {
+                                    resolve(readyDevice);
+                                }
                             },
                             onFail: reject,
                         })
@@ -97,7 +106,14 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 return;
                             }
 
-                            resolve(readyDevice);
+                            if (
+                                readyDevice.usb?.device.descriptor.idProduct ===
+                                    0x53ab &&
+                                readyDevice.usb?.device.descriptor.idVendor ===
+                                    0x1915
+                            ) {
+                                resolve(readyDevice);
+                            }
                         },
                         progress => {
                             onProgress(
