@@ -56,7 +56,8 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
     supportsProgrammingMode: (device: Device) =>
         device.traits.mcuBoot === true &&
         device.traits.serialPorts === true &&
-        device.usb?.device.descriptor.idProduct === 0x53ab &&
+        (device.usb?.device.descriptor.idProduct === 0x53ab ||
+            device.usb?.device.descriptor.idProduct === 0x53ac) &&
         device.usb?.device.descriptor.idVendor === 0x1915,
     getFirmwareOptions: device => [
         {
@@ -64,13 +65,22 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
             description: firmware.description,
             programDevice: onProgress => dispatch =>
                 new Promise<Device>((resolve, reject) => {
+                    let readyDevice: Device = device;
                     dispatch(
                         setWaitForDevice({
                             timeout: 60000,
-                            when: 'always',
+                            when: programmedDevice =>
+                                // device lib report device with wrong value initially so we have to wait until device is fully recognized
+                                programmedDevice.serialPorts?.length === 2 &&
+                                programmedDevice.traits.mcuBoot === true &&
+                                device.traits.serialPorts === true &&
+                                programmedDevice.usb?.device.descriptor
+                                    .idProduct === 0x53ab &&
+                                programmedDevice.usb?.device.descriptor
+                                    .idVendor === 0x1915,
                             once: true,
                             onSuccess: dev => {
-                                device = dev;
+                                readyDevice = dev;
                             },
                             onFail: reject,
                         })
@@ -87,7 +97,7 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 return;
                             }
 
-                            resolve(device);
+                            resolve(readyDevice);
                         },
                         progress => {
                             onProgress(
@@ -110,6 +120,14 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 return;
             }
 
+            if (device.usb?.device.descriptor.idProduct === 0x53ac) {
+                resolve({
+                    device,
+                    validFirmware: false,
+                });
+                return;
+            }
+
             createSerialPort(
                 {
                     path: device.serialPorts[0].comName,
@@ -121,7 +139,10 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                     hookModemToShellParser(
                         port,
                         xTerminalShellParserWrapper(
-                            new Terminal({ allowProposedApi: true, cols: 999 })
+                            new Terminal({
+                                allowProposedApi: true,
+                                cols: 999,
+                            })
                         ),
                         {
                             shellPromptUart: 'shell:~$ ',
@@ -176,7 +197,7 @@ const deviceSetupConfig: DeviceSetupConfig = {
         }),
     ],
     confirmMessage:
-        'The EK firmware is not compatible with this APP version. Do you want to program it?',
+        'The Evaluation Kit requires programming. Do you want to program it?',
 };
 
 const mapState = () => ({
