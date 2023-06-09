@@ -20,6 +20,8 @@ and this project adheres to
 -   NTC thermistor support for 10k, 47k, 100k
 -   NTC thermistor support for 10k, 47k, 100k in profiling wizard
 -   Feedback tab
+-   Integrated firmware updating from nPM PowerUP (requirers nrf connect for
+    desktop 4.1.2)
 
 ### Fixed
 
