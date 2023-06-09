@@ -83,10 +83,10 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 readyDevice = dev;
 
                                 if (
-                                    readyDevice.usb?.device.descriptor
-                                        .idProduct === 0x53ac &&
-                                    readyDevice.usb?.device.descriptor
-                                        .idVendor === 0x1915
+                                    device.usb?.device.descriptor.idProduct ===
+                                        0x53ac &&
+                                    device.usb?.device.descriptor.idVendor ===
+                                        0x1915
                                 ) {
                                     resolve(readyDevice);
                                 }
@@ -107,9 +107,9 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                             }
 
                             if (
-                                readyDevice.usb?.device.descriptor.idProduct ===
+                                device.usb?.device.descriptor.idProduct ===
                                     0x53ab &&
-                                readyDevice.usb?.device.descriptor.idVendor ===
+                                device.usb?.device.descriptor.idVendor ===
                                     0x1915
                             ) {
                                 resolve(readyDevice);
