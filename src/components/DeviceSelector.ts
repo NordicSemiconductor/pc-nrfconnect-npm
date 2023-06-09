@@ -167,7 +167,7 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
         }),
 });
 
-const deviceSetup: DeviceSetupConfig = {
+const deviceSetupConfig: DeviceSetupConfig = {
     deviceSetups: [
         npmDeviceSetup({
             key: 'nPM1300',
@@ -181,7 +181,7 @@ const deviceSetup: DeviceSetupConfig = {
 
 const mapState = () => ({
     deviceListing,
-    deviceSetup,
+    deviceSetupConfig,
 });
 
 /*
