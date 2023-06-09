@@ -28,7 +28,6 @@ import {
     canProfile,
     getActiveBatterModel,
     getFuelGaugeNotChargingSamplingRate,
-    getFuelGaugeReportingRate,
     getHardcodedBatterModels,
     getLatestAdcSample,
     getNpmDevice,
@@ -58,13 +57,6 @@ export default ({ disabled }: { disabled: boolean }) => {
             fuelGaugeNotChargingSamplingRate
         );
     }, [dispatch, fuelGaugeNotChargingSamplingRate]);
-
-    const fuelGaugeReportingRate = useSelector(getFuelGaugeReportingRate);
-    const [fuelGaugeReportingRateInternal, setFuelGaugeReportingRateInternal] =
-        useState(fuelGaugeReportingRate);
-    useEffect(() => {
-        setFuelGaugeReportingRateInternal(fuelGaugeReportingRate);
-    }, [fuelGaugeReportingRate]);
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
@@ -309,46 +301,6 @@ export default ({ disabled }: { disabled: boolean }) => {
                     disabled={disabled}
                 />
             </div> */}
-            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row">
-                    <div>Reporting Rate</div>
-
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={fuelGaugeReportingRateInternal}
-                            range={{ min: 500, max: 10000 }}
-                            onChange={value =>
-                                setFuelGaugeReportingRateInternal(value)
-                            }
-                            onChangeComplete={() =>
-                                dispatch(
-                                    updateAdcTimings({
-                                        reportInterval:
-                                            fuelGaugeReportingRateInternal,
-                                    })
-                                )
-                            }
-                            disabled={disabled}
-                        />
-                        <span>ms</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[fuelGaugeReportingRateInternal]}
-                    onChange={[
-                        value => setFuelGaugeReportingRateInternal(value),
-                    ]}
-                    onChangeComplete={() =>
-                        dispatch(
-                            updateAdcTimings({
-                                reportInterval: fuelGaugeReportingRateInternal,
-                            })
-                        )
-                    }
-                    range={{ min: 500, max: 10000 }}
-                    disabled={disabled}
-                />
-            </div>
         </>
     );
 };

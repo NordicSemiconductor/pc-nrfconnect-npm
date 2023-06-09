@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     CollapsibleGroup,
+    NumberInlineInput,
     SidePanel,
+    Slider,
     StartStopButton,
 } from 'pc-nrfconnect-shared';
 
@@ -19,8 +22,10 @@ import {
     selectDirectoryDialog,
 } from '../../actions/fileActions';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
+import { updateAdcTimings } from '../../features/pmicControl/npm/pmicHelpers';
 import {
     getEventRecordingPath,
+    getFuelGaugeReportingRate,
     getNpmDevice,
     setEventRecordingPath,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -35,6 +40,13 @@ export default () => {
 
     const npmDevice = useSelector(getNpmDevice);
     const pmicConnection = npmDevice?.getConnectionState();
+
+    const fuelGaugeReportingRate = useSelector(getFuelGaugeReportingRate);
+    const [fuelGaugeReportingRateInternal, setFuelGaugeReportingRateInternal] =
+        useState(fuelGaugeReportingRate);
+    useEffect(() => {
+        setFuelGaugeReportingRateInternal(fuelGaugeReportingRate);
+    }, [fuelGaugeReportingRate]);
 
     return (
         <SidePanel className="side-panel">
@@ -100,6 +112,60 @@ export default () => {
                         }
                     />
                 </DocumentationTooltip>
+            </CollapsibleGroup>
+            <CollapsibleGroup defaultCollapsed={false} heading="Settings">
+                <div
+                    className={`slider-container ${
+                        pmicConnection === 'ek-disconnected' || uiDisabled
+                            ? 'disabled'
+                            : ''
+                    }`}
+                >
+                    <FormLabel className="flex-row">
+                        <div>Reporting Rate</div>
+
+                        <div className="flex-row">
+                            <NumberInlineInput
+                                value={fuelGaugeReportingRateInternal}
+                                range={{ min: 500, max: 10000 }}
+                                onChange={value =>
+                                    setFuelGaugeReportingRateInternal(value)
+                                }
+                                onChangeComplete={() =>
+                                    dispatch(
+                                        updateAdcTimings({
+                                            reportInterval:
+                                                fuelGaugeReportingRateInternal,
+                                        })
+                                    )
+                                }
+                                disabled={
+                                    pmicConnection === 'ek-disconnected' ||
+                                    uiDisabled
+                                }
+                            />
+                            <span>ms</span>
+                        </div>
+                    </FormLabel>
+                    <Slider
+                        values={[fuelGaugeReportingRateInternal]}
+                        onChange={[
+                            value => setFuelGaugeReportingRateInternal(value),
+                        ]}
+                        onChangeComplete={() =>
+                            dispatch(
+                                updateAdcTimings({
+                                    reportInterval:
+                                        fuelGaugeReportingRateInternal,
+                                })
+                            )
+                        }
+                        range={{ min: 500, max: 10000 }}
+                        disabled={
+                            pmicConnection === 'ek-disconnected' || uiDisabled
+                        }
+                    />
+                </div>
             </CollapsibleGroup>
             <CollapsibleGroup defaultCollapsed={false} heading="Fuel Gauge">
                 <FuelGaugeSettings
