@@ -12,9 +12,14 @@ import { OpenDialogReturnValue } from 'electron';
 
 import { showOpenDialog } from '../../../actions/fileActions';
 import {
+    getNpmDevice,
+    getPmicState,
+} from '../../../features/pmicControl/pmicControlSlice';
+import {
     addRecentProject,
     getProfileProjects,
 } from '../../../features/pmicControl/profilingProjectsSlice.';
+import { setProfilingStage } from '../../../features/pmicControl/profilingSlice';
 import { reloadRecentProjects } from '../helpers';
 import AddEditProjectDialog from './AddEditProjectDialog';
 import MissingProjectSettingsCard from './MissingProjectSettingsCard';
@@ -26,6 +31,8 @@ import './profilingProjects.scss';
 export default () => {
     const dispatch = useDispatch();
     const profiles = useSelector(getProfileProjects);
+    const npmDevice = useSelector(getNpmDevice);
+    const pmicState = useSelector(getPmicState);
 
     const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
     useProfilingProjects();
@@ -72,7 +79,30 @@ export default () => {
                     }}
                     variant="secondary"
                 >
-                    Create new project
+                    Create New Project
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item
+                    onClick={() => {
+                        npmDevice
+                            ?.getBatteryProfiler()
+                            ?.canProfile()
+                            .then(result => {
+                                if (result) {
+                                    dispatch(
+                                        setProfilingStage('Configuration')
+                                    );
+                                } else {
+                                    dispatch(
+                                        setProfilingStage('MissingSyncBoard')
+                                    );
+                                }
+                            });
+                    }}
+                    disabled={pmicState !== 'pmic-connected'}
+                    variant="secondary"
+                >
+                    Profile Battery
                 </Dropdown.Item>
             </DropdownButton>
 
