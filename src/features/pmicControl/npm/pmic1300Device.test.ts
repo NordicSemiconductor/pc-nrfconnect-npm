@@ -2937,6 +2937,7 @@ describe('PMIC 1300', () => {
                 fuelGauge: true,
                 firmwareVersion: '0.7.0+0',
                 deviceType: 'npm1300',
+                fuelGaugeChargingSamplingRate: 1000,
             });
             verifyApplyConfig();
         });
@@ -2993,6 +2994,7 @@ describe('PMIC 1300', () => {
                 fuelGauge: true,
                 firmwareVersion: '0.0.0+9',
                 deviceType: 'npm1300',
+                fuelGaugeChargingSamplingRate: 1000,
             });
 
             expect(mockDialogHandler).toBeCalledTimes(1);
@@ -3052,6 +3054,7 @@ describe('PMIC 1300', () => {
                 fuelGauge: true,
                 firmwareVersion: '0.0.0+9',
                 deviceType: 'npm1300',
+                fuelGaugeChargingSamplingRate: 1000,
             });
 
             expect(mockDialogHandler).toBeCalledTimes(1);
@@ -3111,6 +3114,7 @@ describe('PMIC 1300', () => {
                 fuelGauge: true,
                 firmwareVersion: '0.0.0+9',
                 deviceType: 'npm1300',
+                fuelGaugeChargingSamplingRate: 1000,
             });
 
             expect(mockDialogHandler).toBeCalledTimes(1);

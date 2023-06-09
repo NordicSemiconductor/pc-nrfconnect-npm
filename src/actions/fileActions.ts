@@ -37,6 +37,8 @@ const saveSettings =
             fuelGauge: currentState.fuelGauge,
             firmwareVersion: currentState.npmDevice.getSupportedVersion(),
             deviceType: currentState.npmDevice.getDeviceType(),
+            fuelGaugeChargingSamplingRate:
+                currentState.fuelGaugeChargingSamplingRate,
         };
 
         store.set(out);

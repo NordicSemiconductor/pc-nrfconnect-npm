@@ -359,6 +359,7 @@ export interface NpmExport {
     fuelGauge: boolean;
     firmwareVersion: string;
     deviceType: NpmModel;
+    fuelGaugeChargingSamplingRate: number;
 }
 
 export interface LoggingEvent {
