@@ -4,257 +4,41 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { Form, ProgressBar } from 'react-bootstrap';
-import FormLabel from 'react-bootstrap/FormLabel';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    Alert,
     Button,
     CollapsibleGroup,
-    DialogButton,
-    Dropdown,
-    DropdownItem,
-    GenericDialog,
-    NumberInlineInput,
     SidePanel,
-    Slider,
     StartStopButton,
 } from 'pc-nrfconnect-shared';
-import { Terminal } from 'xterm-headless';
 
 import {
-    getProfileBuffer,
     loadConfiguration,
     saveFileDialog,
     selectDirectoryDialog,
 } from '../../actions/fileActions';
-import { RootState } from '../../appReducer';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    dialogHandler,
-    DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-} from '../../features/pmicControl/npm/pmicHelpers';
-import { BatteryModel } from '../../features/pmicControl/npm/types';
-import useNpmDevice from '../../features/pmicControl/npm/useNpmDevice';
-import {
-    canProfile,
-    getActiveBatterModel,
-    getDialog,
     getEventRecordingPath,
-    getFuelGaugeChargingSamplingRate,
-    getFuelGaugeNotChargingSamplingRate,
-    getFuelGaugeReportingRate,
-    getHardcodedBatterModels,
-    getLatestAdcSample,
     getNpmDevice,
-    getStoredBatterModels,
     setEventRecordingPath,
 } from '../../features/pmicControl/pmicControlSlice';
-import { setProfilingStage } from '../../features/pmicControl/profilingSlice';
-import {
-    getSerialPort,
-    getShellParser,
-    setIsPaused,
-    setSerialPort,
-    setShellParser,
-} from '../../features/serial/serialSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
-import {
-    hookModemToShellParser,
-    xTerminalShellParserWrapper,
-} from '../../hooks/commandParser';
-import { TDispatch } from '../../thunk';
-import ProfilingWizard from '../Profiling/Dialog/ProfilingWizard';
+import FuelGaugeSettings from '../FuelGauge/FuelGaugeSettings';
 import ConnectionStatus from './ConnectionStatus';
 
-const updateAdcTimings =
-    ({
-        samplingRate,
-        chargingSamplingRate,
-        reportInterval,
-    }: {
-        samplingRate?: number;
-        chargingSamplingRate?: number;
-        reportInterval?: number;
-    }) =>
-    (_: TDispatch, getState: () => RootState) => {
-        getState().app.pmicControl.npmDevice?.startAdcSample(
-            reportInterval ?? getState().app.pmicControl.fuelGaugeReportingRate,
-            getState().app.pmicControl.chargers[0].enabled
-                ? chargingSamplingRate ??
-                      getState().app.pmicControl.fuelGaugeChargingSamplingRate
-                : samplingRate ??
-                      getState().app.pmicControl
-                          .fuelGaugeNotChargingSamplingRate
-        );
-    };
-
 export default () => {
-    const noop = () => {};
-
-    const currentPmicDialog = useSelector(getDialog);
-    const eventRecordingPath = useSelector(getEventRecordingPath);
-
-    const serialPort = useSelector(getSerialPort);
-    const shellParserO = useSelector(getShellParser);
     const dispatch = useDispatch();
-    useNpmDevice();
+    const eventRecordingPath = useSelector(getEventRecordingPath);
+    const uiDisabled = useIsUIDisabled();
 
     const npmDevice = useSelector(getNpmDevice);
     const pmicConnection = npmDevice?.getConnectionState();
 
-    const activeBatteryModel = useSelector(getActiveBatterModel);
-    const hardcodedBatterModels = useSelector(getHardcodedBatterModels);
-    const storedBatterModels = useSelector(getStoredBatterModels);
-    const latestAdcSample = useSelector(getLatestAdcSample);
-    const profilingSupported = useSelector(canProfile);
-    const uiDisabled = useIsUIDisabled();
-
-    const fuelGaugeNotChargingSamplingRate = useSelector(
-        getFuelGaugeNotChargingSamplingRate
-    );
-    const [
-        fuelGaugeNotChargingSamplingRateInternal,
-        setFuelGaugeNotChargingSamplingRateInternal,
-    ] = useState(fuelGaugeNotChargingSamplingRate);
-    useEffect(() => {
-        setFuelGaugeNotChargingSamplingRateInternal(
-            fuelGaugeNotChargingSamplingRate
-        );
-    }, [dispatch, fuelGaugeNotChargingSamplingRate]);
-
-    const fuelGaugeChargingSamplingRate = useSelector(
-        getFuelGaugeChargingSamplingRate
-    );
-    const [
-        fuelGaugeChargingSamplingRateInternal,
-        setFuelGaugeChargingSamplingRateInternal,
-    ] = useState(fuelGaugeChargingSamplingRate);
-    useEffect(() => {
-        setFuelGaugeChargingSamplingRateInternal(fuelGaugeChargingSamplingRate);
-    }, [dispatch, fuelGaugeChargingSamplingRate]);
-
-    const fuelGaugeReportingRate = useSelector(getFuelGaugeReportingRate);
-    const [fuelGaugeReportingRateInternal, setFuelGaugeReportingRateInternal] =
-        useState(fuelGaugeReportingRate);
-    useEffect(() => {
-        setFuelGaugeReportingRateInternal(fuelGaugeReportingRate);
-    }, [dispatch, fuelGaugeReportingRate]);
-
-    const getClosest = (
-        batteryModel: BatteryModel | undefined,
-        temperature: number
-    ) =>
-        batteryModel?.characterizations.reduce((prev, curr) =>
-            Math.abs(curr.temperature - temperature) <
-            Math.abs(prev.temperature - temperature)
-                ? curr
-                : prev
-        ) ?? undefined;
-
-    const batteryModelItems: DropdownItem[] = useMemo(() => {
-        const items = [...hardcodedBatterModels];
-        if (activeBatteryModel) {
-            if (
-                hardcodedBatterModels.filter(
-                    v => v && v.name !== activeBatteryModel.name
-                ).length > 0
-            )
-                items.push(activeBatteryModel);
-        }
-
-        storedBatterModels?.forEach(storedBatterModel => {
-            if (storedBatterModel) items.push(storedBatterModel);
-        });
-
-        const keys = new Set(items.map(item => item.name));
-        return Array.from(keys).map(key => ({
-            label: `${key} (${
-                getClosest(
-                    items.find(batterModel => batterModel.name === key),
-                    latestAdcSample?.tBat ?? 24
-                )?.capacity ?? ''
-            } mAh)`,
-            value: key,
-        }));
-    }, [
-        activeBatteryModel,
-        hardcodedBatterModels,
-        latestAdcSample?.tBat,
-        storedBatterModels,
-    ]);
-
-    const selectedActiveItemBatteryMode = useMemo(
-        () =>
-            batteryModelItems.find(
-                item => item.value === activeBatteryModel?.name
-            ) ?? {
-                label: 'N/A',
-                value: '',
-            },
-        [activeBatteryModel, batteryModelItems]
-    );
-
-    // init shell parser
-    useEffect(() => {
-        const init = async () => {
-            if (serialPort) {
-                const shellParser = await hookModemToShellParser(
-                    serialPort,
-                    xTerminalShellParserWrapper(
-                        new Terminal({ allowProposedApi: true, cols: 999 })
-                    ),
-                    {
-                        shellPromptUart: 'shell:~$ ',
-                        logRegex:
-                            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
-                        errorRegex: /Error: /,
-                        timeout: 5000,
-                        columnWidth: 80,
-                    }
-                );
-
-                const releaseOnUnknownCommand = shellParser.onUnknownCommand(
-                    data => {
-                        console.warn(`Unknown Command:\r\n${data}`);
-                    }
-                );
-
-                const onClosedRelease = serialPort.onClosed(() => {
-                    dispatch(setSerialPort(undefined));
-                });
-
-                dispatch(setShellParser(shellParser));
-                return () => {
-                    releaseOnUnknownCommand();
-                    onClosedRelease();
-                    shellParser.unregister();
-                };
-            }
-
-            dispatch(setShellParser(undefined));
-        };
-        init().catch(console.error);
-    }, [dispatch, serialPort]);
-
-    useEffect(() => {
-        if (shellParserO === undefined) {
-            dispatch(setEventRecordingPath(undefined));
-        }
-    }, [dispatch, shellParserO]);
-
-    useEffect(
-        () =>
-            shellParserO?.onPausedChange(state => {
-                dispatch(setIsPaused(state));
-            }) ?? noop,
-        [dispatch, shellParserO]
-    );
-
     return (
         <SidePanel className="side-panel">
-            <CollapsibleGroup defaultCollapsed={false} heading="Settings">
+            <CollapsibleGroup defaultCollapsed={false} heading="Actions">
                 <DocumentationTooltip
                     card="SidePanel"
                     item="ExportConfiguration"
@@ -309,7 +93,7 @@ export default () => {
                                 dispatch(setEventRecordingPath(''));
                             }
                         }}
-                        disabled={shellParserO === undefined}
+                        disabled={npmDevice === undefined}
                         started={
                             eventRecordingPath !== undefined &&
                             eventRecordingPath.length > 0
@@ -318,340 +102,13 @@ export default () => {
                 </DocumentationTooltip>
             </CollapsibleGroup>
             <CollapsibleGroup defaultCollapsed={false} heading="Fuel Gauge">
-                <Dropdown
-                    label={
-                        <DocumentationTooltip
-                            card="SidePanel"
-                            item="ActiveBatteryModel"
-                        >
-                            Active Battery Model
-                        </DocumentationTooltip>
-                    }
-                    items={batteryModelItems}
-                    onSelect={(item: DropdownItem) => {
-                        npmDevice?.setActiveBatteryModel(item.value);
-                    }}
-                    selectedItem={selectedActiveItemBatteryMode}
+                <FuelGaugeSettings
                     disabled={
-                        selectedActiveItemBatteryMode.value === '' || uiDisabled
+                        pmicConnection === 'ek-disconnected' || uiDisabled
                     }
                 />
-                <DocumentationTooltip card="SidePanel" item="LoadBatteryModel">
-                    <Button
-                        variant="secondary"
-                        className="w-100"
-                        onClick={() => {
-                            getProfileBuffer()
-                                .then(buffer => {
-                                    dispatch(
-                                        dialogHandler({
-                                            uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-                                            message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
-                                            confirmLabel: 'Load',
-                                            confirmClosesDialog: false,
-                                            cancelLabel: 'Cancel',
-                                            title: 'Load',
-                                            onConfirm: () => {
-                                                npmDevice?.downloadFuelGaugeProfile(
-                                                    buffer
-                                                );
-                                            },
-                                            onCancel: () => {},
-                                        })
-                                    );
-                                })
-                                .catch(res => {
-                                    dispatch(
-                                        dialogHandler({
-                                            uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-                                            message: (
-                                                <>
-                                                    <div>
-                                                        Load battery profile.
-                                                    </div>
-                                                    <br />
-                                                    <Alert
-                                                        label="Error "
-                                                        variant="danger"
-                                                    >
-                                                        {res}
-                                                    </Alert>
-                                                </>
-                                            ),
-                                            type: 'alert',
-                                            confirmLabel: 'Load',
-                                            confirmDisabled: true,
-                                            cancelLabel: 'Cancel',
-                                            title: 'Load',
-                                            onConfirm: () => {},
-                                            onCancel: () => {},
-                                        })
-                                    );
-                                });
-                        }}
-                        disabled={
-                            pmicConnection === 'ek-disconnected' || uiDisabled
-                        }
-                    >
-                        Load Battery Model
-                    </Button>
-                </DocumentationTooltip>
-                {profilingSupported && (
-                    <DocumentationTooltip
-                        card="SidePanel"
-                        item="ProfileBattery"
-                    >
-                        <Button
-                            variant="secondary"
-                            className="w-100"
-                            onClick={() => {
-                                npmDevice
-                                    ?.getBatteryProfiler()
-                                    ?.canProfile()
-                                    .then(result => {
-                                        if (result) {
-                                            dispatch(
-                                                setProfilingStage(
-                                                    'Configuration'
-                                                )
-                                            );
-                                        } else {
-                                            dispatch(
-                                                setProfilingStage(
-                                                    'MissingSyncBoard'
-                                                )
-                                            );
-                                        }
-                                    });
-                            }}
-                            disabled={
-                                !profilingSupported ||
-                                pmicConnection === 'ek-disconnected' ||
-                                uiDisabled
-                            }
-                        >
-                            Profile Battery
-                        </Button>
-                    </DocumentationTooltip>
-                )}
-                <div
-                    className={`slider-container ${
-                        pmicConnection === 'ek-disconnected' || uiDisabled
-                            ? 'disabled'
-                            : ''
-                    }`}
-                >
-                    <FormLabel className="flex-row">
-                        <div>Sampling Rate</div>
-
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={fuelGaugeNotChargingSamplingRateInternal}
-                                range={{ min: 500, max: 10000 }}
-                                onChange={value =>
-                                    setFuelGaugeNotChargingSamplingRateInternal(
-                                        value
-                                    )
-                                }
-                                onChangeComplete={() =>
-                                    dispatch(
-                                        updateAdcTimings({
-                                            samplingRate:
-                                                fuelGaugeNotChargingSamplingRateInternal,
-                                        })
-                                    )
-                                }
-                                disabled={
-                                    pmicConnection === 'ek-disconnected' ||
-                                    uiDisabled
-                                }
-                            />
-                            <span>ms</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[fuelGaugeNotChargingSamplingRateInternal]}
-                        onChange={[
-                            value =>
-                                setFuelGaugeNotChargingSamplingRateInternal(
-                                    value
-                                ),
-                        ]}
-                        onChangeComplete={() =>
-                            dispatch(
-                                updateAdcTimings({
-                                    samplingRate:
-                                        fuelGaugeNotChargingSamplingRateInternal,
-                                })
-                            )
-                        }
-                        range={{ min: 500, max: 10000 }}
-                        disabled={
-                            pmicConnection === 'ek-disconnected' || uiDisabled
-                        }
-                    />
-                </div>
-                <div
-                    className={`slider-container ${
-                        pmicConnection === 'ek-disconnected' || uiDisabled
-                            ? 'disabled'
-                            : ''
-                    }`}
-                >
-                    <FormLabel className="flex-row">
-                        <div>Charging Sampling Rate</div>
-
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={fuelGaugeChargingSamplingRateInternal}
-                                range={{ min: 500, max: 10000 }}
-                                onChange={value =>
-                                    setFuelGaugeChargingSamplingRateInternal(
-                                        value
-                                    )
-                                }
-                                onChangeComplete={() =>
-                                    dispatch(
-                                        updateAdcTimings({
-                                            chargingSamplingRate:
-                                                fuelGaugeChargingSamplingRateInternal,
-                                        })
-                                    )
-                                }
-                                disabled={
-                                    pmicConnection === 'ek-disconnected' ||
-                                    uiDisabled
-                                }
-                            />
-                            <span>ms</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[fuelGaugeChargingSamplingRateInternal]}
-                        onChange={[
-                            value =>
-                                setFuelGaugeChargingSamplingRateInternal(value),
-                        ]}
-                        onChangeComplete={() =>
-                            dispatch(
-                                updateAdcTimings({
-                                    chargingSamplingRate:
-                                        fuelGaugeChargingSamplingRateInternal,
-                                })
-                            )
-                        }
-                        range={{ min: 500, max: 10000 }}
-                        disabled={
-                            pmicConnection === 'ek-disconnected' || uiDisabled
-                        }
-                    />
-                </div>
-                <div
-                    className={`slider-container ${
-                        pmicConnection === 'ek-disconnected' || uiDisabled
-                            ? 'disabled'
-                            : ''
-                    }`}
-                >
-                    <FormLabel className="flex-row">
-                        <div>Reporting Rate</div>
-
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={fuelGaugeReportingRateInternal}
-                                range={{ min: 500, max: 10000 }}
-                                onChange={value =>
-                                    setFuelGaugeReportingRateInternal(value)
-                                }
-                                onChangeComplete={() =>
-                                    dispatch(
-                                        updateAdcTimings({
-                                            reportInterval:
-                                                fuelGaugeReportingRateInternal,
-                                        })
-                                    )
-                                }
-                                disabled={
-                                    pmicConnection === 'ek-disconnected' ||
-                                    uiDisabled
-                                }
-                            />
-                            <span>ms</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[fuelGaugeReportingRateInternal]}
-                        onChange={[
-                            value => setFuelGaugeReportingRateInternal(value),
-                        ]}
-                        onChangeComplete={() =>
-                            dispatch(
-                                updateAdcTimings({
-                                    reportInterval:
-                                        fuelGaugeReportingRateInternal,
-                                })
-                            )
-                        }
-                        range={{ min: 500, max: 10000 }}
-                        disabled={
-                            pmicConnection === 'ek-disconnected' || uiDisabled
-                        }
-                    />
-                </div>
             </CollapsibleGroup>
             <ConnectionStatus />
-
-            {currentPmicDialog && (
-                <GenericDialog
-                    title={currentPmicDialog?.title ?? ''}
-                    headerIcon={currentPmicDialog?.type}
-                    isVisible
-                    showSpinner={currentPmicDialog?.progress !== undefined}
-                    closeOnEsc
-                    onHide={currentPmicDialog?.onCancel}
-                    footer={
-                        <>
-                            <DialogButton
-                                variant="primary"
-                                disabled={currentPmicDialog?.confirmDisabled}
-                                onClick={currentPmicDialog?.onConfirm ?? noop}
-                            >
-                                {currentPmicDialog?.confirmLabel}
-                            </DialogButton>
-                            <DialogButton
-                                disabled={currentPmicDialog?.cancelDisabled}
-                                onClick={currentPmicDialog?.onCancel ?? noop}
-                            >
-                                {currentPmicDialog?.cancelLabel}
-                            </DialogButton>
-                            {currentPmicDialog?.optionalLabel && (
-                                <DialogButton
-                                    disabled={
-                                        currentPmicDialog?.optionalDisabled
-                                    }
-                                    onClick={
-                                        currentPmicDialog?.onOptional ?? noop
-                                    }
-                                >
-                                    {currentPmicDialog?.optionalLabel}
-                                </DialogButton>
-                            )}
-                        </>
-                    }
-                >
-                    {currentPmicDialog?.message}
-                    {currentPmicDialog?.progress !== undefined && (
-                        <Form.Group>
-                            <br />
-                            <ProgressBar
-                                now={currentPmicDialog?.progress}
-                                style={{ height: '4px' }}
-                            />
-                        </Form.Group>
-                    )}
-                </GenericDialog>
-            )}
-            <ProfilingWizard />
         </SidePanel>
     );
 };

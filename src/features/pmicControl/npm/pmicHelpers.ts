@@ -7,6 +7,7 @@
 import { getPersistentStore } from 'pc-nrfconnect-shared';
 import { v4 as uuid } from 'uuid';
 
+import { RootState } from '../../../appReducer';
 import { TDispatch } from '../../../thunk';
 import { dequeueDialog, requestDialog } from '../pmicControlSlice';
 import {
@@ -187,6 +188,28 @@ export const dialogHandler =
         }
 
         dispatch(requestDialog(pmicDialog));
+    };
+
+export const updateAdcTimings =
+    ({
+        samplingRate,
+        chargingSamplingRate,
+        reportInterval,
+    }: {
+        samplingRate?: number;
+        chargingSamplingRate?: number;
+        reportInterval?: number;
+    }) =>
+    (_: TDispatch, getState: () => RootState) => {
+        getState().app.pmicControl.npmDevice?.startAdcSample(
+            reportInterval ?? getState().app.pmicControl.fuelGaugeReportingRate,
+            getState().app.pmicControl.chargers[0].enabled
+                ? chargingSamplingRate ??
+                      getState().app.pmicControl.fuelGaugeChargingSamplingRate
+                : samplingRate ??
+                      getState().app.pmicControl
+                          .fuelGaugeNotChargingSamplingRate
+        );
     };
 
 export const MAX_TIMESTAMP = 359999999; // 99hrs 59min 59sec 999ms
