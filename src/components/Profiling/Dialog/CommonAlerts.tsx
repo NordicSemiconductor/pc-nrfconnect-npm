@@ -14,9 +14,9 @@ export const RestingProfilingAlerts = () => (
             ongoing temperature profile.
         </Alert>
         <Alert variant="info" label="Note: ">
-            Profiling takes a long time to complete (~48hrs per temperature).
-            Please make sure that the computer does not go into sleep or
-            hibernate during this process.
+            Profiling takes approximately 48 hours, per temperature in the
+            Battery Profile. You must ensure that the computer does not go into
+            sleep or hibernate during this process.
         </Alert>
     </>
 );
