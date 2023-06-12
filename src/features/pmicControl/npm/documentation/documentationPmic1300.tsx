@@ -19,9 +19,9 @@ export const documentation: Documentation = {
                         , measured by nPM1300’s ADC.
                     </p>
                     <p className="title font-weight-bold">
-                        Range (V<span className="subscript">BATOP</span>):
+                        Range (V<span className="subscript">BATOP</span>)
                     </p>
-                    <p>2.3V to 4.45V</p>
+                    <p>2.3 V to 4.45 V</p>
                 </>
             ),
         },
@@ -34,14 +34,14 @@ export const documentation: Documentation = {
                         , measured by nPM1300’s ADC.
                     </p>
                     <p>
-                        Positive value indicates the battery is being loaded,
-                        while a negative value indicates the battery is being
-                        charged.
+                        A positive value indicates a load on the battery - it is
+                        discharging, while a negative value indicates that the
+                        battery is being charged.
                     </p>
                     <p className="title font-weight-bold">Range discharging</p>
-                    <p>0mA to -1340mA</p>
+                    <p>0 mA to 1340 mA</p>
                     <p className="title font-weight-bold">Range charging</p>
-                    <p>32mA – 800mA</p>
+                    <p>-32 mA to -800 mA</p>
                 </>
             ),
         },
@@ -63,13 +63,13 @@ export const documentation: Documentation = {
             title: 'Charging Mode',
             description: (
                 <>
-                    <p>Shows the charger’s charging mode.</p>
+                    <p>The charger’s charging mode.</p>
                     <p className="title font-weight-bold">Trickle</p>
                     <p>
                         Charging mode for batteries at low voltage, V
                         <span className="subscript">BAT</span> &lt; V
                         <span className="subscript">TRICKLE_FAST</span> (default
-                        2.9V). Charging current is 10% of configured I
+                        2.9 V). Charging current is 10% of configured I
                         <span className="subscript">CHG</span>.
                     </p>
                     <p className="title font-weight-bold">Constant Current</p>
@@ -83,12 +83,13 @@ export const documentation: Documentation = {
                     <p>
                         When V<span className="subscript">BAT</span> reaches V
                         <span className="subscript">TERM </span>
-                        constant voltage charging starts. The battery voltage is
-                        maintained at V<span className="subscript">TERM </span>
+                        constant voltage, charging starts. The battery voltage
+                        is maintained at V
+                        <span className="subscript">TERM </span>
                         while monitoring current flow into the battery. When
                         current into the battery drops below I
-                        <span className="subscript">TERM</span> (default 10% of
-                        I<span className="subscript">CHG</span>) charging is
+                        <span className="subscript">TERM</span> (by default 10%
+                        of I<span className="subscript">CHG</span>) charging is
                         complete.
                     </p>
                     <p>N/A: Charger is not charging.</p>
@@ -101,8 +102,9 @@ export const documentation: Documentation = {
             title: 'Time to full',
             description: (
                 <p>
-                    Uses charge profile and rate of change in state-of-charge to
-                    estimate time to battery is full in hours and minutes.
+                    Load profile and rate of change of state-of-charge is used
+                    to estimate time until battery is full, in hours and
+                    minutes.
                 </p>
             ),
         },
@@ -110,8 +112,9 @@ export const documentation: Documentation = {
             title: 'Time to empty',
             description: (
                 <p>
-                    Uses load profile and rate of change in state-of-charge to
-                    estimate time to battery is empty in hours and minutes.
+                    Load profile and rate of change of state-of-charge is used
+                    to estimate time until battery is empty, in hours and
+                    minutes.
                 </p>
             ),
         },
@@ -120,8 +123,8 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        Battery voltage, current and temperature is used to
-                        accurately calculate the battery state-of-charge.
+                        Battery voltage, current, and temperature is used to
+                        calculate the battery state-of-charge.
                     </p>
                     <p className="title font-weight-bold">Range</p>
                     <p>0% to 100%, in 0.1% steps</p>
@@ -150,16 +153,16 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        Charger termination voltage. This is the maximum battery
+                        Charger termination voltage is the maximum battery
                         voltage allowed. When V
                         <span className="subscript">BAT</span> reaches this
-                        level, the charger goes from constant current to
+                        level, the charger changes from constant current to
                         constant voltage charging mode. V
                         <span className="subscript">TERM</span> should be
-                        configured according to specification of battery used.
+                        configured according to your battery specification.
                     </p>
                     <p className="title font-weight-bold">Range</p>
-                    <p>3.50V to 3.65V, and 4.00V to 4.45V in 50mV step</p>
+                    <p>3.50 V to 3.65 V, and 4.00 V to 4.45 V, in 50mV steps</p>
                 </>
             ),
         },
@@ -175,10 +178,10 @@ export const documentation: Documentation = {
                     <p>
                         Charging current limit. I
                         <span className="subscript">CHG</span> should be
-                        configured according to specification of battery used.
+                        configured according to your battery specification.
                     </p>
                     <p className="title font-weight-bold">Range</p>
-                    <p>32mA to 800mA in 2mA steps</p>
+                    <p>32 mA to 800 mA, in 2 mA steps</p>
                 </>
             ),
         },
@@ -190,7 +193,7 @@ export const documentation: Documentation = {
                     <span className="subscript">BAT</span> decreases below V
                     <span className="subscript">RECHARGE</span> (95% of V
                     <span className="subscript">TERM</span>) automatic recharge
-                    is started when enabled (and charger is enabled).
+                    is started, if enabled (and if charger is enabled).
                 </p>
             ),
         },
@@ -203,11 +206,11 @@ export const documentation: Documentation = {
             ),
             description: (
                 <p>
-                    Sets the charging termination current level in % of I
+                    Sets the charging termination current level as a % of I
                     <span className="subscript">CHG</span>, either 10% (default)
-                    or 20%. When charging mode is “Constant Voltage”, the
+                    or 20%. When the charging mode is “Constant Voltage”, the
                     current flow into the battery is monitored. When the current
-                    drops below I<span className="subscript">TERM</span>{' '}
+                    drops below I<span className="subscript">TERM</span> ,
                     charging is complete.
                 </p>
             ),
@@ -223,8 +226,8 @@ export const documentation: Documentation = {
                 <p>
                     Sets the V<span className="subscript">BAT</span> level where
                     the charger goes from trickle charging to constant current
-                    charging. Available voltage levels are 2.9V (default) and
-                    2.5V.
+                    charging. Available voltage levels are 2.9 V (default) and
+                    2.5 V.
                 </p>
             ),
         },
@@ -247,16 +250,17 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        The load switch can either function as a switch or LDO.
+                        The load switch can function either as a switch or an
+                        LDO.
                     </p>
                     <p>
-                        As a switch it supports an input voltage range from 1.0V
-                        to 5.5V and up to 100mA.
+                        As a switch it supports an input voltage range from 1.0
+                        V to 5.5 V, and up to 100mA.
                     </p>
                     <p>
-                        As a LDO it supports an input voltage range from 2.6V to
-                        5.5V, and output voltage range from 1.0V and 3.3V in
-                        100mV steps up to 50mA.
+                        As an LDO it supports an input voltage range from 2.6 V
+                        to 5.5 V, and output voltage range from 1.0 V to 3.3 V,
+                        in 100 mV steps up to 50 mA.
                     </p>
                 </>
             ),
@@ -272,7 +276,7 @@ export const documentation: Documentation = {
                 <>
                     <p>LDO output voltage level.</p>
                     <p className="title font-weight-bold">Range</p>
-                    <p>1.0V to 3.3V in 100mV steps</p>
+                    <p>1.0 V to 3.3 V, in 100 mV steps</p>
                 </>
             ),
         },
@@ -283,16 +287,17 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        The load switch can either function as a switch or LDO.
+                        The load switch can function either as a switch or an
+                        LDO.
                     </p>
                     <p>
-                        As a switch it supports an input voltage range from 1.0V
-                        to 5.5V and up to 100mA.
+                        As a switch, it supports an input voltage range from 1.0
+                        V to 5.5 V, and up to 100 mA.
                     </p>
                     <p>
-                        As a LDO it supports an input voltage range from 2.6V to
-                        5.5V, and output voltage range from 1.0V and 3.3V in
-                        100mV steps up to 50mA.
+                        As an LDO, it supports an input voltage range from 2.6 V
+                        to 5.5 V, and an output voltage range from 1.0 V to 3.3
+                        V, in 100 mV steps up to 50 mA.
                     </p>
                 </>
             ),
@@ -308,7 +313,7 @@ export const documentation: Documentation = {
                 <>
                     <p>LDO output voltage level.</p>
                     <p className="title font-weight-bold">Range</p>
-                    <p>1.0V to 3.3V in 100mV steps</p>
+                    <p>1.0 V to 3.3 V in 100 mV steps</p>
                 </>
             ),
         },
@@ -318,8 +323,8 @@ export const documentation: Documentation = {
             title: 'Buck',
             description: (
                 <p>
-                    Ultra-high efficiency step-down buck regulator. Supports up
-                    to 200mA output current.
+                    Ultra-high efficiency step-down buck regulator. Supports
+                    output current up to 200 mA .
                 </p>
             ),
         },
@@ -341,7 +346,7 @@ export const documentation: Documentation = {
                     </p>
                     <p>
                         When software is used to set voltage level the range is
-                        1.0V to 3.3V in 100mV steps.
+                        1.0 V to 3.3 V, in 100 mV steps.
                     </p>
                 </>
             ),
@@ -369,11 +374,11 @@ export const documentation: Documentation = {
             description: (
                 <p>
                     Configures BUCK mode. The BUCK can be in forced PFM
-                    (hysteretic) mode, forced PWM (pulse width modulation) mode
+                    (hysteretic) mode, forced PWM (pulse width modulation) mode,
                     or automatic mode (default). In automatic mode the BUCK
                     selects PFM mode for low load currents, and PWM mode for
-                    high load currents, to ensure highest efficiency across the
-                    whole load current range. PWM mode can be enabled and
+                    high load currents, to ensure the highest efficiency across
+                    the whole load current range. PWM mode can be enabled and
                     disabled using a GPIO pin if GPIO[n] is selected.
                 </p>
             ),
@@ -383,7 +388,7 @@ export const documentation: Documentation = {
             description: (
                 <p>
                     BUCK on or off can be controlled by software, V
-                    <span className="subscript">SET1</span> pin or a GPIO pin.
+                    <span className="subscript">SET1</span> pin, or a GPIO pin.
                 </p>
             ),
         },
@@ -408,7 +413,7 @@ export const documentation: Documentation = {
             description: (
                 <p>
                     Ultra-high efficiency step-down buck regulator. Supports up
-                    to 200mA output current.
+                    to 200 mA output current.
                 </p>
             ),
         },
@@ -430,7 +435,7 @@ export const documentation: Documentation = {
                     </p>
                     <p>
                         When software is used to set voltage level the range is
-                        1.0V to 3.3V in 100mV steps.
+                        from 1.0 V to 3.3 V, in 100 mV steps.
                     </p>
                 </>
             ),
@@ -497,10 +502,10 @@ export const documentation: Documentation = {
             description: (
                 <p>
                     Select the battery model to be used for evaluation. If you
-                    don’t have a battery model of the battery used, you can
-                    select the one best matching the capacity of battery used.
-                    This will not give best state-of-charge accuracy, but
-                    enables easy initial evaluation of fuel gauge.
+                    don’t find your battery model in the list, you can select
+                    the one best matching the capacity of your battery. This
+                    will not give best state-of-charge accuracy, but enables
+                    easy initial evaluation of the fuel gauge.
                 </p>
             ),
         },
@@ -508,8 +513,8 @@ export const documentation: Documentation = {
             title: 'Load Battery Model',
             description: (
                 <p>
-                    Lets you load a battery model to start evaluating fuel gauge
-                    in nPM PowerUP.
+                    You can load a battery model to start evaluating the nPM
+                    PowerUP fuel gauge.
                 </p>
             ),
         },
@@ -518,23 +523,23 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        Battery profiling is done to provide accurate
-                        state-of-charge estimation across voltage, current and
-                        temperature range for the specific battery used. The
-                        outcome of the battery profiling is a battery model,
-                        that can be evaluated in nPM PowerUP by using the “Load
-                        Battery Model” option.
+                        Battery profiling provides accurate state-of-charge
+                        estimation across voltage, current, and temperature
+                        range for the specific battery used. The result of the
+                        battery profiling is a battery model which can be
+                        evaluated in nPM PowerUP by using the “Load Battery
+                        Model” option.
                     </p>
                     <p>
-                        An addition board, nPM-FG, is required to perform
-                        battery profiling. Please connect this to nPM1300-EK
-                        before starting battery profiling.
+                        An additional board, nPM-FG, is required to perform
+                        battery profiling. This must be connected to nPM1300-EK
+                        before battery profiling is started.
                     </p>
                     <p>
                         The battery model can also be included in the NCS or
-                        bare-metal project to do further testing and development
-                        on a Nordic nRF SoC development kit or custom HW. Refer
-                        to NCS documentation for more details:{' '}
+                        bare-metal project for further testing and development
+                        on a Nordic nRF SoC development kit or custom hardware.
+                        Refer to NCS documentation for more details:{' '}
                         <a
                             target="_blank"
                             rel="noreferrer"
@@ -558,10 +563,10 @@ export const documentation: Documentation = {
             description: (
                 <p>
                     Exports the full configuration of the nPM1300 based on the
-                    settings in nPM PowerUP. You can select to export to NCS or
-                    to a bare-metal project. This also saves the nPM PowerUP
-                    configuration, to make it easy to pick up from where you
-                    left by using the “Load Configuration” option.
+                    nPM PowerUP settings. You can choose to export to NCS or to
+                    a bare-metal project. This also saves the nPM PowerUP
+                    configuration, making it easy to resume by using the “Load
+                    Configuration” option.
                 </p>
             ),
         },
@@ -584,8 +589,8 @@ export const documentation: Documentation = {
             title: 'Reset Device',
             description: (
                 <p>
-                    This will reset the nPM1300 and nPM Controller. The nPM1300
-                    configuration will go back to default device configuration.
+                    Resets the nPM1300 and nPM Controller. The nPM1300 default
+                    device configuration is restored.
                 </p>
             ),
         },
@@ -593,8 +598,8 @@ export const documentation: Documentation = {
             title: 'Record Events',
             description: (
                 <p>
-                    This will record all terminal log events, including commands
-                    executed and battery voltage, current temperature, voltage,
+                    Records all terminal log events, including commands
+                    executed, battery voltage, current temperature, voltage,
                     state-of-charge, time to empty and time to full in csv
                     files.
                 </p>
