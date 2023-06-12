@@ -70,7 +70,8 @@ export const startProcessingCsv =
     };
 export const generateParamsFromCSV =
     (projectAbsolutePath: string, index: number) => (dispatch: TDispatch) => {
-        if (!fs.existsSync(NRFUTIL_BINARY)) {
+        const pathObject = path.parse(NRFUTIL_BINARY);
+        if (!fs.existsSync(pathObject.dir)) {
             dispatch(
                 addProjectProfileProgress({
                     path: projectAbsolutePath,
