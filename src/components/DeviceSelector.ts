@@ -201,7 +201,7 @@ const deviceSetupConfig: DeviceSetupConfig = {
         }),
     ],
     confirmMessage:
-        'The Evaluation Kit requires programming. Do you want to program it?',
+        'Programming required. The nPM1300 EK FW version does not match the required FW version.',
 };
 
 const mapState = () => ({
