@@ -6,7 +6,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { appendFile, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { appendFile, writeFileSync } from 'fs';
 import path from 'path';
 import { ConfirmationDialog } from 'pc-nrfconnect-shared';
 
@@ -22,7 +22,6 @@ import {
     getNpmDevice,
     isBatteryConnected,
     isUsbPowered,
-    setEventRecordingPath,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
     clearAbortAction,
@@ -100,29 +99,6 @@ export default () => {
             };
         }
     }, [dispatch, profilingStage]);
-
-    useEffect(() => {
-        if (profilingStage === 'Charging') {
-            const baseDirectory = path.join(
-                profile.baseDirectory,
-                profile.name,
-                `${PROFILE_FOLDER_PREFIX}${index + 1}`
-            );
-
-            if (!existsSync(baseDirectory)) {
-                mkdirSync(baseDirectory, { recursive: true });
-            }
-
-            const debugFolder = path.join(baseDirectory, 'debug');
-
-            if (!existsSync(debugFolder)) {
-                mkdirSync(debugFolder, { recursive: true });
-            }
-            dispatch(setEventRecordingPath(debugFolder));
-        } else if (profilingStage === 'Complete') {
-            dispatch(setEventRecordingPath(''));
-        }
-    }, [dispatch, index, profile, profilingStage]);
 
     useEffect(
         () =>

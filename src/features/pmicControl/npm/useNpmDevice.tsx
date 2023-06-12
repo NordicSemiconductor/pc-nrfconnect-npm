@@ -7,7 +7,8 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ipcRenderer } from 'electron';
-import { appendFile, existsSync } from 'fs';
+import { appendFile, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 import {
     Alert,
     clearWaitForDevice,
@@ -17,6 +18,7 @@ import {
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { RootState } from '../../../appReducer';
+import { PROFILE_FOLDER_PREFIX } from '../../../components/Profiling/helpers';
 import { TDispatch } from '../../../thunk';
 import { getShellParser } from '../../serial/serialSlice';
 import {
@@ -47,7 +49,12 @@ import {
     updateCharger,
     updateLdo,
 } from '../pmicControlSlice';
-import { setCcProfiling } from '../profilingSlice';
+import {
+    getProfile,
+    getProfileIndex,
+    getProfilingStage,
+    setCcProfiling,
+} from '../profilingSlice';
 import { getNpmDevice } from './npmFactory';
 import {
     dialogHandler,
@@ -64,6 +71,9 @@ export default () => {
     const pmicState = useSelector(getPmicState);
     const recordEvents = useSelector(getEventRecording);
     const recordEventsPath = useSelector(getEventRecordingPath);
+    const profile = useSelector(getProfile);
+    const profileIndex = useSelector(getProfileIndex);
+    const profilingStage = useSelector(getProfilingStage);
     const bucks = useSelector(getBucks);
     const preventSleepId = useRef<number | null>();
 
@@ -488,7 +498,35 @@ export default () => {
 
     useEffect(() => {
         if (!npmDevice) return;
-        const releaseOnLoggingEvent = npmDevice.onLoggingEvent(e => {
+
+        const loggingPathsBase: string[] = [];
+
+        if (recordEvents && recordEventsPath) {
+            loggingPathsBase.push(recordEventsPath);
+        }
+
+        if (
+            profilingStage === 'Charging' ||
+            profilingStage === 'Resting' ||
+            profilingStage === 'Profiling' ||
+            profilingStage === 'Checklist'
+        ) {
+            const baseDirectory = join(
+                profile.baseDirectory,
+                profile.name,
+                `${PROFILE_FOLDER_PREFIX}${profileIndex + 1}`
+            );
+
+            const debugFolder = join(baseDirectory, 'debug');
+
+            if (!existsSync(debugFolder)) {
+                mkdirSync(debugFolder, { recursive: true });
+            }
+
+            loggingPathsBase.push(debugFolder);
+        }
+
+        return npmDevice.onLoggingEvent(e => {
             if (e.loggingEvent.module !== 'shell_commands') {
                 switch (e.loggingEvent.logLevel) {
                     case 'wrn':
@@ -503,11 +541,12 @@ export default () => {
                         break;
                 }
             }
-            if (recordEvents) {
+
+            loggingPathsBase.forEach(baseDir => {
                 if (e.dataPair) {
                     let data = '';
                     // sample message abc=10,xyz=44
-                    const path = `${recordEventsPath}/${e.loggingEvent.module}.csv`;
+                    const path = join(baseDir, `${e.loggingEvent.module}.csv`);
                     const addHeaders = !existsSync(path);
                     const valuePairs = e.loggingEvent.message.split(',');
                     if (addHeaders) {
@@ -521,7 +560,7 @@ export default () => {
                     appendFile(path, data, () => {});
                 }
                 let data = '';
-                const path = `${recordEventsPath}/all_events.csv`;
+                const path = `${baseDir}/all_events.csv`;
                 const addHeaders = !existsSync(path);
                 if (addHeaders) data += `timestamp,logLevel,module,message\r\n`;
                 data += `${e.loggingEvent.timestamp},${
@@ -531,10 +570,16 @@ export default () => {
                     ' '
                 )}"\r\n`; // TODO look for escaping new lines in csvs
                 appendFile(path, data, () => {});
-            }
+            });
         });
-        return () => releaseOnLoggingEvent();
-    }, [npmDevice, recordEvents, recordEventsPath]);
+    }, [
+        npmDevice,
+        profile,
+        profileIndex,
+        profilingStage,
+        recordEvents,
+        recordEventsPath,
+    ]);
 
     useEffect(() => {
         if (npmDevice) {
