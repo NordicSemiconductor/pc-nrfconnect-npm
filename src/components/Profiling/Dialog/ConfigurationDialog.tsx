@@ -215,7 +215,7 @@ export default () => {
                 <div className="slider-container">
                     <FormLabel className="flex-row">
                         <div>
-                            <span>Discharge Cut Off Voltage</span>
+                            <span>Discharge cut-off voltage</span>
                         </div>
                         <div className="flex-row">
                             <NumberInlineInput

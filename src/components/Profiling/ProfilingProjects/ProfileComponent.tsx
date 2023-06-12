@@ -59,14 +59,22 @@ export default ({
         }
     }, [progress, reset, pause, isRunning]);
 
+    const message = (
+        <span>
+            {`Temperature: ${profile.temperature} °C, V`}
+            <span>TERM</span>
+            {` ${profile.vUpperCutOff} V,  Discharge cut-off voltage: ${profile.vLowerCutOff} V.`}
+        </span>
+    );
+
     return (
         <div className="profile pt-2 pb-2">
             <div className="d-flex flex-row justify-content-between mt-2 mb-2">
                 <div className="flex-grow-1 mr-4">
                     {!dataCollected && (
-                        <Alert variant="info">
-                            <strong>Profile is incomplete.</strong>
-                            <span>{` Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V.`}</span>
+                        <Alert variant="warning">
+                            <strong>Profile is incomplete </strong>
+                            {message}
                         </Alert>
                     )}
                     {dataCollected && !csvReadyExists && (
@@ -83,8 +91,8 @@ export default ({
                         !profile.paramsJson &&
                         !progress && (
                             <Alert variant="info">
-                                <strong>Requirers processing</strong>
-                                <span>{` Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V.`}</span>
+                                <strong>Requirers processing </strong>
+                                <span>{message}</span>
                             </Alert>
                         )}
                     {dataCollected &&
@@ -92,8 +100,8 @@ export default ({
                         ((profile.batteryJson && profile.paramsJson) ||
                             progress) && (
                             <div className="mb-2">
-                                <strong>Profile</strong>
-                                <span>{` - Temperature: ${profile.temperature} °C, Upper Cutoff: ${profile.vUpperCutOff} V,  Lower Cutoff: ${profile.vLowerCutOff} V`}</span>
+                                <strong>Profile </strong>
+                                <span> {message}</span>
                             </div>
                         )}
                 </div>
