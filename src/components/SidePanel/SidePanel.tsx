@@ -108,7 +108,7 @@ export default () => {
                                 dispatch(setEventRecordingPath(''));
                             }
                         }}
-                        disabled={npmDevice === undefined}
+                        disabled={pmicConnection === 'ek-disconnected'}
                         started={
                             eventRecordingPath !== undefined &&
                             eventRecordingPath.length > 0
