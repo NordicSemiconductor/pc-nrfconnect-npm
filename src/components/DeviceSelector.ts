@@ -52,20 +52,27 @@ type NpmFirmware = {
     hex: string;
 };
 
+const isNpm1300SerialApplicationMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ab &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
+const isNpm1300SerialRecoverMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ac &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
 export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
     supportsProgrammingMode: (device: Device) =>
         device.traits.mcuBoot === true &&
         device.traits.serialPorts === true &&
-        (device.usb?.device.descriptor.idProduct === 0x53ab ||
-            device.usb?.device.descriptor.idProduct === 0x53ac) &&
-        device.usb?.device.descriptor.idVendor === 0x1915,
+        (isNpm1300SerialRecoverMode(device) ||
+            isNpm1300SerialApplicationMode(device)),
     getFirmwareOptions: device => [
         {
             key: firmware.key,
             description: firmware.description,
             programDevice: onProgress => dispatch =>
                 new Promise<Device>((resolve, reject) => {
-                    let readyDevice: Device = device;
+                    let success = false;
                     dispatch(
                         setWaitForDevice({
                             timeout: 60000,
@@ -74,22 +81,13 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 programmedDevice.serialPorts?.length === 2 &&
                                 programmedDevice.traits.mcuBoot === true &&
                                 device.traits.serialPorts === true &&
-                                programmedDevice.usb?.device.descriptor
-                                    .idProduct === 0x53ab &&
-                                programmedDevice.usb?.device.descriptor
-                                    .idVendor === 0x1915,
+                                isNpm1300SerialApplicationMode(
+                                    programmedDevice
+                                ),
                             once: true,
                             onSuccess: dev => {
-                                readyDevice = dev;
-
-                                if (
-                                    device.usb?.device.descriptor.idProduct ===
-                                        0x53ac &&
-                                    device.usb?.device.descriptor.idVendor ===
-                                        0x1915
-                                ) {
-                                    resolve(readyDevice);
-                                }
+                                success = true;
+                                resolve(dev);
                             },
                             onFail: reject,
                         })
@@ -101,18 +99,8 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                         'NRFDL_FW_INTEL_HEX',
                         firmware.hex,
                         err => {
-                            if (err) {
+                            if (err && !success) {
                                 reject(err.message);
-                                return;
-                            }
-
-                            if (
-                                device.usb?.device.descriptor.idProduct ===
-                                    0x53ab &&
-                                device.usb?.device.descriptor.idVendor ===
-                                    0x1915
-                            ) {
-                                resolve(readyDevice);
                             }
                         },
                         progress => {
@@ -136,7 +124,7 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 return;
             }
 
-            if (device.usb?.device.descriptor.idProduct === 0x53ac) {
+            if (isNpm1300SerialRecoverMode(device)) {
                 resolve({
                     device,
                     validFirmware: false,
