@@ -46,7 +46,7 @@ export default () => {
     const [name, setName] = useState('');
 
     const [capacity, setCapacity] = useState(800);
-    const [ntcThermistor, setNTCThermistor] = useState<NTCThermistor>('10kΩ');
+    const [ntcThermistor, setNTCThermistor] = useState<NTCThermistor>('10 kΩ');
     const [temperatures, setTemperatures] = useState<number[]>([25]);
     const [ratedChargingCurrent, setRatedChargingCurrent] = useState(
         capacity / 2

@@ -903,17 +903,17 @@ describe('PMIC 1300', () => {
                 >(index => [
                     {
                         index,
-                        mode: '100kΩ',
+                        mode: '100 kΩ',
                         cliMode: 'ntc_100k',
                     },
                     {
                         index,
-                        mode: '10kΩ',
+                        mode: '10 kΩ',
                         cliMode: 'ntc_10k',
                     },
                     {
                         index,
-                        mode: '47kΩ',
+                        mode: '47 kΩ',
                         cliMode: 'ntc_47k',
                     },
                 ]).flat()
@@ -1916,17 +1916,17 @@ describe('PMIC 1300', () => {
                 >(index => [
                     {
                         index,
-                        mode: '100kΩ',
+                        mode: '100 kΩ',
                         cliMode: 'ntc_100k',
                     },
                     {
                         index,
-                        mode: '10kΩ',
+                        mode: '10 kΩ',
                         cliMode: 'ntc_10k',
                     },
                     {
                         index,
-                        mode: '47kΩ',
+                        mode: '47 kΩ',
                         cliMode: 'ntc_47k',
                     },
                 ]).flat()
@@ -2776,7 +2776,7 @@ describe('PMIC 1300', () => {
             enabled: true,
             enableRecharging: true,
             iTerm: '20%',
-            ntcThermistor: '10kΩ',
+            ntcThermistor: '10 kΩ',
         };
 
         const initBuck: Buck = {
@@ -2899,7 +2899,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcThermistor: '10kΩ',
+                        ntcThermistor: '10 kΩ',
                     },
                 ],
                 bucks: [
@@ -2956,7 +2956,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcThermistor: '10kΩ',
+                        ntcThermistor: '10 kΩ',
                     },
                 ],
                 bucks: [
@@ -3016,7 +3016,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcThermistor: '10kΩ',
+                        ntcThermistor: '10 kΩ',
                     },
                 ],
                 bucks: [
@@ -3076,7 +3076,7 @@ describe('PMIC 1300', () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcThermistor: '10kΩ',
+                        ntcThermistor: '10 kΩ',
                     },
                 ],
                 bucks: [
@@ -3323,25 +3323,25 @@ describe('PMIC 1300', () => {
                     index,
                     append: 'get',
                     successReturn: 'Value: 47k.',
-                    ntcThermistor: '47kΩ' as NTCThermistor,
+                    ntcThermistor: '47 kΩ' as NTCThermistor,
                 },
                 {
                     index,
                     append: 'set ntc_47k',
                     successReturn: 'Value: 47k.',
-                    ntcThermistor: '47kΩ' as NTCThermistor,
+                    ntcThermistor: '47 kΩ' as NTCThermistor,
                 },
                 {
                     index,
                     append: 'set ntc_10k',
                     successReturn: 'Value: 10k.',
-                    ntcThermistor: '10kΩ' as NTCThermistor,
+                    ntcThermistor: '10 kΩ' as NTCThermistor,
                 },
                 {
                     index,
                     append: 'set ntc_100k',
                     successReturn: 'Value: 100k.',
-                    ntcThermistor: '100kΩ' as NTCThermistor,
+                    ntcThermistor: '100 kΩ' as NTCThermistor,
                 },
             ]).flat()
         )(

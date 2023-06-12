@@ -42,7 +42,7 @@ const initialState: profilingState = {
         vLowerCutOff: 3.1,
         capacity: 400,
         ratedChargingCurrent: 200,
-        ntcThermistor: '10kΩ',
+        ntcThermistor: '10 kΩ',
         temperatures: [25],
         baseDirectory: '~/',
         restingProfiles: [],

@@ -451,15 +451,15 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     switch (result) {
                         case '10k.':
                         case 'ntc_10k.':
-                            mode = '10kΩ';
+                            mode = '10 kΩ';
                             break;
                         case '47k.':
                         case 'ntc_47k.':
-                            mode = '47kΩ';
+                            mode = '47 kΩ';
                             break;
                         case '100k.':
                         case 'ntc_100k.':
-                            mode = '100kΩ';
+                            mode = '100 kΩ';
                             break;
                     }
 
@@ -961,13 +961,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             } else {
                 let value = '';
                 switch (mode) {
-                    case '100kΩ':
+                    case '100 kΩ':
                         value = 'ntc_100k';
                         break;
-                    case '47kΩ':
+                    case '47 kΩ':
                         value = 'ntc_47k';
                         break;
-                    case '10kΩ':
+                    case '10 kΩ':
                         value = 'ntc_10k';
                         break;
                 }

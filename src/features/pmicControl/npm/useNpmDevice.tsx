@@ -167,7 +167,7 @@ export default () => {
                         enabled: false,
                         iTerm: '10%',
                         enableRecharging: false,
-                        ntcThermistor: '10kΩ',
+                        ntcThermistor: '10 kΩ',
                     });
                 }
                 dispatch(setChargers(emptyChargers));
