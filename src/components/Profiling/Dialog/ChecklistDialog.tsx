@@ -131,6 +131,15 @@ export default () => {
             }
         >
             <Group>
+                {adcSample && adcSample.vBat > profile.vUpperCutOff && (
+                    <Alert label="Caution: " variant="warning">
+                        The battery voltage exceeds V
+                        <span className="subscript">TERM</span>. This might
+                        effect results. It is recommended to discharge the
+                        battery below V<span className="subscript">TERM</span>{' '}
+                        before starting battery profiling.
+                    </Alert>
+                )}
                 {pmicConnectionState === 'pmic-disconnected' && (
                     <Alert label="Caution: " variant="warning">
                         PMIC is not powered.
