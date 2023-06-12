@@ -27,11 +27,13 @@ import {
     getEventRecordingPath,
     getFuelGaugeReportingRate,
     getNpmDevice,
+    getPmicState,
     setEventRecordingPath,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import FuelGaugeSettings from '../FuelGauge/FuelGaugeSettings';
 import ConnectionStatus from './ConnectionStatus';
+import OpenSerialTerminal from './OpenSerialTerminal';
 
 export default () => {
     const dispatch = useDispatch();
@@ -39,7 +41,7 @@ export default () => {
     const uiDisabled = useIsUIDisabled();
 
     const npmDevice = useSelector(getNpmDevice);
-    const pmicConnection = npmDevice?.getConnectionState();
+    const pmicConnection = useSelector(getPmicState);
 
     const fuelGaugeReportingRate = useSelector(getFuelGaugeReportingRate);
     const [fuelGaugeReportingRateInternal, setFuelGaugeReportingRateInternal] =
@@ -76,6 +78,7 @@ export default () => {
                         Load Configuration
                     </Button>
                 </DocumentationTooltip>
+                <OpenSerialTerminal />
                 <DocumentationTooltip card="SidePanel" item="ResetDevice">
                     <Button
                         variant="secondary"
