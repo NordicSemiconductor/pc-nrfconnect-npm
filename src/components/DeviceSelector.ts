@@ -240,6 +240,9 @@ const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
         logger.info(`Device Disconnected SN:${device.serialNumber}`);
         dispatch(deviceDisconnected());
     },
+    deviceFilter: (device: Device) =>
+        isNpm1300SerialRecoverMode(device) ||
+        isNpm1300SerialApplicationMode(device),
 });
 
 export default connect(mapState, mapDispatch)(DeviceSelector);
