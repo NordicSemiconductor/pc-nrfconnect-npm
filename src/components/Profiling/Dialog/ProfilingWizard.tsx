@@ -13,6 +13,7 @@ import { ConfirmationDialog } from 'pc-nrfconnect-shared';
 import {
     addConfirmBeforeClose,
     clearConfirmBeforeClose,
+    getShowConfirmCloseDialog,
 } from '../../../features/confirmBeforeClose/confirmBeforeCloseSlice';
 import { Profile } from '../../../features/pmicControl/npm/types';
 import {
@@ -80,6 +81,7 @@ export default () => {
     const index = useSelector(getProfileIndex);
     const ccProfilingState = useSelector(getCcProfilingState);
     const abortAction = useSelector(getAbort);
+    const showCloseAppDialog = useSelector(getShowConfirmCloseDialog);
 
     const dispatch = useDispatch();
 
@@ -297,22 +299,34 @@ export default () => {
                 <PreConfigurationDialog />
             )}
             {profilingStage === 'Configuration' && (
-                <ConfigurationDialog isVisible={!abortAction} />
+                <ConfigurationDialog
+                    isVisible={!abortAction && !showCloseAppDialog}
+                />
             )}
             {profilingStage === 'Checklist' && (
-                <ChecklistDialog isVisible={!abortAction} />
+                <ChecklistDialog
+                    isVisible={!abortAction && !showCloseAppDialog}
+                />
             )}
             {profilingStage === 'Charging' && (
-                <ChargingDialog isVisible={!abortAction} />
+                <ChargingDialog
+                    isVisible={!abortAction && !showCloseAppDialog}
+                />
             )}
             {profilingStage === 'Resting' && (
-                <RestingDialog isVisible={!abortAction} />
+                <RestingDialog
+                    isVisible={!abortAction && !showCloseAppDialog}
+                />
             )}
             {profilingStage === 'Profiling' && (
-                <ProfilingDialog isVisible={!abortAction} />
+                <ProfilingDialog
+                    isVisible={!abortAction && !showCloseAppDialog}
+                />
             )}
             {profilingStage === 'Complete' && (
-                <CompleteDialog isVisible={!abortAction} />
+                <CompleteDialog
+                    isVisible={!abortAction && !showCloseAppDialog}
+                />
             )}
         </div>
     );
