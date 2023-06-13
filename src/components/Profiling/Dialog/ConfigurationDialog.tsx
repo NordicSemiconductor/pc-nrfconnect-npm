@@ -289,7 +289,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 }}
                                 onChange={setRatedChargingCurrent}
                             />
-                            <span>mAh</span>
+                            <span>mA</span>
                         </div>
                     </FormLabel>
                     <Slider
