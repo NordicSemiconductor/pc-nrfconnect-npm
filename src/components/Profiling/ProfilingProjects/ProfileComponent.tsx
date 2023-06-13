@@ -143,7 +143,7 @@ export default ({
                             time={time}
                             progress={progress.progress ?? 0}
                         />
-                        {/* <Button --> TODO once NRF UTIL terminates all child processes
+                        <Button
                             className="ml-2"
                             variant="secondary"
                             onClick={() => {
@@ -151,7 +151,7 @@ export default ({
                             }}
                         >
                             Cancel
-                        </Button> */}
+                        </Button>
                     </div>
                 </div>
             )}

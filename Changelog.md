@@ -13,6 +13,7 @@ and this project adheres to
 -   Open serial terminal button
 -   Alert if VBat > VTerm when profiling
 -   PMIC1300 FP2 Support FW Version 0.7.1+1
+-   Cancel button for profiling processes
 
 ### Changes
 
@@ -25,6 +26,7 @@ and this project adheres to
 -   Tooltip documentation improvements
 -   UI Improvements
 -   Removed sampling rate from side panel
+-   Update to nrfutil-npm-x86_64-pc-windows-msvc-0.2.0-alpha.5
 
 ### Fixed
 
