@@ -2843,7 +2843,7 @@ describe('PMIC 1300', () => {
                     enabled: false,
                     iTerm: '10%',
                     enableRecharging: false,
-                    ntcThermistor: '10kΩ',
+                    ntcThermistor: '10 kΩ',
                 },
             ]);
 
