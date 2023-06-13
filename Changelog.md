@@ -6,10 +6,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.7.3 - 2023-06-13
+
+### Added
+
+-   Open serial terminal button
+-   Alert if VBat > VTerm when profiling
+
+### Changes
+
+-   Filter non NPM device
+-   Improved Device programming, App is immediately usable after device reboots
+-   If events are are already being recorded when a profiling session is
+    started, events will be save in both the debug folder of the profile and the
+    original path set when recoding events was enabled
+-   App Icon
+-   Tooltip documentation improvements
+-   UI Improvements
+-   Removed sampling rate from side panel
+
+### Fixed
+
+-   Record events should be enabled when not connected to a device
+-   Processing data on windows should no fail with message OS not supported
+-   Aborting the Profile Wizard before starting the net temperature now show the
+    confirm message
+-   Dialog UI state of profiling step are persisted if abort is not confirmed
+
 ## 0.7.2 - 2023-06-05
 
 ### Added
 
+-   PMIC1300 FP2 Support FW Version 0.7.1+0
 -   Confirm dialog aborting profiling
 -   Confirm dialog before app closes while profiling
 -   Confirm dialog before app closes while data is processing
