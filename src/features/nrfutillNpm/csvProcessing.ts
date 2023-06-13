@@ -310,7 +310,8 @@ export const mergeBatteryParams = (
     profiles: ProfilingProjectProfile[]
 ) =>
     new Promise<string>((resolve, reject) => {
-        if (!fs.existsSync(NRFUTIL_BINARY)) {
+        const pathObject = path.parse(NRFUTIL_BINARY);
+        if (!fs.existsSync(pathObject.dir)) {
             reject(new Error('OS not supported'));
             return;
         }
