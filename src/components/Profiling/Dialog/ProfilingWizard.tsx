@@ -276,7 +276,7 @@ export default () => {
 
     return (
         <div>
-            {abortAction ? (
+            {abortAction && (
                 <ConfirmationDialog
                     title="Aborting profiling"
                     isVisible
@@ -292,20 +292,27 @@ export default () => {
                     close this profiling session. Progress will be lost. Are you
                     sure you want to abort profiling?
                 </ConfirmationDialog>
-            ) : (
-                <>
-                    {profilingStage === 'MissingSyncBoard' && (
-                        <PreConfigurationDialog />
-                    )}
-                    {profilingStage === 'Configuration' && (
-                        <ConfigurationDialog />
-                    )}
-                    {profilingStage === 'Checklist' && <ChecklistDialog />}
-                    {profilingStage === 'Charging' && <ChargingDialog />}
-                    {profilingStage === 'Resting' && <RestingDialog />}
-                    {profilingStage === 'Profiling' && <ProfilingDialog />}
-                    {profilingStage === 'Complete' && <CompleteDialog />}
-                </>
+            )}
+            {profilingStage === 'MissingSyncBoard' && (
+                <PreConfigurationDialog />
+            )}
+            {profilingStage === 'Configuration' && (
+                <ConfigurationDialog isVisible={!abortAction} />
+            )}
+            {profilingStage === 'Checklist' && (
+                <ChecklistDialog isVisible={!abortAction} />
+            )}
+            {profilingStage === 'Charging' && (
+                <ChargingDialog isVisible={!abortAction} />
+            )}
+            {profilingStage === 'Resting' && (
+                <RestingDialog isVisible={!abortAction} />
+            )}
+            {profilingStage === 'Profiling' && (
+                <ProfilingDialog isVisible={!abortAction} />
+            )}
+            {profilingStage === 'Complete' && (
+                <CompleteDialog isVisible={!abortAction} />
             )}
         </div>
     );

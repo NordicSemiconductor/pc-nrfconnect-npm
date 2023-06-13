@@ -28,7 +28,6 @@ import {
     closeProfiling,
     getProfile,
     getProfileIndex,
-    getProfilingStage,
     setAbortAction,
     setCompleteStep,
     setProfilingStage,
@@ -41,13 +40,12 @@ import {
 } from './CommonAlerts';
 import StepperProgress from './StepperProgress';
 
-export default () => {
+export default ({ isVisible }: { isVisible: boolean }) => {
     const npmDevice = useSelector(getNpmDevice);
     const usbPowered = useSelector(isUsbPowered);
     const chargers = useSelector(getChargers);
     const pmicChargingState = useSelector(getPmicChargingState);
     const batteryConnected = useSelector(isBatteryConnected);
-    const profilingStage = useSelector(getProfilingStage);
     const profile = useSelector(getProfile);
     const adcSample = useSelector(getLatestAdcSample);
     const index = useSelector(getProfileIndex);
@@ -109,7 +107,7 @@ export default () => {
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
             } @ ${profile.temperatures[index]} °C`}
-            isVisible={profilingStage === 'Charging'}
+            isVisible={isVisible}
             showSpinner={!batteryFull}
             closeOnEsc={false}
             footer={

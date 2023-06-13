@@ -36,6 +36,7 @@ import {
     getProfileIndex,
     nextProfile,
     restartProfile,
+    setAbortAction,
 } from '../../../features/pmicControl/profilingSlice';
 import { TDispatch } from '../../../thunk';
 import {
@@ -277,19 +278,27 @@ const AbortProfileButton = () => {
         <DialogButton
             variant="secondary"
             onClick={() => {
-                npmDevice?.setAutoRebootDevice(true);
-                npmDevice
-                    ?.getBatteryProfiler()
-                    ?.isProfiling()
-                    .then(result => {
-                        if (result) {
-                            npmDevice.getBatteryProfiler()?.stopProfiling();
-                        }
-                        dispatch(closeProfiling());
-                    })
-                    .catch(() => {
-                        dispatch(closeProfiling());
-                    });
+                () => {
+                    dispatch(
+                        setAbortAction(() => {
+                            npmDevice?.setAutoRebootDevice(true);
+                            npmDevice
+                                ?.getBatteryProfiler()
+                                ?.isProfiling()
+                                .then(result => {
+                                    if (result) {
+                                        npmDevice
+                                            .getBatteryProfiler()
+                                            ?.stopProfiling();
+                                    }
+                                    dispatch(closeProfiling());
+                                })
+                                .catch(() => {
+                                    dispatch(closeProfiling());
+                                });
+                        })
+                    );
+                };
             }}
         >
             Abort
@@ -297,7 +306,7 @@ const AbortProfileButton = () => {
     );
 };
 
-export default () => {
+export default ({ isVisible }: { isVisible: boolean }) => {
     const [generatingBatteryModel, setGeneratingBatterModel] = useState(false);
     const profile = useSelector(getProfile);
     const completeStep = useSelector(getCompleteStep);
@@ -319,7 +328,7 @@ export default () => {
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
             } @ ${profile.temperatures[index]} °C`}
-            isVisible
+            isVisible={isVisible}
             showSpinner={generatingBatteryModel}
             closeOnEsc={false}
             footer={

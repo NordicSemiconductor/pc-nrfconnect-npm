@@ -39,7 +39,7 @@ import { ProfilingProject } from '../types';
 
 import '../profiling.scss';
 
-export default () => {
+export default ({ isVisible }: { isVisible: boolean }) => {
     const [vLowerCutOff, setLowerVCutOff] = useState(3);
     const [vUpperCutOff, setUpperVCutOff] = useState(4.2);
     const [validName, setValidName] = useState(false);
@@ -62,7 +62,7 @@ export default () => {
     return (
         <GenericDialog
             title={`Battery Profiling ${name.length > 0 ? `- ${name}` : ''}`}
-            isVisible
+            isVisible={isVisible}
             size="sm"
             closeOnEsc={false}
             footer={

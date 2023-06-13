@@ -32,7 +32,7 @@ import {
 } from '../../../features/pmicControl/profilingSlice';
 import { ChargingTemperatureAlert } from './CommonAlerts';
 
-export default () => {
+export default ({ isVisible }: { isVisible: boolean }) => {
     const adcSample = useSelector(getLatestAdcSample);
     const npmDevice = useSelector(getNpmDevice);
     const profile = useSelector(getProfile);
@@ -49,7 +49,7 @@ export default () => {
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
             } @ ${profile.temperatures[index]} °C`}
-            isVisible
+            isVisible={isVisible}
             closeOnEsc={false}
             footer={
                 <>

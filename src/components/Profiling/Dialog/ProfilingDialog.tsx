@@ -31,7 +31,7 @@ import {
 } from './CommonAlerts';
 import StepperProgress from './StepperProgress';
 
-export default () => {
+export default ({ isVisible }: { isVisible: boolean }) => {
     const profile = useSelector(getProfile);
     const capacityConsumed = useSelector(getCapacityConsumed);
     const index = useSelector(getProfileIndex);
@@ -101,7 +101,7 @@ export default () => {
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
             } @ ${profile.temperatures[index]} °C`}
-            isVisible
+            isVisible={isVisible}
             showSpinner
             closeOnEsc={false}
             footer={
