@@ -145,6 +145,7 @@ export default ({
                         />
                         <Button
                             className="ml-2"
+                            large
                             variant="secondary"
                             onClick={() => {
                                 progress.cancel();
