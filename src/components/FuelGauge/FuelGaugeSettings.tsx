@@ -4,30 +4,20 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    Alert,
-    Button,
-    Dropdown,
-    DropdownItem,
-    NumberInlineInput,
-    Slider,
-} from 'pc-nrfconnect-shared';
+import { Alert, Button, Dropdown, DropdownItem } from 'pc-nrfconnect-shared';
 
 import { getProfileBuffer } from '../../actions/fileActions';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     dialogHandler,
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-    updateAdcTimings,
 } from '../../features/pmicControl/npm/pmicHelpers';
 import { BatteryModel } from '../../features/pmicControl/npm/types';
 import {
     canProfile,
     getActiveBatterModel,
-    getFuelGaugeNotChargingSamplingRate,
     getHardcodedBatterModels,
     getLatestAdcSample,
     getNpmDevice,
@@ -44,19 +34,6 @@ export default ({ disabled }: { disabled: boolean }) => {
     const hardcodedBatterModels = useSelector(getHardcodedBatterModels);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
-
-    const fuelGaugeNotChargingSamplingRate = useSelector(
-        getFuelGaugeNotChargingSamplingRate
-    );
-    const [
-        fuelGaugeNotChargingSamplingRateInternal,
-        setFuelGaugeNotChargingSamplingRateInternal,
-    ] = useState(fuelGaugeNotChargingSamplingRate);
-    useEffect(() => {
-        setFuelGaugeNotChargingSamplingRateInternal(
-            fuelGaugeNotChargingSamplingRate
-        );
-    }, [dispatch, fuelGaugeNotChargingSamplingRate]);
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
@@ -215,92 +192,6 @@ export default ({ disabled }: { disabled: boolean }) => {
                     </Button>
                 </DocumentationTooltip>
             )}
-            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row">
-                    <div>Sampling Rate</div>
-
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={fuelGaugeNotChargingSamplingRateInternal}
-                            range={{ min: 500, max: 10000 }}
-                            onChange={value =>
-                                setFuelGaugeNotChargingSamplingRateInternal(
-                                    value
-                                )
-                            }
-                            onChangeComplete={() =>
-                                dispatch(
-                                    updateAdcTimings({
-                                        samplingRate:
-                                            fuelGaugeNotChargingSamplingRateInternal,
-                                    })
-                                )
-                            }
-                            disabled={disabled}
-                        />
-                        <span>ms</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[fuelGaugeNotChargingSamplingRateInternal]}
-                    onChange={[
-                        value =>
-                            setFuelGaugeNotChargingSamplingRateInternal(value),
-                    ]}
-                    onChangeComplete={() =>
-                        dispatch(
-                            updateAdcTimings({
-                                samplingRate:
-                                    fuelGaugeNotChargingSamplingRateInternal,
-                            })
-                        )
-                    }
-                    range={{ min: 500, max: 10000 }}
-                    disabled={disabled}
-                />
-            </div>
-            {/* <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row">
-                    <div>Charging Sampling Rate</div>
-
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={fuelGaugeChargingSamplingRateInternal}
-                            range={{ min: 500, max: 10000 }}
-                            onChange={value =>
-                                setFuelGaugeChargingSamplingRateInternal(value)
-                            }
-                            onChangeComplete={() =>
-                                dispatch(
-                                    updateAdcTimings({
-                                        chargingSamplingRate:
-                                            fuelGaugeChargingSamplingRateInternal,
-                                    })
-                                )
-                            }
-                            disabled={disabled}
-                        />
-                        <span>ms</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[fuelGaugeChargingSamplingRateInternal]}
-                    onChange={[
-                        value =>
-                            setFuelGaugeChargingSamplingRateInternal(value),
-                    ]}
-                    onChangeComplete={() =>
-                        dispatch(
-                            updateAdcTimings({
-                                chargingSamplingRate:
-                                    fuelGaugeChargingSamplingRateInternal,
-                            })
-                        )
-                    }
-                    range={{ min: 500, max: 10000 }}
-                    disabled={disabled}
-                />
-            </div> */}
         </>
     );
 };
