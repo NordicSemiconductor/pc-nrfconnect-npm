@@ -12,6 +12,7 @@ and this project adheres to
 
 -   Open serial terminal button
 -   Alert if VBat > VTerm when profiling
+-   PMIC1300 FP2 Support FW Version 0.7.1+1
 
 ### Changes
 
