@@ -166,9 +166,9 @@ export default ({
                         <span>
                             <strong>{`${
                                 progress.errorLevel === 'warning'
-                                    ? 'Warning'
+                                    ? 'Caution'
                                     : 'Error'
-                            }:`}</strong>{' '}
+                            }`}</strong>{' '}
                             {progress.message}
                         </span>
                         <Button
