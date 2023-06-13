@@ -329,15 +329,7 @@ export const mergeBatteryParams = (
         const resultsFolder = path.join(tempFolder, 'Results');
         fs.mkdirSync(resultsFolder);
 
-        const args = [
-            'merge',
-            '--output-directory',
-            resultsFolder,
-            '--v-cutoff-high',
-            '0',
-            '--v-cutoff-low',
-            '0',
-        ];
+        const args = ['merge', '--output-directory', resultsFolder];
 
         profiles.forEach(profile => {
             if (profile.paramsJson) {
