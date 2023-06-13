@@ -21,7 +21,7 @@ export const DocumentationTooltip = ({
 }: {
     card: string;
     item: string;
-    placement: 'bottom-start' | 'right-start';
+    placement?: 'bottom-start' | 'right-start';
     children: React.ReactElement | string;
 }) => {
     const [keepShowing, setKeepShowing] = useState<boolean>();
