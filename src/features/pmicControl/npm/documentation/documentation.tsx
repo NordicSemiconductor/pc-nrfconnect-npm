@@ -16,10 +16,12 @@ import { documentation as pmic1300Documentation } from './documentationPmic1300'
 export const DocumentationTooltip = ({
     card,
     item,
+    placement = 'bottom-start',
     children,
 }: {
     card: string;
     item: string;
+    placement: 'bottom-start' | 'right-start';
     children: React.ReactElement | string;
 }) => {
     const [keepShowing, setKeepShowing] = useState<boolean>();
@@ -34,7 +36,7 @@ export const DocumentationTooltip = ({
         <div className="tooltip-overlay-trigger-wrapper">
             <OverlayTrigger
                 key="overlay"
-                placement="bottom-end"
+                placement={placement}
                 show={keepShowing}
                 delay={500}
                 overlay={

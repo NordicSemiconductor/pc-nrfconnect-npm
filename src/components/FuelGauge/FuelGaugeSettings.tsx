@@ -94,6 +94,7 @@ export default ({ disabled }: { disabled: boolean }) => {
             <Dropdown
                 label={
                     <DocumentationTooltip
+                        placement="right-start"
                         card="SidePanel"
                         item="ActiveBatteryModel"
                     >
@@ -107,7 +108,11 @@ export default ({ disabled }: { disabled: boolean }) => {
                 selectedItem={selectedActiveItemBatteryMode}
                 disabled={disabled}
             />
-            <DocumentationTooltip card="SidePanel" item="LoadBatteryModel">
+            <DocumentationTooltip
+                placement="right-start"
+                card="SidePanel"
+                item="LoadBatteryModel"
+            >
                 <Button
                     variant="secondary"
                     className="w-100"
@@ -164,7 +169,11 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </Button>
             </DocumentationTooltip>
             {profilingSupported && (
-                <DocumentationTooltip card="SidePanel" item="ProfileBattery">
+                <DocumentationTooltip
+                    placement="right-start"
+                    card="SidePanel"
+                    item="ProfileBattery"
+                >
                     <Button
                         variant="secondary"
                         className="w-100"

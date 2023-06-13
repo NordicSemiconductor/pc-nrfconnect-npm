@@ -56,6 +56,7 @@ export default () => {
                 <DocumentationTooltip
                     card="SidePanel"
                     item="ExportConfiguration"
+                    placement="right-start"
                 >
                     <Button
                         disabled
@@ -67,7 +68,11 @@ export default () => {
                     </Button>
                 </DocumentationTooltip>
 
-                <DocumentationTooltip card="SidePanel" item="LoadConfiguration">
+                <DocumentationTooltip
+                    placement="right-start"
+                    card="SidePanel"
+                    item="LoadConfiguration"
+                >
                     <Button
                         disabled
                         variant="secondary"
@@ -79,7 +84,11 @@ export default () => {
                     </Button>
                 </DocumentationTooltip>
                 <OpenSerialTerminal />
-                <DocumentationTooltip card="SidePanel" item="ResetDevice">
+                <DocumentationTooltip
+                    placement="right-start"
+                    card="SidePanel"
+                    item="ResetDevice"
+                >
                     <Button
                         variant="secondary"
                         disabled={pmicConnection === 'ek-disconnected'}
@@ -89,7 +98,11 @@ export default () => {
                         Reset Device
                     </Button>
                 </DocumentationTooltip>
-                <DocumentationTooltip card="SidePanel" item="RecordEvents">
+                <DocumentationTooltip
+                    placement="right-start"
+                    card="SidePanel"
+                    item="RecordEvents"
+                >
                     <StartStopButton
                         large={false}
                         variant="secondary"
@@ -115,6 +128,13 @@ export default () => {
                         }
                     />
                 </DocumentationTooltip>
+            </CollapsibleGroup>
+            <CollapsibleGroup defaultCollapsed={false} heading="Fuel Gauge">
+                <FuelGaugeSettings
+                    disabled={
+                        pmicConnection === 'ek-disconnected' || uiDisabled
+                    }
+                />
             </CollapsibleGroup>
             <CollapsibleGroup defaultCollapsed={false} heading="Settings">
                 <div
@@ -169,13 +189,6 @@ export default () => {
                         }
                     />
                 </div>
-            </CollapsibleGroup>
-            <CollapsibleGroup defaultCollapsed={false} heading="Fuel Gauge">
-                <FuelGaugeSettings
-                    disabled={
-                        pmicConnection === 'ek-disconnected' || uiDisabled
-                    }
-                />
             </CollapsibleGroup>
             <ConnectionStatus />
         </SidePanel>

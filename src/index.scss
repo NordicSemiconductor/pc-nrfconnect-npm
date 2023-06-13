@@ -87,15 +87,29 @@ label {
 }
 
 .tooltip {
-    div.arrow {
-        top: -6px;
-        width: 12px;
-        height: 12px;
-        pointer-events: none;
+    &.bs-tooltip-bottom {
+        div.arrow {
+            top: -5px;
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+        }
+        div.arrow::before {
+            border-bottom-color: $gray-900;
+            border-width: 0 6px 6px 6px;
+        }
     }
-    div.arrow::before {
-        border-bottom-color: $gray-900;
-        border-width: 0 6px 6px 6px;
+    &.bs-tooltip-right {
+        div.arrow {
+            left: -5px;
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+        }
+        div.arrow::before {
+            border-right-color: $gray-900;
+            border-width: 6px 6px 6px 0;
+        }
     }
     .tooltip-inner {
         background: $gray-900;
@@ -121,4 +135,8 @@ label {
     button[disabled] {
         pointer-events: none;
     }
+}
+
+body {
+    overflow: hidden;
 }
