@@ -204,8 +204,8 @@ export default ({
                         <FormLabel className="flex-row">
                             <DocumentationTooltip card={card} item="RETVOUT">
                                 <div>
-                                    <span>RET</span>
-                                    <span className="subscript">{`VOUT${
+                                    <span>V</span>
+                                    <span className="subscript">{`RET${
                                         index + 1
                                     }`}</span>
                                 </div>

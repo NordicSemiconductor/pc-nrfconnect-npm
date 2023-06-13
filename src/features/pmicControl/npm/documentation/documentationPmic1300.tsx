@@ -354,15 +354,15 @@ export const documentation: Documentation = {
         RETVOUT: {
             title: (
                 <>
-                    <span>RET</span>
-                    <span className="subscript">VOUT1</span>
+                    <span>V</span>
+                    <span className="subscript">RET1</span>
                 </>
             ),
             description: (
                 <p>
                     Configures the retention/sleep mode voltage level of the
-                    BUCK. A GPIO can be configured to select between RET
-                    <span className="subscript">VOUT1</span> and V
+                    BUCK. A GPIO can be configured to select between V
+                    <span className="subscript">RET1</span> and V
                     <span className="subscript">OUT1</span> BUCK voltage level.
                     The GPIO[n] to control this is configured below in
                     “Retention control”.
@@ -443,15 +443,15 @@ export const documentation: Documentation = {
         RETVOUT: {
             title: (
                 <>
-                    <span>RET</span>
-                    <span className="subscript">VOUT1</span>
+                    <span>V</span>
+                    <span className="subscript">RET2</span>
                 </>
             ),
             description: (
                 <p>
                     Configures the retention/sleep mode voltage level of the
-                    BUCK. A GPIO can be configured to select between RET
-                    <span className="subscript">VOUT2</span> and V
+                    BUCK. A GPIO can be configured to select between V
+                    <span className="subscript">RET2</span> and V
                     <span className="subscript">OUT2</span> BUCK voltage level.
                     The GPIO[n] to control this is configured below in
                     “Retention control”.
