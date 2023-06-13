@@ -62,7 +62,7 @@ export default ({
     const message = (
         <span>
             {`Temperature: ${profile.temperature} °C, V`}
-            <span>TERM</span>
+            <span className="subscript">TERM</span>
             {` ${profile.vUpperCutOff} V,  Discharge cut-off voltage: ${profile.vLowerCutOff} V.`}
         </span>
     );
