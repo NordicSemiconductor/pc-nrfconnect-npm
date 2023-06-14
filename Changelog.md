@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.7.4 - 2023-06-14
+
+### Changes
+
+-   UI Improvements
+-   Update to nrfutil-npm-x86_64-unknown-linux-gnu-0.2.0-alpha.5
+
 ## 0.7.3 - 2023-06-13
 
 ### Added
