@@ -121,7 +121,7 @@ export default ({
         >
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <DocumentationTooltip card="charger" item="VTERM">
+                    <DocumentationTooltip card={card} item="VTERM">
                         <div>
                             <span>V</span>
                             <span className="subscript">TERM</span>
@@ -153,7 +153,7 @@ export default ({
             </div>
             <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
                 <FormLabel className="flex-row">
-                    <DocumentationTooltip card="charger" item="ICHG">
+                    <DocumentationTooltip card={card} item="ICHG">
                         <div>
                             <span>I</span>
                             <span className="subscript">CHG</span>
@@ -183,7 +183,7 @@ export default ({
                     <Toggle
                         label={
                             <DocumentationTooltip
-                                card="charger"
+                                card={card}
                                 item="EnableRecharging"
                             >
                                 Enable Recharging
@@ -226,7 +226,7 @@ export default ({
                     <Dropdown
                         label={
                             <DocumentationTooltip
-                                card="charger"
+                                card={card}
                                 item="VTrickleFast"
                             >
                                 <>
@@ -261,7 +261,7 @@ export default ({
                     <Dropdown
                         label={
                             <DocumentationTooltip
-                                card="charger"
+                                card={card}
                                 item="NTCThermistor"
                             >
                                 <span>NTC thermistor</span>
