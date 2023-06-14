@@ -19,6 +19,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { selectDirectoryDialog } from '../../../actions/fileActions';
+import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     CCProfile,
     NTCThermistor,
@@ -183,10 +184,12 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 </div>
                 <div className="slider-container">
                     <FormLabel className="flex-row">
-                        <div>
-                            <span>V</span>
-                            <span className="subscript">TERM</span>
-                        </div>
+                        <DocumentationTooltip card="charger" item="VTERM">
+                            <div>
+                                <span>V</span>
+                                <span className="subscript">TERM</span>
+                            </div>
+                        </DocumentationTooltip>
                         <div className="flex-row">
                             <NumberInlineInput
                                 value={vUpperCutOff}
@@ -276,10 +279,12 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 </div>
                 <div className="slider-container">
                     <FormLabel className="flex-row">
-                        <div>
-                            <span>I</span>
-                            <span className="subscript">CHG</span>
-                        </div>
+                        <DocumentationTooltip card="charger" item="ICHG">
+                            <div>
+                                <span>I</span>
+                                <span className="subscript">CHG</span>
+                            </div>
+                        </DocumentationTooltip>
                         <div className="flex-row">
                             <NumberInlineInput
                                 value={ratedChargingCurrent}
@@ -299,7 +304,14 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     />
                 </div>
                 <Dropdown
-                    label="NTC thermistor"
+                    label={
+                        <DocumentationTooltip
+                            card="charger"
+                            item="NTCThermistor"
+                        >
+                            <span>NTC thermistor</span>
+                        </DocumentationTooltip>
+                    }
                     items={ntcThermistorItems}
                     onSelect={item =>
                         setNTCThermistor(item.value as NTCThermistor)
