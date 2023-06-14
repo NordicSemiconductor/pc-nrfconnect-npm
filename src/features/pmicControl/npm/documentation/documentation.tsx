@@ -17,11 +17,13 @@ export const DocumentationTooltip = ({
     card,
     item,
     placement = 'bottom-start',
+    keepShowingOnHoverTooltip = false,
     children,
 }: {
     card: string;
     item: string;
     placement?: 'bottom-start' | 'right-start';
+    keepShowingOnHoverTooltip?: boolean;
     children: React.ReactElement | string;
 }) => {
     const [keepShowing, setKeepShowing] = useState<boolean>();
@@ -45,7 +47,9 @@ export const DocumentationTooltip = ({
                         className="tooltip"
                         show={keepShowing}
                         onMouseEnter={() => {
-                            setKeepShowing(true);
+                            if (keepShowingOnHoverTooltip) {
+                                setKeepShowing(true);
+                            }
                         }}
                         onMouseLeave={() => {
                             setKeepShowing(undefined);

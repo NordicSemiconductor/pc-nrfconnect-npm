@@ -173,6 +173,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                     placement="right-start"
                     card="SidePanel"
                     item="ProfileBattery"
+                    keepShowingOnHoverTooltip
                 >
                     <Button
                         variant="secondary"
