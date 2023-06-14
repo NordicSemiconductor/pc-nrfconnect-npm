@@ -8,7 +8,7 @@ import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, writeFileSync } from 'fs';
 import path from 'path';
-import { ConfirmationDialog } from 'pc-nrfconnect-shared';
+import { Alert, ConfirmationDialog } from 'pc-nrfconnect-shared';
 
 import {
     addConfirmBeforeClose,
@@ -90,7 +90,8 @@ export default () => {
             dispatch(
                 addConfirmBeforeClose({
                     id: 'PROFILING_WIZARD',
-                    message: 'Profiling is currently ongoing.',
+                    message:
+                        ' Battery profiling is ongoing. All profiling data will be lost if you close the app. ',
                     onClose() {
                         dispatch(closeProfiling());
                     },
@@ -173,7 +174,7 @@ export default () => {
                 dispatch(
                     setCompleteStep({
                         level: 'danger',
-                        message: ` Process was interrupted due to USB PMIC connected while ${profilingStage}.`,
+                        message: ` The profiling process was interrupted, as USB PMIC was connected while ${profilingStage}.`,
                     })
                 );
             } else if (fuelGauge) {
@@ -182,7 +183,7 @@ export default () => {
                 dispatch(
                     setCompleteStep({
                         level: 'danger',
-                        message: ` Process was interrupted due to Fuel Gauge being turned on while ${profilingStage}.`,
+                        message: ` The profiling process was interrupted, as Fuel Gauge was turned on while ${profilingStage}.`,
                     })
                 );
             } else if (!batteryConnected) {
@@ -191,7 +192,7 @@ export default () => {
                 dispatch(
                     setCompleteStep({
                         level: 'danger',
-                        message: ` Process was interrupted due to battery being disconnected while ${profilingStage}.`,
+                        message: `  The profiling process was interrupted, as battery was disconnected while ${profilingStage}.`,
                     })
                 );
             } else if (ldos.filter(ldo => ldo.enabled).length > 0) {
@@ -200,7 +201,7 @@ export default () => {
                 dispatch(
                     setCompleteStep({
                         level: 'danger',
-                        message: ` Process was interrupted due to LDO being enabled while ${profilingStage}.`,
+                        message: ` The profiling process was interrupted, as LDO was enabled while ${profilingStage}.`,
                     })
                 );
             } else if (bucks.length && bucks[0].enabled) {
@@ -209,7 +210,7 @@ export default () => {
                 dispatch(
                     setCompleteStep({
                         level: 'danger',
-                        message: ` Process was interrupted due to Buck being enabled while ${profilingStage}.`,
+                        message: ` The profiling process was interrupted, as Buck was enabled while ${profilingStage}.`,
                     })
                 );
             }
@@ -290,9 +291,11 @@ export default () => {
                         dispatch(clearAbortAction());
                     }}
                 >
-                    Aborting profiling now will terminate the ongoing step and
-                    close this profiling session. Progress will be lost. Are you
-                    sure you want to abort profiling?
+                    <Alert variant="warning" label="Caution: ">
+                        Aborting profiling now will terminate the ongoing step
+                        and close this profiling session. Progress will be lost.
+                        Are you sure you want to abort profiling?
+                    </Alert>
                 </ConfirmationDialog>
             )}
             {profilingStage === 'MissingSyncBoard' && (

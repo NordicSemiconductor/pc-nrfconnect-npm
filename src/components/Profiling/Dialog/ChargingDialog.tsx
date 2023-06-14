@@ -187,26 +187,26 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     </Alert>
                 )}
                 {!batteryFull && !usbPowered && (
-                    <Alert label="Action: " variant="warning">
-                        Please connect USB PMIC to continue
+                    <Alert label="Action required: " variant="warning">
+                        You must connect USB PMIC to continue
                     </Alert>
                 )}
                 {batteryFull && usbPowered && (
-                    <Alert label="Action: " variant="warning">
-                        Please disconnect USB PMIC to continue
+                    <Alert label="Action required: " variant="warning">
+                        You must disconnect USB PMIC to continue
                     </Alert>
                 )}
                 {batteryFull && !usbPowered && (
-                    <Alert label="Action: " variant="warning">
-                        Please click continue
+                    <Alert label="Action required: " variant="warning">
+                        Click continue
                     </Alert>
                 )}
                 {!batteryFull && !chargers[0]?.enabled && (
                     <Alert label="" variant="warning">
                         <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
                             <span>
-                                <strong>Action:</strong> Charging has been
-                                turned off.
+                                <strong>Action required:</strong> Charging has
+                                been turned off.
                             </span>
                             <Button
                                 variant="custom"

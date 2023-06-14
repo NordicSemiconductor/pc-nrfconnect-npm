@@ -34,12 +34,12 @@ export default ({ project }: { project: ProjectPathPair }) => {
             }
         >
             {project.error === 'fileMissing' && (
-                <Alert label="Error " variant="danger">
+                <Alert label="Error: " variant="danger">
                     Project settings could not be found
                 </Alert>
             )}
             {project.error === 'fileCorrupted' && (
-                <Alert label="Error " variant="danger">
+                <Alert label="Error: " variant="danger">
                     Project settings are corrupt or not valid format
                 </Alert>
             )}

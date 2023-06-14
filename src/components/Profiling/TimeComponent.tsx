@@ -105,7 +105,7 @@ export default ({
                               )} (estimated)` // don't show seconds
                             : ''}
                         {progress >= 100 ? 'Remaining time: almost done' : ''}
-                        {progress <= 0 ? 'Remaining time: calculating' : ''}
+                        {progress <= 0 ? 'Remaining time: calculating…' : ''}
                     </span>
                     <br />
                 </div>

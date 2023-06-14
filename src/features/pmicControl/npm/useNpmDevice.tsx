@@ -368,7 +368,7 @@ export default () => {
                                             <div>Load battery profile.</div>
                                             <br />
                                             <Alert
-                                                label="Warning "
+                                                label="Caution: "
                                                 variant="warning"
                                             >
                                                 {payload.alertMessage}
@@ -387,7 +387,7 @@ export default () => {
                                             <div>Load battery profile.</div>
                                             <br />
                                             <Alert
-                                                label="Success "
+                                                label="Success: "
                                                 variant="success"
                                             >
                                                 {payload.alertMessage}
@@ -406,7 +406,7 @@ export default () => {
                                             <div>Load battery profile.</div>
                                             <br />
                                             <Alert
-                                                label="Error "
+                                                label="Error: "
                                                 variant="danger"
                                             >
                                                 {payload.alertMessage}

@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentWindow } from '@electron/remote';
-import { ConfirmationDialog } from 'pc-nrfconnect-shared';
+import { Alert, ConfirmationDialog } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import { TDispatch } from '../../thunk';
@@ -79,8 +79,9 @@ export default () => {
                 setConfirmedDialogs([]);
             }}
         >
-            {`${nextConfirmDialog?.message} Any progress will be lost.
-                Are you sure you want to close the app?`}
+            <Alert variant="warning" label="Caution: ">
+                {`${nextConfirmDialog?.message} Are you sure you want to close the app?`}
+            </Alert>
         </ConfirmationDialog>
     );
 };

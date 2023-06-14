@@ -141,8 +141,9 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     </Alert>
                 )}
                 {pmicConnectionState === 'pmic-disconnected' && (
-                    <Alert label="Caution: " variant="warning">
-                        PMIC is not powered.
+                    <Alert label="Action required: " variant="warning">
+                        You must power the PMIC. Connect the battery and USB
+                        PMIC.
                     </Alert>
                 )}
                 {pmicConnectionState === 'pmic-pending-reboot' && (
@@ -172,13 +173,13 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 {pmicConnectionState === 'pmic-connected' && (
                     <>
                         {!usbPowered && (
-                            <Alert label="Action: " variant="warning">
-                                Please connect USB PMIC to continue
+                            <Alert label="Action required: " variant="warning">
+                                You must connect USB PMIC to continue
                             </Alert>
                         )}
                         {!batteryConnected && (
                             <Alert label="Caution: " variant="warning">
-                                Battery is not detected. Make sure it is
+                                No battery is detected. Make sure battery is
                                 connected to the Evaluation Kit before you
                                 continue
                             </Alert>

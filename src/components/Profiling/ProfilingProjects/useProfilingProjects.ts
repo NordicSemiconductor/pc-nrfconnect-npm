@@ -36,7 +36,8 @@ export const useProfilingProjects = () => {
             dispatch(
                 addConfirmBeforeClose({
                     id: 'NRF_UTIL_PROCESSING',
-                    message: 'Processing ongoing.',
+                    message:
+                        'Processing is ongoing. All progress will be lost if you close the app.',
                     onClose() {
                         progress.forEach(prog => {
                             prog.cancel();

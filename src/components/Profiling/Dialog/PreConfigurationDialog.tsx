@@ -43,7 +43,7 @@ export default () => {
             }
         >
             <Group>
-                <Alert label="Error " variant="danger">
+                <Alert label="Error: " variant="danger">
                     nPM-FG board is not connected. Turn off Evaluation Kit and
                     connect nPM-FG to the Evaluation Kit
                 </Alert>

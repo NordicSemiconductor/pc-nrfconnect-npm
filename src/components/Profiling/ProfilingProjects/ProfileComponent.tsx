@@ -73,7 +73,7 @@ export default ({
                 <div className="flex-grow-1 mr-4">
                     {!dataCollected && (
                         <Alert variant="warning">
-                            <strong>Profile is incomplete </strong>
+                            <strong>Profile is incomplete: </strong>
                             {message}
                         </Alert>
                     )}
@@ -91,7 +91,7 @@ export default ({
                         !profile.paramsJson &&
                         !progress && (
                             <Alert variant="info">
-                                <strong>Requirers processing </strong>
+                                <strong>Requires processing: </strong>
                                 <span>{message}</span>
                             </Alert>
                         )}

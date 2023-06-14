@@ -131,7 +131,7 @@ export default ({
                 },
                 {
                     id: '2',
-                    caption: 'Try Again',
+                    caption: 'Press to try again',
                     action: () => dispatch(startProcessingCsv(profile, index)),
                 },
             ];

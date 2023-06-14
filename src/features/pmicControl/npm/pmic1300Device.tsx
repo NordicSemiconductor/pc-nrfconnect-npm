@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import React from 'react';
 import EventEmitter from 'events';
 
 import { getRange } from '../../../utils/helpers';
@@ -1046,8 +1047,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-1',
-                    message: `Buck 2 Powers the I2C communications that is needed for this app. 
-                    Any voltage lower that 1.7 V Might cause issues with the Connection to the app. Are you sure you want to continue?`,
+                    message: `Buck 2 powers the I2C communication required by this app. A voltage lower than 1.7 V might cause issues with the app connection. 
+                    Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, don't ask again",
                     cancelLabel: 'No',
@@ -1123,8 +1124,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
-                    message: `Buck 2 Powers the I2C communications that is needed for this app. 
-                    Software voltage might be already set to less then 1.7 V . Are you sure you want to continue?`,
+                    message: `Buck 2 powers the I2C communication required by this app. A software voltage might be already set to less then 1.7 V . Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, don't ask again",
                     cancelLabel: 'No',
@@ -1335,10 +1335,58 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             pmicState !== 'ek-disconnected' &&
             mode === 'LDO'
         ) {
-            const ldo1Message =
-                'Please ensure correct nPM1300-EK configuration before enabling LDO1. Connect LDO bypass capacitors by connecting the LDO1 jumper on P16. Disconnect VOUT1-LSIN1 and HIGH-LSOUT1 jumpers on P15. Ensure IN1, on P8, is connected to a source that is between 2.6V and 5.5V, for example Vsys.';
-            const ldo2Message =
-                'Please ensure correct nPM1300-EK configuration before enabling LDO2. Connect LDO bypass capacitors by connecting the LDO2 jumper on P16. Disconnect VOUT2-LSIN2 and LOW-LSOUT2 jumpers on P15. Ensure IN2, on P8, is connected to a source that is between 2.6V and 5.5V, for example Vsys.';
+            const ldo1Message = (
+                <span>
+                    Before enabling LDO1, configure the nPM1300-EK as follows:
+                    <ul>
+                        <li>
+                            Connect LDO bypass capacitors by connecting the LDO1
+                            jumper on P16.
+                        </li>
+                        <li>
+                            Disconnect V<span className="subscript">OUT1</span>{' '}
+                            - LS
+                            <span className="subscript">IN1</span>.
+                        </li>
+                        <li>
+                            Disconnect HIGH - LS
+                            <span className="subscript">OUT1</span> jumpers on
+                            P15.
+                        </li>
+                        <li>
+                            Ensure IN1, on P8, is connected to a source that is
+                            between 2.6 V and 5.5 V, for example V
+                            <span className="subscript">SYS</span>.
+                        </li>
+                    </ul>
+                </span>
+            );
+            const ldo2Message = (
+                <span>
+                    Before enabling LDO2, configure the nPM1300-EK as follows:
+                    <ul>
+                        <li>
+                            Connect LDO bypass capacitors by connecting the LDO2
+                            jumper on P16.
+                        </li>
+                        <li>
+                            Disconnect V<span className="subscript">OUT2</span>{' '}
+                            - LS
+                            <span className="subscript">IN2</span>.
+                        </li>
+                        <li>
+                            Disconnect LOW - LS
+                            <span className="subscript">OUT2</span> jumpers on
+                            P15.
+                        </li>
+                        <li>
+                            Ensure IN2, on P8, is connected to a source that is
+                            between 2.6 V and 5.5 V, for example V
+                            <span className="subscript">SYS</span>.
+                        </li>
+                    </ul>
+                </span>
+            );
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',

@@ -10,7 +10,7 @@ import { Alert } from 'pc-nrfconnect-shared';
 export const RestingProfilingAlerts = () => (
     <>
         <Alert variant="warning" label="Caution: ">
-            Modifying device configuration during profiling will abort the
+            Modifying the device configuration during profiling aborts the
             ongoing temperature profile.
         </Alert>
         <Alert variant="info" label="Note: ">
@@ -61,7 +61,7 @@ export const ChargingTemperatureAlert = ({
         showOnWarning={showOnWarning}
         expectedTemperature={expectedTemperature}
         currentTemperature={currentTemperature}
-        message={`Make sure battery is at room temperature before charging (20 °C - 25 °C). Current NTC temperature ${
+        message={`Before charging, Make sure battery is at room temperature (20 °C - 25 °C). The current NTC temperature is ${
             currentTemperature ?? NaN
         } °C`}
     />
