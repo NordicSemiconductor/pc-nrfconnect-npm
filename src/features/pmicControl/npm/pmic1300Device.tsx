@@ -1046,10 +1046,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-1',
-                    message: `Buck 2 Powers the I2C communications that are needed for this app. 
-                    Any voltage lower that 1.7v Might cause issues with the Connection to the app. Are you sure you want to continue`,
+                    message: `Buck 2 Powers the I2C communications that is needed for this app. 
+                    Any voltage lower that 1.7 V Might cause issues with the Connection to the app. Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
-                    optionalLabel: "Yes, Don't ask again",
+                    optionalLabel: "Yes, don't ask again",
                     cancelLabel: 'No',
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
@@ -1123,10 +1123,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
-                    message: `Buck 2 Powers the I2C communications that are needed for this app. 
-                    Software voltage might be already set to less then 1.7V . Are you sure you want to continue`,
+                    message: `Buck 2 Powers the I2C communications that is needed for this app. 
+                    Software voltage might be already set to less then 1.7 V . Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
-                    optionalLabel: "Yes, Don't ask again",
+                    optionalLabel: "Yes, don't ask again",
                     cancelLabel: 'No',
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
@@ -1244,9 +1244,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckEnabled-1',
                     message: `Disabling the buck 2 might effect I2C communications to the PMIC 1300 chip and hance you might get 
-                disconnected from the app. Are you sure you want to proceed?`,
+                disconnected from the app. Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
-                    optionalLabel: "Yes, Don't ask again",
+                    optionalLabel: "Yes, don't ask again",
                     cancelLabel: 'No',
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
@@ -1344,8 +1344,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     type: 'alert',
                     doNotAskAgainStoreID: `pmic1300-setLdoMode-${index}`,
                     message: index === 0 ? ldo1Message : ldo2Message,
-                    confirmLabel: 'Ok',
-                    optionalLabel: "Ok, Don't ask again",
+                    confirmLabel: 'OK',
+                    optionalLabel: "OK, don't ask again",
                     cancelLabel: 'Cancel',
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
@@ -1603,7 +1603,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     }. Device is running a different version. 
                     ${baseDevice.getSupportedVersion()}. Do you still want to apply this configuration?`,
                     confirmLabel: 'Yes',
-                    optionalLabel: "Yes, Don't ask again",
+                    optionalLabel: "Yes, don't ask again",
                     cancelLabel: 'No',
                     title: 'Warning',
                     onConfirm: action,
