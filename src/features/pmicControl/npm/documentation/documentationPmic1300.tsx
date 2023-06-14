@@ -34,6 +34,11 @@ export const documentation: Documentation = {
                         , measured by nPM1300’s ADC.
                     </p>
                     <p>
+                        The current measurement is designed to satisfy the
+                        requirements of the fuel gauge algorithm. It is not
+                        intended to be used for accurate current measurements.
+                    </p>
+                    <p>
                         A positive value indicates a load on the battery - it is
                         discharging, while a negative value indicates that the
                         battery is being charged.
