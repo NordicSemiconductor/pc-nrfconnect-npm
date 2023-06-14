@@ -33,7 +33,6 @@ interface pmicControlState {
     fuelGauge: boolean;
     supportedVersion?: boolean;
     dialog: PmicDialog[];
-    eventRecording: boolean;
     eventRecordingPath?: string;
     activeBatterModel?: BatteryModel;
     hardcodedBatterModels: BatteryModel[];
@@ -63,7 +62,6 @@ const initialState: pmicControlState = {
     fuelGauge: false,
     hardcodedBatterModels: [],
     dialog: [],
-    eventRecording: false,
     usbPowered: false,
     profilingState: 'Off',
     fuelGaugeChargingSamplingRate: 500,
@@ -82,6 +80,7 @@ const pmicControlSlice = createSlice({
 
             return {
                 ...initialState,
+                eventRecordingPath: state.eventRecordingPath,
                 npmDevice: action.payload,
             };
         },
@@ -165,11 +164,11 @@ const pmicControlSlice = createSlice({
         dequeueDialog(state) {
             state.dialog = [...state.dialog.slice(1)];
         },
-        setEventRecordingPath(
-            state,
-            action: PayloadAction<string | undefined>
-        ) {
+        setEventRecordingPath(state, action: PayloadAction<string>) {
             state.eventRecordingPath = action.payload;
+        },
+        stopEventRecording(state) {
+            state.eventRecordingPath = undefined;
         },
         setUsbPowered(state, action: PayloadAction<boolean>) {
             state.usbPowered = action.payload;
@@ -279,6 +278,7 @@ export const {
     requestDialog,
     dequeueDialog,
     setEventRecordingPath,
+    stopEventRecording,
     setUsbPowered,
     setFuelGaugeChargingSamplingRate,
     setFuelGaugeNotChargingSamplingRate,

@@ -29,6 +29,7 @@ import {
     openDevice,
 } from '../actions/deviceActions';
 import { getNpmDevice } from '../features/pmicControl/npm/npmFactory';
+import { stopEventRecording } from '../features/pmicControl/pmicControlSlice';
 import { closeProfiling } from '../features/pmicControl/profilingSlice';
 import {
     hookModemToShellParser,
@@ -224,6 +225,7 @@ const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
         logger.info('Deselected device');
         dispatch(closeDevice());
         dispatch(closeProfiling());
+        dispatch(stopEventRecording());
     },
     onDeviceIsReady: (device: Device) => {
         logger.info(

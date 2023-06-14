@@ -29,6 +29,7 @@ import {
     getNpmDevice,
     getPmicState,
     setEventRecordingPath,
+    stopEventRecording,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import FuelGaugeSettings from '../FuelGauge/FuelGaugeSettings';
@@ -110,22 +111,16 @@ export default () => {
                         startText="Record Events"
                         stopText="Stop Recording"
                         onClick={() => {
-                            if (
-                                eventRecordingPath === undefined ||
-                                eventRecordingPath.length === 0
-                            ) {
+                            if (!eventRecordingPath) {
                                 selectDirectoryDialog().then(filePath =>
                                     dispatch(setEventRecordingPath(filePath))
                                 );
                             } else {
-                                dispatch(setEventRecordingPath(''));
+                                dispatch(stopEventRecording());
                             }
                         }}
                         disabled={pmicConnection === 'ek-disconnected'}
-                        started={
-                            eventRecordingPath !== undefined &&
-                            eventRecordingPath.length > 0
-                        }
+                        started={!!eventRecordingPath}
                     />
                 </DocumentationTooltip>
             </CollapsibleGroup>

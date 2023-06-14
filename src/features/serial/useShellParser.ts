@@ -14,7 +14,6 @@ import {
 } from '../../hooks/commandParser';
 import { noop } from '../pmicControl/npm/pmicHelpers';
 import useNpmDevice from '../pmicControl/npm/useNpmDevice';
-import { setEventRecordingPath } from '../pmicControl/pmicControlSlice';
 import {
     getSerialPort,
     getShellParser,
@@ -70,12 +69,6 @@ export default () => {
         };
         init().catch(console.error);
     }, [dispatch, serialPort]);
-
-    useEffect(() => {
-        if (shellParserO === undefined) {
-            dispatch(setEventRecordingPath(undefined));
-        }
-    }, [dispatch, shellParserO]);
 
     useEffect(
         () =>
