@@ -16,6 +16,7 @@ import {
 import {
     getNpmDevice,
     getPmicState,
+    isBatteryConnected,
     isSupportedVersion,
     isUsbPowered,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -35,6 +36,7 @@ export default () => {
     const ccProfilingState = useSelector(getCcProfilingState);
     const npmDevice = useSelector(getNpmDevice);
     const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
+    const batteryConnected = useSelector(isBatteryConnected);
     const dispatch = useDispatch();
 
     const [pauseFor10Ms, setPauseFor100ms] = useState(paused);
@@ -138,7 +140,11 @@ export default () => {
             ];
             pmicStep.state = 'warning';
         } else if (!usbPowered) {
-            pmicStep.caption = 'Not powered with USB';
+            pmicStep.caption =
+                'Not powered by USB PMIC. Charging is not possible';
+            pmicStep.state = 'warning';
+        } else if (!batteryConnected) {
+            pmicStep.caption = 'Battery not detected';
             pmicStep.state = 'warning';
         } else {
             pmicStep.state = 'success';
