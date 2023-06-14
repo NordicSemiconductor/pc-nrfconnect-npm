@@ -93,16 +93,19 @@ const SideText = ({
 
             {batteryConnected && (
                 <>
-                    <h2>
-                        {fuelGauge &&
-                        latestAdcSample &&
-                        !Number.isNaN(latestAdcSample.soc)
-                            ? `${Math.min(
-                                  100,
-                                  Math.max(latestAdcSample.soc ?? 0, 0)
-                              ).toFixed(1)} %`
-                            : 'N/A %'}
-                    </h2>
+                    <DocumentationTooltip card={card} item="StateOfCharge">
+                        <h2>
+                            {fuelGauge &&
+                            latestAdcSample &&
+                            !Number.isNaN(latestAdcSample.soc)
+                                ? `${Math.min(
+                                      100,
+                                      Math.max(latestAdcSample.soc ?? 0, 0)
+                                  ).toFixed(1)} %`
+                                : 'N/A %'}
+                        </h2>
+                    </DocumentationTooltip>
+
                     {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) ? (
                         <div className="line-wrapper">
                             <DocumentationTooltip card={card} item="TimeToFull">

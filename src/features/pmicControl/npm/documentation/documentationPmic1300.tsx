@@ -136,6 +136,19 @@ export const documentation: Documentation = {
                 </>
             ),
         },
+        StateOfCharge: {
+            title: 'State Of Charge',
+            description: (
+                <>
+                    <p>
+                        Battery voltage, current, and temperature is used to
+                        calculate the battery state-of-charge.
+                    </p>
+                    <p className="title font-weight-bold">Range</p>
+                    <p>0% to 100%, in 0.1% steps</p>
+                </>
+            ),
+        },
     },
     charger: {
         Charger: {

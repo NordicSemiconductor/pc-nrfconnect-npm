@@ -25,6 +25,7 @@ import {
 } from 'chart.js';
 import { Button, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { AdcSample } from '../../features/pmicControl/npm/types';
 import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import canvasAreaNotifier from '../../utils/chart/canvasAreaNotifier';
@@ -302,6 +303,12 @@ export default ({ active }: PaneProps) => {
             data: [chartDataVBat, chartDataIBat, chartDataTBat, chartDataSoc],
             refs: [refVBat, refIBat, refTBat, refSoc],
             labels: ['Voltage', 'Current', 'Temperature', 'State of Charge'],
+            tooltip: [
+                { card: 'batteryStatus', item: 'Voltage' },
+                { card: 'batteryStatus', item: 'Current' },
+                { card: 'batteryStatus', item: 'Temperature' },
+                { card: 'battery', item: 'StateOfCharge' },
+            ],
         }),
         [
             chartIBat,
@@ -465,11 +472,16 @@ export default ({ active }: PaneProps) => {
             </div>
             {chartMetaData.charts.map((_, index) => (
                 <Fragment key={chartMetaData.labels[index]}>
-                    <div className="text-center">
+                    <div className="d-flex justify-content-center">
                         <span>
-                            <strong>
-                                <u>{chartMetaData.labels[index]}</u>
-                            </strong>
+                            <DocumentationTooltip
+                                card={chartMetaData.tooltip[index].card}
+                                item={chartMetaData.tooltip[index].item}
+                            >
+                                <strong>
+                                    <u>{chartMetaData.labels[index]}</u>
+                                </strong>
+                            </DocumentationTooltip>
                         </span>
                     </div>
                     <div className="graph-container">
