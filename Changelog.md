@@ -8,10 +8,20 @@ and this project adheres to
 
 ## 0.7.4 - 2023-06-14
 
+### Added
+
+-   PMIC1300 FP2 Support FW Version 0.7.1+2
+-   Profiling Wizard tooltips
+
 ### Changes
 
 -   UI Improvements
 -   Update to nrfutil-npm-x86_64-unknown-linux-gnu-0.2.0-alpha.5
+-   Profiling temperature now only allow 0 °C - 60 °C
+
+### Fixed
+
+-   Graph temperature Y-Axis
 
 ## 0.7.3 - 2023-06-13
 
