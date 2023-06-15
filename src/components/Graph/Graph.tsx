@@ -223,7 +223,7 @@ export default ({ active }: PaneProps) => {
                     position: 'left',
                     ticks: {
                         callback(value) {
-                            return `${value} °C`;
+                            return `${Number(value).toFixed(2)} °C`;
                         },
                         maxTicksLimit: 5,
                     },
