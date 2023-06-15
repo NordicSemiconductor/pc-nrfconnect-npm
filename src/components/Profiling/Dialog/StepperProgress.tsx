@@ -85,7 +85,7 @@ export default ({
 
         const stepProcessing: Step = {
             id: `DataProcessing${index}`,
-            title: `Data Processing for ${temp} °C`,
+            title: `Data Processing ${temp} °C`,
             caption: `${
                 processingCSVProgress?.message
                     ? `${processingCSVProgress?.message}`
@@ -127,7 +127,7 @@ export default ({
             stepProcessing.caption = [
                 {
                     id: '1',
-                    caption: processingCSVProgress.message ?? 'Failed.',
+                    caption: 'Failed.',
                 },
                 {
                     id: '2',
