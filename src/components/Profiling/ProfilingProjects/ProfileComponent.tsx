@@ -167,8 +167,8 @@ export default ({
                         <span>
                             <strong>{`${
                                 progress.errorLevel === 'warning'
-                                    ? 'Caution'
-                                    : 'Error'
+                                    ? 'Caution:'
+                                    : 'Error:'
                             }`}</strong>{' '}
                             {progress.message}
                         </span>
