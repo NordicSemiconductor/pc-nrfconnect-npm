@@ -187,9 +187,9 @@ export const npmDeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 })
                 .catch(reject);
         }),
-    tryToSwitchToApplicationMode: device => () =>
-        new Promise<Device>(resolve => {
-            resolve(device);
+    tryToSwitchToApplicationMode: () => () =>
+        new Promise<Device | null>(resolve => {
+            resolve(null);
         }),
 });
 
