@@ -95,7 +95,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 label={
                     <DocumentationTooltip
                         placement="right-start"
-                        card="SidePanel"
+                        card="sidePanel"
                         item="ActiveBatteryModel"
                     >
                         Active Battery Model
@@ -110,7 +110,7 @@ export default ({ disabled }: { disabled: boolean }) => {
             />
             <DocumentationTooltip
                 placement="right-start"
-                card="SidePanel"
+                card="sidePanel"
                 item="LoadBatteryModel"
             >
                 <Button
@@ -171,7 +171,7 @@ export default ({ disabled }: { disabled: boolean }) => {
             {profilingSupported && (
                 <DocumentationTooltip
                     placement="right-start"
-                    card="SidePanel"
+                    card="sidePanel"
                     item="ProfileBattery"
                     keepShowingOnHoverTooltip
                 >
