@@ -340,8 +340,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         <NumberInlineInput
                                             value={temp}
                                             range={{
-                                                min: -45,
-                                                max: 85,
+                                                min: 0,
+                                                max: 60,
                                             }}
                                             onChange={value => {
                                                 const data = [...temperatures];
@@ -362,8 +362,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         },
                                     ]}
                                     range={{
-                                        min: -45,
-                                        max: 85,
+                                        min: 0,
+                                        max: 60,
                                     }}
                                 />
                             </div>
