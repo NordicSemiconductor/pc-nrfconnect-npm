@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import React from 'react';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
@@ -162,8 +163,16 @@ export const generateParamsFromCSV =
                             updateProjectProfileProgress({
                                 path: projectAbsolutePath,
                                 index,
-                                message:
-                                    'Battery voltage does not cross the defined low cut off voltage. Please define higher cut off level and run again.',
+                                message: (
+                                    <span>
+                                        Battery voltage does not cross the
+                                        defined V
+                                        <span className="subscript">TERM</span>.
+                                        Please define higher V
+                                        <span className="subscript">TERM</span>{' '}
+                                        and run again.
+                                    </span>
+                                ),
                                 errorLevel: 'error',
                                 cancel: () => {
                                     dispatch(
