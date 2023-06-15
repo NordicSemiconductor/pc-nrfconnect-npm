@@ -38,7 +38,7 @@ export default () => {
     useProfilingProjects();
 
     return (
-        <div className="profiles-container d-flex flex-column">
+        <div className="projects-container d-flex flex-column">
             <DropdownButton
                 className="align-self-end mr-3"
                 variant="secondary"
