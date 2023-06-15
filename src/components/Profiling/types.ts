@@ -13,7 +13,7 @@ export type ProjectPathPair = {
 export type ProfilingCSVProgress = {
     path: string;
     index: number;
-    message: React.ReactNode;
+    message: string;
     progress?: number;
     errorLevel?: 'warning' | 'error';
     cancel: () => void;

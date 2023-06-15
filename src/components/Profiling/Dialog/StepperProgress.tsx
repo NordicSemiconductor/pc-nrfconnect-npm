@@ -127,7 +127,7 @@ export default ({
             stepProcessing.caption = [
                 {
                     id: '1',
-                    caption: 'Failed.',
+                    caption: processingCSVProgress.message ?? `Failed.`,
                 },
                 {
                     id: '2',

@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
@@ -163,16 +162,7 @@ export const generateParamsFromCSV =
                             updateProjectProfileProgress({
                                 path: projectAbsolutePath,
                                 index,
-                                message: (
-                                    <span>
-                                        Battery voltage does not cross the
-                                        defined V
-                                        <span className="subscript">TERM</span>.
-                                        Please define higher V
-                                        <span className="subscript">TERM</span>{' '}
-                                        and run again.
-                                    </span>
-                                ),
+                                message: `The smallest voltage in the collected profile data is bigger than the defined discharged cutoff voltage. Please define a correct discharged cutoff voltage and run again.`,
                                 errorLevel: 'error',
                                 cancel: () => {
                                     dispatch(
