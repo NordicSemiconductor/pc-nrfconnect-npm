@@ -51,11 +51,13 @@ export default () => {
         setFuelGaugeReportingRateInternal(fuelGaugeReportingRate);
     }, [fuelGaugeReportingRate]);
 
+    const card = 'sidePanel';
+
     return (
         <SidePanel className="side-panel">
             <CollapsibleGroup defaultCollapsed={false} heading="Actions">
                 <DocumentationTooltip
-                    card="SidePanel"
+                    card={card}
                     item="ExportConfiguration"
                     placement="right-start"
                 >
@@ -71,7 +73,7 @@ export default () => {
 
                 <DocumentationTooltip
                     placement="right-start"
-                    card="SidePanel"
+                    card={card}
                     item="LoadConfiguration"
                 >
                     <Button
@@ -87,7 +89,7 @@ export default () => {
                 <OpenSerialTerminal />
                 <DocumentationTooltip
                     placement="right-start"
-                    card="SidePanel"
+                    card={card}
                     item="ResetDevice"
                 >
                     <Button
@@ -101,7 +103,7 @@ export default () => {
                 </DocumentationTooltip>
                 <DocumentationTooltip
                     placement="right-start"
-                    card="SidePanel"
+                    card={card}
                     item="RecordEvents"
                 >
                     <StartStopButton

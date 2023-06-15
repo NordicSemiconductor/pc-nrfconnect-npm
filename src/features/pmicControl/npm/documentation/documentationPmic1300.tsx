@@ -514,7 +514,7 @@ export const documentation: Documentation = {
             ),
         },
     },
-    SidePanel: {
+    sidePanel: {
         ActiveBatteryModel: {
             title: 'Active Battery Model',
             description: (
