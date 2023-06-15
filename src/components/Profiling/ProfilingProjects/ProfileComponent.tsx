@@ -61,7 +61,7 @@ export default ({
 
     const message = (
         <span>
-            {`Temperature: ${profile.temperature} °C, V`}
+            {`Temperature: ${profile.temperature}°C, V`}
             <span className="subscript">TERM</span>
             {` ${profile.vUpperCutOff} V,  Discharge cut-off voltage: ${profile.vLowerCutOff} V.`}
         </span>
@@ -73,7 +73,7 @@ export default ({
                 <div className="flex-grow-1 mr-4">
                     {!dataCollected && (
                         <Alert variant="warning">
-                            <strong>Profile is incomplete: </strong>
+                            <strong>Profile is not complete: </strong>
                             {message}
                         </Alert>
                     )}

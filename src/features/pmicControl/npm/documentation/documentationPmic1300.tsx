@@ -16,7 +16,7 @@ export const documentation: Documentation = {
                 <>
                     <p>
                         Battery voltage, V<span className="subscript">BAT</span>
-                        , measured by nPM1300’s ADC.
+                        , measured by PMIC’s ADC.
                     </p>
                     <p className="title font-weight-bold">
                         Range (V<span className="subscript">BATOP</span>)
@@ -31,7 +31,7 @@ export const documentation: Documentation = {
                 <>
                     <p>
                         Battery current, I<span className="subscript">BAT</span>
-                        , measured by nPM1300’s ADC.
+                        , measured by PMIC’s ADC.
                     </p>
                     <p>
                         The current measurement is designed to satisfy the
@@ -57,7 +57,7 @@ export const documentation: Documentation = {
                     <p>
                         Battery temperature, T
                         <span className="subscript">BAT</span>, measured by
-                        nPM1300’s ADC.
+                        PMIC’s ADC.
                     </p>
                     <p className="title font-weight-bold">Range</p>
                     <p>-40°C to 85°C</p>
@@ -550,8 +550,8 @@ export const documentation: Documentation = {
                     </p>
                     <p>
                         An additional board, nPM-FG, is required to perform
-                        battery profiling. This must be connected to nPM1300-EK
-                        before battery profiling is started.
+                        battery profiling. This must be connected to EK before
+                        battery profiling is started.
                     </p>
                     <p>
                         The battery model can also be included in the NCS or
@@ -580,9 +580,9 @@ export const documentation: Documentation = {
             ),
             description: (
                 <p>
-                    Exports the full configuration of the nPM1300 based on the
-                    nPM PowerUP settings. You can choose to export to NCS or to
-                    a bare-metal project. This also saves the nPM PowerUP
+                    Exports the full configuration of the PMIC based on the nPM
+                    PowerUP settings. You can choose to export to NCS or to a
+                    bare-metal project. This also saves the nPM PowerUP
                     configuration, making it easy to resume by using the “Load
                     Configuration” option.
                 </p>
@@ -607,8 +607,8 @@ export const documentation: Documentation = {
             title: 'Reset Device',
             description: (
                 <p>
-                    Resets the nPM1300 and nPM Controller. The nPM1300 default
-                    device configuration is restored.
+                    Resets the PMIC and nPM Controller. The PMIC default device
+                    configuration is restored.
                 </p>
             ),
         },
@@ -654,9 +654,9 @@ export const documentation: Documentation = {
                         temperatures for best state-of-charge accuracy.
                     </p>
                     <p>
-                        For example, if the application temperature range is 5
-                        °C to 45 °C, we recommend to profile at 5 °C, 25 °C and
-                        45 °C. Range is 0 °C to 65 °C in 1 °C steps.
+                        For example, if the application temperature range is 5°C
+                        to 45°C, we recommend to profile at 5°C, 25°C and 45°C.
+                        Range is 0°C to 65°C in 1°C steps.
                     </p>
                 </>
             ),

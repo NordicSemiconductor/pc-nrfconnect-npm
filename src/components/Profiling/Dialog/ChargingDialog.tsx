@@ -106,7 +106,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
         <GenericDialog
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
-            } @ ${profile.temperatures[index]} °C`}
+            } @ ${profile.temperatures[index]}°C`}
             isVisible={isVisible}
             showSpinner={!batteryFull}
             closeOnEsc={false}
@@ -188,12 +188,13 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 )}
                 {!batteryFull && !usbPowered && (
                     <Alert label="Action required: " variant="warning">
-                        You must connect USB PMIC to continue
+                        You must connect <strong>USB PMIC</strong> to continue
                     </Alert>
                 )}
                 {batteryFull && usbPowered && (
                     <Alert label="Action required: " variant="warning">
-                        You must disconnect USB PMIC to continue
+                        You must disconnect <strong>USB PMIC</strong> to
+                        continue
                     </Alert>
                 )}
                 {batteryFull && !usbPowered && (

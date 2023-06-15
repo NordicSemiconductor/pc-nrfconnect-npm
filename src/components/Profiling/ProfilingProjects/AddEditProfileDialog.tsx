@@ -184,7 +184,7 @@ export default ({
                                     }}
                                     onChange={value => setTemperature(value)}
                                 />
-                                <span>°C </span>
+                                <span>°C</span>
                             </div>
                         </FormLabel>
                         <Slider

@@ -37,7 +37,7 @@ export default ({
     profile.temperatures.forEach((temp, index) => {
         let stepDataCollection: Step = {
             id: `DataCollection${index}`,
-            title: `Profiling ${temp} °C`,
+            title: `Profiling ${temp}°C`,
         };
 
         let dataCollected = false;
@@ -85,7 +85,7 @@ export default ({
 
         const stepProcessing: Step = {
             id: `DataProcessing${index}`,
-            title: `Data Processing ${temp} °C`,
+            title: `Data Processing ${temp}°C`,
             caption: `${
                 processingCSVProgress?.message
                     ? `${processingCSVProgress?.message}`

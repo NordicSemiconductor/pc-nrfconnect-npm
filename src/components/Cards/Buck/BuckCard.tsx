@@ -242,7 +242,7 @@ export default ({
                                 card={card}
                                 item="ModeControl"
                             >
-                                <span>ModeControl</span>
+                                <span>Mode Control</span>
                             </DocumentationTooltip>
                         }
                         items={modeControlItems}

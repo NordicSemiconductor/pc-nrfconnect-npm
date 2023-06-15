@@ -219,7 +219,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     <FormLabel className="flex-row">
                         <DocumentationTooltip card="profiling" item="Capacity">
                             <div>
-                                <span>DischargeCutOff</span>
+                                <span>Discharge cut-off voltage</span>
                             </div>
                         </DocumentationTooltip>
                         <div className="flex-row">
@@ -358,7 +358,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                                 setTemperatures(data);
                                             }}
                                         />
-                                        <span>°C </span>
+                                        <span>°C</span>
                                     </div>
                                 </FormLabel>
                                 <Slider

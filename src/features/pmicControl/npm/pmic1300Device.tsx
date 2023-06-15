@@ -1243,7 +1243,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckEnabled-1',
-                    message: `Disabling the buck 2 might effect I2C communications to the PMIC 1300 chip and hance you might get 
+                    message: `Disabling the buck 2 might effect I2C communications to the PMIC chip and hance you might get 
                 disconnected from the app. Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, don't ask again",
@@ -1337,7 +1337,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ) {
             const ldo1Message = (
                 <span>
-                    Before enabling LDO1, configure the nPM1300-EK as follows:
+                    Before enabling LDO1, configure the EK as follows:
                     <ul>
                         <li>
                             Connect LDO bypass capacitors by connecting the LDO1
@@ -1363,7 +1363,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             );
             const ldo2Message = (
                 <span>
-                    Before enabling LDO2, configure the nPM1300-EK as follows:
+                    Before enabling LDO2, configure the EK as follows:
                     <ul>
                         <li>
                             Connect LDO bypass capacitors by connecting the LDO2

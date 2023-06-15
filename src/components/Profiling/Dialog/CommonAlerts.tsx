@@ -61,9 +61,9 @@ export const ChargingTemperatureAlert = ({
         showOnWarning={showOnWarning}
         expectedTemperature={expectedTemperature}
         currentTemperature={currentTemperature}
-        message={`Before charging, Make sure battery is at room temperature (20 °C - 25 °C). The current NTC temperature is ${
+        message={`Before charging, Make sure battery is at room temperature (20°C to 25°C). The current NTC temperature is ${
             currentTemperature ?? NaN
-        } °C`}
+        }°C`}
     />
 );
 
@@ -80,8 +80,8 @@ export const ProfilingTemperatureAlert = ({
         showOnWarning={showOnWarning}
         expectedTemperature={expectedTemperature}
         currentTemperature={currentTemperature}
-        message={`Make sure battery is in a temperature chamber with a temperature of ${expectedTemperature} °C. Current NTC temperature ${
+        message={`Make sure battery is in a temperature chamber with a temperature of ${expectedTemperature}°C. Current NTC temperature ${
             currentTemperature ?? NaN
-        } °C`}
+        }°C`}
     />
 );

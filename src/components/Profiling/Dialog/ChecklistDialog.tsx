@@ -48,7 +48,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
         <GenericDialog
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
-            } @ ${profile.temperatures[index]} °C`}
+            } @ ${profile.temperatures[index]}°C`}
             isVisible={isVisible}
             closeOnEsc={false}
             footer={
@@ -174,14 +174,14 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     <>
                         {!usbPowered && (
                             <Alert label="Action required: " variant="warning">
-                                You must connect USB PMIC to continue
+                                You must connect <strong>USB PMIC</strong> to
+                                continue
                             </Alert>
                         )}
                         {!batteryConnected && (
                             <Alert label="Caution: " variant="warning">
                                 No battery is detected. Make sure battery is
-                                connected to the Evaluation Kit before you
-                                continue
+                                connected to the EK before you continue
                             </Alert>
                         )}
                         <ChargingTemperatureAlert

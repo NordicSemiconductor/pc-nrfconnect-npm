@@ -29,7 +29,7 @@ export default () => {
         <GenericDialog
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
-            } @ ${profile.temperatures[index]} °C`}
+            } @ ${profile.temperatures[index]}°C`}
             isVisible
             closeOnEsc={false}
             footer={
@@ -44,8 +44,8 @@ export default () => {
         >
             <Group>
                 <Alert label="Error: " variant="danger">
-                    nPM-FG board is not connected. Turn off Evaluation Kit and
-                    connect nPM-FG to the Evaluation Kit
+                    nPM-FG board is not connected. Turn off EK and connect
+                    nPM-FG to the EK
                 </Alert>
             </Group>
         </GenericDialog>

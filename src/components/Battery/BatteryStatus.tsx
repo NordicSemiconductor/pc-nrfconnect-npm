@@ -69,7 +69,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 </DocumentationTooltip>
                 <span className="line-data">
                     {batteryConnected && latestAdcSample
-                        ? `${latestAdcSample?.tBat.toFixed(2)} °C`
+                        ? `${latestAdcSample?.tBat.toFixed(2)}°C`
                         : 'N/A'}
                 </span>
             </div>

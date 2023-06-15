@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentWindow } from '@electron/remote';
-import { Alert, ConfirmationDialog } from 'pc-nrfconnect-shared';
+import { ConfirmationDialog } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import { TDispatch } from '../../thunk';
@@ -60,7 +60,8 @@ export default () => {
 
     return (
         <ConfirmationDialog
-            title="Closing nPM PowerUp"
+            headerIcon="alert-outline"
+            title="Closing nPM PowerUP"
             isVisible={showCloseDialog && !!nextConfirmDialog}
             onConfirm={() => {
                 if (nextConfirmDialog) {
@@ -79,9 +80,7 @@ export default () => {
                 setConfirmedDialogs([]);
             }}
         >
-            <Alert variant="warning" label="Caution: ">
-                {`${nextConfirmDialog?.message} Are you sure you want to close the app?`}
-            </Alert>
+            {`${nextConfirmDialog?.message} Are you sure you want to close the app?`}
         </ConfirmationDialog>
     );
 };

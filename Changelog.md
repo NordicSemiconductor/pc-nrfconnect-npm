@@ -17,7 +17,7 @@ and this project adheres to
 
 -   UI Improvements
 -   Update to nrfutil-npm-x86_64-unknown-linux-gnu-0.2.0-alpha.5
--   Profiling temperature now only allow 0 °C - 60 °C
+-   Profiling temperature now only allow 0°C to 60°C
 
 ### Fixed
 
