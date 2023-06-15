@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Store from 'electron-store';
 import fs from 'fs';
@@ -36,8 +36,13 @@ export const useProfilingProjects = () => {
             dispatch(
                 addConfirmBeforeClose({
                     id: 'NRF_UTIL_PROCESSING',
-                    message:
-                        'Processing is ongoing. All progress will be lost if you close the app.',
+                    message: (
+                        <span>
+                            <strong>Important:</strong> Processing is ongoing.
+                            All progress will be lost if you close the app. Are
+                            you sure you want to close the app?
+                        </span>
+                    ),
                     onClose() {
                         progress.forEach(prog => {
                             prog.cancel();

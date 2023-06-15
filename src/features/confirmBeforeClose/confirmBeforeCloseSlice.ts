@@ -10,7 +10,7 @@ import type { RootState } from '../../appReducer';
 
 export interface ConfirmBeforeCloseApp {
     id: string;
-    message: string;
+    message: React.ReactNode;
     onClose?: () => void;
 }
 

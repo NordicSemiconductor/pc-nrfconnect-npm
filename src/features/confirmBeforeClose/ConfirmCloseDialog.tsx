@@ -80,7 +80,7 @@ export default () => {
                 setConfirmedDialogs([]);
             }}
         >
-            {`${nextConfirmDialog?.message} Are you sure you want to close the app?`}
+            {nextConfirmDialog?.message}
         </ConfirmationDialog>
     );
 };

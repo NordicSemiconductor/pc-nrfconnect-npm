@@ -90,8 +90,13 @@ export default () => {
             dispatch(
                 addConfirmBeforeClose({
                     id: 'PROFILING_WIZARD',
-                    message:
-                        ' Battery profiling is ongoing. All profiling data will be lost if you close the app. ',
+                    message: (
+                        <Alert label="Caution: " variant="warning">
+                            Battery profiling is ongoing. All profiling data
+                            will be lost if you close the app. Are you sure you
+                            want to close the app?
+                        </Alert>
+                    ),
                     onClose() {
                         dispatch(closeProfiling());
                     },
