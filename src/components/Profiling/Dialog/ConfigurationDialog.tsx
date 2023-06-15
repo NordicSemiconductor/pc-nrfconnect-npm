@@ -217,9 +217,11 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 </div>
                 <div className="slider-container">
                     <FormLabel className="flex-row">
-                        <div>
-                            <span>Discharge cut-off voltage</span>
-                        </div>
+                        <DocumentationTooltip card="profiling" item="Capacity">
+                            <div>
+                                <span>DischargeCutOff</span>
+                            </div>
+                        </DocumentationTooltip>
                         <div className="flex-row">
                             <NumberInlineInput
                                 value={vLowerCutOff}
@@ -247,9 +249,11 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 </div>
                 <div className="slider-container">
                     <FormLabel className="flex-row">
-                        <div>
-                            <span>Capacity</span>
-                        </div>
+                        <DocumentationTooltip card="profiling" item="Capacity">
+                            <div>
+                                <span>Capacity</span>
+                            </div>
+                        </DocumentationTooltip>
                         <div className="flex-row">
                             <NumberInlineInput
                                 value={capacity}
@@ -332,9 +336,14 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         <div className="flex-row">
                             <div className="flex-grow-1 slider-container">
                                 <FormLabel className="flex-row">
-                                    <div>
-                                        <span>Temperature</span>
-                                    </div>
+                                    <DocumentationTooltip
+                                        card="profiling"
+                                        item="Temperature"
+                                    >
+                                        <div>
+                                            <span>Temperature</span>
+                                        </div>
+                                    </DocumentationTooltip>
 
                                     <div className="flex-row">
                                         <NumberInlineInput

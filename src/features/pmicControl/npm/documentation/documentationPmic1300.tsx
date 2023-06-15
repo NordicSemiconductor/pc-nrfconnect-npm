@@ -624,4 +624,42 @@ export const documentation: Documentation = {
             ),
         },
     },
+    profiling: {
+        DischargeCutOff: {
+            title: 'Discharge cut-off',
+            description: (
+                <p>
+                    Discharge cut-off is the lowest operating voltage of the
+                    battery. This should be set according to the battery
+                    specification.
+                </p>
+            ),
+        },
+        Capacity: {
+            title: 'Capacity',
+            description: (
+                <p>
+                    This is the battery capacity in mAh. This should be set
+                    according to the rated capacity of the battery used.
+                </p>
+            ),
+        },
+        Temperature: {
+            title: 'Temperature',
+            description: (
+                <>
+                    <p>
+                        This specifies the temperatures the battery will be
+                        profiled at. We recommend profiling at three
+                        temperatures for best state-of-charge accuracy.
+                    </p>
+                    <p>
+                        For example, if the application temperature range is 5
+                        °C to 45 °C, we recommend to profile at 5 °C, 25 °C and
+                        45 °C. Range is 0 °C to 65 °C in 1 °C steps.
+                    </p>
+                </>
+            ),
+        },
+    },
 };
