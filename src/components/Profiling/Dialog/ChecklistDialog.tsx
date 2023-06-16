@@ -179,7 +179,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             </Alert>
                         )}
                         {!batteryConnected && (
-                            <Alert label="Caution: " variant="warning">
+                            <Alert label="Important: " variant="warning">
                                 No battery is detected. Make sure battery is
                                 connected to the EK before you continue
                             </Alert>
