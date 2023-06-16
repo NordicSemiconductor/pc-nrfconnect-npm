@@ -39,9 +39,9 @@ import {
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import {
-    atomicUpdateProjectSettings,
     generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
+    readAndUpdateProjectSettings,
     REPORTING_RATE,
 } from '../helpers';
 import ChargingDialog from './ChargingDialog';
@@ -132,7 +132,7 @@ export default () => {
                     );
 
                     dispatch(
-                        atomicUpdateProjectSettings(
+                        readAndUpdateProjectSettings(
                             generateDefaultProjectPath(profile),
                             profileSettings => {
                                 profileSettings.profiles[index].csvReady =
