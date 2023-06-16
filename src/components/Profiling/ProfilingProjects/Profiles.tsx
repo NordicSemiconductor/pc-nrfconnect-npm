@@ -5,21 +5,15 @@
  */
 
 import React, { useState } from 'react';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { OpenDialogReturnValue } from 'electron';
+import { Button } from 'pc-nrfconnect-shared';
 
 import { showOpenDialog } from '../../../actions/fileActions';
-import {
-    getNpmDevice,
-    getPmicState,
-} from '../../../features/pmicControl/pmicControlSlice';
 import {
     addRecentProject,
     getProfileProjects,
 } from '../../../features/pmicControl/profilingProjectsSlice.';
-import { setProfilingStage } from '../../../features/pmicControl/profilingSlice';
 import { reloadRecentProjects } from '../helpers';
 import AddEditProjectDialog from './AddEditProjectDialog';
 import MissingProjectSettingsCard from './MissingProjectSettingsCard';
@@ -31,28 +25,22 @@ import './profilingProjects.scss';
 export default () => {
     const dispatch = useDispatch();
     const profiles = useSelector(getProfileProjects);
-    const npmDevice = useSelector(getNpmDevice);
-    const pmicState = useSelector(getPmicState);
 
     const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
     useProfilingProjects();
 
     return (
         <div className="projects-container d-flex flex-column">
-            <DropdownButton
-                className="align-self-end mr-3"
-                variant="secondary"
-                title="Projects"
-                alignRight
-            >
-                <Dropdown.Item
+            <div className="d-flex justify-content-end">
+                <Button
+                    className="mx-1"
                     onClick={() => dispatch(reloadRecentProjects())}
                     variant="secondary"
                 >
                     Reload Projects
-                </Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item
+                </Button>
+                <Button
+                    className="mx-1"
                     onClick={() => {
                         showOpenDialog({
                             title: 'Select a JSON file',
@@ -72,39 +60,17 @@ export default () => {
                     variant="secondary"
                 >
                     Add Existing Project
-                </Dropdown.Item>
-                <Dropdown.Item
+                </Button>
+                <Button
+                    className="mx-1"
                     onClick={() => {
                         setShowAddProjectDialog(true);
                     }}
                     variant="secondary"
                 >
                     Create New Project
-                </Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item
-                    onClick={() => {
-                        npmDevice
-                            ?.getBatteryProfiler()
-                            ?.canProfile()
-                            .then(result => {
-                                if (result) {
-                                    dispatch(
-                                        setProfilingStage('Configuration')
-                                    );
-                                } else {
-                                    dispatch(
-                                        setProfilingStage('MissingSyncBoard')
-                                    );
-                                }
-                            });
-                    }}
-                    disabled={pmicState !== 'pmic-connected'}
-                    variant="secondary"
-                >
-                    Profile Battery
-                </Dropdown.Item>
-            </DropdownButton>
+                </Button>
+            </div>
 
             <div className="d-flex flex-column-reverse">
                 {profiles.map(project => (

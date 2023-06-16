@@ -10,6 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import { Alert, Button, Toggle, useStopwatch } from 'pc-nrfconnect-shared';
 
+import { generateParamsFromCSV } from '../../../features/nrfutillNpm/csvProcessing';
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { readAndUpdateProjectSettings } from '../helpers';
 import TimeComponent from '../TimeComponent';
@@ -91,8 +92,25 @@ export default ({
                         !profile.paramsJson &&
                         !progress && (
                             <Alert variant="info">
-                                <strong>Requires processing: </strong>
-                                <span>{message}</span>
+                                <div className="d-flex align-items-center flex-wrap justify-content-between alert-info-with-button">
+                                    <span>
+                                        <strong>Requires processing: </strong>
+                                        <span>{message}</span>
+                                    </span>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => {
+                                            dispatch(
+                                                generateParamsFromCSV(
+                                                    projectSettingsPath,
+                                                    index
+                                                )
+                                            );
+                                        }}
+                                    >
+                                        Process now
+                                    </Button>
+                                </div>
                             </Alert>
                         )}
                     {dataCollected &&
@@ -108,7 +126,7 @@ export default ({
                 <div className="d-flex flex-row justify-content-between  align-items-center float-right">
                     <div>
                         <Toggle
-                            label="Exclude"
+                            label="include"
                             onToggle={value => {
                                 dispatch(
                                     readAndUpdateProjectSettings(
@@ -117,14 +135,14 @@ export default ({
                                             if (projectSettings)
                                                 projectSettings.profiles[
                                                     index
-                                                ].exclude = value;
+                                                ].exclude = !value;
 
                                             return projectSettings;
                                         }
                                     )
                                 );
                             }}
-                            isToggled={!!profile.exclude || !dataCollected}
+                            isToggled={!(!!profile.exclude || !dataCollected)}
                             disabled={!dataCollected}
                         />
                     </div>

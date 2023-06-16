@@ -61,27 +61,33 @@ label {
     margin-bottom: 11px !important;
 }
 
-.alert .alert-warning-with-button {
-    gap: 8px;
+.alert {
+    .alert-info-with-button {
+        gap: 8px;
+    }
 
-    button {
-        border: 1px solid #b75300;
-        color: #b75300;
-        background-color: white;
+    .alert-warning-with-button {
+        gap: 8px;
 
-        &:hover:not([disabled]) {
+        button {
+            border: 1px solid #b75300;
             color: #b75300;
             background-color: white;
-            border-color: #b75300;
-        }
 
-        &:focus:not([disabled]) {
-            background-color: white;
-            border-color: #b75300 !important;
-        }
+            &:hover:not([disabled]) {
+                color: #b75300;
+                background-color: white;
+                border-color: #b75300;
+            }
 
-        &:active:not([disabled]) {
-            background-color: color.scale(white, $lightness: -10%);
+            &:focus:not([disabled]) {
+                background-color: white;
+                border-color: #b75300 !important;
+            }
+
+            &:active:not([disabled]) {
+                background-color: color.scale(white, $lightness: -10%);
+            }
         }
     }
 }

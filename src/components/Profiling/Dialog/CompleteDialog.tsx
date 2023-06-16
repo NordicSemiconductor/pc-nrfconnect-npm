@@ -420,7 +420,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         {`Profiling  ${profile.temperatures[index]}°C is complete. Click 'Next Profile' to continue.`}
                     </Alert>
                 )}
-                {completeStep?.level !== 'terminal' &&
+                {(completeStep?.level === 'success' ||
+                    completeStep?.level === 'warning') &&
                     lastProfile &&
                     !allProcessedSuccessfully && (
                         <Alert variant="warning" label="Caution: ">

@@ -21,11 +21,10 @@ export default ({
     <Card
         title={
             <div className="d-flex justify-content-between">
-                <div>
+                <div className="d-flex align-items-center">
                     <span>
-                        <span>{`${settings.name} - ${settings.capacity} mAh - `}</span>
+                        <span>{`${settings.name} - ${settings.capacity} mAh`}</span>
                     </span>
-                    <span>{projectSettingsPath}</span>
                 </div>
                 <div>
                     <ProjectCardMenu
