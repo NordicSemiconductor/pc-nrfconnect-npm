@@ -111,7 +111,7 @@ export default ({ disabled }: { disabled: boolean }) => {
             <DocumentationTooltip
                 placement="right-start"
                 card="sidePanel"
-                item="LoadBatteryModel"
+                item="WriteBatteryModel"
             >
                 <Button
                     variant="secondary"
@@ -122,11 +122,11 @@ export default ({ disabled }: { disabled: boolean }) => {
                                 dispatch(
                                     dialogHandler({
                                         uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-                                        message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
-                                        confirmLabel: 'Load',
+                                        message: `Write battery profile will reset the current fuel gauge. Click 'Write' to continue.`,
+                                        confirmLabel: 'Write',
                                         confirmClosesDialog: false,
                                         cancelLabel: 'Cancel',
-                                        title: 'Load',
+                                        title: 'Write',
                                         onConfirm: () => {
                                             npmDevice?.downloadFuelGaugeProfile(
                                                 buffer
@@ -142,7 +142,9 @@ export default ({ disabled }: { disabled: boolean }) => {
                                         uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
                                         message: (
                                             <>
-                                                <div>Load battery profile.</div>
+                                                <div>
+                                                    Write battery profile.
+                                                </div>
                                                 <br />
                                                 <Alert
                                                     label="Error "
@@ -153,10 +155,10 @@ export default ({ disabled }: { disabled: boolean }) => {
                                             </>
                                         ),
                                         type: 'alert',
-                                        confirmLabel: 'Load',
+                                        confirmLabel: 'Write',
                                         confirmDisabled: true,
                                         cancelLabel: 'Cancel',
-                                        title: 'Load',
+                                        title: 'Write',
                                         onConfirm: () => {},
                                         onCancel: () => {},
                                     })
@@ -165,7 +167,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                     }}
                     disabled={disabled}
                 >
-                    Load Battery Model
+                    Write Battery Model
                 </Button>
             </DocumentationTooltip>
             {profilingSupported && (

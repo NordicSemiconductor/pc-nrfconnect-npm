@@ -527,8 +527,8 @@ export const documentation: Documentation = {
                 </p>
             ),
         },
-        LoadBatteryModel: {
-            title: 'Load Battery Model',
+        WriteBatteryModel: {
+            title: 'Write Battery Model',
             description: (
                 <p>
                     You can load a battery model to start evaluating the nPM
@@ -545,7 +545,7 @@ export const documentation: Documentation = {
                         estimation across voltage, current, and temperature
                         range for the specific battery used. The result of the
                         battery profiling is a battery model which can be
-                        evaluated in nPM PowerUP by using the “Load Battery
+                        evaluated in nPM PowerUP by using the Write Battery
                         Model” option.
                     </p>
                     <p>

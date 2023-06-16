@@ -279,12 +279,12 @@ export default () => {
                 npmDevice.onProfileDownloadUpdate(payload => {
                     const progressDialog: PmicDialog = {
                         uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-                        message: `Load battery profile will reset the current fuel gauge. Click 'Load' to continue.`,
+                        message: `Writing battery profile will reset the current fuel gauge. Click 'Write' to continue.`,
                         confirmDisabled: true,
-                        confirmLabel: 'Load',
+                        confirmLabel: 'Write',
                         cancelLabel: 'Close',
                         cancelDisabled: false,
-                        title: 'Load',
+                        title: 'Write',
                         onConfirm: () => {},
                         onCancel: () => {},
                     };
@@ -307,7 +307,7 @@ export default () => {
                                     },
                                     message: (
                                         <>
-                                            <div>Load battery profile.</div>
+                                            <div>Writing battery profile.</div>
                                             <br />
                                             <strong>Status: </strong>
                                             {payload.totalChunks ===
@@ -331,7 +331,7 @@ export default () => {
                                     ...progressDialog,
                                     message: (
                                         <>
-                                            <div>Load battery profile.</div>
+                                            <div>Writing battery profile.</div>
                                             <br />
                                             <strong>Status: </strong>
                                             Aborting download
@@ -346,7 +346,7 @@ export default () => {
                                     ...progressDialog,
                                     message: (
                                         <>
-                                            <div>Load battery profile.</div>
+                                            <div>Writing battery profile.</div>
                                             <br />
                                             <Alert
                                                 label="Caution: "
@@ -365,7 +365,7 @@ export default () => {
                                     ...progressDialog,
                                     message: (
                                         <>
-                                            <div>Load battery profile.</div>
+                                            <div>Writing battery profile.</div>
                                             <br />
                                             <Alert
                                                 label="Success: "
@@ -384,7 +384,7 @@ export default () => {
                                     ...progressDialog,
                                     message: (
                                         <>
-                                            <div>Load battery profile.</div>
+                                            <div>Writing battery profile.</div>
                                             <br />
                                             <Alert
                                                 label="Error: "

@@ -116,7 +116,7 @@ export default ({
                         }
                     }}
                 >
-                    Load Battery Model
+                    Write Battery Model
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item
