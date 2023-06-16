@@ -60,8 +60,6 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         }
                         variant="primary"
                         onClick={async () => {
-                            await npmDevice?.setFuelGaugeEnabled(false);
-
                             // PMIC 1300 Specific
                             await npmDevice?.setLdoEnabled(0, false);
                             await npmDevice?.setLdoEnabled(1, false);
