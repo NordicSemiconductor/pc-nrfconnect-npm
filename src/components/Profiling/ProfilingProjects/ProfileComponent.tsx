@@ -11,7 +11,7 @@ import path from 'path';
 import { Alert, Button, Toggle, useStopwatch } from 'pc-nrfconnect-shared';
 
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
-import { atomicUpdateProjectSettings } from '../helpers';
+import { readAndUpdateProjectSettings } from '../helpers';
 import TimeComponent from '../TimeComponent';
 import { ProfilingProject } from '../types';
 import ProfileComponentMenu from './ProfileComponentMenu';
@@ -111,7 +111,7 @@ export default ({
                             label="Exclude"
                             onToggle={value => {
                                 dispatch(
-                                    atomicUpdateProjectSettings(
+                                    readAndUpdateProjectSettings(
                                         projectSettingsPath,
                                         projectSettings => {
                                             if (projectSettings)

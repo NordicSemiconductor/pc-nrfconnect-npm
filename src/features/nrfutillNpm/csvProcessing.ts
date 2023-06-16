@@ -12,8 +12,8 @@ import { getAppDir, getAppFile } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import {
-    atomicUpdateProjectSettings,
     generateDefaultProjectPath,
+    readAndUpdateProjectSettings,
 } from '../../components/Profiling/helpers';
 import {
     ProfilingProject,
@@ -94,7 +94,7 @@ export const generateParamsFromCSV =
         }
 
         dispatch(
-            atomicUpdateProjectSettings(projectAbsolutePath, project => {
+            readAndUpdateProjectSettings(projectAbsolutePath, project => {
                 const profile = project.profiles[index];
 
                 if (!profile.csvPath) {
@@ -230,7 +230,7 @@ export const generateParamsFromCSV =
 
                 processCSV.on('close', () => {
                     dispatch(
-                        atomicUpdateProjectSettings(
+                        readAndUpdateProjectSettings(
                             projectAbsolutePath,
                             proj => {
                                 const batteryModelPath = path.join(
@@ -289,14 +289,14 @@ export const generateParamsFromCSV =
                                 return proj;
                             }
                         )
-                    ).finally(() => {
-                        if (fs.existsSync(tempFolder)) {
-                            fs.rmSync(tempFolder, {
-                                recursive: true,
-                                force: true,
-                            });
-                        }
-                    });
+                    );
+
+                    if (fs.existsSync(tempFolder)) {
+                        fs.rmSync(tempFolder, {
+                            recursive: true,
+                            force: true,
+                        });
+                    }
                 });
 
                 return project;

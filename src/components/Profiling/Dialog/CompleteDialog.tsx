@@ -40,9 +40,9 @@ import {
 } from '../../../features/pmicControl/profilingSlice';
 import { TDispatch } from '../../../thunk';
 import {
-    atomicUpdateProjectSettings,
     generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
+    readAndUpdateProjectSettings,
 } from '../helpers';
 import StepperProgress from './StepperProgress';
 
@@ -53,7 +53,7 @@ export const markProfilersAsReady =
 
         const fileName = generateDefaultProjectPath(profile);
         dispatch(
-            atomicUpdateProjectSettings(fileName, profileSettings => {
+            readAndUpdateProjectSettings(fileName, profileSettings => {
                 profileSettings.profiles[index].csvReady = true;
 
                 return profileSettings;
@@ -204,7 +204,7 @@ const RestartProfileButton = ({
                 const filePath = generateDefaultProjectPath(profile);
 
                 dispatch(
-                    atomicUpdateProjectSettings(filePath, profileSettings => {
+                    readAndUpdateProjectSettings(filePath, profileSettings => {
                         profileSettings.profiles[index].csvReady = false;
                         profileSettings.profiles[index].csvPath = undefined;
                         return profileSettings;

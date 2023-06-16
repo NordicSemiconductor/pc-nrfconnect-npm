@@ -16,8 +16,8 @@ import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
 import useIsUIDisabled from '../../../features/useIsUIDisabled';
 import {
-    atomicUpdateProjectSettings,
     isProfileReadyForProcessing,
+    readAndUpdateProjectSettings,
 } from '../helpers';
 import { ProfilingProject } from '../types';
 import AddEditProfileDialog from './AddEditProfileDialog';
@@ -132,7 +132,7 @@ export default ({
                     onClick={() => {
                         progress?.cancel();
                         dispatch(
-                            atomicUpdateProjectSettings(
+                            readAndUpdateProjectSettings(
                                 projectSettingsPath,
                                 projectSettings => {
                                     projectSettings.profiles.splice(index, 1);

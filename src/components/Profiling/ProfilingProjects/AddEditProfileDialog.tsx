@@ -18,7 +18,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { showOpenDialog } from '../../../actions/fileActions';
-import { atomicUpdateProjectSettings } from '../helpers';
+import { readAndUpdateProjectSettings } from '../helpers';
 import { ProfilingProjectProfile } from '../types';
 
 export default ({
@@ -58,7 +58,7 @@ export default ({
                         variant="primary"
                         onClick={() => {
                             dispatch(
-                                atomicUpdateProjectSettings(
+                                readAndUpdateProjectSettings(
                                     projectSettingsPath,
                                     project => {
                                         if (profile) {
