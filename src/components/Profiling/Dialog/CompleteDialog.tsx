@@ -304,6 +304,21 @@ const AbortProfileButton = () => {
     );
 };
 
+const CloseProfileButton = () => {
+    const dispatch = useDispatch();
+
+    return (
+        <DialogButton
+            variant="secondary"
+            onClick={() => {
+                dispatch(closeProfiling());
+            }}
+        >
+            Close
+        </DialogButton>
+    );
+};
+
 export default ({ isVisible }: { isVisible: boolean }) => {
     const [generatingBatteryModel, setGeneratingBatterModel] = useState(false);
     const profile = useSelector(getProfile);
@@ -392,24 +407,41 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             )}
                         </>
                     )}
+
+                    {completeStep?.level === 'terminal' && (
+                        <CloseProfileButton />
+                    )}
                 </>
             }
         >
             <Group>
-                {lastProfile && !allProcessedSuccessfully && (
-                    <Alert variant="warning" label="Caution: ">
-                        {!allAreProcessing &&
-                            `Models that failed to, or are still processing, will not be included when saving the battery model. `}
-                        {allAreProcessing &&
-                            `Not able to save battery model. No battery profiles are available yet. Try reprocess any failed models. `}
-                        {`Data will continue to be processed in the background if
-                        you click finish. You can continue to work on theses
-                        profiles from the 'Profiles' tab`}
+                {completeStep?.level === 'success' && !lastProfile && (
+                    <Alert variant="success" label="Action required: ">
+                        {`Profiling  ${profile.temperatures[index]}°C is complete. Click 'Next Profile' to continue.`}
                     </Alert>
                 )}
-                {generatingBatteryModel && (
-                    <Alert variant="info" label="Note: ">
-                        Generating battery model
+                {completeStep?.level !== 'terminal' &&
+                    lastProfile &&
+                    !allProcessedSuccessfully && (
+                        <Alert variant="warning" label="Caution: ">
+                            {!allAreProcessing &&
+                                `Models that failed to, or are still processing, will not be included when saving the battery model. `}
+                            {allAreProcessing &&
+                                `Not able to save battery model. No battery profiles are available yet. Try reprocess any failed models. `}
+                            {`Data will continue to be processed in the background if
+                        you click finish. You can continue to work on theses
+                        profiles from the 'Profiles' tab`}
+                        </Alert>
+                    )}
+                {completeStep?.level !== 'terminal' &&
+                    generatingBatteryModel && (
+                        <Alert variant="info" label="Note: ">
+                            Generating battery model
+                        </Alert>
+                    )}
+                {completeStep?.level === 'terminal' && (
+                    <Alert variant="danger" label="Error: ">
+                        {completeStep.message}
                     </Alert>
                 )}
                 <StepperProgress

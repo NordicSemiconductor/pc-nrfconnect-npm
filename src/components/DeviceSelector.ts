@@ -30,7 +30,7 @@ import {
 } from '../actions/deviceActions';
 import { getNpmDevice } from '../features/pmicControl/npm/npmFactory';
 import { stopEventRecording } from '../features/pmicControl/pmicControlSlice';
-import { closeProfiling } from '../features/pmicControl/profilingSlice';
+import { setCompleteStep } from '../features/pmicControl/profilingSlice';
 import {
     hookModemToShellParser,
     xTerminalShellParserWrapper,
@@ -224,7 +224,12 @@ const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
     onDeviceDeselected: () => {
         logger.info('Deselected device');
         dispatch(closeDevice());
-        dispatch(closeProfiling());
+        dispatch(
+            setCompleteStep({
+                level: 'terminal',
+                message: `The device disconnected.`,
+            })
+        );
         dispatch(stopEventRecording());
     },
     onDeviceIsReady: (device: Device) => {

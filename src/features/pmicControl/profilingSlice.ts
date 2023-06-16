@@ -19,7 +19,7 @@ type ProfileStage =
 
 interface ProfileComplete {
     message: string;
-    level: 'success' | 'danger' | 'warning';
+    level: 'success' | 'danger' | 'warning' | 'terminal';
 }
 
 interface profilingState {
@@ -65,7 +65,9 @@ const profilingSlice = createSlice({
             state.stage = action.payload;
         },
         setCompleteStep(state, action: PayloadAction<ProfileComplete>) {
-            state.completeStep = action.payload;
+            if (state.stage) {
+                state.completeStep = action.payload;
+            }
         },
         setProfile(state, action: PayloadAction<Profile>) {
             state.profile = action.payload;
