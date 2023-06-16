@@ -11,7 +11,6 @@ import {
     AdcSample,
     BatteryModel,
     Buck,
-    CCProfilingState,
     Charger,
     Ldo,
     NpmDevice,
@@ -38,7 +37,6 @@ interface pmicControlState {
     hardcodedBatterModels: BatteryModel[];
     storedBatterModel?: (BatteryModel | null)[];
     usbPowered: boolean;
-    profilingState: CCProfilingState;
     fuelGaugeChargingSamplingRate: number;
     fuelGaugeNotChargingSamplingRate: number;
     fuelGaugeReportingRate: number;
@@ -63,7 +61,6 @@ const initialState: pmicControlState = {
     hardcodedBatterModels: [],
     dialog: [],
     usbPowered: false,
-    profilingState: 'Off',
     fuelGaugeChargingSamplingRate: 500,
     fuelGaugeNotChargingSamplingRate: 1000,
     fuelGaugeReportingRate: 2000,
