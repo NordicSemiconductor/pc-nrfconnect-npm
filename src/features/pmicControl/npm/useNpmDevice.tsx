@@ -135,25 +135,6 @@ export default () => {
     }, [dispatch, npmDevice, pmicState, supportedVersion]);
 
     useEffect(() => {
-        dispatch((_: TDispatch, getState: () => RootState) => {
-            if (
-                npmDevice &&
-                pmicState === 'pmic-connected' &&
-                supportedVersion
-            ) {
-                npmDevice.startAdcSample(
-                    getState().app.pmicControl.fuelGaugeReportingRate,
-                    getState().app.pmicControl.chargers[0].enabled
-                        ? getState().app.pmicControl
-                              .fuelGaugeChargingSamplingRate
-                        : getState().app.pmicControl
-                              .fuelGaugeNotChargingSamplingRate
-                );
-            }
-        });
-    }, [dispatch, npmDevice, pmicState, supportedVersion]);
-
-    useEffect(() => {
         if (npmDevice) {
             const initComponents = () => {
                 if (!npmDevice) return;
