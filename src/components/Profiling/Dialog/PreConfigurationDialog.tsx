@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
     Alert,
     DialogButton,
@@ -13,23 +13,14 @@ import {
     Group,
 } from 'pc-nrfconnect-shared';
 
-import {
-    closeProfiling,
-    getProfile,
-    getProfileIndex,
-} from '../../../features/pmicControl/profilingSlice';
+import { closeProfiling } from '../../../features/pmicControl/profilingSlice';
 
 export default () => {
-    const profile = useSelector(getProfile);
-    const index = useSelector(getProfileIndex);
-
     const dispatch = useDispatch();
 
     return (
         <GenericDialog
-            title={`Battery Profiling ${
-                profile.name.length > 0 ? `- ${profile.name}` : ''
-            } @ ${profile.temperatures[index]}°C`}
+            title="Battery Profiling"
             isVisible
             closeOnEsc={false}
             footer={
