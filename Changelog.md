@@ -6,7 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.7.4 - 2023-06-14
+## 0.7.5 - 2023-06-16
+
+### Added
+
+-   Open profiling project folder button
+-   Error dialog showing when Profiling failed with EK disconnect
+
+### Changes
+
+-   `Load Battery Model` labels changed to `Write Battery Model`
+
+### Fixed
+
+-   UI Issues
+-   Profiling not started automatically after data collection
+-   Abort button in before you start profiling the next profile did not work
+
+## 0.7.4 - 2023-06-15
 
 ### Added
 
