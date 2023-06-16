@@ -8,6 +8,8 @@ import React, { useMemo, useState } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import { useDispatch, useSelector } from 'react-redux';
+import { shell } from 'electron';
+import path from 'path';
 import { GenericDialog } from 'pc-nrfconnect-shared';
 
 import { showSaveDialog } from '../../../actions/fileActions';
@@ -181,6 +183,17 @@ export default ({
                     Add Profile
                 </Dropdown.Item>
                 <Dropdown.Divider />
+                <Dropdown.Item
+                    disabled={
+                        projectProgress.filter(progress => !progress.errorLevel)
+                            .length > 0
+                    }
+                    onClick={() => {
+                        shell.openPath(path.parse(projectSettingsPath).dir);
+                    }}
+                >
+                    Open Folder
+                </Dropdown.Item>
                 <Dropdown.Item
                     disabled={
                         projectProgress.filter(progress => !progress.errorLevel)
