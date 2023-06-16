@@ -218,7 +218,11 @@ export default () => {
                 npmDevice.onChargerUpdate(payload => {
                     dispatch((_: TDispatch, getState: () => RootState) => {
                         dispatch(updateCharger(payload));
-                        if (payload.data.enabled != null) {
+                        if (
+                            payload.data.enabled != null &&
+                            getState().app.profiling.ccProfilingState !==
+                                'Running'
+                        ) {
                             npmDevice.startAdcSample(
                                 getState().app.pmicControl
                                     .fuelGaugeReportingRate,
