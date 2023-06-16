@@ -108,6 +108,7 @@ export default () => {
                 >
                     <StartStopButton
                         large={false}
+                        showIcon={false}
                         variant="secondary"
                         className="w-100"
                         startText="Record Events"
