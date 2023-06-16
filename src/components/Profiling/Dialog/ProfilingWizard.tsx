@@ -4,12 +4,18 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { appendFile, writeFileSync } from 'fs';
 import path from 'path';
-import { Alert, ConfirmationDialog } from 'pc-nrfconnect-shared';
+import {
+    Alert,
+    clearWaitForDevice,
+    ConfirmationDialog,
+    setWaitForDevice,
+} from 'pc-nrfconnect-shared';
 
+import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import {
     addConfirmBeforeClose,
     clearConfirmBeforeClose,
@@ -21,8 +27,10 @@ import {
     getFuelGauge,
     getLdos,
     getNpmDevice,
+    getPmicState,
     isBatteryConnected,
     isUsbPowered,
+    setBatteryConnected,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
     clearAbortAction,
@@ -82,6 +90,8 @@ export default () => {
     const ccProfilingState = useSelector(getCcProfilingState);
     const abortAction = useSelector(getAbort);
     const showCloseAppDialog = useSelector(getShowConfirmCloseDialog);
+    const pmicState = useSelector(getPmicState);
+    const [initializing, setInitializing] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -111,6 +121,7 @@ export default () => {
     useEffect(
         () =>
             npmDevice?.getBatteryProfiler()?.onProfilingEvent(event => {
+                dispatch(setBatteryConnected(event.data.vLoad > 1));
                 dispatch(
                     setLatestTBat(Number.parseFloat(event.data.tBat.toFixed(2)))
                 );
@@ -154,25 +165,34 @@ export default () => {
                         (Math.abs(event.data.iLoad) * REPORTING_RATE) / 3600;
                     dispatch(incrementCapacityConsumed(mAhConsumed));
 
-                    const profilingCsvPath = generateCSVFileNamePath(
-                        profile,
-                        index
-                    );
+                    const deltaT =
+                        (event.timestamp - timeOffset.current) / 1000;
 
-                    const data = `${
-                        (event.timestamp - timeOffset.current) / 1000
-                    },${event.data.iLoad},${event.data.vLoad},${
-                        event.data.tBat
-                    }\r\n`;
+                    if (!Number.isNaN(deltaT)) {
+                        const profilingCsvPath = generateCSVFileNamePath(
+                            profile,
+                            index
+                        );
 
-                    appendFile(profilingCsvPath, data, () => {});
+                        const data = `${
+                            (event.timestamp - timeOffset.current) / 1000
+                        },${event.data.iLoad},${event.data.vLoad},${
+                            event.data.tBat
+                        }\r\n`;
+
+                        appendFile(profilingCsvPath, data, () => {});
+                    }
                 }
             }),
         [dispatch, index, npmDevice, profile, profilingStage]
     );
 
     useEffect(() => {
-        if (profilingStage === 'Resting' || profilingStage === 'Profiling') {
+        if (
+            pmicState !== 'ek-disconnected' &&
+            !initializing &&
+            (profilingStage === 'Resting' || profilingStage === 'Profiling')
+        ) {
             if (usbPowered) {
                 npmDevice?.setAutoRebootDevice(true);
                 npmDevice?.getBatteryProfiler()?.stopProfiling();
@@ -225,8 +245,10 @@ export default () => {
         bucks,
         dispatch,
         fuelGauge,
+        initializing,
         ldos,
         npmDevice,
+        pmicState,
         profilingStage,
         usbPowered,
     ]);
@@ -281,6 +303,35 @@ export default () => {
                 break;
         }
     }, [ccProfilingState, dispatch, profilingStage]);
+
+    useEffect(() => {
+        if (profilingStage) {
+            let t: NodeJS.Timeout;
+            const initWaitForDevice = () => {
+                dispatch(
+                    setWaitForDevice({
+                        when: 'sameTraits',
+                        once: true,
+                        timeout: 2000,
+                        onSuccess: async device => {
+                            initWaitForDevice();
+                            setInitializing(true);
+                            await dispatch(closeDevice());
+                            dispatch(openDevice(device));
+                            t = setTimeout(() => setInitializing(false), 10000);
+                        },
+                    })
+                );
+            };
+
+            initWaitForDevice();
+
+            return () => {
+                clearTimeout(t);
+                dispatch(clearWaitForDevice());
+            };
+        }
+    }, [dispatch, profilingStage]);
 
     return (
         <div>
