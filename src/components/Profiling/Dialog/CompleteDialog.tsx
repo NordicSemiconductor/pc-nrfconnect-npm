@@ -278,27 +278,25 @@ const AbortProfileButton = () => {
         <DialogButton
             variant="secondary"
             onClick={() => {
-                () => {
-                    dispatch(
-                        setAbortAction(() => {
-                            npmDevice?.setAutoRebootDevice(true);
-                            npmDevice
-                                ?.getBatteryProfiler()
-                                ?.isProfiling()
-                                .then(result => {
-                                    if (result) {
-                                        npmDevice
-                                            .getBatteryProfiler()
-                                            ?.stopProfiling();
-                                    }
-                                    dispatch(closeProfiling());
-                                })
-                                .catch(() => {
-                                    dispatch(closeProfiling());
-                                });
-                        })
-                    );
-                };
+                dispatch(
+                    setAbortAction(() => {
+                        npmDevice?.setAutoRebootDevice(true);
+                        npmDevice
+                            ?.getBatteryProfiler()
+                            ?.isProfiling()
+                            .then(result => {
+                                if (result) {
+                                    npmDevice
+                                        .getBatteryProfiler()
+                                        ?.stopProfiling();
+                                }
+                                dispatch(closeProfiling());
+                            })
+                            .catch(() => {
+                                dispatch(closeProfiling());
+                            });
+                    })
+                );
             }}
         >
             Abort
