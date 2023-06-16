@@ -7,7 +7,7 @@
 import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
-import { describeError, getAppDir, logger } from 'pc-nrfconnect-shared';
+import { describeError, logger } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import { Profile } from '../../features/pmicControl/npm/types';
@@ -27,25 +27,7 @@ import {
 export const REST_DURATION = 900; // seconds
 export const REPORTING_RATE = 1000;
 export const PROFILE_FOLDER_PREFIX = 'profile_';
-const LOCK_FILE = path.join(getAppDir(), 'profiling.lock');
-
-const acquireFileLock = (lockFile: string): Promise<() => void> =>
-    new Promise((resolve, reject) => {
-        fs.open(lockFile, 'w', (err, fd) => {
-            if (err) {
-                setTimeout(
-                    () => acquireFileLock(lockFile).then(resolve, reject),
-                    10
-                );
-            } else {
-                resolve(() => {
-                    fs.closeSync(fd);
-                    fs.unlinkSync(lockFile);
-                });
-            }
-        });
-    });
-
+``;
 export const generateDefaultProjectPath = (profile: Profile) =>
     path.join(profile.baseDirectory, profile.name, 'profileSettings.json');
 
@@ -105,13 +87,12 @@ export const readProjectSettingsFromFile = (
     return { settings: undefined, error: 'fileCorrupted' };
 };
 
-export const atomicUpdateProjectSettings =
+export const readAndUpdateProjectSettings =
     (
         filePath: string,
         updateProject: (currentProject: ProfilingProject) => ProfilingProject
     ) =>
-    async (dispatch: TDispatch) => {
-        const releaseFileLock = await acquireFileLock(LOCK_FILE);
+    (dispatch: TDispatch) => {
         const pathObject = path.parse(filePath);
         const store = new Store<ProfilingProject>({
             cwd: pathObject.dir,
@@ -134,7 +115,6 @@ export const atomicUpdateProjectSettings =
                 logger.error(describeError(error));
             }
         }
-        releaseFileLock();
     };
 
 export const saveProjectSettings =
