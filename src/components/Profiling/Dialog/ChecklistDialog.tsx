@@ -16,6 +16,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import {
+    getChargers,
     getLatestAdcSample,
     getNpmDevice,
     getPmicState,
@@ -36,6 +37,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const adcSample = useSelector(getLatestAdcSample);
     const npmDevice = useSelector(getNpmDevice);
     const profile = useSelector(getProfile);
+    const chargers = useSelector(getChargers);
     const pmicConnectionState = useSelector(getPmicState);
     const usbPowered = useSelector(isUsbPowered);
     const batteryConnected = useSelector(isBatteryConnected);
@@ -130,15 +132,18 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             }
         >
             <Group>
-                {adcSample && adcSample.vBat > profile.vUpperCutOff && (
-                    <Alert label="Caution: " variant="warning">
-                        The battery voltage exceeds V
-                        <span className="subscript">TERM</span>. This might
-                        effect results. It is recommended to discharge the
-                        battery below V<span className="subscript">TERM</span>{' '}
-                        before starting battery profiling.
-                    </Alert>
-                )}
+                {adcSample &&
+                    adcSample.vBat > profile.vUpperCutOff &&
+                    !chargers[0].enabled && (
+                        <Alert label="Caution: " variant="warning">
+                            The battery voltage exceeds V
+                            <span className="subscript">TERM</span>. This might
+                            effect results. It is recommended to discharge the
+                            battery below V
+                            <span className="subscript">TERM</span> before
+                            starting battery profiling.
+                        </Alert>
+                    )}
                 {pmicConnectionState === 'pmic-disconnected' && (
                     <Alert label="Action required: " variant="warning">
                         You must power the PMIC. Connect the battery and USB
