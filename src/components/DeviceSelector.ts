@@ -198,7 +198,7 @@ const deviceSetupConfig: DeviceSetupConfig = {
         npmDeviceSetup({
             key: 'nPM1300',
             description: '',
-            hex: getAppFile('fw/app_signed_0.7.1+2.hex'),
+            hex: getAppFile('fw/app_signed_0.7.1+4.hex'),
         }),
     ],
     confirmMessage:

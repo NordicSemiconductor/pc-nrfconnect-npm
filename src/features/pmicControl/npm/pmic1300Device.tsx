@@ -60,7 +60,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         dialogHandler,
         eventEmitter,
         devices,
-        '0.7.1+2'
+        '0.7.1+4'
     );
     const batteryProfiler = shellParser
         ? BatteryProfiler(shellParser, eventEmitter)
