@@ -104,6 +104,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             isVisible={isVisible}
             showSpinner
             closeOnEsc={false}
+            className="app-dialog"
             footer={
                 <>
                     <DialogButton variant="primary" disabled onClick={noop}>

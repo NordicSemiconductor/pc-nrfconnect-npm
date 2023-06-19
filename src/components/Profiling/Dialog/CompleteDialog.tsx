@@ -343,6 +343,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             } @ ${profile.temperatures[index]}°C`}
             isVisible={isVisible}
             showSpinner={generatingBatteryModel}
+            className="app-dialog"
             closeOnEsc={false}
             footer={
                 <>

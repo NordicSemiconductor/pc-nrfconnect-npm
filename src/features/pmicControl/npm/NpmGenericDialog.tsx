@@ -22,6 +22,7 @@ export default () => {
             title={currentPmicDialog?.title ?? ''}
             headerIcon={currentPmicDialog?.type}
             isVisible
+            className="app-dialog"
             showSpinner={currentPmicDialog?.progress !== undefined}
             closeOnEsc
             onHide={currentPmicDialog?.onCancel}

@@ -50,6 +50,7 @@ export default ({
             title={`${profile ? 'Edit' : 'Add'} Profile`}
             isVisible
             size="sm"
+            className="app-dialog"
             closeOnEsc={false}
             footer={
                 <>

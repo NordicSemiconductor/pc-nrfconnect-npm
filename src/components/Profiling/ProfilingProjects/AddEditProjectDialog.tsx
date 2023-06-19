@@ -46,6 +46,7 @@ export default ({
             }`}
             isVisible
             size="sm"
+            className="app-dialog"
             closeOnEsc={false}
             footer={
                 <>

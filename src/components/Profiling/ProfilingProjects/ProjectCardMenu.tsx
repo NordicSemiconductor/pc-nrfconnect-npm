@@ -222,6 +222,7 @@ export default ({
             </DropdownButton>
             <GenericDialog
                 title="Battery Model"
+                className="app-dialog"
                 onHide={() => {}}
                 showSpinner
                 isVisible={generatingBatterModel}

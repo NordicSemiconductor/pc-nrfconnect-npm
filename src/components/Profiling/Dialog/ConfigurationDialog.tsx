@@ -65,6 +65,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             title={`Battery Profiling ${name.length > 0 ? `- ${name}` : ''}`}
             isVisible={isVisible}
             size="sm"
+            className="app-dialog"
             closeOnEsc={false}
             footer={
                 <>

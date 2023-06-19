@@ -23,6 +23,7 @@ export default () => {
             title="Battery Profiling"
             isVisible
             closeOnEsc={false}
+            className="app-dialog"
             footer={
                 <DialogButton
                     onClick={() => {

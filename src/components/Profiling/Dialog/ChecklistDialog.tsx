@@ -50,6 +50,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 profile.name.length > 0 ? `- ${profile.name}` : ''
             } @ ${profile.temperatures[index]}°C`}
             isVisible={isVisible}
+            className="app-dialog"
             closeOnEsc={false}
             footer={
                 <>
