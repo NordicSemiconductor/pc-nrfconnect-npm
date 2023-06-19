@@ -35,6 +35,13 @@ export default ({
     const [validName, setValidName] = useState(!!projectSettings);
     const [name, setName] = useState(projectSettings?.project.name ?? '');
 
+    const [vLowerCutOff, setLowerVCutOff] = useState(
+        projectSettings?.project.vLowerCutOff ?? 3
+    );
+    const [vUpperCutOff, setUpperVCutOff] = useState(
+        projectSettings?.project.vUpperCutOff ?? 4.2
+    );
+
     const [capacity, setCapacity] = useState(800);
     const dispatch = useDispatch();
     const maxLength = 20;
@@ -62,6 +69,8 @@ export default ({
                                             ...currentProject,
                                             name,
                                             capacity,
+                                            vLowerCutOff,
+                                            vUpperCutOff,
                                         })
                                     )
                                 );
@@ -84,6 +93,8 @@ export default ({
                                                     {
                                                         name,
                                                         capacity,
+                                                        vLowerCutOff,
+                                                        vUpperCutOff,
                                                         profiles: [],
                                                     }
                                                 )
@@ -140,6 +151,67 @@ export default ({
                         values={[capacity]}
                         onChange={[setCapacity]}
                         range={{ min: 32, max: 3000 }}
+                    />
+                </div>
+                <div className="slider-container">
+                    <FormLabel className="flex-row">
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">TERM</span>
+                        </div>
+                        <div className="flex-row">
+                            <NumberInlineInput
+                                value={vUpperCutOff}
+                                range={{
+                                    min: 4,
+                                    max: 4.4,
+                                    step: 0.05,
+                                    decimals: 2,
+                                }}
+                                onChange={setUpperVCutOff}
+                            />
+                            <span>V</span>
+                        </div>
+                    </FormLabel>
+                    <Slider
+                        values={[vUpperCutOff]}
+                        onChange={[setUpperVCutOff]}
+                        range={{
+                            min: 4,
+                            max: 4.4,
+                            step: 0.05,
+                            decimals: 2,
+                        }}
+                    />
+                </div>
+                <div className="slider-container">
+                    <FormLabel className="flex-row">
+                        <div>
+                            <span>Discharge cut-off voltage</span>
+                        </div>
+                        <div className="flex-row">
+                            <NumberInlineInput
+                                value={vLowerCutOff}
+                                range={{
+                                    min: 2.7,
+                                    max: 3.1,
+                                    step: 0.05,
+                                    decimals: 2,
+                                }}
+                                onChange={setLowerVCutOff}
+                            />
+                            <span>V</span>
+                        </div>
+                    </FormLabel>
+                    <Slider
+                        values={[vLowerCutOff]}
+                        onChange={[setLowerVCutOff]}
+                        range={{
+                            min: 2.7,
+                            max: 3.1,
+                            step: 0.05,
+                            decimals: 2,
+                        }}
                     />
                 </div>
             </Group>

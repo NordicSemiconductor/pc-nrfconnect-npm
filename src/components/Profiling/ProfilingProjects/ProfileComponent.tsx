@@ -60,13 +60,7 @@ export default ({
         }
     }, [progress, reset, pause, isRunning]);
 
-    const message = (
-        <span>
-            {`Temperature: ${profile.temperature}°C, V`}
-            <span className="subscript">TERM</span>
-            {` ${profile.vUpperCutOff} V,  Discharge cut-off voltage: ${profile.vLowerCutOff} V.`}
-        </span>
-    );
+    const message = <span>{`Temperature: ${profile.temperature}°C`}</span>;
 
     return (
         <div className="profile pt-2 pb-2">

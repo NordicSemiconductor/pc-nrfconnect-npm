@@ -20,8 +20,6 @@ export type ProfilingCSVProgress = {
 };
 
 export interface ProfilingProjectProfile {
-    vLowerCutOff: number;
-    vUpperCutOff: number;
     temperature: number;
     csvPath?: string;
     csvReady: boolean;
@@ -32,5 +30,7 @@ export interface ProfilingProjectProfile {
 export interface ProfilingProject {
     name: string;
     capacity: number;
+    vLowerCutOff: number;
+    vUpperCutOff: number;
     profiles: ProfilingProjectProfile[];
 }

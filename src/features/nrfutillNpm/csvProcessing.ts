@@ -189,9 +189,9 @@ export const generateParamsFromCSV =
                         '--output-directory',
                         resultsFolder,
                         '--v-cutoff-high',
-                        profile.vUpperCutOff.toString(),
+                        project.vUpperCutOff.toString(),
                         '--v-cutoff-low',
-                        profile.vLowerCutOff.toString(),
+                        project.vLowerCutOff.toString(),
                     ],
                     {
                         env,
@@ -328,7 +328,15 @@ export const mergeBatteryParams = (
         const resultsFolder = path.join(tempFolder, 'Results');
         fs.mkdirSync(resultsFolder);
 
-        const args = ['merge', '--output-directory', resultsFolder];
+        const args = [
+            'merge',
+            '--output-directory',
+            resultsFolder,
+            '--v-cutoff-high',
+            project.vUpperCutOff.toString(),
+            '--v-cutoff-low',
+            project.vLowerCutOff.toString(),
+        ];
 
         profiles.forEach(profile => {
             if (profile.paramsJson) {
