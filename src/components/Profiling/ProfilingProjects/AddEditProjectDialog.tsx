@@ -17,6 +17,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { showSaveDialog } from '../../../actions/fileActions';
+import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import { readAndUpdateProjectSettings, saveProjectSettings } from '../helpers';
 import { ProfilingProject } from '../types';
 
@@ -155,10 +156,12 @@ export default ({
                 </div>
                 <div className="slider-container">
                     <FormLabel className="flex-row">
-                        <div>
-                            <span>V</span>
-                            <span className="subscript">TERM</span>
-                        </div>
+                        <DocumentationTooltip card="charger" item="VTERM">
+                            <div>
+                                <span>V</span>
+                                <span className="subscript">TERM</span>
+                            </div>
+                        </DocumentationTooltip>
                         <div className="flex-row">
                             <NumberInlineInput
                                 value={vUpperCutOff}
@@ -186,9 +189,11 @@ export default ({
                 </div>
                 <div className="slider-container">
                     <FormLabel className="flex-row">
-                        <div>
-                            <span>Discharge cut-off voltage</span>
-                        </div>
+                        <DocumentationTooltip card="profiling" item="Capacity">
+                            <div>
+                                <span>Discharge cut-off voltage</span>
+                            </div>
+                        </DocumentationTooltip>
                         <div className="flex-row">
                             <NumberInlineInput
                                 value={vLowerCutOff}
