@@ -12,6 +12,7 @@ import { join } from 'path';
 import {
     Alert,
     clearWaitForDevice,
+    describeError,
     logger,
     setWaitForDevice,
 } from 'pc-nrfconnect-shared';
@@ -542,7 +543,11 @@ export default () => {
                     data += `${e.loggingEvent.timestamp},${valuePairs
                         .map(p => p.split('=')[1] ?? 'NaN')
                         .join(',')}\r\n`;
-                    appendFile(path, data, () => {});
+                    appendFile(path, data, err => {
+                        if (err) {
+                            logger.error(describeError(err));
+                        }
+                    });
                 }
                 let data = '';
                 const path = `${baseDir}/all_events.csv`;
@@ -554,7 +559,11 @@ export default () => {
                     /(\r\n|\r|\n)/g,
                     ' '
                 )}"\r\n`; // TODO look for escaping new lines in csvs
-                appendFile(path, data, () => {});
+                appendFile(path, data, err => {
+                    if (err) {
+                        logger.error(describeError(err));
+                    }
+                });
             });
         });
     }, [

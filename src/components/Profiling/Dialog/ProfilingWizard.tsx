@@ -12,6 +12,8 @@ import {
     Alert,
     clearWaitForDevice,
     ConfirmationDialog,
+    describeError,
+    logger,
     setWaitForDevice,
 } from 'pc-nrfconnect-shared';
 
@@ -180,7 +182,11 @@ export default () => {
                             event.data.tBat
                         }\r\n`;
 
-                        appendFile(profilingCsvPath, data, () => {});
+                        appendFile(profilingCsvPath, data, err => {
+                            if (err) {
+                                logger.error(describeError(err));
+                            }
+                        });
                     }
                 }
             }),
