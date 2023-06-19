@@ -9,7 +9,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Step, Stepper } from 'pc-nrfconnect-shared';
 
 import { startProcessingCsv } from '../../../features/nrfutillNpm/csvProcessing';
-import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
+import {
+    getProfileProjects,
+    getProjectProfileProgress,
+} from '../../../features/pmicControl/profilingProjectsSlice.';
 import {
     getCompleteStep,
     getProfile,
@@ -28,6 +31,9 @@ export default ({
     const currentProfilingIndex = useSelector(getProfileIndex);
     const completeStep = useSelector(getCompleteStep);
     const profilingStage = useSelector(getProfilingStage);
+    const profileProject = useSelector(getProfileProjects).find(
+        p => p.path === generateDefaultProjectPath(profile)
+    );
     const profileProgress = useSelector(getProjectProfileProgress).filter(
         p => p.path === generateDefaultProjectPath(profile)
     );
@@ -93,32 +99,32 @@ export default ({
             } `,
         };
 
-        if (
+        const settings = profileProject?.settings?.profiles[index];
+
+        if (settings?.paramsJson && settings?.batteryJson) {
+            stepProcessing.state = 'success';
+        } else if (
             processingCSVProgress === undefined &&
             currentProfilingIndex >= index &&
-            dataCollected
+            dataCollected &&
+            completeStep?.level === 'warning'
         ) {
-            if (completeStep?.level === 'success') {
-                stepProcessing.state = 'success';
-            } else if (completeStep?.level === 'warning') {
-                stepProcessing.state = 'warning';
-                if (index === profile.temperatures.length - 1) {
-                    stepProcessing.caption = [
-                        {
-                            id: '1',
-                            caption: 'Data collected might not be correct.',
-                        },
-                        {
-                            id: '2',
-                            caption: 'Process now',
-                            action: () =>
-                                dispatch(startProcessingCsv(profile, index)),
-                        },
-                    ];
-                } else {
-                    stepProcessing.caption =
-                        'Data collected might not be correct.';
-                }
+            stepProcessing.state = 'warning';
+            if (index === profile.temperatures.length - 1) {
+                stepProcessing.caption = [
+                    {
+                        id: '1',
+                        caption: 'Data collected might not be correct.',
+                    },
+                    {
+                        id: '2',
+                        caption: 'Process now',
+                        action: () =>
+                            dispatch(startProcessingCsv(profile, index)),
+                    },
+                ];
+            } else {
+                stepProcessing.caption = 'Data collected might not be correct.';
             }
         } else if (processingCSVProgress && !processingCSVProgress.errorLevel) {
             stepProcessing.state = 'active';
