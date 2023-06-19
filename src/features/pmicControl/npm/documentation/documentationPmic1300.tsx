@@ -531,7 +531,7 @@ export const documentation: Documentation = {
             title: 'Write Battery Model',
             description: (
                 <p>
-                    You can load a battery model to start evaluating the nPM
+                    You can write a battery model to start evaluating the nPM
                     PowerUP fuel gauge.
                 </p>
             ),
@@ -629,9 +629,8 @@ export const documentation: Documentation = {
             title: 'Discharge cut-off',
             description: (
                 <p>
-                    Discharge cut-off is the lowest operating voltage of the
-                    battery. This should be set according to the battery
-                    specification.
+                    The lowest battery operating voltage. Set this according to
+                    the battery specification.
                 </p>
             ),
         },
@@ -639,8 +638,8 @@ export const documentation: Documentation = {
             title: 'Capacity',
             description: (
                 <p>
-                    This is the battery capacity in mAh. This should be set
-                    according to the rated capacity of the battery used.
+                    The battery capacity in mAh. Set this according to the rated
+                    capacity of the battery used.
                 </p>
             ),
         },
@@ -649,14 +648,14 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        This specifies the temperatures the battery will be
-                        profiled at. We recommend profiling at three
-                        temperatures for best state-of-charge accuracy.
+                        The battery profiling temperatures. Temperatures between
+                        0°C to 60°C, in steps of 1°C, are supported.
                     </p>
                     <p>
-                        For example, if the application temperature range is 5°C
-                        to 45°C, we recommend to profile at 5°C, 25°C and 45°C.
-                        Range is 0°C to 65°C in 1°C steps.
+                        We recommend profiling at three temperatures for best
+                        state-of-charge accuracy. For example, if your
+                        application temperature range is 5°C to 45°C, we
+                        recommend profiling at 5°C, 25°C, and 45°C.
                     </p>
                 </>
             ),
