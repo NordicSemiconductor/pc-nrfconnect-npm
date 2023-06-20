@@ -133,6 +133,15 @@ export const documentation: Documentation = {
                     </p>
                     <p className="title font-weight-bold">Range</p>
                     <p>0% to 100%, in 0.1% steps</p>
+                    <p className="title font-weight-bold">Note</p>
+                    <p>
+                        nPM1300 fuel gauge algorithm incorporate internal
+                        adjustments to correct any initialization errors
+                        resulting from unrelaxed battery and unexpected reset
+                        conditions. These errors typically have a minor impact
+                        and the predictions will converge to the accurate value
+                        within a few minutes of normal operation.
+                    </p>
                 </>
             ),
         },
@@ -146,6 +155,15 @@ export const documentation: Documentation = {
                     </p>
                     <p className="title font-weight-bold">Range</p>
                     <p>0% to 100%, in 0.1% steps</p>
+                    <p className="title font-weight-bold">Note</p>
+                    <p>
+                        nPM1300 fuel gauge algorithm incorporate internal
+                        adjustments to correct any initialization errors
+                        resulting from unrelaxed battery and unexpected reset
+                        conditions. These errors typically have a minor impact
+                        and the predictions will converge to the accurate value
+                        within a few minutes of normal operation.
+                    </p>
                 </>
             ),
         },
