@@ -13,6 +13,13 @@ and this project adheres to
 -   Wait for device while in the profiling wizard int the checklist or complete
     stages
 
+### Changes
+
+-   Update to nrfutil-npm-x86_64-unknown-linux-gnu-0.2.0-alpha.6
+-   Update to nrfutil-npm-x86_64-pc-windows-msvc-0.2.0-alpha.6
+-   Move `VTerm` and `Discharge cut-off` from profile to project in the
+    `Profiles` tab
+
 ## 0.7.7 - 2023-06-20
 
 ### Added
