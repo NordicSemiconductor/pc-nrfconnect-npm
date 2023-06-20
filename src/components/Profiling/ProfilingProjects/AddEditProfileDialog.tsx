@@ -30,12 +30,6 @@ export default ({
     profile?: ProfilingProjectProfile & { index: number };
     onClose: () => void;
 }) => {
-    const [vLowerCutOff, setLowerVCutOff] = useState(
-        profile?.vLowerCutOff ?? 3
-    );
-    const [vUpperCutOff, setUpperVCutOff] = useState(
-        profile?.vUpperCutOff ?? 4.2
-    );
     const [temperature, setTemperature] = useState<number>(
         profile?.temperature ?? 25
     );
@@ -69,8 +63,6 @@ export default ({
                                                 ...project.profiles[
                                                     profile.index
                                                 ],
-                                                vLowerCutOff,
-                                                vUpperCutOff,
                                                 temperature,
                                                 csvPath,
                                                 batteryJson: csvPathChanged
@@ -86,8 +78,6 @@ export default ({
                                             };
                                         } else {
                                             project.profiles.push({
-                                                vLowerCutOff,
-                                                vUpperCutOff,
                                                 temperature,
                                                 csvReady: true,
                                                 csvPath,
@@ -108,67 +98,6 @@ export default ({
             }
         >
             <Group>
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
-                        <div>
-                            <span>V</span>
-                            <span className="subscript">TERM</span>
-                        </div>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={vUpperCutOff}
-                                range={{
-                                    min: 4,
-                                    max: 4.4,
-                                    step: 0.05,
-                                    decimals: 2,
-                                }}
-                                onChange={setUpperVCutOff}
-                            />
-                            <span>V</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[vUpperCutOff]}
-                        onChange={[setUpperVCutOff]}
-                        range={{
-                            min: 4,
-                            max: 4.4,
-                            step: 0.05,
-                            decimals: 2,
-                        }}
-                    />
-                </div>
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
-                        <div>
-                            <span>Discharge cut-off voltage</span>
-                        </div>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={vLowerCutOff}
-                                range={{
-                                    min: 2.7,
-                                    max: 3.1,
-                                    step: 0.05,
-                                    decimals: 2,
-                                }}
-                                onChange={setLowerVCutOff}
-                            />
-                            <span>V</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[vLowerCutOff]}
-                        onChange={[setLowerVCutOff]}
-                        range={{
-                            min: 2.7,
-                            max: 3.1,
-                            step: 0.05,
-                            decimals: 2,
-                        }}
-                    />
-                </div>
                 <div className="flex-row">
                     <div className="flex-grow-1 slider-container">
                         <FormLabel className="flex-row">

@@ -129,10 +129,10 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 const project: ProfilingProject = {
                                     name,
                                     capacity,
+                                    vLowerCutOff,
+                                    vUpperCutOff,
                                     profiles: profile.temperatures.map(
                                         temperature => ({
-                                            vLowerCutOff,
-                                            vUpperCutOff,
                                             temperature,
                                             csvReady: false,
                                         })

@@ -24,6 +24,10 @@ export default ({
                 <div className="d-flex align-items-center">
                     <span>
                         <span>{`${settings.name} - ${settings.capacity} mAh`}</span>
+                        <span className="font-weight-normal">
+                            {' - '}V<span className="subscript">TERM</span>
+                            {` ${settings.vUpperCutOff} V,  Discharge cut-off voltage ${settings.vLowerCutOff} V.`}
+                        </span>
                     </span>
                 </div>
                 <div>
