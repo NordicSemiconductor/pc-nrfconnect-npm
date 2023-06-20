@@ -47,7 +47,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
         <GenericDialog
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
-            } @ ${profile.temperatures[index]}°C`}
+            } @ ${profile.temperatures[index]}°C - NTC ${latestTBat}°C`}
             isVisible={isVisible}
             className="app-dialog"
             showSpinner

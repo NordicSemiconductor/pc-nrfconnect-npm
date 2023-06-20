@@ -12,6 +12,7 @@ and this project adheres to
 
 -   Wait for device while in the profiling wizard int the checklist or complete
     stages
+-   NTC temperature to Profiling and Resting dialogs
 
 ### Changes
 
