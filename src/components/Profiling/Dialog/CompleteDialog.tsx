@@ -13,6 +13,7 @@ import {
     ButtonVariants,
     DialogButton,
     GenericDialog,
+    getWaitingForDeviceTimeout,
     Group,
 } from 'pc-nrfconnect-shared';
 
@@ -325,6 +326,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const completeStep = useSelector(getCompleteStep);
     const index = useSelector(getProfileIndex);
     const capacityConsumed = useSelector(getCapacityConsumed);
+    const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
 
     const profileProgress = useSelector(getProjectProfileProgress).filter(
         p => p.path === generateDefaultProjectPath(profile)
@@ -416,6 +418,11 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             }
         >
             <Group>
+                {waitingForDevice && (
+                    <Alert label="Caution: " variant="warning">
+                        Waiting to for device to reconnect...
+                    </Alert>
+                )}
                 {completeStep?.level === 'success' && !lastProfile && (
                     <Alert variant="success" label="Action required: ">
                         {`Profiling  ${profile.temperatures[index]}°C is complete. Click 'Next Profile' to continue.`}

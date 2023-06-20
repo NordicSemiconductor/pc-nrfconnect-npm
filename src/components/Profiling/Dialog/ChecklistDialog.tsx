@@ -170,8 +170,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 )}
                 {(pmicConnectionState === 'pmic-pending-rebooting' ||
                     waitingForDevice) && (
-                    <Alert label="Note: " variant="info">
-                        Waiting to for PMIC to reboot
+                    <Alert label="Caution: " variant="warning">
+                        Waiting to for device to reconnect...
                     </Alert>
                 )}
                 {pmicConnectionState === 'pmic-connected' && (

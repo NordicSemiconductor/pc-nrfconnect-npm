@@ -408,17 +408,28 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onBeforeReboot(() => {
-                    dispatch(
-                        setWaitForDevice({
-                            when: 'sameTraits',
-                            once: true,
-                            timeout: 10000,
-                            onSuccess: async device => {
-                                await dispatch(closeDevice());
-                                dispatch(openDevice(device));
-                            },
-                        })
-                    );
+                    dispatch((dis: TDispatch, getState: () => RootState) => {
+                        const previousWaitForDevice =
+                            getState().deviceAutoSelect.waitForDevice;
+                        dis(
+                            setWaitForDevice({
+                                when: 'sameTraits',
+                                once: true,
+                                timeout: 10000,
+                                onSuccess: async device => {
+                                    await dispatch(closeDevice());
+                                    dispatch(openDevice(device));
+                                    if (previousWaitForDevice) {
+                                        dis(
+                                            setWaitForDevice(
+                                                previousWaitForDevice
+                                            )
+                                        );
+                                    }
+                                },
+                            })
+                        );
+                    });
                 })
             );
 
@@ -428,15 +439,29 @@ export default () => {
                         dispatch(clearWaitForDevice());
                     } else {
                         dispatch(
-                            setWaitForDevice({
-                                when: 'sameTraits',
-                                once: true,
-                                timeout: 10000,
-                                onSuccess: async device => {
-                                    await dispatch(closeDevice());
-                                    dispatch(openDevice(device));
-                                },
-                            })
+                            (dis: TDispatch, getState: () => RootState) => {
+                                const previousWaitForDevice =
+                                    getState().deviceAutoSelect.waitForDevice;
+
+                                dis(
+                                    setWaitForDevice({
+                                        when: 'sameTraits',
+                                        once: true,
+                                        timeout: 10000,
+                                        onSuccess: async device => {
+                                            await dispatch(closeDevice());
+                                            dispatch(openDevice(device));
+                                            if (previousWaitForDevice) {
+                                                dis(
+                                                    setWaitForDevice(
+                                                        previousWaitForDevice
+                                                    )
+                                                );
+                                            }
+                                        },
+                                    })
+                                );
+                            }
                         );
                     }
                 })

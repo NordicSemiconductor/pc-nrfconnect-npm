@@ -311,14 +311,24 @@ export default () => {
     }, [ccProfilingState, dispatch, profilingStage]);
 
     useEffect(() => {
-        if (profilingStage) {
+        if (
+            profilingStage === 'Profiling' ||
+            profilingStage === 'Resting' ||
+            profilingStage === 'Checklist' ||
+            profilingStage === 'Complete' ||
+            profilingStage === 'Charging'
+        ) {
             let t: NodeJS.Timeout;
             const initWaitForDevice = () => {
                 dispatch(
                     setWaitForDevice({
                         when: 'sameTraits',
                         once: true,
-                        timeout: 2000,
+                        timeout:
+                            profilingStage === 'Checklist' ||
+                            profilingStage === 'Complete'
+                                ? 24 * 60 * 60 * 1000
+                                : 2000,
                         onSuccess: async device => {
                             initWaitForDevice();
                             setInitializing(true);
