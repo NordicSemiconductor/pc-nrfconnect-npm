@@ -135,12 +135,12 @@ export const documentation: Documentation = {
                     <p>0% to 100%, in 0.1% steps</p>
                     <p className="title font-weight-bold">Note</p>
                     <p>
-                        nPM1300 fuel gauge algorithm incorporate internal
-                        adjustments to correct any initialization errors
-                        resulting from stressed battery and unexpected reset
-                        conditions. These errors typically have a minor impact
-                        and the predictions will converge to the accurate value
-                        within a few minutes of normal operation.
+                        The nPM1300 fuel gauge algorithm adjusts to correct for
+                        possible initialization errors due to a stressed
+                        battery, or unexpected reset conditions. Typically the
+                        impact of these errors is minor and the predictions will
+                        converge to an accurate value within a few minutes of
+                        normal operation.
                     </p>
                 </>
             ),
@@ -157,12 +157,12 @@ export const documentation: Documentation = {
                     <p>0% to 100%, in 0.1% steps</p>
                     <p className="title font-weight-bold">Note</p>
                     <p>
-                        nPM1300 fuel gauge algorithm incorporate internal
-                        adjustments to correct any initialization errors
-                        resulting from stressed battery and unexpected reset
-                        conditions. These errors typically have a minor impact
-                        and the predictions will converge to the accurate value
-                        within a few minutes of normal operation.
+                        The nPM1300 fuel gauge algorithm adjusts to correct for
+                        possible initialization errors due to a stressed
+                        battery, or unexpected reset conditions. Typically the
+                        impact of these errors is minor and the predictions will
+                        converge to an accurate value within a few minutes of
+                        normal operation.
                     </p>
                 </>
             ),
