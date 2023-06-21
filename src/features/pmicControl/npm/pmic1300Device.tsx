@@ -1600,6 +1600,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...baseDevice,
         release: () => {
             baseDevice.release();
+            batteryProfiler?.release();
             releaseAll.forEach(release => release());
         },
         applyConfig: config => {

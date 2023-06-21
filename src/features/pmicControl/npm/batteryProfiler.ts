@@ -77,54 +77,69 @@ export const BatteryProfiler: IBatteryProfiler = (
         }
     };
 
-    shellParser?.registerCommandCallback(
-        toRegex('cc_profile start'),
-        () => {
-            if (profiling !== 'Running') {
-                profiling = 'Running';
-                eventEmitter.emit('onProfilingStateChange', profiling);
-            }
-        },
-        noop
-    );
+    const releaseAll: (() => void)[] = [];
 
-    shellParser?.registerCommandCallback(
-        toRegex('cc_profile active'),
-        res => {
-            const newState = parseToBoolean(res) ? 'Running' : 'Off';
-            if (newState !== profiling) {
-                profiling = newState;
-                eventEmitter.emit('onProfilingStateChange', newState);
-            }
-        },
-        noop
-    );
+    if (shellParser) {
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('cc_profile start'),
+                () => {
+                    if (profiling !== 'Running') {
+                        profiling = 'Running';
+                        eventEmitter.emit('onProfilingStateChange', profiling);
+                    }
+                },
+                noop
+            )
+        );
 
-    shellParser?.registerCommandCallback(
-        toRegex('cc_profile stop'),
-        () => {
-            if (profiling !== 'Off') {
-                profiling = 'Off';
-                eventEmitter.emit('onProfilingStateChange', profiling);
-            }
-        },
-        res => {
-            if (res.includes('No profiling ongoing')) {
-                if (profiling !== 'Off') {
-                    profiling = 'Off';
-                    eventEmitter.emit('onProfilingStateChange', profiling);
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('cc_profile active'),
+                res => {
+                    const newState = parseToBoolean(res) ? 'Running' : 'Off';
+                    if (newState !== profiling) {
+                        profiling = newState;
+                        eventEmitter.emit('onProfilingStateChange', newState);
+                    }
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('cc_profile stop'),
+                () => {
+                    if (profiling !== 'Off') {
+                        profiling = 'Off';
+                        eventEmitter.emit('onProfilingStateChange', profiling);
+                    }
+                },
+                res => {
+                    if (res.includes('No profiling ongoing')) {
+                        if (profiling !== 'Off') {
+                            profiling = 'Off';
+                            eventEmitter.emit(
+                                'onProfilingStateChange',
+                                profiling
+                            );
+                        }
+                    }
                 }
-            }
-        }
-    );
+            )
+        );
 
-    shellParser?.onShellLoggingEvent(logEvent => {
-        parseLogData(logEvent, loggingEvent => {
-            if (loggingEvent.module === 'module_cc_profiling') {
-                processModuleCcProfiling(loggingEvent);
-            }
-        });
-    });
+        releaseAll.push(
+            shellParser.onShellLoggingEvent(logEvent => {
+                parseLogData(logEvent, loggingEvent => {
+                    if (loggingEvent.module === 'module_cc_profiling') {
+                        processModuleCcProfiling(loggingEvent);
+                    }
+                });
+            })
+        );
+    }
 
     const setProfile = (
         reportIntervalCc: number,
@@ -216,6 +231,9 @@ export const BatteryProfiler: IBatteryProfiler = (
         });
 
     return {
+        release: () => {
+            releaseAll.forEach(release => release());
+        },
         setProfile,
         startProfiling,
         stopProfiling,

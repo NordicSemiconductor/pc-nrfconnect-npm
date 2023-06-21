@@ -401,6 +401,7 @@ export interface IBatteryProfiler {
 }
 
 export type BatteryProfiler = {
+    release: () => void;
     setProfile: (
         reportIntervalCc: number,
         reportIntervalNtc: number,
