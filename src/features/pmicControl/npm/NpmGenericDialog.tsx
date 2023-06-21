@@ -4,10 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, ProgressBar } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { DialogButton, GenericDialog } from 'pc-nrfconnect-shared';
+import {
+    DialogButton,
+    GenericDialog,
+    selectedDevice,
+} from 'pc-nrfconnect-shared';
 
 import useShellParser from '../../serial/useShellParser';
 import { getDialog } from '../pmicControlSlice';
@@ -15,7 +19,14 @@ import { noop } from './pmicHelpers';
 
 export default () => {
     const currentPmicDialog = useSelector(getDialog);
+    const device = useSelector(selectedDevice);
     useShellParser();
+
+    useEffect(() => {
+        if (!device && currentPmicDialog) {
+            currentPmicDialog?.onCancel();
+        }
+    }, [currentPmicDialog, device]);
 
     return currentPmicDialog ? (
         <GenericDialog

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { getPersistentStore } from 'pc-nrfconnect-shared';
+import { Device, getPersistentStore } from 'pc-nrfconnect-shared';
 import { v4 as uuid } from 'uuid';
 
 import { RootState } from '../../../appReducer';
@@ -211,6 +211,14 @@ export const updateAdcTimings =
                           .fuelGaugeNotChargingSamplingRate
         );
     };
+
+export const isNpm1300SerialApplicationMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ab &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
+export const isNpm1300SerialRecoverMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ac &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
 
 export const MAX_TIMESTAMP = 359999999; // 99hrs 59min 59sec 999ms
 export const DOWNLOAD_BATTERY_PROFILE_DIALOG_ID = 'downloadBatteryProfile';
