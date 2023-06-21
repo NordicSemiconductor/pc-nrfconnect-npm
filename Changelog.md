@@ -21,6 +21,7 @@ and this project adheres to
 
 -   `Process Data` could not be click when error/warning alert was still open
 -   Preserve data order when written to files.
+-   Battery resting time changed to back 15 minutes
 
 ## 0.7.8 - 2023-06-20
 
