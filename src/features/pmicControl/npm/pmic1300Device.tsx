@@ -223,33 +223,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         sendCommand(`npm_adc sample 0`);
     };
 
-    shellParser?.onShellLoggingEvent(logEvent => {
-        parseLogData(logEvent, loggingEvent => {
-            switch (loggingEvent.module) {
-                case 'module_pmic':
-                    processModulePmic(loggingEvent);
-                    break;
-                case 'module_pmic_adc':
-                    processModulePmicAdc(loggingEvent);
-                    break;
-                case 'module_pmic_irq':
-                    processModulePmicIrq(loggingEvent);
-                    break;
-                case 'module_pmic_charger':
-                    processModulePmicCharger(loggingEvent);
-                    break;
-                case 'module_fg':
-                    processModuleFuelGauge(loggingEvent);
-                    break;
-            }
-
-            eventEmitter.emit('onLoggingEvent', {
-                loggingEvent,
-                dataPair: isModuleDataPair(loggingEvent.module),
-            });
-        });
-    });
-
     const emitOnChargingStatusUpdate = (value: number) =>
         eventEmitter.emit('onChargingStatusUpdate', {
             // eslint-disable-next-line no-bitwise
@@ -284,6 +257,35 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const releaseAll: (() => void)[] = [];
 
     if (shellParser) {
+        releaseAll.push(
+            shellParser.onShellLoggingEvent(logEvent => {
+                parseLogData(logEvent, loggingEvent => {
+                    switch (loggingEvent.module) {
+                        case 'module_pmic':
+                            processModulePmic(loggingEvent);
+                            break;
+                        case 'module_pmic_adc':
+                            processModulePmicAdc(loggingEvent);
+                            break;
+                        case 'module_pmic_irq':
+                            processModulePmicIrq(loggingEvent);
+                            break;
+                        case 'module_pmic_charger':
+                            processModulePmicCharger(loggingEvent);
+                            break;
+                        case 'module_fg':
+                            processModuleFuelGauge(loggingEvent);
+                            break;
+                    }
+
+                    eventEmitter.emit('onLoggingEvent', {
+                        loggingEvent,
+                        dataPair: isModuleDataPair(loggingEvent.module),
+                    });
+                });
+            })
+        );
+
         releaseAll.push(
             shellParser.registerCommandCallback(
                 toRegex('npm_adc sample', false, undefined, '[0-9]+ [0-9]+'),
