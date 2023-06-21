@@ -194,7 +194,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                                             onCancel: () => {
                                                                 reject(
                                                                     new Error(
-                                                                        'Device setup canceled cancelled'
+                                                                        'Device setup cancelled'
                                                                     )
                                                                 );
                                                             },
