@@ -76,7 +76,8 @@ export default ({
                         includedProfiles.length === 0 ||
                         projectProgress.filter(
                             progress =>
-                                !project.profiles[progress.index].exclude
+                                !project.profiles[progress.index].exclude &&
+                                !progress.errorLevel
                         ).length === includedProfiles.length ||
                         includedProfiles.filter(profile =>
                             isProfileReadyForProcessing(
@@ -103,7 +104,7 @@ export default ({
                         });
                     }}
                 >
-                    Process All Data
+                    Process Included Data
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item
