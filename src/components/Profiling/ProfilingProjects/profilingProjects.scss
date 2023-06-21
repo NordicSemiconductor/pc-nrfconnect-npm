@@ -7,8 +7,8 @@
 @import '~pc-nrfconnect-shared/src/variables';
 
 .projects-container {
-    max-width: 100%;
-    width: fit-content;
+    max-width: fit-content;
+    min-width: 905px;
     margin: auto;
     padding: 16px;
 
