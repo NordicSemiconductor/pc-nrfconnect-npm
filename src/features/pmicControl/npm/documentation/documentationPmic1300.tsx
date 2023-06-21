@@ -128,7 +128,7 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        Battery voltage, current, and temperature is used to
+                        Battery voltage, current, and temperature are used to
                         calculate the battery state-of-charge.
                     </p>
                     <p className="title font-weight-bold">Range</p>
@@ -137,7 +137,7 @@ export const documentation: Documentation = {
                     <p>
                         nPM1300 fuel gauge algorithm incorporate internal
                         adjustments to correct any initialization errors
-                        resulting from unrelaxed battery and unexpected reset
+                        resulting from stressed battery and unexpected reset
                         conditions. These errors typically have a minor impact
                         and the predictions will converge to the accurate value
                         within a few minutes of normal operation.
@@ -150,7 +150,7 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        Battery voltage, current, and temperature is used to
+                        Battery voltage, current, and temperature are used to
                         calculate the battery state-of-charge.
                     </p>
                     <p className="title font-weight-bold">Range</p>
@@ -159,7 +159,7 @@ export const documentation: Documentation = {
                     <p>
                         nPM1300 fuel gauge algorithm incorporate internal
                         adjustments to correct any initialization errors
-                        resulting from unrelaxed battery and unexpected reset
+                        resulting from stressed battery and unexpected reset
                         conditions. These errors typically have a minor impact
                         and the predictions will converge to the accurate value
                         within a few minutes of normal operation.
