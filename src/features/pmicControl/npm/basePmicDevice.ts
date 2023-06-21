@@ -271,25 +271,29 @@ export const baseNpmDevice: IBaseNpmDevice = (
         getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,
 
         isSupportedVersion: () =>
-            new Promise<boolean>((resolve, reject) => {
-                shellParser?.enqueueRequest(
-                    'app_version',
-                    {
-                        onSuccess: result => {
-                            resolve(
-                                `app_version=${supportsVersion}` === result
-                            );
+            new Promise<{ supported: boolean; version: string }>(
+                (resolve, reject) => {
+                    shellParser?.enqueueRequest(
+                        'app_version',
+                        {
+                            onSuccess: result => {
+                                result = result.replace('app_version=', '');
+                                resolve({
+                                    supported: supportsVersion === result,
+                                    version: result,
+                                });
+                            },
+                            onError: reject,
+                            onTimeout: error => {
+                                reject(error);
+                                console.warn(error);
+                            },
                         },
-                        onError: reject,
-                        onTimeout: error => {
-                            reject(error);
-                            console.warn(error);
-                        },
-                    },
-                    undefined,
-                    true
-                );
-            }),
+                        undefined,
+                        true
+                    );
+                }
+            ),
         getSupportedVersion: () => supportsVersion,
 
         getUptimeOverflowCounter: () => uptimeOverflowCounter,

@@ -112,7 +112,9 @@ export default () => {
                     action: () =>
                         npmDevice
                             ?.isSupportedVersion()
-                            .then(result => dispatch(setIsPaused(result))),
+                            .then(result =>
+                                dispatch(setIsPaused(result.supported))
+                            ),
                 },
             ];
         } else if (pmicState === 'pmic-disconnected') {

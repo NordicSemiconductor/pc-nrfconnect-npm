@@ -87,7 +87,7 @@ export default () => {
     useEffect(() => {
         if (npmDevice) {
             npmDevice.isSupportedVersion().then(result => {
-                dispatch(setSupportedVersion(result));
+                dispatch(setSupportedVersion(result.supported));
             });
         }
     }, [dispatch, npmDevice]);

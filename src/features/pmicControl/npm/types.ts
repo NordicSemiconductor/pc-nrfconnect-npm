@@ -218,7 +218,7 @@ export type BaseNpmDevice = {
     getNumberOfLdos: () => number;
     getNumberOfGPIOs: () => number;
 
-    isSupportedVersion: () => Promise<boolean>;
+    isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
     getSupportedVersion: () => string;
 
     getUptimeOverflowCounter: () => number;
