@@ -706,7 +706,10 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await expect(pmic.isSupportedVersion()).resolves.toBe(true);
+                await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
+                    supported: true,
+                    version: '0.7.1+5',
+                });
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -732,7 +735,10 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await expect(pmic.isSupportedVersion()).resolves.toBe(false);
+                await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
+                    supported: false,
+                    version: '0.0.0+9',
+                });
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
