@@ -7,7 +7,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ipcRenderer } from 'electron';
-import { appendFile, existsSync, mkdirSync } from 'fs';
+import { appendFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import {
     Alert,
@@ -568,12 +568,13 @@ export default () => {
                     data += `${e.loggingEvent.timestamp},${valuePairs
                         .map(p => p.split('=')[1] ?? 'NaN')
                         .join(',')}\r\n`;
-                    appendFile(path, data, err => {
-                        if (err) {
-                            logger.error(describeError(err));
-                        }
-                    });
+                    try {
+                        appendFileSync(path, data);
+                    } catch (err) {
+                        logger.error(describeError(err));
+                    }
                 }
+
                 let data = '';
                 const path = `${baseDir}/all_events.csv`;
                 const addHeaders = !existsSync(path);
@@ -584,11 +585,12 @@ export default () => {
                     /(\r\n|\r|\n)/g,
                     ' '
                 )}"\r\n`; // TODO look for escaping new lines in csvs
-                appendFile(path, data, err => {
-                    if (err) {
-                        logger.error(describeError(err));
-                    }
-                });
+
+                try {
+                    appendFileSync(path, data);
+                } catch (err) {
+                    logger.error(describeError(err));
+                }
             });
         });
     }, [

@@ -6,7 +6,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { appendFile, writeFileSync } from 'fs';
+import { appendFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import {
     Alert,
@@ -182,11 +182,11 @@ export default () => {
                             event.data.tBat
                         }\r\n`;
 
-                        appendFile(profilingCsvPath, data, err => {
-                            if (err) {
-                                logger.error(describeError(err));
-                            }
-                        });
+                        try {
+                            appendFileSync(profilingCsvPath, data);
+                        } catch (err) {
+                            logger.error(describeError(err));
+                        }
                     }
                 }
             }),
