@@ -177,37 +177,33 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                                     });
                                                 };
 
-                                                if (
-                                                    result.version === '0.7.0+0'
-                                                ) {
-                                                    const information: PmicDialog =
-                                                        {
-                                                            type: 'information',
-                                                            doNotAskAgainStoreID:
-                                                                'pmic1300-fp2-reset-issue',
-                                                            message:
-                                                                npm1300EngineeringCMessage,
-                                                            confirmLabel: 'Yes',
-                                                            cancelLabel: 'No',
-                                                            title: 'Important notice!',
-                                                            onConfirm: action,
-                                                            onCancel: () => {
-                                                                reject(
-                                                                    new Error(
-                                                                        'Device setup cancelled'
-                                                                    )
-                                                                );
-                                                            },
-                                                        };
+                                                // TODO shown by reading HW version FP2 only should het this
+                                                const information: PmicDialog =
+                                                    {
+                                                        type: 'information',
+                                                        doNotAskAgainStoreID:
+                                                            'pmic1300-fp2-reset-issue',
+                                                        message:
+                                                            npm1300EngineeringCMessage,
+                                                        confirmLabel: 'Yes',
+                                                        cancelLabel: 'No',
+                                                        optionalLabel:
+                                                            "Yes, don't ask again",
+                                                        title: 'Important notice!',
+                                                        onConfirm: action,
+                                                        onCancel: () => {
+                                                            reject(
+                                                                new Error(
+                                                                    'Device setup cancelled'
+                                                                )
+                                                            );
+                                                        },
+                                                        onOptional: action,
+                                                    };
 
-                                                    dispatch(
-                                                        dialogHandler(
-                                                            information
-                                                        )
-                                                    );
-                                                } else {
-                                                    action();
-                                                }
+                                                dispatch(
+                                                    dialogHandler(information)
+                                                );
                                             });
                                         })
                                         .catch(error =>
