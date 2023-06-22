@@ -209,7 +209,7 @@ export const generateParamsFromCSV =
                         progress: 0,
                         cancel: () => {
                             // TODO Ask for fix in NRF UTIL
-                            processCSV.kill('SIGKILL');
+                            processCSV.kill('SIGINT');
                             dispatch(
                                 removeProjectProfileProgress({
                                     path: projectAbsolutePath,
