@@ -701,14 +701,14 @@ describe('PMIC 1300', () => {
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _unique?: boolean
                     ) => {
-                        callbacks?.onSuccess('app_version=0.7.1+5', command);
+                        callbacks?.onSuccess('app_version=0.7.1+6', command);
                         return Promise.resolve();
                     }
                 );
 
                 await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
                     supported: true,
-                    version: '0.7.1+5',
+                    version: '0.7.1+6',
                 });
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -2941,7 +2941,7 @@ describe('PMIC 1300', () => {
                     },
                 ],
                 fuelGauge: true,
-                firmwareVersion: '0.7.1+5',
+                firmwareVersion: '0.7.1+6',
                 deviceType: 'npm1300',
                 fuelGaugeChargingSamplingRate: 1000,
             });
