@@ -43,6 +43,8 @@ const NRFUTIL_HOME = path.join(
     os.platform()
 );
 
+let nrfUtilVersion = 'unknown';
+
 const NRFUTIL_BINARY = getAppFile(
     path.join('resources', 'nrfutil-npm', os.platform(), 'bin', 'nrfutil-npm')
 );
@@ -258,6 +260,9 @@ export const generateParamsFromCSV =
                                     proj.profiles[index].paramsJson =
                                         fs.readFileSync(paramsPath, 'utf8');
 
+                                    proj.profiles[index].nrfUtilVersion =
+                                        nrfUtilVersion;
+
                                     dispatch(
                                         removeProjectProfileProgress({
                                             path: projectAbsolutePath,
@@ -303,6 +308,48 @@ export const generateParamsFromCSV =
             })
         );
     };
+
+export const getVersion = () =>
+    new Promise<string>((resolve, reject) => {
+        const pathObject = path.parse(NRFUTIL_BINARY);
+        if (!fs.existsSync(pathObject.dir)) {
+            reject(new Error('OS not supported'));
+            return;
+        }
+
+        const tempFolder = generateTempFolder();
+        const resultsFolder = path.join(tempFolder, 'Results');
+        fs.mkdirSync(resultsFolder);
+
+        const args = ['--version'];
+
+        const env = { ...process.env };
+        env.NRFUTIL_HOME = NRFUTIL_HOME;
+
+        const processCSV = spawn(NRFUTIL_BINARY, args, {
+            env,
+        });
+
+        let result = '';
+        let error = false;
+
+        processCSV.stdout.on('data', data => {
+            result += data.toString();
+            error = error || false;
+        });
+
+        processCSV.stderr.on('data', data => {
+            result += data.toString();
+        });
+
+        processCSV.on('close', () => {
+            if (!error) {
+                resolve(result);
+            } else {
+                reject(result);
+            }
+        });
+    });
 
 export const mergeBatteryParams = (
     project: ProfilingProject,
@@ -390,4 +437,12 @@ export const mergeBatteryParams = (
                 });
             }
         });
+    });
+
+getVersion()
+    .then(version => {
+        nrfUtilVersion = version;
+    })
+    .catch(() => {
+        nrfUtilVersion = 'unknown';
     });

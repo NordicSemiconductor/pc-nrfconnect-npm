@@ -26,6 +26,7 @@ export interface ProfilingProjectProfile {
     paramsJson?: string;
     batteryJson?: string;
     exclude?: boolean;
+    nrfUtilVersion?: string;
 }
 export interface ProfilingProject {
     name: string;
@@ -33,4 +34,5 @@ export interface ProfilingProject {
     vLowerCutOff: number;
     vUpperCutOff: number;
     profiles: ProfilingProjectProfile[];
+    appVersion: string;
 }

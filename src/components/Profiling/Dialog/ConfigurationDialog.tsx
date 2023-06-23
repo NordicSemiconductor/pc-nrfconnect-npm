@@ -126,7 +126,10 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     profilingProfiles,
                                 };
 
-                                const project: ProfilingProject = {
+                                const project: Omit<
+                                    ProfilingProject,
+                                    'appVersion'
+                                > = {
                                     name,
                                     capacity,
                                     vLowerCutOff,

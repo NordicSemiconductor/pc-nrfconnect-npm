@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { describeError, logger } from 'pc-nrfconnect-shared';
 
+import packageJsons from '../../../package.json';
 import { RootState } from '../../appReducer';
 import { Profile } from '../../features/pmicControl/npm/types';
 import {
@@ -104,6 +105,7 @@ export const readAndUpdateProjectSettings =
         if (oldProject) {
             try {
                 const newProject = updateProject(oldProject);
+                newProject.appVersion = packageJsons.version;
                 store.set(newProject);
                 dispatch(
                     updateProfilingProject({
@@ -118,8 +120,13 @@ export const readAndUpdateProjectSettings =
     };
 
 export const saveProjectSettings =
-    (filePath: string, project: ProfilingProject) =>
+    (filePath: string, projectToSave: Omit<ProfilingProject, 'appVersion'>) =>
     (dispatch: TDispatch, getState: () => RootState) => {
+        const project: ProfilingProject = {
+            ...projectToSave,
+            appVersion: packageJsons.version,
+        };
+
         const pathObject = path.parse(filePath);
         const store = new Store<ProfilingProject>({
             cwd: pathObject.dir,
