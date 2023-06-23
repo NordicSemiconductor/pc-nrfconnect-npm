@@ -15,6 +15,8 @@ and this project adheres to
 ### Changes
 
 -   Only show information dialog when connected to nPM1300 PMIC version 2.0
+-   Update to nrfutil-npm-x86_64-unknown-linux-gnu-0.2.0-alpha.7
+-   Update to nrfutil-npm-x86_64-pc-windows-msvc-0.2.0-alpha.7
 
 ## 0.7.9 - 2023-06-21
 
