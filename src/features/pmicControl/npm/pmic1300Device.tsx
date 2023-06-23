@@ -956,32 +956,40 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         });
     const setChargerNTCThermistor = (index: number, mode: NTCThermistor) =>
         new Promise<void>((resolve, reject) => {
+            emitPartialEvent<Charger>('onChargerUpdate', index, {
+                ntcThermistor: mode,
+            });
+
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', index, {
-                    ntcThermistor: mode,
-                });
                 resolve();
             } else {
-                let value = '';
-                switch (mode) {
-                    case '100 kΩ':
-                        value = 'ntc_100k';
-                        break;
-                    case '47 kΩ':
-                        value = 'ntc_47k';
-                        break;
-                    case '10 kΩ':
-                        value = 'ntc_10k';
-                        break;
-                }
-                sendCommand(
-                    `npmx adc ntc set ${value}`,
-                    () => resolve(),
-                    () => {
+                setChargerEnabled(index, false)
+                    .then(() => {
+                        let value = '';
+                        switch (mode) {
+                            case '100 kΩ':
+                                value = 'ntc_100k';
+                                break;
+                            case '47 kΩ':
+                                value = 'ntc_47k';
+                                break;
+                            case '10 kΩ':
+                                value = 'ntc_10k';
+                                break;
+                        }
+                        sendCommand(
+                            `npmx adc ntc set ${value}`,
+                            () => resolve(),
+                            () => {
+                                requestUpdate.chargerNTCThermistor(index);
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
                         requestUpdate.chargerNTCThermistor(index);
                         reject();
-                    }
-                );
+                    });
             }
         });
 

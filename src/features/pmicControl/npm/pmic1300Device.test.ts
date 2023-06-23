@@ -1937,16 +1937,27 @@ describe('PMIC 1300', () => {
                     },
                 ]).flat()
             )(
-                'Set setChargerNTCThermistor - Fail immediately -  %p',
+                'Set setChargerNTCThermistor - onError case 2 - Fail immediately -  %p',
                 async ({ index, mode, cliMode }) => {
+                    mockEnqueueRequest.mockImplementationOnce(
+                        helpers.registerCommandCallbackSuccess
+                    );
+
                     await expect(
                         pmic.setChargerNTCThermistor(index, mode)
                     ).rejects.toBeUndefined();
 
                     // turn chance ntc thermistor
-                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
+                        `npmx charger module charger set 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
                         `npmx adc ntc set ${cliMode}`,
                         expect.anything(),
                         undefined,
@@ -1955,7 +1966,60 @@ describe('PMIC 1300', () => {
 
                     // Refresh data due to error
                     expect(mockEnqueueRequest).nthCalledWith(
+                        3,
+                        `npmx adc ntc get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                }
+            );
+
+            test.each(
+                PMIC_1300_CHARGERS.map<
+                    { index: number; mode: NTCThermistor }[]
+                >(index => [
+                    {
+                        index,
+                        mode: '100 kΩ',
+                    },
+                    {
+                        index,
+                        mode: '10 kΩ',
+                    },
+                    {
+                        index,
+                        mode: '47 kΩ',
+                    },
+                ]).flat()
+            )(
+                'Set setChargerNTCThermistor - Fail immediately -  %p',
+                async ({ index, mode }) => {
+                    await expect(
+                        pmic.setChargerNTCThermistor(index, mode)
+                    ).rejects.toBeUndefined();
+
+                    // turn chance ntc thermistor
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npmx charger module charger set 0`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    expect(mockEnqueueRequest).nthCalledWith(
                         2,
+                        `npmx charger module charger get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
                         `npmx adc ntc get`,
                         expect.anything(),
                         undefined,
