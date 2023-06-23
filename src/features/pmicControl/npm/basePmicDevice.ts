@@ -296,6 +296,26 @@ export const baseNpmDevice: IBaseNpmDevice = (
             ),
         getSupportedVersion: () => supportsVersion,
 
+        getPmicVersion: () =>
+            new Promise<number>((resolve, reject) => {
+                shellParser?.enqueueRequest(
+                    'pmic_revision',
+                    {
+                        onSuccess: result => {
+                            result = result.replace('pmic_revision=', '');
+                            resolve(Number.parseFloat(result));
+                        },
+                        onError: reject,
+                        onTimeout: error => {
+                            reject(error);
+                            console.warn(error);
+                        },
+                    },
+                    undefined,
+                    true
+                );
+            }),
+
         getUptimeOverflowCounter: () => uptimeOverflowCounter,
         setUptimeOverflowCounter: (value: number) => {
             uptimeOverflowCounter = value;

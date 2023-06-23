@@ -220,6 +220,7 @@ export type BaseNpmDevice = {
 
     isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
     getSupportedVersion: () => string;
+    getPmicVersion: () => Promise<number>;
 
     getUptimeOverflowCounter: () => number;
     setUptimeOverflowCounter: (value: number) => void;

@@ -163,43 +163,58 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                     npmDevice
                                         .isSupportedVersion()
                                         .then(result => {
-                                            port.close().finally(() => {
-                                                const action = () => {
-                                                    resolve({
-                                                        device,
-                                                        validFirmware:
-                                                            result.supported,
-                                                    });
-                                                };
+                                            const action = () => {
+                                                resolve({
+                                                    device,
+                                                    validFirmware:
+                                                        result.supported,
+                                                });
+                                            };
 
-                                                // TODO shown by reading HW version FP2 only should het this
-                                                const information: PmicDialog =
-                                                    {
-                                                        type: 'information',
-                                                        doNotAskAgainStoreID:
-                                                            'pmic1300-fp2-reset-issue',
-                                                        message:
-                                                            npm1300EngineeringCMessage,
-                                                        confirmLabel: 'Yes',
-                                                        cancelLabel: 'No',
-                                                        optionalLabel:
-                                                            "Yes, don't ask again",
-                                                        title: 'Important notice!',
-                                                        onConfirm: action,
-                                                        onCancel: () => {
-                                                            reject(
-                                                                new Error(
-                                                                    'Device setup cancelled'
+                                            npmDevice
+                                                .getPmicVersion()
+                                                .then(version => {
+                                                    port.close().finally(() => {
+                                                        if (version === 2.0) {
+                                                            // FP2
+                                                            const information: PmicDialog =
+                                                                {
+                                                                    type: 'alert',
+                                                                    doNotAskAgainStoreID:
+                                                                        'pmic1300-fp2-reset-issue',
+                                                                    message:
+                                                                        npm1300EngineeringCMessage,
+                                                                    confirmLabel:
+                                                                        'Yes',
+                                                                    cancelLabel:
+                                                                        'No',
+                                                                    optionalLabel:
+                                                                        "Yes, don't ask again",
+                                                                    title: 'Important notice!',
+                                                                    onConfirm:
+                                                                        action,
+                                                                    onCancel:
+                                                                        () => {
+                                                                            reject(
+                                                                                new Error(
+                                                                                    'Device setup cancelled'
+                                                                                )
+                                                                            );
+                                                                        },
+                                                                    onOptional:
+                                                                        action,
+                                                                };
+
+                                                            dispatch(
+                                                                dialogHandler(
+                                                                    information
                                                                 )
                                                             );
-                                                        },
-                                                        onOptional: action,
-                                                    };
-
-                                                dispatch(
-                                                    dialogHandler(information)
-                                                );
-                                            });
+                                                        } else {
+                                                            action();
+                                                        }
+                                                    });
+                                                });
                                         })
                                         .catch(error =>
                                             port
