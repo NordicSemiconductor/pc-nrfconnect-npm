@@ -44,7 +44,7 @@ const npm1300EngineeringCMessage = (
             are needed.
         </p>
         <ul>
-            <li>Connect VSYS (P7) to LSIN2 using jumper wire.</li>
+            <li>Connect VSYS (P7) to LSIN2 (P15) using jumper wire.</li>
             <li>Connect VSYS (P7) to LSOUT2 (P15) using jumper wire.</li>
             <li>Do not use load switch 2 for any other purpose.</li>
         </ul>
