@@ -11,7 +11,11 @@ import { describeError, logger } from 'pc-nrfconnect-shared';
 
 import packageJsons from '../../../package.json';
 import { RootState } from '../../appReducer';
-import { Profile } from '../../features/pmicControl/npm/types';
+import {
+    dialogHandler,
+    DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+} from '../../features/pmicControl/npm/pmicHelpers';
+import { NpmDevice, Profile } from '../../features/pmicControl/npm/types';
 import {
     addRecentProject,
     loadRecentProject,
@@ -147,3 +151,21 @@ export const saveProjectSettings =
 
 export const reloadRecentProjects = () => (dispatch: TDispatch) =>
     dispatch(setRecentProjects(loadRecentProject()));
+
+export const writeBatterModel =
+    (data: Buffer, npmDevice: NpmDevice) => (dispatch: TDispatch) => {
+        dispatch(
+            dialogHandler({
+                uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
+                message: `Write battery profile will reset the current fuel gauge. Click 'Write' to continue.`,
+                confirmLabel: 'Write',
+                confirmClosesDialog: false,
+                cancelLabel: 'Cancel',
+                title: 'Write',
+                onConfirm: () => {
+                    npmDevice.downloadFuelGaugeProfile(Buffer.from(data));
+                },
+                onCancel: () => {},
+            })
+        );
+    };

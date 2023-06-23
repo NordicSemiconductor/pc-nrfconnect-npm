@@ -24,7 +24,7 @@ import {
     removeRecentProject,
 } from '../../../features/pmicControl/profilingProjectsSlice.';
 import useIsUIDisabled from '../../../features/useIsUIDisabled';
-import { isProfileReadyForProcessing } from '../helpers';
+import { isProfileReadyForProcessing, writeBatterModel } from '../helpers';
 import { ProfilingProject } from '../types';
 import AddEditProfileDialog from './AddEditProfileDialog';
 import AddEditProjectDialog from './AddEditProjectDialog';
@@ -152,11 +152,16 @@ export default ({
                     onClick={() => {
                         setGeneratingBatterModel(true);
                         mergeBatteryParams(project, includedProfiles)
-                            .then(data =>
-                                npmDevice?.downloadFuelGaugeProfile(
-                                    Buffer.from(data)
-                                )
-                            )
+                            .then(data => {
+                                if (npmDevice) {
+                                    dispatch(
+                                        writeBatterModel(
+                                            Buffer.from(data),
+                                            npmDevice
+                                        )
+                                    );
+                                }
+                            })
                             .finally(() => setGeneratingBatterModel(false));
                     }}
                     disabled={

@@ -18,6 +18,7 @@ import useIsUIDisabled from '../../../features/useIsUIDisabled';
 import {
     isProfileReadyForProcessing,
     readAndUpdateProjectSettings,
+    writeBatterModel,
 } from '../helpers';
 import { ProfilingProject } from '../types';
 import AddEditProfileDialog from './AddEditProfileDialog';
@@ -109,9 +110,12 @@ export default ({
                         !profile.batteryJson
                     }
                     onClick={() => {
-                        if (profile.batteryJson) {
-                            npmDevice?.downloadFuelGaugeProfile(
-                                Buffer.from(profile.batteryJson)
+                        if (profile.batteryJson && npmDevice) {
+                            dispatch(
+                                writeBatterModel(
+                                    Buffer.from(profile.batteryJson),
+                                    npmDevice
+                                )
                             );
                         }
                     }}

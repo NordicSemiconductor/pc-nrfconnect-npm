@@ -24,6 +24,7 @@ import {
     getStoredBatterModels,
 } from '../../features/pmicControl/pmicControlSlice';
 import { setProfilingStage } from '../../features/pmicControl/profilingSlice';
+import { writeBatterModel } from '../Profiling/helpers';
 
 export default ({ disabled }: { disabled: boolean }) => {
     const dispatch = useDispatch();
@@ -119,22 +120,11 @@ export default ({ disabled }: { disabled: boolean }) => {
                     onClick={() => {
                         getProfileBuffer()
                             .then(buffer => {
-                                dispatch(
-                                    dialogHandler({
-                                        uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-                                        message: `Write battery profile will reset the current fuel gauge. Click 'Write' to continue.`,
-                                        confirmLabel: 'Write',
-                                        confirmClosesDialog: false,
-                                        cancelLabel: 'Cancel',
-                                        title: 'Write',
-                                        onConfirm: () => {
-                                            npmDevice?.downloadFuelGaugeProfile(
-                                                buffer
-                                            );
-                                        },
-                                        onCancel: () => {},
-                                    })
-                                );
+                                if (npmDevice) {
+                                    dispatch(
+                                        writeBatterModel(buffer, npmDevice)
+                                    );
+                                }
                             })
                             .catch(res => {
                                 dispatch(
@@ -142,9 +132,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                                         uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
                                         message: (
                                             <>
-                                                <div>
-                                                    Write battery profile.
-                                                </div>
+                                                <div>Write battery model.</div>
                                                 <br />
                                                 <Alert
                                                     label="Error "
