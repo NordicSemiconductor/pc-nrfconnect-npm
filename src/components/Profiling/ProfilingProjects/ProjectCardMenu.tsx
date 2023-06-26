@@ -10,7 +10,7 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { shell } from 'electron';
 import path from 'path';
-import { GenericDialog } from 'pc-nrfconnect-shared';
+import { Alert, DialogButton, GenericDialog } from 'pc-nrfconnect-shared';
 
 import { showSaveDialog } from '../../../actions/fileActions';
 import { stringToFile } from '../../../features/helpers';
@@ -37,6 +37,10 @@ export default ({
     project: ProfilingProject;
 }) => {
     const dispatch = useDispatch();
+    const [
+        generatingBatterModelErrorMessage,
+        setGeneratingBatterModelErrorMessage,
+    ] = useState<Error>();
     const [generatingBatterModel, setGeneratingBatterModel] = useState(false);
     const uiDisabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
@@ -125,11 +129,13 @@ export default ({
                                 setGeneratingBatterModel(true);
                                 mergeBatteryParams(project, includedProfiles)
                                     .then(data => {
-                                        if (result.filePath)
+                                        if (result.filePath) {
                                             stringToFile(result.filePath, data);
+                                        }
+                                        setGeneratingBatterModel(false);
                                     })
-                                    .finally(() =>
-                                        setGeneratingBatterModel(false)
+                                    .catch(
+                                        setGeneratingBatterModelErrorMessage
                                     );
                             }
                         });
@@ -161,8 +167,9 @@ export default ({
                                         )
                                     );
                                 }
+                                setGeneratingBatterModel(false);
                             })
-                            .finally(() => setGeneratingBatterModel(false));
+                            .catch(setGeneratingBatterModelErrorMessage);
                     }}
                     disabled={
                         uiDisabled ||
@@ -230,11 +237,25 @@ export default ({
                 title="Battery Model"
                 className="app-dialog"
                 onHide={() => {}}
-                showSpinner
+                showSpinner={!generatingBatterModelErrorMessage}
                 isVisible={generatingBatterModel}
-                footer={null}
+                footer={
+                    generatingBatterModelErrorMessage ? (
+                        <DialogButton
+                            onClick={() => setGeneratingBatterModel(false)}
+                        >
+                            Close
+                        </DialogButton>
+                    ) : null
+                }
             >
-                Generating battery model...
+                {generatingBatterModelErrorMessage ? (
+                    <Alert variant="danger" label="Error: ">
+                        {generatingBatterModelErrorMessage.message}
+                    </Alert>
+                ) : (
+                    'Generating battery model...'
+                )}
             </GenericDialog>
             {showAddProfileDialog && (
                 <AddEditProfileDialog

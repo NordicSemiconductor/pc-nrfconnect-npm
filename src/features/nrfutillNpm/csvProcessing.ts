@@ -358,7 +358,11 @@ export const mergeBatteryParams = (
     new Promise<string>((resolve, reject) => {
         const pathObject = path.parse(NRFUTIL_BINARY);
         if (!fs.existsSync(pathObject.dir)) {
-            reject(new Error('OS not supported'));
+            reject(
+                new Error(
+                    'This operation is not supported by your operating system. Export a merged file on Windows or Linux. And use the Write batter model from the side bar'
+                )
+            );
             return;
         }
 
@@ -427,7 +431,7 @@ export const mergeBatteryParams = (
             if (fs.existsSync(batteryModelPath)) {
                 resolve(fs.readFileSync(batteryModelPath, 'utf8'));
             } else {
-                reject();
+                reject(new Error('Something went wrong'));
             }
 
             if (fs.existsSync(tempFolder)) {
