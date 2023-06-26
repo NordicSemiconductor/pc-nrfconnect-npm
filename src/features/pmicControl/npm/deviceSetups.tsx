@@ -175,7 +175,14 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                                 .getPmicVersion()
                                                 .then(version => {
                                                     port.close().finally(() => {
-                                                        if (version === 2.0) {
+                                                        if (
+                                                            version === 2.0 ||
+                                                            (Number.isNaN(
+                                                                version
+                                                            ) &&
+                                                                result.version ===
+                                                                    '0.7.0+0')
+                                                        ) {
                                                             // FP2
                                                             const information: PmicDialog =
                                                                 {
