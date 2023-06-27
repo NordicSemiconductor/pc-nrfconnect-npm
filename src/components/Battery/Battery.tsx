@@ -98,10 +98,7 @@ const SideText = ({
                             {fuelGauge &&
                             latestAdcSample &&
                             !Number.isNaN(latestAdcSample.soc)
-                                ? `${Math.min(
-                                      100,
-                                      Math.max(latestAdcSample.soc ?? 0, 0)
-                                  ).toFixed(1)}%`
+                                ? `${latestAdcSample.soc ?? 0}%`
                                 : 'N/A %'}
                         </h2>
                     </DocumentationTooltip>

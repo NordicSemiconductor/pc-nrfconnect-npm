@@ -128,7 +128,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     adcSample.tBat = fixed(1, pair[1]);
                     break;
                 case 'soc':
-                    adcSample.soc = fixed(1, pair[1]);
+                    adcSample.soc = Math.min(
+                        100,
+                        Math.max(0, fixed(1, pair[1]))
+                    );
                     break;
                 case 'tte':
                     adcSample.tte = Number(pair[1] ?? NaN);
