@@ -537,11 +537,13 @@ export const documentation: Documentation = {
             title: 'Active Battery Model',
             description: (
                 <p>
-                    Select the battery model to be used for evaluation. If you
-                    don’t find your battery model in the list, you can select
-                    the one best matching the capacity of your battery. This
-                    will not give best state-of-charge accuracy, but enables
-                    easy initial evaluation of the fuel gauge.
+                    Select the battery model to be used for evaluation. These
+                    Li-Ion battery models cover the operating voltage range of
+                    3.0-4.2V for the fuel gauge. If you don’t find your battery
+                    model in the list, you can select the one best matching the
+                    capacity of your battery. This will not give best
+                    state-of-charge accuracy, but enables easy initial
+                    evaluation of the fuel gauge.
                 </p>
             ),
         },
