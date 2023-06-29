@@ -8,7 +8,7 @@
 
 .projects-container {
     max-width: fit-content;
-    min-width: 905px;
+    min-width: min(905px, 100%);
     margin: auto;
     padding: 16px;
 
