@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+-   Support for PCA63563 Fuel Gauge board.
 -   Battery model `inc` file format export option.
 
 ### Fixed
