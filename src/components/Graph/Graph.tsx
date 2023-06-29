@@ -477,6 +477,7 @@ export default ({ active }: PaneProps) => {
                             <DocumentationTooltip
                                 card={chartMetaData.tooltip[index].card}
                                 item={chartMetaData.tooltip[index].item}
+                                placement="right-start"
                             >
                                 <strong>
                                     <u>{chartMetaData.labels[index]}</u>
