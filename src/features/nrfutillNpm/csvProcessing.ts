@@ -8,7 +8,7 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { getAppDir, getAppFile } from 'pc-nrfconnect-shared';
+import { AppThunk, getAppDir, getAppFile } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import {
@@ -19,7 +19,6 @@ import {
     ProfilingProject,
     ProfilingProjectProfile,
 } from '../../components/Profiling/types';
-import { TDispatch } from '../../thunk';
 import { generateTempFolder, stringToFile } from '../helpers';
 import { Profile } from '../pmicControl/npm/types';
 import {
@@ -50,8 +49,8 @@ const NRFUTIL_BINARY = getAppFile(
 );
 
 export const startProcessingCsv =
-    (profile: Profile, index: number) =>
-    (dispatch: TDispatch, getState: () => RootState) => {
+    (profile: Profile, index: number): AppThunk<RootState> =>
+    (dispatch, getState) => {
         const profilingProjectPath = generateDefaultProjectPath(profile);
 
         const progress =
@@ -71,7 +70,8 @@ export const startProcessingCsv =
         dispatch(generateParamsFromCSV(profilingProjectPath, index));
     };
 export const generateParamsFromCSV =
-    (projectAbsolutePath: string, index: number) => (dispatch: TDispatch) => {
+    (projectAbsolutePath: string, index: number): AppThunk =>
+    dispatch => {
         const pathObject = path.parse(NRFUTIL_BINARY);
         if (!fs.existsSync(pathObject.dir)) {
             dispatch(

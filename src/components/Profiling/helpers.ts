@@ -7,7 +7,7 @@
 import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
-import { describeError, logger } from 'pc-nrfconnect-shared';
+import { AppThunk, describeError, logger } from 'pc-nrfconnect-shared';
 
 import packageJsons from '../../../package.json';
 import { RootState } from '../../appReducer';
@@ -22,7 +22,6 @@ import {
     setRecentProjects,
     updateProfilingProject,
 } from '../../features/pmicControl/profilingProjectsSlice.';
-import { TDispatch } from '../../thunk';
 import {
     ProfilingProject,
     ProfilingProjectProfile,
@@ -96,8 +95,8 @@ export const readAndUpdateProjectSettings =
     (
         filePath: string,
         updateProject: (currentProject: ProfilingProject) => ProfilingProject
-    ) =>
-    (dispatch: TDispatch) => {
+    ): AppThunk =>
+    dispatch => {
         const pathObject = path.parse(filePath);
         const store = new Store<ProfilingProject>({
             cwd: pathObject.dir,
@@ -124,8 +123,11 @@ export const readAndUpdateProjectSettings =
     };
 
 export const saveProjectSettings =
-    (filePath: string, projectToSave: Omit<ProfilingProject, 'appVersion'>) =>
-    (dispatch: TDispatch, getState: () => RootState) => {
+    (
+        filePath: string,
+        projectToSave: Omit<ProfilingProject, 'appVersion'>
+    ): AppThunk<RootState> =>
+    (dispatch, getState) => {
         const project: ProfilingProject = {
             ...projectToSave,
             appVersion: packageJsons.version,
@@ -149,11 +151,12 @@ export const saveProjectSettings =
         dispatch(addRecentProject(filePath));
     };
 
-export const reloadRecentProjects = () => (dispatch: TDispatch) =>
+export const reloadRecentProjects = (): AppThunk => dispatch =>
     dispatch(setRecentProjects(loadRecentProject()));
 
 export const writeBatterModel =
-    (data: Buffer, npmDevice: NpmDevice) => (dispatch: TDispatch) => {
+    (data: Buffer, npmDevice: NpmDevice): AppThunk =>
+    dispatch => {
         dispatch(
             dialogHandler({
                 uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,

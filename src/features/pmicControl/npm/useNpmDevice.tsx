@@ -11,6 +11,7 @@ import { appendFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import {
     Alert,
+    AppThunk,
     clearWaitForDevice,
     describeError,
     logger,
@@ -18,9 +19,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
-import { RootState } from '../../../appReducer';
 import { PROFILE_FOLDER_PREFIX } from '../../../components/Profiling/helpers';
-import { TDispatch } from '../../../thunk';
 import { getShellParser } from '../../serial/serialSlice';
 import {
     getBucks,
@@ -197,7 +196,7 @@ export default () => {
             releaseAll.push(
                 npmDevice.onAdcSettingsChange(settings => {
                     dispatch(setFuelGaugeReportingRate(settings.reportRate));
-                    dispatch((_: TDispatch, getState: () => RootState) => {
+                    dispatch<AppThunk>((_, getState) => {
                         if (getState().app.pmicControl.chargers[0].enabled) {
                             dispatch(
                                 setFuelGaugeChargingSamplingRate(
@@ -217,7 +216,7 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onChargerUpdate(payload => {
-                    dispatch((_: TDispatch, getState: () => RootState) => {
+                    dispatch<AppThunk>((_, getState) => {
                         dispatch(updateCharger(payload));
                         if (
                             payload.data.enabled != null &&
@@ -408,7 +407,7 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onBeforeReboot(() => {
-                    dispatch((dis: TDispatch, getState: () => RootState) => {
+                    dispatch<AppThunk>((dis, getState) => {
                         const previousWaitForDevice =
                             getState().deviceAutoSelect.waitForDevice;
                         dis(
@@ -438,31 +437,29 @@ export default () => {
                     if (!success) {
                         dispatch(clearWaitForDevice());
                     } else {
-                        dispatch(
-                            (dis: TDispatch, getState: () => RootState) => {
-                                const previousWaitForDevice =
-                                    getState().deviceAutoSelect.waitForDevice;
+                        dispatch<AppThunk>((dis, getState) => {
+                            const previousWaitForDevice =
+                                getState().deviceAutoSelect.waitForDevice;
 
-                                dis(
-                                    setWaitForDevice({
-                                        when: 'sameTraits',
-                                        once: true,
-                                        timeout: 10000,
-                                        onSuccess: async device => {
-                                            await dispatch(closeDevice());
-                                            dispatch(openDevice(device));
-                                            if (previousWaitForDevice) {
-                                                dis(
-                                                    setWaitForDevice(
-                                                        previousWaitForDevice
-                                                    )
-                                                );
-                                            }
-                                        },
-                                    })
-                                );
-                            }
-                        );
+                            dis(
+                                setWaitForDevice({
+                                    when: 'sameTraits',
+                                    once: true,
+                                    timeout: 10000,
+                                    onSuccess: async device => {
+                                        await dispatch(closeDevice());
+                                        dispatch(openDevice(device));
+                                        if (previousWaitForDevice) {
+                                            dis(
+                                                setWaitForDevice(
+                                                    previousWaitForDevice
+                                                )
+                                            );
+                                        }
+                                    },
+                                })
+                            );
+                        });
                     }
                 })
             );

@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, rmSync } from 'fs';
 import path from 'path';
 import {
     Alert,
+    AppThunk,
     ButtonVariants,
     DialogButton,
     GenericDialog,
@@ -39,7 +40,6 @@ import {
     restartProfile,
     setAbortAction,
 } from '../../../features/pmicControl/profilingSlice';
-import { TDispatch } from '../../../thunk';
 import {
     generateDefaultProjectPath,
     PROFILE_FOLDER_PREFIX,
@@ -47,41 +47,39 @@ import {
 } from '../helpers';
 import StepperProgress from './StepperProgress';
 
-export const markProfilersAsReady =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        const profile = getState().app.profiling.profile;
-        const index = getState().app.profiling.index;
+export const markProfilersAsReady = (): AppThunk => (dispatch, getState) => {
+    const profile = getState().app.profiling.profile;
+    const index = getState().app.profiling.index;
 
-        const fileName = generateDefaultProjectPath(profile);
-        dispatch(
-            readAndUpdateProjectSettings(fileName, profileSettings => {
-                profileSettings.profiles[index].csvReady = true;
+    const fileName = generateDefaultProjectPath(profile);
+    dispatch(
+        readAndUpdateProjectSettings(fileName, profileSettings => {
+            profileSettings.profiles[index].csvReady = true;
 
-                return profileSettings;
-            })
-        );
+            return profileSettings;
+        })
+    );
 
-        dispatch(startProcessingCsv(profile, index));
-    };
+    dispatch(startProcessingCsv(profile, index));
+};
 
-const finishProfiling =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        const npmDevice = getState().app.pmicControl.npmDevice;
+const finishProfiling = (): AppThunk<RootState> => (dispatch, getState) => {
+    const npmDevice = getState().app.pmicControl.npmDevice;
 
-        npmDevice?.setAutoRebootDevice(true);
-        npmDevice
-            ?.getBatteryProfiler()
-            ?.isProfiling()
-            .then(result => {
-                if (result) {
-                    npmDevice.getBatteryProfiler()?.stopProfiling();
-                }
-                dispatch(closeProfiling());
-            })
-            .catch(() => {
-                dispatch(closeProfiling());
-            });
-    };
+    npmDevice?.setAutoRebootDevice(true);
+    npmDevice
+        ?.getBatteryProfiler()
+        ?.isProfiling()
+        .then(result => {
+            if (result) {
+                npmDevice.getBatteryProfiler()?.stopProfiling();
+            }
+            dispatch(closeProfiling());
+        })
+        .catch(() => {
+            dispatch(closeProfiling());
+        });
+};
 
 const FinishButton = ({
     disabled,
