@@ -13,13 +13,13 @@ import {
 import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
+import { AppThunk } from 'pc-nrfconnect-shared';
 
-import { RootState } from '../appReducer';
 import { NpmExport } from '../features/pmicControl/npm/types';
-import { TDispatch } from '../thunk';
 
 const saveSettings =
-    (filePath: string) => (_dispatch: TDispatch, getState: () => RootState) => {
+    (filePath: string): AppThunk =>
+    (_dispatch, getState) => {
         const currentState = getState().app.pmicControl;
 
         if (!currentState.npmDevice) return;
@@ -45,7 +45,8 @@ const saveSettings =
     };
 
 const parseFile =
-    (filePath: string) => (_dispatch: TDispatch, getState: () => RootState) => {
+    (filePath: string): AppThunk =>
+    (_dispatch, getState) => {
         const currentState = getState().app.pmicControl;
 
         const pathObject = path.parse(filePath);
@@ -66,7 +67,7 @@ export const showOpenDialog = (options: OpenDialogOptions) =>
 export const showSaveDialog = (options: SaveDialogOptions) =>
     dialog.showSaveDialog(getCurrentWindow(), options);
 
-export const loadConfiguration = () => (dispatch: TDispatch) => {
+export const loadConfiguration = (): AppThunk => dispatch => {
     showOpenDialog({
         title: 'Select a JSON file',
         filters: [
@@ -140,7 +141,7 @@ export const selectDirectoryDialog = () =>
             .catch(reject);
     });
 
-export const saveFileDialog = () => (dispatch: TDispatch) => {
+export const saveFileDialog = (): AppThunk => dispatch => {
     showSaveDialog({
         title: 'Save Device Settings',
         filters: [

@@ -5,13 +5,17 @@
  */
 
 import type { AutoDetectTypes } from '@serialport/bindings-cpp';
-import { createSerialPort, describeError, Device } from 'pc-nrfconnect-shared';
+import {
+    AppThunk,
+    createSerialPort,
+    describeError,
+    Device,
+} from 'pc-nrfconnect-shared';
 import type { SerialPortOpenOptions } from 'serialport';
 
 import { setSerialPort } from '../features/serial/serialSlice';
-import { TAction } from '../thunk';
 
-export const closeDevice = (): TAction => async (dispatch, getState) => {
+export const closeDevice = (): AppThunk => async (dispatch, getState) => {
     try {
         await getState().app.serial.serialPort?.close();
     } catch (e) {
@@ -22,7 +26,7 @@ export const closeDevice = (): TAction => async (dispatch, getState) => {
 };
 
 export const openDevice =
-    (device: Device): TAction =>
+    (device: Device): AppThunk =>
     async dispatch => {
         // Reset serial port settings
         const ports = device.serialPorts;
@@ -45,6 +49,6 @@ export const openDevice =
         }
     };
 
-export const deviceConnected = (): TAction => () => {};
+export const deviceConnected = (): AppThunk => () => {};
 
-export const deviceDisconnected = (): TAction => () => {};
+export const deviceDisconnected = (): AppThunk => () => {};

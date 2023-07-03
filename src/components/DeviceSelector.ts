@@ -7,6 +7,7 @@
 import { connect } from 'react-redux';
 import { DeviceTraits } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
+    AppDispatch,
     Device,
     DeviceSelector,
     DeviceSelectorProps,
@@ -28,7 +29,6 @@ import {
 } from '../features/pmicControl/npm/pmicHelpers';
 import { stopEventRecording } from '../features/pmicControl/pmicControlSlice';
 import { setCompleteStep } from '../features/pmicControl/profilingSlice';
-import { TDispatch } from '../thunk';
 
 /**
  * Configures which device types to show in the device selector.
@@ -64,7 +64,7 @@ const mapState = () => ({
  * Note that the callbacks releaseCurrentDevice and onDeviceIsReady
  * are only invoked, if a deviceSetup is defined.
  */
-const mapDispatch = (dispatch: TDispatch): Partial<DeviceSelectorProps> => ({
+const mapDispatch = (dispatch: AppDispatch): Partial<DeviceSelectorProps> => ({
     onDeviceSelected: (device: Device) => {
         logger.info(`Selected device with s/n ${device.serialNumber}`);
     },

@@ -7,10 +7,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentWindow } from '@electron/remote';
-import { ConfirmationDialog } from 'pc-nrfconnect-shared';
+import { AppThunk, ConfirmationDialog } from 'pc-nrfconnect-shared';
 
-import { RootState } from '../../appReducer';
-import { TDispatch } from '../../thunk';
 import {
     addConfirmBeforeClose,
     clearConfirmBeforeClose,
@@ -41,7 +39,7 @@ export default () => {
 
     useEffect(() => {
         const action = (ev: BeforeUnloadEvent) =>
-            dispatch((_: TDispatch, getState: () => RootState) => {
+            dispatch<AppThunk>((_, getState) => {
                 const hasToGetExplicitConform =
                     getState().app.confirmBeforeClose.confirmCloseApp.length >
                     0;

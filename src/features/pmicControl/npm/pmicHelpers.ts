@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Device, getPersistentStore } from 'pc-nrfconnect-shared';
+import { AppThunk, Device, getPersistentStore } from 'pc-nrfconnect-shared';
 import { v4 as uuid } from 'uuid';
 
-import { RootState } from '../../../appReducer';
-import { TDispatch } from '../../../thunk';
 import { dequeueDialog, requestDialog } from '../pmicControlSlice';
 import {
     BatteryModel,
@@ -141,7 +139,8 @@ export const toRegex = (
 };
 
 export const dialogHandler =
-    (pmicDialog: PmicDialog) => (dispatch: TDispatch) => {
+    (pmicDialog: PmicDialog): AppThunk =>
+    dispatch => {
         if (!pmicDialog.uuid) pmicDialog.uuid === uuid();
 
         if (
@@ -199,8 +198,8 @@ export const updateAdcTimings =
         samplingRate?: number;
         chargingSamplingRate?: number;
         reportInterval?: number;
-    }) =>
-    (_: TDispatch, getState: () => RootState) => {
+    }): AppThunk =>
+    (_, getState) => {
         getState().app.pmicControl.npmDevice?.startAdcSample(
             reportInterval ?? getState().app.pmicControl.fuelGaugeReportingRate,
             getState().app.pmicControl.chargers[0].enabled
