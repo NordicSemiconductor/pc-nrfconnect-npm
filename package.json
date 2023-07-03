@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-npm",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "description": "EXPERIMENTAL: Evaluate and implement Nordic's PMICs​",
     "displayName": "nPM PowerUP​",
     "repository": {
@@ -39,7 +39,7 @@
     "devDependencies": {
         "chart.js": "^4.0.1",
         "chartjs-adapter-date-fns": "^2.0.1",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v65",
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v66",
         "react-chartjs-2": "^5.0.1",
         "xterm-headless": "^5.1.0"
     },
