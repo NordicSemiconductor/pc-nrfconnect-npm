@@ -48,7 +48,3 @@ export const openDevice =
             }
         }
     };
-
-export const deviceConnected = (): AppThunk => () => {};
-
-export const deviceDisconnected = (): AppThunk => () => {};
