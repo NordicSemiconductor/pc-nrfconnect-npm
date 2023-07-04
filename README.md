@@ -3,7 +3,12 @@
 [![Build Status](https://dev.azure.com/NordicSemiconductor/Wayland/_apis/build/status/NordicPlayground.pc-nrfconnect-npm?branchName=main)](https://dev.azure.com/NordicSemiconductor/Wayland/_build/latest?definitionId=127&branchName=master)
 [![License](https://img.shields.io/badge/license-Modified%20BSD%20License-blue.svg)](LICENSE)
 
-_nRF Connect nM PowerUP_ is a desktop application indented to work with the nPM1300 EK to allow customers to quickly and efficiently evaluate the nPM1300 PMIC for their projects. Once connected to an EK, the app gives full control over the adjustable settings of the nPM1300 PMIC. Using the included battery models, you can also get an estimated time-to-full and time-to-empty when charging or discharging a battery connected to the EK.=
+_nRF Connect nM PowerUP_ is a desktop application indented to work with the
+nPM1300 EK to allow customers to quickly and efficiently evaluate the nPM1300
+PMIC for their projects. Once connected to an EK, the app gives full control
+over the adjustable settings of the nPM1300 PMIC. Using the included battery
+models, you can also get an estimated time-to-full and time-to-empty when
+charging or discharging a battery connected to the EK.=
 
 ## Installation
 
