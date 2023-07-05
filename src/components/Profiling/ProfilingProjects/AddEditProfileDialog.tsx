@@ -70,6 +70,11 @@ export default ({
                                                     : project.profiles[
                                                           profile.index
                                                       ].batteryJson,
+                                                batteryInc: csvPathChanged
+                                                    ? undefined
+                                                    : project.profiles[
+                                                          profile.index
+                                                      ].batteryInc,
                                                 paramsJson: csvPathChanged
                                                     ? undefined
                                                     : project.profiles[

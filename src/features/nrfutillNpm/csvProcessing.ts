@@ -202,6 +202,7 @@ export const generateParamsFromCSV =
 
                 profile.paramsJson = undefined;
                 profile.batteryJson = undefined;
+                profile.batteryInc = undefined;
 
                 dispatch(
                     addProjectProfileProgress({
@@ -235,9 +236,13 @@ export const generateParamsFromCSV =
                         readAndUpdateProjectSettings(
                             projectAbsolutePath,
                             proj => {
-                                const batteryModelPath = path.join(
+                                const batteryModelJsonPath = path.join(
                                     resultsFolder,
                                     'battery_model.json'
+                                );
+                                const batteryModelIncPath = path.join(
+                                    resultsFolder,
+                                    'battery_model.inc'
                                 );
                                 const paramsPath = path.join(
                                     resultsFolder,
@@ -248,12 +253,23 @@ export const generateParamsFromCSV =
                                 );
 
                                 if (
-                                    fs.existsSync(batteryModelPath) &&
+                                    fs.existsSync(batteryModelJsonPath) &&
                                     fs.existsSync(paramsPath)
                                 ) {
                                     proj.profiles[index].batteryJson =
                                         fs.readFileSync(
-                                            batteryModelPath,
+                                            batteryModelJsonPath,
+                                            'utf8'
+                                        );
+                                    proj.profiles[index].batteryInc =
+                                        fs.readFileSync(
+                                            batteryModelIncPath,
+                                            'utf8'
+                                        );
+
+                                    proj.profiles[index].batteryJson =
+                                        fs.readFileSync(
+                                            batteryModelJsonPath,
                                             'utf8'
                                         );
 
@@ -355,7 +371,7 @@ export const mergeBatteryParams = (
     project: ProfilingProject,
     profiles: ProfilingProjectProfile[]
 ) =>
-    new Promise<string>((resolve, reject) => {
+    new Promise<{ json: string; inc: string }>((resolve, reject) => {
         const pathObject = path.parse(NRFUTIL_BINARY);
         if (!fs.existsSync(pathObject.dir)) {
             reject(
@@ -370,8 +386,15 @@ export const mergeBatteryParams = (
             return;
         }
 
-        if (profiles.length === 1 && profiles[0].batteryJson) {
-            resolve(profiles[0].batteryJson);
+        if (
+            profiles.length === 1 &&
+            profiles[0].batteryJson &&
+            profiles[0].batteryInc
+        ) {
+            resolve({
+                json: profiles[0].batteryJson,
+                inc: profiles[0].batteryInc,
+            });
             return;
         }
 
@@ -423,13 +446,24 @@ export const mergeBatteryParams = (
         });
 
         processCSV.on('close', () => {
-            const batteryModelPath = path.join(
+            const batteryModelJsonPath = path.join(
                 resultsFolder,
                 'battery_model.json'
             );
 
-            if (fs.existsSync(batteryModelPath)) {
-                resolve(fs.readFileSync(batteryModelPath, 'utf8'));
+            const batteryModelIncPath = path.join(
+                resultsFolder,
+                'battery_model.inc'
+            );
+
+            if (
+                fs.existsSync(batteryModelJsonPath) &&
+                fs.existsSync(batteryModelIncPath)
+            ) {
+                resolve({
+                    json: fs.readFileSync(batteryModelJsonPath, 'utf8'),
+                    inc: fs.readFileSync(batteryModelIncPath, 'utf8'),
+                });
             } else {
                 reject(new Error('Something went wrong'));
             }

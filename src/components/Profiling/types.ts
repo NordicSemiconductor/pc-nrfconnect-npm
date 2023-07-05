@@ -25,6 +25,7 @@ export interface ProfilingProjectProfile {
     csvReady: boolean;
     paramsJson?: string;
     batteryJson?: string;
+    batteryInc?: string;
     exclude?: boolean;
     nrfUtilVersion?: string;
 }

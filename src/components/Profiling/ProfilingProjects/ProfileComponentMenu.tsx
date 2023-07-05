@@ -75,7 +75,7 @@ export default ({
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item
-                    disabled={!profile.batteryJson}
+                    disabled={!profile.batteryJson || !profile.batteryInc}
                     onClick={() => {
                         showSaveDialog({
                             title: 'Battery Model',
@@ -85,18 +85,29 @@ export default ({
                                     name: 'JSON',
                                     extensions: ['json'],
                                 },
+                                {
+                                    name: 'INC',
+                                    extensions: ['inc'],
+                                },
                             ],
                         }).then(result => {
                             if (
                                 profile.batteryJson &&
+                                profile.batteryInc &&
                                 !result.canceled &&
                                 result.filePath
                             ) {
-                                if (result.filePath)
+                                if (result.filePath?.endsWith('.json')) {
                                     stringToFile(
                                         result.filePath,
                                         profile.batteryJson
                                     );
+                                } else if (result.filePath?.endsWith('.inc')) {
+                                    stringToFile(
+                                        result.filePath,
+                                        profile.batteryInc
+                                    );
+                                }
                             }
                         });
                     }}
