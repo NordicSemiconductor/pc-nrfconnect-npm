@@ -124,7 +124,7 @@ const SaveBatteryModelButton = ({
 
     const finishedProfiles =
         project?.settings?.profiles.filter(
-            prof => prof.batteryJson && prof.paramsJson
+            prof => prof.batteryJson && prof.paramsJson && prof.batteryInc
         ) ?? [];
 
     return (
@@ -136,7 +136,7 @@ const SaveBatteryModelButton = ({
                     title: 'Battery Profile',
                     defaultPath: `${profile.name}_${finishedProfiles
                         .map(p => p.temperature)
-                        .join('_')}C.json`,
+                        .join('_')}C`,
                     filters: [
                         {
                             name: 'JSON',

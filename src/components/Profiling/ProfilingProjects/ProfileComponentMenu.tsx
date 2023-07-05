@@ -79,7 +79,7 @@ export default ({
                     onClick={() => {
                         showSaveDialog({
                             title: 'Battery Model',
-                            defaultPath: `${project.name}_${profile.temperature}C.json`,
+                            defaultPath: `${project.name}_${profile.temperature}C`,
                             filters: [
                                 {
                                     name: 'JSON',
