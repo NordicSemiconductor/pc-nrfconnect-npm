@@ -82,8 +82,9 @@ export default ({
                     )}
                     {dataCollected &&
                         csvReadyExists &&
-                        !profile.batteryJson &&
-                        !profile.paramsJson &&
+                        (!profile.batteryJson ||
+                            !profile.batteryInc ||
+                            !profile.paramsJson) &&
                         !progress && (
                             <Alert variant="info">
                                 <div className="d-flex align-items-center flex-wrap justify-content-between alert-info-with-button">
@@ -109,7 +110,9 @@ export default ({
                         )}
                     {dataCollected &&
                         csvReadyExists &&
-                        ((profile.batteryJson && profile.paramsJson) ||
+                        ((profile.batteryJson &&
+                            profile.batteryInc &&
+                            profile.paramsJson) ||
                             progress) && (
                             <div className="mb-2">
                                 <strong>Profile </strong>

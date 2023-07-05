@@ -123,14 +123,30 @@ export default ({
                                     name: 'JSON',
                                     extensions: ['json'],
                                 },
+                                {
+                                    name: 'INC',
+                                    extensions: ['inc'],
+                                },
                             ],
                         }).then(result => {
                             if (!result.canceled && result.filePath) {
                                 setGeneratingBatterModel(true);
                                 mergeBatteryParams(project, includedProfiles)
                                     .then(data => {
-                                        if (result.filePath) {
-                                            stringToFile(result.filePath, data);
+                                        if (
+                                            result.filePath?.endsWith('.json')
+                                        ) {
+                                            stringToFile(
+                                                result.filePath,
+                                                data.json
+                                            );
+                                        } else if (
+                                            result.filePath?.endsWith('.inc')
+                                        ) {
+                                            stringToFile(
+                                                result.filePath,
+                                                data.inc
+                                            );
                                         }
                                         setGeneratingBatterModel(false);
                                     })
@@ -162,7 +178,7 @@ export default ({
                                 if (npmDevice) {
                                     dispatch(
                                         writeBatterModel(
-                                            Buffer.from(data),
+                                            Buffer.from(data.json),
                                             npmDevice
                                         )
                                     );

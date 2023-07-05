@@ -8,6 +8,10 @@ and this project adheres to
 
 ## 0.9.1 - UNRELEASED
 
+### Added
+
+-   Battery model `inc` file format export option.
+
 ### Fixed
 
 -   `Restart application with verbose logging` button did not restart app

@@ -101,7 +101,12 @@ export default ({
 
         const settings = profileProject?.settings?.profiles[index];
 
-        if (settings?.paramsJson && settings?.batteryJson) {
+        if (
+            settings &&
+            settings.paramsJson &&
+            settings.batteryJson &&
+            settings.batteryInc
+        ) {
             stepProcessing.state = 'success';
         } else if (
             processingCSVProgress === undefined &&
