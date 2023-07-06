@@ -117,15 +117,15 @@ export default ({
                             title: 'Battery Model',
                             defaultPath: `${project.name}_${includedProfiles
                                 .map(profile => `${profile.temperature}`)
-                                .join('_')}C.json`,
+                                .join('C_')}C.inc`,
                             filters: [
-                                {
-                                    name: 'JSON',
-                                    extensions: ['json'],
-                                },
                                 {
                                     name: 'INC',
                                     extensions: ['inc'],
+                                },
+                                {
+                                    name: 'JSON',
+                                    extensions: ['json'],
                                 },
                             ],
                         }).then(result => {
