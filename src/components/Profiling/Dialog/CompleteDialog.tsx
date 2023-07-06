@@ -18,7 +18,6 @@ import {
     Group,
 } from 'pc-nrfconnect-shared';
 
-import { showSaveDialog } from '../../../actions/fileActions';
 import { RootState } from '../../../appReducer';
 import { stringToFile } from '../../../features/helpers';
 import {
@@ -132,42 +131,24 @@ const SaveBatteryModelButton = ({
             variant={variant}
             disabled={finishedProfiles.length === 0 || disabled}
             onClick={() => {
-                showSaveDialog({
-                    title: 'Battery Profile',
-                    defaultPath: `${profile.name}_${finishedProfiles
-                        .map(p => p.temperature)
-                        .join('_')}C.json`,
-                    filters: [
-                        {
-                            name: 'JSON',
-                            extensions: ['json'],
-                        },
-                        {
-                            name: 'INC',
-                            extensions: ['inc'],
-                        },
-                    ],
-                }).then(result => {
-                    if (
-                        project?.settings &&
-                        !result.canceled &&
-                        result.filePath
-                    ) {
-                        onGeneratingBatteryModel(true);
-                        mergeBatteryParams(project.settings, finishedProfiles)
-                            .then(data => {
-                                if (result.filePath?.endsWith('.json')) {
-                                    stringToFile(result.filePath, data.json);
-                                } else if (result.filePath?.endsWith('.inc')) {
-                                    stringToFile(result.filePath, data.inc);
-                                }
-                            })
-                            .finally(() => {
-                                dispatch(finishProfiling());
-                                onGeneratingBatteryModel(false);
-                            });
-                    }
-                });
+                if (project?.settings) {
+                    onGeneratingBatteryModel(true);
+                    mergeBatteryParams(project.settings, finishedProfiles)
+                        .then(data => {
+                            const filePath = path.join(
+                                profile.baseDirectory,
+                                `${profile.name}_${finishedProfiles
+                                    .map(p => p.temperature)
+                                    .join('_')}C`
+                            );
+                            stringToFile(`${filePath}.json`, data.json);
+                            stringToFile(`${filePath}.inc`, data.inc);
+                        })
+                        .finally(() => {
+                            dispatch(finishProfiling());
+                            onGeneratingBatteryModel(false);
+                        });
+                }
             }}
         >
             Save Battery Model
