@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
     Button,
+    clearWaitForDevice,
     DialogButton,
     GenericDialog,
     Group,
@@ -166,6 +167,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             dispatch(
                                 setAbortAction(() => {
                                     dispatch(closeProfiling());
+                                    dispatch(clearWaitForDevice());
                                 })
                             );
                         }}

@@ -12,6 +12,7 @@ import {
     Alert,
     AppThunk,
     ButtonVariants,
+    clearWaitForDevice,
     DialogButton,
     GenericDialog,
     getWaitingForDeviceTimeout,
@@ -261,6 +262,7 @@ const NextProfileButton = ({
 const AbortProfileButton = () => {
     const dispatch = useDispatch();
     const npmDevice = useSelector(getNpmDevice);
+    const isWaitingForDevice = useSelector(getWaitingForDeviceTimeout);
 
     return (
         <DialogButton
@@ -268,21 +270,26 @@ const AbortProfileButton = () => {
             onClick={() => {
                 dispatch(
                     setAbortAction(() => {
-                        npmDevice?.setAutoRebootDevice(true);
-                        npmDevice
-                            ?.getBatteryProfiler()
-                            ?.isProfiling()
-                            .then(result => {
-                                if (result) {
-                                    npmDevice
-                                        .getBatteryProfiler()
-                                        ?.stopProfiling();
-                                }
-                                dispatch(closeProfiling());
-                            })
-                            .catch(() => {
-                                dispatch(closeProfiling());
-                            });
+                        if (isWaitingForDevice) {
+                            dispatch(closeProfiling());
+                            dispatch(clearWaitForDevice());
+                        } else {
+                            npmDevice
+                                ?.getBatteryProfiler()
+                                ?.isProfiling()
+                                .then(result => {
+                                    if (result) {
+                                        npmDevice
+                                            .getBatteryProfiler()
+                                            ?.stopProfiling();
+                                    }
+                                    dispatch(closeProfiling());
+                                })
+                                .catch(() => {
+                                    dispatch(closeProfiling());
+                                });
+                            npmDevice?.setAutoRebootDevice(true);
+                        }
                     })
                 );
             }}

@@ -7,6 +7,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    clearWaitForDevice,
     DialogButton,
     GenericDialog,
     Group,
@@ -62,11 +63,12 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         onClick={() => {
                             dispatch(
                                 setAbortAction(() => {
-                                    npmDevice?.setAutoRebootDevice(true);
                                     npmDevice
                                         ?.getBatteryProfiler()
                                         ?.stopProfiling();
+                                    npmDevice?.setAutoRebootDevice(true);
                                     dispatch(closeProfiling());
+                                    dispatch(clearWaitForDevice());
                                 })
                             );
                         }}

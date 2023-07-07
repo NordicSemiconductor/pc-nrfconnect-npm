@@ -7,6 +7,7 @@
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    clearWaitForDevice,
     DialogButton,
     GenericDialog,
     Group,
@@ -118,8 +119,9 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     npmDevice
                                         ?.getBatteryProfiler()
                                         ?.stopProfiling();
-                                    dispatch(closeProfiling());
                                     npmDevice?.setAutoRebootDevice(true);
+                                    dispatch(closeProfiling());
+                                    dispatch(clearWaitForDevice());
                                 })
                             );
                         }}

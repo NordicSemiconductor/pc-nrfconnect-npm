@@ -15,6 +15,8 @@ and this project adheres to
 ### Fixed
 
 -   `Restart application with verbose logging` button did not restart app
+-   Aborting profiling wizard would not closed dialog when device is
+    disconnected and we are waiting to reconnect
 
 ## 0.9.0 - 2023-06-27
 
