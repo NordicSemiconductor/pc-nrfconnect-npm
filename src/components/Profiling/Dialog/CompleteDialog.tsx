@@ -137,6 +137,7 @@ const SaveBatteryModelButton = ({
                         .then(data => {
                             const filePath = path.join(
                                 profile.baseDirectory,
+                                profile.name,
                                 `${profile.name}_${finishedProfiles
                                     .map(p => p.temperature)
                                     .join('_')}C`
