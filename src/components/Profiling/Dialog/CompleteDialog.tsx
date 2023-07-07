@@ -425,7 +425,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             {allAreProcessing &&
                                 `Not able to save battery model. No battery profiles are available yet. Try reprocess any failed models. `}
                             {`Data will continue to be processed in the background if
-                        you click finish. You can continue to work on theses
+                        you click finish. You can continue to work on these
                         profiles from the 'Profiles' tab`}
                         </Alert>
                     )}
