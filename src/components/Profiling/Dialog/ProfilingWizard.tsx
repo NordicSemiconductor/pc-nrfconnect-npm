@@ -356,8 +356,8 @@ export default () => {
                     title="Aborting profiling"
                     isVisible
                     onConfirm={() => {
-                        abortAction();
                         dispatch(abortAction());
+                        dispatch(clearAbortAction());
                     }}
                     onCancel={() => {
                         dispatch(clearAbortAction());
