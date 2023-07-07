@@ -357,7 +357,7 @@ export default () => {
                     isVisible
                     onConfirm={() => {
                         abortAction();
-                        dispatch(clearAbortAction());
+                        dispatch(abortAction());
                     }}
                     onCancel={() => {
                         dispatch(clearAbortAction());
