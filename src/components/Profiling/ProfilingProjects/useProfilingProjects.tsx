@@ -70,7 +70,7 @@ export const useProfilingProjects = () => {
             )
         );
 
-        const unsubscribe = recentProjects.map(recentProject => {
+        recentProjects.forEach(recentProject => {
             if (fs.existsSync(recentProject)) {
                 const pathObject = path.parse(recentProject);
                 try {
@@ -80,19 +80,16 @@ export const useProfilingProjects = () => {
                         name: pathObject.name,
                     });
 
-                    // TODO See why no events come when file is changed
-                    return store.onDidAnyChange(newSettings => {
-                        dispatch(
-                            updateProfilingProject({
-                                path: recentProject,
-                                settings: newSettings ?? undefined,
-                                error:
-                                    newSettings === undefined
-                                        ? 'fileMissing'
-                                        : undefined,
-                            })
-                        );
-                    });
+                    dispatch(
+                        updateProfilingProject({
+                            path: recentProject,
+                            settings: store.store ?? undefined,
+                            error:
+                                store.store === undefined
+                                    ? 'fileMissing'
+                                    : undefined,
+                        })
+                    );
                 } catch (error) {
                     dispatch(
                         updateProfilingProject({
@@ -101,9 +98,9 @@ export const useProfilingProjects = () => {
                             error: 'fileCorrupted',
                         })
                     );
-
-                    return () => {};
                 }
+
+                return;
             }
 
             dispatch(
@@ -113,12 +110,6 @@ export const useProfilingProjects = () => {
                     error: 'fileMissing',
                 })
             );
-
-            return () => {};
         });
-
-        return () => {
-            unsubscribe.forEach(release => release());
-        };
     }, [dispatch, recentProjects]);
 };

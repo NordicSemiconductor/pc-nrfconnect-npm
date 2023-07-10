@@ -211,7 +211,6 @@ export const generateParamsFromCSV =
                         message: 'Processing has started',
                         progress: 0,
                         cancel: () => {
-                            // TODO Ask for fix in NRF UTIL
                             processCSV.kill('SIGINT');
                             dispatch(
                                 removeProjectProfileProgress({
