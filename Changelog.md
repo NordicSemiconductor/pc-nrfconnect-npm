@@ -18,6 +18,9 @@ and this project adheres to
 -   `Restart application with verbose logging` button did not restart app
 -   Aborting profiling wizard would not closed dialog when device is
     disconnected and we are waiting to reconnect
+-   App crash if profiling project is deleted while app is running
+-   Empty directory is created if profiling folder is deleted and app is
+    reopened
 
 ## 0.9.0 - 2023-06-27
 
