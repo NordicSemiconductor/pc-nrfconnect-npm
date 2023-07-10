@@ -219,6 +219,6 @@ export const isNpm1300SerialRecoverMode = (device: Device) =>
     device.usb?.device.descriptor.idProduct === 0x53ac &&
     device.usb?.device.descriptor.idVendor === 0x1915;
 
-export const MAX_TIMESTAMP = 359999999; // 99hrs 59min 59sec 999ms
+export const MAX_TIMESTAMP = 2 ** 32 - 1; //  2^32
 export const DOWNLOAD_BATTERY_PROFILE_DIALOG_ID = 'downloadBatteryProfile';
 export const GENERATE_BATTERY_PROFILE_DIALOG_ID = 'generateBatteryProfile';
