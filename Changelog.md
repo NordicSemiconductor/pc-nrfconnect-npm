@@ -21,6 +21,7 @@ and this project adheres to
 -   App crash if profiling project is deleted while app is running
 -   Empty directory is created if profiling folder is deleted and app is
     reopened
+-   Application does not sync statues with device when uptime is >= 100hrs
 
 ## 0.9.0 - 2023-06-27
 

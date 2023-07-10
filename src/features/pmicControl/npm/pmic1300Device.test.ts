@@ -4042,7 +4042,7 @@ describe('PMIC 1300', () => {
             });
         });
 
-        test('Adc Sample Logging event - overflow 99hrs +', () => {
+        test('Adc Sample Logging event - overflow 1193.046471111111 hrs +', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
                 '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
             );
@@ -4067,7 +4067,7 @@ describe('PMIC 1300', () => {
             });
 
             expect(mockOnAdcSample).nthCalledWith(2, {
-                timestamp: 359999999 + 10525, // 99hrs 59min 59sec 999ms + 10.525 sec
+                timestamp: 2 ** 32 - 1 + 10525, // 1193hrs 02min 47sec 295ms + 10.525 sec
                 vBat: 4.25,
                 iBat: 0.62, // converted to mA
                 tBat: 26.7,
@@ -4077,7 +4077,7 @@ describe('PMIC 1300', () => {
             });
 
             expect(mockOnAdcSample).nthCalledWith(3, {
-                timestamp: 359999999 + 359999999 + 8525, // 99hrs 59min 59sec 999ms + 8.525 sec
+                timestamp: (2 ** 32 - 1) * 2 + 8525, // 1193hrs 02min 47sec 295ms + 8.525 sec
                 vBat: 4.25,
                 iBat: 0.62, // converted to mA
                 tBat: 26.7,

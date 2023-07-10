@@ -88,7 +88,7 @@ const setupMocks = () => {
     const settings: ShellParserSettings = {
         shellPromptUart: 'uart:~$',
         logRegex:
-            /[[][0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
+            /[[][0-9]{2,}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
         errorRegex: /error: /,
         timeout: 1000,
         columnWidth: 80,
@@ -829,6 +829,32 @@ describe('shell command parser', () => {
         expect(mockOnShellLogging).toBeCalledTimes(1);
         expect(mockOnShellLogging).toBeCalledWith(
             '[00:00:01.114,532] <inf> main: v=3.595881,i=0.176776'
+        );
+
+        expect(mockOnError).toBeCalledTimes(0);
+        expect(mockOnSuccess).toBeCalledTimes(0);
+        expect(mockOnUnknown).toBeCalledTimes(0);
+    });
+
+    test('Verify onShellLogging callback is called large timestamp', async () => {
+        const shellParser = await hookModemToShellParser(
+            mockModem(),
+            mockTerminal(),
+            settings
+        );
+
+        shellParser.onShellLoggingEvent(mockOnShellLogging);
+        shellParser.onUnknownCommand(mockOnUnknown);
+
+        onResponseCallback(
+            Buffer.from(
+                '[1000:00:01.114,532] <inf> main: v=3.595881,i=0.176776\r\n'
+            )
+        );
+
+        expect(mockOnShellLogging).toBeCalledTimes(1);
+        expect(mockOnShellLogging).toBeCalledWith(
+            '[1000:00:01.114,532] <inf> main: v=3.595881,i=0.176776'
         );
 
         expect(mockOnError).toBeCalledTimes(0);
