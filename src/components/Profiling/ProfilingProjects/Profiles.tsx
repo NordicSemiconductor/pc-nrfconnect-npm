@@ -24,7 +24,7 @@ import './profilingProjects.scss';
 
 export default () => {
     const dispatch = useDispatch();
-    const profiles = useSelector(getProfileProjects);
+    const projects = useSelector(getProfileProjects);
 
     const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
     useProfilingProjects();
@@ -73,7 +73,7 @@ export default () => {
             </div>
 
             <div className="d-flex flex-column-reverse">
-                {profiles.map(project => (
+                {projects.map(project => (
                     <React.Fragment key={project.path}>
                         {project.error && (
                             <MissingProjectSettingsCard project={project} />
