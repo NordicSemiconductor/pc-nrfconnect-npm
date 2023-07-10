@@ -5,6 +5,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import fs from 'fs';
 import path from 'path';
 import { getPersistentStore } from 'pc-nrfconnect-shared';
 
@@ -14,8 +15,14 @@ import {
     ProjectPathPair,
 } from '../../components/Profiling/types';
 
-export const loadRecentProject = (): string[] =>
-    (getPersistentStore().get(`profiling_projects`) ?? []) as string[];
+export const loadRecentProject = (): string[] => {
+    const allProjects = (getPersistentStore().get(`profiling_projects`) ??
+        []) as string[];
+    const validPaths = allProjects.filter(p => fs.existsSync(p));
+    if (allProjects.length !== validPaths.length)
+        getPersistentStore().set(`profiling_projects`, validPaths);
+    return validPaths;
+};
 
 interface profilingProjectState {
     recentProjects: string[];
