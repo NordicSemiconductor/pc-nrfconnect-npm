@@ -10,20 +10,21 @@ and this project adheres to
 
 ### Added
 
--   Support for PCA63563 Fuel Gauge board.
--   Battery model `inc` file format export option.
+-   Introduced support for the PCA63563 Fuel Gauge board.
+-   Implemented an export option for the battery model INC file format.
 
 ### Fixed
 
--   `Restart application with verbose logging` button did not restart app
--   Clicking `Abort` when profiling would not closed dialog if the device is
-    disconnected.
--   App no longer crashes when a profiling project is deleted while app is
-    running.
--   Empty directory is created if profiling folder is deleted and app is
-    reopened.
--   Application does not sync log statues with device when uptime is greater or
-    equal to 100hrs
+-   Corrected an issue where the 'Restart application with verbose logging'
+    button failed to restart the application.
+-   Rectified a problem where the 'Abort' command during profiling would not
+    close the dialog if the device was disconnected.
+-   Resolved an issue causing the application to crash if a profiling project
+    was deleted while the application was running.
+-   Fixed a glitch that resulted in an empty directory being created when the
+    profiling folder was deleted and the application was subsequently reopened.
+-   Addressed a syncing issue where the application did not synchronize log
+    statuses with the device when the uptime was equal to or exceeded 100 hours.
 
 ## 0.9.0 - 2023-06-27
 
