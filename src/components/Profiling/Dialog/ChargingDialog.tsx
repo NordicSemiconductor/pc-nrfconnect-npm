@@ -8,7 +8,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
-    Button,
     clearWaitForDevice,
     DialogButton,
     GenericDialog,
@@ -212,8 +211,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 <strong>Action required:</strong> Charging has
                                 been turned off.
                             </span>
-                            <Button
-                                variant="custom"
+                            <button
+                                type="button"
                                 onClick={() => {
                                     chargers.forEach((_, i) =>
                                         npmDevice?.setChargerEnabled(i, true)
@@ -221,7 +220,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 }}
                             >
                                 Turn on
-                            </Button>
+                            </button>
                         </div>
                     </Alert>
                 )}

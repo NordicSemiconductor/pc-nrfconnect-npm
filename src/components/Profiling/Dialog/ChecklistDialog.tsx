@@ -8,7 +8,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
-    Button,
     clearWaitForDevice,
     DialogButton,
     GenericDialog,
@@ -159,14 +158,14 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 <strong>Caution: </strong>PMIC Pending device
                                 restart.
                             </span>
-                            <Button
-                                variant="custom"
+                            <button
+                                type="button"
                                 onClick={() => {
                                     npmDevice?.kernelReset();
                                 }}
                             >
                                 Reboot now
-                            </Button>
+                            </button>
                         </div>
                     </Alert>
                 )}
