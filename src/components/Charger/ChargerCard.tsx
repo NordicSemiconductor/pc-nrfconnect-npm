@@ -15,6 +15,8 @@ import {
 import BatteryCard from '../Cards/Battery/BatteryCard';
 import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import PowerCard from '../Cards/Power/PowerCard';
+import Jeita from './Jeita';
+import ThermalRegulation from './ThermalRegulation';
 
 interface DashboardControlCardProps {
     disabled: boolean;
@@ -41,6 +43,17 @@ export default ({ disabled }: DashboardControlCardProps) => {
                         disabled={disabled}
                     />
                 ))}
+
+            {npmDevice && (
+                <Jeita index={0} npmDevice={npmDevice} disabled={disabled} />
+            )}
+            {npmDevice && (
+                <ThermalRegulation
+                    index={0}
+                    npmDevice={npmDevice}
+                    disabled={disabled}
+                />
+            )}
         </MasonryLayout>
     );
 };
