@@ -122,11 +122,7 @@ export default ({
     return (
         <Card
             title={
-                <div
-                    className={`d-flex justify-content-between ${
-                        disabled ? 'disabled' : ''
-                    }`}
-                >
+                <div className="tw-flex tw-justify-between">
                     <DocumentationTooltip card={card} item="Buck">
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
