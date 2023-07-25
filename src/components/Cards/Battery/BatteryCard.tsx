@@ -24,11 +24,7 @@ export default ({ disabled }: BatteryCardProperties) => {
     return (
         <Card
             title={
-                <div
-                    className={`d-flex justify-content-between ${
-                        disabled ? 'disabled' : ''
-                    }`}
-                >
+                <div className="tw-flex tw-justify-between">
                     <DocumentationTooltip card="battery" item="FuelGauge">
                         <span>Fuel Gauge</span>
                     </DocumentationTooltip>

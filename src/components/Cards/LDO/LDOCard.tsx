@@ -56,11 +56,7 @@ export default ({
     return ldo ? (
         <Card
             title={
-                <div
-                    className={`d-flex justify-content-between ${
-                        disabled ? 'disabled' : ''
-                    }`}
-                >
+                <div className="tw-flex tw-justify-between">
                     <DocumentationTooltip card={card} item="LoadSwitchLDO">
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
