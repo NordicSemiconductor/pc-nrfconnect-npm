@@ -5,15 +5,13 @@
  */
 
 import React, { useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch } from 'react-redux';
 import {
     classNames,
     DialogButton,
     GenericDialog,
     Group,
-    NumberInlineInput,
-    Slider,
+    NumberInputSliderWithUnit,
 } from 'pc-nrfconnect-shared';
 
 import { showSaveDialog } from '../../../actions/fileActions';
@@ -133,92 +131,52 @@ export default ({
                         value={name}
                     />
                 </div>
-
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
+                <NumberInputSliderWithUnit
+                    label={
                         <div>
                             <span>Capacity</span>
                         </div>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={capacity}
-                                range={{ min: 32, max: 3000 }}
-                                onChange={setCapacity}
-                            />
-                            <span>mAh</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[capacity]}
-                        onChange={[setCapacity]}
-                        range={{ min: 32, max: 3000 }}
-                    />
-                </div>
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
-                        <DocumentationTooltip card="charger" item="VTERM">
-                            <div>
-                                <span>V</span>
-                                <span className="subscript">TERM</span>
-                            </div>
-                        </DocumentationTooltip>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={vUpperCutOff}
-                                range={{
-                                    min: 4,
-                                    max: 4.4,
-                                    step: 0.05,
-                                    decimals: 2,
-                                }}
-                                onChange={setUpperVCutOff}
-                            />
+                    }
+                    unit="mAh"
+                    value={capacity}
+                    range={{ min: 32, max: 3000 }}
+                    onChange={setCapacity}
+                />
+                <NumberInputSliderWithUnit
+                    label={
+                        <div>
                             <span>V</span>
+                            <span className="subscript">TERM</span>
                         </div>
-                    </FormLabel>
-                    <Slider
-                        values={[vUpperCutOff]}
-                        onChange={[setUpperVCutOff]}
-                        range={{
-                            min: 4,
-                            max: 4.4,
-                            step: 0.05,
-                            decimals: 2,
-                        }}
-                    />
-                </div>
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
+                    }
+                    unit="V"
+                    value={vUpperCutOff}
+                    range={{
+                        min: 4,
+                        max: 4.4,
+                        step: 0.05,
+                        decimals: 2,
+                    }}
+                    onChange={setUpperVCutOff}
+                />
+                <NumberInputSliderWithUnit
+                    label={
                         <DocumentationTooltip card="profiling" item="Capacity">
                             <div>
                                 <span>Discharge cut-off voltage</span>
                             </div>
                         </DocumentationTooltip>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={vLowerCutOff}
-                                range={{
-                                    min: 2.7,
-                                    max: 3.1,
-                                    step: 0.05,
-                                    decimals: 2,
-                                }}
-                                onChange={setLowerVCutOff}
-                            />
-                            <span>V</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[vLowerCutOff]}
-                        onChange={[setLowerVCutOff]}
-                        range={{
-                            min: 2.7,
-                            max: 3.1,
-                            step: 0.05,
-                            decimals: 2,
-                        }}
-                    />
-                </div>
+                    }
+                    unit="V"
+                    value={vLowerCutOff}
+                    range={{
+                        min: 2.7,
+                        max: 3.1,
+                        step: 0.05,
+                        decimals: 2,
+                    }}
+                    onChange={setLowerVCutOff}
+                />
             </Group>
         </GenericDialog>
     );

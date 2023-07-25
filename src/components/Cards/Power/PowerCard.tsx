@@ -5,13 +5,11 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
 import {
     Card,
     classNames,
     Dropdown,
-    NumberInlineInput,
-    Slider,
+    NumberInputSliderWithUnit,
     Toggle,
 } from 'pc-nrfconnect-shared';
 
@@ -30,7 +28,7 @@ import {
 interface PowerCardProperties {
     index: number;
     npmDevice: NpmDevice;
-    charger?: Charger;
+    charger: Charger;
     cardLabel?: string;
     disabled: boolean;
     defaultSummary?: boolean;
@@ -47,25 +45,15 @@ export default ({
     const card = 'charger';
     const [summary, setSummary] = useState(defaultSummary);
     const currentRange = npmDevice.getChargerCurrentRange(index);
-    const currentVoltage = npmDevice.getChargerVoltageRange(index);
+    const currentVoltageRange = npmDevice.getChargerVoltageRange(index);
 
-    const onVTermChange = (value: number) =>
-        npmDevice.setChargerVTerm(index, value);
+    const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
+    const [internalIChg, setInternalIChg] = useState(charger.iChg);
 
-    const onEnableChargingToggle = (value: boolean) =>
-        npmDevice.setChargerEnabled(index, value);
-
-    const onIChgChange = (value: number) =>
-        npmDevice.setChargerIChg(index, value);
-
-    const [internalVTerm, setInternalVTerm] = useState(charger?.vTerm ?? 0);
-    const [internalIChg, setInternalIChg] = useState(charger?.iChg ?? 0);
-
+    // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
-        if (charger) {
-            setInternalVTerm(charger.vTerm);
-            setInternalIChg(charger.iChg);
-        }
+        setInternalVTerm(charger.vTerm);
+        setInternalIChg(charger.iChg);
     }, [charger]);
 
     const vTrickleFastItems = [...VTrickleFastValues].map(item => ({
@@ -83,7 +71,7 @@ export default ({
         value: `${item}`,
     }));
 
-    return charger ? (
+    return (
         <Card
             title={
                 <div
@@ -99,7 +87,9 @@ export default ({
                         <Toggle
                             label="Enable"
                             isToggled={charger.enabled}
-                            onToggle={onEnableChargingToggle}
+                            onToggle={v =>
+                                npmDevice.setChargerEnabled(index, v)
+                            }
                             disabled={disabled}
                         />
                         <span
@@ -119,65 +109,39 @@ export default ({
                 </div>
             }
         >
-            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row">
+            <NumberInputSliderWithUnit
+                label={
                     <DocumentationTooltip card={card} item="VTERM">
                         <div>
                             <span>V</span>
                             <span className="subscript">TERM</span>
                         </div>
                     </DocumentationTooltip>
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={internalVTerm}
-                            range={currentVoltage}
-                            onChange={value => setInternalVTerm(value)}
-                            onChangeComplete={() =>
-                                onVTermChange(internalVTerm)
-                            }
-                            disabled={disabled}
-                        />
-                        <span>V</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[currentVoltage.indexOf(internalVTerm)]}
-                    onChange={[i => setInternalVTerm(currentVoltage[i])]}
-                    onChangeComplete={() => onVTermChange(internalVTerm)}
-                    range={{
-                        min: 0,
-                        max: currentVoltage.length - 1,
-                    }}
-                    disabled={disabled}
-                />
-            </div>
-            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row">
+                }
+                unit="V"
+                disabled={disabled}
+                range={currentVoltageRange}
+                value={internalVTerm}
+                onChange={setInternalVTerm}
+                onChangeComplete={v => npmDevice.setChargerVTerm(index, v)}
+            />
+            <NumberInputSliderWithUnit
+                label={
                     <DocumentationTooltip card={card} item="ICHG">
                         <div>
                             <span>I</span>
                             <span className="subscript">CHG</span>
                         </div>
                     </DocumentationTooltip>
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={internalIChg}
-                            range={currentRange}
-                            onChange={value => setInternalIChg(value)}
-                            onChangeComplete={() => onIChgChange(internalIChg)}
-                            disabled={disabled}
-                        />
-                        <span>mA</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[internalIChg]}
-                    onChange={[value => setInternalIChg(value)]}
-                    onChangeComplete={() => onIChgChange(internalIChg)}
-                    range={currentRange}
-                    disabled={disabled}
-                />
-            </div>
+                }
+                unit="mA"
+                disabled={disabled}
+                range={currentRange}
+                value={internalIChg}
+                onChange={setInternalIChg}
+                onChangeComplete={v => npmDevice.setChargerIChg(index, v)}
+            />
+
             {!summary && (
                 <>
                     <Toggle
@@ -290,5 +254,5 @@ export default ({
                 </>
             )}
         </Card>
-    ) : null;
+    );
 };
