@@ -187,14 +187,14 @@ export default ({
                             }`}</strong>{' '}
                             {progress.message}
                         </span>
-                        <Button
-                            variant="custom"
+                        <button
+                            type="button"
                             onClick={() => {
                                 progress.cancel();
                             }}
                         >
                             Close
-                        </Button>
+                        </button>
                     </div>
                 </Alert>
             )}
