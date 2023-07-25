@@ -5,14 +5,12 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     CollapsibleGroup,
-    NumberInlineInput,
+    NumberInputSliderWithUnit,
     SidePanel,
-    Slider,
     StartStopButton,
 } from 'pc-nrfconnect-shared';
 
@@ -135,58 +133,23 @@ export default () => {
                 />
             </CollapsibleGroup>
             <CollapsibleGroup defaultCollapsed={false} heading="Settings">
-                <div
-                    className={`slider-container ${
+                <NumberInputSliderWithUnit
+                    label="Reporting Rate"
+                    unit="ms"
+                    value={fuelGaugeReportingRateInternal}
+                    range={{ min: 500, max: 10000 }}
+                    onChange={value => setFuelGaugeReportingRateInternal(value)}
+                    onChangeComplete={() =>
+                        dispatch(
+                            updateAdcTimings({
+                                reportInterval: fuelGaugeReportingRateInternal,
+                            })
+                        )
+                    }
+                    disabled={
                         pmicConnection === 'ek-disconnected' || uiDisabled
-                            ? 'disabled'
-                            : ''
-                    }`}
-                >
-                    <FormLabel className="flex-row">
-                        <div>Reporting Rate</div>
-
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={fuelGaugeReportingRateInternal}
-                                range={{ min: 500, max: 10000 }}
-                                onChange={value =>
-                                    setFuelGaugeReportingRateInternal(value)
-                                }
-                                onChangeComplete={() =>
-                                    dispatch(
-                                        updateAdcTimings({
-                                            reportInterval:
-                                                fuelGaugeReportingRateInternal,
-                                        })
-                                    )
-                                }
-                                disabled={
-                                    pmicConnection === 'ek-disconnected' ||
-                                    uiDisabled
-                                }
-                            />
-                            <span>ms</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[fuelGaugeReportingRateInternal]}
-                        onChange={[
-                            value => setFuelGaugeReportingRateInternal(value),
-                        ]}
-                        onChangeComplete={() =>
-                            dispatch(
-                                updateAdcTimings({
-                                    reportInterval:
-                                        fuelGaugeReportingRateInternal,
-                                })
-                            )
-                        }
-                        range={{ min: 500, max: 10000 }}
-                        disabled={
-                            pmicConnection === 'ek-disconnected' || uiDisabled
-                        }
-                    />
-                </div>
+                    }
+                />
             </CollapsibleGroup>
             <ConnectionStatus />
         </SidePanel>

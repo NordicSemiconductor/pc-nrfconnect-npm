@@ -5,7 +5,6 @@
  */
 
 import React, { useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch } from 'react-redux';
 import path from 'path';
 import {
@@ -13,8 +12,7 @@ import {
     DialogButton,
     GenericDialog,
     Group,
-    NumberInlineInput,
-    Slider,
+    NumberInputSliderWithUnit,
 } from 'pc-nrfconnect-shared';
 
 import { showOpenDialog } from '../../../actions/fileActions';
@@ -103,36 +101,21 @@ export default ({
             }
         >
             <Group>
-                <div className="flex-row">
-                    <div className="flex-grow-1 slider-container">
-                        <FormLabel className="flex-row">
+                <div>
+                    <NumberInputSliderWithUnit
+                        label={
                             <div>
                                 <span>Temperature</span>
                             </div>
-
-                            <div className="flex-row">
-                                <NumberInlineInput
-                                    value={temperature}
-                                    range={{
-                                        min: -45,
-                                        max: 85,
-                                    }}
-                                    onChange={value => setTemperature(value)}
-                                />
-                                <span>°C</span>
-                            </div>
-                        </FormLabel>
-                        <Slider
-                            values={[temperature]}
-                            onChange={[
-                                (value: number) => setTemperature(value),
-                            ]}
-                            range={{
-                                min: -45,
-                                max: 85,
-                            }}
-                        />
-                    </div>
+                        }
+                        unit="°C"
+                        value={temperature}
+                        range={{
+                            min: -45,
+                            max: 85,
+                        }}
+                        onChange={value => setTemperature(value)}
+                    />
                 </div>
                 <div className="flex-column">
                     <div>{csvPath ?? 'No data file set'}</div>
