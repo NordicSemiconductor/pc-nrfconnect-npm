@@ -7,8 +7,6 @@
 import React from 'react';
 import { Alert } from 'pc-nrfconnect-shared';
 
-import './systemFeatures.scss';
-
 export default () => (
     <div className="systemFeatures-container">
         <div className="graph">
