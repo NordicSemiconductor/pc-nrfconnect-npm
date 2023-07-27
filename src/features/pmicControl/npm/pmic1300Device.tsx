@@ -30,6 +30,7 @@ import {
     BuckModeControl,
     BuckOnOffControl,
     BuckRetentionControl,
+    ChargeCurrentCool,
     Charger,
     GPIOValues,
     INpmDevice,
@@ -1068,6 +1069,166 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    const setChargerTChgStop = (value: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    tChgStop: value,
+                });
+                resolve();
+            } else {
+                reject(new Error('Not implemented'));
+                // sendCommand(
+                //     `npmx charger module recharge set ${value}`,
+                //     () => resolve(),
+                //     () => {
+                //         requestUpdate.chargerTChgStop();
+                //         reject();
+                //     }
+                // );
+            }
+        });
+
+    const setChargerTChgResume = (value: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    tChgResume: value,
+                });
+                resolve();
+            } else {
+                reject(new Error('Not implemented'));
+                // sendCommand(
+                //     `npmx charger module recharge set ${value}`,
+                //     () => resolve(),
+                //     () => {
+                //         requestUpdate.chargerTChgResume();
+                //         reject();
+                //     }
+                // );
+            }
+        });
+
+    const setChargerCurrentCool = (mode: ChargeCurrentCool) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    currentCool: mode,
+                });
+                resolve();
+            } else {
+                reject(new Error('Not implemented'));
+                // sendCommand(
+                //     `npmx charger module recharge set ${value}`,
+                //     () => resolve(),
+                //     () => {
+                //         requestUpdate.chargerTChgResume();
+                //         reject();
+                //     }
+                // );
+            }
+        });
+
+    const setChargerVTermR = (value: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTermR: value,
+                });
+                resolve();
+            } else {
+                reject(new Error('Not implemented'));
+                // sendCommand(
+                //     `npmx charger module recharge set ${value}`,
+                //     () => resolve(),
+                //     () => {
+                //         requestUpdate.chargerVTermR();
+                //         reject();
+                //     }
+                // );
+            }
+        });
+
+    const setChargerTCold = (value: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    tCold: value,
+                });
+                resolve();
+            } else {
+                reject(new Error('Not implemented'));
+                // sendCommand(
+                //     `npmx charger module recharge set ${value}`,
+                //     () => resolve(),
+                //     () => {
+                //         requestUpdate.chargerTCold();
+                //         reject();
+                //     }
+                // );
+            }
+        });
+
+    const setChargerTCool = (value: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    tCool: value,
+                });
+                resolve();
+            } else {
+                reject(new Error('Not implemented'));
+                // sendCommand(
+                //     `npmx charger module recharge set ${value}`,
+                //     () => resolve(),
+                //     () => {
+                //         requestUpdate.chargerTCool();
+                //         reject();
+                //     }
+                // );
+            }
+        });
+
+    const setChargerTWarm = (value: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    tWarm: value,
+                });
+                resolve();
+            } else {
+                reject(new Error('Not implemented'));
+                // sendCommand(
+                //     `npmx charger module recharge set ${value}`,
+                //     () => resolve(),
+                //     () => {
+                //         requestUpdate.chargerTWarm();
+                //         reject();
+                //     }
+                // );
+            }
+        });
+
+    const setChargerTHot = (value: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    tHot: value,
+                });
+                resolve();
+            } else {
+                reject(new Error('Not implemented'));
+                // sendCommand(
+                //     `npmx charger module recharge set ${value}`,
+                //     () => resolve(),
+                //     () => {
+                //         requestUpdate.chargerTHot();
+                //         reject();
+                //     }
+                // );
+            }
+        });
+
     const setBuckVOutNormal = (index: number, value: number) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
@@ -1661,6 +1822,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerEnabledRecharging: () =>
             sendCommand('npmx charger module recharge get'),
         chargerNTCThermistor: () => sendCommand('npmx adc ntc get'),
+        chargerTChgStop: () => console.log('Not Implemented'),
+        chargerTChgResume: () => console.log('Not Implemented'),
+        chargerCurrentCool: () => console.log('Not Implemented'),
+        chargerVTermR: () => console.log('Not Implemented'),
+        chargerTCold: () => console.log('Not Implemented'),
+        chargerVCool: () => console.log('Not Implemented'),
+        chargerVWarm: () => console.log('Not Implemented'),
+        chargerVHot: () => console.log('Not Implemented'),
 
         buckVOutNormal: (index: number) =>
             sendCommand(`npmx buck voltage normal get ${index}`),
@@ -1777,7 +1946,31 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     step: 0.05,
                 },
             ]).map(v => Number(v.toFixed(2))),
-
+        getChargerVTermRRange: () =>
+            getRange([
+                {
+                    min: 3.5,
+                    max: 3.65,
+                    step: 0.05,
+                },
+                {
+                    min: 4.0,
+                    max: 4.45,
+                    step: 0.05,
+                },
+            ]).map(v => Number(v.toFixed(2))),
+        getChargerJeitaRange: () => ({
+            min: 0,
+            max: 100,
+        }),
+        getChargerTChgStopRange: () => ({
+            min: 50,
+            max: 110,
+        }),
+        getChargerTChgResumeRange: () => ({
+            min: 50,
+            max: 110,
+        }),
         getChargerCurrentRange: () => ({
             min: 32,
             max: 800,
@@ -1813,6 +2006,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setChargerITerm,
         setChargerEnabledRecharging,
         setChargerNTCThermistor,
+        setChargerTChgStop,
+        setChargerTChgResume,
+        setChargerCurrentCool,
+        setChargerVTermR,
+        setChargerTCold,
+        setChargerTCool,
+        setChargerTWarm,
+        setChargerTHot,
         setBuckVOutNormal,
         setBuckVOutRetention,
         setBuckMode,

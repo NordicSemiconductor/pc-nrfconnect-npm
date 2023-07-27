@@ -28,7 +28,7 @@ export default ({ disabled }: DashboardControlCardProps) => {
     return (
         <MasonryLayout
             className="masonry-layout min-height-cards"
-            minWidth={300}
+            minWidth={420}
         >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
@@ -40,10 +40,17 @@ export default ({ disabled }: DashboardControlCardProps) => {
                     disabled={disabled}
                 />
             )}
-            {npmDevice && (
-                <ThermalRegulation
-                    index={0}
+            {npmDevice && charger && (
+                <Jeita
                     npmDevice={npmDevice}
+                    charger={charger}
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice && charger && (
+                <ThermalRegulation
+                    npmDevice={npmDevice}
+                    charger={charger}
                     disabled={disabled}
                 />
             )}

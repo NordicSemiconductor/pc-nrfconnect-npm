@@ -105,6 +105,14 @@ export default () => {
                 npmDevice.requestUpdate.chargerEnabledRecharging();
                 npmDevice.requestUpdate.pmicChargingState();
                 npmDevice.requestUpdate.chargerNTCThermistor();
+                npmDevice.requestUpdate.chargerTChgStop();
+                npmDevice.requestUpdate.chargerTChgResume();
+                npmDevice.requestUpdate.chargerCurrentCool();
+                npmDevice.requestUpdate.chargerVTermR();
+                npmDevice.requestUpdate.chargerTCold();
+                npmDevice.requestUpdate.chargerVCool();
+                npmDevice.requestUpdate.chargerVWarm();
+                npmDevice.requestUpdate.chargerVHot();
             }
 
             for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
@@ -150,6 +158,14 @@ export default () => {
                             iTerm: '10%',
                             enableRecharging: false,
                             ntcThermistor: '10 kΩ',
+                            tChgStop: 110,
+                            tChgResume: 100,
+                            currentCool: 'iCool',
+                            vTermR: 3.6,
+                            tCold: 0,
+                            tCool: 10,
+                            tWarm: 45,
+                            tHot: 60,
                         })
                     );
                 }

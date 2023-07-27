@@ -50,6 +50,8 @@ export type CCProfilingState =
     | 'ThermalError'
     | 'Ready';
 
+export type ChargeCurrentCool = 'iCHG' | 'iCool';
+
 export type ProfilingEvent = {
     timestamp: number;
     data: ProfilingEventData;
@@ -78,6 +80,14 @@ export type Charger = {
     enableRecharging: boolean;
     iTerm: ITerm;
     ntcThermistor: NTCThermistor;
+    tChgStop: number;
+    tChgResume: number;
+    currentCool: ChargeCurrentCool;
+    vTermR: number;
+    tCold: number;
+    tCool: number;
+    tWarm: number;
+    tHot: number;
 };
 
 export type Buck = {
@@ -249,6 +259,10 @@ export type NpmDevice = {
 
     getChargerCurrentRange: () => RangeType;
     getChargerVoltageRange: () => number[];
+    getChargerVTermRRange: () => number[];
+    getChargerJeitaRange: () => RangeType;
+    getChargerTChgStopRange: () => RangeType;
+    getChargerTChgResumeRange: () => RangeType;
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
@@ -262,6 +276,14 @@ export type NpmDevice = {
         chargerITerm: () => void;
         chargerEnabledRecharging: () => void;
         chargerNTCThermistor: () => void;
+        chargerTChgStop: () => void;
+        chargerTChgResume: () => void;
+        chargerCurrentCool: () => void;
+        chargerVTermR: () => void;
+        chargerTCold: () => void;
+        chargerVCool: () => void;
+        chargerVWarm: () => void;
+        chargerVHot: () => void;
 
         buckVOutNormal: (index: number) => void;
         buckVOutRetention: (index: number) => void;
@@ -290,6 +312,14 @@ export type NpmDevice = {
     setChargerITerm: (iTerm: ITerm) => Promise<void>;
     setChargerEnabledRecharging: (enabled: boolean) => Promise<void>;
     setChargerNTCThermistor: (mode: NTCThermistor) => Promise<void>;
+    setChargerTChgStop: (value: number) => Promise<void>;
+    setChargerTChgResume: (value: number) => Promise<void>;
+    setChargerCurrentCool: (mode: ChargeCurrentCool) => Promise<void>;
+    setChargerVTermR: (value: number) => Promise<void>;
+    setChargerTCold: (value: number) => Promise<void>;
+    setChargerTCool: (value: number) => Promise<void>;
+    setChargerTWarm: (value: number) => Promise<void>;
+    setChargerTHot: (value: number) => Promise<void>;
 
     setBuckVOutNormal: (index: number, value: number) => Promise<void>;
     setBuckVOutRetention: (index: number, value: number) => Promise<void>;

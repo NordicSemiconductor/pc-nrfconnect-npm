@@ -2647,6 +2647,14 @@ describe('PMIC 1300', () => {
             enableRecharging: true,
             iTerm: '20%',
             ntcThermistor: '10 kΩ',
+            tChgStop: 10,
+            tChgResume: 110,
+            currentCool: 'iCHG',
+            vTermR: 4,
+            tCold: 1,
+            tCool: 12,
+            tWarm: 47,
+            tHot: 69,
         };
 
         const initBuck: Buck = {
@@ -2713,6 +2721,14 @@ describe('PMIC 1300', () => {
                 iTerm: '10%',
                 enableRecharging: false,
                 ntcThermistor: '10 kΩ',
+                tChgStop: 10,
+                tChgResume: 110,
+                currentCool: 'iCHG',
+                vTermR: 4,
+                tCold: 1,
+                tCool: 12,
+                tWarm: 47,
+                tHot: 69,
             });
 
             expect(bucks).toStrictEqual([
@@ -2767,6 +2783,14 @@ describe('PMIC 1300', () => {
                     iTerm: '10%',
                     enableRecharging: false,
                     ntcThermistor: '10 kΩ',
+                    tChgStop: 10,
+                    tChgResume: 110,
+                    currentCool: 'iCHG',
+                    vTermR: 4,
+                    tCold: 1,
+                    tCool: 12,
+                    tWarm: 47,
+                    tHot: 69,
                 },
 
                 bucks: [
@@ -2823,6 +2847,14 @@ describe('PMIC 1300', () => {
                     iTerm: '10%',
                     enableRecharging: false,
                     ntcThermistor: '10 kΩ',
+                    tChgStop: 10,
+                    tChgResume: 110,
+                    currentCool: 'iCHG',
+                    vTermR: 4,
+                    tCold: 1,
+                    tCool: 12,
+                    tWarm: 47,
+                    tHot: 69,
                 },
                 bucks: [
                     {
@@ -2881,6 +2913,14 @@ describe('PMIC 1300', () => {
                     iTerm: '10%',
                     enableRecharging: false,
                     ntcThermistor: '10 kΩ',
+                    tChgStop: 10,
+                    tChgResume: 110,
+                    currentCool: 'iCHG',
+                    vTermR: 4,
+                    tCold: 1,
+                    tCool: 12,
+                    tWarm: 47,
+                    tHot: 69,
                 },
                 bucks: [
                     {
@@ -2939,6 +2979,14 @@ describe('PMIC 1300', () => {
                     iTerm: '10%',
                     enableRecharging: false,
                     ntcThermistor: '10 kΩ',
+                    tChgStop: 10,
+                    tChgResume: 110,
+                    currentCool: 'iCHG',
+                    vTermR: 4,
+                    tCold: 1,
+                    tCool: 12,
+                    tWarm: 47,
+                    tHot: 69,
                 },
                 bucks: [
                     {

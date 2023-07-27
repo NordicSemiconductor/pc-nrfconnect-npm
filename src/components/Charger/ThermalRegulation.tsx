@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
     Card,
@@ -12,25 +12,28 @@ import {
     NumberInputSliderWithUnit,
 } from 'pc-nrfconnect-shared';
 
-import { NpmDevice } from '../../features/pmicControl/npm/types';
+import { Charger, NpmDevice } from '../../features/pmicControl/npm/types';
 import { getPmicChargingState } from '../../features/pmicControl/pmicControlSlice';
 
-interface PowerCardProperties {
-    index: number;
+export default ({
+    npmDevice,
+    charger,
+    disabled,
+}: {
     npmDevice: NpmDevice;
+    charger: Charger;
     disabled: boolean;
-}
-
-export default ({ index, npmDevice, disabled }: PowerCardProperties) => {
+}) => {
     const pmicChargingState = useSelector(getPmicChargingState);
 
-    const [tempChgStop, setTempChgStop] = useState(1);
-    const [tempChgResume, setTempChgResume] = useState(1);
+    const [tempChgStop, setTempChgStop] = useState(charger.tChgStop);
+    const [tempChgResume, setTempChgResume] = useState(charger.tChgResume);
 
-    // NumberInputSliderWithUnit do not use ldo.<prop> as value as we send only at on change complete
-    // useEffect(() => {
-    //     setInternalVTermr(ldo.voltage);
-    // }, [ldo]);
+    // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
+    useEffect(() => {
+        setTempChgStop(charger.tChgStop);
+        setTempChgResume(charger.tChgResume);
+    }, [charger]);
 
     return (
         <Card
@@ -49,11 +52,9 @@ export default ({ index, npmDevice, disabled }: PowerCardProperties) => {
                 }
                 unit="°C"
                 value={tempChgStop}
-                range={{ min: 0, max: 120 }}
+                range={npmDevice.getChargerTChgStopRange()}
                 onChange={value => setTempChgStop(value)}
-                onChangeComplete={() => {
-                    // TODO
-                }}
+                onChangeComplete={npmDevice.setChargerTChgStop}
                 disabled={disabled}
             />
             <NumberInputSliderWithUnit
@@ -65,11 +66,9 @@ export default ({ index, npmDevice, disabled }: PowerCardProperties) => {
                 }
                 unit="°C"
                 value={tempChgResume}
-                range={{ min: 0, max: 120 }}
+                range={npmDevice.getChargerTChgResumeRange()}
                 onChange={value => setTempChgResume(value)}
-                onChangeComplete={() => {
-                    // TODO
-                }}
+                onChangeComplete={npmDevice.setChargerTChgResume}
                 disabled={disabled}
             />
             <div className="tw-flex tw-flex-row tw-justify-between ">
