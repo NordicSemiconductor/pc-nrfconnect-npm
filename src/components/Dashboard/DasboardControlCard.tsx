@@ -10,7 +10,7 @@ import { MasonryLayout } from 'pc-nrfconnect-shared';
 
 import {
     getBucks,
-    getChargers,
+    getCharger,
     getLdos,
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -25,7 +25,7 @@ interface DashboardControlCardProps {
 }
 export default ({ disabled }: DashboardControlCardProps) => {
     const npmDevice = useSelector(getNpmDevice);
-    const chargers = useSelector(getChargers);
+    const charger = useSelector(getCharger);
     const bucks = useSelector(getBucks);
     const ldos = useSelector(getLdos);
 
@@ -36,18 +36,15 @@ export default ({ disabled }: DashboardControlCardProps) => {
         >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
-            {npmDevice &&
-                chargers.map((charger, index) => (
-                    <PowerCard
-                        npmDevice={npmDevice}
-                        charger={charger}
-                        key={`Charger${1 + index}`}
-                        index={index}
-                        cardLabel="Charger"
-                        disabled={disabled}
-                        defaultSummary
-                    />
-                ))}
+            {npmDevice && charger && (
+                <PowerCard
+                    npmDevice={npmDevice}
+                    charger={charger}
+                    cardLabel="Charger"
+                    disabled={disabled}
+                    defaultSummary
+                />
+            )}
             {npmDevice &&
                 bucks.map((buck, index) => (
                     <BuckCard

@@ -17,7 +17,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import {
-    getChargers,
+    getCharger,
     getLatestAdcSample,
     getNpmDevice,
     getPmicChargingState,
@@ -43,7 +43,7 @@ import StepperProgress from './StepperProgress';
 export default ({ isVisible }: { isVisible: boolean }) => {
     const npmDevice = useSelector(getNpmDevice);
     const usbPowered = useSelector(isUsbPowered);
-    const chargers = useSelector(getChargers);
+    const charger = useSelector(getCharger);
     const pmicChargingState = useSelector(getPmicChargingState);
     const batteryConnected = useSelector(isBatteryConnected);
     const profile = useSelector(getProfile);
@@ -75,7 +75,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             state: 'active',
         };
     } else if (!batteryFull) {
-        const charging = usbPowered && batteryConnected && chargers[0].enabled;
+        const charging = usbPowered && batteryConnected && charger?.enabled;
         if (charging && !pmicChargingState.dieTempHigh) {
             stepOverride = {
                 caption: `Charging ${
@@ -122,7 +122,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             dispatch(setProfilingStage('Resting'));
                             npmDevice?.setAutoRebootDevice(false);
                             npmDevice
-                                ?.setChargerEnabled(0, false)
+                                ?.setChargerEnabled(false)
                                 .then(() => {
                                     npmDevice
                                         ?.getBatteryProfiler()
@@ -204,7 +204,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         Click continue
                     </Alert>
                 )}
-                {!batteryFull && !chargers[0]?.enabled && (
+                {!batteryFull && !charger?.enabled && (
                     <Alert label="" variant="warning">
                         <div className="d-flex align-items-center flex-wrap alert-warning-with-button">
                             <span>
@@ -214,9 +214,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    chargers.forEach((_, i) =>
-                                        npmDevice?.setChargerEnabled(i, true)
-                                    );
+                                    npmDevice?.setChargerEnabled(true);
                                 }}
                             >
                                 Turn on

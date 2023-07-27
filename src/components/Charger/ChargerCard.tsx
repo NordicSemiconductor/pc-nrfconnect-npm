@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { MasonryLayout } from 'pc-nrfconnect-shared';
 
 import {
-    getChargers,
+    getCharger,
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
 import BatteryCard from '../Cards/Battery/BatteryCard';
@@ -23,7 +23,7 @@ interface DashboardControlCardProps {
 }
 export default ({ disabled }: DashboardControlCardProps) => {
     const npmDevice = useSelector(getNpmDevice);
-    const chargers = useSelector(getChargers);
+    const charger = useSelector(getCharger);
 
     return (
         <MasonryLayout
@@ -32,20 +32,13 @@ export default ({ disabled }: DashboardControlCardProps) => {
         >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
-            {npmDevice &&
-                chargers.map((charger, index) => (
-                    <PowerCard
-                        npmDevice={npmDevice}
-                        charger={charger}
-                        key={`Charger${1 + index}`}
-                        index={index}
-                        cardLabel="Charger"
-                        disabled={disabled}
-                    />
-                ))}
-
-            {npmDevice && (
-                <Jeita index={0} npmDevice={npmDevice} disabled={disabled} />
+            {npmDevice && charger && (
+                <PowerCard
+                    npmDevice={npmDevice}
+                    charger={charger}
+                    cardLabel="Charger"
+                    disabled={disabled}
+                />
             )}
             {npmDevice && (
                 <ThermalRegulation

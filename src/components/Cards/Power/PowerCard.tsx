@@ -26,7 +26,6 @@ import {
 } from '../../../features/pmicControl/npm/types';
 
 interface PowerCardProperties {
-    index: number;
     npmDevice: NpmDevice;
     charger: Charger;
     cardLabel?: string;
@@ -35,17 +34,16 @@ interface PowerCardProperties {
 }
 
 export default ({
-    index,
     npmDevice,
     charger,
-    cardLabel = `Charging ${index + 1}`,
+    cardLabel = `Charger`,
     disabled,
     defaultSummary = false,
 }: PowerCardProperties) => {
     const card = 'charger';
     const [summary, setSummary] = useState(defaultSummary);
-    const currentRange = npmDevice.getChargerCurrentRange(index);
-    const currentVoltageRange = npmDevice.getChargerVoltageRange(index);
+    const currentRange = npmDevice.getChargerCurrentRange();
+    const currentVoltageRange = npmDevice.getChargerVoltageRange();
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
@@ -83,9 +81,7 @@ export default ({
                         <Toggle
                             label="Enable"
                             isToggled={charger.enabled}
-                            onToggle={v =>
-                                npmDevice.setChargerEnabled(index, v)
-                            }
+                            onToggle={v => npmDevice.setChargerEnabled(v)}
                             disabled={disabled}
                         />
                         <span
@@ -119,7 +115,7 @@ export default ({
                 range={currentVoltageRange}
                 value={internalVTerm}
                 onChange={setInternalVTerm}
-                onChangeComplete={v => npmDevice.setChargerVTerm(index, v)}
+                onChangeComplete={v => npmDevice.setChargerVTerm(v)}
             />
             <NumberInputSliderWithUnit
                 label={
@@ -135,7 +131,7 @@ export default ({
                 range={currentRange}
                 value={internalIChg}
                 onChange={setInternalIChg}
-                onChangeComplete={v => npmDevice.setChargerIChg(index, v)}
+                onChangeComplete={v => npmDevice.setChargerIChg(v)}
             />
 
             {!summary && (
@@ -151,7 +147,7 @@ export default ({
                         }
                         isToggled={charger.enableRecharging}
                         onToggle={value =>
-                            npmDevice.setChargerEnabledRecharging(index, value)
+                            npmDevice.setChargerEnabledRecharging(value)
                         }
                         disabled={disabled}
                     />
@@ -166,10 +162,7 @@ export default ({
                         }
                         items={iTermItems}
                         onSelect={item =>
-                            npmDevice.setChargerITerm(
-                                index,
-                                item.value as ITerm
-                            )
+                            npmDevice.setChargerITerm(item.value as ITerm)
                         }
                         selectedItem={
                             iTermItems[
@@ -200,7 +193,6 @@ export default ({
                         items={vTrickleFastItems}
                         onSelect={item =>
                             npmDevice.setChargerVTrickleFast(
-                                index,
                                 Number.parseFloat(item.value) as VTrickleFast
                             )
                         }
@@ -230,7 +222,6 @@ export default ({
                         items={ntcThermistorItems}
                         onSelect={item =>
                             npmDevice.setChargerNTCThermistor(
-                                index,
                                 item.value as NTCThermistor
                             )
                         }

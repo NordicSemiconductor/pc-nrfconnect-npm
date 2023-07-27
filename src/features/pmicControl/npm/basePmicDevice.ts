@@ -29,7 +29,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
     _dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
     eventEmitter: EventEmitter,
     devices: {
-        noOfChargers?: number;
+        charger?: boolean;
         noOfBucks?: number;
         noOfLdos?: number;
         noOfGPIOs?: number;
@@ -176,7 +176,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
         onChargerUpdate: (
-            handler: (payload: PartialUpdate<Charger>, error?: string) => void
+            handler: (payload: Partial<Charger>, error?: string) => void
         ) => {
             eventEmitter.on('onChargerUpdate', handler);
             return () => {
@@ -265,7 +265,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
-        getNumberOfChargers: () => devices.noOfChargers ?? 0,
+        hasCharger: () => devices.charger ?? false,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
         getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,

@@ -16,7 +16,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import {
-    getChargers,
+    getCharger,
     getLatestAdcSample,
     getNpmDevice,
     getPmicState,
@@ -37,7 +37,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const adcSample = useSelector(getLatestAdcSample);
     const npmDevice = useSelector(getNpmDevice);
     const profile = useSelector(getProfile);
-    const chargers = useSelector(getChargers);
+    const charger = useSelector(getCharger);
     const pmicConnectionState = useSelector(getPmicState);
     const usbPowered = useSelector(isUsbPowered);
     const batteryConnected = useSelector(isBatteryConnected);
@@ -70,11 +70,10 @@ export default ({ isVisible }: { isVisible: boolean }) => {
 
                             await npmDevice?.setFuelGaugeEnabled(false);
                             await npmDevice?.setChargerNTCThermistor(
-                                0,
                                 profile.ntcThermistor
                             );
                             await npmDevice
-                                ?.setChargerVTerm(0, profile.vUpperCutOff)
+                                ?.setChargerVTerm(profile.vUpperCutOff)
                                 .catch(message => {
                                     dispatch(
                                         setCompleteStep({
@@ -85,7 +84,6 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 });
                             await npmDevice
                                 ?.setChargerIChg(
-                                    0,
                                     Math.min(
                                         800,
                                         Math.floor(
@@ -102,7 +100,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     );
                                 });
                             await npmDevice
-                                ?.setChargerEnabled(0, true)
+                                ?.setChargerEnabled(true)
                                 .catch(message => {
                                     dispatch(
                                         setCompleteStep({
@@ -135,7 +133,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             <Group>
                 {adcSample &&
                     adcSample.vBat > profile.vUpperCutOff &&
-                    !chargers[0].enabled && (
+                    !charger?.enabled && (
                         <Alert label="Caution: " variant="warning">
                             The battery voltage exceeds V
                             <span className="subscript">TERM</span>. This might

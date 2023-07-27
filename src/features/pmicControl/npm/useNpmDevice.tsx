@@ -19,6 +19,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
+import { RootState } from '../../../appReducer';
 import { PROFILE_FOLDER_PREFIX } from '../../../components/Profiling/helpers';
 import { getShellParser } from '../../serial/serialSlice';
 import {
@@ -31,7 +32,7 @@ import {
     setActiveBatterModel,
     setBatteryConnected,
     setBucks,
-    setChargers,
+    setCharger,
     setFuelGauge,
     setFuelGaugeChargingSamplingRate,
     setFuelGaugeNotChargingSamplingRate,
@@ -61,7 +62,7 @@ import {
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
     noop,
 } from './pmicHelpers';
-import { Buck, Charger, Ldo, PmicDialog } from './types';
+import { Buck, Ldo, PmicDialog } from './types';
 
 export default () => {
     const shellParser = useSelector(getShellParser);
@@ -95,15 +96,15 @@ export default () => {
         if (npmDevice && pmicState === 'pmic-connected' && supportedVersion) {
             npmDevice.requestUpdate.usbPowered();
 
-            for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
-                npmDevice.requestUpdate.chargerVTerm(i);
-                npmDevice.requestUpdate.chargerIChg(i);
-                npmDevice.requestUpdate.chargerEnabled(i);
-                npmDevice.requestUpdate.chargerVTrickleFast(i);
-                npmDevice.requestUpdate.chargerITerm(i);
-                npmDevice.requestUpdate.chargerEnabledRecharging(i);
-                npmDevice.requestUpdate.pmicChargingState(i);
-                npmDevice.requestUpdate.chargerNTCThermistor(i);
+            if (npmDevice.hasCharger()) {
+                npmDevice.requestUpdate.chargerVTerm();
+                npmDevice.requestUpdate.chargerIChg();
+                npmDevice.requestUpdate.chargerEnabled();
+                npmDevice.requestUpdate.chargerVTrickleFast();
+                npmDevice.requestUpdate.chargerITerm();
+                npmDevice.requestUpdate.chargerEnabledRecharging();
+                npmDevice.requestUpdate.pmicChargingState();
+                npmDevice.requestUpdate.chargerNTCThermistor();
             }
 
             for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
@@ -139,19 +140,19 @@ export default () => {
             const initComponents = () => {
                 if (!npmDevice) return;
 
-                const emptyChargers: Charger[] = [];
-                for (let i = 0; i < npmDevice.getNumberOfChargers(); i += 1) {
-                    emptyChargers.push({
-                        vTerm: npmDevice.getChargerVoltageRange(i)[0],
-                        vTrickleFast: 2.5,
-                        iChg: npmDevice.getChargerCurrentRange(i).min,
-                        enabled: false,
-                        iTerm: '10%',
-                        enableRecharging: false,
-                        ntcThermistor: '10 kΩ',
-                    });
+                if (npmDevice.hasCharger()) {
+                    dispatch(
+                        setCharger({
+                            vTerm: npmDevice.getChargerVoltageRange()[0],
+                            vTrickleFast: 2.5,
+                            iChg: npmDevice.getChargerCurrentRange().min,
+                            enabled: false,
+                            iTerm: '10%',
+                            enableRecharging: false,
+                            ntcThermistor: '10 kΩ',
+                        })
+                    );
                 }
-                dispatch(setChargers(emptyChargers));
 
                 const emptyBuck: Buck[] = [];
                 for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
@@ -196,8 +197,8 @@ export default () => {
             releaseAll.push(
                 npmDevice.onAdcSettingsChange(settings => {
                     dispatch(setFuelGaugeReportingRate(settings.reportRate));
-                    dispatch<AppThunk>((_, getState) => {
-                        if (getState().app.pmicControl.chargers[0].enabled) {
+                    dispatch<AppThunk<RootState>>((_, getState) => {
+                        if (getState().app.pmicControl.charger?.enabled) {
                             dispatch(
                                 setFuelGaugeChargingSamplingRate(
                                     settings.samplingRate
@@ -216,17 +217,17 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onChargerUpdate(payload => {
-                    dispatch<AppThunk>((_, getState) => {
+                    dispatch<AppThunk<RootState>>((_, getState) => {
                         dispatch(updateCharger(payload));
                         if (
-                            payload.data.enabled != null &&
+                            payload.enabled != null &&
                             getState().app.profiling.ccProfilingState !==
                                 'Running'
                         ) {
                             npmDevice.startAdcSample(
                                 getState().app.pmicControl
                                     .fuelGaugeReportingRate,
-                                payload.data.enabled
+                                payload.enabled
                                     ? getState().app.pmicControl
                                           .fuelGaugeChargingSamplingRate
                                     : getState().app.pmicControl

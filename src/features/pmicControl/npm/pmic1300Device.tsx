@@ -51,7 +51,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();
     const devices = {
         noOfBucks: 2,
-        noOfChargers: 1,
+        charger: true,
         noOfLdos: 2,
         noOfGPIOs: 5,
     };
@@ -248,13 +248,18 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const emitPartialEvent = <T,>(
         eventName: string,
-        index: number,
-        data: Partial<T>
+        data: Partial<T>,
+        index?: number
     ) => {
-        eventEmitter.emit(eventName, {
-            index,
-            data,
-        } as PartialUpdate<T>);
+        eventEmitter.emit(
+            eventName,
+            index !== undefined
+                ? ({
+                      index,
+                      data,
+                  } as PartialUpdate<T>)
+                : data
+        );
     };
 
     const releaseAll: (() => void)[] = [];
@@ -339,7 +344,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 toRegex('npmx charger termination_voltage normal', true),
                 res => {
                     const value = parseToNumber(res);
-                    emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
                         vTerm: value / 1000, // mv to V
                     });
                 },
@@ -352,7 +357,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 toRegex('npmx charger charger_current', true),
                 res => {
                     const value = parseToNumber(res);
-                    emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
                         iChg: value,
                     });
                 },
@@ -380,7 +385,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '(1|0)'
                 ),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
                         enableRecharging: parseToBoolean(res),
                     });
                 },
@@ -397,7 +402,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '(1|0)'
                 ),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
                         enabled: parseToBoolean(res),
                     });
                 },
@@ -412,7 +417,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     const result = parseToNumber(res) / 1000;
 
                     if (result === 2.5 || result === 2.9) {
-                        emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                        emitPartialEvent<Charger>('onChargerUpdate', {
                             vTrickleFast: result,
                         });
                     }
@@ -433,7 +438,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     const result = parseToNumber(res);
 
                     if (result === 10 || result === 20) {
-                        emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                        emitPartialEvent<Charger>('onChargerUpdate', {
                             iTerm: `${result}%`,
                         });
                     }
@@ -470,7 +475,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     }
 
                     if (mode) {
-                        emitPartialEvent<Charger>('onChargerUpdate', 0, {
+                        emitPartialEvent<Charger>('onChargerUpdate', {
                             ntcThermistor: mode,
                         });
                     }
@@ -639,10 +644,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     res => {
                         const value = Number.parseInt(res.split('=')[1], 16);
 
-                        emitPartialEvent<Buck>('onBuckUpdate', i, {
-                            // eslint-disable-next-line no-bitwise
-                            enabled: (value & (i === 0 ? 0x4 : 0x64)) !== 0, // mV to V
-                        });
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                // eslint-disable-next-line no-bitwise
+                                enabled: (value & (i === 0 ? 0x4 : 0x64)) !== 0, // mV to V
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -653,9 +662,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx buck voltage normal', true, i),
                     res => {
                         const value = parseToNumber(res);
-                        emitPartialEvent<Buck>('onBuckUpdate', i, {
-                            vOutNormal: value / 1000, // mV to V
-                        });
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                vOutNormal: value / 1000, // mV to V
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -666,9 +679,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx buck voltage retention', true, i),
                     res => {
                         const value = parseToNumber(res);
-                        emitPartialEvent<Buck>('onBuckUpdate', i, {
-                            vOutRetention: value / 1000, // mV to V
-                        });
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                vOutRetention: value / 1000, // mV to V
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -679,9 +696,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx buck vout select', true, i),
                     res => {
                         const value = parseToNumber(res);
-                        emitPartialEvent<Buck>('onBuckUpdate', i, {
-                            mode: value === 0 ? 'vSet' : 'software',
-                        });
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                mode: value === 0 ? 'vSet' : 'software',
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -691,9 +712,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx buck', true, i),
                     res => {
-                        emitPartialEvent<Buck>('onBuckUpdate', i, {
-                            enabled: parseToBoolean(res),
-                        });
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                enabled: parseToBoolean(res),
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -704,10 +729,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx buck gpio on_off', true, i, '(-?[0-9]+) (0)'),
                     res => {
                         const result = parseToNumber(res);
-                        emitPartialEvent<Buck>('onBuckUpdate', i, {
-                            onOffControl:
-                                result === -1 ? 'Off' : GPIOValues[result],
-                        });
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                onOffControl:
+                                    result === -1 ? 'Off' : GPIOValues[result],
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -723,10 +752,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     ),
                     res => {
                         const result = parseToNumber(res);
-                        emitPartialEvent<Buck>('onBuckUpdate', i, {
-                            retentionControl:
-                                result === -1 ? 'Off' : GPIOValues[result],
-                        });
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                retentionControl:
+                                    result === -1 ? 'Off' : GPIOValues[result],
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -742,10 +775,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     ),
                     res => {
                         const result = parseToNumber(res);
-                        emitPartialEvent<Buck>('onBuckUpdate', i, {
-                            modeControl:
-                                result === -1 ? 'Auto' : GPIOValues[result],
-                        });
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                modeControl:
+                                    result === -1 ? 'Auto' : GPIOValues[result],
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -757,9 +794,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx ldsw', true, i),
                     res => {
-                        emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                            enabled: parseToBoolean(res),
-                        });
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                enabled: parseToBoolean(res),
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -769,10 +810,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx ldsw mode', true, i),
                     res => {
-                        emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                            mode:
-                                parseToNumber(res) === 0 ? 'ldoSwitch' : 'LDO',
-                        });
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                mode:
+                                    parseToNumber(res) === 0
+                                        ? 'ldoSwitch'
+                                        : 'LDO',
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -782,9 +829,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx ldsw ldo_voltage', true, i),
                     res => {
-                        emitPartialEvent<Ldo>('onLdoUpdate', i, {
-                            voltage: parseToNumber(res) / 1000, // mV to V
-                        });
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                voltage: parseToNumber(res) / 1000, // mV to V
+                            },
+                            i
+                        );
                     },
                     noop
                 )
@@ -826,16 +877,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
-    const setChargerVTerm = (index: number, value: number) =>
+    const setChargerVTerm = (value: number) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', index, {
+            emitPartialEvent<Charger>('onChargerUpdate', {
                 vTerm: value,
             });
 
             if (pmicState === 'ek-disconnected') {
                 resolve();
             } else {
-                setChargerEnabled(index, false)
+                setChargerEnabled(false)
                     .then(() => {
                         sendCommand(
                             `npmx charger termination_voltage normal set ${
@@ -843,82 +894,82 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             }`, // mv to V
                             () => resolve(),
                             () => {
-                                requestUpdate.chargerVTerm(index);
+                                requestUpdate.chargerVTerm();
                                 reject();
                             }
                         );
                     })
                     .catch(() => {
-                        requestUpdate.chargerVTerm(index);
+                        requestUpdate.chargerVTerm();
                         reject();
                     });
             }
         });
 
-    const setChargerIChg = (index: number, value: number) =>
+    const setChargerIChg = (value: number) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', index, {
+            emitPartialEvent<Charger>('onChargerUpdate', {
                 iChg: value,
             });
 
             if (pmicState === 'ek-disconnected') {
                 resolve();
             } else {
-                setChargerEnabled(index, false)
+                setChargerEnabled(false)
                     .then(() =>
                         sendCommand(
                             `npmx charger charger_current set ${value}`,
                             () => resolve(),
                             () => {
-                                requestUpdate.chargerIChg(index);
+                                requestUpdate.chargerIChg();
                                 reject();
                             }
                         )
                     )
                     .catch(() => {
-                        requestUpdate.chargerIChg(index);
+                        requestUpdate.chargerIChg();
                         reject();
                     });
             }
         });
 
-    const setChargerVTrickleFast = (index: number, value: VTrickleFast) =>
+    const setChargerVTrickleFast = (value: VTrickleFast) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', index, {
+            emitPartialEvent<Charger>('onChargerUpdate', {
                 vTrickleFast: value,
             });
 
             if (pmicState === 'ek-disconnected') {
                 resolve();
             } else {
-                setChargerEnabled(index, false)
+                setChargerEnabled(false)
                     .then(() => {
                         sendCommand(
                             `npmx charger trickle set ${value * 1000}`,
                             () => resolve(),
                             () => {
-                                requestUpdate.chargerVTrickleFast(index);
+                                requestUpdate.chargerVTrickleFast();
                                 reject();
                             }
                         );
                     })
                     .catch(() => {
-                        requestUpdate.chargerVTrickleFast(index);
+                        requestUpdate.chargerVTrickleFast();
                         reject();
                     });
             }
         });
 
-    const setChargerITerm = (index: number, iTerm: ITerm) =>
+    const setChargerITerm = (iTerm: ITerm) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', index, {
+            emitPartialEvent<Charger>('onChargerUpdate', {
                 iTerm,
             });
 
             if (pmicState === 'ek-disconnected') {
                 resolve();
             } else {
-                setChargerEnabled(index, false)
+                setChargerEnabled(false)
                     .then(() => {
                         sendCommand(
                             `npmx charger termination_current set ${Number.parseInt(
@@ -927,22 +978,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             )}`,
                             () => resolve(),
                             () => {
-                                requestUpdate.chargerITerm(index);
+                                requestUpdate.chargerITerm();
                                 reject();
                             }
                         );
                     })
                     .catch(() => {
-                        requestUpdate.chargerITerm(index);
+                        requestUpdate.chargerITerm();
                         reject();
                     });
             }
         });
 
-    const setChargerEnabledRecharging = (index: number, enabled: boolean) =>
+    const setChargerEnabledRecharging = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', index, {
+                emitPartialEvent<Charger>('onChargerUpdate', {
                     enableRecharging: enabled,
                 });
                 resolve();
@@ -951,22 +1002,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     `npmx charger module recharge set ${enabled ? '1' : '0'}`,
                     () => resolve(),
                     () => {
-                        requestUpdate.chargerEnabledRecharging(index);
+                        requestUpdate.chargerEnabledRecharging();
                         reject();
                     }
                 );
             }
         });
-    const setChargerNTCThermistor = (index: number, mode: NTCThermistor) =>
+    const setChargerNTCThermistor = (mode: NTCThermistor) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', index, {
+            emitPartialEvent<Charger>('onChargerUpdate', {
                 ntcThermistor: mode,
             });
 
             if (pmicState === 'ek-disconnected') {
                 resolve();
             } else {
-                setChargerEnabled(index, false)
+                setChargerEnabled(false)
                     .then(() => {
                         let value = '';
                         switch (mode) {
@@ -984,22 +1035,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             `npmx adc ntc set ${value}`,
                             () => resolve(),
                             () => {
-                                requestUpdate.chargerNTCThermistor(index);
+                                requestUpdate.chargerNTCThermistor();
                                 reject();
                             }
                         );
                     })
                     .catch(() => {
-                        requestUpdate.chargerNTCThermistor(index);
+                        requestUpdate.chargerNTCThermistor();
                         reject();
                     });
             }
         });
 
-    const setChargerEnabled = (index: number, enabled: boolean) =>
+    const setChargerEnabled = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', index, {
+                emitPartialEvent<Charger>('onChargerUpdate', {
                     enabled,
                 });
                 resolve();
@@ -1010,7 +1061,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         resolve();
                     },
                     () => {
-                        requestUpdate.chargerEnabled(index);
+                        requestUpdate.chargerEnabled();
                         reject();
                     }
                 );
@@ -1021,13 +1072,21 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
-                    emitPartialEvent<Buck>('onBuckUpdate', index, {
-                        vOutNormal: value,
-                    });
+                    emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            vOutNormal: value,
+                        },
+                        index
+                    );
 
-                    emitPartialEvent<Buck>('onBuckUpdate', index, {
-                        mode: 'software',
-                    });
+                    emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            mode: 'software',
+                        },
+                        index
+                    );
 
                     resolve();
                 } else {
@@ -1084,9 +1143,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setBuckVOutRetention = (index: number, value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    vOutRetention: value,
-                });
+                emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        vOutRetention: value,
+                    },
+                    index
+                );
 
                 resolve();
             } else {
@@ -1105,9 +1168,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
-                    emitPartialEvent<Buck>('onBuckUpdate', index, {
-                        mode,
-                    });
+                    emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            mode,
+                        },
+                        index
+                    );
                     resolve();
                 } else {
                     sendCommand(
@@ -1157,9 +1224,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setBuckModeControl = (index: number, modeControl: BuckModeControl) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    modeControl,
-                });
+                emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        modeControl,
+                    },
+                    index
+                );
 
                 resolve();
             } else {
@@ -1182,9 +1253,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     ) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    onOffControl,
-                });
+                emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        onOffControl,
+                    },
+                    index
+                );
 
                 resolve();
             } else {
@@ -1207,9 +1282,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     ) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>('onBuckUpdate', index, {
-                    retentionControl,
-                });
+                emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        retentionControl,
+                    },
+                    index
+                );
 
                 resolve();
             } else {
@@ -1230,9 +1309,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
-                    emitPartialEvent<Buck>('onBuckUpdate', index, {
-                        enabled,
-                    });
+                    emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            enabled,
+                        },
+                        index
+                    );
                     resolve();
                 } else {
                     sendCommand(
@@ -1276,9 +1359,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const setLdoVoltage = (index: number, voltage: number) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Ldo>('onLdoUpdate', index, {
-                voltage,
-            });
+            emitPartialEvent<Ldo>(
+                'onLdoUpdate',
+                {
+                    voltage,
+                },
+                index
+            );
 
             if (pmicState === 'ek-disconnected') {
                 resolve();
@@ -1306,9 +1393,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setLdoEnabled = (index: number, enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Ldo>('onLdoUpdate', index, {
-                    enabled,
-                });
+                emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        enabled,
+                    },
+                    index
+                );
                 resolve();
             } else {
                 sendCommand(
@@ -1325,9 +1416,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
-                    emitPartialEvent<Ldo>('onLdoUpdate', index, {
-                        mode,
-                    });
+                    emitPartialEvent<Ldo>(
+                        'onLdoUpdate',
+                        {
+                            mode,
+                        },
+                        index
+                    );
                     resolve();
                 } else {
                     sendCommand(
@@ -1556,30 +1651,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         });
 
     const requestUpdate = {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        pmicChargingState: (index: number) =>
-            sendCommand('npmx charger status get'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerVTerm: (index: number) =>
+        pmicChargingState: () => sendCommand('npmx charger status get'),
+        chargerVTerm: () =>
             sendCommand('npmx charger termination_voltage normal get'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerIChg: (index: number) =>
-            sendCommand('npmx charger charger_current get'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerEnabled: (index: number) =>
-            sendCommand('npmx charger module charger get'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerVTrickleFast: (index: number) =>
-            sendCommand('npmx charger trickle get'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerITerm: (index: number) =>
-            sendCommand('npmx charger termination_current get'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerEnabledRecharging: (index: number) =>
+        chargerIChg: () => sendCommand('npmx charger charger_current get'),
+        chargerEnabled: () => sendCommand('npmx charger module charger get'),
+        chargerVTrickleFast: () => sendCommand('npmx charger trickle get'),
+        chargerITerm: () => sendCommand('npmx charger termination_current get'),
+        chargerEnabledRecharging: () =>
             sendCommand('npmx charger module recharge get'),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        chargerNTCThermistor: (index: number) =>
-            sendCommand('npmx adc ntc get'),
+        chargerNTCThermistor: () => sendCommand('npmx adc ntc get'),
 
         buckVOutNormal: (index: number) =>
             sendCommand(`npmx buck voltage normal get ${index}`),
@@ -1622,18 +1703,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
 
             const action = () => {
-                config.chargers.forEach((charger, index) => {
-                    setChargerVTerm(index, charger.vTerm);
-                    setChargerIChg(index, charger.iChg);
-                    setChargerEnabled(index, charger.enabled);
-                    setChargerITerm(index, charger.iTerm);
-                    setChargerEnabledRecharging(
-                        index,
-                        charger.enableRecharging
-                    );
-                    setChargerVTrickleFast(index, charger.vTrickleFast);
-                    setChargerNTCThermistor(index, charger.ntcThermistor);
-                });
+                if (config.charger) {
+                    const charger = config.charger;
+                    setChargerVTerm(charger.vTerm);
+                    setChargerIChg(charger.iChg);
+                    setChargerEnabled(charger.enabled);
+                    setChargerITerm(charger.iTerm);
+                    setChargerEnabledRecharging(charger.enableRecharging);
+                    setChargerVTrickleFast(charger.vTrickleFast);
+                    setChargerNTCThermistor(charger.ntcThermistor);
+                }
 
                 config.bucks.forEach((buck, index) => {
                     setBuckVOutNormal(index, buck.vOutNormal);
