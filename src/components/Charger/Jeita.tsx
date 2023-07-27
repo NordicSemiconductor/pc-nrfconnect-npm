@@ -109,7 +109,7 @@ export default ({
             title={
                 <div className="tw-flex tw-justify-between">
                     <span>
-                        T<span className="subscript">TBAT</span> Monitoring –
+                        T<span className="subscript">BAT</span> Monitoring –
                         JEITA Compliance
                     </span>
                 </div>
