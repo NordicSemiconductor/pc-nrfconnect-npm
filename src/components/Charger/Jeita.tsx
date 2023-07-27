@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
     Card,
     classNames,
@@ -18,6 +19,7 @@ import {
     Charger,
     NpmDevice,
 } from '../../features/pmicControl/npm/types';
+import { getLatestAdcSample } from '../../features/pmicControl/pmicControlSlice';
 
 export default ({
     npmDevice,
@@ -28,6 +30,8 @@ export default ({
     charger: Charger;
     disabled: boolean;
 }) => {
+    const latestAdcSample = useSelector(getLatestAdcSample);
+
     const [internalVTermr, setInternalVTermr] = useState(charger.vTermR);
     const [internalTJeita1, setInternalTJeita1] = useState(charger.tCold);
     const [internalTJeita2, setInternalTJeita2] = useState(charger.tCool);
@@ -137,7 +141,7 @@ export default ({
             />
 
             <div className="tw-preflight">
-                <div className="tw-relative tw-my-6 tw-flex tw-flex-row tw-justify-between tw-gap-1.5 tw-text-xs">
+                <div className="tw-relative tw-my-6 tw-flex tw-flex-row tw-justify-between tw-gap-2 tw-text-xs">
                     <div className="tw-flex tw-flex-col tw-font-medium">
                         <span>Temp Region</span>
                         <span>Charge Current</span>
@@ -146,7 +150,13 @@ export default ({
                     <div>
                         <Line />
                     </div>
-                    <div className="tw-flex tw-flex-col tw-text-center">
+                    <div
+                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                            latestAdcSample &&
+                                latestAdcSample?.tBat < internalJeitaTemps[0] &&
+                                'tw-bg-indigo-100'
+                        )}`}
+                    >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Cold
                         </span>
@@ -159,7 +169,15 @@ export default ({
                             temperature={internalJeitaTemps[0]}
                         />
                     </div>
-                    <div className="tw-flex tw-flex-col tw-text-center">
+                    <div
+                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                            latestAdcSample &&
+                                latestAdcSample?.tBat >=
+                                    internalJeitaTemps[0] &&
+                                latestAdcSample?.tBat < internalJeitaTemps[1] &&
+                                'tw-bg-lightBlue-100'
+                        )}`}
+                    >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Cool
                         </span>
@@ -177,7 +195,15 @@ export default ({
                             temperature={internalJeitaTemps[1]}
                         />
                     </div>
-                    <div className="tw-flex tw-flex-col tw-text-center">
+                    <div
+                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                            latestAdcSample &&
+                                latestAdcSample?.tBat >=
+                                    internalJeitaTemps[1] &&
+                                latestAdcSample?.tBat < internalJeitaTemps[2] &&
+                                'tw-bg-green-100'
+                        )}`}
+                    >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Nominal
                         </span>
@@ -194,7 +220,15 @@ export default ({
                             temperature={internalJeitaTemps[2]}
                         />
                     </div>
-                    <div className="tw-flex tw-flex-col tw-text-center">
+                    <div
+                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                            latestAdcSample &&
+                                latestAdcSample?.tBat >=
+                                    internalJeitaTemps[2] &&
+                                latestAdcSample?.tBat < internalJeitaTemps[3] &&
+                                'tw-bg-orange-100'
+                        )}`}
+                    >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Warm
                         </span>
@@ -208,7 +242,14 @@ export default ({
                     <div>
                         <Arrow type="HOT" temperature={internalJeitaTemps[3]} />
                     </div>
-                    <div className="tw-flex tw-flex-col tw-text-center">
+                    <div
+                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                            latestAdcSample &&
+                                latestAdcSample?.tBat >=
+                                    internalJeitaTemps[3] &&
+                                'tw-bg-red-100'
+                        )}`}
+                    >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Hot
                         </span>
