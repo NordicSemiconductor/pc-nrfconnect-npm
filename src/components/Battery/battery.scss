@@ -126,38 +126,3 @@
         }
     }
 }
-
-.line-wrapper {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid $gray-200;
-    padding-bottom: 6px;
-    margin-bottom: 6px;
-    line-height: 1;
-
-    &:last-child {
-        margin-bottom: 0px;
-        padding-bottom: 6px;
-    }
-
-    .line-title {
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .line-data {
-        text-align: right;
-        font-size: 12px;
-    }
-}
-.disabled {
-    .line-wrapper {
-        .line-title {
-            color: $gray-300;
-        }
-
-        .line-data {
-            color: $gray-300;
-        }
-    }
-}
