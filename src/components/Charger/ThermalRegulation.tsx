@@ -52,8 +52,13 @@ export default ({
                 }
                 unit="°C"
                 value={tempChgStop}
-                range={npmDevice.getChargerTChgStopRange()}
-                onChange={value => setTempChgStop(value)}
+                range={{
+                    ...npmDevice.getChargerTChgStopRange(),
+                    min: charger.tChgResume + 1,
+                }}
+                onChange={value => {
+                    if (value) setTempChgStop(value);
+                }}
                 onChangeComplete={npmDevice.setChargerTChgStop}
                 disabled={disabled}
             />
@@ -66,8 +71,13 @@ export default ({
                 }
                 unit="°C"
                 value={tempChgResume}
-                range={npmDevice.getChargerTChgResumeRange()}
-                onChange={value => setTempChgResume(value)}
+                range={{
+                    ...npmDevice.getChargerTChgResumeRange(),
+                    max: charger.tChgStop - 1,
+                }}
+                onChange={value => {
+                    if (value) setTempChgResume(value);
+                }}
                 onChangeComplete={npmDevice.setChargerTChgResume}
                 disabled={disabled}
             />
