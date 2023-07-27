@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import {
     Card,
     classNames,
+    NumberInlineInput,
     NumberInputSliderWithUnit,
     Slider,
     StateSelector,
@@ -20,6 +21,7 @@ import {
     NpmDevice,
 } from '../../features/pmicControl/npm/types';
 import { getLatestAdcSample } from '../../features/pmicControl/pmicControlSlice';
+import { RangeType } from '../../utils/helpers';
 
 export default ({
     npmDevice,
@@ -33,16 +35,12 @@ export default ({
     const latestAdcSample = useSelector(getLatestAdcSample);
 
     const [internalVTermr, setInternalVTermr] = useState(charger.vTermR);
-    const [internalTJeita1, setInternalTJeita1] = useState(charger.tCold);
-    const [internalTJeita2, setInternalTJeita2] = useState(charger.tCool);
-    const [internalTJeita3, setInternalTJeita3] = useState(charger.tWarm);
-    const [internalTJeita4, setInternalTJeita4] = useState(charger.tHot);
 
     const [internalJeitaTemps, setInternalJeitaTemps] = useState([
-        internalTJeita1,
-        internalTJeita2,
-        internalTJeita3,
-        internalTJeita4,
+        charger.tCold,
+        charger.tCool,
+        charger.tWarm,
+        charger.tHot,
     ]);
 
     const currentCoolItems = [
@@ -64,24 +62,8 @@ export default ({
         },
     ] as { key: ChargeCurrentCool; renderItem: React.ReactNode }[];
 
-    useEffect(() => {
-        setInternalJeitaTemps(
-            [
-                internalTJeita1,
-                internalTJeita2,
-                internalTJeita3,
-                internalTJeita4,
-            ].sort((a, b) => a - b)
-        );
-    }, [internalTJeita1, internalTJeita2, internalTJeita3, internalTJeita4]);
-
     const updateNpmDeviceJeitaTemps = () => {
-        const temp = [
-            internalTJeita1,
-            internalTJeita2,
-            internalTJeita3,
-            internalTJeita4,
-        ].sort();
+        const temp = internalJeitaTemps.sort((a, b) => a - b);
 
         if (temp[0] !== charger.tCold) npmDevice.setChargerTCold(temp[0]);
         if (temp[1] !== charger.tCool) npmDevice.setChargerTCool(temp[1]);
@@ -98,11 +80,28 @@ export default ({
             charger.tWarm,
             charger.tHot,
         ]);
-        setInternalTJeita1(charger.tCold);
-        setInternalTJeita2(charger.tCool);
-        setInternalTJeita3(charger.tWarm);
-        setInternalTJeita4(charger.tHot);
     }, [charger]);
+
+    const updateInternal = (index: number, value: number) => {
+        if (index === 0 && value >= internalJeitaTemps[1]) {
+            return;
+        }
+        if (index === 3 && internalJeitaTemps[2] >= value) {
+            return;
+        }
+        if (
+            index !== 0 &&
+            index !== 3 &&
+            (value >= internalJeitaTemps[index + 1] ||
+                internalJeitaTemps[index - 1] >= value)
+        ) {
+            return;
+        }
+
+        const temp = [...internalJeitaTemps];
+        temp[index] = value;
+        setInternalJeitaTemps(temp);
+    };
 
     return (
         <Card
@@ -167,6 +166,12 @@ export default ({
                         <Arrow
                             type="COLD"
                             temperature={internalJeitaTemps[0]}
+                            range={{
+                                min: npmDevice.getChargerJeitaRange().min,
+                                max: internalJeitaTemps[1] - 1,
+                            }}
+                            onChange={v => updateInternal(0, v)}
+                            onChangeComplete={updateNpmDeviceJeitaTemps}
                         />
                     </div>
                     <div
@@ -193,6 +198,12 @@ export default ({
                         <Arrow
                             type="COOL"
                             temperature={internalJeitaTemps[1]}
+                            range={{
+                                min: internalJeitaTemps[0] + 1,
+                                max: internalJeitaTemps[2] - 1,
+                            }}
+                            onChange={v => updateInternal(1, v)}
+                            onChangeComplete={updateNpmDeviceJeitaTemps}
                         />
                     </div>
                     <div
@@ -218,6 +229,12 @@ export default ({
                         <Arrow
                             type="WARM"
                             temperature={internalJeitaTemps[2]}
+                            range={{
+                                min: internalJeitaTemps[1] + 1,
+                                max: internalJeitaTemps[3] - 1,
+                            }}
+                            onChange={v => updateInternal(2, v)}
+                            onChangeComplete={updateNpmDeviceJeitaTemps}
                         />
                     </div>
                     <div
@@ -240,7 +257,16 @@ export default ({
                         </span>
                     </div>
                     <div>
-                        <Arrow type="HOT" temperature={internalJeitaTemps[3]} />
+                        <Arrow
+                            type="HOT"
+                            temperature={internalJeitaTemps[3]}
+                            range={{
+                                min: internalJeitaTemps[2] + 1,
+                                max: npmDevice.getChargerJeitaRange().max,
+                            }}
+                            onChange={v => updateInternal(3, v)}
+                            onChangeComplete={updateNpmDeviceJeitaTemps}
+                        />
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
@@ -262,19 +288,11 @@ export default ({
                     <span>{npmDevice.getChargerJeitaRange().min}°C</span>
                     <div className="tw-w-full">
                         <Slider
-                            values={[
-                                internalTJeita1,
-                                internalTJeita2,
-                                internalTJeita3,
-                                internalTJeita4,
-                            ]}
+                            values={internalJeitaTemps}
                             range={npmDevice.getChargerJeitaRange()}
-                            onChange={[
-                                setInternalTJeita1,
-                                setInternalTJeita2,
-                                setInternalTJeita3,
-                                setInternalTJeita4,
-                            ]}
+                            onChange={[0, 1, 2, 3].map(
+                                i => v => updateInternal(i, v)
+                            )}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
                         />
                     </div>
@@ -296,9 +314,15 @@ const Line = ({ className }: { className?: string }) => (
 const Arrow = ({
     type,
     temperature,
+    range,
+    onChange,
+    onChangeComplete,
 }: {
     type: 'COLD' | 'COOL' | 'WARM' | 'HOT';
     temperature: number;
+    range: RangeType;
+    onChange: (value: number) => void;
+    onChangeComplete: () => void;
 }) => (
     <>
         <span className="tw-absolute tw--top-5 tw--translate-x-1/2">
@@ -308,8 +332,16 @@ const Arrow = ({
             className="before:tw-absolute before:tw-bottom-0 before:tw-right-[2px] before:tw-h-3 before:tw--translate-x-1/2 before:tw--rotate-[30deg] before:tw-border-l before:tw-border-l-gray-300
         after:tw-absolute after:tw-bottom-0 after:tw-left-[3px] after:tw-h-3 after:tw-translate-x-1/2 after:tw-rotate-[30deg] after:tw-border-r after:tw-border-r-gray-300"
         />
-        <span className="tw-absolute tw--bottom-5 tw--translate-x-1/2">
-            {temperature}°C
-        </span>
+        <div className="tw-absolute tw--bottom-5 tw--translate-x-1/2">
+            <div className="tw-flex tw-flex-row">
+                <NumberInlineInput
+                    value={temperature}
+                    range={range}
+                    onChange={onChange}
+                    onChangeComplete={onChangeComplete}
+                />
+                <span>°C</span>
+            </div>
+        </div>
     </>
 );
