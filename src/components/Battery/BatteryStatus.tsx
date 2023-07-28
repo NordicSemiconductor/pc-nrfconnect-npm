@@ -26,7 +26,7 @@ const LineData = ({
     value: string;
     docItem: string;
 }) => (
-    <div className="tw-flex tw-justify-between tw-border-b tw-border-b-gray-200 tw-pb-1 tw-text-xs">
+    <div className="tw-flex tw-justify-between tw-border-b tw-border-b-gray-200 tw-pb-0.5 tw-text-xs">
         <DocumentationTooltip card="batteryStatus" item={docItem}>
             <span className="tw-font-medium">{title}</span>
         </DocumentationTooltip>
@@ -60,7 +60,7 @@ export default ({ disabled }: { disabled: boolean }) => {
 
     return (
         <div
-            className={`tw-preflight tw-flex tw-flex-col tw-gap-1 ${classNames(
+            className={`tw-preflight tw-flex tw-flex-col tw-gap-0.5 ${classNames(
                 disabled && 'tw-text-gray-300'
             )}`}
         >
