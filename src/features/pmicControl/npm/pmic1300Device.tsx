@@ -1963,11 +1963,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             min: 0,
             max: 100,
         }),
-        getChargerTChgStopRange: () => ({
-            min: 50,
-            max: 110,
-        }),
-        getChargerTChgResumeRange: () => ({
+        getChargerChipThermalRange: () => ({
             min: 50,
             max: 110,
         }),
