@@ -9,10 +9,11 @@ import { useSelector } from 'react-redux';
 import {
     Card,
     classNames,
+    Dropdown,
+    DropdownItem,
     NumberInlineInput,
     NumberInputSliderWithUnit,
     Slider,
-    StateSelector,
 } from 'pc-nrfconnect-shared';
 
 import {
@@ -43,32 +44,34 @@ export default ({
         charger.tHot,
     ]);
 
-    const currentCoolItems = [
+    const currentCoolItems: DropdownItem[] = [
         {
-            key: 'iCHG',
-            renderItem: (
+            value: 'iCHG',
+            label: (
                 <div>
                     I<span className="subscript">COOL</span>
                 </div>
             ),
         },
         {
-            key: 'iCool',
-            renderItem: (
+            value: 'iCool',
+            label: (
                 <div>
                     I<span className="subscript">CHG</span>
                 </div>
             ),
         },
-    ] as { key: ChargeCurrentCool; renderItem: React.ReactNode }[];
+    ];
 
     const updateNpmDeviceJeitaTemps = () => {
-        const temp = internalJeitaTemps.sort((a, b) => a - b);
-
-        if (temp[0] !== charger.tCold) npmDevice.setChargerTCold(temp[0]);
-        if (temp[1] !== charger.tCool) npmDevice.setChargerTCool(temp[1]);
-        if (temp[2] !== charger.tWarm) npmDevice.setChargerTWarm(temp[2]);
-        if (temp[3] !== charger.tHot) npmDevice.setChargerTHot(temp[3]);
+        if (internalJeitaTemps[0] !== charger.tCold)
+            npmDevice.setChargerTCold(internalJeitaTemps[0]);
+        if (internalJeitaTemps[1] !== charger.tCool)
+            npmDevice.setChargerTCool(internalJeitaTemps[1]);
+        if (internalJeitaTemps[2] !== charger.tWarm)
+            npmDevice.setChargerTWarm(internalJeitaTemps[2]);
+        if (internalJeitaTemps[3] !== charger.tHot)
+            npmDevice.setChargerTHot(internalJeitaTemps[3]);
     };
 
     //  NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
@@ -114,37 +117,14 @@ export default ({
                 </div>
             }
         >
-            <StateSelector
-                items={currentCoolItems}
-                onSelect={i =>
-                    npmDevice.setChargerCurrentCool(currentCoolItems[i].key)
-                }
-                selectedItem={
-                    currentCoolItems[charger.currentCool === 'iCHG' ? 0 : 1]
-                }
-                disabled={disabled}
-            />
-            <NumberInputSliderWithUnit
-                label={
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">TERMR</span>
-                    </div>
-                }
-                unit="V"
-                value={internalVTermr}
-                range={npmDevice.getChargerVTermRRange()}
-                onChange={value => setInternalVTermr(value)}
-                onChangeComplete={npmDevice.setChargerVTermR}
-                disabled={disabled}
-            />
-
-            <div className="tw-preflight">
+            <div className="tw-preflight tw-mb-4">
                 <div className="tw-relative tw-my-6 tw-flex tw-flex-row tw-justify-between tw-gap-2 tw-text-xs">
-                    <div className="tw-flex tw-flex-col tw-font-medium">
-                        <span>Temp Region</span>
-                        <span>Charge Current</span>
-                        <span>Termination Voltage</span>
+                    <div className="tw-flex tw-flex-col tw-p-1 tw-font-medium">
+                        <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
+                            Temperature
+                        </span>
+                        <span>Current</span>
+                        <span>Voltage</span>
                     </div>
                     <div>
                         <Line />
@@ -159,8 +139,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Cold
                         </span>
-                        <span>0 mAh</span>
-                        <span>0 V</span>
+                        <span>Off</span>
+                        <span>N/A</span>
                     </div>
                     <div>
                         <Arrow
@@ -279,8 +259,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Hot
                         </span>
-                        <span>0 mAh</span>
-                        <span>0 V</span>
+                        <span>Off</span>
+                        <span>N/A</span>
                     </div>
                 </div>
 
@@ -299,6 +279,33 @@ export default ({
                     <span>{npmDevice.getChargerJeitaRange().max}°C</span>
                 </div>
             </div>
+            <NumberInputSliderWithUnit
+                label={
+                    <div>
+                        <span>V</span>
+                        <span className="subscript">TERMR</span>
+                    </div>
+                }
+                unit="V"
+                value={internalVTermr}
+                range={npmDevice.getChargerVTermRRange()}
+                onChange={value => setInternalVTermr(value)}
+                onChangeComplete={npmDevice.setChargerVTermR}
+                disabled={disabled}
+            />
+            <Dropdown
+                label="Cool current"
+                items={currentCoolItems}
+                onSelect={item =>
+                    npmDevice.setChargerCurrentCool(
+                        item.value as ChargeCurrentCool
+                    )
+                }
+                selectedItem={
+                    currentCoolItems[charger.currentCool === 'iCHG' ? 0 : 1]
+                }
+                disabled={disabled}
+            />
         </Card>
     );
 };
