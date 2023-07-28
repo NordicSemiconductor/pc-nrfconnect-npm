@@ -370,6 +370,90 @@ describe('PMIC 1300', () => {
                 );
             });
 
+            test.skip('Request update chargerTChgResume', () => {
+                pmic.requestUpdate.chargerTChgResume();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    'npmx adc ntc get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Request update chargerTChgStop', () => {
+                pmic.requestUpdate.chargerTChgStop();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    'npmx adc ntc get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Request update chargerTCold', () => {
+                pmic.requestUpdate.chargerTCold();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    'npmx adc ntc get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Request update chargerTCool', () => {
+                pmic.requestUpdate.chargerTCool();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    'npmx adc ntc get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Request update chargerTWarm', () => {
+                pmic.requestUpdate.chargerTWarm();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    'npmx adc ntc get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Request update chargerTHot', () => {
+                pmic.requestUpdate.chargerTHot();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    'npmx adc ntc get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Request update chargerCurrentCool', () => {
+                pmic.requestUpdate.chargerCurrentCool();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    'npmx adc ntc get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
             test.each(PMIC_1300_BUCKS)(
                 'Request update buckVOut index: %p',
                 index => {
@@ -869,6 +953,83 @@ describe('PMIC 1300', () => {
                     );
                 }
             );
+
+            test.skip('Set setChargerTChgResume', async () => {
+                await pmic.setChargerTChgResume(90);
+
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx charger trickle set 2500`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Set setChargerTChgStop', async () => {
+                await pmic.setChargerTChgStop(90);
+
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx charger trickle set 2500`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Set setChargerTCold', async () => {
+                await pmic.setChargerTCold(90);
+
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx charger trickle set 2500`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Set setChargerTCool', async () => {
+                await pmic.setChargerTCool(90);
+
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx charger trickle set 2500`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Set setChargerTWarm', async () => {
+                await pmic.setChargerTWarm(90);
+
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx charger trickle set 2500`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Set setChargerTHot', async () => {
+                await pmic.setChargerTHot(90);
+
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx charger trickle set 2500`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
+
+            test.skip('Set setChargerCurrentCool', async () => {
+                await pmic.setChargerCurrentCool('iCHG');
+
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx charger trickle set 2500`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            });
 
             test.each(PMIC_1300_BUCKS)(
                 'Set setBuckVOut index: %p',
@@ -1906,6 +2067,187 @@ describe('PMIC 1300', () => {
                 }
             );
 
+            test.skip('Set setChargerTChgResume - Fail immediately', async () => {
+                await expect(
+                    pmic.setChargerTChgResume(90)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx charger module charger set 90`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    'npmx charger module charger get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            });
+
+            test.skip('Set setChargerTChgStop - Fail immediately', async () => {
+                await expect(
+                    pmic.setChargerTChgStop(90)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx charger module charger set 90`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    'npmx charger module charger get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            });
+
+            test.skip('Set setChargerTCold - Fail immediately', async () => {
+                await expect(pmic.setChargerTCold(90)).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx charger module charger set 90`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    'npmx charger module charger get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            });
+
+            test.skip('Set setChargerTCool - Fail immediately', async () => {
+                await expect(pmic.setChargerTCool(90)).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx charger module charger set 90`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    'npmx charger module charger get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            });
+
+            test.skip('Set setChargerTWarm - Fail immediately', async () => {
+                await expect(pmic.setChargerTWarm(90)).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx charger module charger set 90`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    'npmx charger module charger get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            });
+
+            test.skip('Set setChargerTHot - Fail immediately', async () => {
+                await expect(pmic.setChargerTWarm(90)).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx charger module charger set 90`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    'npmx charger module charger get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            });
+
+            test.skip('Set setChargerCurrentCool - Fail immediately', async () => {
+                await expect(
+                    pmic.setChargerCurrentCool('iCHG')
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx charger module charger set 90`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    'npmx charger module charger get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            });
+
             test.each(PMIC_1300_BUCKS)(
                 'Set setBuckVOut - Fail immediately - index: %p',
                 async index => {
@@ -2451,6 +2793,57 @@ describe('PMIC 1300', () => {
             expect(mockOnChargerUpdate).toBeCalledWith({ enabled: true });
         });
 
+        test('Set setChargerTChgResume', async () => {
+            await pmic.setChargerTChgResume(90);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ tChgResume: 90 });
+        });
+
+        test('Set setChargerTChgStop', async () => {
+            await pmic.setChargerTChgStop(90);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ tChgStop: 90 });
+        });
+
+        test('Set setChargerTCold', async () => {
+            await pmic.setChargerTCold(90);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ tCold: 90 });
+        });
+
+        test('Set setChargerTCool', async () => {
+            await pmic.setChargerTCool(90);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ tCool: 90 });
+        });
+
+        test('Set setChargerTWarm', async () => {
+            await pmic.setChargerTWarm(90);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ tWarm: 90 });
+        });
+
+        test('Set setChargerTHot', async () => {
+            await pmic.setChargerTHot(90);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ tHot: 90 });
+        });
+
+        test('Set setChargerCurrentCool', async () => {
+            await pmic.setChargerCurrentCool('iCool');
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({
+                currentCool: 'iCool',
+            });
+        });
+
         test.each(PMIC_1300_BUCKS)('Set setBuckVOut index: %p', async index => {
             await pmic.setBuckVOutNormal(index, 1.2);
 
@@ -2602,6 +2995,32 @@ describe('PMIC 1300', () => {
                 3.5, 3.55, 3.6, 3.65, 4, 4.05, 4.1, 4.15, 4.2, 4.25, 4.3, 4.35,
                 4.4, 4.45,
             ]));
+
+        test('Charger Voltage Warm Range', () =>
+            expect(pmic.getChargerVTermRRange()).toStrictEqual([
+                3.5, 3.55, 3.6, 3.65, 4, 4.05, 4.1, 4.15, 4.2, 4.25, 4.3, 4.35,
+                4.4, 4.45,
+            ]));
+
+        test('Charger Chip Thermal Range', () =>
+            expect(pmic.getChargerChipThermalRange()).toStrictEqual({
+                min: 50,
+                max: 110,
+            }));
+
+        test('Charger Jeita Range', () =>
+            expect(pmic.getChargerJeitaRange()).toStrictEqual({
+                min: 0,
+                max: 100,
+            }));
+
+        test('Charger Current Range', () =>
+            expect(pmic.getChargerCurrentRange()).toStrictEqual({
+                min: 32,
+                max: 800,
+                decimals: 0,
+                step: 2,
+            }));
 
         test.each(PMIC_1300_BUCKS)('Buck Voltage Range index: %p', index =>
             expect(pmic.getBuckVoltageRange(index)).toStrictEqual({
