@@ -110,9 +110,9 @@ export default () => {
                 npmDevice.requestUpdate.chargerCurrentCool();
                 npmDevice.requestUpdate.chargerVTermR();
                 npmDevice.requestUpdate.chargerTCold();
-                npmDevice.requestUpdate.chargerVCool();
-                npmDevice.requestUpdate.chargerVWarm();
-                npmDevice.requestUpdate.chargerVHot();
+                npmDevice.requestUpdate.chargerTCool();
+                npmDevice.requestUpdate.chargerTWarm();
+                npmDevice.requestUpdate.chargerTHot();
             }
 
             for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {

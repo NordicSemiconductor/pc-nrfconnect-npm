@@ -280,9 +280,9 @@ export type NpmDevice = {
         chargerCurrentCool: () => void;
         chargerVTermR: () => void;
         chargerTCold: () => void;
-        chargerVCool: () => void;
-        chargerVWarm: () => void;
-        chargerVHot: () => void;
+        chargerTCool: () => void;
+        chargerTWarm: () => void;
+        chargerTHot: () => void;
 
         buckVOutNormal: (index: number) => void;
         buckVOutRetention: (index: number) => void;

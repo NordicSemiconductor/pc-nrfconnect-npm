@@ -1827,9 +1827,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerCurrentCool: () => console.log('Not Implemented'),
         chargerVTermR: () => console.log('Not Implemented'),
         chargerTCold: () => console.log('Not Implemented'),
-        chargerVCool: () => console.log('Not Implemented'),
-        chargerVWarm: () => console.log('Not Implemented'),
-        chargerVHot: () => console.log('Not Implemented'),
+        chargerTCool: () => console.log('Not Implemented'),
+        chargerTWarm: () => console.log('Not Implemented'),
+        chargerTHot: () => console.log('Not Implemented'),
 
         buckVOutNormal: (index: number) =>
             sendCommand(`npmx buck voltage normal get ${index}`),
