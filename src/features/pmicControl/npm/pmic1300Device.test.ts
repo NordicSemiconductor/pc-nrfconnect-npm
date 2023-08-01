@@ -212,7 +212,7 @@ const setupMocksWithShellParser = () => {
 
     const mockUnregister = jest.fn(() => {});
     const mockIsPause = jest.fn(() => false);
-    const mockUnPause = jest.fn(() => {});
+    const mockUnPause = jest.fn().mockResolvedValue(undefined);
     const mockSetShellEchos = jest.fn(() => {});
 
     const mockShellParser = jest.fn<ShellParser, []>(() => ({
