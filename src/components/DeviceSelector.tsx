@@ -11,7 +11,7 @@ import {
     DeviceSetupConfig,
     getAppFile,
     logger,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { closeDevice, openDevice } from '../actions/deviceActions';
 import { npm1300DeviceSetup } from '../features/pmicControl/npm/deviceSetups';

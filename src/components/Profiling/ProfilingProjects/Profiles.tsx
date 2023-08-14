@@ -6,8 +6,8 @@
 
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Button } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { OpenDialogReturnValue } from 'electron';
-import { Button } from 'pc-nrfconnect-shared';
 
 import { showOpenDialog } from '../../../actions/fileActions';
 import {

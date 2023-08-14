@@ -6,8 +6,6 @@
 
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { existsSync, mkdirSync, rmSync } from 'fs';
-import path from 'path';
 import {
     Alert,
     AppThunk,
@@ -17,7 +15,9 @@ import {
     GenericDialog,
     getWaitingForDeviceTimeout,
     Group,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { existsSync, mkdirSync, rmSync } from 'fs';
+import path from 'path';
 
 import { RootState } from '../../../appReducer';
 import { stringToFile } from '../../../features/helpers';

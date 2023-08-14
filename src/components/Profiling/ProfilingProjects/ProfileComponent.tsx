@@ -6,9 +6,14 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+    Alert,
+    Button,
+    Toggle,
+    useStopwatch,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import fs from 'fs';
 import path from 'path';
-import { Alert, Button, Toggle, useStopwatch } from 'pc-nrfconnect-shared';
 
 import { generateParamsFromCSV } from '../../../features/nrfutillNpm/csvProcessing';
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';

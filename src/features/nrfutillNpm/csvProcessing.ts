@@ -4,11 +4,15 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import {
+    AppThunk,
+    getAppDir,
+    getAppFile,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { AppThunk, getAppDir, getAppFile } from 'pc-nrfconnect-shared';
 
 import { RootState } from '../../appReducer';
 import {

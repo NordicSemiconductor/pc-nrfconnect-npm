@@ -13,7 +13,8 @@ import {
     openWindow,
     selectedDevice,
     usageData,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { ipcRenderer } from 'electron';
 
 import { getPmicState } from '../../features/pmicControl/pmicControlSlice';
 import { getSerialPort } from '../../features/serial/serialSlice';

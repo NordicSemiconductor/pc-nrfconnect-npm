@@ -14,7 +14,7 @@ import {
     NumberInlineInput,
     NumberInputSliderWithUnit,
     Slider,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     ChargeCurrentCool,

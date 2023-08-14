@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Card } from 'pc-nrfconnect-shared';
+import { Card } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import FuelGaugeSettings from '../../FuelGauge/FuelGaugeSettings';
 

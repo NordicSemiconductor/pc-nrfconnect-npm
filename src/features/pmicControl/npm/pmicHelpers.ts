@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { AppThunk, Device, getPersistentStore } from 'pc-nrfconnect-shared';
+import {
+    AppThunk,
+    Device,
+    getPersistentStore,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { v4 as uuid } from 'uuid';
 
 import { dequeueDialog, requestDialog } from '../pmicControlSlice';

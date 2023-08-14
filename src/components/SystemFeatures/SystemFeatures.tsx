@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Alert } from 'pc-nrfconnect-shared';
+import { Alert } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 export default () => (
     <div className="systemFeatures-container">

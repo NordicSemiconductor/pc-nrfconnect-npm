@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { App } from 'pc-nrfconnect-shared';
+import { App, render } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
@@ -22,7 +22,7 @@ import NpmGenericDialog from './features/pmicControl/npm/NpmGenericDialog';
 
 import './index.scss';
 
-export default () => (
+render(
     <App
         reportUsageData
         appReducer={appReducer}

@@ -3,6 +3,7 @@
     "version": "0.9.1",
     "description": "EXPERIMENTAL: Evaluate and implement Nordic's PMICs​",
     "displayName": "nPM PowerUP​",
+    "homepage": "https://github.com/NordicPlayground/pc-nrfconnect-npm",
     "repository": {
         "type": "git",
         "url": "https://github.com/NordicSemiconductor/pc-nrfconnect-npm"
@@ -13,6 +14,7 @@
         "nrfconnect": "^4.1.2"
     },
     "main": "dist/bundle.js",
+    "html": "dist/index.html",
     "files": [
         "fw/*.hex",
         "dist/",
@@ -37,16 +39,16 @@
         "prepare": "husky install"
     },
     "devDependencies": {
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^85.0.0",
         "chart.js": "^4.0.1",
         "chartjs-adapter-date-fns": "^2.0.1",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v76",
         "react-chartjs-2": "^5.0.1",
         "xterm-headless": "^5.1.0"
     },
     "eslintConfig": {
-        "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
+        "extends": "./node_modules/@nordicsemiconductor/pc-nrfconnect-shared/config/eslintrc"
     },
-    "prettier": "./node_modules/pc-nrfconnect-shared/config/prettier.config.js",
+    "prettier": "@nordicsemiconductor/pc-nrfconnect-shared/config/prettier.config.js",
     "bundleDependencies": [],
     "dependencies": {
         "zod": "^3.22.2"

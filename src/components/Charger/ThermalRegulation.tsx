@@ -11,7 +11,7 @@ import {
     classNames,
     NumberInlineInput,
     Slider,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { Charger, NpmDevice } from '../../features/pmicControl/npm/types';
 import { getPmicChargingState } from '../../features/pmicControl/pmicControlSlice';

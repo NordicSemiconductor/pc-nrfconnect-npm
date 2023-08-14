@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Alert, Button, Card } from 'pc-nrfconnect-shared';
+import { Alert, Button, Card } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { removeRecentProject } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { ProjectPathPair } from '../types';

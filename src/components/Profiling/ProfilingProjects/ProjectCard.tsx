@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Alert, Card } from 'pc-nrfconnect-shared';
+import { Alert, Card } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { ProfilingProject } from '../types';
 import ProfileComponent from './ProfileComponent';

@@ -15,7 +15,7 @@ import {
     getDeviceLibContext,
     logger,
     setWaitForDevice,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
 import { RootState } from '../../../appReducer';

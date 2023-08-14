@@ -6,7 +6,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { classNames } from 'pc-nrfconnect-shared';
+import { classNames } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {

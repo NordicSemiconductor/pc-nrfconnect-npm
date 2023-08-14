@@ -12,7 +12,7 @@ import {
     GenericDialog,
     Group,
     NumberInputSliderWithUnit,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { showSaveDialog } from '../../../actions/fileActions';
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';

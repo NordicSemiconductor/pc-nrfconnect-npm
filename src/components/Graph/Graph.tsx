@@ -10,6 +10,11 @@ import { Line } from 'react-chartjs-2';
 import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
 import {
+    Button,
+    PaneProps,
+    Toggle,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
     CategoryScale,
     Chart as ChartJS,
     ChartArea,
@@ -23,7 +28,6 @@ import {
     Title,
     Tooltip,
 } from 'chart.js';
-import { Button, PaneProps, Toggle } from 'pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { AdcSample } from '../../features/pmicControl/npm/types';

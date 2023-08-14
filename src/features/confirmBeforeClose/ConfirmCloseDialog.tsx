@@ -7,7 +7,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentWindow } from '@electron/remote';
-import { AppThunk, ConfirmationDialog } from 'pc-nrfconnect-shared';
+import {
+    AppThunk,
+    ConfirmationDialog,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     addConfirmBeforeClose,
