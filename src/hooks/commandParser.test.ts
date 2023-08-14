@@ -64,6 +64,7 @@ const setupMocks = () => {
     const mockClose = jest.fn(async () => {});
     const mockWrite = jest.fn((data: string | number[] | Buffer) => {
         onDataWrittenCallback(Buffer.from(data));
+        return Promise.resolve();
     });
 
     const mockIsOpen = jest.fn(
@@ -75,8 +76,8 @@ const setupMocks = () => {
     const mockGetOptions = jest.fn(
         () => new Promise<SerialPortOpenOptions<AutoDetectTypes>>(() => {})
     );
-    const mockUpdate = jest.fn(() => '');
-    const mockSet = jest.fn(() => '');
+    const mockUpdate = jest.fn().mockResolvedValue(undefined);
+    const mockSet = jest.fn().mockResolvedValue(undefined);
 
     const mockOnAnyCommandResponse = jest.fn(() => '');
     const mockOnShellLogging = jest.fn(() => '');

@@ -6,11 +6,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ipcRenderer } from 'electron';
 import {
+    apps,
     Button,
     Device,
-    openAppWindow,
+    openWindow,
     selectedDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
@@ -59,7 +59,7 @@ export default () => {
 
 const openSerialTerminal = (device: Device, serialPortPath: string) => {
     usageData.sendUsageData(EventAction.OPEN_SERIAL_TERMINAL);
-    openAppWindow(
+    openWindow.openApp(
         { name: 'pc-nrfconnect-serial-terminal', source: 'official' },
         {
             device: {
@@ -71,20 +71,12 @@ const openSerialTerminal = (device: Device, serialPortPath: string) => {
 };
 
 const detectInstalledApp = async () => {
-    const downloadableApps = (await ipcRenderer.invoke(
-        'apps:get-downloadable-apps'
-    )) as {
-        apps: {
-            name: string;
-            source: string;
-            installed?: object;
-        }[];
-    };
+    const downloadableApps = await apps.getDownloadableApps();
 
     return downloadableApps.apps.some(
         app =>
             app.source === 'official' &&
             app.name === 'pc-nrfconnect-serial-terminal' &&
-            app.installed !== undefined
+            apps.isInstalled(app)
     );
 };
