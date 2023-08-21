@@ -560,31 +560,28 @@ export const documentation: Documentation = {
             description: (
                 <>
                     <p>
-                        Battery profiling provides accurate state-of-charge
+                        {`Battery profiling provides accurate state-of-charge
                         estimation across voltage, current, and temperature
                         range for the specific battery used. The result of the
-                        battery profiling is a battery model which can be
-                        evaluated in nPM PowerUP by using the Write Battery
-                        Model” option.
+                        battery profiling is a battery model. To evaluate the
+                        battery model in nPM PowerUP use the 'Write Battery
+                        Model' option to upload the battery model .json file. To
+                        continue development and implementation on your own
+                        design use the battery model .inc file. Refer to NCS
+                        documentation for more details: `}
+                        <a
+                            target="_blank"
+                            rel="noreferrer"
+                            href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/samples/pmic/native/npm1300_fuel_gauge/README.html#npm1300-fuel-gauge"
+                        >
+                            nPM1300: Fuel gauge — nRF Connect SDK 2.4.99
+                            documentation
+                        </a>
                     </p>
                     <p>
                         An additional board, nPM-FG, is required to perform
                         battery profiling. This must be connected to EK before
                         battery profiling is started.
-                    </p>
-                    <p>
-                        The battery model can also be included in the NCS or
-                        bare-metal project for further testing and development
-                        on a Nordic nRF SoC development kit or custom hardware.
-                        Refer to NCS documentation for more details:{' '}
-                        <a
-                            target="_blank"
-                            rel="noreferrer"
-                            href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/samples/pmic/native/npm1300_fuel_gauge/README.html"
-                        >
-                            nPM1300: Fuel gauge — nRF Connect SDK 2.3.99
-                            documentation
-                        </a>
                     </p>
                 </>
             ),
