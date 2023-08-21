@@ -1054,13 +1054,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             dialogHandler &&
             pmicState !== 'ek-disconnected' &&
             index === 1 &&
-            value <= 1.7
+            value <= 1.6
         ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-1',
-                    message: `Buck 2 powers the I2C communication required by this app. A voltage lower than 1.7 V might cause issues with the app connection. 
+                    message: `Buck 2 powers the I2C communication required by this app. A voltage lower than 1.6 V might cause issues with the app connection. 
                     Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, don't ask again",
@@ -1137,7 +1137,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
-                    message: `Buck 2 powers the I2C communication required by this app. A software voltage might be already set to less then 1.7 V . Are you sure you want to continue?`,
+                    message: `Buck 2 powers the I2C communication required by this app. A software voltage might be already set to less then 1.6 V . Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, don't ask again",
                     cancelLabel: 'No',
