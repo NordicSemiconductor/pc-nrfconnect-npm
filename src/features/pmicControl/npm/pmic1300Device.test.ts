@@ -973,7 +973,7 @@ describe('PMIC 1300', () => {
                 );
 
                 await expect(
-                    pmic.setBuckVOutNormal(1, 1.7)
+                    pmic.setBuckVOutNormal(1, 1.6)
                 ).rejects.toBeUndefined();
 
                 expect(mockDialogHandler).toBeCalledTimes(1);
@@ -998,13 +998,13 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckVOutNormal(1, 1.7);
+                await pmic.setBuckVOutNormal(1, 1.6);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck voltage normal set 1 1700`,
+                    `npmx buck voltage normal set 1 1600`,
                     expect.anything(),
                     undefined,
                     true
@@ -1030,13 +1030,13 @@ describe('PMIC 1300', () => {
                     }
                 );
 
-                await pmic.setBuckVOutNormal(1, 1.7);
+                await pmic.setBuckVOutNormal(1, 1.6);
                 expect(mockDialogHandler).toBeCalledTimes(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck voltage normal set 1 1700`,
+                    `npmx buck voltage normal set 1 1600`,
                     expect.anything(),
                     undefined,
                     true
