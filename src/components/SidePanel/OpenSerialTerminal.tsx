@@ -14,7 +14,6 @@ import {
     selectedDevice,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { ipcRenderer } from 'electron';
 
 import { getPmicState } from '../../features/pmicControl/pmicControlSlice';
 import { getSerialPort } from '../../features/serial/serialSlice';

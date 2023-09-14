@@ -5,17 +5,16 @@
  */
 
 import React from 'react';
-import nrfDeviceLib from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     AppThunk,
     createSerialPort,
     Device,
     DeviceSetup,
     getAppDir,
-    getDeviceLibContext,
     logger,
     setWaitForDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import { Terminal } from 'xterm-headless';
 
 import { RootState } from '../../../appReducer';
@@ -93,24 +92,16 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                             onFail: reject,
                         })
                     );
-                    nrfDeviceLib.firmwareProgram(
-                        getDeviceLibContext(),
-                        device.id,
-                        'NRFDL_FW_FILE',
-                        'NRFDL_FW_INTEL_HEX',
-                        firmware.hex,
-                        err => {
-                            if (err && !success) {
-                                reject(err.message);
-                            }
-                        },
-                        progress => {
-                            onProgress(
-                                progress.progressJson.progressPercentage,
-                                progress.progressJson.message
-                            );
+                    NrfutilDeviceLib.program(device, firmware.hex, progress => {
+                        onProgress(
+                            progress.totalProgressPercentage,
+                            progress.message
+                        );
+                    }).catch(err => {
+                        if (err && !success) {
+                            reject(err.message);
                         }
-                    );
+                    });
                     logger.debug('firmware updated finished');
                 }),
         },
