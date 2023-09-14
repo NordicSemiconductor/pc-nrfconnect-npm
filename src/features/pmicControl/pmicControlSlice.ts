@@ -22,7 +22,7 @@ import {
 
 interface pmicControlState {
     npmDevice?: NpmDevice;
-    chargers: Charger[];
+    charger?: Charger;
     bucks: Buck[];
     ldos: Ldo[];
     latestAdcSample?: AdcSample;
@@ -43,7 +43,6 @@ interface pmicControlState {
 }
 
 const initialState: pmicControlState = {
-    chargers: [],
     bucks: [],
     ldos: [],
     pmicChargingState: {
@@ -81,19 +80,19 @@ const pmicControlSlice = createSlice({
                 npmDevice: action.payload,
             };
         },
-        updateCharger(state, action: PayloadAction<PartialUpdate<Charger>>) {
-            if (state.chargers.length >= action.payload.index) {
-                state.chargers[action.payload.index] = {
-                    ...state.chargers[action.payload.index],
-                    ...action.payload.data,
+        updateCharger(state, action: PayloadAction<Partial<Charger>>) {
+            if (state.charger) {
+                state.charger = {
+                    ...state.charger,
+                    ...action.payload,
                 };
             }
         },
         setPmicState(state, action: PayloadAction<PmicState>) {
             state.pmicState = action.payload;
         },
-        setChargers(state, action: PayloadAction<Charger[]>) {
-            state.chargers = action.payload;
+        setCharger(state, action: PayloadAction<Charger>) {
+            state.charger = action.payload;
         },
         setPmicChargingState(state, action: PayloadAction<PmicChargingState>) {
             state.pmicChargingState = action.payload;
@@ -195,7 +194,7 @@ export const getNpmDevice = (state: RootState) =>
     state.app.pmicControl.npmDevice;
 export const getPmicState = (state: RootState) =>
     state.app.pmicControl.pmicState;
-export const getChargers = (state: RootState) => state.app.pmicControl.chargers;
+export const getCharger = (state: RootState) => state.app.pmicControl.charger;
 export const getLatestAdcSample = (state: RootState) => {
     const { pmicState, latestAdcSample } = state.app.pmicControl;
     return parseConnectedState(
@@ -261,7 +260,7 @@ export const {
     setPmicChargingState,
     setLatestAdcSample,
     updateCharger,
-    setChargers,
+    setCharger,
     setBucks,
     updateBuck,
     setLdos,

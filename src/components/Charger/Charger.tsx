@@ -5,21 +5,54 @@
  */
 
 import React from 'react';
-import { PaneProps } from 'pc-nrfconnect-shared';
+import { useSelector } from 'react-redux';
+import { MasonryLayout, PaneProps } from 'pc-nrfconnect-shared';
 
+import {
+    getCharger,
+    getNpmDevice,
+} from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
-import ChargerCard from './ChargerCard';
+import BatteryCard from '../Cards/Battery/BatteryCard';
+import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
+import PowerCard from '../Cards/Power/PowerCard';
+import Jeita from './Jeita';
+import ThermalRegulation from './ThermalRegulation';
 
 export default ({ active }: PaneProps) => {
     const disabled = useIsUIDisabled();
+    const npmDevice = useSelector(getNpmDevice);
+    const charger = useSelector(getCharger);
 
-    return !active ? null : (
-        <div>
-            <div>
-                <div>
-                    <ChargerCard disabled={disabled} />
-                </div>
-            </div>
-        </div>
-    );
+    return active && npmDevice && charger ? (
+        <MasonryLayout
+            className="masonry-layout min-height-cards"
+            minWidth={422}
+        >
+            <BatteryCard disabled={disabled} />
+            <BatteryStatusCard disabled={disabled} />
+            {npmDevice && charger && (
+                <PowerCard
+                    npmDevice={npmDevice}
+                    charger={charger}
+                    cardLabel="Charger"
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice && charger && (
+                <Jeita
+                    npmDevice={npmDevice}
+                    charger={charger}
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice && charger && (
+                <ThermalRegulation
+                    npmDevice={npmDevice}
+                    charger={charger}
+                    disabled={disabled}
+                />
+            )}
+        </MasonryLayout>
+    ) : null;
 };

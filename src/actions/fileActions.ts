@@ -31,7 +31,7 @@ const saveSettings =
         });
 
         const out: NpmExport = {
-            chargers: [...currentState.chargers],
+            charger: { ...currentState.charger },
             bucks: [...currentState.bucks],
             ldos: [...currentState.ldos],
             fuelGauge: currentState.fuelGauge,

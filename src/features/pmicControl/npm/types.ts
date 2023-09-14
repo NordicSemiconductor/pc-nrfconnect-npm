@@ -50,6 +50,8 @@ export type CCProfilingState =
     | 'ThermalError'
     | 'Ready';
 
+export type ChargeCurrentCool = 'iCHG' | 'iCool';
+
 export type ProfilingEvent = {
     timestamp: number;
     data: ProfilingEventData;
@@ -78,6 +80,14 @@ export type Charger = {
     enableRecharging: boolean;
     iTerm: ITerm;
     ntcThermistor: NTCThermistor;
+    tChgStop: number;
+    tChgResume: number;
+    currentCool: ChargeCurrentCool;
+    vTermR: number;
+    tCold: number;
+    tCool: number;
+    tWarm: number;
+    tHot: number;
 };
 
 export type Buck = {
@@ -145,9 +155,10 @@ export interface IBaseNpmDevice {
         dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
         eventEmitter: EventEmitter,
         devices: {
-            noOfChargers?: number;
+            charger?: boolean;
             noOfBucks?: number;
             noOfLdos?: number;
+            noOfGPIOs?: number;
         },
         supportsVersion: string
     ): BaseNpmDevice;
@@ -176,7 +187,7 @@ export type BaseNpmDevice = {
         handler: (payload: PmicChargingState, error?: string) => void
     ) => () => void;
     onChargerUpdate: (
-        handler: (payload: PartialUpdate<Charger>, error?: string) => void
+        handler: (payload: Partial<Charger>, error?: string) => void
     ) => () => void;
     onBuckUpdate: (
         handler: (payload: PartialUpdate<Buck>, error?: string) => void
@@ -213,7 +224,7 @@ export type BaseNpmDevice = {
         handler: (payload: PartialUpdate<Ldo>, error?: string) => void
     ) => () => void;
 
-    getNumberOfChargers: () => number;
+    hasCharger: () => boolean;
     getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
     getNumberOfGPIOs: () => number;
@@ -246,21 +257,32 @@ export type NpmDevice = {
     startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
 
-    getChargerCurrentRange: (index: number) => RangeType;
-    getChargerVoltageRange: (index: number) => number[];
+    getChargerCurrentRange: () => RangeType;
+    getChargerVoltageRange: () => number[];
+    getChargerVTermRRange: () => number[];
+    getChargerJeitaRange: () => RangeType;
+    getChargerChipThermalRange: () => RangeType;
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
 
     requestUpdate: {
-        pmicChargingState: (index: number) => void;
-        chargerVTerm: (index: number) => void;
-        chargerIChg: (index: number) => void;
-        chargerEnabled: (index: number) => void;
-        chargerVTrickleFast: (index: number) => void;
-        chargerITerm: (index: number) => void;
-        chargerEnabledRecharging: (index: number) => void;
-        chargerNTCThermistor: (index: number) => void;
+        pmicChargingState: () => void;
+        chargerVTerm: () => void;
+        chargerIChg: () => void;
+        chargerEnabled: () => void;
+        chargerVTrickleFast: () => void;
+        chargerITerm: () => void;
+        chargerEnabledRecharging: () => void;
+        chargerNTCThermistor: () => void;
+        chargerTChgStop: () => void;
+        chargerTChgResume: () => void;
+        chargerCurrentCool: () => void;
+        chargerVTermR: () => void;
+        chargerTCold: () => void;
+        chargerTCool: () => void;
+        chargerTWarm: () => void;
+        chargerTHot: () => void;
 
         buckVOutNormal: (index: number) => void;
         buckVOutRetention: (index: number) => void;
@@ -282,22 +304,21 @@ export type NpmDevice = {
         usbPowered: () => void;
     };
 
-    setChargerVTerm: (index: number, value: number) => Promise<void>;
-    setChargerIChg: (index: number, value: number) => Promise<void>;
-    setChargerEnabled: (index: number, state: boolean) => Promise<void>;
-    setChargerVTrickleFast: (
-        index: number,
-        value: VTrickleFast
-    ) => Promise<void>;
-    setChargerITerm: (index: number, iTerm: ITerm) => Promise<void>;
-    setChargerEnabledRecharging: (
-        index: number,
-        enabled: boolean
-    ) => Promise<void>;
-    setChargerNTCThermistor: (
-        index: number,
-        mode: NTCThermistor
-    ) => Promise<void>;
+    setChargerVTerm: (value: number) => Promise<void>;
+    setChargerIChg: (value: number) => Promise<void>;
+    setChargerEnabled: (state: boolean) => Promise<void>;
+    setChargerVTrickleFast: (value: VTrickleFast) => Promise<void>;
+    setChargerITerm: (iTerm: ITerm) => Promise<void>;
+    setChargerEnabledRecharging: (enabled: boolean) => Promise<void>;
+    setChargerNTCThermistor: (mode: NTCThermistor) => Promise<void>;
+    setChargerTChgStop: (value: number) => Promise<void>;
+    setChargerTChgResume: (value: number) => Promise<void>;
+    setChargerCurrentCool: (mode: ChargeCurrentCool) => Promise<void>;
+    setChargerVTermR: (value: number) => Promise<void>;
+    setChargerTCold: (value: number) => Promise<void>;
+    setChargerTCool: (value: number) => Promise<void>;
+    setChargerTWarm: (value: number) => Promise<void>;
+    setChargerTHot: (value: number) => Promise<void>;
 
     setBuckVOutNormal: (index: number, value: number) => Promise<void>;
     setBuckVOutRetention: (index: number, value: number) => Promise<void>;
@@ -354,7 +375,7 @@ export interface PmicDialog {
 export type NpmModel = 'npm1300';
 
 export interface NpmExport {
-    chargers: Charger[];
+    charger?: Charger;
     bucks: Buck[];
     ldos: Ldo[];
     fuelGauge: boolean;

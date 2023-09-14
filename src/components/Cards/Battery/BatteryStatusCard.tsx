@@ -12,11 +12,7 @@ import BatteryStatus from '../../Battery/BatteryStatus';
 export default ({ disabled }: { disabled: boolean }) => (
     <Card
         title={
-            <div
-                className={`d-flex justify-content-between ${
-                    disabled ? 'disabled' : ''
-                }`}
-            >
+            <div className="tw-flex tw-justify-between">
                 <span>Battery Status</span>
             </div>
         }

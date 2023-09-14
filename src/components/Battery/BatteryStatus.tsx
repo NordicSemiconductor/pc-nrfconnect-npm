@@ -6,19 +6,38 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { classNames } from 'pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     getLatestAdcSample,
+    getNpmDevice,
     getPmicChargingState,
 } from '../../features/pmicControl/pmicControlSlice';
 
 import './battery.scss';
 
+const LineData = ({
+    title,
+    value,
+    docItem,
+}: {
+    title: string;
+    value: string;
+    docItem: string;
+}) => (
+    <div className="tw-flex tw-justify-between tw-border-b tw-border-b-gray-200 tw-pb-0.5 tw-text-xs">
+        <DocumentationTooltip card="batteryStatus" item={docItem}>
+            <span className="tw-font-medium">{title}</span>
+        </DocumentationTooltip>
+        <span className="tw-text-right">{value}</span>
+    </div>
+);
+
 export default ({ disabled }: { disabled: boolean }) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
-    const card = 'batteryStatus';
+    const npmDevice = useSelector(getNpmDevice);
 
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
@@ -40,45 +59,50 @@ export default ({ disabled }: { disabled: boolean }) => {
     }, [iconSize]);
 
     return (
-        <div className={`${disabled ? 'disabled' : ''}`}>
-            <div className="line-wrapper">
-                <DocumentationTooltip card={card} item="Voltage">
-                    <span className="line-title">Voltage</span>
-                </DocumentationTooltip>
-                <span className="line-data">
-                    {batteryConnected && latestAdcSample
+        <div
+            className={`tw-preflight tw-flex tw-flex-col tw-gap-0.5 ${classNames(
+                disabled && 'tw-text-gray-300'
+            )}`}
+        >
+            <LineData
+                title="Voltage"
+                value={
+                    batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.vBat.toFixed(2)} V`
-                        : 'N/A'}
-                </span>
-            </div>
-            <div className="line-wrapper">
-                <DocumentationTooltip card={card} item="Current">
-                    <span className="line-title">Current</span>
-                </DocumentationTooltip>
-                <span className="line-data">
-                    {batteryConnected && latestAdcSample
+                        : 'N/A'
+                }
+                docItem="Voltage"
+            />
+
+            <LineData
+                title="Current"
+                value={
+                    batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.iBat < 0 ? '—' : ''}${Math.round(
                               Math.abs(latestAdcSample?.iBat ?? 0)
                           )} mA`
-                        : 'N/A'}
-                </span>
-            </div>
-            <div className="line-wrapper">
-                <DocumentationTooltip card={card} item="Temperature">
-                    <span className="line-title">Temperature</span>
-                </DocumentationTooltip>
-                <span className="line-data">
-                    {batteryConnected && latestAdcSample
+                        : 'N/A'
+                }
+                docItem="Current"
+            />
+
+            <LineData
+                title="Temperature"
+                value={
+                    batteryConnected && latestAdcSample
                         ? `${latestAdcSample?.tBat.toFixed(2)}°C`
-                        : 'N/A'}
-                </span>
-            </div>
-            <div className="line-wrapper">
-                <DocumentationTooltip card={card} item="ChargingMode">
-                    <span className="line-title">Charging Mode</span>
-                </DocumentationTooltip>
-                <span className="line-data">{mode}</span>
-            </div>
+                        : 'N/A'
+                }
+                docItem="Temperature"
+            />
+
+            {npmDevice?.hasCharger() && (
+                <LineData
+                    title="Charging Mode"
+                    value={mode}
+                    docItem="ChargingMode"
+                />
+            )}
         </div>
     );
 };

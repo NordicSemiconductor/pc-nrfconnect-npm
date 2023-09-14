@@ -5,7 +5,6 @@
  */
 
 import React, { useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
 import { useDispatch } from 'react-redux';
 import {
     Button,
@@ -14,8 +13,7 @@ import {
     Dropdown,
     GenericDialog,
     Group,
-    NumberInlineInput,
-    Slider,
+    NumberInputSliderWithUnit,
 } from 'pc-nrfconnect-shared';
 
 import { selectDirectoryDialog } from '../../../actions/fileActions';
@@ -186,131 +184,82 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         value={name}
                     />
                 </div>
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
+                <NumberInputSliderWithUnit
+                    label={
                         <DocumentationTooltip card="charger" item="VTERM">
                             <div>
                                 <span>V</span>
                                 <span className="subscript">TERM</span>
                             </div>
                         </DocumentationTooltip>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={vUpperCutOff}
-                                range={{
-                                    min: 4,
-                                    max: 4.4,
-                                    step: 0.05,
-                                    decimals: 2,
-                                }}
-                                onChange={setUpperVCutOff}
-                            />
-                            <span>V</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[vUpperCutOff]}
-                        onChange={[setUpperVCutOff]}
-                        range={{
-                            min: 4,
-                            max: 4.4,
-                            step: 0.05,
-                            decimals: 2,
-                        }}
-                    />
-                </div>
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
+                    }
+                    unit="V"
+                    value={vUpperCutOff}
+                    range={{
+                        min: 4,
+                        max: 4.4,
+                        step: 0.05,
+                        decimals: 2,
+                    }}
+                    onChange={setUpperVCutOff}
+                />
+
+                <NumberInputSliderWithUnit
+                    label={
                         <DocumentationTooltip card="profiling" item="Capacity">
                             <div>
                                 <span>Discharge cut-off voltage</span>
                             </div>
                         </DocumentationTooltip>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={vLowerCutOff}
-                                range={{
-                                    min: 2.65,
-                                    max: 3.1,
-                                    step: 0.05,
-                                    decimals: 2,
-                                }}
-                                onChange={setLowerVCutOff}
-                            />
-                            <span>V</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[vLowerCutOff]}
-                        onChange={[setLowerVCutOff]}
-                        range={{
-                            min: 2.7,
-                            max: 3.1,
-                            step: 0.05,
-                            decimals: 2,
-                        }}
-                    />
-                </div>
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
+                    }
+                    unit="V"
+                    value={vLowerCutOff}
+                    range={{
+                        min: 2.7,
+                        max: 3.1,
+                        step: 0.05,
+                        decimals: 2,
+                    }}
+                    onChange={setLowerVCutOff}
+                />
+
+                <NumberInputSliderWithUnit
+                    label={
                         <DocumentationTooltip card="profiling" item="Capacity">
                             <div>
                                 <span>Capacity</span>
                             </div>
                         </DocumentationTooltip>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={capacity}
-                                range={{ min: 32, max: 3000 }}
-                                onChange={c => {
-                                    setCapacity(c);
-                                    if (ratedChargingCurrent > c) {
-                                        setRatedChargingCurrent(c);
-                                    }
-                                }}
-                            />
-                            <span>mAh</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[capacity]}
-                        onChange={[
-                            c => {
-                                setCapacity(c);
-                                if (ratedChargingCurrent > c) {
-                                    setRatedChargingCurrent(c);
-                                }
-                            },
-                        ]}
-                        range={{ min: 32, max: 3000 }}
-                    />
-                </div>
-                <div className="slider-container">
-                    <FormLabel className="flex-row">
+                    }
+                    unit="mAh"
+                    value={capacity}
+                    range={{ min: 32, max: 3000 }}
+                    onChange={c => {
+                        setCapacity(c);
+                        if (ratedChargingCurrent > c) {
+                            setRatedChargingCurrent(c);
+                        }
+                    }}
+                />
+
+                <NumberInputSliderWithUnit
+                    label={
                         <DocumentationTooltip card="charger" item="ICHG">
                             <div>
                                 <span>I</span>
                                 <span className="subscript">CHG</span>
                             </div>
                         </DocumentationTooltip>
-                        <div className="flex-row">
-                            <NumberInlineInput
-                                value={ratedChargingCurrent}
-                                range={{
-                                    min: 32,
-                                    max: Math.min(800, capacity),
-                                }}
-                                onChange={setRatedChargingCurrent}
-                            />
-                            <span>mA</span>
-                        </div>
-                    </FormLabel>
-                    <Slider
-                        values={[ratedChargingCurrent]}
-                        onChange={[setRatedChargingCurrent]}
-                        range={{ min: 32, max: Math.min(800, capacity) }}
-                    />
-                </div>
+                    }
+                    unit="mA"
+                    value={ratedChargingCurrent}
+                    range={{
+                        min: 32,
+                        max: Math.min(800, capacity),
+                    }}
+                    onChange={setRatedChargingCurrent}
+                />
+
                 <Dropdown
                     label={
                         <DocumentationTooltip
@@ -337,9 +286,10 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 />
                 {temperatures.map((temp, index) => (
                     <React.Fragment key={`temp-${index + 1}`}>
-                        <div className="flex-row">
-                            <div className="flex-grow-1 slider-container">
-                                <FormLabel className="flex-row">
+                        <div className="tw-flex tw-flex-row tw-items-center">
+                            <NumberInputSliderWithUnit
+                                className="tw-flex-grow"
+                                label={
                                     <DocumentationTooltip
                                         card="profiling"
                                         item="Temperature"
@@ -348,38 +298,19 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                             <span>Temperature</span>
                                         </div>
                                     </DocumentationTooltip>
-
-                                    <div className="flex-row">
-                                        <NumberInlineInput
-                                            value={temp}
-                                            range={{
-                                                min: 0,
-                                                max: 60,
-                                            }}
-                                            onChange={value => {
-                                                const data = [...temperatures];
-                                                data[index] = value;
-                                                setTemperatures(data);
-                                            }}
-                                        />
-                                        <span>°C</span>
-                                    </div>
-                                </FormLabel>
-                                <Slider
-                                    values={[temperatures[index]]}
-                                    onChange={[
-                                        (value: number) => {
-                                            const data = [...temperatures];
-                                            data[index] = value;
-                                            setTemperatures(data);
-                                        },
-                                    ]}
-                                    range={{
-                                        min: 0,
-                                        max: 60,
-                                    }}
-                                />
-                            </div>
+                                }
+                                unit="°C"
+                                value={temp}
+                                range={{
+                                    min: 0,
+                                    max: 60,
+                                }}
+                                onChange={value => {
+                                    const data = [...temperatures];
+                                    data[index] = value;
+                                    setTemperatures(data);
+                                }}
+                            />
                             <div>
                                 {temperatures.length > 1 && (
                                     <Button

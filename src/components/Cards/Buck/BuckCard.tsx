@@ -5,13 +5,11 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
 import {
     Card,
     classNames,
     Dropdown,
-    NumberInlineInput,
-    Slider,
+    NumberInputSliderWithUnit,
     StateSelector,
     Toggle,
 } from 'pc-nrfconnect-shared';
@@ -33,7 +31,7 @@ import {
 interface BuckCardProperties {
     index: number;
     npmDevice: NpmDevice;
-    buck?: Buck;
+    buck: Buck;
     cardLabel?: string;
     defaultSummary?: boolean;
     disabled: boolean;
@@ -78,7 +76,7 @@ export default ({
     const buckOnOffControlItems = [...BuckOnOffControlValues, ...gpioNames].map(
         (item, i) => {
             const label =
-                buck?.mode === 'software' ? (
+                buck.mode === 'software' ? (
                     'Software'
                 ) : (
                     <>
@@ -112,21 +110,19 @@ export default ({
         },
     ];
 
-    const [internalVOut, setInternalVOut] = useState(buck?.vOutNormal ?? 0);
+    const [internalVOut, setInternalVOut] = useState(buck.vOutNormal);
     const [internalRetVOut, setInternalRetVOut] = useState(1);
 
+    // NumberInputSliderWithUnit do not use ldo.<prop> as value as we send only at on change complete
     useEffect(() => {
-        if (buck) setInternalVOut(buck.vOutNormal);
+        setInternalVOut(buck.vOutNormal);
+        setInternalRetVOut(buck.vOutRetention);
     }, [buck]);
 
-    return npmDevice && buck ? (
+    return (
         <Card
             title={
-                <div
-                    className={`d-flex justify-content-between ${
-                        disabled ? 'disabled' : ''
-                    }`}
-                >
+                <div className="tw-flex tw-justify-between">
                     <DocumentationTooltip card={card} item="Buck">
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
@@ -164,8 +160,8 @@ export default ({
                 disabled={disabled}
             />
 
-            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row">
+            <NumberInputSliderWithUnit
+                label={
                     <DocumentationTooltip card={card} item="VOUT">
                         <div>
                             <span>V</span>
@@ -174,34 +170,18 @@ export default ({
                             }`}</span>
                         </div>
                     </DocumentationTooltip>
-
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            value={internalVOut}
-                            range={voltageRange}
-                            onChange={value => setInternalVOut(value)}
-                            onChangeComplete={() => onVOutChange(internalVOut)}
-                            disabled={disabled}
-                        />
-                        <span>V</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    values={[internalVOut]}
-                    onChange={[value => setInternalVOut(value)]}
-                    onChangeComplete={() => onVOutChange(internalVOut)}
-                    range={voltageRange}
-                    disabled={disabled}
-                />
-            </div>
+                }
+                unit="V"
+                disabled={disabled}
+                range={voltageRange}
+                value={internalVOut}
+                onChange={setInternalVOut}
+                onChangeComplete={onVOutChange}
+            />
             {!summary && (
                 <>
-                    <div
-                        className={`slider-container ${
-                            disabled ? 'disabled' : ''
-                        }`}
-                    >
-                        <FormLabel className="flex-row">
+                    <NumberInputSliderWithUnit
+                        label={
                             <DocumentationTooltip card={card} item="RETVOUT">
                                 <div>
                                     <span>V</span>
@@ -210,32 +190,14 @@ export default ({
                                     }`}</span>
                                 </div>
                             </DocumentationTooltip>
-
-                            <div className="flex-row">
-                                <NumberInlineInput
-                                    value={internalRetVOut}
-                                    range={retVOutRange}
-                                    onChange={value =>
-                                        setInternalRetVOut(value)
-                                    }
-                                    onChangeComplete={() =>
-                                        onRetVOutChange(internalRetVOut)
-                                    }
-                                    disabled={disabled}
-                                />
-                                <span>V</span>
-                            </div>
-                        </FormLabel>
-                        <Slider
-                            values={[internalRetVOut]}
-                            onChange={[value => setInternalRetVOut(value)]}
-                            onChangeComplete={() =>
-                                onRetVOutChange(internalRetVOut)
-                            }
-                            range={retVOutRange}
-                            disabled={disabled}
-                        />
-                    </div>
+                        }
+                        unit="V"
+                        disabled={disabled}
+                        range={retVOutRange}
+                        value={internalRetVOut}
+                        onChange={setInternalRetVOut}
+                        onChangeComplete={onRetVOutChange}
+                    />
                     <Dropdown
                         label={
                             <DocumentationTooltip
@@ -324,5 +286,5 @@ export default ({
                 </>
             )}
         </Card>
-    ) : null;
+    );
 };

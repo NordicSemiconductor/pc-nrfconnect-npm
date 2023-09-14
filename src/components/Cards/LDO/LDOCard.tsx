@@ -5,11 +5,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import FormLabel from 'react-bootstrap/FormLabel';
 import {
     Card,
-    NumberInlineInput,
-    Slider,
+    NumberInputSliderWithUnit,
     StateSelector,
     Toggle,
 } from 'pc-nrfconnect-shared';
@@ -46,22 +44,19 @@ export default ({
     const onVoltageChange = (value: number) =>
         npmDevice.setLdoVoltage(index, value);
 
-    const [internalVLdo, setInternalVLdo] = useState(ldo?.voltage ?? 0);
+    const [internalVLdo, setInternalVLdo] = useState(ldo.voltage);
 
     const modeItems = ['LDO', 'Load Switch'];
 
+    // NumberInputSliderWithUnit do not use ldo.<prop> as value as we send only at on change complete
     useEffect(() => {
-        if (ldo) setInternalVLdo(ldo.voltage);
+        setInternalVLdo(ldo.voltage);
     }, [ldo]);
 
     return ldo ? (
         <Card
             title={
-                <div
-                    className={`d-flex justify-content-between ${
-                        disabled ? 'disabled' : ''
-                    }`}
-                >
+                <div className="tw-flex tw-justify-between">
                     <DocumentationTooltip card={card} item="LoadSwitchLDO">
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
@@ -84,8 +79,8 @@ export default ({
                 }
             />
 
-            <div className={`slider-container ${disabled ? 'disabled' : ''}`}>
-                <FormLabel className="flex-row">
+            <NumberInputSliderWithUnit
+                label={
                     <DocumentationTooltip card={card} item="VOUTLDO">
                         <div>
                             <span>V</span>
@@ -94,28 +89,14 @@ export default ({
                             }`}</span>
                         </div>
                     </DocumentationTooltip>
-
-                    <div className="flex-row">
-                        <NumberInlineInput
-                            disabled={disabled}
-                            value={internalVLdo}
-                            range={range}
-                            onChange={value => setInternalVLdo(value)}
-                            onChangeComplete={() =>
-                                onVoltageChange(internalVLdo)
-                            }
-                        />
-                        <span>V</span>
-                    </div>
-                </FormLabel>
-                <Slider
-                    disabled={disabled}
-                    values={[internalVLdo]}
-                    onChange={[value => setInternalVLdo(value)]}
-                    onChangeComplete={() => onVoltageChange(internalVLdo)}
-                    range={range}
-                />
-            </div>
+                }
+                unit="V"
+                disabled={disabled}
+                range={range}
+                value={internalVLdo}
+                onChange={setInternalVLdo}
+                onChangeComplete={onVoltageChange}
+            />
         </Card>
     ) : null;
 };
