@@ -230,7 +230,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             <NumberInlineInput
                                 value={vLowerCutOff}
                                 range={{
-                                    min: 2.7,
+                                    min: 2.65,
                                     max: 3.1,
                                     step: 0.05,
                                     decimals: 2,
