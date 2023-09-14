@@ -96,14 +96,14 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         tRest: 2400000, // 40Min
                                         iLoad: capacity / 5 / 1000, // A
                                         iRest: 0,
-                                        vCutoff: 3.9,
+                                        vCutoff: vUpperCutOff - 0.3,
                                     },
                                     {
                                         tLoad: 300000, // 5Min
                                         tRest: 1800000, // 30Min
                                         iLoad: capacity / 5 / 1000, // A
                                         iRest: 0,
-                                        vCutoff: 3.5,
+                                        vCutoff: vLowerCutOff + 0.5,
                                     },
                                     {
                                         tLoad: 300000, // 5Min
