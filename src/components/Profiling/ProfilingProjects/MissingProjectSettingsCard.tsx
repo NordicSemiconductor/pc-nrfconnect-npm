@@ -33,16 +33,18 @@ export default ({ project }: { project: ProjectPathPair }) => {
                 </div>
             }
         >
-            {project.error === 'fileMissing' && (
-                <Alert label="Error: " variant="danger">
-                    Project settings could not be found
-                </Alert>
-            )}
-            {project.error === 'fileCorrupted' && (
-                <Alert label="Error: " variant="danger">
-                    Project settings are corrupt or not valid format
-                </Alert>
-            )}
+            <div className="tw-pb-4">
+                {project.error === 'fileMissing' && (
+                    <Alert label="Error: " variant="danger">
+                        Project settings could not be found
+                    </Alert>
+                )}
+                {project.error === 'fileCorrupted' && (
+                    <Alert label="Error: " variant="danger">
+                        Project settings are corrupt or not valid format
+                    </Alert>
+                )}
+            </div>
         </Card>
     );
 };
