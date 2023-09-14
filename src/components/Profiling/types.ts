@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { z } from 'zod';
+
 export type ProjectPathPair = {
     path: string;
     settings: ProfilingProject | undefined;
@@ -19,21 +21,28 @@ export type ProfilingCSVProgress = {
     cancel: () => void;
 };
 
-export interface ProfilingProjectProfile {
-    temperature: number;
-    csvPath?: string;
-    csvReady: boolean;
-    paramsJson?: string;
-    batteryJson?: string;
-    batteryInc?: string;
-    exclude?: boolean;
-    nrfUtilVersion?: string;
-}
-export interface ProfilingProject {
-    name: string;
-    capacity: number;
-    vLowerCutOff: number;
-    vUpperCutOff: number;
-    profiles: ProfilingProjectProfile[];
-    appVersion: string;
-}
+export const zodProfilingProjectProfile = z.object({
+    temperature: z.number(),
+    csvPath: z.string().optional(),
+    csvReady: z.boolean(),
+    paramsJson: z.string().optional(),
+    batteryJson: z.string().optional(),
+    batteryInc: z.string().optional(),
+    exclude: z.boolean().optional(),
+    nrfUtilVersion: z.string().optional(),
+});
+
+export type ProfilingProjectProfile = z.infer<
+    typeof zodProfilingProjectProfile
+>;
+
+export const zodProfilingProject = z.object({
+    name: z.string(),
+    capacity: z.number(),
+    vLowerCutOff: z.number(),
+    vUpperCutOff: z.number(),
+    profiles: zodProfilingProjectProfile.array(),
+    appVersion: z.string(),
+});
+
+export type ProfilingProject = z.infer<typeof zodProfilingProject>;
