@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
 import { AppThunk, describeError, logger } from 'pc-nrfconnect-shared';
@@ -26,6 +25,7 @@ import {
     ProfilingProject,
     ProfilingProjectProfile,
     ProjectPathPair,
+    zodProfilingProject,
 } from './types';
 
 export const REST_DURATION = 900; // seconds
@@ -75,20 +75,16 @@ export const readProjectSettingsFromFile = (
     }
 
     try {
-        const pathObject = path.parse(filePath);
-        if (pathObject.ext === '.json') {
-            const store = new Store<ProfilingProject>({
-                cwd: pathObject.dir,
-                name: pathObject.name,
-            });
+        const profilingProject = JSON.parse(
+            fs.readFileSync(filePath).toString()
+        ) as ProfilingProject;
 
-            return { settings: updateSettingsWithValidPath(store.store) };
-        }
+        zodProfilingProject.parse(profilingProject);
+
+        return { settings: updateSettingsWithValidPath(profilingProject) };
     } catch (error) {
         return { settings: undefined, error: 'fileCorrupted' };
     }
-
-    return { settings: undefined, error: 'fileCorrupted' };
 };
 
 export const readAndUpdateProjectSettings =
@@ -97,19 +93,19 @@ export const readAndUpdateProjectSettings =
         updateProject: (currentProject: ProfilingProject) => ProfilingProject
     ): AppThunk =>
     dispatch => {
-        const pathObject = path.parse(filePath);
-        const store = new Store<ProfilingProject>({
-            cwd: pathObject.dir,
-            name: pathObject.name,
-        });
+        const profilingProject = JSON.parse(
+            fs.readFileSync(filePath).toString()
+        ) as ProfilingProject;
 
-        const oldProject = updateSettingsWithValidPath(store.store);
+        zodProfilingProject.parse(profilingProject);
+
+        const oldProject = updateSettingsWithValidPath(profilingProject);
 
         if (oldProject) {
             try {
                 const newProject = updateProject(oldProject);
                 newProject.appVersion = packageJsons.version;
-                store.set(newProject);
+                fs.writeFileSync(filePath, JSON.stringify(newProject, null, 2));
                 dispatch(
                     updateProfilingProject({
                         path: filePath,
@@ -132,14 +128,7 @@ export const saveProjectSettings =
             ...projectToSave,
             appVersion: packageJsons.version,
         };
-
-        const pathObject = path.parse(filePath);
-        const store = new Store<ProfilingProject>({
-            cwd: pathObject.dir,
-            name: pathObject.name,
-        });
-
-        store.set(project);
+        fs.writeFileSync(filePath, JSON.stringify(project, null, 2));
 
         // Abort any ongoing processes with the same project file name
         getState()
