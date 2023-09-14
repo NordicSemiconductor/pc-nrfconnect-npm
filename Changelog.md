@@ -8,6 +8,12 @@ and this project adheres to
 
 ## 0.9.2 - UNRELEASED
 
+### Changed
+
+-   Battery profiling can now support a minimum Discharge cut-off voltage of
+    2.65v
+-   Improved Battery profiling load profile
+
 ### Fixed
 
 -   Buck 2 vOut warning is triggered at 1.6V
