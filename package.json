@@ -47,5 +47,8 @@
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
     },
     "prettier": "./node_modules/pc-nrfconnect-shared/config/prettier.config.js",
-    "bundleDependencies": []
+    "bundleDependencies": [],
+    "dependencies": {
+        "zod": "^3.22.2"
+    }
 }

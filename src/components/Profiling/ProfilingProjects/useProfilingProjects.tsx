@@ -6,9 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Store from 'electron-store';
 import fs from 'fs';
-import path from 'path';
 
 import {
     addConfirmBeforeClose,
@@ -21,7 +19,7 @@ import {
     updateProfilingProject,
 } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { readProjectSettingsFromFile, reloadRecentProjects } from '../helpers';
-import { ProfilingProject } from '../types';
+import { ProfilingProject, zodProfilingProject } from '../types';
 
 export const useProfilingProjects = () => {
     const dispatch = useDispatch();
@@ -72,20 +70,19 @@ export const useProfilingProjects = () => {
 
         recentProjects.forEach(recentProject => {
             if (fs.existsSync(recentProject)) {
-                const pathObject = path.parse(recentProject);
                 try {
-                    const store = new Store<ProfilingProject>({
-                        watch: true,
-                        cwd: pathObject.dir,
-                        name: pathObject.name,
-                    });
+                    const profilingProject = JSON.parse(
+                        fs.readFileSync(recentProject).toString()
+                    ) as ProfilingProject;
+
+                    zodProfilingProject.parse(profilingProject);
 
                     dispatch(
                         updateProfilingProject({
                             path: recentProject,
-                            settings: store.store ?? undefined,
+                            settings: profilingProject ?? undefined,
                             error:
-                                store.store === undefined
+                                profilingProject === undefined
                                     ? 'fileMissing'
                                     : undefined,
                         })

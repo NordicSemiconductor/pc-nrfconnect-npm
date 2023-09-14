@@ -11,6 +11,7 @@ and this project adheres to
 ### Fixed
 
 -   Buck 2 vOut warning is triggered at 1.6V
+-   App crashed if a invalid `Profile Project` project json is loaded
 
 ## 0.9.1 - 2023-07-17
 
