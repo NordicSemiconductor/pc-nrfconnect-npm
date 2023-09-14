@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { getPersistentStore } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import path from 'path';
-import { getPersistentStore } from 'pc-nrfconnect-shared';
 
 import type { RootState } from '../../appReducer';
 import {

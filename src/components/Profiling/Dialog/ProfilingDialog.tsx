@@ -12,7 +12,7 @@ import {
     GenericDialog,
     Group,
     useStopwatch,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { noop } from '../../../features/pmicControl/npm/pmicHelpers';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';

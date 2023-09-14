@@ -6,14 +6,14 @@
 
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import path from 'path';
 import {
     Button,
     DialogButton,
     GenericDialog,
     Group,
     NumberInputSliderWithUnit,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import path from 'path';
 
 import { showOpenDialog } from '../../../actions/fileActions';
 import { readAndUpdateProjectSettings } from '../helpers';

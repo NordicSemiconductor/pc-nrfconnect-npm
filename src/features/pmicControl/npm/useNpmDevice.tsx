@@ -6,9 +6,6 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ipcRenderer } from 'electron';
-import { appendFileSync, existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
 import {
     Alert,
     AppThunk,
@@ -16,7 +13,10 @@ import {
     describeError,
     logger,
     setWaitForDevice,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { ipcRenderer } from 'electron';
+import { appendFileSync, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { RootState } from '../../../appReducer';

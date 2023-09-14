@@ -7,7 +7,7 @@
 // This file is imported by index.jsx, and may contain styles for the app.
 
 @use 'sass:color';
-@import '~pc-nrfconnect-shared/src/variables';
+@import '~@nordicsemiconductor/pc-nrfconnect-shared/src/variables';
 
 .subscript {
     position: relative;

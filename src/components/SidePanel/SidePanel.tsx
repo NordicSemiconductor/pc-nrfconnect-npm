@@ -12,7 +12,7 @@ import {
     NumberInputSliderWithUnit,
     SidePanel,
     StartStopButton,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     loadConfiguration,

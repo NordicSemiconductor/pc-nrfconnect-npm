@@ -11,7 +11,7 @@ import {
     DialogButton,
     GenericDialog,
     Group,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { closeProfiling } from '../../../features/pmicControl/profilingSlice';
 

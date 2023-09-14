@@ -5,6 +5,7 @@
  */
 
 import { dialog, getCurrentWindow } from '@electron/remote';
+import { AppThunk } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     OpenDialogOptions,
     OpenDialogReturnValue,
@@ -13,7 +14,6 @@ import {
 import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
-import { AppThunk } from 'pc-nrfconnect-shared';
 
 import { NpmExport } from '../features/pmicControl/npm/types';
 

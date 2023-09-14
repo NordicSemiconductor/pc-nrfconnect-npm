@@ -6,7 +6,10 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { MasonryLayout, PaneProps } from 'pc-nrfconnect-shared';
+import {
+    MasonryLayout,
+    PaneProps,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     getCharger,

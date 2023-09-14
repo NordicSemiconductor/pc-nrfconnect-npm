@@ -8,9 +8,13 @@ import React, { useMemo, useState } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+    Alert,
+    DialogButton,
+    GenericDialog,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { shell } from 'electron';
 import path from 'path';
-import { Alert, DialogButton, GenericDialog } from 'pc-nrfconnect-shared';
 
 import { showSaveDialog } from '../../../actions/fileActions';
 import { stringToFile } from '../../../features/helpers';

@@ -6,7 +6,12 @@
 
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Button, Dropdown, DropdownItem } from 'pc-nrfconnect-shared';
+import {
+    Alert,
+    Button,
+    Dropdown,
+    DropdownItem,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getProfileBuffer } from '../../actions/fileActions';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';

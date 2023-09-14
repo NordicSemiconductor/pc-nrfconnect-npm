@@ -6,8 +6,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { appendFileSync, writeFileSync } from 'fs';
-import path from 'path';
 import {
     Alert,
     clearWaitForDevice,
@@ -15,7 +13,9 @@ import {
     describeError,
     logger,
     setWaitForDevice,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { appendFileSync, writeFileSync } from 'fs';
+import path from 'path';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import {

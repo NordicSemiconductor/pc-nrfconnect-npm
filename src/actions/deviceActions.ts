@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import type { AutoDetectTypes } from '@serialport/bindings-cpp';
 import {
     AppThunk,
     createSerialPort,
     describeError,
     Device,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import type { AutoDetectTypes } from '@serialport/bindings-cpp';
 import type { SerialPortOpenOptions } from 'serialport';
 
 import { setSerialPort } from '../features/serial/serialSlice';

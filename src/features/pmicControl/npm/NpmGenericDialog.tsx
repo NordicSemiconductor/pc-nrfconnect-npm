@@ -11,7 +11,7 @@ import {
     DialogButton,
     GenericDialog,
     selectedDevice,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import useShellParser from '../../serial/useShellParser';
 import { getDialog } from '../pmicControlSlice';

@@ -11,7 +11,7 @@ import {
     Dropdown,
     NumberInputSliderWithUnit,
     Toggle,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
