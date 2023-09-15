@@ -355,6 +355,19 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(
             shellParser.registerCommandCallback(
+                toRegex('npmx charger termination_voltage warm', true),
+                res => {
+                    const value = parseToNumber(res);
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        vTermR: value / 1000, // mv to V
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
                 toRegex('npmx charger charger_current', true),
                 res => {
                     const value = parseToNumber(res);
@@ -1166,15 +1179,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerVTermR();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger termination_voltage warm set ${value * 1000}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerVTermR();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1855,7 +1867,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerTChgResume: () =>
             sendCommand('npmx charger die_temp resume get'),
         chargerCurrentCool: () => console.log('Not Implemented'),
-        chargerVTermR: () => console.log('Not Implemented'),
+        chargerVTermR: () =>
+            sendCommand('npmx charger termination_voltage warm get'),
         chargerTCold: () => console.log('Not Implemented'),
         chargerTCool: () => console.log('Not Implemented'),
         chargerTWarm: () => console.log('Not Implemented'),
@@ -1990,8 +2003,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 },
             ]).map(v => Number(v.toFixed(2))),
         getChargerJeitaRange: () => ({
-            min: 0,
-            max: 100,
+            min: -20,
+            max: 60,
         }),
         getChargerChipThermalRange: () => ({
             min: 50,

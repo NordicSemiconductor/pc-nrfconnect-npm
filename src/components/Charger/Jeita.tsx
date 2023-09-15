@@ -86,16 +86,24 @@ export default ({
     }, [charger]);
 
     const updateInternal = (index: number, value: number) => {
-        if (index === 0 && value >= internalJeitaTemps[1]) {
+        if (index === 0 && value > internalJeitaTemps[1]) {
             return;
         }
-        if (index === 3 && internalJeitaTemps[2] >= value) {
+        if (index === 3 && internalJeitaTemps[2] > value) {
             return;
         }
+
         if (
-            index !== 0 &&
-            index !== 3 &&
+            index === 1 &&
             (value >= internalJeitaTemps[index + 1] ||
+                internalJeitaTemps[index - 1] > value)
+        ) {
+            return;
+        }
+
+        if (
+            index === 2 &&
+            (value > internalJeitaTemps[index + 1] ||
                 internalJeitaTemps[index - 1] >= value)
         ) {
             return;
@@ -148,7 +156,7 @@ export default ({
                             temperature={internalJeitaTemps[0]}
                             range={{
                                 min: npmDevice.getChargerJeitaRange().min,
-                                max: internalJeitaTemps[1] - 1,
+                                max: internalJeitaTemps[1],
                             }}
                             onChange={v => updateInternal(0, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
@@ -179,7 +187,7 @@ export default ({
                             type="COOL"
                             temperature={internalJeitaTemps[1]}
                             range={{
-                                min: internalJeitaTemps[0] + 1,
+                                min: internalJeitaTemps[0],
                                 max: internalJeitaTemps[2] - 1,
                             }}
                             onChange={v => updateInternal(1, v)}
@@ -211,7 +219,7 @@ export default ({
                             temperature={internalJeitaTemps[2]}
                             range={{
                                 min: internalJeitaTemps[1] + 1,
-                                max: internalJeitaTemps[3] - 1,
+                                max: internalJeitaTemps[3],
                             }}
                             onChange={v => updateInternal(2, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
@@ -241,7 +249,7 @@ export default ({
                             type="HOT"
                             temperature={internalJeitaTemps[3]}
                             range={{
-                                min: internalJeitaTemps[2] + 1,
+                                min: internalJeitaTemps[2],
                                 max: npmDevice.getChargerJeitaRange().max,
                             }}
                             onChange={v => updateInternal(3, v)}
