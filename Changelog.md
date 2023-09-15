@@ -8,6 +8,16 @@ and this project adheres to
 
 ## 0.9.2 - UNRELEASED
 
+### Added
+
+-   Added support for NTC thermistor `ntc_z` option
+-   Added support for Chip Thermal Regulation
+    -   Read and Write Tchgresume
+    -   Read and Write Tchgstop
+    -   Read Thermal Regulation state ?
+-   Added support JEITA
+    -   Read and Write vTermR
+
 ### Changed
 
 -   Battery profiling can now support a minimum Discharge cut-off voltage of
