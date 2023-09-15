@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ICallbacks, ShellParser } from '../../../hooks/commandParser';
+import {
+    ShellParser,
+    ShellParserCallbacks as Callbacks,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import { getNPM1300 } from './pmic1300Device';
 import {
     BatteryModel,
@@ -32,7 +36,7 @@ jest.setSystemTime(systemTime);
 const helpers = {
     registerCommandCallbackError: (
         _command: string,
-        callbacks?: ICallbacks,
+        callbacks?: Callbacks,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _timeout?: number,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,7 +47,7 @@ const helpers = {
     },
     registerCommandCallbackSuccess: (
         _command: string,
-        callbacks?: ICallbacks,
+        callbacks?: Callbacks,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _timeout?: number,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -187,7 +191,7 @@ const setupMocksWithShellParser = () => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             _command: string,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            _callbacks?: ICallbacks,
+            _callbacks?: Callbacks,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             _timeout?: number,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -230,7 +234,7 @@ const setupMocksWithShellParser = () => {
     mockEnqueueRequest.mockImplementationOnce(
         (
             command: string,
-            callbacks?: ICallbacks,
+            callbacks?: Callbacks,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             _timeout?: number,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -650,7 +654,7 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         _command: string,
-                        callbacks?: ICallbacks,
+                        callbacks?: Callbacks,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _timeout?: number,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -740,7 +744,7 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         command: string,
-                        callbacks?: ICallbacks,
+                        callbacks?: Callbacks,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _timeout?: number,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -766,7 +770,7 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         command: string,
-                        callbacks?: ICallbacks,
+                        callbacks?: Callbacks,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _timeout?: number,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -795,7 +799,7 @@ describe('PMIC 1300', () => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (
                         command: string,
-                        callbacks?: ICallbacks,
+                        callbacks?: Callbacks,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         _timeout?: number,
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -2529,14 +2533,14 @@ describe('PMIC 1300', () => {
                 }
             );
 
-            test.skip.each(PMIC_1300_BUCKS)(
+            test.each(PMIC_1300_BUCKS)(
                 'Set setBuckEnabled - Fail immediately - index: %p',
                 async index => {
                     await expect(
                         pmic.setBuckEnabled(index, true)
                     ).rejects.toBeUndefined();
 
-                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
                     expect(mockEnqueueRequest).nthCalledWith(
                         1,
                         `npmx buck set ${index} 1`,
@@ -2545,15 +2549,13 @@ describe('PMIC 1300', () => {
                         true
                     );
 
-                    // Refresh data due to error
-                    // TODO
-                    // expect(mockEnqueueRequest).nthCalledWith(
-                    //     2,
-                    //     `npmx buck get ${index}`,
-                    //     expect.anything(),
-                    //     undefined,
-                    //     true
-                    // );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npmx buck status power get ${index}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
                     // Updates should only be emitted when we get response
                     expect(mockOnBuckUpdate).toBeCalledTimes(0);

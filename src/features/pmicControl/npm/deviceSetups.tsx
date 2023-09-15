@@ -13,15 +13,13 @@ import {
     getAppDir,
     logger,
     setWaitForDevice,
+    shellParser,
+    xTerminalShellParserWrapper,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import { Terminal } from 'xterm-headless';
 
 import { RootState } from '../../../appReducer';
-import {
-    hookModemToShellParser,
-    xTerminalShellParserWrapper,
-} from '../../../hooks/commandParser';
 import { getNpmDevice } from './npmFactory';
 import {
     dialogHandler,
@@ -142,7 +140,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                     { overwrite: true, settingsLocked: true }
                 )
                     .then(port => {
-                        hookModemToShellParser(
+                        shellParser(
                             port,
                             xTerminalShellParserWrapper(
                                 new Terminal({
@@ -159,8 +157,8 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 columnWidth: 80,
                             }
                         )
-                            .then(shellParser => {
-                                getNpmDevice(shellParser, null)
+                            .then(shellParserO => {
+                                getNpmDevice(shellParserO, null)
                                     .then(npmDevice => {
                                         npmDevice
                                             .isSupportedVersion()

@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
 
-import { ShellParser } from '../../../hooks/commandParser';
 import { noop, parseLogData, parseToBoolean, toRegex } from './pmicHelpers';
 import {
     CCProfile,

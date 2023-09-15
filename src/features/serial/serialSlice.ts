@@ -4,11 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { SerialPort } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    SerialPort,
+    ShellParser,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../appReducer';
-import { ShellParser } from '../../hooks/commandParser';
 
 interface SerialState {
     availableSerialPorts: string[];
