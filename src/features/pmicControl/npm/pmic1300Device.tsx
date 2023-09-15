@@ -450,6 +450,30 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(
             shellParser.registerCommandCallback(
+                toRegex('npmx charger die_temp stop', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        tChgStop: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger die_temp resume', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        tChgResume: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
                 toRegex(
                     'npmx adc ntc',
                     true,
@@ -475,7 +499,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             break;
                         case 'HI_Z.':
                         case 'ntc_hi_z.':
-                            mode = 'HI_Z';
+                            mode = 'HI Z';
                             break;
                     }
 
@@ -1035,7 +1059,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             case '10 kΩ':
                                 value = 'ntc_10k';
                                 break;
-                            case 'HI_Z':
+                            case 'HI Z':
                                 value = 'ntc_hi_z';
                                 break;
                         }
@@ -1084,15 +1108,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTChgStop();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger die_temp stop set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerTChgStop();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1104,15 +1127,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTChgResume();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger die_temp resume set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerTChgResume();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1829,8 +1851,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerEnabledRecharging: () =>
             sendCommand('npmx charger module recharge get'),
         chargerNTCThermistor: () => sendCommand('npmx adc ntc get'),
-        chargerTChgStop: () => console.log('Not Implemented'),
-        chargerTChgResume: () => console.log('Not Implemented'),
+        chargerTChgStop: () => sendCommand('npmx charger die_temp stop get'),
+        chargerTChgResume: () =>
+            sendCommand('npmx charger die_temp resume get'),
         chargerCurrentCool: () => console.log('Not Implemented'),
         chargerVTermR: () => console.log('Not Implemented'),
         chargerTCold: () => console.log('Not Implemented'),

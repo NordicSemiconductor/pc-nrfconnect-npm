@@ -3608,6 +3608,38 @@ describe('PMIC 1300', () => {
             expect(mockOnChargerUpdate).nthCalledWith(1, { iTerm: '20%' });
         });
 
+        test.each(['get', 'set 100'])(
+            'npmx charger die_temp resume %p',
+            append => {
+                const command = `npmx charger die_temp resume ${append}`;
+                const callback =
+                    eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+                callback?.onSuccess('Value: 100 *C', command);
+
+                expect(mockOnChargerUpdate).toBeCalledTimes(1);
+                expect(mockOnChargerUpdate).nthCalledWith(1, {
+                    tChgResume: 100,
+                });
+            }
+        );
+
+        test.each(['get', 'set 100'])(
+            'npmx charger die_temp stop %p',
+            append => {
+                const command = `npmx charger die_temp stop ${append}`;
+                const callback =
+                    eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+                callback?.onSuccess('Value: 100 *C', command);
+
+                expect(mockOnChargerUpdate).toBeCalledTimes(1);
+                expect(mockOnChargerUpdate).nthCalledWith(1, {
+                    tChgStop: 100,
+                });
+            }
+        );
+
         test.each([
             {
                 append: 'get',
