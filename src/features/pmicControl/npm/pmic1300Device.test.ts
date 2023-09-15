@@ -940,6 +940,10 @@ describe('PMIC 1300', () => {
                     mode: '47 kΩ',
                     cliMode: 'ntc_47k',
                 },
+                {
+                    mode: 'Hi Z',
+                    cliMode: 'ntc_hi_z',
+                },
             ] as { mode: NTCThermistor; cliMode: string }[])(
                 'Set setChargerNTCThermistor %p',
                 async ({ mode, cliMode }) => {
@@ -1959,6 +1963,10 @@ describe('PMIC 1300', () => {
                 {
                     mode: '47 kΩ',
                     cliMode: 'ntc_47k',
+                },
+                {
+                    mode: 'Hi Z',
+                    cliMode: 'ntc_hi_z',
                 },
             ] as { mode: NTCThermistor; cliMode: string }[])(
                 'Set setChargerNTCThermistor - onError case 2 - Fail immediately -  %p',
@@ -3620,6 +3628,11 @@ describe('PMIC 1300', () => {
                 append: 'set ntc_100k',
                 successReturn: 'Value: 100k.',
                 ntcThermistor: '100 kΩ' as NTCThermistor,
+            },
+            {
+                append: 'set ntc_hi_z',
+                successReturn: 'Value: HI_Z',
+                ntcThermistor: 'HI Z' as NTCThermistor,
             },
         ])(
             'npmx charger ntc thermistor %p',

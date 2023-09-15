@@ -473,6 +473,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         case 'ntc_100k.':
                             mode = '100 kΩ';
                             break;
+                        case 'HI_Z.':
+                        case 'ntc_hi_z.':
+                            mode = 'HI_Z';
+                            break;
                     }
 
                     if (mode) {
@@ -1030,6 +1034,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                 break;
                             case '10 kΩ':
                                 value = 'ntc_10k';
+                                break;
+                            case 'HI_Z':
+                                value = 'ntc_hi_z';
                                 break;
                         }
                         sendCommand(
