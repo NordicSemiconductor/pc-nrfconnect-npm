@@ -941,7 +941,7 @@ describe('PMIC 1300', () => {
                     cliMode: 'ntc_47k',
                 },
                 {
-                    mode: 'Hi Z',
+                    mode: 'HI Z',
                     cliMode: 'ntc_hi_z',
                 },
             ] as { mode: NTCThermistor; cliMode: string }[])(
@@ -1965,7 +1965,7 @@ describe('PMIC 1300', () => {
                     cliMode: 'ntc_47k',
                 },
                 {
-                    mode: 'Hi Z',
+                    mode: 'HI Z',
                     cliMode: 'ntc_hi_z',
                 },
             ] as { mode: NTCThermistor; cliMode: string }[])(
@@ -3631,7 +3631,7 @@ describe('PMIC 1300', () => {
             },
             {
                 append: 'set ntc_hi_z',
-                successReturn: 'Value: HI_Z',
+                successReturn: 'Value: HI_Z.',
                 ntcThermistor: 'HI Z' as NTCThermistor,
             },
         ])(
