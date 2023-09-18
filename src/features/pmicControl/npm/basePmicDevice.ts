@@ -17,6 +17,7 @@ import {
     GPIO,
     IBaseNpmDevice,
     Ldo,
+    LED,
     LoggingEvent,
     PartialUpdate,
     PmicChargingState,
@@ -33,6 +34,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         noOfBucks?: number;
         noOfLdos?: number;
         noOfGPIOs?: number;
+        noOfLEDs?: number;
     },
     supportsVersion: string
 ) => {
@@ -217,6 +219,15 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
+        onLEDUpdate: (
+            handler: (payload: PartialUpdate<LED>, error?: string) => void
+        ) => {
+            eventEmitter.on('onLEDUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onLEDUpdate', handler);
+            };
+        },
+
         onLoggingEvent: (
             handler: (payload: {
                 loggingEvent: LoggingEvent;
@@ -278,6 +289,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
         getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,
+        getNumberOfLEDs: () => devices.noOfLEDs ?? 0,
 
         isSupportedVersion: () =>
             new Promise<{ supported: boolean; version: string }>(

@@ -44,6 +44,9 @@ import {
     ITerm,
     Ldo,
     LdoMode,
+    LED,
+    LEDMode,
+    LEDModeValues,
     LoggingEvent,
     NTCThermistor,
     PartialUpdate,
@@ -61,6 +64,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         charger: true,
         noOfLdos: 2,
         noOfGPIOs: 5,
+        noOfLEDs: 3,
     };
     const baseDevice = baseNpmDevice(
         shellParser,
@@ -972,6 +976,27 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             },
                             i
                         );
+                    },
+                    noop
+                )
+            );
+        }
+
+        for (let i = 0; i < devices.noOfLEDs; i += 1) {
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx leds mode', true, i, '[0-3]'),
+                    res => {
+                        const mode = LEDModeValues[parseToNumber(res)];
+                        if (mode) {
+                            emitPartialEvent<LED>(
+                                'onLEDUpdate',
+                                {
+                                    mode,
+                                },
+                                i
+                            );
+                        }
                     },
                     noop
                 )
@@ -1950,6 +1975,31 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    const setLedMode = (index: number, mode: LEDMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<LED>(
+                    'onLEDUpdate',
+                    {
+                        mode,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx leds mode set ${index} ${LEDModeValues.findIndex(
+                        m => m === mode
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ledMode(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
     const downloadFuelGaugeProfile = (profile: Buffer) => {
         const chunkSize = 256;
         const chunks = Math.ceil(profile.byteLength / chunkSize);
@@ -2098,6 +2148,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         gpioDebounce: (index: number) =>
             sendCommand(`npmx gpio debounce get ${index}`),
 
+        ledMode: (index: number) => sendCommand(`npmx leds mode get ${index}`),
+
         buckVOutNormal: (index: number) =>
             sendCommand(`npmx buck voltage normal get ${index}`),
         buckVOutRetention: (index: number) =>
@@ -2172,6 +2224,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     setGpioDrive(index, gpio.drive);
                     setGpioOpenDrain(index, gpio.openDrain);
                     setGpioDebounce(index, gpio.debounce);
+                });
+
+                config.leds.forEach((led, index) => {
+                    setLedMode(index, led.mode);
                 });
 
                 setFuelGaugeEnabled(config.fuelGauge);
@@ -2300,6 +2356,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setGpioDrive,
         setGpioOpenDrain,
         setGpioDebounce,
+        setLedMode,
 
         setFuelGaugeEnabled,
         downloadFuelGaugeProfile,

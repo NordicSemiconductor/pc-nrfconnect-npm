@@ -41,6 +41,7 @@ import {
     setHardcodedBatterModels,
     setLatestAdcSample,
     setLdos,
+    setLEDs,
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
@@ -51,6 +52,7 @@ import {
     updateCharger,
     updateGPIOs,
     updateLdo,
+    updateLEDs,
 } from '../pmicControlSlice';
 import {
     getProfile,
@@ -64,7 +66,7 @@ import {
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
     noop,
 } from './pmicHelpers';
-import { Buck, GPIO, Ldo, PmicDialog } from './types';
+import { Buck, GPIO, Ldo, LED, LEDModeValues, PmicDialog } from './types';
 
 export default () => {
     const shellParser = useSelector(getShellParser);
@@ -138,6 +140,10 @@ export default () => {
                 npmDevice.requestUpdate.gpioDrive(i);
                 npmDevice.requestUpdate.gpioOpenDrain(i);
                 npmDevice.requestUpdate.gpioDebounce(i);
+            }
+
+            for (let i = 0; i < npmDevice.getNumberOfLEDs(); i += 1) {
+                npmDevice.requestUpdate.ledMode(i);
             }
 
             npmDevice.requestUpdate.fuelGauge();
@@ -215,6 +221,14 @@ export default () => {
                     });
                 }
                 dispatch(setGPIOs(emptyGPIOs));
+
+                const emptyLEDs: LED[] = [];
+                for (let i = 0; i < npmDevice.getNumberOfLEDs(); i += 1) {
+                    emptyLEDs.push({
+                        mode: LEDModeValues[i],
+                    });
+                }
+                dispatch(setLEDs(emptyLEDs));
             };
 
             const releaseAll: (() => void)[] = [];
@@ -303,6 +317,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onGPIOUpdate(payload => {
                     dispatch(updateGPIOs(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onLEDUpdate(payload => {
+                    dispatch(updateLEDs(payload));
                 })
             );
 
