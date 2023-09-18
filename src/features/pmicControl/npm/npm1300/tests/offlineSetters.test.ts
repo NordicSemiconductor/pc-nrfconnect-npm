@@ -5,10 +5,12 @@
  */
 
 import { PmicDialog } from '../../types';
-import { setupMocksBase } from './helpers';
-
-const PMIC_1300_BUCKS = [0, 1];
-const PMIC_1300_LDOS = [0, 1];
+import {
+    PMIC_1300_BUCKS,
+    PMIC_1300_GPIOS,
+    PMIC_1300_LDOS,
+    setupMocksBase,
+} from './helpers';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell
 describe('PMIC 1300 - Setters Offline tests', () => {
@@ -18,6 +20,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         mockOnBuckUpdate,
         mockOnFuelGaugeUpdate,
         mockOnLdoUpdate,
+        mockOnGpioUpdate,
         pmic,
     } = setupMocksBase();
 
@@ -233,6 +236,59 @@ describe('PMIC 1300 - Setters Offline tests', () => {
             index,
         });
     });
+
+    test.each(PMIC_1300_GPIOS)('Set setGpioMode index: %p', async index => {
+        await pmic.setGpioMode(index, 'Input');
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { mode: 'Input' },
+            index,
+        });
+    });
+
+    test.each(PMIC_1300_GPIOS)('Set setGpioPull index: %p', async index => {
+        await pmic.setGpioPull(index, 'pull down');
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { pull: 'pull down' },
+            index,
+        });
+    });
+
+    test.each(PMIC_1300_GPIOS)('Set setGpioDrive index: %p', async index => {
+        await pmic.setGpioDrive(index, 1);
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { drive: 1 },
+            index,
+        });
+    });
+
+    test.each(PMIC_1300_GPIOS)('Set setGpioDebounce index: %p', async index => {
+        await pmic.setGpioDebounce(index, true);
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { debounce: true },
+            index,
+        });
+    });
+
+    test.each(PMIC_1300_GPIOS)(
+        'Set setGpioOpenDrain index: %p',
+        async index => {
+            await pmic.setGpioOpenDrain(index, true);
+
+            expect(mockOnGpioUpdate).toBeCalledTimes(1);
+            expect(mockOnGpioUpdate).toBeCalledWith({
+                data: { openDrain: true },
+                index,
+            });
+        }
+    );
 
     test('Set setFuelGaugeEnabled', async () => {
         await pmic.setFuelGaugeEnabled(false);

@@ -425,6 +425,7 @@ export interface NpmExport {
     charger?: Charger;
     bucks: Buck[];
     ldos: Ldo[];
+    gpios: GPIO[];
     fuelGauge: boolean;
     firmwareVersion: string;
     deviceType: NpmModel;

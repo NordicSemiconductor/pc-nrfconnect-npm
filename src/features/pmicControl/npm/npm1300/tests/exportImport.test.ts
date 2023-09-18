@@ -4,7 +4,15 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Buck, Charger, Ldo, PartialUpdate, PmicDialog } from '../../types';
+import {
+    Buck,
+    Charger,
+    GPIO,
+    Ldo,
+    NpmExport,
+    PartialUpdate,
+    PmicDialog,
+} from '../../types';
 import { setupMocksBase } from './helpers';
 
 describe('PMIC 1300 - Apply Config ', () => {
@@ -12,6 +20,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         mockOnChargerUpdate,
         mockOnBuckUpdate,
         mockOnLdoUpdate,
+        mockOnGpioUpdate,
         mockOnFuelGaugeUpdate,
         mockDialogHandler,
         pmic,
@@ -51,9 +60,111 @@ describe('PMIC 1300 - Apply Config ', () => {
         enabled: true,
     };
 
+    const sampleConfig: NpmExport = {
+        charger: {
+            vTerm: 3.5,
+            vTrickleFast: 2.5,
+            iChg: 32,
+            enabled: false,
+            iTerm: '10%',
+            enableRecharging: false,
+            ntcThermistor: '10 kΩ',
+            tChgStop: 10,
+            tChgResume: 110,
+            currentCool: 'iCHG',
+            vTermR: 4,
+            tCold: 1,
+            tCool: 12,
+            tWarm: 47,
+            tHot: 69,
+        },
+        bucks: [
+            {
+                vOutNormal: 1,
+                vOutRetention: 1,
+                mode: 'vSet',
+                enabled: true,
+                modeControl: 'GPIO0',
+                onOffControl: 'GPIO1',
+                retentionControl: 'GPIO2',
+            },
+            {
+                vOutNormal: 2,
+                vOutRetention: 2,
+                mode: 'vSet',
+                enabled: true,
+                modeControl: 'GPIO1',
+                onOffControl: 'GPIO2',
+                retentionControl: 'GPIO3',
+            },
+        ],
+        ldos: [
+            {
+                voltage: 1,
+                mode: 'ldoSwitch',
+                enabled: false,
+            },
+            {
+                voltage: 2,
+                mode: 'ldoSwitch',
+                enabled: false,
+            },
+        ],
+        gpios: [
+            {
+                mode: 'Input',
+                pull: 'pull down',
+                drive: 6,
+                openDrain: false,
+                debounce: false,
+            },
+            {
+                mode: 'Input falling edge event',
+                pull: 'pull down',
+                drive: 6,
+                openDrain: true,
+                debounce: true,
+            },
+            {
+                mode: 'Input logic 0',
+                pull: 'pull up',
+                drive: 1,
+                openDrain: false,
+                debounce: true,
+            },
+            {
+                mode: 'Output logic 0',
+                pull: 'pull disable',
+                drive: 1,
+                openDrain: true,
+                debounce: false,
+            },
+            {
+                mode: 'Output power loss warning',
+                pull: 'pull disable',
+                drive: 1,
+                openDrain: false,
+                debounce: false,
+            },
+        ],
+        fuelGauge: true,
+        firmwareVersion: '0.9.2+0',
+        deviceType: 'npm1300',
+        fuelGaugeChargingSamplingRate: 1000,
+    };
+
+    const initGPIO: GPIO = {
+        mode: 'Input falling edge event',
+        pull: 'pull down',
+        drive: 6,
+        openDrain: false,
+        debounce: false,
+    };
+
     let charger: Charger | undefined;
     let bucks: Buck[] = [];
     let ldos: Ldo[] = [];
+    let gpios: GPIO[] = [];
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -61,6 +172,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         charger = undefined;
         bucks = [];
         ldos = [];
+        gpios = [];
 
         mockOnChargerUpdate.mockImplementation(
             (partialUpdate: Partial<Charger>) => {
@@ -88,126 +200,37 @@ describe('PMIC 1300 - Apply Config ', () => {
                 };
             }
         );
+
+        mockOnGpioUpdate.mockImplementation(
+            (partialUpdate: PartialUpdate<GPIO>) => {
+                gpios[partialUpdate.index] = {
+                    ...(gpios[partialUpdate.index] ?? initGPIO),
+                    ...partialUpdate.data,
+                };
+            }
+        );
     });
 
     const verifyApplyConfig = () => {
-        expect(charger).toStrictEqual({
-            vTerm: 3.5,
-            vTrickleFast: 2.5,
-            iChg: 32,
-            enabled: false,
-            iTerm: '10%',
-            enableRecharging: false,
-            ntcThermistor: '10 kΩ',
-            tChgStop: 10,
-            tChgResume: 110,
-            currentCool: 'iCHG',
-            vTermR: 4,
-            tCold: 1,
-            tCool: 12,
-            tWarm: 47,
-            tHot: 69,
-        });
+        expect(charger).toStrictEqual(sampleConfig.charger);
 
-        expect(bucks).toStrictEqual([
-            {
-                vOutNormal: 1,
-                vOutRetention: 1,
-                mode: 'vSet',
-                enabled: true,
-                modeControl: 'GPIO0',
-                onOffControl: 'GPIO1',
-                retentionControl: 'GPIO2',
-            },
-            {
-                vOutNormal: 2,
-                vOutRetention: 2,
-                mode: 'vSet',
-                enabled: true,
-                modeControl: 'GPIO1',
-                onOffControl: 'GPIO2',
-                retentionControl: 'GPIO3',
-            },
-        ]);
+        expect(bucks).toStrictEqual(sampleConfig.bucks);
 
-        expect(ldos).toStrictEqual([
-            {
-                voltage: 1,
-                mode: 'ldoSwitch',
-                enabled: false,
-            },
-            {
-                voltage: 2,
-                mode: 'ldoSwitch',
-                enabled: false,
-            },
-        ]);
+        expect(ldos).toStrictEqual(sampleConfig.ldos);
+
+        expect(gpios).toStrictEqual(sampleConfig.gpios);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(7);
         expect(mockOnBuckUpdate).toBeCalledTimes(16); // 7 states + 1 (mode change on vOut) * 2 Bucks
         expect(mockOnLdoUpdate).toBeCalledTimes(6);
+        expect(mockOnGpioUpdate).toBeCalledTimes(25);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
         expect(mockOnFuelGaugeUpdate).toBeCalledWith(true);
     };
 
     test('Apply Correct config', () => {
-        pmic.applyConfig({
-            charger: {
-                vTerm: 3.5,
-                vTrickleFast: 2.5,
-                iChg: 32,
-                enabled: false,
-                iTerm: '10%',
-                enableRecharging: false,
-                ntcThermistor: '10 kΩ',
-                tChgStop: 10,
-                tChgResume: 110,
-                currentCool: 'iCHG',
-                vTermR: 4,
-                tCold: 1,
-                tCool: 12,
-                tWarm: 47,
-                tHot: 69,
-            },
-
-            bucks: [
-                {
-                    vOutNormal: 1,
-                    vOutRetention: 1,
-                    mode: 'vSet',
-                    enabled: true,
-                    modeControl: 'GPIO0',
-                    onOffControl: 'GPIO1',
-                    retentionControl: 'GPIO2',
-                },
-                {
-                    vOutNormal: 2,
-                    vOutRetention: 2,
-                    mode: 'vSet',
-                    enabled: true,
-                    modeControl: 'GPIO1',
-                    onOffControl: 'GPIO2',
-                    retentionControl: 'GPIO3',
-                },
-            ],
-            ldos: [
-                {
-                    voltage: 1,
-                    mode: 'ldoSwitch',
-                    enabled: false,
-                },
-                {
-                    voltage: 2,
-                    mode: 'ldoSwitch',
-                    enabled: false,
-                },
-            ],
-            fuelGauge: true,
-            firmwareVersion: '0.9.2+0',
-            deviceType: 'npm1300',
-            fuelGaugeChargingSamplingRate: 1000,
-        });
+        pmic.applyConfig(sampleConfig);
         verifyApplyConfig();
     });
 
@@ -216,61 +239,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             dialog.onConfirm();
         });
 
-        pmic.applyConfig({
-            charger: {
-                vTerm: 3.5,
-                vTrickleFast: 2.5,
-                iChg: 32,
-                enabled: false,
-                iTerm: '10%',
-                enableRecharging: false,
-                ntcThermistor: '10 kΩ',
-                tChgStop: 10,
-                tChgResume: 110,
-                currentCool: 'iCHG',
-                vTermR: 4,
-                tCold: 1,
-                tCool: 12,
-                tWarm: 47,
-                tHot: 69,
-            },
-            bucks: [
-                {
-                    vOutNormal: 1,
-                    vOutRetention: 1,
-                    mode: 'vSet',
-                    enabled: true,
-                    modeControl: 'GPIO0',
-                    onOffControl: 'GPIO1',
-                    retentionControl: 'GPIO2',
-                },
-                {
-                    vOutNormal: 2,
-                    vOutRetention: 2,
-                    mode: 'vSet',
-                    enabled: true,
-                    modeControl: 'GPIO1',
-                    onOffControl: 'GPIO2',
-                    retentionControl: 'GPIO3',
-                },
-            ],
-            ldos: [
-                {
-                    voltage: 1,
-                    mode: 'ldoSwitch',
-                    enabled: false,
-                },
-                {
-                    voltage: 2,
-                    mode: 'ldoSwitch',
-                    enabled: false,
-                },
-            ],
-            fuelGauge: true,
-            firmwareVersion: '0.0.0+9',
-            deviceType: 'npm1300',
-            fuelGaugeChargingSamplingRate: 1000,
-        });
+        pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
 
         expect(mockDialogHandler).toBeCalledTimes(1);
 
@@ -282,61 +251,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             if (dialog.onOptional) dialog.onOptional();
         });
 
-        pmic.applyConfig({
-            charger: {
-                vTerm: 3.5,
-                vTrickleFast: 2.5,
-                iChg: 32,
-                enabled: false,
-                iTerm: '10%',
-                enableRecharging: false,
-                ntcThermistor: '10 kΩ',
-                tChgStop: 10,
-                tChgResume: 110,
-                currentCool: 'iCHG',
-                vTermR: 4,
-                tCold: 1,
-                tCool: 12,
-                tWarm: 47,
-                tHot: 69,
-            },
-            bucks: [
-                {
-                    vOutNormal: 1,
-                    vOutRetention: 1,
-                    mode: 'vSet',
-                    enabled: true,
-                    modeControl: 'GPIO0',
-                    onOffControl: 'GPIO1',
-                    retentionControl: 'GPIO2',
-                },
-                {
-                    vOutNormal: 2,
-                    vOutRetention: 2,
-                    mode: 'vSet',
-                    enabled: true,
-                    modeControl: 'GPIO1',
-                    onOffControl: 'GPIO2',
-                    retentionControl: 'GPIO3',
-                },
-            ],
-            ldos: [
-                {
-                    voltage: 1,
-                    mode: 'ldoSwitch',
-                    enabled: false,
-                },
-                {
-                    voltage: 2,
-                    mode: 'ldoSwitch',
-                    enabled: false,
-                },
-            ],
-            fuelGauge: true,
-            firmwareVersion: '0.0.0+9',
-            deviceType: 'npm1300',
-            fuelGaugeChargingSamplingRate: 1000,
-        });
+        pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
 
         expect(mockDialogHandler).toBeCalledTimes(1);
 
@@ -348,61 +263,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             dialog.onCancel();
         });
 
-        pmic.applyConfig({
-            charger: {
-                vTerm: 3.5,
-                vTrickleFast: 2.5,
-                iChg: 32,
-                enabled: false,
-                iTerm: '10%',
-                enableRecharging: false,
-                ntcThermistor: '10 kΩ',
-                tChgStop: 10,
-                tChgResume: 110,
-                currentCool: 'iCHG',
-                vTermR: 4,
-                tCold: 1,
-                tCool: 12,
-                tWarm: 47,
-                tHot: 69,
-            },
-            bucks: [
-                {
-                    vOutNormal: 1,
-                    vOutRetention: 1,
-                    mode: 'vSet',
-                    enabled: true,
-                    modeControl: 'GPIO0',
-                    onOffControl: 'GPIO1',
-                    retentionControl: 'GPIO2',
-                },
-                {
-                    vOutNormal: 2,
-                    vOutRetention: 2,
-                    mode: 'vSet',
-                    enabled: true,
-                    modeControl: 'GPIO1',
-                    onOffControl: 'GPIO2',
-                    retentionControl: 'GPIO3',
-                },
-            ],
-            ldos: [
-                {
-                    voltage: 1,
-                    mode: 'ldoSwitch',
-                    enabled: false,
-                },
-                {
-                    voltage: 2,
-                    mode: 'ldoSwitch',
-                    enabled: false,
-                },
-            ],
-            fuelGauge: true,
-            firmwareVersion: '0.0.0+9',
-            deviceType: 'npm1300',
-            fuelGaugeChargingSamplingRate: 1000,
-        });
+        pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
 
         expect(mockDialogHandler).toBeCalledTimes(1);
 

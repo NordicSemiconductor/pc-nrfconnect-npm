@@ -9,7 +9,14 @@ import {
     ShellParserCallbacks as Callbacks,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { Buck, Charger, Ldo, PartialUpdate, PmicDialog } from '../../types';
+import {
+    Buck,
+    Charger,
+    GPIO,
+    Ldo,
+    PartialUpdate,
+    PmicDialog,
+} from '../../types';
 import { getNPM1300 } from '../pmic1300Device';
 
 export const PMIC_1300_BUCKS = [0, 1];
@@ -41,6 +48,10 @@ export const setupMocksBase = (
     const mockOnFuelGaugeUpdate = jest.fn(() => {});
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const mockOnLdoUpdate = jest.fn((_partialUpdate: PartialUpdate<Ldo>) => {});
+    const mockOnGpioUpdate = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: PartialUpdate<GPIO>) => {}
+    );
     const mockOnLoggingEvent = jest.fn(() => {});
     const mockOnPmicStateChange = jest.fn(() => {});
     const mockOnReboot = jest.fn(() => {});
@@ -52,6 +63,7 @@ export const setupMocksBase = (
     pmic.onBeforeReboot(mockOnBeforeReboot);
     pmic.onBuckUpdate(mockOnBuckUpdate);
     pmic.onChargerUpdate(mockOnChargerUpdate);
+    pmic.onGPIOUpdate(mockOnGpioUpdate);
     pmic.onChargingStatusUpdate(mockOnChargingStatusUpdate);
     pmic.onFuelGaugeUpdate(mockOnFuelGaugeUpdate);
     pmic.onLdoUpdate(mockOnLdoUpdate);
@@ -71,6 +83,7 @@ export const setupMocksBase = (
         mockOnChargingStatusUpdate,
         mockOnFuelGaugeUpdate,
         mockOnLdoUpdate,
+        mockOnGpioUpdate,
         mockOnLoggingEvent,
         mockOnPmicStateChange,
         mockOnReboot,

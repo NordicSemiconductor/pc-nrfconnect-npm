@@ -8,12 +8,16 @@ import {
     BatteryModel,
     BuckModeControlValues,
     BuckOnOffControlValues,
+    GPIODriveValues,
+    GPIOModeValues,
+    GPIOPullValues,
     GPIOValues,
     NTCThermistor,
     PmicChargingState,
 } from '../../types';
 import {
     PMIC_1300_BUCKS,
+    PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
     setupMocksWithShellParser,
 } from './helpers';
@@ -30,6 +34,7 @@ describe('PMIC 1300 - Command callbacks', () => {
         mockOnUsbPowered,
         mockOnBuckUpdate,
         mockOnLdoUpdate,
+        mockOnGpioUpdate,
         mockOnReboot,
     } = setupMocksWithShellParser();
 
@@ -723,6 +728,159 @@ Battery models stored in database:
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
             data: { mode },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1300_GPIOS.map(index =>
+            GPIOModeValues.map((mode, modeIndex) => [
+                {
+                    index,
+                    append: `get ${index}`,
+                    mode,
+                    modeIndex,
+                },
+                {
+                    index,
+                    append: `set ${index} ${modeIndex}`,
+                    mode,
+                    modeIndex,
+                },
+            ]).flat()
+        ).flat()
+    )('npmx gpio mode %p', ({ index, append, mode, modeIndex }) => {
+        const command = `npmx gpio mode ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${modeIndex}.`, command);
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { mode },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1300_GPIOS.map(index =>
+            GPIOPullValues.map((pull, pullIndex) => [
+                {
+                    index,
+                    append: `get ${index}`,
+                    pull,
+                    pullIndex,
+                },
+                {
+                    index,
+                    append: `set ${index} ${pullIndex}`,
+                    pull,
+                    pullIndex,
+                },
+            ]).flat()
+        ).flat()
+    )('npmx gpio pull %p', ({ index, append, pull, pullIndex }) => {
+        const command = `npmx gpio pull ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${pullIndex}.`, command);
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { pull },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1300_GPIOS.map(index =>
+            GPIODriveValues.map(drive => [
+                {
+                    index,
+                    append: `get ${index}`,
+                    drive,
+                },
+                {
+                    index,
+                    append: `set ${index} ${drive}`,
+                    drive,
+                },
+            ]).flat()
+        ).flat()
+    )('npmx gpio drive %p', ({ index, append, drive }) => {
+        const command = `npmx gpio drive ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${drive}.`, command);
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { drive },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1300_GPIOS.map(index =>
+            [true, false]
+                .map(debounce => [
+                    {
+                        index,
+                        append: `get ${index}`,
+                        debounce,
+                    },
+                    {
+                        index,
+                        append: `set ${index} ${debounce ? '1' : '0'}`,
+                        debounce,
+                    },
+                ])
+                .flat()
+        ).flat()
+    )('npmx gpio debounce %p', ({ index, append, debounce }) => {
+        const command = `npmx gpio debounce ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${debounce ? '1' : '0'}.`, command);
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { debounce },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1300_GPIOS.map(index =>
+            [true, false]
+                .map(openDrain => [
+                    {
+                        index,
+                        append: `get ${index}`,
+                        openDrain,
+                    },
+                    {
+                        index,
+                        append: `set ${index} ${openDrain ? '1' : '0'}`,
+                        openDrain,
+                    },
+                ])
+                .flat()
+        ).flat()
+    )('npmx gpio open_drain %p', ({ index, append, openDrain }) => {
+        const command = `npmx gpio open_drain ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${openDrain ? '1' : '0'}.`, command);
+
+        expect(mockOnGpioUpdate).toBeCalledTimes(1);
+        expect(mockOnGpioUpdate).toBeCalledWith({
+            data: { openDrain },
             index,
         });
     });

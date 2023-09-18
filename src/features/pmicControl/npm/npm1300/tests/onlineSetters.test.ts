@@ -4,10 +4,17 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NTCThermistor, PmicDialog } from '../../types';
+import {
+    GPIODriveValues,
+    GPIOModeValues,
+    GPIOPullValues,
+    NTCThermistor,
+    PmicDialog,
+} from '../../types';
 import {
     helpers,
     PMIC_1300_BUCKS,
+    PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
     setupMocksWithShellParser,
 } from './helpers';
@@ -772,6 +779,118 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockOnLdoUpdate).toBeCalledTimes(0);
             }
         );
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                GPIOModeValues.map((mode, modeIndex) => ({
+                    index,
+                    mode,
+                    modeIndex,
+                }))
+            ).flat()
+        )('Set setGpioMode index: %p', async ({ index, mode, modeIndex }) => {
+            await pmic.setGpioMode(index, mode);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx gpio mode set ${index} ${modeIndex}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+        });
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                GPIOPullValues.map((pull, pullIndex) => ({
+                    index,
+                    pull,
+                    pullIndex,
+                }))
+            ).flat()
+        )('Set setGpioPull index: %p', async ({ index, pull, pullIndex }) => {
+            await pmic.setGpioPull(index, pull);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx gpio pull set ${index} ${pullIndex}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+        });
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                GPIODriveValues.map(drive => ({
+                    index,
+                    drive,
+                }))
+            ).flat()
+        )('Set setGpioDrive index: %p', async ({ index, drive }) => {
+            await pmic.setGpioDrive(index, drive);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx gpio drive set ${index} ${drive}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+        });
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                [true, false].map(debounce => ({
+                    index,
+                    debounce,
+                }))
+            ).flat()
+        )('Set setGpioDebounce index: %p', async ({ index, debounce }) => {
+            await pmic.setGpioDebounce(index, debounce);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx gpio debounce set ${index} ${debounce ? '1' : '0'}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+        });
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                [true, false].map(openDrain => ({
+                    index,
+                    openDrain,
+                }))
+            ).flat()
+        )('Set setGpioOpenDrain index: %p', async ({ index, openDrain }) => {
+            await pmic.setGpioOpenDrain(index, openDrain);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx gpio open_drain set ${index} ${openDrain ? '1' : '0'}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+        });
 
         test.each([true, false])(
             'Set setFuelGaugeEnabled enabled: %p',
@@ -1881,6 +2000,220 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
                     `npmx ldsw mode get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                GPIOModeValues.map((mode, modeIndex) => ({
+                    index,
+                    mode,
+                    modeIndex,
+                }))
+            ).flat()
+        )(
+            'Set setGpioMode - Fail immediately - index: %p',
+            async ({ index, mode, modeIndex }) => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
+                await expect(
+                    pmic.setGpioMode(index, mode)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx gpio mode set ${index} ${modeIndex}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx gpio mode get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                GPIODriveValues.map(drive => ({
+                    index,
+                    drive,
+                }))
+            ).flat()
+        )(
+            'Set setGpioDrive - Fail immediately - index: %p',
+            async ({ index, drive }) => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
+                await expect(
+                    pmic.setGpioDrive(index, drive)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx gpio drive set ${index} ${drive}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx gpio drive get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                GPIOPullValues.map((pull, pullIndex) => ({
+                    index,
+                    pull,
+                    pullIndex,
+                }))
+            ).flat()
+        )(
+            'Set setGpioPull - Fail immediately - index: %p',
+            async ({ index, pull, pullIndex }) => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
+                await expect(
+                    pmic.setGpioPull(index, pull)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx gpio pull set ${index} ${pullIndex}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx gpio pull get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                [true, false].map(debounce => ({
+                    index,
+                    debounce,
+                }))
+            ).flat()
+        )(
+            'Set setGpioDebounce - Fail immediately - index: %p',
+            async ({ index, debounce }) => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
+                await expect(
+                    pmic.setGpioDebounce(index, debounce)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx gpio debounce set ${index} ${debounce ? '1' : '0'}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx gpio debounce get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                [true, false].map(openDrain => ({
+                    index,
+                    openDrain,
+                }))
+            ).flat()
+        )(
+            'Set setGpioOpenDrain - Fail immediately - index: %p',
+            async ({ index, openDrain }) => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
+                await expect(
+                    pmic.setGpioOpenDrain(index, openDrain)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx gpio open_drain set ${index} ${
+                        openDrain ? '1' : '0'
+                    }`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx gpio open_drain get ${index}`,
                     expect.anything(),
                     undefined,
                     true

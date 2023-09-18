@@ -34,7 +34,6 @@ import {
     Charger,
     GPIO,
     GPIODrive,
-    GPIODriveValues,
     GPIOMode,
     GPIOModeValues,
     GPIOPullMode,
@@ -894,7 +893,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         for (let i = 0; i < devices.noOfGPIOs; i += 1) {
             releaseAll.push(
                 shellParser.registerCommandCallback(
-                    toRegex('npmx gpio mode', true, i),
+                    toRegex('npmx gpio mode', true, i, '[0-9]'),
                     res => {
                         const mode = GPIOModeValues[parseToNumber(res)];
                         if (mode) {
@@ -913,7 +912,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             releaseAll.push(
                 shellParser.registerCommandCallback(
-                    toRegex('npmx gpio pull', true, i),
+                    toRegex('npmx gpio pull', true, i, '(0|1|2)'),
                     res => {
                         const pull = GPIOPullValues[parseToNumber(res)];
                         if (pull) {
@@ -1876,12 +1875,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 resolve();
             } else {
                 sendCommand(
-                    `npmx gpio drive set ${index} ${GPIODriveValues.findIndex(
-                        d => d === drive
-                    )}`,
+                    `npmx gpio drive set ${index} ${drive}`,
                     () => resolve(),
                     () => {
-                        requestUpdate.gpioPull(index);
+                        requestUpdate.gpioDrive(index);
                         reject();
                     }
                 );
@@ -2093,8 +2090,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerTHot: () => console.log('Not Implemented'),
 
         gpioMode: (index: number) => sendCommand(`npmx gpio mode get ${index}`),
-        gpioPull: (index: number) =>
-            sendCommand(`npmx gpio mode pull get ${index}`),
+        gpioPull: (index: number) => sendCommand(`npmx gpio pull get ${index}`),
         gpioDrive: (index: number) =>
             sendCommand(`npmx gpio drive get ${index}`),
         gpioOpenDrain: (index: number) =>
@@ -2168,6 +2164,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     setLdoVoltage(index, ldo.voltage);
                     setLdoMode(index, ldo.mode);
                     setLdoEnabled(index, ldo.enabled);
+                });
+
+                config.gpios.forEach((gpio, index) => {
+                    setGpioMode(index, gpio.mode);
+                    setGpioPull(index, gpio.pull);
+                    setGpioDrive(index, gpio.drive);
+                    setGpioOpenDrain(index, gpio.openDrain);
+                    setGpioDebounce(index, gpio.debounce);
                 });
 
                 setFuelGaugeEnabled(config.fuelGauge);

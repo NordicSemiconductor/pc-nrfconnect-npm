@@ -9,6 +9,7 @@ import { ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfco
 import { BatteryModel } from '../../types';
 import {
     PMIC_1300_BUCKS,
+    PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
     setupMocksWithShellParser,
 } from './helpers';
@@ -340,6 +341,72 @@ describe('PMIC 1300 - Request update commands', () => {
             true
         );
     });
+
+    test.each(PMIC_1300_GPIOS)('Request update gpioMode index: %p', index => {
+        pmic.requestUpdate.gpioMode(index);
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx gpio mode get ${index}`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test.each(PMIC_1300_GPIOS)('Request update gpioPull index: %p', index => {
+        pmic.requestUpdate.gpioPull(index);
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx gpio pull get ${index}`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test.each(PMIC_1300_GPIOS)('Request update gpioDrive index: %p', index => {
+        pmic.requestUpdate.gpioDrive(index);
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx gpio drive get ${index}`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test.each(PMIC_1300_GPIOS)(
+        'Request update gpioDebounce index: %p',
+        index => {
+            pmic.requestUpdate.gpioDebounce(index);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx gpio debounce get ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        }
+    );
+
+    test.each(PMIC_1300_GPIOS)(
+        'Request update gpioOpenDrain index: %p',
+        index => {
+            pmic.requestUpdate.gpioOpenDrain(index);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx gpio open_drain get ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        }
+    );
 
     test('Request update fuelGauge', () => {
         pmic.requestUpdate.fuelGauge();
