@@ -7,9 +7,9 @@
 import React from 'react';
 import EventEmitter from 'events';
 
-import { getRange } from '../../../utils/helpers';
-import { baseNpmDevice } from './basePmicDevice';
-import { BatteryProfiler } from './batteryProfiler';
+import { getRange } from '../../../../utils/helpers';
+import { baseNpmDevice } from '../basePmicDevice';
+import { BatteryProfiler } from '../batteryProfiler';
 import {
     isModuleDataPair,
     MAX_TIMESTAMP,
@@ -20,7 +20,7 @@ import {
     parseToBoolean,
     parseToNumber,
     toRegex,
-} from './pmicHelpers';
+} from '../pmicHelpers';
 import {
     AdcSample,
     AdcSampleSettings,
@@ -53,7 +53,7 @@ import {
     PmicState,
     ProfileDownload,
     VTrickleFast,
-} from './types';
+} from '../types';
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();

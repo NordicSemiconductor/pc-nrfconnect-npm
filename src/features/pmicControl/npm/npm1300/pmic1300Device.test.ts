@@ -9,7 +9,6 @@ import {
     ShellParserCallbacks as Callbacks,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { getNPM1300 } from './pmic1300Device';
 import {
     BatteryModel,
     Buck,
@@ -22,7 +21,8 @@ import {
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
-} from './types';
+} from '../types';
+import { getNPM1300 } from './pmic1300Device';
 
 const PMIC_1300_BUCKS = [0, 1];
 const PMIC_1300_LDOS = [0, 1];

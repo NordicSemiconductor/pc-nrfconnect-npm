@@ -10,8 +10,8 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import { useSelector } from 'react-redux';
 
 import { getNpmDevice } from '../../pmicControlSlice';
+import { documentation as pmic1300Documentation } from '../npm1300/documentationPmic1300';
 import { NpmModel } from '../types';
-import { documentation as pmic1300Documentation } from './documentationPmic1300';
 
 export const DocumentationTooltip = ({
     card,
