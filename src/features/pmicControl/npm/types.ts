@@ -138,6 +138,18 @@ export type GPIO = {
     debounce: boolean;
 };
 
+export const LEDModeValues = [
+    'Charger error',
+    'Charging',
+    'HOST',
+    'Not used',
+] as const;
+export type LEDMode = (typeof LEDModeValues)[number];
+
+export type LED = {
+    mode: LEDMode;
+};
+
 export type AdcSample = {
     timestamp: number;
     vBat: number;
@@ -191,6 +203,7 @@ export interface IBaseNpmDevice {
             noOfBucks?: number;
             noOfLdos?: number;
             noOfGPIOs?: number;
+            noOfLEDs?: number;
         },
         supportsVersion: string
     ): BaseNpmDevice;
@@ -226,6 +239,9 @@ export type BaseNpmDevice = {
     ) => () => void;
     onGPIOUpdate: (
         handler: (payload: PartialUpdate<GPIO>, error?: string) => void
+    ) => () => void;
+    onLEDUpdate: (
+        handler: (payload: PartialUpdate<LED>, error?: string) => void
     ) => () => void;
     onBeforeReboot: (
         handler: (payload: number, error?: string) => void
@@ -263,6 +279,7 @@ export type BaseNpmDevice = {
     getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
     getNumberOfGPIOs: () => number;
+    getNumberOfLEDs: () => number;
 
     isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
     getSupportedVersion: () => string;
@@ -337,6 +354,8 @@ export type NpmDevice = {
         gpioOpenDrain: (index: number) => void;
         gpioDebounce: (index: number) => void;
 
+        ledMode: (index: number) => void;
+
         fuelGauge: () => void;
 
         activeBatteryModel: () => void;
@@ -385,6 +404,8 @@ export type NpmDevice = {
     setGpioOpenDrain: (index: number, openDrain: boolean) => Promise<void>;
     setGpioDebounce: (index: number, debounce: boolean) => Promise<void>;
 
+    setLedMode: (index: number, mode: LEDMode) => Promise<void>;
+
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
     abortDownloadFuelGaugeProfile: () => Promise<void>;
@@ -426,6 +447,7 @@ export interface NpmExport {
     bucks: Buck[];
     ldos: Ldo[];
     gpios: GPIO[];
+    leds: LED[];
     fuelGauge: boolean;
     firmwareVersion: string;
     deviceType: NpmModel;
