@@ -14,6 +14,7 @@ import {
     BatteryModel,
     Buck,
     Charger,
+    GPIO,
     IBaseNpmDevice,
     Ldo,
     LoggingEvent,
@@ -204,6 +205,15 @@ export const baseNpmDevice: IBaseNpmDevice = (
             eventEmitter.on('onLdoUpdate', handler);
             return () => {
                 eventEmitter.removeListener('onLdoUpdate', handler);
+            };
+        },
+
+        onGPIOUpdate: (
+            handler: (payload: PartialUpdate<GPIO>, error?: string) => void
+        ) => {
+            eventEmitter.on('onGPIOUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onGPIOUpdate', handler);
             };
         },
 

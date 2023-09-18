@@ -37,6 +37,7 @@ import {
     setFuelGaugeChargingSamplingRate,
     setFuelGaugeNotChargingSamplingRate,
     setFuelGaugeReportingRate,
+    setGPIOs,
     setHardcodedBatterModels,
     setLatestAdcSample,
     setLdos,
@@ -48,6 +49,7 @@ import {
     setUsbPowered,
     updateBuck,
     updateCharger,
+    updateGPIOs,
     updateLdo,
 } from '../pmicControlSlice';
 import {
@@ -62,7 +64,7 @@ import {
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
     noop,
 } from './pmicHelpers';
-import { Buck, Ldo, PmicDialog } from './types';
+import { Buck, GPIO, Ldo, PmicDialog } from './types';
 
 export default () => {
     const shellParser = useSelector(getShellParser);
@@ -130,6 +132,14 @@ export default () => {
                 npmDevice.requestUpdate.ldoEnabled(i);
             }
 
+            for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
+                npmDevice.requestUpdate.gpioMode(i);
+                npmDevice.requestUpdate.gpioPull(i);
+                npmDevice.requestUpdate.gpioDrive(i);
+                npmDevice.requestUpdate.gpioOpenDrain(i);
+                npmDevice.requestUpdate.gpioDebounce(i);
+            }
+
             npmDevice.requestUpdate.fuelGauge();
             npmDevice.requestUpdate.activeBatteryModel();
             npmDevice.requestUpdate.storedBatteryModel();
@@ -193,6 +203,18 @@ export default () => {
                     });
                 }
                 dispatch(setLdos(emptyLdos));
+
+                const emptyGPIOs: GPIO[] = [];
+                for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
+                    emptyGPIOs.push({
+                        mode: 'Input',
+                        pull: 'pull up',
+                        drive: 1,
+                        openDrain: false,
+                        debounce: false,
+                    });
+                }
+                dispatch(setGPIOs(emptyGPIOs));
             };
 
             const releaseAll: (() => void)[] = [];
@@ -275,6 +297,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onLdoUpdate(payload => {
                     dispatch(updateLdo(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onGPIOUpdate(payload => {
+                    dispatch(updateGPIOs(payload));
                 })
             );
 

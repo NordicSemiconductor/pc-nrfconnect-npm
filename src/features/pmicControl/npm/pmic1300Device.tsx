@@ -32,6 +32,13 @@ import {
     BuckRetentionControl,
     ChargeCurrentCool,
     Charger,
+    GPIO,
+    GPIODrive,
+    GPIODriveValues,
+    GPIOMode,
+    GPIOModeValues,
+    GPIOPullMode,
+    GPIOPullValues,
     GPIOValues,
     INpmDevice,
     IrqEvent,
@@ -883,6 +890,94 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 )
             );
         }
+
+        for (let i = 0; i < devices.noOfGPIOs; i += 1) {
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio mode', true, i),
+                    res => {
+                        const mode = GPIOModeValues[parseToNumber(res)];
+                        if (mode) {
+                            emitPartialEvent<GPIO>(
+                                'onGPIOUpdate',
+                                {
+                                    mode,
+                                },
+                                i
+                            );
+                        }
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio pull', true, i),
+                    res => {
+                        const pull = GPIOPullValues[parseToNumber(res)];
+                        if (pull) {
+                            emitPartialEvent<GPIO>(
+                                'onGPIOUpdate',
+                                {
+                                    pull,
+                                },
+                                i
+                            );
+                        }
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio drive', true, i, '(1|6)'),
+                    res => {
+                        emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                drive: parseToNumber(res) as GPIODrive,
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio open_drain', true, i, '(0|1)'),
+                    res => {
+                        emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                openDrain: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio debounce', true, i, '(0|1)'),
+                    res => {
+                        emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                debounce: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+        }
     }
 
     const sendCommand = (
@@ -1718,6 +1813,129 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         return action();
     };
 
+    const setGpioMode = (index: number, mode: GPIOMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        mode,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio mode set ${index} ${GPIOModeValues.findIndex(
+                        m => m === mode
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioMode(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioPull = (index: number, pull: GPIOPullMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        pull,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio pull set ${index} ${GPIOPullValues.findIndex(
+                        p => p === pull
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioPull(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioDrive = (index: number, drive: GPIODrive) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        drive,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio drive set ${index} ${GPIODriveValues.findIndex(
+                        d => d === drive
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioPull(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioOpenDrain = (index: number, openDrain: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        openDrain,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio open_drain set ${index} ${
+                        openDrain ? '1' : '0'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioOpenDrain(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioDebounce = (index: number, debounce: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        debounce,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio debounce set ${index} ${debounce ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioDebounce(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
     const setFuelGaugeEnabled = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
@@ -1873,6 +2091,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerTCool: () => console.log('Not Implemented'),
         chargerTWarm: () => console.log('Not Implemented'),
         chargerTHot: () => console.log('Not Implemented'),
+
+        gpioMode: (index: number) => sendCommand(`npmx gpio mode get ${index}`),
+        gpioPull: (index: number) =>
+            sendCommand(`npmx gpio mode pull get ${index}`),
+        gpioDrive: (index: number) =>
+            sendCommand(`npmx gpio drive get ${index}`),
+        gpioOpenDrain: (index: number) =>
+            sendCommand(`npmx gpio open_drain get ${index}`),
+        gpioDebounce: (index: number) =>
+            sendCommand(`npmx gpio debounce get ${index}`),
 
         buckVOutNormal: (index: number) =>
             sendCommand(`npmx buck voltage normal get ${index}`),
@@ -2063,6 +2291,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setLdoVoltage,
         setLdoEnabled,
         setLdoMode,
+        setGpioMode,
+        setGpioPull,
+        setGpioDrive,
+        setGpioOpenDrain,
+        setGpioDebounce,
 
         setFuelGaugeEnabled,
         downloadFuelGaugeProfile,
