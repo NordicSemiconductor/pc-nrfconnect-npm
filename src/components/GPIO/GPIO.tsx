@@ -36,7 +36,7 @@ const gpioModeValuesItems = [...GPIOModeValues].map(item => ({
 }));
 
 const gpioDriveValuesItems = [...GPIODriveValues].map(item => ({
-    label: `${item}`,
+    label: `${item} mA`,
     value: `${item}`,
 }));
 
