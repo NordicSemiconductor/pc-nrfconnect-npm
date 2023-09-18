@@ -114,136 +114,94 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 validFirmware: boolean;
             }>
         > =>
-        dispatch =>
-            new Promise<{
-                device: Device;
-                validFirmware: boolean;
-            }>((resolve, reject) => {
-                if (!(device.serialPorts && device.serialPorts[0].comName)) {
-                    reject(new Error('device does not have a serial port'));
-                    return;
-                }
+        async dispatch => {
+            if (!(device.serialPorts && device.serialPorts[0].comName)) {
+                throw new Error('device does not have a serial port');
+            }
+            const port = await createSerialPort(
+                {
+                    path: device.serialPorts[0].comName,
+                    baudRate: 115200,
+                },
+                { overwrite: true, settingsLocked: true }
+            );
 
+            const shellParserO = await shellParser(
+                port,
+                xTerminalShellParserWrapper(
+                    new Terminal({
+                        allowProposedApi: true,
+                        cols: 999,
+                    })
+                ),
+                {
+                    shellPromptUart: 'shell:~$ ',
+                    logRegex:
+                        /[[][0-9]{2,}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
+                    errorRegex: /Error: /,
+                    timeout: 5000,
+                    columnWidth: 80,
+                }
+            );
+
+            try {
                 if (isNpm1300SerialRecoverMode(device)) {
-                    resolve({
+                    return {
                         device,
                         validFirmware: false,
-                    });
-                    return;
+                    };
                 }
 
-                createSerialPort(
-                    {
-                        path: device.serialPorts[0].comName,
-                        baudRate: 115200,
-                    },
-                    { overwrite: true, settingsLocked: true }
-                )
-                    .then(port => {
-                        shellParser(
-                            port,
-                            xTerminalShellParserWrapper(
-                                new Terminal({
-                                    allowProposedApi: true,
-                                    cols: 999,
-                                })
-                            ),
-                            {
-                                shellPromptUart: 'shell:~$ ',
-                                logRegex:
-                                    /[[][0-9]{2,}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
-                                errorRegex: /Error: /,
-                                timeout: 5000,
-                                columnWidth: 80,
-                            }
-                        )
-                            .then(shellParserO => {
-                                getNpmDevice(shellParserO, null)
-                                    .then(npmDevice => {
-                                        npmDevice
-                                            .isSupportedVersion()
-                                            .then(result => {
-                                                const action = () => {
-                                                    resolve({
-                                                        device,
-                                                        validFirmware:
-                                                            result.supported,
-                                                    });
-                                                };
+                const npmDevice = await getNpmDevice(shellParserO, null);
 
-                                                npmDevice
-                                                    .getPmicVersion()
-                                                    .then(version => {
-                                                        port.close().finally(
-                                                            () => {
-                                                                if (
-                                                                    version ===
-                                                                        2.0 ||
-                                                                    (Number.isNaN(
-                                                                        version
-                                                                    ) &&
-                                                                        result.version ===
-                                                                            '0.7.0+0')
-                                                                ) {
-                                                                    // FP2
-                                                                    const information: PmicDialog =
-                                                                        {
-                                                                            type: 'alert',
-                                                                            doNotAskAgainStoreID:
-                                                                                'pmic1300-fp2-reset-issue',
-                                                                            message:
-                                                                                npm1300EngineeringCMessage,
-                                                                            confirmLabel:
-                                                                                'Yes',
-                                                                            cancelLabel:
-                                                                                'No',
-                                                                            optionalLabel:
-                                                                                "Yes, don't ask again",
-                                                                            title: 'Important notice!',
-                                                                            onConfirm:
-                                                                                action,
-                                                                            onCancel:
-                                                                                () => {
-                                                                                    reject(
-                                                                                        new Error(
-                                                                                            'Device setup cancelled'
-                                                                                        )
-                                                                                    );
-                                                                                },
-                                                                            onOptional:
-                                                                                action,
-                                                                        };
+                const result = await npmDevice.isSupportedVersion();
 
-                                                                    dispatch(
-                                                                        dialogHandler(
-                                                                            information
-                                                                        )
-                                                                    );
-                                                                } else {
-                                                                    action();
-                                                                }
-                                                            }
-                                                        );
-                                                    });
-                                            })
-                                            .catch(error =>
-                                                port
-                                                    .close()
-                                                    .finally(() =>
-                                                        reject(error)
-                                                    )
-                                            )
-                                            .finally();
-                                    })
-                                    .catch(reject);
-                            })
-                            .catch(error => {
-                                port.close();
-                                reject(error);
-                            });
-                    })
-                    .catch(reject);
-            }),
+                const action = () => ({
+                    device,
+                    validFirmware: result.supported,
+                });
+
+                const version = await npmDevice.getPmicVersion();
+
+                shellParserO.unregister();
+                await port.close();
+
+                if (
+                    version === 2.0 ||
+                    (Number.isNaN(version) && result.version === '0.7.0+0')
+                ) {
+                    const p = new Promise<{
+                        device: Device;
+                        validFirmware: boolean;
+                    }>((resolve, reject) => {
+                        const information: PmicDialog = {
+                            type: 'alert',
+                            doNotAskAgainStoreID: 'pmic1300-fp2-reset-issue',
+                            message: npm1300EngineeringCMessage,
+                            confirmLabel: 'Yes',
+                            cancelLabel: 'No',
+                            optionalLabel: "Yes, don't ask again",
+                            title: 'Important notice!',
+                            onConfirm: () => resolve(action()),
+                            onCancel: () => {
+                                reject(new Error('Device setup cancelled'));
+                            },
+                            onOptional: action,
+                        };
+
+                        dispatch(dialogHandler(information));
+                    });
+
+                    return p;
+                }
+
+                return action();
+            } catch (e) {
+                shellParserO.unregister();
+                await port.close();
+                throw e;
+            }
+        },
     tryToSwitchToApplicationMode: () => () =>
         new Promise<Device | null>(resolve => {
             resolve(null);
