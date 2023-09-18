@@ -12,6 +12,7 @@ import {
     BatteryModel,
     Buck,
     Charger,
+    GPIO,
     Ldo,
     NpmDevice,
     PartialUpdate,
@@ -25,6 +26,7 @@ interface pmicControlState {
     charger?: Charger;
     bucks: Buck[];
     ldos: Ldo[];
+    gpios: GPIO[];
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
     pmicChargingState: PmicChargingState;
@@ -45,6 +47,7 @@ interface pmicControlState {
 const initialState: pmicControlState = {
     bucks: [],
     ldos: [],
+    gpios: [],
     pmicChargingState: {
         batteryFull: false,
         trickleCharge: false,
@@ -121,6 +124,17 @@ const pmicControlSlice = createSlice({
             if (state.ldos.length >= action.payload.index) {
                 state.ldos[action.payload.index] = {
                     ...state.ldos[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
+        },
+        setGPIOs(state, action: PayloadAction<GPIO[]>) {
+            state.gpios = action.payload;
+        },
+        updateGPIOs(state, action: PayloadAction<PartialUpdate<GPIO>>) {
+            if (state.gpios.length >= action.payload.index) {
+                state.gpios[action.payload.index] = {
+                    ...state.gpios[action.payload.index],
                     ...action.payload.data,
                 };
             }
@@ -213,6 +227,7 @@ export const getPmicChargingState = (state: RootState) => {
 };
 export const getBucks = (state: RootState) => state.app.pmicControl.bucks;
 export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
+export const getGPIOs = (state: RootState) => state.app.pmicControl.gpios;
 export const isBatteryConnected = (state: RootState) => {
     const { pmicState, batteryConnected } = state.app.pmicControl;
     return parseConnectedState(
@@ -265,6 +280,8 @@ export const {
     updateBuck,
     setLdos,
     updateLdo,
+    setGPIOs,
+    updateGPIOs,
     setBatteryConnected,
     setFuelGauge,
     setActiveBatterModel,
