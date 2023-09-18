@@ -24,15 +24,19 @@ export const BuckModeControlValues = ['Auto'] as const; // TODO 'PWM', 'PFM'
 export const BuckOnOffControlValues = ['Off'] as const;
 export const BuckRetentionControlValues = ['Off'] as const;
 
-export type GPIO = (typeof GPIOValues)[number];
+type GPIONames = (typeof GPIOValues)[number];
 export type RebootMode = 'cold' | 'warm';
 export type LdoMode = 'ldoSwitch' | 'LDO';
 export type BuckMode = 'vSet' | 'software';
-export type BuckModeControl = (typeof BuckModeControlValues)[number] | GPIO;
-export type BuckOnOffControl = (typeof BuckOnOffControlValues)[number] | GPIO;
+export type BuckModeControl =
+    | (typeof BuckModeControlValues)[number]
+    | GPIONames;
+export type BuckOnOffControl =
+    | (typeof BuckOnOffControlValues)[number]
+    | GPIONames;
 export type BuckRetentionControl =
     | (typeof BuckRetentionControlValues)[number]
-    | GPIO;
+    | GPIONames;
 
 export const ITermValues = ['10%', '20%'] as const;
 export type ITerm = (typeof ITermValues)[number];
@@ -104,6 +108,34 @@ export type Ldo = {
     voltage: number;
     enabled: boolean;
     mode: LdoMode;
+};
+
+export const GPIOModeValues = [
+    'Input',
+    'Input logic 1',
+    'Input logic 0',
+    'Input rising edge event',
+    'Input falling edge event',
+    'Output interrupt',
+    'Output reset',
+    'Output power loss warning',
+    'Output logic 1',
+    'Output logic 0',
+] as const;
+export type GPIOMode = (typeof GPIOModeValues)[number];
+
+export const GPIOPullValues = ['pull down', 'pull up', 'pull disable'] as const;
+export type GPIOPullMode = (typeof GPIOPullValues)[number];
+
+export const GPIODriveValues = [1, 6] as const;
+export type GPIODrive = (typeof GPIODriveValues)[number];
+
+export type GPIO = {
+    mode: GPIOMode;
+    pull: GPIOPullMode;
+    drive: GPIODrive;
+    openDrain: boolean;
+    debounce: boolean;
 };
 
 export type AdcSample = {
@@ -191,6 +223,9 @@ export type BaseNpmDevice = {
     ) => () => void;
     onBuckUpdate: (
         handler: (payload: PartialUpdate<Buck>, error?: string) => void
+    ) => () => void;
+    onGPIOUpdate: (
+        handler: (payload: PartialUpdate<GPIO>, error?: string) => void
     ) => () => void;
     onBeforeReboot: (
         handler: (payload: number, error?: string) => void
@@ -296,6 +331,12 @@ export type NpmDevice = {
         ldoEnabled: (index: number) => void;
         ldoMode: (index: number) => void;
 
+        gpioMode: (index: number) => void;
+        gpioPull: (index: number) => void;
+        gpioDrive: (index: number) => void;
+        gpioOpenDrain: (index: number) => void;
+        gpioDebounce: (index: number) => void;
+
         fuelGauge: () => void;
 
         activeBatteryModel: () => void;
@@ -337,6 +378,12 @@ export type NpmDevice = {
     setLdoVoltage: (index: number, value: number) => Promise<void>;
     setLdoEnabled: (index: number, state: boolean) => Promise<void>;
     setLdoMode: (index: number, mode: LdoMode) => Promise<void>;
+
+    setGpioMode: (index: number, mode: GPIOMode) => Promise<void>;
+    setGpioPull: (index: number, mode: GPIOPullMode) => Promise<void>;
+    setGpioDrive: (index: number, drive: GPIODrive) => Promise<void>;
+    setGpioOpenDrain: (index: number, openDrain: boolean) => Promise<void>;
+    setGpioDebounce: (index: number, debounce: boolean) => Promise<void>;
 
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
