@@ -14,6 +14,7 @@ import {
     Charger,
     GPIO,
     Ldo,
+    LED,
     NpmDevice,
     PartialUpdate,
     PmicChargingState,
@@ -27,6 +28,7 @@ interface pmicControlState {
     bucks: Buck[];
     ldos: Ldo[];
     gpios: GPIO[];
+    leds: LED[];
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
     pmicChargingState: PmicChargingState;
@@ -48,6 +50,7 @@ const initialState: pmicControlState = {
     bucks: [],
     ldos: [],
     gpios: [],
+    leds: [],
     pmicChargingState: {
         batteryFull: false,
         trickleCharge: false,
@@ -135,6 +138,17 @@ const pmicControlSlice = createSlice({
             if (state.gpios.length >= action.payload.index) {
                 state.gpios[action.payload.index] = {
                     ...state.gpios[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
+        },
+        setLEDs(state, action: PayloadAction<LED[]>) {
+            state.leds = action.payload;
+        },
+        updateLEDs(state, action: PayloadAction<PartialUpdate<LED>>) {
+            if (state.leds.length >= action.payload.index) {
+                state.leds[action.payload.index] = {
+                    ...state.leds[action.payload.index],
                     ...action.payload.data,
                 };
             }
@@ -228,6 +242,7 @@ export const getPmicChargingState = (state: RootState) => {
 export const getBucks = (state: RootState) => state.app.pmicControl.bucks;
 export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
 export const getGPIOs = (state: RootState) => state.app.pmicControl.gpios;
+export const getLEDs = (state: RootState) => state.app.pmicControl.leds;
 export const isBatteryConnected = (state: RootState) => {
     const { pmicState, batteryConnected } = state.app.pmicControl;
     return parseConnectedState(
@@ -282,6 +297,8 @@ export const {
     updateLdo,
     setGPIOs,
     updateGPIOs,
+    setLEDs,
+    updateLEDs,
     setBatteryConnected,
     setFuelGauge,
     setActiveBatterModel,
