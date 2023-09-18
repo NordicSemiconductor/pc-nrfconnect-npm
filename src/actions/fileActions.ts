@@ -34,6 +34,8 @@ const saveSettings =
             charger: { ...currentState.charger },
             bucks: [...currentState.bucks],
             ldos: [...currentState.ldos],
+            gpios: [...currentState.gpios],
+            leds: [...currentState.leds],
             fuelGauge: currentState.fuelGauge,
             firmwareVersion: currentState.npmDevice.getSupportedVersion(),
             deviceType: currentState.npmDevice.getDeviceType(),
