@@ -5,14 +5,39 @@
  */
 
 import React from 'react';
-import { Alert } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { useSelector } from 'react-redux';
+import {
+    MasonryLayout,
+    PaneProps,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-export default () => (
-    <div className="systemFeatures-container">
-        <div className="graph">
-            <Alert variant="info" label="Coming Soon! -​ ">
-                Keep a lookout for updates. This is coming your way soon
-            </Alert>
-        </div>
-    </div>
-);
+import {
+    getGPIOs,
+    getNpmDevice,
+} from '../../features/pmicControl/pmicControlSlice';
+import useIsUIDisabled from '../../features/useIsUIDisabled';
+import GPIO from '../GPIO/GPIO';
+
+export default ({ active }: PaneProps) => {
+    const disabled = useIsUIDisabled();
+    const npmDevice = useSelector(getNpmDevice);
+    const gpios = useSelector(getGPIOs);
+
+    return active ? (
+        <MasonryLayout
+            className="masonry-layout min-height-cards"
+            minWidth={300}
+        >
+            {npmDevice &&
+                gpios.map((gpio, index) => (
+                    <GPIO
+                        gpio={gpio}
+                        npmDevice={npmDevice}
+                        key={`GPIO${1 + index}`}
+                        index={index}
+                        disabled={disabled}
+                    />
+                ))}
+        </MasonryLayout>
+    ) : null;
+};
