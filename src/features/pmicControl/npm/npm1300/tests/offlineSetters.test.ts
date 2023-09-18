@@ -9,6 +9,7 @@ import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
+    PMIC_1300_LEDS,
     setupMocksBase,
 } from './helpers';
 
@@ -21,6 +22,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         mockOnFuelGaugeUpdate,
         mockOnLdoUpdate,
         mockOnGpioUpdate,
+        mockOnLEDUpdate,
         pmic,
     } = setupMocksBase();
 
@@ -289,6 +291,16 @@ describe('PMIC 1300 - Setters Offline tests', () => {
             });
         }
     );
+
+    test.each(PMIC_1300_LEDS)('Set setLedMode index: %p', async index => {
+        await pmic.setLedMode(index, 'Charger error');
+
+        expect(mockOnLEDUpdate).toBeCalledTimes(1);
+        expect(mockOnLEDUpdate).toBeCalledWith({
+            data: { mode: 'Charger error' },
+            index,
+        });
+    });
 
     test('Set setFuelGaugeEnabled', async () => {
         await pmic.setFuelGaugeEnabled(false);

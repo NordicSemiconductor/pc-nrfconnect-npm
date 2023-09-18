@@ -12,6 +12,7 @@ import {
     GPIOModeValues,
     GPIOPullValues,
     GPIOValues,
+    LEDModeValues,
     NTCThermistor,
     PmicChargingState,
 } from '../../types';
@@ -19,6 +20,7 @@ import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
+    PMIC_1300_LEDS,
     setupMocksWithShellParser,
 } from './helpers';
 
@@ -35,6 +37,7 @@ describe('PMIC 1300 - Command callbacks', () => {
         mockOnBuckUpdate,
         mockOnLdoUpdate,
         mockOnGpioUpdate,
+        mockOnLEDUpdate,
         mockOnReboot,
     } = setupMocksWithShellParser();
 
@@ -881,6 +884,37 @@ Battery models stored in database:
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
             data: { openDrain },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1300_LEDS.map(index =>
+            LEDModeValues.map((mode, modeIndex) => [
+                {
+                    index,
+                    append: `get ${index}`,
+                    mode,
+                    modeIndex,
+                },
+                {
+                    index,
+                    append: `set ${index} ${modeIndex}`,
+                    mode,
+                    modeIndex,
+                },
+            ]).flat()
+        ).flat()
+    )('npmx leds mode %p', ({ index, append, mode, modeIndex }) => {
+        const command = `npmx leds mode ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${modeIndex}.`, command);
+
+        expect(mockOnLEDUpdate).toBeCalledTimes(1);
+        expect(mockOnLEDUpdate).toBeCalledWith({
+            data: { mode },
             index,
         });
     });

@@ -11,6 +11,7 @@ import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
+    PMIC_1300_LEDS,
     setupMocksWithShellParser,
 } from './helpers';
 
@@ -407,6 +408,18 @@ describe('PMIC 1300 - Request update commands', () => {
             );
         }
     );
+
+    test.each(PMIC_1300_LEDS)('Request update ledMode index: %p', index => {
+        pmic.requestUpdate.ledMode(index);
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx leds mode get ${index}`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
 
     test('Request update fuelGauge', () => {
         pmic.requestUpdate.fuelGauge();

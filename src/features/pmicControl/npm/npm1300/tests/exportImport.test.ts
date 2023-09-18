@@ -9,6 +9,7 @@ import {
     Charger,
     GPIO,
     Ldo,
+    LED,
     NpmExport,
     PartialUpdate,
     PmicDialog,
@@ -21,6 +22,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         mockOnBuckUpdate,
         mockOnLdoUpdate,
         mockOnGpioUpdate,
+        mockOnLEDUpdate,
         mockOnFuelGaugeUpdate,
         mockDialogHandler,
         pmic,
@@ -58,6 +60,10 @@ describe('PMIC 1300 - Apply Config ', () => {
         voltage: -1,
         mode: 'LDO',
         enabled: true,
+    };
+
+    const initLed: LED = {
+        mode: 'Charger error',
     };
 
     const sampleConfig: NpmExport = {
@@ -147,6 +153,17 @@ describe('PMIC 1300 - Apply Config ', () => {
                 debounce: false,
             },
         ],
+        leds: [
+            {
+                mode: 'Charger error',
+            },
+            {
+                mode: 'Charging',
+            },
+            {
+                mode: 'Not used',
+            },
+        ],
         fuelGauge: true,
         firmwareVersion: '0.9.2+0',
         deviceType: 'npm1300',
@@ -165,6 +182,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     let bucks: Buck[] = [];
     let ldos: Ldo[] = [];
     let gpios: GPIO[] = [];
+    let leds: LED[] = [];
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -173,6 +191,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         bucks = [];
         ldos = [];
         gpios = [];
+        leds = [];
 
         mockOnChargerUpdate.mockImplementation(
             (partialUpdate: Partial<Charger>) => {
@@ -209,6 +228,15 @@ describe('PMIC 1300 - Apply Config ', () => {
                 };
             }
         );
+
+        mockOnLEDUpdate.mockImplementation(
+            (partialUpdate: PartialUpdate<LED>) => {
+                leds[partialUpdate.index] = {
+                    ...(leds[partialUpdate.index] ?? initLed),
+                    ...partialUpdate.data,
+                };
+            }
+        );
     });
 
     const verifyApplyConfig = () => {
@@ -224,6 +252,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnBuckUpdate).toBeCalledTimes(16); // 7 states + 1 (mode change on vOut) * 2 Bucks
         expect(mockOnLdoUpdate).toBeCalledTimes(6);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
+        expect(mockOnLEDUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
         expect(mockOnFuelGaugeUpdate).toBeCalledWith(true);

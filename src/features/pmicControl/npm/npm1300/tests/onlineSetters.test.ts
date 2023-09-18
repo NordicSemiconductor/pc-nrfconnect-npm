@@ -8,6 +8,7 @@ import {
     GPIODriveValues,
     GPIOModeValues,
     GPIOPullValues,
+    LEDModeValues,
     NTCThermistor,
     PmicDialog,
 } from '../../types';
@@ -16,6 +17,7 @@ import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
+    PMIC_1300_LEDS,
     setupMocksWithShellParser,
 } from './helpers';
 
@@ -27,6 +29,8 @@ describe('PMIC 1300 - Setters Online tests', () => {
         mockOnChargerUpdate,
         mockOnFuelGaugeUpdate,
         mockOnLdoUpdate,
+        mockOnGpioUpdate,
+        mockOnLEDUpdate,
         mockEnqueueRequest,
         pmic,
     } = setupMocksWithShellParser();
@@ -800,7 +804,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            expect(mockOnGpioUpdate).toBeCalledTimes(0);
         });
 
         test.each(
@@ -823,7 +827,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            expect(mockOnGpioUpdate).toBeCalledTimes(0);
         });
 
         test.each(
@@ -845,7 +849,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            expect(mockOnGpioUpdate).toBeCalledTimes(0);
         });
 
         test.each(
@@ -867,7 +871,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            expect(mockOnGpioUpdate).toBeCalledTimes(0);
         });
 
         test.each(
@@ -889,7 +893,30 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            expect(mockOnGpioUpdate).toBeCalledTimes(0);
+        });
+
+        test.each(
+            PMIC_1300_GPIOS.map(index =>
+                LEDModeValues.map((mode, modeIndex) => ({
+                    index,
+                    mode,
+                    modeIndex,
+                }))
+            ).flat()
+        )('Set setLedMode index: %p', async ({ index, mode, modeIndex }) => {
+            await pmic.setLedMode(index, mode);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx leds mode set ${index} ${modeIndex}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnLEDUpdate).toBeCalledTimes(0);
         });
 
         test.each([true, false])(
@@ -2049,7 +2076,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 // Updates should only be emitted when we get response
-                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                expect(mockOnGpioUpdate).toBeCalledTimes(0);
             }
         );
 
@@ -2091,7 +2118,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 // Updates should only be emitted when we get response
-                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                expect(mockOnGpioUpdate).toBeCalledTimes(0);
             }
         );
 
@@ -2134,7 +2161,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 // Updates should only be emitted when we get response
-                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                expect(mockOnGpioUpdate).toBeCalledTimes(0);
             }
         );
 
@@ -2176,7 +2203,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 // Updates should only be emitted when we get response
-                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                expect(mockOnGpioUpdate).toBeCalledTimes(0);
             }
         );
 
@@ -2220,7 +2247,50 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 // Updates should only be emitted when we get response
-                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+                expect(mockOnGpioUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            PMIC_1300_LEDS.map(index =>
+                LEDModeValues.map((mode, modeIndex) => ({
+                    index,
+                    mode,
+                    modeIndex,
+                }))
+            ).flat()
+        )(
+            'Set setGpioMode - Fail immediately - index: %p',
+            async ({ index, mode, modeIndex }) => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
+                await expect(
+                    pmic.setLedMode(index, mode)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx leds mode set ${index} ${modeIndex}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx leds mode get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLEDUpdate).toBeCalledTimes(0);
             }
         );
 
