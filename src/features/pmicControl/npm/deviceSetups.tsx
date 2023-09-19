@@ -91,7 +91,6 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                         })
                     );
                     NrfutilDeviceLib.program(device, firmware.hex, progress => {
-                        console.log(progress);
                         onProgress(
                             progress.stepProgressPercentage,
                             progress.message
