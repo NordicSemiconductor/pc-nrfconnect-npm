@@ -159,6 +159,24 @@ export type POF = {
     threshold: number;
 };
 
+export const TimerModeValues = [
+    'Boot monitor',
+    'Watchdog warning',
+    'Watchdog reset',
+    'General purpose',
+    'Wakeup',
+] as const;
+export type TimerMode = (typeof TimerModeValues)[number];
+
+export const TimerPrescalerValues = ['Slow', 'Fast'] as const;
+export type TimerPrescaler = (typeof TimerPrescalerValues)[number];
+
+export type TimerConfig = {
+    mode: TimerMode;
+    prescaler: TimerPrescaler;
+    period: number;
+};
+
 export type AdcSample = {
     timestamp: number;
     vBat: number;
@@ -254,6 +272,9 @@ export type BaseNpmDevice = {
     ) => () => void;
     onPOFUpdate: (
         handler: (payload: Partial<POF>, error?: string) => void
+    ) => () => void;
+    onTimerConfigUpdate: (
+        handler: (payload: Partial<TimerConfig>, error?: string) => void
     ) => () => void;
     onBeforeReboot: (
         handler: (payload: number, error?: string) => void
@@ -373,6 +394,10 @@ export type NpmDevice = {
         pofPolarity: () => void;
         pofThreshold: () => void;
 
+        timerConfigMode: () => void;
+        timerConfigPrescaler: () => void;
+        timerConfigPeriod: () => void;
+
         fuelGauge: () => void;
 
         activeBatteryModel: () => void;
@@ -427,6 +452,10 @@ export type NpmDevice = {
     setPOFPolarity: (polarity: POFPolarity) => Promise<void>;
     setPOFThreshold: (threshold: number) => Promise<void>;
 
+    setTimerConfigMode: (mode: TimerMode) => Promise<void>;
+    setTimerConfigPrescaler: (prescaler: TimerPrescaler) => Promise<void>;
+    setTimerConfigPeriod: (period: number) => Promise<void>;
+
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
     abortDownloadFuelGaugeProfile: () => Promise<void>;
@@ -470,6 +499,7 @@ export interface NpmExport {
     gpios: GPIO[];
     leds: LED[];
     pof: POF;
+    timerConfig: TimerConfig;
     fuelGauge: boolean;
     firmwareVersion: string;
     deviceType: NpmModel;
