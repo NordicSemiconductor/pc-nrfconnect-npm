@@ -53,6 +53,9 @@ import {
     PmicChargingState,
     PmicDialog,
     PmicState,
+    POF,
+    POFPolarity,
+    POFPolarityValues,
     ProfileDownload,
     VTrickleFast,
 } from '../types';
@@ -1002,6 +1005,42 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 )
             );
         }
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx pof enable', true, undefined, '(0|1)'),
+                res => {
+                    emitPartialEvent<POF>('onPOFUpdate', {
+                        enable: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx pof polarity', true, undefined, '(0|1)'),
+                res => {
+                    emitPartialEvent<POF>('onPOFUpdate', {
+                        polarity: POFPolarityValues[parseToNumber(res)],
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx pof threshold', true),
+                res => {
+                    emitPartialEvent<POF>('onPOFUpdate', {
+                        threshold: parseToNumber(res) / 1000, // mV to V
+                    });
+                },
+                noop
+            )
+        );
     }
 
     const sendCommand = (
@@ -2000,6 +2039,65 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    const setPOFEnabled = (enable: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<POF>('onPOFUpdate', {
+                    enable,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx pof enable set ${enable ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.pofEnable();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setPOFThreshold = (threshold: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<POF>('onPOFUpdate', {
+                    threshold,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx pof threshold set ${threshold * 1000}`, // V to mV
+                    () => resolve(),
+                    () => {
+                        requestUpdate.pofThreshold();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setPOFPolarity = (polarity: POFPolarity) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<POF>('onPOFUpdate', {
+                    polarity,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx pof polarity set ${POFPolarityValues.findIndex(
+                        p => p === polarity
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.pofPolarity();
+                        reject();
+                    }
+                );
+            }
+        });
+
     const downloadFuelGaugeProfile = (profile: Buffer) => {
         const chunkSize = 256;
         const chunks = Math.ceil(profile.byteLength / chunkSize);
@@ -2171,6 +2269,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
         ldoMode: (index: number) => sendCommand(`npmx ldsw mode get ${index}`),
 
+        pofEnable: () => sendCommand(`npmx pof enable get`),
+        pofPolarity: () => sendCommand(`npmx pof polarity get`),
+        pofThreshold: () => sendCommand(`npmx pof threshold get`),
+
         fuelGauge: () => sendCommand('fuel_gauge get'),
         activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
         storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
@@ -2229,6 +2331,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 config.leds.forEach((led, index) => {
                     setLedMode(index, led.mode);
                 });
+
+                setPOFEnabled(config.pof.enable);
+                setPOFPolarity(config.pof.polarity);
+                setPOFThreshold(config.pof.threshold);
 
                 setFuelGaugeEnabled(config.fuelGauge);
             };
@@ -2324,6 +2430,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             step: 0.1,
         }),
 
+        getPOFThresholdRange: () => ({
+            min: 2.6,
+            max: 3.5,
+            decimals: 1,
+            step: 0.1,
+        }),
+
         requestUpdate,
 
         setChargerVTerm,
@@ -2357,6 +2470,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setGpioOpenDrain,
         setGpioDebounce,
         setLedMode,
+        setPOFEnabled,
+        setPOFThreshold,
+        setPOFPolarity,
 
         setFuelGaugeEnabled,
         downloadFuelGaugeProfile,

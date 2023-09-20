@@ -23,6 +23,7 @@ import {
     PmicChargingState,
     PmicDialog,
     PmicState,
+    POF,
 } from './types';
 
 export const baseNpmDevice: IBaseNpmDevice = (
@@ -225,6 +226,14 @@ export const baseNpmDevice: IBaseNpmDevice = (
             eventEmitter.on('onLEDUpdate', handler);
             return () => {
                 eventEmitter.removeListener('onLEDUpdate', handler);
+            };
+        },
+        onPOFUpdate: (
+            handler: (payload: Partial<POF>, error?: string) => void
+        ) => {
+            eventEmitter.on('onPOFUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onPOFUpdate', handler);
             };
         },
 
