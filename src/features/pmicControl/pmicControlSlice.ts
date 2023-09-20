@@ -21,6 +21,7 @@ import {
     PmicDialog,
     PmicState,
     POF,
+    TimerConfig,
 } from './npm/types';
 
 interface pmicControlState {
@@ -31,6 +32,7 @@ interface pmicControlState {
     gpios: GPIO[];
     leds: LED[];
     pof: POF;
+    timerConfig: TimerConfig;
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
     pmicChargingState: PmicChargingState;
@@ -57,6 +59,11 @@ const initialState: pmicControlState = {
         enable: true,
         threshold: 2.8,
         polarity: 'Active heigh',
+    },
+    timerConfig: {
+        mode: 'Boot monitor',
+        prescaler: 'Slow',
+        period: 0,
     },
     pmicChargingState: {
         batteryFull: false,
@@ -166,6 +173,15 @@ const pmicControlSlice = createSlice({
         updatePOFs(state, action: PayloadAction<Partial<POF>>) {
             state.pof = {
                 ...state.pof,
+                ...action.payload,
+            };
+        },
+        setTimerConfig(state, action: PayloadAction<TimerConfig>) {
+            state.timerConfig = action.payload;
+        },
+        updateTimerConfig(state, action: PayloadAction<Partial<TimerConfig>>) {
+            state.timerConfig = {
+                ...state.timerConfig,
                 ...action.payload,
             };
         },
@@ -317,6 +333,8 @@ export const {
     updateLEDs,
     setPOFs,
     updatePOFs,
+    setTimerConfig,
+    updateTimerConfig,
     setBatteryConnected,
     setFuelGauge,
     setActiveBatterModel,
