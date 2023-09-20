@@ -45,7 +45,6 @@ import {
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
-    setPOFs,
     setStoredBatterModel,
     setSupportedVersion,
     setUsbPowered,
@@ -55,6 +54,7 @@ import {
     updateLdo,
     updateLEDs,
     updatePOFs,
+    updateTimerConfig,
 } from '../pmicControlSlice';
 import {
     getProfile,
@@ -152,6 +152,10 @@ export default () => {
             npmDevice.requestUpdate.pofPolarity();
             npmDevice.requestUpdate.pofThreshold();
 
+            npmDevice.requestUpdate.timerConfigMode();
+            npmDevice.requestUpdate.timerConfigPeriod();
+            npmDevice.requestUpdate.timerConfigPrescaler();
+
             npmDevice.requestUpdate.fuelGauge();
             npmDevice.requestUpdate.activeBatteryModel();
             npmDevice.requestUpdate.storedBatteryModel();
@@ -235,14 +239,6 @@ export default () => {
                     });
                 }
                 dispatch(setLEDs(emptyLEDs));
-
-                dispatch(
-                    setPOFs({
-                        enable: true,
-                        threshold: 2.8,
-                        polarity: 'Active heigh',
-                    })
-                );
             };
 
             const releaseAll: (() => void)[] = [];
@@ -343,6 +339,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onPOFUpdate(payload => {
                     dispatch(updatePOFs(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onTimerConfigUpdate(payload => {
+                    dispatch(updateTimerConfig(payload));
                 })
             );
 
