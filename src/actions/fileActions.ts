@@ -15,10 +15,11 @@ import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
 
+import { RootState } from '../appReducer';
 import { NpmExport } from '../features/pmicControl/npm/types';
 
 const saveSettings =
-    (filePath: string): AppThunk =>
+    (filePath: string): AppThunk<RootState> =>
     (_dispatch, getState) => {
         const currentState = getState().app.pmicControl;
 
@@ -31,11 +32,15 @@ const saveSettings =
         });
 
         const out: NpmExport = {
-            charger: { ...currentState.charger },
+            charger: currentState.charger
+                ? { ...currentState.charger }
+                : undefined,
             bucks: [...currentState.bucks],
             ldos: [...currentState.ldos],
             gpios: [...currentState.gpios],
             leds: [...currentState.leds],
+            pof: currentState.pof,
+            timerConfig: currentState.timerConfig,
             fuelGauge: currentState.fuelGauge,
             firmwareVersion: currentState.npmDevice.getSupportedVersion(),
             deviceType: currentState.npmDevice.getDeviceType(),

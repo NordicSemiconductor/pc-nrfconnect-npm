@@ -24,6 +24,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         mockOnGpioUpdate,
         mockOnLEDUpdate,
         mockOnPOFUpdate,
+        mockOnTimerConfigUpdate,
         pmic,
     } = setupMocksBase();
 
@@ -294,11 +295,25 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         expect(mockOnPOFUpdate).toBeCalledWith({ polarity: 'Active low' });
     });
 
-    test('Set set pof threshold ', async () => {
-        await pmic.setPOFThreshold(2.9);
+    test('Set set timer config mode ', async () => {
+        await pmic.setTimerConfigMode('Wakeup');
 
-        expect(mockOnPOFUpdate).toBeCalledTimes(1);
-        expect(mockOnPOFUpdate).toBeCalledWith({ threshold: 2.9 });
+        expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
+        expect(mockOnTimerConfigUpdate).toBeCalledWith({ mode: 'Wakeup' });
+    });
+
+    test('Set set timer config prescaler ', async () => {
+        await pmic.setTimerConfigPrescaler('Fast');
+
+        expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
+        expect(mockOnTimerConfigUpdate).toBeCalledWith({ prescaler: 'Fast' });
+    });
+
+    test('Set set timer config period ', async () => {
+        await pmic.setTimerConfigPeriod(1000);
+
+        expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
+        expect(mockOnTimerConfigUpdate).toBeCalledWith({ period: 1000 });
     });
 
     test.each(PMIC_1300_GPIOS)(

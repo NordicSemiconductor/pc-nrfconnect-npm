@@ -14,6 +14,7 @@ import {
     PartialUpdate,
     PmicDialog,
     POF,
+    TimerConfig,
 } from '../../types';
 import { setupMocksBase } from './helpers';
 
@@ -25,6 +26,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         mockOnGpioUpdate,
         mockOnLEDUpdate,
         mockOnPOFUpdate,
+        mockOnTimerConfigUpdate,
         mockOnFuelGaugeUpdate,
         mockDialogHandler,
         pmic,
@@ -72,6 +74,12 @@ describe('PMIC 1300 - Apply Config ', () => {
         enable: true,
         threshold: 2.8,
         polarity: 'Active heigh',
+    };
+
+    const initTimerConfig: TimerConfig = {
+        mode: 'Boot monitor',
+        prescaler: 'Slow',
+        period: 0,
     };
 
     const sampleConfig: NpmExport = {
@@ -173,6 +181,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             },
         ],
         pof: initPOF,
+        timerConfig: initTimerConfig,
         fuelGauge: true,
         firmwareVersion: '0.9.2+1',
         deviceType: 'npm1300',
@@ -193,6 +202,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
+    let timerConfig = { ...initTimerConfig };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -203,6 +213,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         gpios = [];
         leds = [];
         pof = { ...initPOF };
+        timerConfig = { ...initTimerConfig };
 
         mockOnChargerUpdate.mockImplementation(
             (partialUpdate: Partial<Charger>) => {
@@ -255,6 +266,15 @@ describe('PMIC 1300 - Apply Config ', () => {
                 ...partialUpdate,
             };
         });
+
+        mockOnTimerConfigUpdate.mockImplementation(
+            (partialUpdate: Partial<TimerConfig>) => {
+                timerConfig = {
+                    ...timerConfig,
+                    ...partialUpdate,
+                };
+            }
+        );
     });
 
     const verifyApplyConfig = () => {
@@ -272,6 +292,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);
+        expect(mockOnTimerConfigUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
         expect(mockOnFuelGaugeUpdate).toBeCalledWith(true);

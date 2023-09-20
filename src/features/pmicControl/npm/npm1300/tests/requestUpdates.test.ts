@@ -457,6 +457,42 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
+    test('Request update timerConfigMode', () => {
+        pmic.requestUpdate.timerConfigMode();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx timer config mode get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update timerConfigPrescaler', () => {
+        pmic.requestUpdate.timerConfigPrescaler();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx timer config prescaler get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update timerConfigPeriod', () => {
+        pmic.requestUpdate.timerConfigPeriod();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx timer config period get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
     test('Request update fuelGauge', () => {
         pmic.requestUpdate.fuelGauge();
 

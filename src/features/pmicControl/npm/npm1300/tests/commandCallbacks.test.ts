@@ -16,6 +16,8 @@ import {
     NTCThermistor,
     PmicChargingState,
     POFPolarityValues,
+    TimerModeValues,
+    TimerPrescalerValues,
 } from '../../types';
 import {
     PMIC_1300_BUCKS,
@@ -40,6 +42,7 @@ describe('PMIC 1300 - Command callbacks', () => {
         mockOnGpioUpdate,
         mockOnPOFUpdate,
         mockOnLEDUpdate,
+        mockOnTimerConfigUpdate,
         mockOnReboot,
     } = setupMocksWithShellParser();
 
@@ -983,6 +986,74 @@ Battery models stored in database:
         expect(mockOnPOFUpdate).toBeCalledTimes(1);
         expect(mockOnPOFUpdate).toBeCalledWith({
             threshold: 2.8,
+        });
+    });
+
+    test.each(
+        TimerModeValues.map((mode, modeIndex) => [
+            {
+                append: `get`,
+                mode,
+                modeIndex,
+            },
+            {
+                append: `set ${modeIndex}`,
+                mode,
+                modeIndex,
+            },
+        ]).flat()
+    )('npmx timer config mode %p', ({ append, mode, modeIndex }) => {
+        const command = `npmx timer config mode ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${modeIndex}.`, command);
+
+        expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
+        expect(mockOnTimerConfigUpdate).toBeCalledWith({
+            mode,
+        });
+    });
+
+    test.each(
+        TimerPrescalerValues.map((prescaler, prescalerIndex) => [
+            {
+                append: `get`,
+                prescaler,
+                prescalerIndex,
+            },
+            {
+                append: `set ${prescalerIndex}`,
+                prescaler,
+                prescalerIndex,
+            },
+        ]).flat()
+    )(
+        'npmx timer config prescaler %p',
+        ({ append, prescaler, prescalerIndex }) => {
+            const command = `npmx timer config prescaler ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess(`Value: ${prescalerIndex}.`, command);
+
+            expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
+            expect(mockOnTimerConfigUpdate).toBeCalledWith({
+                prescaler,
+            });
+        }
+    );
+
+    test.each([`get`, `set 2800`])('npmx timer config period %p', append => {
+        const command = `npmx timer config period ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: 2800.`, command);
+
+        expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
+        expect(mockOnTimerConfigUpdate).toBeCalledWith({
+            period: 2800,
         });
     });
 });
