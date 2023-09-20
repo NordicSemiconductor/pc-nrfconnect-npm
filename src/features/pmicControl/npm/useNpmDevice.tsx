@@ -45,6 +45,7 @@ import {
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
+    setPOFs,
     setStoredBatterModel,
     setSupportedVersion,
     setUsbPowered,
@@ -53,6 +54,7 @@ import {
     updateGPIOs,
     updateLdo,
     updateLEDs,
+    updatePOFs,
 } from '../pmicControlSlice';
 import {
     getProfile,
@@ -229,6 +231,14 @@ export default () => {
                     });
                 }
                 dispatch(setLEDs(emptyLEDs));
+
+                dispatch(
+                    setPOFs({
+                        enable: true,
+                        threshold: 2.8,
+                        polarity: 'Active heigh',
+                    })
+                );
             };
 
             const releaseAll: (() => void)[] = [];
@@ -323,6 +333,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onLEDUpdate(payload => {
                     dispatch(updateLEDs(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onPOFUpdate(payload => {
+                    dispatch(updatePOFs(payload));
                 })
             );
 
