@@ -20,6 +20,7 @@ import {
     PmicChargingState,
     PmicDialog,
     PmicState,
+    POF,
 } from './npm/types';
 
 interface pmicControlState {
@@ -29,6 +30,7 @@ interface pmicControlState {
     ldos: Ldo[];
     gpios: GPIO[];
     leds: LED[];
+    pof: POF;
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
     pmicChargingState: PmicChargingState;
@@ -51,6 +53,11 @@ const initialState: pmicControlState = {
     ldos: [],
     gpios: [],
     leds: [],
+    pof: {
+        enable: true,
+        threshold: 2.8,
+        polarity: 'Active heigh',
+    },
     pmicChargingState: {
         batteryFull: false,
         trickleCharge: false,
@@ -152,6 +159,15 @@ const pmicControlSlice = createSlice({
                     ...action.payload.data,
                 };
             }
+        },
+        setPOFs(state, action: PayloadAction<POF>) {
+            state.pof = action.payload;
+        },
+        updatePOFs(state, action: PayloadAction<Partial<POF>>) {
+            state.pof = {
+                ...state.pof,
+                ...action.payload,
+            };
         },
         setBatteryConnected(state, action: PayloadAction<boolean>) {
             state.batteryConnected = action.payload;
@@ -299,6 +315,8 @@ export const {
     updateGPIOs,
     setLEDs,
     updateLEDs,
+    setPOFs,
+    updatePOFs,
     setBatteryConnected,
     setFuelGauge,
     setActiveBatterModel,
