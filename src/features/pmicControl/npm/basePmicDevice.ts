@@ -24,6 +24,7 @@ import {
     PmicDialog,
     PmicState,
     POF,
+    TimerConfig,
 } from './types';
 
 export const baseNpmDevice: IBaseNpmDevice = (
@@ -234,6 +235,14 @@ export const baseNpmDevice: IBaseNpmDevice = (
             eventEmitter.on('onPOFUpdate', handler);
             return () => {
                 eventEmitter.removeListener('onPOFUpdate', handler);
+            };
+        },
+        onTimerConfigUpdate: (
+            handler: (payload: Partial<TimerConfig>, error?: string) => void
+        ) => {
+            eventEmitter.on('onTimerConfigUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onTimerConfigUpdate', handler);
             };
         },
 

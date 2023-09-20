@@ -57,6 +57,11 @@ import {
     POFPolarity,
     POFPolarityValues,
     ProfileDownload,
+    TimerConfig,
+    TimerMode,
+    TimerModeValues,
+    TimerPrescaler,
+    TimerPrescalerValues,
     VTrickleFast,
 } from '../types';
 
@@ -1036,6 +1041,47 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 res => {
                     emitPartialEvent<POF>('onPOFUpdate', {
                         threshold: parseToNumber(res) / 1000, // mV to V
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx timer config mode', true, undefined, '[0-4]'),
+                res => {
+                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                        mode: TimerModeValues[parseToNumber(res)],
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx timer config prescaler',
+                    true,
+                    undefined,
+                    '[0-1]'
+                ),
+                res => {
+                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                        prescaler: TimerPrescalerValues[parseToNumber(res)],
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx timer config period', true),
+                res => {
+                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                        period: parseToNumber(res),
                     });
                 },
                 noop
@@ -2098,6 +2144,67 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    const setTimerConfigMode = (mode: TimerMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                    mode,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx timer config mode set ${TimerModeValues.findIndex(
+                        m => m === mode
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.timerConfigMode();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setTimerConfigPrescaler = (prescaler: TimerPrescaler) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                    prescaler,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx timer config prescaler set ${TimerPrescalerValues.findIndex(
+                        p => p === prescaler
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.timerConfigPrescaler();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setTimerConfigPeriod = (period: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                    period,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx timer config period set ${period}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.timerConfigPeriod();
+                        reject();
+                    }
+                );
+            }
+        });
+
     const downloadFuelGaugeProfile = (profile: Buffer) => {
         const chunkSize = 256;
         const chunks = Math.ceil(profile.byteLength / chunkSize);
@@ -2273,6 +2380,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         pofPolarity: () => sendCommand(`npmx pof polarity get`),
         pofThreshold: () => sendCommand(`npmx pof threshold get`),
 
+        timerConfigMode: () => sendCommand(`npmx timer config mode get`),
+        timerConfigPrescaler: () =>
+            sendCommand(`npmx timer config prescaler get`),
+        timerConfigPeriod: () => sendCommand(`npmx timer config period get`),
+
         fuelGauge: () => sendCommand('fuel_gauge get'),
         activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
         storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
@@ -2335,6 +2447,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 setPOFEnabled(config.pof.enable);
                 setPOFPolarity(config.pof.polarity);
                 setPOFThreshold(config.pof.threshold);
+
+                setTimerConfigMode(config.timerConfig.mode);
+                setTimerConfigPrescaler(config.timerConfig.prescaler);
+                setTimerConfigPeriod(config.timerConfig.period);
 
                 setFuelGaugeEnabled(config.fuelGauge);
             };
@@ -2473,6 +2589,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setPOFEnabled,
         setPOFThreshold,
         setPOFPolarity,
+        setTimerConfigMode,
+        setTimerConfigPrescaler,
+        setTimerConfigPeriod,
 
         setFuelGaugeEnabled,
         downloadFuelGaugeProfile,
