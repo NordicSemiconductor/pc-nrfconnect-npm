@@ -13,6 +13,7 @@ import {
     NpmExport,
     PartialUpdate,
     PmicDialog,
+    POF,
 } from '../../types';
 import { setupMocksBase } from './helpers';
 
@@ -23,6 +24,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         mockOnLdoUpdate,
         mockOnGpioUpdate,
         mockOnLEDUpdate,
+        mockOnPOFUpdate,
         mockOnFuelGaugeUpdate,
         mockDialogHandler,
         pmic,
@@ -64,6 +66,12 @@ describe('PMIC 1300 - Apply Config ', () => {
 
     const initLed: LED = {
         mode: 'Charger error',
+    };
+
+    const initPOF: POF = {
+        enable: true,
+        threshold: 2.8,
+        polarity: 'Active heigh',
     };
 
     const sampleConfig: NpmExport = {
@@ -164,6 +172,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 mode: 'Not used',
             },
         ],
+        pof: initPOF,
         fuelGauge: true,
         firmwareVersion: '0.9.2+1',
         deviceType: 'npm1300',
@@ -183,6 +192,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     let ldos: Ldo[] = [];
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
+    let pof: POF = { ...initPOF };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -192,6 +202,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         ldos = [];
         gpios = [];
         leds = [];
+        pof = { ...initPOF };
 
         mockOnChargerUpdate.mockImplementation(
             (partialUpdate: Partial<Charger>) => {
@@ -237,6 +248,13 @@ describe('PMIC 1300 - Apply Config ', () => {
                 };
             }
         );
+
+        mockOnPOFUpdate.mockImplementation((partialUpdate: Partial<POF>) => {
+            pof = {
+                ...pof,
+                ...partialUpdate,
+            };
+        });
     });
 
     const verifyApplyConfig = () => {
@@ -253,6 +271,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnLdoUpdate).toBeCalledTimes(6);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
+        expect(mockOnPOFUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
         expect(mockOnFuelGaugeUpdate).toBeCalledWith(true);

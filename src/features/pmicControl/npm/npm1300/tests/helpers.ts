@@ -17,6 +17,7 @@ import {
     LED,
     PartialUpdate,
     PmicDialog,
+    POF,
 } from '../../types';
 import { getNPM1300 } from '../pmic1300Device';
 
@@ -58,6 +59,12 @@ export const setupMocksBase = (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_partialUpdate: PartialUpdate<LED>) => {}
     );
+
+    const mockOnPOFUpdate = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: Partial<POF>) => {}
+    );
+
     const mockOnLoggingEvent = jest.fn(() => {});
     const mockOnPmicStateChange = jest.fn(() => {});
     const mockOnReboot = jest.fn(() => {});
@@ -71,6 +78,7 @@ export const setupMocksBase = (
     pmic.onChargerUpdate(mockOnChargerUpdate);
     pmic.onGPIOUpdate(mockOnGpioUpdate);
     pmic.onLEDUpdate(mockOnLEDUpdate);
+    pmic.onPOFUpdate(mockOnPOFUpdate);
     pmic.onChargingStatusUpdate(mockOnChargingStatusUpdate);
     pmic.onFuelGaugeUpdate(mockOnFuelGaugeUpdate);
     pmic.onLdoUpdate(mockOnLdoUpdate);
@@ -92,6 +100,7 @@ export const setupMocksBase = (
         mockOnLdoUpdate,
         mockOnGpioUpdate,
         mockOnLEDUpdate,
+        mockOnPOFUpdate,
         mockOnLoggingEvent,
         mockOnPmicStateChange,
         mockOnReboot,

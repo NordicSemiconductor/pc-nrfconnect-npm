@@ -23,6 +23,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         mockOnLdoUpdate,
         mockOnGpioUpdate,
         mockOnLEDUpdate,
+        mockOnPOFUpdate,
         pmic,
     } = setupMocksBase();
 
@@ -277,6 +278,27 @@ describe('PMIC 1300 - Setters Offline tests', () => {
             data: { debounce: true },
             index,
         });
+    });
+
+    test('Set set pof enable ', async () => {
+        await pmic.setPOFEnabled(true);
+
+        expect(mockOnPOFUpdate).toBeCalledTimes(1);
+        expect(mockOnPOFUpdate).toBeCalledWith({ enable: true });
+    });
+
+    test('Set set pof polarity ', async () => {
+        await pmic.setPOFPolarity('Active low');
+
+        expect(mockOnPOFUpdate).toBeCalledTimes(1);
+        expect(mockOnPOFUpdate).toBeCalledWith({ polarity: 'Active low' });
+    });
+
+    test('Set set pof threshold ', async () => {
+        await pmic.setPOFThreshold(2.9);
+
+        expect(mockOnPOFUpdate).toBeCalledTimes(1);
+        expect(mockOnPOFUpdate).toBeCalledWith({ threshold: 2.9 });
     });
 
     test.each(PMIC_1300_GPIOS)(

@@ -421,6 +421,42 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
+    test('Request update pofEnable', () => {
+        pmic.requestUpdate.pofEnable();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx pof enable get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update pofPolarity', () => {
+        pmic.requestUpdate.pofPolarity();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx pof polarity get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update pofThreshold', () => {
+        pmic.requestUpdate.pofThreshold();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx pof threshold get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
     test('Request update fuelGauge', () => {
         pmic.requestUpdate.fuelGauge();
 

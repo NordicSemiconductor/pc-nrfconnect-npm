@@ -11,6 +11,7 @@ import {
     LEDModeValues,
     NTCThermistor,
     PmicDialog,
+    POFPolarityValues,
 } from '../../types';
 import {
     helpers,
@@ -31,6 +32,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         mockOnLdoUpdate,
         mockOnGpioUpdate,
         mockOnLEDUpdate,
+        mockOnPOFUpdate,
         mockEnqueueRequest,
         pmic,
     } = setupMocksWithShellParser();
@@ -917,6 +919,53 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
             // Updates should only be emitted when we get response
             expect(mockOnLEDUpdate).toBeCalledTimes(0);
+        });
+
+        test.each([true, false])('Set pof enable %p', async enable => {
+            await pmic.setPOFEnabled(enable);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx pof enable set ${enable ? '1' : '0'}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnPOFUpdate).toBeCalledTimes(0);
+        });
+
+        test('Set pof threshold', async () => {
+            await pmic.setPOFThreshold(3);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx pof threshold set 3000`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnPOFUpdate).toBeCalledTimes(0);
+        });
+
+        test.each(
+            POFPolarityValues.map((polarity, index) => ({ polarity, index }))
+        )('Set pof polarity %p', async ({ polarity, index }) => {
+            await pmic.setPOFPolarity(polarity);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx pof polarity set ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnPOFUpdate).toBeCalledTimes(0);
         });
 
         test.each([true, false])(
@@ -2293,6 +2342,106 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockOnLEDUpdate).toBeCalledTimes(0);
             }
         );
+
+        test.each([true, false])(
+            'Set setPOFEnable - Fail immediately - index: %p',
+            async enable => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
+                await expect(
+                    pmic.setPOFEnabled(enable)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx pof enable set ${enable ? '1' : '0'}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx pof enable get`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnPOFUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            POFPolarityValues.map((polarity, index) => ({ polarity, index }))
+        )(
+            'Set setPOFPolarity - Fail immediately - index: %p',
+            async ({ polarity, index }) => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
+                await expect(
+                    pmic.setPOFPolarity(polarity)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx pof polarity set ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx pof polarity get`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnPOFUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test('Set setPOFThreshold - Fail immediately - index: %p', async () => {
+            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
+                dialog.onConfirm();
+            });
+
+            await expect(pmic.setPOFThreshold(2.7)).rejects.toBeUndefined();
+
+            expect(mockEnqueueRequest).toBeCalledTimes(2);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx pof threshold set 2700`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Refresh data due to error
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npmx pof threshold get`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnPOFUpdate).toBeCalledTimes(0);
+        });
 
         test.each([true, false])(
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',
