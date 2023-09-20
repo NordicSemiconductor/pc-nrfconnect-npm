@@ -150,6 +150,15 @@ export type LED = {
     mode: LEDMode;
 };
 
+export const POFPolarityValues = ['Active low', 'Active heigh'] as const;
+export type POFPolarity = (typeof POFPolarityValues)[number];
+
+export type POF = {
+    enable: boolean;
+    polarity: POFPolarity;
+    threshold: number;
+};
+
 export type AdcSample = {
     timestamp: number;
     vBat: number;
@@ -243,6 +252,9 @@ export type BaseNpmDevice = {
     onLEDUpdate: (
         handler: (payload: PartialUpdate<LED>, error?: string) => void
     ) => () => void;
+    onPOFUpdate: (
+        handler: (payload: Partial<POF>, error?: string) => void
+    ) => () => void;
     onBeforeReboot: (
         handler: (payload: number, error?: string) => void
     ) => () => void;
@@ -317,6 +329,7 @@ export type NpmDevice = {
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
+    getPOFThresholdRange: () => RangeType;
 
     requestUpdate: {
         pmicChargingState: () => void;
@@ -355,6 +368,10 @@ export type NpmDevice = {
         gpioDebounce: (index: number) => void;
 
         ledMode: (index: number) => void;
+
+        pofEnable: () => void;
+        pofPolarity: () => void;
+        pofThreshold: () => void;
 
         fuelGauge: () => void;
 
@@ -406,6 +423,10 @@ export type NpmDevice = {
 
     setLedMode: (index: number, mode: LEDMode) => Promise<void>;
 
+    setPOFEnabled: (state: boolean) => Promise<void>;
+    setPOFPolarity: (polarity: POFPolarity) => Promise<void>;
+    setPOFThreshold: (threshold: number) => Promise<void>;
+
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
     abortDownloadFuelGaugeProfile: () => Promise<void>;
@@ -448,6 +469,7 @@ export interface NpmExport {
     ldos: Ldo[];
     gpios: GPIO[];
     leds: LED[];
+    pof: POF;
     fuelGauge: boolean;
     firmwareVersion: string;
     deviceType: NpmModel;
