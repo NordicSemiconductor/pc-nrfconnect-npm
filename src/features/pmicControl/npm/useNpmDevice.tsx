@@ -148,6 +148,10 @@ export default () => {
                 npmDevice.requestUpdate.ledMode(i);
             }
 
+            npmDevice.requestUpdate.pofEnable();
+            npmDevice.requestUpdate.pofPolarity();
+            npmDevice.requestUpdate.pofThreshold();
+
             npmDevice.requestUpdate.fuelGauge();
             npmDevice.requestUpdate.activeBatteryModel();
             npmDevice.requestUpdate.storedBatteryModel();
