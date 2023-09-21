@@ -8,6 +8,144 @@ import React from 'react';
 
 import { Documentation } from '../types';
 
+const buckDoc = (n: number) => ({
+    Buck: [
+        {
+            title: 'Buck',
+            content: [
+                <p key="p1">
+                    Ultra-high efficiency step-down buck regulator. Supports
+                    output current up to 200 mA.
+                </p>,
+            ],
+        },
+    ],
+    VOUT: [
+        {
+            title: (
+                <>
+                    <span>V</span>
+                    <span className="subscript">{`OUT${n}`}</span>
+                </>
+            ),
+            content: [
+                <p key="p1">BUCK output voltage level.</p>,
+                <p key="p2">
+                    When V<span className="subscript">{`SET${n}`}</span> pin is
+                    used to set voltage level this indicates the voltage level
+                    at V<span className="subscript">{`OUT${n}`}</span> (read
+                    only).
+                </p>,
+                <p key="p3">
+                    When software is used to set voltage level the range is 1.0
+                    V to 3.3 V, in 100 mV steps.
+                </p>,
+            ],
+        },
+    ],
+    RETVOUT: [
+        {
+            title: (
+                <>
+                    <span>V</span>
+                    <span className="subscript">{`RET${n}`}</span>
+                </>
+            ),
+            content: [
+                <p key="p1">
+                    Configures the retention/sleep mode voltage level of the
+                    BUCK. A GPIO can be configured to select between V
+                    <span className="subscript">{`RET${n}`}</span> and V
+                    <span className="subscript">{`OUT${n}`}</span> BUCK voltage
+                    level. The GPIO[n] to control this is configured below in
+                    “Retention control”.
+                </p>,
+            ],
+        },
+    ],
+    ModeControl: [
+        {
+            title: 'Buck Mode Control',
+            content: [
+                <p key="p1">
+                    Configures BUCK mode. The BUCK can be in forced PFM
+                    (hysteretic) mode, forced PWM (pulse width modulation) mode,
+                    or automatic mode (default). In automatic mode the BUCK
+                    selects PFM mode for low load currents, and PWM mode for
+                    high load currents, to ensure the highest efficiency across
+                    the whole load current range. PWM mode can be enabled and
+                    disabled using a GPIO pin if GPIO[n] is selected.
+                </p>,
+            ],
+        },
+    ],
+    OnOffControl: [
+        {
+            title: 'On/Off Control',
+            content: [
+                <p key="p1">
+                    BUCK on or off can be controlled by software, V
+                    <span className="subscript">{`SET${n}`}</span> pin, or a
+                    GPIO pin.
+                </p>,
+            ],
+        },
+    ],
+    RetentionControl: [
+        {
+            title: 'Retention control',
+            content: [
+                <p key="p1">
+                    A GPIO can be configured to select between two voltage
+                    levels. For example, a GPIO can be set to correspond with
+                    active/normal and retention/sleep states of the host. V
+                    <span className="subscript">{`OUT${n}`}</span> sets the BUCK
+                    output voltage level in active/normal mode, while RET
+                    <span className="subscript">{`VOUT${n}`}</span> sets the
+                    BUCK output voltage level in retention/sleep mode.
+                </p>,
+            ],
+        },
+    ],
+});
+
+const ldoDoc = () => ({
+    LoadSwitchLDO: [
+        {
+            title: 'Load Switch/LDO',
+            content: [
+                <p key="p1">
+                    The load switch can function either as a switch or an LDO.
+                </p>,
+                <p key="p2">
+                    As a switch, it supports an input voltage range from 1.0 V
+                    to 5.5 V, and up to 100 mA.
+                </p>,
+                <p key="p3">
+                    As an LDO, it supports an input voltage range from 2.6 V to
+                    5.5 V, and an output voltage range from 1.0 V to 3.3 V, in
+                    100 mV steps up to 50 mA.
+                </p>,
+            ],
+        },
+    ],
+    VOUTLDO: [
+        {
+            title: (
+                <>
+                    <span>V</span>
+                    <span className="subscript">OUTLDO2</span>
+                </>
+            ),
+            content: [<p key="p1">LDO output voltage level.</p>],
+        },
+        {
+            title: 'Range',
+            content: [<p key="p1">1.0 V to 3.3 V in 100 mV steps</p>],
+        },
+    ],
+});
+
 export const documentation: Documentation = {
     batteryStatus: {
         Voltage: [
@@ -338,284 +476,10 @@ export const documentation: Documentation = {
             },
         ],
     },
-    ldo1: {
-        LoadSwitchLDO: [
-            {
-                title: 'Load Switch/LDO',
-                content: [
-                    <p key="p1">
-                        The load switch can function either as a switch or an
-                        LDO.
-                    </p>,
-                    <p key="p2">
-                        As a switch it supports an input voltage range from 1.0
-                        V to 5.5 V, and up to 100mA.
-                    </p>,
-                    <p key="p3">
-                        As an LDO it supports an input voltage range from 2.6 V
-                        to 5.5 V, and output voltage range from 1.0 V to 3.3 V,
-                        in 100 mV steps up to 50 mA.
-                    </p>,
-                ],
-            },
-        ],
-        VOUTLDO: [
-            {
-                title: (
-                    <>
-                        <span>V</span>
-                        <span className="subscript">OUTLDO1</span>
-                    </>
-                ),
-                content: [<p key="p1">LDO output voltage level.</p>],
-            },
-            {
-                title: 'Range',
-                content: [<p key="p1">1.0 V to 3.3 V, in 100 mV steps</p>],
-            },
-        ],
-    },
-    ldo2: {
-        LoadSwitchLDO: [
-            {
-                title: 'Load Switch/LDO',
-                content: [
-                    <p key="p1">
-                        The load switch can function either as a switch or an
-                        LDO.
-                    </p>,
-                    <p key="p2">
-                        As a switch, it supports an input voltage range from 1.0
-                        V to 5.5 V, and up to 100 mA.
-                    </p>,
-                    <p key="p3">
-                        As an LDO, it supports an input voltage range from 2.6 V
-                        to 5.5 V, and an output voltage range from 1.0 V to 3.3
-                        V, in 100 mV steps up to 50 mA.
-                    </p>,
-                ],
-            },
-        ],
-        VOUTLDO: [
-            {
-                title: (
-                    <>
-                        <span>V</span>
-                        <span className="subscript">OUTLDO2</span>
-                    </>
-                ),
-                content: [<p key="p1">LDO output voltage level.</p>],
-            },
-            {
-                title: 'Range',
-                content: [<p key="p1">1.0 V to 3.3 V in 100 mV steps</p>],
-            },
-        ],
-    },
-    buck1: {
-        Buck: [
-            {
-                title: 'Buck',
-                content: [
-                    <p key="p1">
-                        Ultra-high efficiency step-down buck regulator. Supports
-                        output current up to 200 mA.
-                    </p>,
-                ],
-            },
-        ],
-        VOUT: [
-            {
-                title: (
-                    <>
-                        <span>V</span>
-                        <span className="subscript">OUT1</span>
-                    </>
-                ),
-                content: [
-                    <p key="p1">BUCK output voltage level.</p>,
-                    <p key="p2">
-                        When V<span className="subscript">SET1</span> pin is
-                        used to set voltage level this indicates the voltage
-                        level at V<span className="subscript">OUT1</span> (read
-                        only).
-                    </p>,
-                    <p key="p3">
-                        When software is used to set voltage level the range is
-                        1.0 V to 3.3 V, in 100 mV steps.
-                    </p>,
-                ],
-            },
-        ],
-        RETVOUT: [
-            {
-                title: (
-                    <>
-                        <span>V</span>
-                        <span className="subscript">RET1</span>
-                    </>
-                ),
-                content: [
-                    <p key="p1">
-                        Configures the retention/sleep mode voltage level of the
-                        BUCK. A GPIO can be configured to select between V
-                        <span className="subscript">RET1</span> and V
-                        <span className="subscript">OUT1</span> BUCK voltage
-                        level. The GPIO[n] to control this is configured below
-                        in “Retention control”.
-                    </p>,
-                ],
-            },
-        ],
-        ModeControl: [
-            {
-                title: 'Buck Mode Control',
-                content: [
-                    <p key="p1">
-                        Configures BUCK mode. The BUCK can be in forced PFM
-                        (hysteretic) mode, forced PWM (pulse width modulation)
-                        mode, or automatic mode (default). In automatic mode the
-                        BUCK selects PFM mode for low load currents, and PWM
-                        mode for high load currents, to ensure the highest
-                        efficiency across the whole load current range. PWM mode
-                        can be enabled and disabled using a GPIO pin if GPIO[n]
-                        is selected.
-                    </p>,
-                ],
-            },
-        ],
-        OnOffControl: [
-            {
-                title: 'On/Off Control',
-                content: [
-                    <p key="p1">
-                        BUCK on or off can be controlled by software, V
-                        <span className="subscript">SET1</span> pin, or a GPIO
-                        pin.
-                    </p>,
-                ],
-            },
-        ],
-        RetentionControl: [
-            {
-                title: 'Retention control',
-                content: [
-                    <p key="p1">
-                        A GPIO can be configured to select between two voltage
-                        levels. For example, a GPIO can be set to correspond
-                        with active/normal and retention/sleep states of the
-                        host. V<span className="subscript">OUT1</span> sets the
-                        BUCK output voltage level in active/normal mode, while
-                        RET
-                        <span className="subscript">VOUT1</span> sets the BUCK
-                        output voltage level in retention/sleep mode.
-                    </p>,
-                ],
-            },
-        ],
-    },
-    buck2: {
-        Buck: [
-            {
-                title: 'Buck',
-                content: [
-                    <p key="p1">
-                        Ultra-high efficiency step-down buck regulator. Supports
-                        up to 200 mA output current.
-                    </p>,
-                ],
-            },
-        ],
-        VOUT: [
-            {
-                title: (
-                    <>
-                        <span>V</span>
-                        <span className="subscript">OUT2</span>
-                    </>
-                ),
-                content: [
-                    <p key="p1">BUCK output voltage level.</p>,
-                    <p key="p2">
-                        When V<span className="subscript">SET2</span> pin is
-                        used to set voltage level this indicates the voltage
-                        level at V<span className="subscript">OUT2</span> (read
-                        only).
-                    </p>,
-                    <p key="p1">
-                        When software is used to set voltage level the range is
-                        from 1.0 V to 3.3 V, in 100 mV steps.
-                    </p>,
-                ],
-            },
-        ],
-        RETVOUT: [
-            {
-                title: (
-                    <>
-                        <span>V</span>
-                        <span className="subscript">RET2</span>
-                    </>
-                ),
-                content: [
-                    <p key="p1">
-                        Configures the retention/sleep mode voltage level of the
-                        BUCK. A GPIO can be configured to select between V
-                        <span className="subscript">RET2</span> and V
-                        <span className="subscript">OUT2</span> BUCK voltage
-                        level. The GPIO[n] to control this is configured below
-                        in “Retention control”.
-                    </p>,
-                ],
-            },
-        ],
-        ModeControl: [
-            {
-                title: 'Buck Mode Control',
-                content: [
-                    <p key="p1">
-                        Configures BUCK mode. The BUCK can be in forced PFM
-                        (hysteretic) mode, forced PWM (pulse width modulation)
-                        mode or automatic mode (default). In automatic mode the
-                        BUCK selects PFM mode for low load currents, and PWM
-                        mode for high load currents, to ensure highest
-                        efficiency across the whole load current range. PWM mode
-                        can be enabled and disabled using a GPIO pin if GPIO[n]
-                        is selected.
-                    </p>,
-                ],
-            },
-        ],
-        OnOffControl: [
-            {
-                title: 'On/Off Control',
-                content: [
-                    <p key="p1">
-                        BUCK on or off can be controlled by software, V
-                        <span className="subscript">SET2</span> pin or a GPIO
-                        pin.
-                    </p>,
-                ],
-            },
-        ],
-        RetentionControl: [
-            {
-                title: 'Retention control',
-                content: [
-                    <p key="p1">
-                        A GPIO can be configured to select between two voltage
-                        levels. For example, a GPIO can be set to correspond
-                        with active/normal and retention/sleep states of the
-                        host. V<span className="subscript">OUT2</span> sets the
-                        BUCK output voltage level in active/normal mode, while
-                        RET
-                        <span className="subscript">VOUT2</span> sets the BUCK
-                        output voltage level in retention/sleep mode.
-                    </p>,
-                ],
-            },
-        ],
-    },
+    ldo1: ldoDoc(),
+    ldo2: ldoDoc(),
+    buck1: buckDoc(1),
+    buck2: buckDoc(2),
     sidePanel: {
         ActiveBatteryModel: [
             {
