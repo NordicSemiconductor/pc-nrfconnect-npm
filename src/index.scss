@@ -73,57 +73,6 @@
     }
 }
 
-.tooltip {
-    &.bs-tooltip-bottom {
-        div.arrow {
-            top: -5px;
-            width: 12px;
-            height: 12px;
-            pointer-events: none;
-        }
-        div.arrow::before {
-            border-bottom-color: $gray-900;
-            border-width: 0 6px 6px 6px;
-        }
-    }
-    &.bs-tooltip-right {
-        div.arrow {
-            left: -5px;
-            width: 12px;
-            height: 12px;
-            pointer-events: none;
-        }
-        div.arrow::before {
-            border-right-color: $gray-900;
-            border-width: 6px 6px 6px 0;
-        }
-    }
-    .tooltip-inner {
-        background: $gray-900;
-        text-align: left;
-    }
-}
-
-.tooltip-inner {
-    padding-top: 16px;
-    min-width: 240px;
-}
-
-.documentation-tooltip {
-    background: $gray-900;
-    padding: 8px 16px;
-    color: $gray-100;
-    .title {
-        color: white;
-    }
-}
-
-.tooltip-overlay-trigger-wrapper {
-    button[disabled] {
-        pointer-events: none;
-    }
-}
-
 body {
     overflow: hidden;
 }

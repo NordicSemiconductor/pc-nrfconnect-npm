@@ -566,11 +566,13 @@ export type BatteryProfiler = {
     pofError: () => void;
 };
 
+interface DocumentationItem {
+    title: React.ReactNode;
+    content: React.ReactElement[];
+}
+
 export type Documentation = {
     [key: string]: {
-        [key: string]: {
-            title: React.ReactNode;
-            description?: React.ReactNode;
-        };
+        [key: string]: DocumentationItem[];
     };
 };
