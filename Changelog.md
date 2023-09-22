@@ -10,18 +10,26 @@ and this project adheres to
 
 ### Added
 
--   Added support for NTC thermistor `ntc_z` option
--   Added support for Chip Thermal Regulation
+-   Support for NTC thermistor `ntc_z` option
+-   Support for Chip Thermal Regulation
     -   Read and Write Tchgresume
     -   Read and Write Tchgstop
     -   Read Thermal Regulation state ?
--   Added support JEITA
+-   Support JEITA
     -   Read and Write vTermR
--   Added Charger BatLim configuration
--   Added LDO
+-   Charger BatLim configuration
+-   LDO
     -   Soft Starter enable
     -   Soft Starter current
--   Added Bucks Active Output Capacitor Discharge
+-   Bucks Active Output Capacitor Discharge
+-   POF
+    -   Enable POF
+    -   VSYSpof
+    -   POF Polarity
+-   Timer Config
+    -   Mode
+    -   Prescaler
+    -   Period
 
 ### Changed
 

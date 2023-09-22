@@ -25,7 +25,7 @@ const timeString = (
           }`
         : 'less than a minute';
 
-const splitMS = (ms: number) => {
+export const splitMS = (ms: number) => {
     const time = ms;
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
     ms -= days * 24 * 60 * 60 * 1000;

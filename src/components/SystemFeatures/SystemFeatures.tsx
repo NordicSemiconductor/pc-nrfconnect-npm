@@ -15,16 +15,21 @@ import {
     getGPIOs,
     getLEDs,
     getNpmDevice,
+    getPOF,
+    getTimerConfig,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import GPIO from '../GPIO/GPIO';
 import LEDs from '../LEDs/LEDs';
+import SafetyAndLowPower from '../SafetyAndLowPower/SafetyAndLowPower';
 
 export default ({ active }: PaneProps) => {
     const disabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
     const gpios = useSelector(getGPIOs);
     const leds = useSelector(getLEDs);
+    const pof = useSelector(getPOF);
+    const timerConfig = useSelector(getTimerConfig);
 
     return active ? (
         <MasonryLayout
@@ -43,6 +48,14 @@ export default ({ active }: PaneProps) => {
                 ))}
             {npmDevice && (
                 <LEDs npmDevice={npmDevice} leds={leds} disabled={disabled} />
+            )}
+            {npmDevice && (
+                <SafetyAndLowPower
+                    npmDevice={npmDevice}
+                    pof={pof}
+                    timerConfig={timerConfig}
+                    disabled={disabled}
+                />
             )}
         </MasonryLayout>
     ) : null;

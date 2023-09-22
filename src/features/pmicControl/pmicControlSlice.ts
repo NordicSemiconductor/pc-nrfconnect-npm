@@ -275,6 +275,9 @@ export const getBucks = (state: RootState) => state.app.pmicControl.bucks;
 export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
 export const getGPIOs = (state: RootState) => state.app.pmicControl.gpios;
 export const getLEDs = (state: RootState) => state.app.pmicControl.leds;
+export const getPOF = (state: RootState) => state.app.pmicControl.pof;
+export const getTimerConfig = (state: RootState) =>
+    state.app.pmicControl.timerConfig;
 export const isBatteryConnected = (state: RootState) => {
     const { pmicState, batteryConnected } = state.app.pmicControl;
     return parseConnectedState(
