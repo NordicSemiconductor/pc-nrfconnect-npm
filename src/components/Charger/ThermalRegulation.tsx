@@ -37,7 +37,7 @@ export default ({
 
     // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
-        setInternalChipThermal([charger.tChgStop, charger.tChgResume]);
+        setInternalChipThermal([charger.tChgResume, charger.tChgStop]);
     }, [charger]);
 
     const updateInternal = (index: number, value: number) => {
@@ -77,9 +77,9 @@ export default ({
 
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
-                            value={internalChipThermal[1]}
+                            value={internalChipThermal[0]}
                             range={npmDevice.getChargerChipThermalRange()}
-                            onChange={v => updateInternal(1, v)}
+                            onChange={v => updateInternal(0, v)}
                             onChangeComplete={npmDevice.setChargerTChgResume}
                             disabled={disabled}
                         />
@@ -95,9 +95,9 @@ export default ({
                     </DocumentationTooltip>
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
-                            value={internalChipThermal[0]}
+                            value={internalChipThermal[1]}
                             range={npmDevice.getChargerChipThermalRange()}
-                            onChange={v => updateInternal(0, v)}
+                            onChange={v => updateInternal(1, v)}
                             onChangeComplete={npmDevice.setChargerTChgStop}
                             disabled={disabled}
                         />
@@ -109,13 +109,13 @@ export default ({
                     range={npmDevice.getChargerChipThermalRange()}
                     onChange={[0, 1].map(i => v => updateInternal(i, v))}
                     onChangeComplete={() => {
-                        if (internalChipThermal[0] !== charger.tChgStop)
+                        if (internalChipThermal[1] !== charger.tChgStop)
                             npmDevice.setChargerTChgStop(
-                                internalChipThermal[0]
-                            );
-                        if (internalChipThermal[1] !== charger.tChgResume)
-                            npmDevice.setChargerTChgResume(
                                 internalChipThermal[1]
+                            );
+                        if (internalChipThermal[0] !== charger.tChgResume)
+                            npmDevice.setChargerTChgResume(
+                                internalChipThermal[0]
                             );
                     }}
                     disabled={disabled}
