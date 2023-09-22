@@ -224,7 +224,7 @@ export default () => {
                 for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
                     emptyGPIOs.push({
                         mode: 'Input',
-                        pull: 'pull up',
+                        pull: 'Pull up',
                         drive: 1,
                         openDrain: false,
                         debounce: false,

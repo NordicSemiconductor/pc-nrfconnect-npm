@@ -252,7 +252,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test.each(PMIC_1300_GPIOS)('Set setGpioPull index: %p', async index => {
-        await pmic.setGpioPull(index, 'pull down');
+        await pmic.setGpioPull(index, 'Pull down');
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({

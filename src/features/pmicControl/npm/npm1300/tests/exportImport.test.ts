@@ -135,35 +135,35 @@ describe('PMIC 1300 - Apply Config ', () => {
         gpios: [
             {
                 mode: 'Input',
-                pull: 'pull down',
+                pull: 'Pull down',
                 drive: 6,
                 openDrain: false,
                 debounce: false,
             },
             {
                 mode: 'Input falling edge event',
-                pull: 'pull down',
+                pull: 'Pull down',
                 drive: 6,
                 openDrain: true,
                 debounce: true,
             },
             {
                 mode: 'Input logic 0',
-                pull: 'pull up',
+                pull: 'Pull up',
                 drive: 1,
                 openDrain: false,
                 debounce: true,
             },
             {
                 mode: 'Output logic 0',
-                pull: 'pull disable',
+                pull: 'Pull disable',
                 drive: 1,
                 openDrain: true,
                 debounce: false,
             },
             {
                 mode: 'Output power loss warning',
-                pull: 'pull disable',
+                pull: 'Pull disable',
                 drive: 1,
                 openDrain: false,
                 debounce: false,
@@ -190,7 +190,7 @@ describe('PMIC 1300 - Apply Config ', () => {
 
     const initGPIO: GPIO = {
         mode: 'Input falling edge event',
-        pull: 'pull down',
+        pull: 'Pull down',
         drive: 6,
         openDrain: false,
         debounce: false,

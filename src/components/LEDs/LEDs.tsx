@@ -7,13 +7,13 @@
 import React from 'react';
 import { Card, Dropdown } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     LED,
     LEDMode,
     LEDModeValues,
     NpmDevice,
 } from '../../features/pmicControl/npm/types';
-import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 
 interface GPIOProperties {
     npmDevice: NpmDevice;
