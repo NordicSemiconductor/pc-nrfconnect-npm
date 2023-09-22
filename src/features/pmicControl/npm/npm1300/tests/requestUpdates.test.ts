@@ -354,6 +354,36 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
+    test.each(PMIC_1300_LDOS)(
+        'Request update ldoSoftStartEnabled index: %p',
+        index => {
+            pmic.requestUpdate.ldoSoftStartEnabled(index);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx ldsw soft_start enable get ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        }
+    );
+
+    test.each(PMIC_1300_LDOS)(
+        'Request update ldoSoftStart index: %p',
+        index => {
+            pmic.requestUpdate.ldoSoftStart(index);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx ldsw soft_start current get ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        }
+    );
+
     test.each(PMIC_1300_GPIOS)('Request update gpioMode index: %p', index => {
         pmic.requestUpdate.gpioMode(index);
 

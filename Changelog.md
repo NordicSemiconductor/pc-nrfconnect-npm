@@ -18,6 +18,9 @@ and this project adheres to
 -   Added support JEITA
     -   Read and Write vTermR
 -   Added Charger BatLim configuration
+-   Added LDO
+    -   Soft Starter enable
+    -   Soft Starter current
 
 ### Changed
 

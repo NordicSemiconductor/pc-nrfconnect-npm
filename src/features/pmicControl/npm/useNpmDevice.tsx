@@ -135,6 +135,8 @@ export default () => {
                 npmDevice.requestUpdate.ldoVoltage(i);
                 npmDevice.requestUpdate.ldoMode(i);
                 npmDevice.requestUpdate.ldoEnabled(i);
+                npmDevice.requestUpdate.ldoSoftStartEnabled(i);
+                npmDevice.requestUpdate.ldoSoftStart(i);
             }
 
             for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
@@ -218,6 +220,8 @@ export default () => {
                         voltage: npmDevice.getLdoVoltageRange(i).min,
                         mode: 'ldoSwitch',
                         enabled: false,
+                        softStartEnabled: true,
+                        softStart: 25,
                     });
                 }
                 dispatch(setLdos(emptyLdos));

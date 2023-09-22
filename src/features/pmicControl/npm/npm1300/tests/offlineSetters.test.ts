@@ -248,6 +248,29 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         });
     });
 
+    test.each(PMIC_1300_LDOS)(
+        'Set setLdoSoftStartEnabled index: %p',
+        async index => {
+            await pmic.setLdoSoftStartEnabled(index, true);
+
+            expect(mockOnLdoUpdate).toBeCalledTimes(1);
+            expect(mockOnLdoUpdate).toBeCalledWith({
+                data: { softStartEnabled: true },
+                index,
+            });
+        }
+    );
+
+    test.each(PMIC_1300_LDOS)('Set setLdoSoftStart index: %p', async index => {
+        await pmic.setLdoSoftStart(index, 25);
+
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: { softStart: 25 },
+            index,
+        });
+    });
+
     test.each(PMIC_1300_GPIOS)('Set setGpioMode index: %p', async index => {
         await pmic.setGpioMode(index, 'Input');
 

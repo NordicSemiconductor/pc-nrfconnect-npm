@@ -27,6 +27,9 @@ export const BuckRetentionControlValues = ['Off'] as const;
 type GPIONames = (typeof GPIOValues)[number];
 export type RebootMode = 'cold' | 'warm';
 export type LdoMode = 'ldoSwitch' | 'LDO';
+export const SoftStartValues = [25, 50, 75, 100] as const;
+export type SoftStart = (typeof SoftStartValues)[number];
+
 export type BuckMode = 'vSet' | 'software';
 export type BuckModeControl =
     | (typeof BuckModeControlValues)[number]
@@ -109,6 +112,8 @@ export type Ldo = {
     voltage: number;
     enabled: boolean;
     mode: LdoMode;
+    softStartEnabled: boolean;
+    softStart: SoftStart;
 };
 
 export const GPIOModeValues = [
@@ -384,6 +389,8 @@ export type NpmDevice = {
         ldoVoltage: (index: number) => void;
         ldoEnabled: (index: number) => void;
         ldoMode: (index: number) => void;
+        ldoSoftStartEnabled: (index: number) => void;
+        ldoSoftStart: (index: number) => void;
 
         gpioMode: (index: number) => void;
         gpioPull: (index: number) => void;
@@ -443,6 +450,8 @@ export type NpmDevice = {
     setLdoVoltage: (index: number, value: number) => Promise<void>;
     setLdoEnabled: (index: number, state: boolean) => Promise<void>;
     setLdoMode: (index: number, mode: LdoMode) => Promise<void>;
+    setLdoSoftStartEnabled: (index: number, enabled: boolean) => Promise<void>;
+    setLdoSoftStart: (index: number, softStart: SoftStart) => Promise<void>;
 
     setGpioMode: (index: number, mode: GPIOMode) => Promise<void>;
     setGpioPull: (index: number, mode: GPIOPullMode) => Promise<void>;

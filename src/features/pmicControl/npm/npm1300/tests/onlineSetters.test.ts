@@ -12,6 +12,7 @@ import {
     NTCThermistor,
     PmicDialog,
     POFPolarityValues,
+    SoftStartValues,
     TimerModeValues,
     TimerPrescalerValues,
 } from '../../types';
@@ -692,16 +693,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test.each(
-            PMIC_1300_LDOS.map(index => [
-                {
+            PMIC_1300_LDOS.map(index =>
+                [true, false].map(enabled => ({
                     index,
-                    enabled: false,
-                },
-                {
-                    index,
-                    enabled: true,
-                },
-            ]).flat()
+                    enabled,
+                }))
+            ).flat()
         )('Set setLdoEnabled %p', async ({ index, enabled }) => {
             await pmic.setLdoEnabled(index, enabled);
 
@@ -812,6 +809,52 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockOnLdoUpdate).toBeCalledTimes(0);
             }
         );
+
+        test.each(
+            PMIC_1300_LDOS.map(index =>
+                [true, false].map(enabled => ({
+                    index,
+                    enabled,
+                }))
+            ).flat()
+        )('Set setLdoSoftStart %p', async ({ index, enabled }) => {
+            await pmic.setLdoSoftStartEnabled(index, enabled);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx ldsw soft_start enable set ${index} ${
+                    enabled ? '1' : '0'
+                }`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+        });
+
+        test.each(
+            PMIC_1300_LDOS.map(index =>
+                SoftStartValues.map(softStart => ({
+                    index,
+                    softStart,
+                }))
+            ).flat()
+        )('Set setLdoSoftStart %p', async ({ index, softStart }) => {
+            await pmic.setLdoSoftStart(index, softStart);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx ldsw soft_start current set ${index} ${softStart}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+        });
 
         test.each(
             PMIC_1300_GPIOS.map(index =>
@@ -2150,16 +2193,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test.each(
-            PMIC_1300_LDOS.map(index => [
-                {
+            PMIC_1300_LDOS.map(index =>
+                [true, false].map(enabled => ({
                     index,
-                    enabled: false,
-                },
-                {
-                    index,
-                    enabled: true,
-                },
-            ]).flat()
+                    enabled,
+                }))
+            ).flat()
         )(
             'Set setLdoEnabled - Fail immediately - %p',
             async ({ index, enabled }) => {
@@ -2225,6 +2264,80 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
                     `npmx ldsw mode get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            PMIC_1300_LDOS.map(index =>
+                [true, false].map(enabled => ({
+                    index,
+                    enabled,
+                }))
+            ).flat()
+        )(
+            'Set setLdoSoftStartEnabled - Fail immediately - %p',
+            async ({ index, enabled }) => {
+                await expect(
+                    pmic.setLdoSoftStartEnabled(index, enabled)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx ldsw soft_start enable set ${index} ${
+                        enabled ? '1' : '0'
+                    }`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx ldsw soft_start enable get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(
+            PMIC_1300_LDOS.map(index =>
+                SoftStartValues.map(softStart => ({
+                    index,
+                    softStart,
+                }))
+            ).flat()
+        )(
+            'Set setLdoEnabled - Fail immediately - %p',
+            async ({ index, softStart }) => {
+                await expect(
+                    pmic.setLdoSoftStart(index, softStart)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx ldsw soft_start current set ${index} ${softStart}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx ldsw soft_start current get ${index}`,
                     expect.anything(),
                     undefined,
                     true

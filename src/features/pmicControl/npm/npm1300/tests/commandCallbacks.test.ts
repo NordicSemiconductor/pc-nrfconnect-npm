@@ -16,6 +16,7 @@ import {
     NTCThermistor,
     PmicChargingState,
     POFPolarityValues,
+    SoftStartValues,
     TimerModeValues,
     TimerPrescalerValues,
 } from '../../types';
@@ -747,6 +748,64 @@ Battery models stored in database:
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
             data: { mode },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1300_LDOS.map(index => [
+            ...[true, false].map(enabled => [
+                {
+                    index,
+                    append: `get ${index}`,
+                    enabled,
+                },
+                {
+                    index,
+                    append: `set ${index} ${enabled} `,
+                    enabled,
+                },
+            ]),
+        ]).flat()
+    )('npmx ldsw soft_start enable %p', ({ index, append, enabled }) => {
+        const command = `npmx ldsw soft_start enable ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${enabled ? '1' : '0'}.`, command);
+
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: { softStartEnabled: enabled },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1300_LDOS.map(index => [
+            ...SoftStartValues.map(value => [
+                {
+                    index,
+                    append: `get ${index}`,
+                    value,
+                },
+                {
+                    index,
+                    append: `set ${index} ${value} `,
+                    value,
+                },
+            ]),
+        ]).flat()
+    )('npmx ldsw soft_start current %p', ({ index, append, value }) => {
+        const command = `npmx ldsw soft_start current ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${value}mA.`, command);
+
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: { softStart: value },
             index,
         });
     });

@@ -65,6 +65,8 @@ describe('PMIC 1300 - Apply Config ', () => {
         voltage: -1,
         mode: 'LDO',
         enabled: true,
+        softStartEnabled: true,
+        softStart: 25,
     };
 
     const initLed: LED = {
@@ -127,11 +129,15 @@ describe('PMIC 1300 - Apply Config ', () => {
                 voltage: 1,
                 mode: 'ldoSwitch',
                 enabled: false,
+                softStartEnabled: true,
+                softStart: 25,
             },
             {
                 voltage: 2,
                 mode: 'ldoSwitch',
                 enabled: false,
+                softStartEnabled: true,
+                softStart: 25,
             },
         ],
         gpios: [
@@ -290,7 +296,7 @@ describe('PMIC 1300 - Apply Config ', () => {
 
         expect(mockOnChargerUpdate).toBeCalledTimes(11);
         expect(mockOnBuckUpdate).toBeCalledTimes(16); // 7 states + 1 (mode change on vOut) * 2 Bucks
-        expect(mockOnLdoUpdate).toBeCalledTimes(6);
+        expect(mockOnLdoUpdate).toBeCalledTimes(10);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);

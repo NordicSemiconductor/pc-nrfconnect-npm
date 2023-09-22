@@ -7,6 +7,8 @@
 import React, { useEffect, useState } from 'react';
 import {
     Card,
+    classNames,
+    Dropdown,
     NumberInputSliderWithUnit,
     StateSelector,
     Toggle,
@@ -15,8 +17,9 @@ import {
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Ldo,
-    LdoMode,
     NpmDevice,
+    SoftStart,
+    SoftStartValues,
 } from '../../../features/pmicControl/npm/types';
 
 interface LdoCardProperties {
@@ -25,24 +28,26 @@ interface LdoCardProperties {
     ldo: Ldo;
     cardLabel?: string;
     disabled: boolean;
+    defaultSummary?: boolean;
 }
+
+const softStartItems = SoftStartValues.map(item => ({
+    label: `${item}mA`,
+    value: `${item}`,
+}));
 
 export default ({
     index,
     npmDevice,
     ldo,
     cardLabel = `Load Switch/LDO ${index + 1}`,
+    defaultSummary = false,
     disabled,
 }: LdoCardProperties) => {
+    const [summary, setSummary] = useState(defaultSummary);
+
     const card = `ldo${index + 1}`;
     const range = npmDevice.getLdoVoltageRange(index);
-
-    const onEnable = (value: boolean) => npmDevice.setLdoEnabled(index, value);
-
-    const onModeChange = (mode: LdoMode) => npmDevice.setLdoMode(index, mode);
-
-    const onVoltageChange = (value: number) =>
-        npmDevice.setLdoVoltage(index, value);
 
     const [internalVLdo, setInternalVLdo] = useState(ldo.voltage);
 
@@ -61,19 +66,38 @@ export default ({
                         <span>{cardLabel}</span>
                     </DocumentationTooltip>
 
-                    <Toggle
-                        label="Enable"
-                        isToggled={ldo.enabled}
-                        onToggle={value => onEnable(value)}
-                        disabled={disabled}
-                    />
+                    <div className="d-flex">
+                        <Toggle
+                            label="Enable"
+                            isToggled={ldo.enabled}
+                            onToggle={value =>
+                                npmDevice.setLdoEnabled(index, value)
+                            }
+                            disabled={disabled}
+                        />
+                        <span
+                            className={classNames(
+                                'show-more-toggle mdi',
+                                summary && 'mdi-chevron-down',
+                                !summary && 'mdi-chevron-up'
+                            )}
+                            role="button"
+                            tabIndex={0}
+                            onKeyUp={() => {}}
+                            onClick={() => {
+                                setSummary(!summary);
+                            }}
+                        />
+                    </div>
                 </div>
             }
         >
             <StateSelector
                 disabled={disabled}
                 items={modeItems}
-                onSelect={i => onModeChange(i === 0 ? 'LDO' : 'ldoSwitch')}
+                onSelect={i =>
+                    npmDevice.setLdoMode(index, i === 0 ? 'LDO' : 'ldoSwitch')
+                }
                 selectedItem={
                     ldo.mode === 'ldoSwitch' ? modeItems[1] : modeItems[0]
                 }
@@ -95,8 +119,46 @@ export default ({
                 range={range}
                 value={internalVLdo}
                 onChange={setInternalVLdo}
-                onChangeComplete={onVoltageChange}
+                onChangeComplete={value =>
+                    npmDevice.setLdoVoltage(index, value)
+                }
             />
+
+            {!summary && (
+                <>
+                    <Toggle
+                        label="Soft Start Enable"
+                        isToggled={ldo.softStartEnabled}
+                        onToggle={value =>
+                            npmDevice.setLdoSoftStartEnabled(index, value)
+                        }
+                        disabled={disabled}
+                    />
+                    <Dropdown
+                        label="Soft Start"
+                        items={softStartItems}
+                        onSelect={item =>
+                            npmDevice.setLdoSoftStart(
+                                index,
+                                Number.parseInt(item.value, 10) as SoftStart
+                            )
+                        }
+                        selectedItem={
+                            softStartItems[
+                                Math.max(
+                                    0,
+                                    softStartItems.findIndex(
+                                        item =>
+                                            item.value ===
+                                            ldo.softStart.toString()
+                                    )
+                                ) ?? 0
+                            ]
+                        }
+                        disabled={disabled}
+                    />
+                </>
+            )}
         </Card>
     ) : null;
 };

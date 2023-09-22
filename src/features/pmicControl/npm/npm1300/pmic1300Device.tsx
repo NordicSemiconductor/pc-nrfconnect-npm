@@ -57,6 +57,7 @@ import {
     POFPolarity,
     POFPolarityValues,
     ProfileDownload,
+    SoftStart,
     TimerConfig,
     TimerMode,
     TimerModeValues,
@@ -905,6 +906,43 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             'onLdoUpdate',
                             {
                                 voltage: parseToNumber(res) / 1000, // mV to V
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx ldsw soft_start enable', true, i, '(0|1)'),
+                    res => {
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                softStartEnabled: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex(
+                        'npmx ldsw soft_start current',
+                        true,
+                        i,
+                        '(25|50|75|100)'
+                    ),
+                    res => {
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                softStart: parseToNumber(res) as SoftStart,
                             },
                             i
                         );
@@ -1961,6 +1999,54 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         return action();
     };
 
+    const setLdoSoftStartEnabled = (index: number, enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        softStartEnabled: enabled,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw soft_start enable set ${index} ${
+                        enabled ? '1' : '0'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ldoSoftStartEnabled(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setLdoSoftStart = (index: number, softStart: SoftStart) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        softStart,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw soft_start current set ${index} ${softStart}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ldoSoftStart(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
     const setGpioMode = (index: number, mode: GPIOMode) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
@@ -2416,6 +2502,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sendCommand(`npmx ldsw ldo_voltage get ${index}`),
         ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
         ldoMode: (index: number) => sendCommand(`npmx ldsw mode get ${index}`),
+        ldoSoftStartEnabled: (index: number) =>
+            sendCommand(`npmx ldsw soft_start enable get ${index}`),
+        ldoSoftStart: (index: number) =>
+            sendCommand(`npmx ldsw soft_start current get ${index}`),
 
         pofEnable: () => sendCommand(`npmx pof enable get`),
         pofPolarity: () => sendCommand(`npmx pof polarity get`),
@@ -2475,6 +2565,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     setLdoVoltage(index, ldo.voltage);
                     setLdoMode(index, ldo.mode);
                     setLdoEnabled(index, ldo.enabled);
+                    setLdoSoftStartEnabled(index, ldo.softStartEnabled);
+                    setLdoSoftStart(index, ldo.softStart);
                 });
 
                 config.gpios.forEach((gpio, index) => {
@@ -2632,6 +2724,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setLdoVoltage,
         setLdoEnabled,
         setLdoMode,
+        setLdoSoftStartEnabled,
+        setLdoSoftStart,
         setGpioMode,
         setGpioPull,
         setGpioDrive,
