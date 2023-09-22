@@ -92,7 +92,7 @@ export default () => {
                 >
                     <Button
                         variant="secondary"
-                        disabled={pmicConnection === 'ek-disconnected'}
+                        disabled={uiDisabled}
                         className="w-100"
                         onClick={() => npmDevice?.kernelReset()}
                     >
