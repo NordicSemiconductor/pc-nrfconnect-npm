@@ -11,6 +11,7 @@ import {
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     GPIO,
     GPIODrive,
@@ -45,6 +46,8 @@ const gpioPullValues = [...GPIOPullValues].map(item => ({
     value: `${item}`,
 }));
 
+const card = 'gpio';
+
 export default ({
     npmDevice,
     index,
@@ -64,7 +67,11 @@ export default ({
         }
     >
         <Dropdown
-            label="Mode"
+            label={
+                <DocumentationTooltip card={`${card}${index}`} item="Mode">
+                    <span>Mode</span>
+                </DocumentationTooltip>
+            }
             items={gpioModeValuesItems}
             onSelect={item =>
                 npmDevice.setGpioMode(index, item.value as GPIOMode)
@@ -82,7 +89,11 @@ export default ({
             disabled={disabled}
         />
         <Dropdown
-            label="Pull"
+            label={
+                <DocumentationTooltip card={`${card}${index}`} item="Pull">
+                    <span>Pull</span>
+                </DocumentationTooltip>
+            }
             items={gpioPullValues}
             onSelect={item =>
                 npmDevice.setGpioPull(index, item.value as GPIOPullMode)
@@ -97,10 +108,14 @@ export default ({
                     ) ?? 0
                 ]
             }
-            disabled={disabled}
+            disabled={disabled || gpio.mode.startsWith('Output')}
         />
         <Dropdown
-            label="Drive"
+            label={
+                <DocumentationTooltip card={`${card}${index}`} item="Drive">
+                    <span>Drive</span>
+                </DocumentationTooltip>
+            }
             items={gpioDriveValuesItems}
             onSelect={item =>
                 npmDevice.setGpioDrive(
@@ -119,19 +134,27 @@ export default ({
                     ) ?? 0
                 ]
             }
-            disabled={disabled}
+            disabled={disabled || gpio.mode.startsWith('Input')}
         />
         <Toggle
-            label="Open Drain"
+            label={
+                <DocumentationTooltip card={`${card}${index}`} item="OpenDrain">
+                    <span>Open Drain</span>
+                </DocumentationTooltip>
+            }
             isToggled={gpio.openDrain}
             onToggle={value => npmDevice.setGpioOpenDrain(index, value)}
             disabled={disabled}
         />
         <Toggle
-            label="Debounce"
+            label={
+                <DocumentationTooltip card={`${card}${index}`} item="Debounce">
+                    <span>Debounce</span>
+                </DocumentationTooltip>
+            }
             isToggled={gpio.debounce}
             onToggle={value => npmDevice.setGpioDebounce(index, value)}
-            disabled={disabled}
+            disabled={disabled || gpio.mode.startsWith('Output')}
         />
     </Card>
 );

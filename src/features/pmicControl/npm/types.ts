@@ -124,7 +124,7 @@ export const GPIOModeValues = [
 ] as const;
 export type GPIOMode = (typeof GPIOModeValues)[number];
 
-export const GPIOPullValues = ['pull down', 'pull up', 'pull disable'] as const;
+export const GPIOPullValues = ['Pull down', 'Pull up', 'Pull disable'] as const;
 export type GPIOPullMode = (typeof GPIOPullValues)[number];
 
 export const GPIODriveValues = [1, 6] as const;
@@ -141,7 +141,7 @@ export type GPIO = {
 export const LEDModeValues = [
     'Charger error',
     'Charging',
-    'HOST',
+    'Host',
     'Not used',
 ] as const;
 export type LEDMode = (typeof LEDModeValues)[number];

@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { ExternalLink } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { Documentation } from '../types';
 
@@ -142,6 +143,82 @@ const ldoDoc = () => ({
         {
             title: 'Range',
             content: [<p key="p1">1.0 V to 3.3 V in 100 mV steps</p>],
+        },
+    ],
+});
+
+const gpioDoc = (n: number) => ({
+    Mode: [
+        {
+            title: 'Mode',
+            content: [
+                <p key="p1">Selects the GPIO mode. Available options are:</p>,
+                <p key="p2">
+                    <strong>Input</strong> – In this mode {`GPIO${n}`} is used
+                    to control the BUCKs or Load Switches. Refer to the
+                    respective controls to configure what {`GPIO${n}`} should
+                    control. The {`GPIO${n}`} can also be used as a
+                    general-purpose input in this mode.
+                </p>,
+                <p key="p3">
+                    <strong>Input Rising Edge</strong> – In this mode{' '}
+                    {`GPIO${n}`} is used to generate an event on rising edge.
+                </p>,
+                <p key="p4">
+                    <strong>Input Falling Edge</strong> – In this mode{' '}
+                    {`GPIO${n}`} is used to generate an event on falling edge.
+                </p>,
+                <p key="p5">
+                    <strong>Output High</strong> – Sets {`GPIO${n}`} output
+                    high.
+                </p>,
+                <p key="p6">
+                    <strong>Out Low</strong> – Sets {`GPIO${n}`} output low.
+                </p>,
+                <p key="p7">
+                    <strong>Output Interrupt</strong> – Configures {`GPIO${n}`}{' '}
+                    to issue an interrupt. Requires wanted interrupts to be
+                    enabled in “Interrupt Configuration”.
+                </p>,
+                <p key="p8">
+                    <strong>Output Reset</strong> – Configure {`GPIO${n}`} as
+                    Reset (NRESETOUT from watchdog.
+                </p>,
+                <p key="p9">
+                    <strong>Output POF</strong> – Configure {`GPIO${n}`} to
+                    issue a warning when a power loss occurs. Requires POF
+                    warning to be enabled
+                </p>,
+            ],
+        },
+    ],
+    Pull: [
+        {
+            title: 'Pull',
+            content: [<p key="p1">Enable pull-up or pull-down.</p>],
+        },
+    ],
+    Drive: [
+        {
+            title: 'Drive Strength',
+            content: [
+                <p key="p1">
+                    Set output drive strength. Available options are:
+                </p>,
+                <p key="p2">1 mA (default) or 6 mA</p>,
+            ],
+        },
+    ],
+    OpenDrain: [
+        {
+            title: 'Open Drain',
+            content: [<p key="p1">Enable or Disable Open Drain.</p>],
+        },
+    ],
+    Debounce: [
+        {
+            title: 'Debounce',
+            content: [<p key="p1">Enable or Disable input debounce.</p>],
         },
     ],
 });
@@ -480,6 +557,11 @@ export const documentation: Documentation = {
     ldo2: ldoDoc(),
     buck1: buckDoc(1),
     buck2: buckDoc(2),
+    gpio0: gpioDoc(0),
+    gpio1: gpioDoc(1),
+    gpio2: gpioDoc(2),
+    gpio3: gpioDoc(3),
+    gpio4: gpioDoc(4),
     sidePanel: {
         ActiveBatteryModel: [
             {
@@ -522,14 +604,10 @@ export const documentation: Documentation = {
                         continue development and implementation on your own
                         design use the battery model .inc file. Refer to NCS
                         documentation for more details: `}
-                        <a
-                            target="_blank"
-                            rel="noreferrer"
+                        <ExternalLink
+                            label=" nPM1300: Fuel gauge — nRF Connect SDK 2.4.99 documentation"
                             href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/samples/pmic/native/npm1300_fuel_gauge/README.html#npm1300-fuel-gauge"
-                        >
-                            nPM1300: Fuel gauge — nRF Connect SDK 2.4.99
-                            documentation
-                        </a>
+                        />
                     </p>,
                     <p key="p2">
                         An additional board, nPM-FG, is required to perform
