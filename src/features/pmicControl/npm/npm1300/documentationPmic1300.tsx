@@ -562,6 +562,64 @@ export const documentation: Documentation = {
     gpio2: gpioDoc(2),
     gpio3: gpioDoc(3),
     gpio4: gpioDoc(4),
+    chipThermalRegulation: {
+        ChargerThermalRegulation: [
+            {
+                title: 'Charger Thermal Regulation',
+                content: [
+                    <p key="p1">
+                        Configures the die temperature monitoring which is
+                        active during charging.
+                    </p>,
+                ],
+            },
+        ],
+        Tchgresume: [
+            {
+                title: (
+                    <>
+                        <span>T</span>
+                        <span className="subscript">CHGRESUME</span>
+                    </>
+                ),
+                content: [
+                    <p key="p1">
+                        Temperature threshold for charging to resume.
+                    </p>,
+                ],
+            },
+        ],
+        Tchgstop: [
+            {
+                title: (
+                    <>
+                        <span>T</span>
+                        <span className="subscript">CHGSTOP</span>
+                    </>
+                ),
+                content: [
+                    <p key="p1">Temperature threshold for charging to stop.</p>,
+                ],
+            },
+        ],
+        ThermalRegulationActive: [
+            {
+                title: 'Thermal Regulation Active',
+                content: [
+                    <p key="p1">
+                        <strong>Red light:</strong> Charging stopped,
+                        temperature above T
+                        <span className="subscript">CHGSTOP</span>.
+                    </p>,
+                    <p key="p2">
+                        <strong>Green light:</strong> Charger charging if
+                        charging if charging is enabled, temperature below T
+                        <span className="subscript">CHGRESUME</span>.
+                    </p>,
+                ],
+            },
+        ],
+    },
     sidePanel: {
         ActiveBatteryModel: [
             {
