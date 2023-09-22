@@ -256,7 +256,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
-            data: { pull: 'pull down' },
+            data: { pull: 'Pull down' },
             index,
         });
     });
