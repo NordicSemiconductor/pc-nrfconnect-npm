@@ -21,6 +21,7 @@ and this project adheres to
 -   Added LDO
     -   Soft Starter enable
     -   Soft Starter current
+-   Added Bucks Active Output Capacitor Discharge
 
 ### Changed
 

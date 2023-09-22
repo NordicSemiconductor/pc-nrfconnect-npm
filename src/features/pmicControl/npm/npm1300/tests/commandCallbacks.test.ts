@@ -664,6 +664,37 @@ Battery models stored in database:
     });
 
     test.each(
+        PMIC_1300_BUCKS.map(index => [
+            ...[true, false].map(enabled =>
+                [
+                    {
+                        index,
+                        append: `get ${index}`,
+                        enabled,
+                    },
+                    {
+                        index,
+                        append: `set ${index} ${enabled ? '1' : '0'} `,
+                        enabled,
+                    },
+                ].flat()
+            ),
+        ]).flat()
+    )('npmx buck active_discharge %p', ({ index, append, enabled }) => {
+        const command = `npmx buck active_discharge ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${enabled ? '1' : '0'}`, command);
+
+        expect(mockOnBuckUpdate).toBeCalledTimes(1);
+        expect(mockOnBuckUpdate).toBeCalledWith({
+            data: { activeDischargeEnabled: enabled },
+            index,
+        });
+    });
+
+    test.each(
         PMIC_1300_LDOS.map(index => [
             ...[true, false].map(enabled =>
                 [

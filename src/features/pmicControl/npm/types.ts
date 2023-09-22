@@ -106,6 +106,7 @@ export type Buck = {
     onOffControl: BuckOnOffControl;
     retentionControl: BuckRetentionControl;
     enabled: boolean;
+    activeDischargeEnabled: boolean;
 };
 
 export type Ldo = {
@@ -385,6 +386,7 @@ export type NpmDevice = {
         buckOnOffControl: (index: number) => void;
         buckRetentionControl: (index: number) => void;
         buckEnabled: (index: number) => void;
+        buckActiveDischargeEnabled: (index: number) => void;
 
         ldoVoltage: (index: number) => void;
         ldoEnabled: (index: number) => void;
@@ -446,6 +448,10 @@ export type NpmDevice = {
         mode: BuckRetentionControl
     ) => Promise<void>;
     setBuckEnabled: (index: number, state: boolean) => Promise<void>;
+    setBuckActiveDischargeEnabled: (
+        index: number,
+        state: boolean
+    ) => Promise<void>;
 
     setLdoVoltage: (index: number, value: number) => Promise<void>;
     setLdoEnabled: (index: number, state: boolean) => Promise<void>;

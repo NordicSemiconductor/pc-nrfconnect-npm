@@ -198,6 +198,17 @@ export default ({
                         onChange={setInternalRetVOut}
                         onChangeComplete={onRetVOutChange}
                     />
+                    <Toggle
+                        label="Active Output Capacitor Discharge"
+                        isToggled={buck.activeDischargeEnabled}
+                        onToggle={value =>
+                            npmDevice.setBuckActiveDischargeEnabled(
+                                index,
+                                value
+                            )
+                        }
+                        disabled={disabled}
+                    />
                     <Dropdown
                         label={
                             <DocumentationTooltip

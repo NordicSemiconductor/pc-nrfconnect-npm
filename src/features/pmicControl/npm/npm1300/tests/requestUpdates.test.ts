@@ -309,6 +309,21 @@ describe('PMIC 1300 - Request update commands', () => {
         }
     );
 
+    test.each(PMIC_1300_BUCKS)(
+        'Request update buckActiveDischargeEnabled index: %p',
+        index => {
+            pmic.requestUpdate.buckActiveDischargeEnabled(index);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx buck active_discharge get ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        }
+    );
+
     test.skip.each(PMIC_1300_BUCKS)(
         'Request update buckEnabled index: %p',
         index => {

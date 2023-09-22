@@ -224,6 +224,19 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         });
     });
 
+    test.each(PMIC_1300_BUCKS)(
+        'Set setBuckActiveDischargeEnabled index: %p',
+        async index => {
+            await pmic.setBuckActiveDischargeEnabled(index, false);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: { activeDischargeEnabled: false },
+                index,
+            });
+        }
+    );
+
     test.each(PMIC_1300_LDOS)('Set setLdoVoltage index: %p', async index => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
             dialog.onConfirm();

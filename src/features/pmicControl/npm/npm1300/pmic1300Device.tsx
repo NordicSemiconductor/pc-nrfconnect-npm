@@ -860,6 +860,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     noop
                 )
             );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx buck active_discharge', true, i, '(0|1)'),
+                    res => {
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                activeDischargeEnabled: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
         }
 
         for (let i = 0; i < devices.noOfLdos; i += 1) {
@@ -1840,6 +1856,35 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         return action();
     };
 
+    const setBuckActiveDischargeEnabled = (
+        index: number,
+        activeDischargeEnabled: boolean
+    ) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        activeDischargeEnabled,
+                    },
+                    index
+                );
+
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx buck active_discharge set ${index} ${
+                        activeDischargeEnabled ? '1' : '0'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.buckActiveDischargeEnabled(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
     const setLdoVoltage = (index: number, voltage: number) =>
         new Promise<void>((resolve, reject) => {
             emitPartialEvent<Ldo>(
@@ -2497,6 +2542,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckEnabled: (index: number) =>
             sendCommand(`npm1300_reg NPM_BUCK BUCKSTATUS`),
+        buckActiveDischargeEnabled: (index: number) =>
+            sendCommand(`npmx buck active_discharge get ${index}`),
 
         ldoVoltage: (index: number) =>
             sendCommand(`npmx ldsw ldo_voltage get ${index}`),
@@ -2559,6 +2606,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     setBuckVOutRetention(index, buck.vOutRetention);
                     setBuckRetentionControl(index, buck.retentionControl);
                     setBuckOnOffControl(index, buck.onOffControl);
+                    setBuckActiveDischargeEnabled(
+                        index,
+                        buck.activeDischargeEnabled
+                    );
                 });
 
                 config.ldos.forEach((ldo, index) => {
@@ -2721,6 +2772,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setBuckModeControl,
         setBuckOnOffControl,
         setBuckRetentionControl,
+        setBuckActiveDischargeEnabled,
         setLdoVoltage,
         setLdoEnabled,
         setLdoMode,

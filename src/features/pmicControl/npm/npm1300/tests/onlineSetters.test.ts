@@ -599,6 +599,25 @@ describe('PMIC 1300 - Setters Online tests', () => {
             }
         );
 
+        test.each(PMIC_1300_BUCKS)(
+            'Set setBuckActiveDischargeEnabled index: %p',
+            async index => {
+                await pmic.setBuckActiveDischargeEnabled(index, true);
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx buck active_discharge set ${index} 1`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnBuckUpdate).toBeCalledTimes(0);
+            }
+        );
+
         test('Set setBuckEnabled index: 1 false - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
                 dialog.onCancel();
@@ -2093,6 +2112,35 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
                     `npm1300_reg NPM_BUCK BUCKSTATUS`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnBuckUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(PMIC_1300_BUCKS)(
+            'Set setBuckActiveDischargeEnabled - Fail immediately - index: %p',
+            async index => {
+                await expect(
+                    pmic.setBuckActiveDischargeEnabled(index, true)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx buck active_discharge set ${index} 1`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx buck active_discharge get ${index}`,
                     expect.anything(),
                     undefined,
                     true

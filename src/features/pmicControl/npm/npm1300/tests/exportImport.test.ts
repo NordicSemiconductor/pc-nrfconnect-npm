@@ -59,6 +59,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         modeControl: 'GPIO0',
         onOffControl: 'GPIO0',
         retentionControl: 'GPIO0',
+        activeDischargeEnabled: false,
     };
 
     const initLdo: Ldo = {
@@ -113,6 +114,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 modeControl: 'GPIO0',
                 onOffControl: 'GPIO1',
                 retentionControl: 'GPIO2',
+                activeDischargeEnabled: false,
             },
             {
                 vOutNormal: 2,
@@ -122,6 +124,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 modeControl: 'GPIO1',
                 onOffControl: 'GPIO2',
                 retentionControl: 'GPIO3',
+                activeDischargeEnabled: false,
             },
         ],
         ldos: [
@@ -295,7 +298,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(gpios).toStrictEqual(sampleConfig.gpios);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(11);
-        expect(mockOnBuckUpdate).toBeCalledTimes(16); // 7 states + 1 (mode change on vOut) * 2 Bucks
+        expect(mockOnBuckUpdate).toBeCalledTimes(18); // 7 states + 1 (mode change on vOut) * 2 Bucks
         expect(mockOnLdoUpdate).toBeCalledTimes(10);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);

@@ -129,6 +129,7 @@ export default () => {
                 npmDevice.requestUpdate.buckEnabled(i);
                 npmDevice.requestUpdate.buckModeControl(i);
                 npmDevice.requestUpdate.buckOnOffControl(i);
+                npmDevice.requestUpdate.buckActiveDischargeEnabled(i);
             }
 
             for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
@@ -210,6 +211,7 @@ export default () => {
                         modeControl: 'Auto',
                         onOffControl: 'Off',
                         retentionControl: 'Off',
+                        activeDischargeEnabled: false,
                     });
                 }
                 dispatch(setBucks(emptyBuck));
