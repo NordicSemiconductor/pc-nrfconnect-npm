@@ -16,13 +16,23 @@ import {
     Slider,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     ChargeCurrentCool,
     Charger,
     NpmDevice,
+    NTCThermistor,
+    NTCValues,
 } from '../../features/pmicControl/npm/types';
 import { getLatestAdcSample } from '../../features/pmicControl/pmicControlSlice';
 import { RangeType } from '../../utils/helpers';
+
+const ntcThermistorItems = [...NTCValues].map(item => ({
+    label: `${item}`,
+    value: `${item}`,
+}));
+
+const card = 'JEITA';
 
 export default ({
     npmDevice,
@@ -118,10 +128,12 @@ export default ({
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
-                    <span>
-                        T<span className="subscript">BAT</span> Monitoring –
-                        JEITA Compliance
-                    </span>
+                    <DocumentationTooltip card={card} item="JEITACompliance">
+                        <span>
+                            T<span className="subscript">BAT</span> Monitoring –
+                            JEITA Compliance
+                        </span>
+                    </DocumentationTooltip>
                 </div>
             }
         >
@@ -289,10 +301,12 @@ export default ({
             </div>
             <NumberInputSliderWithUnit
                 label={
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">TERMR</span>
-                    </div>
+                    <DocumentationTooltip card={card} item="Vtermr">
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">TERMR</span>
+                        </div>
+                    </DocumentationTooltip>
                 }
                 unit="V"
                 value={internalVTermr}
@@ -302,7 +316,11 @@ export default ({
                 disabled={disabled}
             />
             <Dropdown
-                label="Cool current"
+                label={
+                    <DocumentationTooltip card={card} item="CoolCurrent">
+                        <span>Cool current</span>
+                    </DocumentationTooltip>
+                }
                 items={currentCoolItems}
                 onSelect={item =>
                     npmDevice.setChargerCurrentCool(
@@ -311,6 +329,30 @@ export default ({
                 }
                 selectedItem={
                     currentCoolItems[charger.currentCool === 'iCHG' ? 0 : 1]
+                }
+                disabled={disabled}
+            />
+            <Dropdown
+                label={
+                    <DocumentationTooltip card={card} item="NTCThermistor">
+                        <span>NTC thermistor</span>
+                    </DocumentationTooltip>
+                }
+                items={ntcThermistorItems}
+                onSelect={item =>
+                    npmDevice.setChargerNTCThermistor(
+                        item.value as NTCThermistor
+                    )
+                }
+                selectedItem={
+                    ntcThermistorItems[
+                        Math.max(
+                            0,
+                            ntcThermistorItems.findIndex(
+                                item => item.value === charger.ntcThermistor
+                            )
+                        ) ?? 0
+                    ]
                 }
                 disabled={disabled}
             />

@@ -537,21 +537,6 @@ export const documentation: Documentation = {
                 ],
             },
         ],
-        NTCThermistor: [
-            {
-                title: 'NTC thermistor',
-                content: [
-                    <p key="p1">
-                        The charger supports three NTC thermistors for battery
-                        temperature monitoring. The available options are 10 kΩ,
-                        47 kΩ, 100 kΩ, or no NTC thermistor. If no NTC
-                        thermistor is chosen, the NTC pin must be connected to
-                        GND and the battery pack must have a thermal fuse for
-                        safety.
-                    </p>,
-                ],
-            },
-        ],
     },
     ldo1: ldoDoc(),
     ldo2: ldoDoc(),
@@ -615,6 +600,70 @@ export const documentation: Documentation = {
                         <strong>Green light:</strong> Charger charging if
                         charging if charging is enabled, temperature below T
                         <span className="subscript">CHGRESUME</span>.
+                    </p>,
+                ],
+            },
+        ],
+    },
+    JEITA: {
+        JEITACompliance: [
+            {
+                title: 'Tbat Monitoring – JEITA Compliance',
+                content: [
+                    <p key="p1">
+                        This section configures the different battery
+                        temperature thresholds according to JEITA. The default
+                        values matches the JEITA guideline.
+                    </p>,
+                ],
+            },
+        ],
+        Vtermr: [
+            {
+                title: (
+                    <>
+                        <span>V</span>
+                        <span className="subscript">TERMR</span>
+                    </>
+                ),
+                content: [
+                    <p key="p1">
+                        Set termination voltage for the “Warm” temperature
+                        region. Can be set equal to V
+                        <span className="subscript">TERM</span> if reduced
+                        termination voltage in “Warm” temperature region is not
+                        wanted.
+                    </p>,
+                ],
+            },
+        ],
+        CoolCurrent: [
+            {
+                title: 'Cool Current',
+                content: [
+                    <p key="p1">
+                        Sets charging current in “Cool” temperature region. Ichg
+                        uses the configure I
+                        <span className="subscript">CHG</span> current. I
+                        <span className="subscript">COOL</span>
+                        sets charging current in “Cool” temperature region to
+                        50% of I<span className="subscript">CHG</span>. Default
+                        setting is I<span className="subscript">COOL</span>.
+                    </p>,
+                ],
+            },
+        ],
+        NTCThermistor: [
+            {
+                title: 'NTC thermistor',
+                content: [
+                    <p key="p1">
+                        The charger supports three NTC thermistors for battery
+                        temperature monitoring. The available options are 10 kΩ,
+                        47 kΩ, 100 kΩ, or no NTC thermistor. If no NTC
+                        thermistor is chosen, the NTC pin must be connected to
+                        GND and the battery pack must have a thermal fuse for
+                        safety.
                     </p>,
                 ],
             },
