@@ -669,6 +669,32 @@ export const documentation: Documentation = {
             },
         ],
     },
+    LED: {
+        LED: [
+            {
+                title: 'LEDs',
+                content: [
+                    <p key="p1">nPM1300 have 3 5mA LED drivers.</p>,
+                    <p key="p2">
+                        These can be configured as:
+                        <ul className="tw-ml-6 tw-list-disc">
+                            <li>Charging indication</li>
+                            <li>Charging error indication</li>
+                            <li>An RGB LED (using all three LED pins)</li>
+                            <li>
+                                Output high (open drain, requires external
+                                pull-up resistor)
+                            </li>
+                            <li>
+                                Output low (open drain, requires external
+                                pull-up resistor)
+                            </li>
+                        </ul>
+                    </p>,
+                ],
+            },
+        ],
+    },
     sidePanel: {
         ActiveBatteryModel: [
             {
