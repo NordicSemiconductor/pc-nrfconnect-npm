@@ -94,6 +94,17 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
+    test('Request update chargerBatLim', () => {
+        pmic.requestUpdate.chargerBatLim();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            'npmx charger discharging_current get',
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
     test('Request update chargerEnabledRecharging', () => {
         pmic.requestUpdate.chargerEnabledRecharging();
 

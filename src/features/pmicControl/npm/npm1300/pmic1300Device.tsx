@@ -481,6 +481,18 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(
             shellParser.registerCommandCallback(
+                toRegex('npmx charger discharging_current', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        batLim: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
                 toRegex('npmx charger die_temp stop', true),
                 res => {
                     emitPartialEvent<Charger>('onChargerUpdate', {
@@ -1231,6 +1243,33 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     })
                     .catch(() => {
                         requestUpdate.chargerITerm();
+                        reject();
+                    });
+            }
+        });
+
+    const setChargerBatLim = (batLim: number) =>
+        new Promise<void>((resolve, reject) => {
+            emitPartialEvent<Charger>('onChargerUpdate', {
+                batLim,
+            });
+
+            if (pmicState === 'ek-disconnected') {
+                resolve();
+            } else {
+                setChargerEnabled(false)
+                    .then(() => {
+                        sendCommand(
+                            `npmx charger discharging_current set ${batLim}`,
+                            () => resolve(),
+                            () => {
+                                requestUpdate.chargerBatLim();
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
+                        requestUpdate.chargerBatLim();
                         reject();
                     });
             }
@@ -2330,6 +2369,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerEnabled: () => sendCommand('npmx charger module charger get'),
         chargerVTrickleFast: () => sendCommand('npmx charger trickle get'),
         chargerITerm: () => sendCommand('npmx charger termination_current get'),
+        chargerBatLim: () =>
+            sendCommand('npmx charger discharging_current get'),
         chargerEnabledRecharging: () =>
             sendCommand('npmx charger module recharge get'),
         chargerNTCThermistor: () => sendCommand('npmx adc ntc get'),
@@ -2411,9 +2452,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     setChargerIChg(charger.iChg);
                     setChargerEnabled(charger.enabled);
                     setChargerITerm(charger.iTerm);
+                    setChargerBatLim(charger.batLim);
                     setChargerEnabledRecharging(charger.enableRecharging);
                     setChargerVTrickleFast(charger.vTrickleFast);
                     setChargerNTCThermistor(charger.ntcThermistor);
+                    setChargerTChgResume(charger.tChgResume);
+                    setChargerTChgStop(charger.tChgStop);
+                    setChargerVTermR(charger.vTermR);
                 }
 
                 config.bucks.forEach((buck, index) => {
@@ -2526,6 +2571,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             decimals: 0,
             step: 2,
         }),
+        getChargerIBatLimRange: () => ({
+            min: 268,
+            max: 1340,
+            decimals: 0,
+            step: 1,
+        }),
 
         getBuckVoltageRange: () => ({
             min: 1,
@@ -2560,6 +2611,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setChargerEnabled,
         setChargerVTrickleFast,
         setChargerITerm,
+        setChargerBatLim,
         setChargerEnabledRecharging,
         setChargerNTCThermistor,
         setChargerTChgStop,

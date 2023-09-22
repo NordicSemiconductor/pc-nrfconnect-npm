@@ -17,6 +17,7 @@ and this project adheres to
     -   Read Thermal Regulation state ?
 -   Added support JEITA
     -   Read and Write vTermR
+-   Added Charger BatLim configuration
 
 ### Changed
 

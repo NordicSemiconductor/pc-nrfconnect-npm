@@ -57,6 +57,14 @@ describe('PMIC 1300 - Static getters', () => {
             step: 2,
         }));
 
+    test('Charger Current Range', () =>
+        expect(pmic.getChargerIBatLimRange()).toStrictEqual({
+            min: 268,
+            max: 1340,
+            decimals: 0,
+            step: 1,
+        }));
+
     test.each(PMIC_1300_BUCKS)('Buck Voltage Range index: %p', index =>
         expect(pmic.getBuckVoltageRange(index)).toStrictEqual({
             min: 1,

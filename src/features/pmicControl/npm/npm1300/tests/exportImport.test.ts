@@ -39,6 +39,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         enabled: true,
         enableRecharging: true,
         iTerm: '20%',
+        batLim: 1340,
         ntcThermistor: '10 kΩ',
         tChgStop: 10,
         tChgResume: 110,
@@ -89,6 +90,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             iChg: 32,
             enabled: false,
             iTerm: '10%',
+            batLim: 1340,
             enableRecharging: false,
             ntcThermistor: '10 kΩ',
             tChgStop: 10,
@@ -286,7 +288,7 @@ describe('PMIC 1300 - Apply Config ', () => {
 
         expect(gpios).toStrictEqual(sampleConfig.gpios);
 
-        expect(mockOnChargerUpdate).toBeCalledTimes(7);
+        expect(mockOnChargerUpdate).toBeCalledTimes(11);
         expect(mockOnBuckUpdate).toBeCalledTimes(16); // 7 states + 1 (mode change on vOut) * 2 Bucks
         expect(mockOnLdoUpdate).toBeCalledTimes(6);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);

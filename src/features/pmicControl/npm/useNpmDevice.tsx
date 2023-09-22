@@ -108,6 +108,7 @@ export default () => {
                 npmDevice.requestUpdate.chargerEnabled();
                 npmDevice.requestUpdate.chargerVTrickleFast();
                 npmDevice.requestUpdate.chargerITerm();
+                npmDevice.requestUpdate.chargerBatLim();
                 npmDevice.requestUpdate.chargerEnabledRecharging();
                 npmDevice.requestUpdate.pmicChargingState();
                 npmDevice.requestUpdate.chargerNTCThermistor();
@@ -182,6 +183,7 @@ export default () => {
                             iChg: npmDevice.getChargerCurrentRange().min,
                             enabled: false,
                             iTerm: '10%',
+                            batLim: 1340,
                             enableRecharging: false,
                             ntcThermistor: '10 kΩ',
                             tChgStop: 110,
