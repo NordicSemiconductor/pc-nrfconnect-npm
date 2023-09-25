@@ -32,7 +32,7 @@ interface LdoCardProperties {
 }
 
 const softStartItems = SoftStartValues.map(item => ({
-    label: `${item}mA`,
+    label: `${item} mA`,
     value: `${item}`,
 }));
 
@@ -135,7 +135,7 @@ export default ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="Soft Start"
+                        label="Soft Start Current"
                         items={softStartItems}
                         onSelect={item =>
                             npmDevice.setLdoSoftStart(

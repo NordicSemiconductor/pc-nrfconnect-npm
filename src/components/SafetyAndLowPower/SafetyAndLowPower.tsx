@@ -177,7 +177,9 @@ export default ({ npmDevice, pof, timerConfig, disabled }: GPIOProperties) => {
             />
             <NumberInputSliderWithUnit
                 label="Time Period"
-                unit={<span>{`ms ${timeString}`} </span>}
+                unit={
+                    <span>{`ms${timeString ? ` (${timeString})` : ''}`} </span>
+                }
                 disabled={disabled}
                 range={{
                     min: 0,
