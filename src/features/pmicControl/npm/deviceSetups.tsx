@@ -118,6 +118,14 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
             if (!(device.serialPorts && device.serialPorts[0].comName)) {
                 throw new Error('device does not have a serial port');
             }
+
+            if (isNpm1300SerialRecoverMode(device)) {
+                return {
+                    device,
+                    validFirmware: false,
+                };
+            }
+
             const port = await createSerialPort(
                 {
                     path: device.serialPorts[0].comName,
@@ -145,13 +153,6 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
             );
 
             try {
-                if (isNpm1300SerialRecoverMode(device)) {
-                    return {
-                        device,
-                        validFirmware: false,
-                    };
-                }
-
                 const npmDevice = await getNpmDevice(shellParserO, null);
 
                 const result = await npmDevice.isSupportedVersion();
