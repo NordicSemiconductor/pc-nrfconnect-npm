@@ -6,6 +6,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+    Button,
     Card,
     Dropdown,
     NumberInputSliderWithUnit,
@@ -17,17 +18,21 @@ import {
     POF,
     POFPolarity,
     POFPolarityValues,
+    ShipModeConfig,
     TimerConfig,
     TimerMode,
     TimerModeValues,
     TimerPrescaler,
     TimerPrescalerValues,
+    TimeToActive,
+    TimeToActiveValues,
 } from '../../features/pmicControl/npm/types';
 import { splitMS } from '../Profiling/TimeComponent';
 
 interface GPIOProperties {
     npmDevice: NpmDevice;
     pof: POF;
+    ship: ShipModeConfig;
     timerConfig: TimerConfig;
     disabled: boolean;
 }
@@ -47,7 +52,18 @@ const timerPrescalerItems = TimerPrescalerValues.map(item => ({
     value: `${item}`,
 }));
 
-export default ({ npmDevice, pof, timerConfig, disabled }: GPIOProperties) => {
+const timeToActiveItems = TimeToActiveValues.map(item => ({
+    label: `${item}`,
+    value: `${item}`,
+}));
+
+export default ({
+    npmDevice,
+    pof,
+    timerConfig,
+    ship,
+    disabled,
+}: GPIOProperties) => {
     const [internalPOFThreshold, setInternalPOFThreshold] = useState(
         pof.threshold
     );
@@ -193,6 +209,70 @@ export default ({ npmDevice, pof, timerConfig, disabled }: GPIOProperties) => {
                     npmDevice.setTimerConfigPeriod(v / prescalerMultiplier)
                 }
             />
+            <Dropdown
+                label={
+                    <div>
+                        <span>T</span>
+                        <span className="subscript">ShipToActive</span>
+                    </div>
+                }
+                items={timeToActiveItems}
+                onSelect={item =>
+                    npmDevice.setShipModeTimeToActive(
+                        Number.parseInt(item.value, 10) as TimeToActive
+                    )
+                }
+                selectedItem={
+                    timeToActiveItems[
+                        Math.max(
+                            0,
+                            timeToActiveItems.findIndex(
+                                item => item.value === `${ship.timeToActive}`
+                            )
+                        ) ?? 0
+                    ]
+                }
+                disabled={disabled}
+            />
+
+            <Toggle
+                label="Ship invert polarity"
+                onToggle={npmDevice.setShipInvertPolarity}
+                disabled={disabled}
+                isToggled={ship.invPolarity}
+            />
+            <Toggle
+                label="Long Press Reset"
+                onToggle={npmDevice.setShipLongPressReset}
+                disabled={disabled}
+                isToggled={ship.longPressReset}
+            />
+            <Toggle
+                label="Two Button Reset"
+                onToggle={npmDevice.setShipTwoButtonReset}
+                disabled={disabled}
+                isToggled={ship.twoButtonReset}
+            />
+            <Button
+                variant="secondary"
+                className="tw-my-2 tw-w-full"
+                onClick={() => {
+                    npmDevice.enterShipMode();
+                }}
+                disabled={disabled}
+            >
+                Enter Ship Mode
+            </Button>
+            <Button
+                variant="secondary"
+                className="tw-my-1 tw-w-full"
+                onClick={() => {
+                    npmDevice.enterShipHibernateMode();
+                }}
+                disabled={disabled}
+            >
+                Enter Hibernate Mode
+            </Button>
         </Card>
     );
 };

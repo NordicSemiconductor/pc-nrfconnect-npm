@@ -25,6 +25,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
+        mockOnShipUpdate,
         pmic,
     } = setupMocksBase();
 
@@ -352,11 +353,39 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ prescaler: 'Fast' });
     });
 
-    test('Set set timer config period ', async () => {
+    test('Set set ship config period ', async () => {
         await pmic.setTimerConfigPeriod(1000);
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ period: 1000 });
+    });
+
+    test('Set set timer config time ', async () => {
+        await pmic.setShipModeTimeToActive(16);
+
+        expect(mockOnShipUpdate).toBeCalledTimes(1);
+        expect(mockOnShipUpdate).toBeCalledWith({ timeToActive: 16 });
+    });
+
+    test('Set set timer config inv_polarity ', async () => {
+        await pmic.setShipInvertPolarity(false);
+
+        expect(mockOnShipUpdate).toBeCalledTimes(1);
+        expect(mockOnShipUpdate).toBeCalledWith({ invPolarity: false });
+    });
+
+    test('Set set timer reset long_press ', async () => {
+        await pmic.setShipLongPressReset(false);
+
+        expect(mockOnShipUpdate).toBeCalledTimes(1);
+        expect(mockOnShipUpdate).toBeCalledWith({ longPressReset: false });
+    });
+
+    test('Set set timer reset two_buttons ', async () => {
+        await pmic.setShipTwoButtonReset(false);
+
+        expect(mockOnShipUpdate).toBeCalledTimes(1);
+        expect(mockOnShipUpdate).toBeCalledWith({ twoButtonReset: false });
     });
 
     test.each(PMIC_1300_GPIOS)(

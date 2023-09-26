@@ -549,6 +549,78 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
+    test('Request update shipModeTimeToActive', () => {
+        pmic.requestUpdate.shipModeTimeToActive();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx ship config time get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update shipInvertPolarity', () => {
+        pmic.requestUpdate.shipInvertPolarity();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx ship config inv_polarity get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update shipLongPressReset', () => {
+        pmic.requestUpdate.shipLongPressReset();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx ship reset long_press get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update shipTwoButtonReset', () => {
+        pmic.requestUpdate.shipTwoButtonReset();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx ship reset two_buttons get`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request enterShipMode', () => {
+        pmic.enterShipMode();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx ship mode ship`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request enterShipMode', () => {
+        pmic.enterShipHibernateMode();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            `npmx ship mode hibernate`,
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
     test('Request update fuelGauge', () => {
         pmic.requestUpdate.fuelGauge();
 

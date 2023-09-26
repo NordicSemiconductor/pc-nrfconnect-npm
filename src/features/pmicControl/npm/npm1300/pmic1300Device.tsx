@@ -57,12 +57,14 @@ import {
     POFPolarity,
     POFPolarityValues,
     ProfileDownload,
+    ShipModeConfig,
     SoftStart,
     TimerConfig,
     TimerMode,
     TimerModeValues,
     TimerPrescaler,
     TimerPrescalerValues,
+    TimeToActive,
     VTrickleFast,
 } from '../types';
 
@@ -702,7 +704,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx vbusin vbus status get'),
+                toRegex('npmx vbusin status cc get'),
                 res => {
                     eventEmitter.emit('onUsbPowered', parseToBoolean(res));
                 },
@@ -1148,6 +1150,71 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 res => {
                     emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
                         period: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx ship config time',
+                    true,
+                    undefined,
+                    '(16|32|64|96|304|608|1008|3008)'
+                ),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        timeToActive: parseToNumber(res) as TimeToActive,
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship config inv_polarity', true),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        invPolarity: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship config inv_polarity', true),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        invPolarity: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship reset long_press', true),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        longPressReset: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship reset two_buttons', true),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        twoButtonReset: parseToBoolean(res),
                     });
                 },
                 noop
@@ -2375,6 +2442,82 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    const setShipModeTimeToActive = (timeToActive: TimeToActive) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                    timeToActive,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ship config time set ${timeToActive}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.shipModeTimeToActive();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setShipInvertPolarity = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                    invPolarity: enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ship config inv_polarity set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.shipInvertPolarity();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setShipLongPressReset = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                    longPressReset: enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ship reset long_press set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.shipLongPressReset();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setShipTwoButtonReset = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                    twoButtonReset: enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ship reset two_buttons set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.shipTwoButtonReset();
+                        reject();
+                    }
+                );
+            }
+        });
+
     const downloadFuelGaugeProfile = (profile: Buffer) => {
         const chunkSize = 256;
         const chunks = Math.ceil(profile.byteLength / chunkSize);
@@ -2563,11 +2706,18 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sendCommand(`npmx timer config prescaler get`),
         timerConfigPeriod: () => sendCommand(`npmx timer config period get`),
 
+        shipModeTimeToActive: () => sendCommand(`npmx ship config time get`),
+        shipInvertPolarity: () =>
+            sendCommand(`npmx ship config inv_polarity get`),
+        shipLongPressReset: () => sendCommand(`npmx ship reset long_press get`),
+        shipTwoButtonReset: () =>
+            sendCommand(`npmx ship reset two_buttons get`),
+
         fuelGauge: () => sendCommand('fuel_gauge get'),
         activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
         storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
 
-        usbPowered: () => sendCommand(`npmx vbusin vbus status get`),
+        usbPowered: () => sendCommand(`npmx vbusin status cc get`),
     };
 
     return {
@@ -2639,6 +2789,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 setTimerConfigMode(config.timerConfig.mode);
                 setTimerConfigPrescaler(config.timerConfig.prescaler);
                 setTimerConfigPeriod(config.timerConfig.period);
+
+                setShipModeTimeToActive(config.ship.timeToActive);
+                setShipInvertPolarity(config.ship.invPolarity);
+                setShipLongPressReset(config.ship.longPressReset);
+                setShipTwoButtonReset(config.ship.twoButtonReset);
 
                 setFuelGaugeEnabled(config.fuelGauge);
             };
@@ -2790,9 +2945,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setTimerConfigMode,
         setTimerConfigPrescaler,
         setTimerConfigPeriod,
+        setShipInvertPolarity,
+        setShipModeTimeToActive,
+        setShipLongPressReset,
+        setShipTwoButtonReset,
 
         setFuelGaugeEnabled,
         downloadFuelGaugeProfile,
+
+        enterShipMode: () => sendCommand(`npmx ship mode ship`),
+        enterShipHibernateMode: () => sendCommand(`npmx ship mode hibernate`),
 
         setActiveBatteryModel,
 

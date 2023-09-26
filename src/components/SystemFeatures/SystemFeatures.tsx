@@ -16,6 +16,7 @@ import {
     getLEDs,
     getNpmDevice,
     getPOF,
+    getShip,
     getTimerConfig,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
@@ -29,6 +30,7 @@ export default ({ active }: PaneProps) => {
     const gpios = useSelector(getGPIOs);
     const leds = useSelector(getLEDs);
     const pof = useSelector(getPOF);
+    const ship = useSelector(getShip);
     const timerConfig = useSelector(getTimerConfig);
 
     return active ? (
@@ -36,6 +38,15 @@ export default ({ active }: PaneProps) => {
             className="masonry-layout min-height-cards"
             minWidth={300}
         >
+            {npmDevice && (
+                <SafetyAndLowPower
+                    npmDevice={npmDevice}
+                    pof={pof}
+                    ship={ship}
+                    timerConfig={timerConfig}
+                    disabled={disabled}
+                />
+            )}
             {npmDevice &&
                 gpios.map((gpio, index) => (
                     <GPIO
@@ -48,14 +59,6 @@ export default ({ active }: PaneProps) => {
                 ))}
             {npmDevice && (
                 <LEDs npmDevice={npmDevice} leds={leds} disabled={disabled} />
-            )}
-            {npmDevice && (
-                <SafetyAndLowPower
-                    npmDevice={npmDevice}
-                    pof={pof}
-                    timerConfig={timerConfig}
-                    disabled={disabled}
-                />
             )}
         </MasonryLayout>
     ) : null;

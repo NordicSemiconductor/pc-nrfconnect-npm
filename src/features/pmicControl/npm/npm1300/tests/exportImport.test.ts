@@ -14,6 +14,7 @@ import {
     PartialUpdate,
     PmicDialog,
     POF,
+    ShipModeConfig,
     TimerConfig,
 } from '../../types';
 import { setupMocksBase } from './helpers';
@@ -26,6 +27,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         mockOnGpioUpdate,
         mockOnLEDUpdate,
         mockOnPOFUpdate,
+        mockOnShipUpdate,
         mockOnTimerConfigUpdate,
         mockOnFuelGaugeUpdate,
         mockDialogHandler,
@@ -84,6 +86,13 @@ describe('PMIC 1300 - Apply Config ', () => {
         mode: 'Boot monitor',
         prescaler: 'Slow',
         period: 0,
+    };
+
+    const initShip: ShipModeConfig = {
+        timeToActive: 96,
+        invPolarity: false,
+        longPressReset: true,
+        twoButtonReset: true,
     };
 
     const sampleConfig: NpmExport = {
@@ -193,6 +202,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         ],
         pof: initPOF,
         timerConfig: initTimerConfig,
+        ship: initShip,
         fuelGauge: true,
         firmwareVersion: '0.9.2+4',
         deviceType: 'npm1300',
@@ -213,6 +223,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
+    let ship: ShipModeConfig = { ...initShip };
     let timerConfig = { ...initTimerConfig };
 
     beforeEach(() => {
@@ -224,6 +235,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         gpios = [];
         leds = [];
         pof = { ...initPOF };
+        ship = { ...initShip };
         timerConfig = { ...initTimerConfig };
 
         mockOnChargerUpdate.mockImplementation(
@@ -278,6 +290,15 @@ describe('PMIC 1300 - Apply Config ', () => {
             };
         });
 
+        mockOnShipUpdate.mockImplementation(
+            (partialUpdate: Partial<ShipModeConfig>) => {
+                ship = {
+                    ...ship,
+                    ...partialUpdate,
+                };
+            }
+        );
+
         mockOnTimerConfigUpdate.mockImplementation(
             (partialUpdate: Partial<TimerConfig>) => {
                 timerConfig = {
@@ -303,6 +324,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);
+        expect(mockOnShipUpdate).toBeCalledTimes(4);
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);

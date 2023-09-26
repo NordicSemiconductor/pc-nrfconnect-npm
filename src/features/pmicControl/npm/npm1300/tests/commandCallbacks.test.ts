@@ -19,6 +19,7 @@ import {
     SoftStartValues,
     TimerModeValues,
     TimerPrescalerValues,
+    TimeToActiveValues,
 } from '../../types';
 import {
     PMIC_1300_BUCKS,
@@ -44,6 +45,7 @@ describe('PMIC 1300 - Command callbacks', () => {
         mockOnPOFUpdate,
         mockOnLEDUpdate,
         mockOnTimerConfigUpdate,
+        mockOnShipUpdate,
         mockOnReboot,
     } = setupMocksWithShellParser();
 
@@ -434,8 +436,8 @@ Battery models stored in database:
         ]);
     });
 
-    test.each([true, false])('npmx vbusin vbus status get %p', value => {
-        const command = `npmx vbusin vbus status get`;
+    test.each([true, false])('npmx vbusin status cc get %p', value => {
+        const command = `npmx vbusin status cc get`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1155,6 +1157,102 @@ Battery models stored in database:
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({
             period: 2800,
+        });
+    });
+
+    test.each(
+        TimeToActiveValues.map(value => [
+            { append: `get`, value },
+            { append: `set ${value}`, value },
+        ])
+    )('npmx ship config time %p', ({ append, value }) => {
+        const command = `npmx ship config time ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${value}ms.`, command);
+
+        expect(mockOnShipUpdate).toBeCalledTimes(1);
+        expect(mockOnShipUpdate).toBeCalledWith({
+            timeToActive: value,
+        });
+    });
+
+    test.each(
+        [true, false]
+            .map(enable => [
+                {
+                    append: `get`,
+                    enable,
+                },
+                {
+                    append: `set ${enable ? '1' : '0'}`,
+                    enable,
+                },
+            ])
+            .flat()
+    )('npmx ship config inv_polarity %p', ({ append, enable }) => {
+        const command = `npmx ship config inv_polarity ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${enable ? '1' : '0'}.`, command);
+
+        expect(mockOnShipUpdate).toBeCalledTimes(1);
+        expect(mockOnShipUpdate).toBeCalledWith({
+            invPolarity: enable,
+        });
+    });
+
+    test.each(
+        [true, false]
+            .map(enable => [
+                {
+                    append: `get`,
+                    enable,
+                },
+                {
+                    append: `set ${enable ? '1' : '0'}`,
+                    enable,
+                },
+            ])
+            .flat()
+    )('npmx ship reset long_press %p', ({ append, enable }) => {
+        const command = `npmx ship reset long_press ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${enable ? '1' : '0'}.`, command);
+
+        expect(mockOnShipUpdate).toBeCalledTimes(1);
+        expect(mockOnShipUpdate).toBeCalledWith({
+            longPressReset: enable,
+        });
+    });
+
+    test.each(
+        [true, false]
+            .map(enable => [
+                {
+                    append: `get`,
+                    enable,
+                },
+                {
+                    append: `set ${enable ? '1' : '0'}`,
+                    enable,
+                },
+            ])
+            .flat()
+    )('npmx ship reset two_buttons %p', ({ append, enable }) => {
+        const command = `npmx ship reset two_buttons ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${enable ? '1' : '0'}.`, command);
+
+        expect(mockOnShipUpdate).toBeCalledTimes(1);
+        expect(mockOnShipUpdate).toBeCalledWith({
+            twoButtonReset: enable,
         });
     });
 });

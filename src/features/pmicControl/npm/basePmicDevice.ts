@@ -24,6 +24,7 @@ import {
     PmicDialog,
     PmicState,
     POF,
+    ShipModeConfig,
     TimerConfig,
 } from './types';
 
@@ -68,6 +69,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         rebooting = true;
 
         eventEmitter.emit('onBeforeReboot', 100);
+        shellParser.unPause();
         shellParser.enqueueRequest(
             'delayed_reboot 100',
             {
@@ -243,6 +245,15 @@ export const baseNpmDevice: IBaseNpmDevice = (
             eventEmitter.on('onTimerConfigUpdate', handler);
             return () => {
                 eventEmitter.removeListener('onTimerConfigUpdate', handler);
+            };
+        },
+
+        onShipUpdate: (
+            handler: (payload: Partial<ShipModeConfig>, error?: string) => void
+        ) => {
+            eventEmitter.on('onShipUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onShipUpdate', handler);
             };
         },
 

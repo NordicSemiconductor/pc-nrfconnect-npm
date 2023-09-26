@@ -54,6 +54,7 @@ import {
     updateLdo,
     updateLEDs,
     updatePOFs,
+    updateShipModeConfig,
     updateTimerConfig,
 } from '../pmicControlSlice';
 import {
@@ -159,6 +160,11 @@ export default () => {
             npmDevice.requestUpdate.timerConfigMode();
             npmDevice.requestUpdate.timerConfigPeriod();
             npmDevice.requestUpdate.timerConfigPrescaler();
+
+            npmDevice.requestUpdate.shipModeTimeToActive();
+            npmDevice.requestUpdate.shipInvertPolarity();
+            npmDevice.requestUpdate.shipLongPressReset();
+            npmDevice.requestUpdate.shipTwoButtonReset();
 
             npmDevice.requestUpdate.fuelGauge();
             npmDevice.requestUpdate.activeBatteryModel();
@@ -353,6 +359,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onTimerConfigUpdate(payload => {
                     dispatch(updateTimerConfig(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onShipUpdate(payload => {
+                    dispatch(updateShipModeConfig(payload));
                 })
             );
 

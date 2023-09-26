@@ -184,6 +184,18 @@ export type TimerConfig = {
     period: number;
 };
 
+export const TimeToActiveValues = [
+    16, 32, 64, 96, 304, 608, 1008, 3008,
+] as const;
+export type TimeToActive = (typeof TimeToActiveValues)[number];
+
+export type ShipModeConfig = {
+    timeToActive: TimeToActive;
+    invPolarity: boolean;
+    longPressReset: boolean;
+    twoButtonReset: boolean;
+};
+
 export type AdcSample = {
     timestamp: number;
     vBat: number;
@@ -282,6 +294,9 @@ export type BaseNpmDevice = {
     ) => () => void;
     onTimerConfigUpdate: (
         handler: (payload: Partial<TimerConfig>, error?: string) => void
+    ) => () => void;
+    onShipUpdate: (
+        handler: (payload: Partial<ShipModeConfig>, error?: string) => void
     ) => () => void;
     onBeforeReboot: (
         handler: (payload: number, error?: string) => void
@@ -410,6 +425,11 @@ export type NpmDevice = {
         timerConfigPrescaler: () => void;
         timerConfigPeriod: () => void;
 
+        shipModeTimeToActive: () => void;
+        shipInvertPolarity: () => void;
+        shipLongPressReset: () => void;
+        shipTwoButtonReset: () => void;
+
         fuelGauge: () => void;
 
         activeBatteryModel: () => void;
@@ -475,6 +495,14 @@ export type NpmDevice = {
     setTimerConfigPrescaler: (prescaler: TimerPrescaler) => Promise<void>;
     setTimerConfigPeriod: (period: number) => Promise<void>;
 
+    setShipModeTimeToActive: (time: TimeToActive) => Promise<void>;
+    setShipInvertPolarity: (state: boolean) => Promise<void>;
+    setShipLongPressReset: (state: boolean) => Promise<void>;
+    setShipTwoButtonReset: (state: boolean) => Promise<void>;
+
+    enterShipMode: () => void;
+    enterShipHibernateMode: () => void;
+
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
     abortDownloadFuelGaugeProfile: () => Promise<void>;
@@ -518,6 +546,7 @@ export interface NpmExport {
     gpios: GPIO[];
     leds: LED[];
     pof: POF;
+    ship: ShipModeConfig;
     timerConfig: TimerConfig;
     fuelGauge: boolean;
     firmwareVersion: string;

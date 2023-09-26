@@ -21,6 +21,7 @@ import {
     PmicDialog,
     PmicState,
     POF,
+    ShipModeConfig,
     TimerConfig,
 } from './npm/types';
 
@@ -32,6 +33,7 @@ interface pmicControlState {
     gpios: GPIO[];
     leds: LED[];
     pof: POF;
+    ship: ShipModeConfig;
     timerConfig: TimerConfig;
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
@@ -64,6 +66,12 @@ const initialState: pmicControlState = {
         mode: 'Boot monitor',
         prescaler: 'Slow',
         period: 0,
+    },
+    ship: {
+        timeToActive: 96,
+        invPolarity: true,
+        longPressReset: false,
+        twoButtonReset: false,
     },
     pmicChargingState: {
         batteryFull: false,
@@ -185,6 +193,18 @@ const pmicControlSlice = createSlice({
                 ...action.payload,
             };
         },
+        setShipModeConfig(state, action: PayloadAction<ShipModeConfig>) {
+            state.ship = action.payload;
+        },
+        updateShipModeConfig(
+            state,
+            action: PayloadAction<Partial<ShipModeConfig>>
+        ) {
+            state.ship = {
+                ...state.ship,
+                ...action.payload,
+            };
+        },
         setBatteryConnected(state, action: PayloadAction<boolean>) {
             state.batteryConnected = action.payload;
         },
@@ -276,6 +296,7 @@ export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
 export const getGPIOs = (state: RootState) => state.app.pmicControl.gpios;
 export const getLEDs = (state: RootState) => state.app.pmicControl.leds;
 export const getPOF = (state: RootState) => state.app.pmicControl.pof;
+export const getShip = (state: RootState) => state.app.pmicControl.ship;
 export const getTimerConfig = (state: RootState) =>
     state.app.pmicControl.timerConfig;
 export const isBatteryConnected = (state: RootState) => {
@@ -338,6 +359,8 @@ export const {
     updatePOFs,
     setTimerConfig,
     updateTimerConfig,
+    setShipModeConfig,
+    updateShipModeConfig,
     setBatteryConnected,
     setFuelGauge,
     setActiveBatterModel,
