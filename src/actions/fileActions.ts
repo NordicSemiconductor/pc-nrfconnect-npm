@@ -40,6 +40,7 @@ const saveSettings =
             gpios: [...currentState.gpios],
             leds: [...currentState.leds],
             pof: currentState.pof,
+            ship: currentState.ship,
             timerConfig: currentState.timerConfig,
             fuelGauge: currentState.fuelGauge,
             firmwareVersion: currentState.npmDevice.getSupportedVersion(),
