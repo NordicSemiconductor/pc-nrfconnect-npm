@@ -204,7 +204,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         timerConfig: initTimerConfig,
         ship: initShip,
         fuelGauge: true,
-        firmwareVersion: '0.9.2+4',
+        firmwareVersion: '0.9.2+5',
         deviceType: 'npm1300',
         fuelGaugeChargingSamplingRate: 1000,
     };
