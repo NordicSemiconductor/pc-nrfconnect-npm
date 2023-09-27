@@ -16,13 +16,23 @@ import {
     Slider,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     ChargeCurrentCool,
     Charger,
     NpmDevice,
+    NTCThermistor,
+    NTCValues,
 } from '../../features/pmicControl/npm/types';
 import { getLatestAdcSample } from '../../features/pmicControl/pmicControlSlice';
 import { RangeType } from '../../utils/helpers';
+
+const ntcThermistorItems = [...NTCValues].map(item => ({
+    label: `${item}`,
+    value: `${item}`,
+}));
+
+const card = 'JEITA';
 
 export default ({
     npmDevice,
@@ -86,16 +96,24 @@ export default ({
     }, [charger]);
 
     const updateInternal = (index: number, value: number) => {
-        if (index === 0 && value >= internalJeitaTemps[1]) {
+        if (index === 0 && value > internalJeitaTemps[1]) {
             return;
         }
-        if (index === 3 && internalJeitaTemps[2] >= value) {
+        if (index === 3 && internalJeitaTemps[2] > value) {
             return;
         }
+
         if (
-            index !== 0 &&
-            index !== 3 &&
+            index === 1 &&
             (value >= internalJeitaTemps[index + 1] ||
+                internalJeitaTemps[index - 1] > value)
+        ) {
+            return;
+        }
+
+        if (
+            index === 2 &&
+            (value > internalJeitaTemps[index + 1] ||
                 internalJeitaTemps[index - 1] >= value)
         ) {
             return;
@@ -110,10 +128,12 @@ export default ({
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
-                    <span>
-                        T<span className="subscript">BAT</span> Monitoring –
-                        JEITA Compliance
-                    </span>
+                    <DocumentationTooltip card={card} item="JEITACompliance">
+                        <span>
+                            T<span className="subscript">BAT</span> Monitoring –
+                            JEITA Compliance
+                        </span>
+                    </DocumentationTooltip>
                 </div>
             }
         >
@@ -148,7 +168,7 @@ export default ({
                             temperature={internalJeitaTemps[0]}
                             range={{
                                 min: npmDevice.getChargerJeitaRange().min,
-                                max: internalJeitaTemps[1] - 1,
+                                max: internalJeitaTemps[1],
                             }}
                             onChange={v => updateInternal(0, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
@@ -179,7 +199,7 @@ export default ({
                             type="COOL"
                             temperature={internalJeitaTemps[1]}
                             range={{
-                                min: internalJeitaTemps[0] + 1,
+                                min: internalJeitaTemps[0],
                                 max: internalJeitaTemps[2] - 1,
                             }}
                             onChange={v => updateInternal(1, v)}
@@ -211,7 +231,7 @@ export default ({
                             temperature={internalJeitaTemps[2]}
                             range={{
                                 min: internalJeitaTemps[1] + 1,
-                                max: internalJeitaTemps[3] - 1,
+                                max: internalJeitaTemps[3],
                             }}
                             onChange={v => updateInternal(2, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
@@ -241,7 +261,7 @@ export default ({
                             type="HOT"
                             temperature={internalJeitaTemps[3]}
                             range={{
-                                min: internalJeitaTemps[2] + 1,
+                                min: internalJeitaTemps[2],
                                 max: npmDevice.getChargerJeitaRange().max,
                             }}
                             onChange={v => updateInternal(3, v)}
@@ -281,10 +301,12 @@ export default ({
             </div>
             <NumberInputSliderWithUnit
                 label={
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">TERMR</span>
-                    </div>
+                    <DocumentationTooltip card={card} item="Vtermr">
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">TERMR</span>
+                        </div>
+                    </DocumentationTooltip>
                 }
                 unit="V"
                 value={internalVTermr}
@@ -294,7 +316,11 @@ export default ({
                 disabled={disabled}
             />
             <Dropdown
-                label="Cool current"
+                label={
+                    <DocumentationTooltip card={card} item="CoolCurrent">
+                        <span>Cool current</span>
+                    </DocumentationTooltip>
+                }
                 items={currentCoolItems}
                 onSelect={item =>
                     npmDevice.setChargerCurrentCool(
@@ -303,6 +329,30 @@ export default ({
                 }
                 selectedItem={
                     currentCoolItems[charger.currentCool === 'iCHG' ? 0 : 1]
+                }
+                disabled={disabled}
+            />
+            <Dropdown
+                label={
+                    <DocumentationTooltip card={card} item="NTCThermistor">
+                        <span>NTC thermistor</span>
+                    </DocumentationTooltip>
+                }
+                items={ntcThermistorItems}
+                onSelect={item =>
+                    npmDevice.setChargerNTCThermistor(
+                        item.value as NTCThermistor
+                    )
+                }
+                selectedItem={
+                    ntcThermistorItems[
+                        Math.max(
+                            0,
+                            ntcThermistorItems.findIndex(
+                                item => item.value === charger.ntcThermistor
+                            )
+                        ) ?? 0
+                    ]
                 }
                 disabled={disabled}
             />

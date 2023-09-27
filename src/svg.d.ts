@@ -3,13 +3,12 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
-
-declare module '!!@svgr!_.svg' {
-    const svg: React.ElementType;
-    export default svg;
-}
-
 declare module '*.svg' {
     const url: string;
     export default url;
+}
+
+declare module '!!@svgr!*.svg' {
+    const svg: React.ElementType;
+    export default svg;
 }

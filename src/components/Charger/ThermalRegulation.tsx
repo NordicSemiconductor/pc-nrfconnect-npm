@@ -13,8 +13,11 @@ import {
     Slider,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { Charger, NpmDevice } from '../../features/pmicControl/npm/types';
 import { getPmicChargingState } from '../../features/pmicControl/pmicControlSlice';
+
+const card = 'chipThermalRegulation';
 
 export default ({
     npmDevice,
@@ -54,16 +57,24 @@ export default ({
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
-                    <span>Chip Thermal Regulation</span>
+                    <DocumentationTooltip
+                        card={card}
+                        item="ChargerThermalRegulation"
+                    >
+                        <span>Charger Thermal Regulation</span>
+                    </DocumentationTooltip>
                 </div>
             }
         >
             <div className="tw-flex tw-flex-col tw-justify-between tw-gap-1">
                 <div className="tw-flex tw-flex-row tw-justify-between">
-                    <div>
-                        <span>T</span>
-                        <span className="subscript">CHGRESUME</span>
-                    </div>
+                    <DocumentationTooltip card={card} item="Tchgresume">
+                        <div>
+                            <span>T</span>
+                            <span className="subscript">CHGRESUME</span>
+                        </div>
+                    </DocumentationTooltip>
+
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
                             value={internalChipThermal[0]}
@@ -76,10 +87,12 @@ export default ({
                     </div>
                 </div>
                 <div className="tw-flex tw-justify-between">
-                    <div>
-                        <span>T</span>
-                        <span className="subscript">CHGSTOP</span>
-                    </div>
+                    <DocumentationTooltip card={card} item="Tchgstop">
+                        <div>
+                            <span>T</span>
+                            <span className="subscript">CHGSTOP</span>
+                        </div>
+                    </DocumentationTooltip>
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
                             value={internalChipThermal[1]}
@@ -96,13 +109,13 @@ export default ({
                     range={npmDevice.getChargerChipThermalRange()}
                     onChange={[0, 1].map(i => v => updateInternal(i, v))}
                     onChangeComplete={() => {
-                        if (internalChipThermal[0] !== charger.tCold)
-                            npmDevice.setChargerTChgResume(
-                                internalChipThermal[0]
-                            );
-                        if (internalChipThermal[1] !== charger.tCool)
+                        if (internalChipThermal[1] !== charger.tChgStop)
                             npmDevice.setChargerTChgStop(
                                 internalChipThermal[1]
+                            );
+                        if (internalChipThermal[0] !== charger.tChgResume)
+                            npmDevice.setChargerTChgResume(
+                                internalChipThermal[0]
                             );
                     }}
                     disabled={disabled}
@@ -110,7 +123,12 @@ export default ({
             </div>
 
             <div className="tw-flex tw-flex-row tw-gap-4">
-                <div className="tw-text-xs">Thermal Regulation</div>
+                <DocumentationTooltip
+                    card={card}
+                    item="ThermalRegulationActive"
+                >
+                    <div className="tw-text-xs">Thermal Regulation Active</div>
+                </DocumentationTooltip>
                 <div
                     className={` tw-h-4 tw-w-4 tw-rounded-full tw-border tw-border-solid tw-border-gray-200 ${classNames(
                         pmicChargingState.dieTempHigh

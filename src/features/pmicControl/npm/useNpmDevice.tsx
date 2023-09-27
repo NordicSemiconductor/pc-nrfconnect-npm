@@ -37,9 +37,11 @@ import {
     setFuelGaugeChargingSamplingRate,
     setFuelGaugeNotChargingSamplingRate,
     setFuelGaugeReportingRate,
+    setGPIOs,
     setHardcodedBatterModels,
     setLatestAdcSample,
     setLdos,
+    setLEDs,
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
@@ -48,7 +50,12 @@ import {
     setUsbPowered,
     updateBuck,
     updateCharger,
+    updateGPIOs,
     updateLdo,
+    updateLEDs,
+    updatePOFs,
+    updateShipModeConfig,
+    updateTimerConfig,
 } from '../pmicControlSlice';
 import {
     getProfile,
@@ -62,7 +69,7 @@ import {
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
     noop,
 } from './pmicHelpers';
-import { Buck, Ldo, PmicDialog } from './types';
+import { Buck, GPIO, Ldo, LED, LEDModeValues, PmicDialog } from './types';
 
 export default () => {
     const shellParser = useSelector(getShellParser);
@@ -102,6 +109,7 @@ export default () => {
                 npmDevice.requestUpdate.chargerEnabled();
                 npmDevice.requestUpdate.chargerVTrickleFast();
                 npmDevice.requestUpdate.chargerITerm();
+                npmDevice.requestUpdate.chargerBatLim();
                 npmDevice.requestUpdate.chargerEnabledRecharging();
                 npmDevice.requestUpdate.pmicChargingState();
                 npmDevice.requestUpdate.chargerNTCThermistor();
@@ -122,13 +130,41 @@ export default () => {
                 npmDevice.requestUpdate.buckEnabled(i);
                 npmDevice.requestUpdate.buckModeControl(i);
                 npmDevice.requestUpdate.buckOnOffControl(i);
+                npmDevice.requestUpdate.buckActiveDischargeEnabled(i);
             }
 
             for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
                 npmDevice.requestUpdate.ldoVoltage(i);
                 npmDevice.requestUpdate.ldoMode(i);
                 npmDevice.requestUpdate.ldoEnabled(i);
+                npmDevice.requestUpdate.ldoSoftStartEnabled(i);
+                npmDevice.requestUpdate.ldoSoftStart(i);
             }
+
+            for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
+                npmDevice.requestUpdate.gpioMode(i);
+                npmDevice.requestUpdate.gpioPull(i);
+                npmDevice.requestUpdate.gpioDrive(i);
+                npmDevice.requestUpdate.gpioOpenDrain(i);
+                npmDevice.requestUpdate.gpioDebounce(i);
+            }
+
+            for (let i = 0; i < npmDevice.getNumberOfLEDs(); i += 1) {
+                npmDevice.requestUpdate.ledMode(i);
+            }
+
+            npmDevice.requestUpdate.pofEnable();
+            npmDevice.requestUpdate.pofPolarity();
+            npmDevice.requestUpdate.pofThreshold();
+
+            npmDevice.requestUpdate.timerConfigMode();
+            npmDevice.requestUpdate.timerConfigPeriod();
+            npmDevice.requestUpdate.timerConfigPrescaler();
+
+            npmDevice.requestUpdate.shipModeTimeToActive();
+            npmDevice.requestUpdate.shipInvertPolarity();
+            npmDevice.requestUpdate.shipLongPressReset();
+            npmDevice.requestUpdate.shipTwoButtonReset();
 
             npmDevice.requestUpdate.fuelGauge();
             npmDevice.requestUpdate.activeBatteryModel();
@@ -156,6 +192,7 @@ export default () => {
                             iChg: npmDevice.getChargerCurrentRange().min,
                             enabled: false,
                             iTerm: '10%',
+                            batLim: 1340,
                             enableRecharging: false,
                             ntcThermistor: '10 kΩ',
                             tChgStop: 110,
@@ -180,6 +217,7 @@ export default () => {
                         modeControl: 'Auto',
                         onOffControl: 'Off',
                         retentionControl: 'Off',
+                        activeDischargeEnabled: false,
                     });
                 }
                 dispatch(setBucks(emptyBuck));
@@ -190,9 +228,31 @@ export default () => {
                         voltage: npmDevice.getLdoVoltageRange(i).min,
                         mode: 'ldoSwitch',
                         enabled: false,
+                        softStartEnabled: true,
+                        softStart: 25,
                     });
                 }
                 dispatch(setLdos(emptyLdos));
+
+                const emptyGPIOs: GPIO[] = [];
+                for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
+                    emptyGPIOs.push({
+                        mode: 'Input',
+                        pull: 'Pull up',
+                        drive: 1,
+                        openDrain: false,
+                        debounce: false,
+                    });
+                }
+                dispatch(setGPIOs(emptyGPIOs));
+
+                const emptyLEDs: LED[] = [];
+                for (let i = 0; i < npmDevice.getNumberOfLEDs(); i += 1) {
+                    emptyLEDs.push({
+                        mode: LEDModeValues[i],
+                    });
+                }
+                dispatch(setLEDs(emptyLEDs));
             };
 
             const releaseAll: (() => void)[] = [];
@@ -275,6 +335,36 @@ export default () => {
             releaseAll.push(
                 npmDevice.onLdoUpdate(payload => {
                     dispatch(updateLdo(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onGPIOUpdate(payload => {
+                    dispatch(updateGPIOs(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onLEDUpdate(payload => {
+                    dispatch(updateLEDs(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onPOFUpdate(payload => {
+                    dispatch(updatePOFs(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onTimerConfigUpdate(payload => {
+                    dispatch(updateTimerConfig(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onShipUpdate(payload => {
+                    dispatch(updateShipModeConfig(payload));
                 })
             );
 

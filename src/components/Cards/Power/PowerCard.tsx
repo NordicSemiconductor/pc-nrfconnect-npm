@@ -19,8 +19,6 @@ import {
     ITerm,
     ITermValues,
     NpmDevice,
-    NTCThermistor,
-    NTCValues,
     VTrickleFast,
     VTrickleFastValues,
 } from '../../../features/pmicControl/npm/types';
@@ -32,6 +30,16 @@ interface PowerCardProperties {
     disabled: boolean;
     defaultSummary?: boolean;
 }
+
+const vTrickleFastItems = [...VTrickleFastValues].map(item => ({
+    label: `${item}`,
+    value: `${item}`,
+}));
+
+const iTermItems = [...ITermValues].map(item => ({
+    label: item,
+    value: item,
+}));
 
 export default ({
     npmDevice,
@@ -47,27 +55,14 @@ export default ({
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
+    const [internalBatLim, setInternalBatLim] = useState(charger.batLim);
 
     // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVTerm(charger.vTerm);
         setInternalIChg(charger.iChg);
+        setInternalBatLim(charger.batLim);
     }, [charger]);
-
-    const vTrickleFastItems = [...VTrickleFastValues].map(item => ({
-        label: `${item}`,
-        value: `${item}`,
-    }));
-
-    const iTermItems = [...ITermValues].map(item => ({
-        label: item,
-        value: item,
-    }));
-
-    const ntcThermistorItems = [...NTCValues].map(item => ({
-        label: `${item}`,
-        value: `${item}`,
-    }));
 
     return (
         <Card
@@ -136,6 +131,20 @@ export default ({
 
             {!summary && (
                 <>
+                    <NumberInputSliderWithUnit
+                        label={
+                            <div>
+                                <span>BAT</span>
+                                <span className="subscript">LIM</span>
+                            </div>
+                        }
+                        unit="mA"
+                        disabled={disabled}
+                        range={npmDevice.getChargerIBatLimRange()}
+                        value={internalBatLim}
+                        onChange={setInternalBatLim}
+                        onChangeComplete={v => npmDevice.setChargerBatLim(v)}
+                    />
                     <Toggle
                         label={
                             <DocumentationTooltip
@@ -204,34 +213,6 @@ export default ({
                                         item =>
                                             Number.parseFloat(item.value) ===
                                             charger.vTrickleFast
-                                    )
-                                ) ?? 0
-                            ]
-                        }
-                        disabled={disabled}
-                    />
-                    <Dropdown
-                        label={
-                            <DocumentationTooltip
-                                card={card}
-                                item="NTCThermistor"
-                            >
-                                <span>NTC thermistor</span>
-                            </DocumentationTooltip>
-                        }
-                        items={ntcThermistorItems}
-                        onSelect={item =>
-                            npmDevice.setChargerNTCThermistor(
-                                item.value as NTCThermistor
-                            )
-                        }
-                        selectedItem={
-                            ntcThermistorItems[
-                                Math.max(
-                                    0,
-                                    ntcThermistorItems.findIndex(
-                                        item =>
-                                            item.value === charger.ntcThermistor
                                     )
                                 ) ?? 0
                             ]

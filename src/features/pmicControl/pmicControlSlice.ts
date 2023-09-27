@@ -12,12 +12,17 @@ import {
     BatteryModel,
     Buck,
     Charger,
+    GPIO,
     Ldo,
+    LED,
     NpmDevice,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
     PmicState,
+    POF,
+    ShipModeConfig,
+    TimerConfig,
 } from './npm/types';
 
 interface pmicControlState {
@@ -25,6 +30,11 @@ interface pmicControlState {
     charger?: Charger;
     bucks: Buck[];
     ldos: Ldo[];
+    gpios: GPIO[];
+    leds: LED[];
+    pof: POF;
+    ship: ShipModeConfig;
+    timerConfig: TimerConfig;
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
     pmicChargingState: PmicChargingState;
@@ -45,6 +55,24 @@ interface pmicControlState {
 const initialState: pmicControlState = {
     bucks: [],
     ldos: [],
+    gpios: [],
+    leds: [],
+    pof: {
+        enable: true,
+        threshold: 2.8,
+        polarity: 'Active heigh',
+    },
+    timerConfig: {
+        mode: 'Boot monitor',
+        prescaler: 'Slow',
+        period: 0,
+    },
+    ship: {
+        timeToActive: 96,
+        invPolarity: true,
+        longPressReset: false,
+        twoButtonReset: false,
+    },
     pmicChargingState: {
         batteryFull: false,
         trickleCharge: false,
@@ -124,6 +152,58 @@ const pmicControlSlice = createSlice({
                     ...action.payload.data,
                 };
             }
+        },
+        setGPIOs(state, action: PayloadAction<GPIO[]>) {
+            state.gpios = action.payload;
+        },
+        updateGPIOs(state, action: PayloadAction<PartialUpdate<GPIO>>) {
+            if (state.gpios.length >= action.payload.index) {
+                state.gpios[action.payload.index] = {
+                    ...state.gpios[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
+        },
+        setLEDs(state, action: PayloadAction<LED[]>) {
+            state.leds = action.payload;
+        },
+        updateLEDs(state, action: PayloadAction<PartialUpdate<LED>>) {
+            if (state.leds.length >= action.payload.index) {
+                state.leds[action.payload.index] = {
+                    ...state.leds[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
+        },
+        setPOFs(state, action: PayloadAction<POF>) {
+            state.pof = action.payload;
+        },
+        updatePOFs(state, action: PayloadAction<Partial<POF>>) {
+            state.pof = {
+                ...state.pof,
+                ...action.payload,
+            };
+        },
+        setTimerConfig(state, action: PayloadAction<TimerConfig>) {
+            state.timerConfig = action.payload;
+        },
+        updateTimerConfig(state, action: PayloadAction<Partial<TimerConfig>>) {
+            state.timerConfig = {
+                ...state.timerConfig,
+                ...action.payload,
+            };
+        },
+        setShipModeConfig(state, action: PayloadAction<ShipModeConfig>) {
+            state.ship = action.payload;
+        },
+        updateShipModeConfig(
+            state,
+            action: PayloadAction<Partial<ShipModeConfig>>
+        ) {
+            state.ship = {
+                ...state.ship,
+                ...action.payload,
+            };
         },
         setBatteryConnected(state, action: PayloadAction<boolean>) {
             state.batteryConnected = action.payload;
@@ -213,6 +293,12 @@ export const getPmicChargingState = (state: RootState) => {
 };
 export const getBucks = (state: RootState) => state.app.pmicControl.bucks;
 export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
+export const getGPIOs = (state: RootState) => state.app.pmicControl.gpios;
+export const getLEDs = (state: RootState) => state.app.pmicControl.leds;
+export const getPOF = (state: RootState) => state.app.pmicControl.pof;
+export const getShip = (state: RootState) => state.app.pmicControl.ship;
+export const getTimerConfig = (state: RootState) =>
+    state.app.pmicControl.timerConfig;
 export const isBatteryConnected = (state: RootState) => {
     const { pmicState, batteryConnected } = state.app.pmicControl;
     return parseConnectedState(
@@ -265,6 +351,16 @@ export const {
     updateBuck,
     setLdos,
     updateLdo,
+    setGPIOs,
+    updateGPIOs,
+    setLEDs,
+    updateLEDs,
+    setPOFs,
+    updatePOFs,
+    setTimerConfig,
+    updateTimerConfig,
+    setShipModeConfig,
+    updateShipModeConfig,
     setBatteryConnected,
     setFuelGauge,
     setActiveBatterModel,

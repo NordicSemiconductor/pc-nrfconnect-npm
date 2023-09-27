@@ -6,12 +6,12 @@
 
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+    shellParser as ShellParser,
+    xTerminalShellParserWrapper,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { Terminal } from 'xterm-headless';
 
-import {
-    hookModemToShellParser,
-    xTerminalShellParserWrapper,
-} from '../../hooks/commandParser';
 import { noop } from '../pmicControl/npm/pmicHelpers';
 import useNpmDevice from '../pmicControl/npm/useNpmDevice';
 import {
@@ -32,7 +32,7 @@ export default () => {
     useEffect(() => {
         const init = async () => {
             if (serialPort) {
-                const shellParser = await hookModemToShellParser(
+                const shellParser = await ShellParser(
                     serialPort,
                     xTerminalShellParserWrapper(
                         new Terminal({ allowProposedApi: true, cols: 999 })

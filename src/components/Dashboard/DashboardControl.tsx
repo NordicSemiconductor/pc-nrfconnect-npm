@@ -66,6 +66,7 @@ export default ({ active }: PaneProps) => {
                         key={`Buck${1 + index}`}
                         index={index}
                         disabled={disabled}
+                        defaultSummary
                     />
                 ))}
         </MasonryLayout>

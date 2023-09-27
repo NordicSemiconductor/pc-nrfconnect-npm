@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
 
-import { ShellParser } from '../../../hooks/commandParser';
 import { RangeType } from '../../../utils/helpers';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
@@ -24,21 +24,28 @@ export const BuckModeControlValues = ['Auto'] as const; // TODO 'PWM', 'PFM'
 export const BuckOnOffControlValues = ['Off'] as const;
 export const BuckRetentionControlValues = ['Off'] as const;
 
-export type GPIO = (typeof GPIOValues)[number];
+type GPIONames = (typeof GPIOValues)[number];
 export type RebootMode = 'cold' | 'warm';
 export type LdoMode = 'ldoSwitch' | 'LDO';
+export const SoftStartValues = [25, 50, 75, 100] as const;
+export type SoftStart = (typeof SoftStartValues)[number];
+
 export type BuckMode = 'vSet' | 'software';
-export type BuckModeControl = (typeof BuckModeControlValues)[number] | GPIO;
-export type BuckOnOffControl = (typeof BuckOnOffControlValues)[number] | GPIO;
+export type BuckModeControl =
+    | (typeof BuckModeControlValues)[number]
+    | GPIONames;
+export type BuckOnOffControl =
+    | (typeof BuckOnOffControlValues)[number]
+    | GPIONames;
 export type BuckRetentionControl =
     | (typeof BuckRetentionControlValues)[number]
-    | GPIO;
+    | GPIONames;
 
 export const ITermValues = ['10%', '20%'] as const;
 export type ITerm = (typeof ITermValues)[number];
 
 export const VTrickleFastValues = [2.5, 2.9] as const;
-export const NTCValues = ['10 kΩ', '47 kΩ', '100 kΩ'] as const;
+export const NTCValues = ['HI Z', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
 export type VTrickleFast = (typeof VTrickleFastValues)[number];
 export type NTCThermistor = (typeof NTCValues)[number];
 
@@ -79,6 +86,7 @@ export type Charger = {
     enabled: boolean;
     enableRecharging: boolean;
     iTerm: ITerm;
+    batLim: number;
     ntcThermistor: NTCThermistor;
     tChgStop: number;
     tChgResume: number;
@@ -98,12 +106,94 @@ export type Buck = {
     onOffControl: BuckOnOffControl;
     retentionControl: BuckRetentionControl;
     enabled: boolean;
+    activeDischargeEnabled: boolean;
 };
 
 export type Ldo = {
     voltage: number;
     enabled: boolean;
     mode: LdoMode;
+    softStartEnabled: boolean;
+    softStart: SoftStart;
+};
+
+export const GPIOModeValues = [
+    'Input',
+    'Input logic 1',
+    'Input logic 0',
+    'Input rising edge event',
+    'Input falling edge event',
+    'Output interrupt',
+    'Output reset',
+    'Output power loss warning',
+    'Output logic 1',
+    'Output logic 0',
+] as const;
+export type GPIOMode = (typeof GPIOModeValues)[number];
+
+export const GPIOPullValues = ['Pull down', 'Pull up', 'Pull disable'] as const;
+export type GPIOPullMode = (typeof GPIOPullValues)[number];
+
+export const GPIODriveValues = [1, 6] as const;
+export type GPIODrive = (typeof GPIODriveValues)[number];
+
+export type GPIO = {
+    mode: GPIOMode;
+    pull: GPIOPullMode;
+    drive: GPIODrive;
+    openDrain: boolean;
+    debounce: boolean;
+};
+
+export const LEDModeValues = [
+    'Charger error',
+    'Charging',
+    'Host',
+    'Not used',
+] as const;
+export type LEDMode = (typeof LEDModeValues)[number];
+
+export type LED = {
+    mode: LEDMode;
+};
+
+export const POFPolarityValues = ['Active low', 'Active heigh'] as const;
+export type POFPolarity = (typeof POFPolarityValues)[number];
+
+export type POF = {
+    enable: boolean;
+    polarity: POFPolarity;
+    threshold: number;
+};
+
+export const TimerModeValues = [
+    'Boot monitor',
+    'Watchdog warning',
+    'Watchdog reset',
+    'General purpose',
+    'Wakeup',
+] as const;
+export type TimerMode = (typeof TimerModeValues)[number];
+
+export const TimerPrescalerValues = ['Slow', 'Fast'] as const;
+export type TimerPrescaler = (typeof TimerPrescalerValues)[number];
+
+export type TimerConfig = {
+    mode: TimerMode;
+    prescaler: TimerPrescaler;
+    period: number;
+};
+
+export const TimeToActiveValues = [
+    16, 32, 64, 96, 304, 608, 1008, 3008,
+] as const;
+export type TimeToActive = (typeof TimeToActiveValues)[number];
+
+export type ShipModeConfig = {
+    timeToActive: TimeToActive;
+    invPolarity: boolean;
+    longPressReset: boolean;
+    twoButtonReset: boolean;
 };
 
 export type AdcSample = {
@@ -159,6 +249,7 @@ export interface IBaseNpmDevice {
             noOfBucks?: number;
             noOfLdos?: number;
             noOfGPIOs?: number;
+            noOfLEDs?: number;
         },
         supportsVersion: string
     ): BaseNpmDevice;
@@ -191,6 +282,21 @@ export type BaseNpmDevice = {
     ) => () => void;
     onBuckUpdate: (
         handler: (payload: PartialUpdate<Buck>, error?: string) => void
+    ) => () => void;
+    onGPIOUpdate: (
+        handler: (payload: PartialUpdate<GPIO>, error?: string) => void
+    ) => () => void;
+    onLEDUpdate: (
+        handler: (payload: PartialUpdate<LED>, error?: string) => void
+    ) => () => void;
+    onPOFUpdate: (
+        handler: (payload: Partial<POF>, error?: string) => void
+    ) => () => void;
+    onTimerConfigUpdate: (
+        handler: (payload: Partial<TimerConfig>, error?: string) => void
+    ) => () => void;
+    onShipUpdate: (
+        handler: (payload: Partial<ShipModeConfig>, error?: string) => void
     ) => () => void;
     onBeforeReboot: (
         handler: (payload: number, error?: string) => void
@@ -228,6 +334,7 @@ export type BaseNpmDevice = {
     getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
     getNumberOfGPIOs: () => number;
+    getNumberOfLEDs: () => number;
 
     isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
     getSupportedVersion: () => string;
@@ -262,9 +369,11 @@ export type NpmDevice = {
     getChargerVTermRRange: () => number[];
     getChargerJeitaRange: () => RangeType;
     getChargerChipThermalRange: () => RangeType;
+    getChargerIBatLimRange: () => RangeType;
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
+    getPOFThresholdRange: () => RangeType;
 
     requestUpdate: {
         pmicChargingState: () => void;
@@ -273,6 +382,7 @@ export type NpmDevice = {
         chargerEnabled: () => void;
         chargerVTrickleFast: () => void;
         chargerITerm: () => void;
+        chargerBatLim: () => void;
         chargerEnabledRecharging: () => void;
         chargerNTCThermistor: () => void;
         chargerTChgStop: () => void;
@@ -291,10 +401,34 @@ export type NpmDevice = {
         buckOnOffControl: (index: number) => void;
         buckRetentionControl: (index: number) => void;
         buckEnabled: (index: number) => void;
+        buckActiveDischargeEnabled: (index: number) => void;
 
         ldoVoltage: (index: number) => void;
         ldoEnabled: (index: number) => void;
         ldoMode: (index: number) => void;
+        ldoSoftStartEnabled: (index: number) => void;
+        ldoSoftStart: (index: number) => void;
+
+        gpioMode: (index: number) => void;
+        gpioPull: (index: number) => void;
+        gpioDrive: (index: number) => void;
+        gpioOpenDrain: (index: number) => void;
+        gpioDebounce: (index: number) => void;
+
+        ledMode: (index: number) => void;
+
+        pofEnable: () => void;
+        pofPolarity: () => void;
+        pofThreshold: () => void;
+
+        timerConfigMode: () => void;
+        timerConfigPrescaler: () => void;
+        timerConfigPeriod: () => void;
+
+        shipModeTimeToActive: () => void;
+        shipInvertPolarity: () => void;
+        shipLongPressReset: () => void;
+        shipTwoButtonReset: () => void;
 
         fuelGauge: () => void;
 
@@ -309,6 +443,7 @@ export type NpmDevice = {
     setChargerEnabled: (state: boolean) => Promise<void>;
     setChargerVTrickleFast: (value: VTrickleFast) => Promise<void>;
     setChargerITerm: (iTerm: ITerm) => Promise<void>;
+    setChargerBatLim: (lim: number) => Promise<void>;
     setChargerEnabledRecharging: (enabled: boolean) => Promise<void>;
     setChargerNTCThermistor: (mode: NTCThermistor) => Promise<void>;
     setChargerTChgStop: (value: number) => Promise<void>;
@@ -333,10 +468,40 @@ export type NpmDevice = {
         mode: BuckRetentionControl
     ) => Promise<void>;
     setBuckEnabled: (index: number, state: boolean) => Promise<void>;
+    setBuckActiveDischargeEnabled: (
+        index: number,
+        state: boolean
+    ) => Promise<void>;
 
     setLdoVoltage: (index: number, value: number) => Promise<void>;
     setLdoEnabled: (index: number, state: boolean) => Promise<void>;
     setLdoMode: (index: number, mode: LdoMode) => Promise<void>;
+    setLdoSoftStartEnabled: (index: number, enabled: boolean) => Promise<void>;
+    setLdoSoftStart: (index: number, softStart: SoftStart) => Promise<void>;
+
+    setGpioMode: (index: number, mode: GPIOMode) => Promise<void>;
+    setGpioPull: (index: number, mode: GPIOPullMode) => Promise<void>;
+    setGpioDrive: (index: number, drive: GPIODrive) => Promise<void>;
+    setGpioOpenDrain: (index: number, openDrain: boolean) => Promise<void>;
+    setGpioDebounce: (index: number, debounce: boolean) => Promise<void>;
+
+    setLedMode: (index: number, mode: LEDMode) => Promise<void>;
+
+    setPOFEnabled: (state: boolean) => Promise<void>;
+    setPOFPolarity: (polarity: POFPolarity) => Promise<void>;
+    setPOFThreshold: (threshold: number) => Promise<void>;
+
+    setTimerConfigMode: (mode: TimerMode) => Promise<void>;
+    setTimerConfigPrescaler: (prescaler: TimerPrescaler) => Promise<void>;
+    setTimerConfigPeriod: (period: number) => Promise<void>;
+
+    setShipModeTimeToActive: (time: TimeToActive) => Promise<void>;
+    setShipInvertPolarity: (state: boolean) => Promise<void>;
+    setShipLongPressReset: (state: boolean) => Promise<void>;
+    setShipTwoButtonReset: (state: boolean) => Promise<void>;
+
+    enterShipMode: () => void;
+    enterShipHibernateMode: () => void;
 
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
@@ -378,6 +543,11 @@ export interface NpmExport {
     charger?: Charger;
     bucks: Buck[];
     ldos: Ldo[];
+    gpios: GPIO[];
+    leds: LED[];
+    pof: POF;
+    ship: ShipModeConfig;
+    timerConfig: TimerConfig;
     fuelGauge: boolean;
     firmwareVersion: string;
     deviceType: NpmModel;
@@ -444,11 +614,13 @@ export type BatteryProfiler = {
     pofError: () => void;
 };
 
+interface DocumentationItem {
+    title: React.ReactNode;
+    content: React.ReactElement[];
+}
+
 export type Documentation = {
     [key: string]: {
-        [key: string]: {
-            title: React.ReactNode;
-            description?: React.ReactNode;
-        };
+        [key: string]: DocumentationItem[];
     };
 };

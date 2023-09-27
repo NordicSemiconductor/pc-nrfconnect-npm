@@ -8,6 +8,29 @@ and this project adheres to
 
 ## 0.9.2 - UNRELEASED
 
+### Added
+
+-   Support for NTC thermistor `ntc_z` option
+-   Support for Chip Thermal Regulation
+    -   Read and Write Tchgresume
+    -   Read and Write Tchgstop
+    -   Read Thermal Regulation state ?
+-   Support JEITA
+    -   Read and Write vTermR
+-   Charger BatLim configuration
+-   LDO
+    -   Soft Starter enable
+    -   Soft Starter current
+-   Bucks Active Output Capacitor Discharge
+-   POF
+    -   Enable POF
+    -   VSYSpof
+    -   POF Polarity
+-   Timer Config
+    -   Mode
+    -   Prescaler
+    -   Period
+
 ### Changed
 
 -   Battery profiling can now support a minimum Discharge cut-off voltage of

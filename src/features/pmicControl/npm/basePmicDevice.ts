@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
 
-import { ShellParser } from '../../../hooks/commandParser';
 import { MAX_TIMESTAMP, parseToNumber, toRegex } from './pmicHelpers';
 import {
     AdcSample,
@@ -15,13 +14,18 @@ import {
     BatteryModel,
     Buck,
     Charger,
+    GPIO,
     IBaseNpmDevice,
     Ldo,
+    LED,
     LoggingEvent,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
     PmicState,
+    POF,
+    ShipModeConfig,
+    TimerConfig,
 } from './types';
 
 export const baseNpmDevice: IBaseNpmDevice = (
@@ -33,6 +37,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         noOfBucks?: number;
         noOfLdos?: number;
         noOfGPIOs?: number;
+        noOfLEDs?: number;
     },
     supportsVersion: string
 ) => {
@@ -64,6 +69,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         rebooting = true;
 
         eventEmitter.emit('onBeforeReboot', 100);
+        shellParser.unPause();
         shellParser.enqueueRequest(
             'delayed_reboot 100',
             {
@@ -208,6 +214,49 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
+        onGPIOUpdate: (
+            handler: (payload: PartialUpdate<GPIO>, error?: string) => void
+        ) => {
+            eventEmitter.on('onGPIOUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onGPIOUpdate', handler);
+            };
+        },
+
+        onLEDUpdate: (
+            handler: (payload: PartialUpdate<LED>, error?: string) => void
+        ) => {
+            eventEmitter.on('onLEDUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onLEDUpdate', handler);
+            };
+        },
+        onPOFUpdate: (
+            handler: (payload: Partial<POF>, error?: string) => void
+        ) => {
+            eventEmitter.on('onPOFUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onPOFUpdate', handler);
+            };
+        },
+        onTimerConfigUpdate: (
+            handler: (payload: Partial<TimerConfig>, error?: string) => void
+        ) => {
+            eventEmitter.on('onTimerConfigUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onTimerConfigUpdate', handler);
+            };
+        },
+
+        onShipUpdate: (
+            handler: (payload: Partial<ShipModeConfig>, error?: string) => void
+        ) => {
+            eventEmitter.on('onShipUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onShipUpdate', handler);
+            };
+        },
+
         onLoggingEvent: (
             handler: (payload: {
                 loggingEvent: LoggingEvent;
@@ -269,6 +318,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
         getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,
+        getNumberOfLEDs: () => devices.noOfLEDs ?? 0,
 
         isSupportedVersion: () =>
             new Promise<{ supported: boolean; version: string }>(

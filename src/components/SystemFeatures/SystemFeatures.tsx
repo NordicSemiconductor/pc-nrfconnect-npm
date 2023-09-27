@@ -5,14 +5,61 @@
  */
 
 import React from 'react';
-import { Alert } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { useSelector } from 'react-redux';
+import {
+    MasonryLayout,
+    PaneProps,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-export default () => (
-    <div className="systemFeatures-container">
-        <div className="graph">
-            <Alert variant="info" label="Coming Soon! -​ ">
-                Keep a lookout for updates. This is coming your way soon
-            </Alert>
-        </div>
-    </div>
-);
+import {
+    getGPIOs,
+    getLEDs,
+    getNpmDevice,
+    getPOF,
+    getShip,
+    getTimerConfig,
+} from '../../features/pmicControl/pmicControlSlice';
+import useIsUIDisabled from '../../features/useIsUIDisabled';
+import GPIO from '../GPIO/GPIO';
+import LEDs from '../LEDs/LEDs';
+import SafetyAndLowPower from '../SafetyAndLowPower/SafetyAndLowPower';
+
+export default ({ active }: PaneProps) => {
+    const disabled = useIsUIDisabled();
+    const npmDevice = useSelector(getNpmDevice);
+    const gpios = useSelector(getGPIOs);
+    const leds = useSelector(getLEDs);
+    const pof = useSelector(getPOF);
+    const ship = useSelector(getShip);
+    const timerConfig = useSelector(getTimerConfig);
+
+    return active ? (
+        <MasonryLayout
+            className="masonry-layout min-height-cards"
+            minWidth={300}
+        >
+            {npmDevice && (
+                <SafetyAndLowPower
+                    npmDevice={npmDevice}
+                    pof={pof}
+                    ship={ship}
+                    timerConfig={timerConfig}
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice &&
+                gpios.map((gpio, index) => (
+                    <GPIO
+                        gpio={gpio}
+                        npmDevice={npmDevice}
+                        key={`GPIO${1 + index}`}
+                        index={index}
+                        disabled={disabled}
+                    />
+                ))}
+            {npmDevice && (
+                <LEDs npmDevice={npmDevice} leds={leds} disabled={disabled} />
+            )}
+        </MasonryLayout>
+    ) : null;
+};

@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useState } from 'react';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
+import React from 'react';
 import { useSelector } from 'react-redux';
+import { Overlay } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getNpmDevice } from '../../pmicControlSlice';
+import { documentation as pmic1300Documentation } from '../npm1300/documentationPmic1300';
 import { NpmModel } from '../types';
-import { documentation as pmic1300Documentation } from './documentationPmic1300';
 
 export const DocumentationTooltip = ({
     card,
@@ -26,7 +25,6 @@ export const DocumentationTooltip = ({
     keepShowingOnHoverTooltip?: boolean;
     children: React.ReactElement | string;
 }) => {
-    const [keepShowing, setKeepShowing] = useState<boolean>();
     const npmDevice = useSelector(getNpmDevice);
 
     const fullDocumentation = getDocumentation(npmDevice?.getDeviceType());
@@ -35,39 +33,30 @@ export const DocumentationTooltip = ({
         : null;
 
     return documentation ? (
-        <div className="tooltip-overlay-trigger-wrapper">
-            <OverlayTrigger
-                key="overlay"
-                placement={placement}
-                show={keepShowing}
-                delay={500}
-                overlay={
-                    <Tooltip
-                        id={`tooltip-${card}-${item}`}
-                        className="tooltip"
-                        show={keepShowing}
-                        onMouseEnter={() => {
-                            if (keepShowingOnHoverTooltip) {
-                                setKeepShowing(true);
-                            }
-                        }}
-                        onMouseLeave={() => {
-                            setKeepShowing(undefined);
-                        }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="documentation-tooltip info">
-                            <p className="title font-weight-bold">
-                                {documentation.title}
+        <Overlay
+            tooltipId={`tooltip-${card}-${item}`}
+            keepShowingOnHoverTooltip={keepShowingOnHoverTooltip}
+            placement={placement}
+            tooltipChildren={
+                <div className="tw-preflight tw-flex tw-flex-col tw-gap-4 tw-bg-gray-900 tw-px-4 tw-py-2 tw-text-left tw-text-gray-100">
+                    {documentation.map(it => (
+                        <div
+                            key={`tooltip-${card}-${item}-${it.title}`}
+                            className="tw-flex tw-flex-col tw-gap-2"
+                        >
+                            <p className="tw-font-bold tw-text-white">
+                                {it.title}
                             </p>
-                            <div> {documentation.description}</div>
+                            <div className="tw-flex tw-flex-col tw-gap-1">
+                                {...it.content}
+                            </div>
                         </div>
-                    </Tooltip>
-                }
-            >
-                <div>{children}</div>
-            </OverlayTrigger>
-        </div>
+                    ))}
+                </div>
+            }
+        >
+            {children}
+        </Overlay>
     ) : (
         <span className="line-title">{item}</span>
     );

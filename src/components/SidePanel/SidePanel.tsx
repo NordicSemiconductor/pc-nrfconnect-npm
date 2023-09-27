@@ -29,6 +29,7 @@ import {
     setEventRecordingPath,
     stopEventRecording,
 } from '../../features/pmicControl/pmicControlSlice';
+import { getShellParser } from '../../features/serial/serialSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import FuelGaugeSettings from '../FuelGauge/FuelGaugeSettings';
 import ConnectionStatus from './ConnectionStatus';
@@ -40,6 +41,7 @@ export default () => {
     const uiDisabled = useIsUIDisabled();
 
     const npmDevice = useSelector(getNpmDevice);
+    const shellParser = useSelector(getShellParser);
     const pmicConnection = useSelector(getPmicState);
 
     const fuelGaugeReportingRate = useSelector(getFuelGaugeReportingRate);
@@ -94,7 +96,10 @@ export default () => {
                         variant="secondary"
                         disabled={pmicConnection === 'ek-disconnected'}
                         className="w-100"
-                        onClick={() => npmDevice?.kernelReset()}
+                        onClick={() => {
+                            shellParser?.unPause();
+                            npmDevice?.kernelReset();
+                        }}
                     >
                         Reset Device
                     </Button>

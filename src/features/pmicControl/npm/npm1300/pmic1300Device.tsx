@@ -7,9 +7,9 @@
 import React from 'react';
 import EventEmitter from 'events';
 
-import { getRange } from '../../../utils/helpers';
-import { baseNpmDevice } from './basePmicDevice';
-import { BatteryProfiler } from './batteryProfiler';
+import { getRange } from '../../../../utils/helpers';
+import { baseNpmDevice } from '../basePmicDevice';
+import { BatteryProfiler } from '../batteryProfiler';
 import {
     isModuleDataPair,
     MAX_TIMESTAMP,
@@ -20,7 +20,7 @@ import {
     parseToBoolean,
     parseToNumber,
     toRegex,
-} from './pmicHelpers';
+} from '../pmicHelpers';
 import {
     AdcSample,
     AdcSampleSettings,
@@ -32,21 +32,41 @@ import {
     BuckRetentionControl,
     ChargeCurrentCool,
     Charger,
+    GPIO,
+    GPIODrive,
+    GPIOMode,
+    GPIOModeValues,
+    GPIOPullMode,
+    GPIOPullValues,
     GPIOValues,
     INpmDevice,
     IrqEvent,
     ITerm,
     Ldo,
     LdoMode,
+    LED,
+    LEDMode,
+    LEDModeValues,
     LoggingEvent,
     NTCThermistor,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
     PmicState,
+    POF,
+    POFPolarity,
+    POFPolarityValues,
     ProfileDownload,
+    ShipModeConfig,
+    SoftStart,
+    TimerConfig,
+    TimerMode,
+    TimerModeValues,
+    TimerPrescaler,
+    TimerPrescalerValues,
+    TimeToActive,
     VTrickleFast,
-} from './types';
+} from '../types';
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();
@@ -55,13 +75,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         charger: true,
         noOfLdos: 2,
         noOfGPIOs: 5,
+        noOfLEDs: 3,
     };
     const baseDevice = baseNpmDevice(
         shellParser,
         dialogHandler,
         eventEmitter,
         devices,
-        '0.9.2+0'
+        '0.9.2+5'
     );
     const batteryProfiler = shellParser
         ? BatteryProfiler(shellParser, eventEmitter)
@@ -355,6 +376,19 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(
             shellParser.registerCommandCallback(
+                toRegex('npmx charger termination_voltage warm', true),
+                res => {
+                    const value = parseToNumber(res);
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        vTermR: value / 1000, // mv to V
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
                 toRegex('npmx charger charger_current', true),
                 res => {
                     const value = parseToNumber(res);
@@ -450,6 +484,42 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(
             shellParser.registerCommandCallback(
+                toRegex('npmx charger discharging_current', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        batLim: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger die_temp stop', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        tChgStop: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger die_temp resume', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        tChgResume: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
                 toRegex(
                     'npmx adc ntc',
                     true,
@@ -472,6 +542,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         case '100k.':
                         case 'ntc_100k.':
                             mode = '100 kΩ';
+                            break;
+                        case 'HI_Z.':
+                        case 'ntc_hi_z.':
+                            mode = 'HI Z';
                             break;
                     }
 
@@ -630,7 +704,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx vbusin vbus status get'),
+                toRegex('npmx vbusin status cc get'),
                 res => {
                     eventEmitter.emit('onUsbPowered', parseToBoolean(res));
                 },
@@ -788,6 +862,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     noop
                 )
             );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx buck active_discharge', true, i, '(0|1)'),
+                    res => {
+                        emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                activeDischargeEnabled: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
         }
 
         for (let i = 0; i < devices.noOfLdos; i += 1) {
@@ -841,7 +931,295 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     noop
                 )
             );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx ldsw soft_start enable', true, i, '(0|1)'),
+                    res => {
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                softStartEnabled: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex(
+                        'npmx ldsw soft_start current',
+                        true,
+                        i,
+                        '(25|50|75|100)'
+                    ),
+                    res => {
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                softStart: parseToNumber(res) as SoftStart,
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
         }
+
+        for (let i = 0; i < devices.noOfGPIOs; i += 1) {
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio mode', true, i, '[0-9]'),
+                    res => {
+                        const mode = GPIOModeValues[parseToNumber(res)];
+                        if (mode) {
+                            emitPartialEvent<GPIO>(
+                                'onGPIOUpdate',
+                                {
+                                    mode,
+                                },
+                                i
+                            );
+                        }
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio pull', true, i, '(0|1|2)'),
+                    res => {
+                        const pull = GPIOPullValues[parseToNumber(res)];
+                        if (pull) {
+                            emitPartialEvent<GPIO>(
+                                'onGPIOUpdate',
+                                {
+                                    pull,
+                                },
+                                i
+                            );
+                        }
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio drive', true, i, '(1|6)'),
+                    res => {
+                        emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                drive: parseToNumber(res) as GPIODrive,
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio open_drain', true, i, '(0|1)'),
+                    res => {
+                        emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                openDrain: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx gpio debounce', true, i, '(0|1)'),
+                    res => {
+                        emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                debounce: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+        }
+
+        for (let i = 0; i < devices.noOfLEDs; i += 1) {
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx leds mode', true, i, '[0-3]'),
+                    res => {
+                        const mode = LEDModeValues[parseToNumber(res)];
+                        if (mode) {
+                            emitPartialEvent<LED>(
+                                'onLEDUpdate',
+                                {
+                                    mode,
+                                },
+                                i
+                            );
+                        }
+                    },
+                    noop
+                )
+            );
+        }
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx pof enable', true, undefined, '(0|1)'),
+                res => {
+                    emitPartialEvent<POF>('onPOFUpdate', {
+                        enable: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx pof polarity', true, undefined, '(0|1)'),
+                res => {
+                    emitPartialEvent<POF>('onPOFUpdate', {
+                        polarity: POFPolarityValues[parseToNumber(res)],
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx pof threshold', true),
+                res => {
+                    emitPartialEvent<POF>('onPOFUpdate', {
+                        threshold: parseToNumber(res) / 1000, // mV to V
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx timer config mode', true, undefined, '[0-4]'),
+                res => {
+                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                        mode: TimerModeValues[parseToNumber(res)],
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx timer config prescaler',
+                    true,
+                    undefined,
+                    '[0-1]'
+                ),
+                res => {
+                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                        prescaler: TimerPrescalerValues[parseToNumber(res)],
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx timer config period', true),
+                res => {
+                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                        period: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx ship config time',
+                    true,
+                    undefined,
+                    '(16|32|64|96|304|608|1008|3008)'
+                ),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        timeToActive: parseToNumber(res) as TimeToActive,
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship config inv_polarity', true),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        invPolarity: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship config inv_polarity', true),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        invPolarity: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship reset long_press', true),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        longPressReset: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship reset two_buttons', true),
+                res => {
+                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                        twoButtonReset: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
     }
 
     const sendCommand = (
@@ -991,6 +1369,33 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    const setChargerBatLim = (batLim: number) =>
+        new Promise<void>((resolve, reject) => {
+            emitPartialEvent<Charger>('onChargerUpdate', {
+                batLim,
+            });
+
+            if (pmicState === 'ek-disconnected') {
+                resolve();
+            } else {
+                setChargerEnabled(false)
+                    .then(() => {
+                        sendCommand(
+                            `npmx charger discharging_current set ${batLim}`,
+                            () => resolve(),
+                            () => {
+                                requestUpdate.chargerBatLim();
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
+                        requestUpdate.chargerBatLim();
+                        reject();
+                    });
+            }
+        });
+
     const setChargerEnabledRecharging = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
@@ -1030,6 +1435,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                 break;
                             case '10 kΩ':
                                 value = 'ntc_10k';
+                                break;
+                            case 'HI Z':
+                                value = 'ntc_hi_z';
                                 break;
                         }
                         sendCommand(
@@ -1077,15 +1485,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTChgStop();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger die_temp stop set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerTChgStop();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1097,15 +1504,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTChgResume();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger die_temp resume set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerTChgResume();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1137,15 +1543,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerVTermR();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger termination_voltage warm set ${value * 1000}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerVTermR();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1518,6 +1923,35 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         return action();
     };
 
+    const setBuckActiveDischargeEnabled = (
+        index: number,
+        activeDischargeEnabled: boolean
+    ) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        activeDischargeEnabled,
+                    },
+                    index
+                );
+
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx buck active_discharge set ${index} ${
+                        activeDischargeEnabled ? '1' : '0'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.buckActiveDischargeEnabled(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
     const setLdoVoltage = (index: number, voltage: number) =>
         new Promise<void>((resolve, reject) => {
             emitPartialEvent<Ldo>(
@@ -1677,6 +2111,175 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         return action();
     };
 
+    const setLdoSoftStartEnabled = (index: number, enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        softStartEnabled: enabled,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw soft_start enable set ${index} ${
+                        enabled ? '1' : '0'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ldoSoftStartEnabled(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setLdoSoftStart = (index: number, softStart: SoftStart) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        softStart,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw soft_start current set ${index} ${softStart}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ldoSoftStart(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioMode = (index: number, mode: GPIOMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        mode,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio mode set ${index} ${GPIOModeValues.findIndex(
+                        m => m === mode
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioMode(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioPull = (index: number, pull: GPIOPullMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        pull,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio pull set ${index} ${GPIOPullValues.findIndex(
+                        p => p === pull
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioPull(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioDrive = (index: number, drive: GPIODrive) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        drive,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio drive set ${index} ${drive}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioDrive(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioOpenDrain = (index: number, openDrain: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        openDrain,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio open_drain set ${index} ${
+                        openDrain ? '1' : '0'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioOpenDrain(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setGpioDebounce = (index: number, debounce: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        debounce,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx gpio debounce set ${index} ${debounce ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.gpioDebounce(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
     const setFuelGaugeEnabled = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
@@ -1688,6 +2291,227 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     () => resolve(),
                     () => {
                         requestUpdate.fuelGauge();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setLedMode = (index: number, mode: LEDMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<LED>(
+                    'onLEDUpdate',
+                    {
+                        mode,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx leds mode set ${index} ${LEDModeValues.findIndex(
+                        m => m === mode
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ledMode(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setPOFEnabled = (enable: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<POF>('onPOFUpdate', {
+                    enable,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx pof enable set ${enable ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.pofEnable();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setPOFThreshold = (threshold: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<POF>('onPOFUpdate', {
+                    threshold,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx pof threshold set ${threshold * 1000}`, // V to mV
+                    () => resolve(),
+                    () => {
+                        requestUpdate.pofThreshold();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setPOFPolarity = (polarity: POFPolarity) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<POF>('onPOFUpdate', {
+                    polarity,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx pof polarity set ${POFPolarityValues.findIndex(
+                        p => p === polarity
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.pofPolarity();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setTimerConfigMode = (mode: TimerMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                    mode,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx timer config mode set ${TimerModeValues.findIndex(
+                        m => m === mode
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.timerConfigMode();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setTimerConfigPrescaler = (prescaler: TimerPrescaler) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                    prescaler,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx timer config prescaler set ${TimerPrescalerValues.findIndex(
+                        p => p === prescaler
+                    )}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.timerConfigPrescaler();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setTimerConfigPeriod = (period: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
+                    period,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx timer config period set ${period}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.timerConfigPeriod();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setShipModeTimeToActive = (timeToActive: TimeToActive) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                    timeToActive,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ship config time set ${timeToActive}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.shipModeTimeToActive();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setShipInvertPolarity = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                    invPolarity: enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ship config inv_polarity set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.shipInvertPolarity();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setShipLongPressReset = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                    longPressReset: enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ship reset long_press set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.shipLongPressReset();
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setShipTwoButtonReset = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                    twoButtonReset: enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ship reset two_buttons set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.shipTwoButtonReset();
                         reject();
                     }
                 );
@@ -1819,17 +2643,32 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerEnabled: () => sendCommand('npmx charger module charger get'),
         chargerVTrickleFast: () => sendCommand('npmx charger trickle get'),
         chargerITerm: () => sendCommand('npmx charger termination_current get'),
+        chargerBatLim: () =>
+            sendCommand('npmx charger discharging_current get'),
         chargerEnabledRecharging: () =>
             sendCommand('npmx charger module recharge get'),
         chargerNTCThermistor: () => sendCommand('npmx adc ntc get'),
-        chargerTChgStop: () => console.log('Not Implemented'),
-        chargerTChgResume: () => console.log('Not Implemented'),
+        chargerTChgStop: () => sendCommand('npmx charger die_temp stop get'),
+        chargerTChgResume: () =>
+            sendCommand('npmx charger die_temp resume get'),
         chargerCurrentCool: () => console.log('Not Implemented'),
-        chargerVTermR: () => console.log('Not Implemented'),
+        chargerVTermR: () =>
+            sendCommand('npmx charger termination_voltage warm get'),
         chargerTCold: () => console.log('Not Implemented'),
         chargerTCool: () => console.log('Not Implemented'),
         chargerTWarm: () => console.log('Not Implemented'),
         chargerTHot: () => console.log('Not Implemented'),
+
+        gpioMode: (index: number) => sendCommand(`npmx gpio mode get ${index}`),
+        gpioPull: (index: number) => sendCommand(`npmx gpio pull get ${index}`),
+        gpioDrive: (index: number) =>
+            sendCommand(`npmx gpio drive get ${index}`),
+        gpioOpenDrain: (index: number) =>
+            sendCommand(`npmx gpio open_drain get ${index}`),
+        gpioDebounce: (index: number) =>
+            sendCommand(`npmx gpio debounce get ${index}`),
+
+        ledMode: (index: number) => sendCommand(`npmx leds mode get ${index}`),
 
         buckVOutNormal: (index: number) =>
             sendCommand(`npmx buck voltage normal get ${index}`),
@@ -1846,17 +2685,39 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckEnabled: (index: number) =>
             sendCommand(`npm1300_reg NPM_BUCK BUCKSTATUS`),
+        buckActiveDischargeEnabled: (index: number) =>
+            sendCommand(`npmx buck active_discharge get ${index}`),
 
         ldoVoltage: (index: number) =>
             sendCommand(`npmx ldsw ldo_voltage get ${index}`),
         ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
         ldoMode: (index: number) => sendCommand(`npmx ldsw mode get ${index}`),
+        ldoSoftStartEnabled: (index: number) =>
+            sendCommand(`npmx ldsw soft_start enable get ${index}`),
+        ldoSoftStart: (index: number) =>
+            sendCommand(`npmx ldsw soft_start current get ${index}`),
+
+        pofEnable: () => sendCommand(`npmx pof enable get`),
+        pofPolarity: () => sendCommand(`npmx pof polarity get`),
+        pofThreshold: () => sendCommand(`npmx pof threshold get`),
+
+        timerConfigMode: () => sendCommand(`npmx timer config mode get`),
+        timerConfigPrescaler: () =>
+            sendCommand(`npmx timer config prescaler get`),
+        timerConfigPeriod: () => sendCommand(`npmx timer config period get`),
+
+        shipModeTimeToActive: () => sendCommand(`npmx ship config time get`),
+        shipInvertPolarity: () =>
+            sendCommand(`npmx ship config inv_polarity get`),
+        shipLongPressReset: () => sendCommand(`npmx ship reset long_press get`),
+        shipTwoButtonReset: () =>
+            sendCommand(`npmx ship reset two_buttons get`),
 
         fuelGauge: () => sendCommand('fuel_gauge get'),
         activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
         storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
 
-        usbPowered: () => sendCommand(`npmx vbusin vbus status get`),
+        usbPowered: () => sendCommand(`npmx vbusin status cc get`),
     };
 
     return {
@@ -1878,9 +2739,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     setChargerIChg(charger.iChg);
                     setChargerEnabled(charger.enabled);
                     setChargerITerm(charger.iTerm);
+                    setChargerBatLim(charger.batLim);
                     setChargerEnabledRecharging(charger.enableRecharging);
                     setChargerVTrickleFast(charger.vTrickleFast);
                     setChargerNTCThermistor(charger.ntcThermistor);
+                    setChargerTChgResume(charger.tChgResume);
+                    setChargerTChgStop(charger.tChgStop);
+                    setChargerVTermR(charger.vTermR);
                 }
 
                 config.bucks.forEach((buck, index) => {
@@ -1891,13 +2756,44 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     setBuckVOutRetention(index, buck.vOutRetention);
                     setBuckRetentionControl(index, buck.retentionControl);
                     setBuckOnOffControl(index, buck.onOffControl);
+                    setBuckActiveDischargeEnabled(
+                        index,
+                        buck.activeDischargeEnabled
+                    );
                 });
 
                 config.ldos.forEach((ldo, index) => {
                     setLdoVoltage(index, ldo.voltage);
                     setLdoMode(index, ldo.mode);
                     setLdoEnabled(index, ldo.enabled);
+                    setLdoSoftStartEnabled(index, ldo.softStartEnabled);
+                    setLdoSoftStart(index, ldo.softStart);
                 });
+
+                config.gpios.forEach((gpio, index) => {
+                    setGpioMode(index, gpio.mode);
+                    setGpioPull(index, gpio.pull);
+                    setGpioDrive(index, gpio.drive);
+                    setGpioOpenDrain(index, gpio.openDrain);
+                    setGpioDebounce(index, gpio.debounce);
+                });
+
+                config.leds.forEach((led, index) => {
+                    setLedMode(index, led.mode);
+                });
+
+                setPOFEnabled(config.pof.enable);
+                setPOFPolarity(config.pof.polarity);
+                setPOFThreshold(config.pof.threshold);
+
+                setTimerConfigMode(config.timerConfig.mode);
+                setTimerConfigPrescaler(config.timerConfig.prescaler);
+                setTimerConfigPeriod(config.timerConfig.period);
+
+                setShipModeTimeToActive(config.ship.timeToActive);
+                setShipInvertPolarity(config.ship.invPolarity);
+                setShipLongPressReset(config.ship.longPressReset);
+                setShipTwoButtonReset(config.ship.twoButtonReset);
 
                 setFuelGaugeEnabled(config.fuelGauge);
             };
@@ -1960,8 +2856,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 },
             ]).map(v => Number(v.toFixed(2))),
         getChargerJeitaRange: () => ({
-            min: 0,
-            max: 100,
+            min: -20,
+            max: 60,
         }),
         getChargerChipThermalRange: () => ({
             min: 50,
@@ -1972,6 +2868,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             max: 800,
             decimals: 0,
             step: 2,
+        }),
+        getChargerIBatLimRange: () => ({
+            min: 268,
+            max: 1340,
+            decimals: 0,
+            step: 1,
         }),
 
         getBuckVoltageRange: () => ({
@@ -1993,6 +2895,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             step: 0.1,
         }),
 
+        getPOFThresholdRange: () => ({
+            min: 2.6,
+            max: 3.5,
+            decimals: 1,
+            step: 0.1,
+        }),
+
         requestUpdate,
 
         setChargerVTerm,
@@ -2000,6 +2909,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setChargerEnabled,
         setChargerVTrickleFast,
         setChargerITerm,
+        setChargerBatLim,
         setChargerEnabledRecharging,
         setChargerNTCThermistor,
         setChargerTChgStop,
@@ -2017,12 +2927,34 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setBuckModeControl,
         setBuckOnOffControl,
         setBuckRetentionControl,
+        setBuckActiveDischargeEnabled,
         setLdoVoltage,
         setLdoEnabled,
         setLdoMode,
+        setLdoSoftStartEnabled,
+        setLdoSoftStart,
+        setGpioMode,
+        setGpioPull,
+        setGpioDrive,
+        setGpioOpenDrain,
+        setGpioDebounce,
+        setLedMode,
+        setPOFEnabled,
+        setPOFThreshold,
+        setPOFPolarity,
+        setTimerConfigMode,
+        setTimerConfigPrescaler,
+        setTimerConfigPeriod,
+        setShipInvertPolarity,
+        setShipModeTimeToActive,
+        setShipLongPressReset,
+        setShipTwoButtonReset,
 
         setFuelGaugeEnabled,
         downloadFuelGaugeProfile,
+
+        enterShipMode: () => sendCommand(`npmx ship mode ship`),
+        enterShipHibernateMode: () => sendCommand(`npmx ship mode hibernate`),
 
         setActiveBatteryModel,
 
