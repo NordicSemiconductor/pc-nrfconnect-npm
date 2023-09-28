@@ -96,7 +96,7 @@ npm1300_ek_ldo${index + 1}: LDO${index + 1} {
         npmDevice.getLdoVoltageRange(index).max
     )}>;
     regulator-initial-mode = <${
-        ldo.mode === 'LDO' ? 'NPM1300_LDSW_MODE_LDO' : 'NPM1300_LDSW_MODE_LDSW'
+        ldo.mode === 'LDO' ? 'NPM1300_LDSW_MODE_LDO' : '    '
     }>;
     enable-gpios = <&npm1300_ek_gpio 2 GPIO_ACTIVE_LOW>;
 };
