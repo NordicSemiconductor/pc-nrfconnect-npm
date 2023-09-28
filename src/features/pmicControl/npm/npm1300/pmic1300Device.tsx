@@ -65,6 +65,8 @@ import {
     TimerPrescaler,
     TimerPrescalerValues,
     TimeToActive,
+    USBDetectStatusValues,
+    USBPower,
     VTrickleFast,
 } from '../types';
 
@@ -82,7 +84,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         dialogHandler,
         eventEmitter,
         devices,
-        '0.9.2+5'
+        '0.9.2+6'
     );
     const batteryProfiler = shellParser
         ? BatteryProfiler(shellParser, eventEmitter)
@@ -118,6 +120,26 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     pmicState = 'pmic-pending-reboot';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 }
+                break;
+            case 'No USB connection':
+                eventEmitter.emit('onUsbPower', {
+                    detectStatus: 'No USB connection',
+                } as USBPower);
+                break;
+            case 'Default USB 100/500mA':
+                eventEmitter.emit('onUsbPower', {
+                    detectStatus: 'USB 0.1/0.5 mA',
+                } as USBPower);
+                break;
+            case '1.5A High Power':
+                eventEmitter.emit('onUsbPower', {
+                    detectStatus: '1.5A High Power',
+                } as USBPower);
+                break;
+            case '3A High Power':
+                eventEmitter.emit('onUsbPower', {
+                    detectStatus: '3A High Power',
+                } as USBPower);
                 break;
         }
     };
@@ -704,34 +726,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx vbusin status cc get'),
+                toRegex(
+                    'npmx vbusin status cc get',
+                    false,
+                    undefined,
+                    '(0|1|2|3)'
+                ),
                 res => {
-                    eventEmitter.emit('onUsbPowered', parseToBoolean(res));
+                    emitPartialEvent<USBPower>('onUsbPower', {
+                        detectStatus: USBDetectStatusValues[parseToNumber(res)],
+                    });
                 },
                 noop
             )
         );
 
         for (let i = 0; i < devices.noOfBucks; i += 1) {
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npm1300_reg NPM_BUCK BUCKSTATUS'),
-                    res => {
-                        const value = Number.parseInt(res.split('=')[1], 16);
-
-                        emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                // eslint-disable-next-line no-bitwise
-                                enabled: (value & (i === 0 ? 0x4 : 0x64)) !== 0, // mV to V
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
             releaseAll.push(
                 shellParser.registerCommandCallback(
                     toRegex('npmx buck voltage normal', true, i),
@@ -2902,6 +2912,17 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             decimals: 1,
             step: 0.1,
         }),
+
+        getUSBCurrentLimiterRange: () => [
+            0.1,
+            ...getRange([
+                {
+                    min: 0.5,
+                    max: 1.5,
+                    step: 0.1,
+                },
+            ]).map(v => Number(v.toFixed(2))),
+        ],
 
         requestUpdate,
 

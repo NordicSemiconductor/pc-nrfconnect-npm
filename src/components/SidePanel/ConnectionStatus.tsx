@@ -16,9 +16,9 @@ import {
 import {
     getNpmDevice,
     getPmicState,
+    getUsbPower,
     isBatteryConnected,
     isSupportedVersion,
-    isUsbPowered,
 } from '../../features/pmicControl/pmicControlSlice';
 import { getCcProfilingState } from '../../features/pmicControl/profilingSlice';
 import {
@@ -31,7 +31,8 @@ export default () => {
     const shellParser = useSelector(getShellParser);
     const pmicState = useSelector(getPmicState);
     const supportedVersion = useSelector(isSupportedVersion);
-    const usbPowered = useSelector(isUsbPowered);
+    const usbPower = useSelector(getUsbPower);
+    const usbPowered = usbPower.detectStatus !== 'No USB connection';
     const paused = useSelector(isPaused);
     const ccProfilingState = useSelector(getCcProfilingState);
     const npmDevice = useSelector(getNpmDevice);

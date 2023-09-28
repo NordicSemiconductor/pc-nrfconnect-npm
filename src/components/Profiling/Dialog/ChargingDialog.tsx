@@ -21,8 +21,8 @@ import {
     getLatestAdcSample,
     getNpmDevice,
     getPmicChargingState,
+    getUsbPower,
     isBatteryConnected,
-    isUsbPowered,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
@@ -42,7 +42,8 @@ import StepperProgress from './StepperProgress';
 
 export default ({ isVisible }: { isVisible: boolean }) => {
     const npmDevice = useSelector(getNpmDevice);
-    const usbPowered = useSelector(isUsbPowered);
+    const usbPower = useSelector(getUsbPower);
+    const usbPowered = usbPower.detectStatus !== 'No USB connection';
     const charger = useSelector(getCharger);
     const pmicChargingState = useSelector(getPmicChargingState);
     const batteryConnected = useSelector(isBatteryConnected);

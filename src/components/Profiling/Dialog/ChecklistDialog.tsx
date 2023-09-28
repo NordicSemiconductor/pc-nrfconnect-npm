@@ -20,8 +20,8 @@ import {
     getLatestAdcSample,
     getNpmDevice,
     getPmicState,
+    getUsbPower,
     isBatteryConnected,
-    isUsbPowered,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
@@ -39,7 +39,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const profile = useSelector(getProfile);
     const charger = useSelector(getCharger);
     const pmicConnectionState = useSelector(getPmicState);
-    const usbPowered = useSelector(isUsbPowered);
+    const usbPower = useSelector(getUsbPower);
+    const usbPowered = usbPower.detectStatus !== 'No USB connection';
     const batteryConnected = useSelector(isBatteryConnected);
     const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
     const index = useSelector(getProfileIndex);

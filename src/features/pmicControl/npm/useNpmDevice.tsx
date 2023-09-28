@@ -47,7 +47,6 @@ import {
     setPmicState,
     setStoredBatterModel,
     setSupportedVersion,
-    setUsbPowered,
     updateBuck,
     updateCharger,
     updateGPIOs,
@@ -56,6 +55,7 @@ import {
     updatePOFs,
     updateShipModeConfig,
     updateTimerConfig,
+    updateUsbPower,
 } from '../pmicControlSlice';
 import {
     getProfile,
@@ -381,8 +381,8 @@ export default () => {
             );
 
             releaseAll.push(
-                npmDevice.onUsbPowered(payload => {
-                    dispatch(setUsbPowered(payload));
+                npmDevice.onUsbPower(payload => {
+                    dispatch(updateUsbPower(payload));
                 })
             );
 

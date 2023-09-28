@@ -20,6 +20,7 @@ import {
     TimerModeValues,
     TimerPrescalerValues,
     TimeToActiveValues,
+    USBDetectStatusValues,
 } from '../../types';
 import {
     PMIC_1300_BUCKS,
@@ -38,7 +39,7 @@ describe('PMIC 1300 - Command callbacks', () => {
         mockOnActiveBatteryModelUpdate,
         mockEnqueueRequest,
         mockOnStoredBatteryModelUpdate,
-        mockOnUsbPowered,
+        mockOnUsbPower,
         mockOnBuckUpdate,
         mockOnLdoUpdate,
         mockOnGpioUpdate,
@@ -436,16 +437,19 @@ Battery models stored in database:
         ]);
     });
 
-    test.each([true, false])('npmx vbusin status cc get %p', value => {
-        const command = `npmx vbusin status cc get`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
+    test.each(USBDetectStatusValues.map((state, index) => ({ state, index })))(
+        'npmx vbusin status cc get %p',
+        ({ state, index }) => {
+            const command = `npmx vbusin status cc get`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${value ? '1' : '0'}`, command);
+            callback?.onSuccess(`Value: ${index}`, command);
 
-        expect(mockOnUsbPowered).toBeCalledTimes(1);
-        expect(mockOnUsbPowered).toBeCalledWith(value);
-    });
+            expect(mockOnUsbPower).toBeCalledTimes(1);
+            expect(mockOnUsbPower).toBeCalledWith({ detectStatus: state });
+        }
+    );
 
     test.each(
         PMIC_1300_BUCKS.map(index => [

@@ -216,6 +216,19 @@ export type BatteryModel = {
     characterizations: BatteryModelCharacterization[];
 };
 
+export const USBDetectStatusValues = [
+    'No USB connection',
+    'USB 0.1/0.5 mA',
+    '1.5A High Power',
+    '3A High Power',
+] as const;
+export type USBdetectStatus = (typeof USBDetectStatusValues)[number];
+
+export type USBPower = {
+    detectStatus: USBdetectStatus;
+    currentLimiter: number;
+};
+
 // 'pmic-connected' -> Shell ok - PMIC Online
 // 'pmic-disconnected' -> Shell ok - PMIC disconnected
 // 'pmic-pending-reboot' -> Shell ok - PMIC need restart to proceed
@@ -305,8 +318,8 @@ export type BaseNpmDevice = {
         handler: (success: boolean, error?: string) => void
     ) => () => void;
 
-    onUsbPowered: (
-        handler: (success: boolean, error?: string) => void
+    onUsbPower: (
+        handler: (payload: USBPower, error?: string) => void
     ) => () => void;
 
     onFuelGaugeUpdate: (handler: (payload: boolean) => void) => () => void;
@@ -374,6 +387,7 @@ export type NpmDevice = {
     getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
     getPOFThresholdRange: () => RangeType;
+    getUSBCurrentLimiterRange: () => number[];
 
     requestUpdate: {
         pmicChargingState: () => void;
