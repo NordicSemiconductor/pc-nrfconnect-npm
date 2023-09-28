@@ -30,6 +30,12 @@ and this project adheres to
     -   Mode
     -   Prescaler
     -   Period
+-   VBus
+    -   Input current detection
+-   Enter Ship Mode
+-   Enter Hibernate Mode
+-   Configure Long Press Reset
+-   Configure Two Button Reset
 
 ### Changed
 
