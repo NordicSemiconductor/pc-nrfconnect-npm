@@ -324,12 +324,18 @@ describe('PMIC 1300 - Request update commands', () => {
         }
     );
 
-    test.skip.each(PMIC_1300_BUCKS)(
+    test.each(PMIC_1300_BUCKS)(
         'Request update buckEnabled index: %p',
         index => {
             pmic.requestUpdate.buckEnabled(index);
 
-            // TODO
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx buck status power get ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
         }
     );
 

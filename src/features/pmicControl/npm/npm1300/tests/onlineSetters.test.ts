@@ -589,7 +589,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck set ${index} 1`,
+                    `npmx buck status power set ${index} 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -647,7 +647,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx buck set 1 0`,
+                `npmx buck status power set 1 0`,
                 expect.anything(),
                 undefined,
                 true
@@ -670,7 +670,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx buck set 1 0`,
+                `npmx buck status power set 1 0`,
                 expect.anything(),
                 undefined,
                 true
@@ -2173,7 +2173,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck set ${index} 1`,
+                    `npmx buck status power set ${index} 1`,
                     expect.anything(),
                     undefined,
                     true
@@ -2181,7 +2181,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npm1300_reg NPM_BUCK BUCKSTATUS`,
+                    `npmx buck status power get ${index}`,
                     expect.anything(),
                     undefined,
                     true
