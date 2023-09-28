@@ -785,7 +785,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             releaseAll.push(
                 shellParser.registerCommandCallback(
-                    toRegex('npmx buck', true, i),
+                    toRegex('npmx buck status power', true, i),
                     res => {
                         emitPartialEvent<Buck>(
                             'onBuckUpdate',
@@ -1885,7 +1885,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     resolve();
                 } else {
                     sendCommand(
-                        `npmx buck set ${index} ${enabled ? '1' : '0'}`,
+                        `npmx buck status power set ${index} ${
+                            enabled ? '1' : '0'
+                        }`,
                         () => resolve(),
                         () => {
                             requestUpdate.buckEnabled(index);
@@ -2682,9 +2684,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sendCommand(`npmx buck gpio on_off get ${index}`),
         buckRetentionControl: (index: number) =>
             sendCommand(`npmx buck gpio retention get ${index}`),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         buckEnabled: (index: number) =>
-            sendCommand(`npm1300_reg NPM_BUCK BUCKSTATUS`),
+            sendCommand(`npmx buck status power get ${index}`),
         buckActiveDischargeEnabled: (index: number) =>
             sendCommand(`npmx buck active_discharge get ${index}`),
 
