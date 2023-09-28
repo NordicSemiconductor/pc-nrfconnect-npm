@@ -1230,6 +1230,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 noop
             )
         );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx ship mode (ship|hibernate)'),
+                () => {
+                    eventEmitter.emit('onReboot', true);
+                },
+                noop
+            )
+        );
     }
 
     const sendCommand = (
