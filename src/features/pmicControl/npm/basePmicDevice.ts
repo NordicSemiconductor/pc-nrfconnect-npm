@@ -26,6 +26,7 @@ import {
     POF,
     ShipModeConfig,
     TimerConfig,
+    USBPower,
 } from './types';
 
 export const baseNpmDevice: IBaseNpmDevice = (
@@ -307,10 +308,10 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
-        onUsbPowered: (handler: (success: boolean) => void) => {
-            eventEmitter.on('onUsbPowered', handler);
+        onUsbPower: (handler: (payload: USBPower) => void) => {
+            eventEmitter.on('onUsbPower', handler);
             return () => {
-                eventEmitter.removeListener('onUsbPowered', handler);
+                eventEmitter.removeListener('onUsbPower', handler);
             };
         },
 

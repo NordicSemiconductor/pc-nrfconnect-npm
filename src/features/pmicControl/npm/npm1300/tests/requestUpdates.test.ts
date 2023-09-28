@@ -787,14 +787,14 @@ describe('PMIC 1300 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _unique?: boolean
             ) => {
-                callbacks?.onSuccess('app_version=0.9.2+5', command);
+                callbacks?.onSuccess('app_version=0.9.2+6', command);
                 return Promise.resolve();
             }
         );
 
         await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
             supported: true,
-            version: '0.9.2+5',
+            version: '0.9.2+6',
         });
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);

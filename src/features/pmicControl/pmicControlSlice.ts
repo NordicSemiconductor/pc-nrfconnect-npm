@@ -23,6 +23,7 @@ import {
     POF,
     ShipModeConfig,
     TimerConfig,
+    USBPower,
 } from './npm/types';
 
 interface pmicControlState {
@@ -46,7 +47,7 @@ interface pmicControlState {
     activeBatterModel?: BatteryModel;
     hardcodedBatterModels: BatteryModel[];
     storedBatterModel?: (BatteryModel | null)[];
-    usbPowered: boolean;
+    usbPower: USBPower;
     fuelGaugeChargingSamplingRate: number;
     fuelGaugeNotChargingSamplingRate: number;
     fuelGaugeReportingRate: number;
@@ -87,7 +88,10 @@ const initialState: pmicControlState = {
     fuelGauge: false,
     hardcodedBatterModels: [],
     dialog: [],
-    usbPowered: false,
+    usbPower: {
+        detectStatus: 'No USB connection',
+        currentLimiter: 0.1,
+    },
     fuelGaugeChargingSamplingRate: 500,
     fuelGaugeNotChargingSamplingRate: 1000,
     fuelGaugeReportingRate: 2000,
@@ -246,8 +250,14 @@ const pmicControlSlice = createSlice({
         stopEventRecording(state) {
             state.eventRecordingPath = undefined;
         },
-        setUsbPowered(state, action: PayloadAction<boolean>) {
-            state.usbPowered = action.payload;
+        setUsbPower(state, action: PayloadAction<USBPower>) {
+            state.usbPower = action.payload;
+        },
+        updateUsbPower(state, action: PayloadAction<Partial<USBPower>>) {
+            state.usbPower = {
+                ...state.usbPower,
+                ...action.payload,
+            };
         },
         setFuelGaugeChargingSamplingRate(state, action: PayloadAction<number>) {
             state.fuelGaugeChargingSamplingRate = action.payload;
@@ -315,8 +325,7 @@ export const getHardcodedBatterModels = (state: RootState) =>
     state.app.pmicControl.hardcodedBatterModels;
 export const getStoredBatterModels = (state: RootState) =>
     state.app.pmicControl.storedBatterModel;
-export const isUsbPowered = (state: RootState) =>
-    state.app.pmicControl.usbPowered;
+export const getUsbPower = (state: RootState) => state.app.pmicControl.usbPower;
 export const canProfile = (state: RootState) =>
     state.app.pmicControl.npmDevice?.getBatteryProfiler() !== undefined;
 export const isSupportedVersion = (state: RootState) =>
@@ -371,7 +380,8 @@ export const {
     dequeueDialog,
     setEventRecordingPath,
     stopEventRecording,
-    setUsbPowered,
+    setUsbPower,
+    updateUsbPower,
     setFuelGaugeChargingSamplingRate,
     setFuelGaugeNotChargingSamplingRate,
     setFuelGaugeReportingRate,

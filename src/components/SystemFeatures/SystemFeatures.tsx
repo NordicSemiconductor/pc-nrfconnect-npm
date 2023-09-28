@@ -18,11 +18,13 @@ import {
     getPOF,
     getShip,
     getTimerConfig,
+    getUsbPower,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import GPIO from '../GPIO/GPIO';
 import LEDs from '../LEDs/LEDs';
 import SafetyAndLowPower from '../SafetyAndLowPower/SafetyAndLowPower';
+import VBus from '../VBus/VBus';
 
 export default ({ active }: PaneProps) => {
     const disabled = useIsUIDisabled();
@@ -31,13 +33,11 @@ export default ({ active }: PaneProps) => {
     const leds = useSelector(getLEDs);
     const pof = useSelector(getPOF);
     const ship = useSelector(getShip);
+    const usbPower = useSelector(getUsbPower);
     const timerConfig = useSelector(getTimerConfig);
 
     return active ? (
-        <MasonryLayout
-            className="masonry-layout min-height-cards"
-            minWidth={300}
-        >
+        <MasonryLayout className="masonry-layout" minWidth={300}>
             {npmDevice && (
                 <SafetyAndLowPower
                     npmDevice={npmDevice}
@@ -59,6 +59,13 @@ export default ({ active }: PaneProps) => {
                 ))}
             {npmDevice && (
                 <LEDs npmDevice={npmDevice} leds={leds} disabled={disabled} />
+            )}
+            {npmDevice && (
+                <VBus
+                    npmDevice={npmDevice}
+                    usbPower={usbPower}
+                    disabled={disabled}
+                />
             )}
         </MasonryLayout>
     ) : null;

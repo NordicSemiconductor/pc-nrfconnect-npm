@@ -21,7 +21,7 @@ interface GPIOProperties {
     disabled: boolean;
 }
 
-const ledModeValuesItems = [...LEDModeValues].map(item => ({
+const ledModeValuesItems = LEDModeValues.map(item => ({
     label: `${item}`,
     value: `${item}`,
 }));

@@ -30,8 +30,8 @@ import {
     getLdos,
     getNpmDevice,
     getPmicState,
+    getUsbPower,
     isBatteryConnected,
-    isUsbPowered,
     setBatteryConnected,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
@@ -84,7 +84,8 @@ export default () => {
     const profilingStage = useSelector(getProfilingStage);
     const profile = useSelector(getProfile);
     const batteryConnected = useSelector(isBatteryConnected);
-    const usbPowered = useSelector(isUsbPowered);
+    const usbPower = useSelector(getUsbPower);
+    const usbPowered = usbPower.detectStatus !== 'No USB connection';
     const ldos = useSelector(getLdos);
     const bucks = useSelector(getBucks);
     const fuelGauge = useSelector(getFuelGauge);

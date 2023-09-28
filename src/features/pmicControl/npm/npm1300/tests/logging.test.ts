@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { PmicChargingState } from '../../types';
+import { PmicChargingState, USBDetectStatusValues } from '../../types';
 import { setupMocksWithShellParser } from './helpers';
 
 jest.useFakeTimers();
@@ -69,7 +69,7 @@ describe('PMIC 1300 - Logging', () => {
             eventHandlers,
             mockOnAdcSample,
             mockOnBeforeReboot,
-            mockOnUsbPowered,
+            mockOnUsbPower,
             mockOnChargingStatusUpdate,
             pmic,
         } = setupMocksWithShellParser();
@@ -80,7 +80,7 @@ describe('PMIC 1300 - Logging', () => {
             eventHandlers = setupMock.eventHandlers;
             mockOnAdcSample = setupMock.mockOnAdcSample;
             mockOnBeforeReboot = setupMock.mockOnBeforeReboot;
-            mockOnUsbPowered = setupMock.mockOnUsbPowered;
+            mockOnUsbPower = setupMock.mockOnUsbPower;
             mockOnChargingStatusUpdate = setupMock.mockOnChargingStatusUpdate;
             pmic = setupMock.pmic;
         });
@@ -168,22 +168,22 @@ describe('PMIC 1300 - Logging', () => {
             });
         });
 
-        test('USB Power detected  event', () => {
+        test.each(
+            [
+                'No USB connection',
+                'Default USB 100/500mA',
+                '1.5A High Power',
+                '3A High Power',
+            ].map((value, index) => ({ value, index }))
+        )('USB Power events', ({ value, index }) => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:17.525,000] <inf> module_pmic_irq: type=EVENTSVBUSIN0SET,bit=EVENTVBUSDETECTED'
+                `[00:00:17.525,000] <inf> module_pmic: ${value}`
             );
 
-            expect(mockOnUsbPowered).toBeCalledTimes(1);
-            expect(mockOnUsbPowered).toBeCalledWith(true);
-        });
-
-        test('USB Power removed event', () => {
-            eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:17.525,000] <inf> module_pmic_irq: type=EVENTSVBUSIN0SET,bit=EVENTVBUSREMOVED'
-            );
-
-            expect(mockOnUsbPowered).toBeCalledTimes(1);
-            expect(mockOnUsbPowered).toBeCalledWith(false);
+            expect(mockOnUsbPower).toBeCalledTimes(1);
+            expect(mockOnUsbPower).toBeCalledWith({
+                detectStatus: USBDetectStatusValues[index],
+            });
         });
 
         test.each([0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80])(

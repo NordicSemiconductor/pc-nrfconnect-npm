@@ -20,6 +20,7 @@ import {
     POF,
     ShipModeConfig,
     TimerConfig,
+    USBPower,
 } from '../../types';
 import { getNPM1300 } from '../pmic1300Device';
 
@@ -77,11 +78,15 @@ export const setupMocksBase = (
         (_partialUpdate: Partial<ShipModeConfig>) => {}
     );
 
+    const mockOnUsbPower = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: Partial<USBPower>) => {}
+    );
+
     const mockOnLoggingEvent = jest.fn(() => {});
     const mockOnPmicStateChange = jest.fn(() => {});
     const mockOnReboot = jest.fn(() => {});
     const mockOnStoredBatteryModelUpdate = jest.fn(() => {});
-    const mockOnUsbPowered = jest.fn(() => {});
 
     pmic.onActiveBatteryModelUpdate(mockOnActiveBatteryModelUpdate);
     pmic.onAdcSample(mockOnAdcSample);
@@ -100,7 +105,7 @@ export const setupMocksBase = (
     pmic.onPmicStateChange(mockOnPmicStateChange);
     pmic.onReboot(mockOnReboot);
     pmic.onStoredBatteryModelUpdate(mockOnStoredBatteryModelUpdate);
-    pmic.onUsbPowered(mockOnUsbPowered);
+    pmic.onUsbPower(mockOnUsbPower);
 
     return {
         mockDialogHandler,
@@ -121,7 +126,7 @@ export const setupMocksBase = (
         mockOnPmicStateChange,
         mockOnReboot,
         mockOnStoredBatteryModelUpdate,
-        mockOnUsbPowered,
+        mockOnUsbPower,
         pmic,
     };
 };
