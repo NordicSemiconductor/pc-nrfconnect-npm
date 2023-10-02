@@ -53,14 +53,14 @@ npm1300_ek_charger: charger {
     compatible = "nordic,npm1300-charger";
     term-microvolt = <${toMicro(charger.vTerm)}>;
     term-warm-microvolt = <${toMicro(charger.vTermR)}>;
-    term-current-percent = <${Number.parseInt(charger.iTerm, 10)}>;
+    // term-current-percent = <${Number.parseInt(charger.iTerm, 10)}>;
     current-microamp = <${toMicro(charger.iChg)}>;
-    trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
+    // trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
     dischg-limit-microamp = <1000000>;
     vbus-limit-microamp = <500000>;
     thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
     thermistor-beta = <3380>;
-    ${charger.enableRecharging ? '' : 'disable-recharge;'}
+    ${charger.enableRecharging ? '' : '// disable-recharge;'}
     ${charger.enabled ? 'charging-enable;' : ''}
     thermistor-cold-millidegrees = <${toMilli(charger.tCold)}>;
     thermistor-cool-millidegrees = <${toMilli(charger.tCool)}>;
