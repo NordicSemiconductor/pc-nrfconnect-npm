@@ -192,7 +192,7 @@ export default () => {
                             iChg: npmDevice.getChargerCurrentRange().min,
                             enabled: false,
                             iTerm: '10%',
-                            batLim: 1340,
+                            iBatLim: 1340,
                             enableRecharging: false,
                             ntcThermistor: '10 kΩ',
                             tChgStop: 110,

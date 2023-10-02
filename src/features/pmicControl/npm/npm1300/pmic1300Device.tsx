@@ -510,7 +510,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 toRegex('npmx charger discharging_current', true),
                 res => {
                     emitPartialEvent<Charger>('onChargerUpdate', {
-                        batLim: parseToNumber(res),
+                        iBatLim: parseToNumber(res),
                     });
                 },
                 noop
@@ -1390,10 +1390,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
-    const setChargerBatLim = (batLim: number) =>
+    const setChargerBatLim = (iBatLim: number) =>
         new Promise<void>((resolve, reject) => {
             emitPartialEvent<Charger>('onChargerUpdate', {
-                batLim,
+                iBatLim,
             });
 
             if (pmicState === 'ek-disconnected') {
@@ -1402,7 +1402,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 setChargerEnabled(false)
                     .then(() => {
                         sendCommand(
-                            `npmx charger discharging_current set ${batLim}`,
+                            `npmx charger discharging_current set ${iBatLim}`,
                             () => resolve(),
                             () => {
                                 requestUpdate.chargerBatLim();
@@ -2762,7 +2762,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         setChargerIChg(charger.iChg);
                         setChargerEnabled(charger.enabled);
                         setChargerITerm(charger.iTerm);
-                        setChargerBatLim(charger.batLim);
+                        setChargerBatLim(charger.iBatLim);
                         setChargerEnabledRecharging(charger.enableRecharging);
                         setChargerVTrickleFast(charger.vTrickleFast);
                         setChargerNTCThermistor(charger.ntcThermistor);

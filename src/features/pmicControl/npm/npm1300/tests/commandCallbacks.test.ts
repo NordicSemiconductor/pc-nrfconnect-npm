@@ -133,7 +133,7 @@ describe('PMIC 1300 - Command callbacks', () => {
         callback?.onSuccess('Value: 1000mA.', command);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).nthCalledWith(1, { batLim: 1000 });
+        expect(mockOnChargerUpdate).nthCalledWith(1, { iBatLim: 1000 });
     });
 
     test.each(['get', 'set 100'])('npmx charger die_temp resume %p', append => {

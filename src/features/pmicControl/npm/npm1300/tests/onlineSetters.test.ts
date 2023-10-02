@@ -101,7 +101,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             await pmic.setChargerBatLim(1000);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ batLim: 1000 });
+            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
 
             // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1379,7 +1379,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             await expect(pmic.setChargerBatLim(1000)).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ batLim: 1000 });
+            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1415,7 +1415,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             await expect(pmic.setChargerBatLim(1000)).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ batLim: 1000 });
+            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
 
             // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(3);

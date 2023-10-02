@@ -86,7 +86,7 @@ export type Charger = {
     enabled: boolean;
     enableRecharging: boolean;
     iTerm: ITerm;
-    batLim: number;
+    iBatLim: number;
     ntcThermistor: NTCThermistor;
     tChgStop: number;
     tChgResume: number;
