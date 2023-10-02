@@ -165,33 +165,33 @@ describe('PMIC 1300 - Command callbacks', () => {
     test.each([
         {
             append: 'get',
-            successReturn: 'Value: 47k.',
+            successReturn: 'Value: 47000.',
             ntcThermistor: '47 kΩ' as NTCThermistor,
         },
         {
-            append: 'set ntc_47k',
-            successReturn: 'Value: 47k.',
+            append: 'set 47000',
+            successReturn: 'Value: 47000.',
             ntcThermistor: '47 kΩ' as NTCThermistor,
         },
         {
-            append: 'set ntc_10k',
-            successReturn: 'Value: 10k.',
+            append: 'set 10000',
+            successReturn: 'Value: 10000.',
             ntcThermistor: '10 kΩ' as NTCThermistor,
         },
         {
-            append: 'set ntc_100k',
-            successReturn: 'Value: 100k.',
+            append: 'set 100000',
+            successReturn: 'Value: 100000.',
             ntcThermistor: '100 kΩ' as NTCThermistor,
         },
         {
-            append: 'set ntc_hi_z',
-            successReturn: 'Value: HI_Z.',
+            append: 'set 0',
+            successReturn: 'Value: 0.',
             ntcThermistor: 'Ignore NTC' as NTCThermistor,
         },
     ])(
         'npmx charger ntc thermistor %p',
         ({ append, successReturn, ntcThermistor }) => {
-            const command = `npmx adc ntc ${append}`;
+            const command = `npmx adc ntc type ${append}`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -201,6 +201,19 @@ describe('PMIC 1300 - Command callbacks', () => {
             expect(mockOnChargerUpdate).nthCalledWith(1, { ntcThermistor });
         }
     );
+
+    test.each(['get', 'set 100'])('npmx charger ntc beta %p', append => {
+        const command = `npmx adc ntc beta ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess('Value: 100.', command);
+
+        expect(mockOnChargerUpdate).toBeCalledTimes(1);
+        expect(mockOnChargerUpdate).nthCalledWith(1, {
+            ntcBeta: 100,
+        });
+    });
 
     test.each(
         [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80]
@@ -316,7 +329,7 @@ describe('PMIC 1300 - Command callbacks', () => {
     );
 
     test.each(['get', 'set 20'])(
-        'npmx charger ntc_temperature cold %p',
+        'npmx charger ntc_temperature warm %p',
         append => {
             const command = `npmx charger ntc_temperature warm ${append}`;
             const callback =

@@ -14,6 +14,7 @@ import {
     NumberInlineInput,
     NumberInputSliderWithUnit,
     Slider,
+    Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
@@ -46,6 +47,8 @@ export default ({
     const latestAdcSample = useSelector(getLatestAdcSample);
 
     const [internalVTermr, setInternalVTermr] = useState(charger.vTermR);
+    const [internalNTCBeta, setInternalNTCBeta] = useState(charger.ntcBeta);
+    const [autoNTCBeta, setAutoNTCBeta] = useState(true);
 
     const [internalJeitaTemps, setInternalJeitaTemps] = useState([
         charger.tCold,
@@ -93,6 +96,7 @@ export default ({
             charger.tWarm,
             charger.tHot,
         ]);
+        setInternalNTCBeta(charger.ntcBeta);
     }, [charger]);
 
     const updateInternal = (index: number, value: number) => {
@@ -341,7 +345,8 @@ export default ({
                 items={ntcThermistorItems}
                 onSelect={item =>
                     npmDevice.setChargerNTCThermistor(
-                        item.value as NTCThermistor
+                        item.value as NTCThermistor,
+                        autoNTCBeta
                     )
                 }
                 selectedItem={
@@ -356,6 +361,36 @@ export default ({
                 }
                 disabled={disabled}
             />
+            <Toggle
+                isToggled={autoNTCBeta}
+                onToggle={v => {
+                    setAutoNTCBeta(v);
+                    if (!v) return;
+                    npmDevice.setChargerNTCThermistor(
+                        charger.ntcThermistor,
+                        true
+                    );
+                }}
+                label="Auto NTC Beta"
+            />
+            {!autoNTCBeta && (
+                <div className="tw-flex tw-justify-between">
+                    NTC Beta
+                    <div className="tw-flex tw-flex-row">
+                        <NumberInlineInput
+                            range={{
+                                min: 0,
+                                max: 4294967295,
+                                decimals: undefined,
+                                step: undefined,
+                            }}
+                            value={internalNTCBeta}
+                            onChange={setInternalNTCBeta}
+                            onChangeComplete={npmDevice.setChargerNTCBeta}
+                        />
+                    </div>
+                </div>
+            )}
         </Card>
     );
 };

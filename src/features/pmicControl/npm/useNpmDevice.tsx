@@ -113,6 +113,7 @@ export default () => {
                 npmDevice.requestUpdate.chargerEnabledRecharging();
                 npmDevice.requestUpdate.pmicChargingState();
                 npmDevice.requestUpdate.chargerNTCThermistor();
+                npmDevice.requestUpdate.chargerNTCBeta();
                 npmDevice.requestUpdate.chargerTChgStop();
                 npmDevice.requestUpdate.chargerTChgResume();
                 npmDevice.requestUpdate.chargerCurrentCool();
@@ -195,6 +196,7 @@ export default () => {
                             iBatLim: 1340,
                             enableRecharging: false,
                             ntcThermistor: '10 kΩ',
+                            ntcBeta: 3380,
                             tChgStop: 110,
                             tChgResume: 100,
                             currentCool: 'iCool',

@@ -597,30 +597,26 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         releaseAll.push(
             shellParser.registerCommandCallback(
                 toRegex(
-                    'npmx adc ntc',
+                    'npmx adc ntc type',
                     true,
                     undefined,
-                    '(ntc_hi_z|ntc_10k|ntc_47k|ntc_100k)'
+                    '(0|10000|47000|100000)'
                 ),
                 res => {
-                    const result = parseColonBasedAnswer(res);
+                    const result = parseToNumber(res);
 
                     let mode: NTCThermistor | null = null;
                     switch (result) {
-                        case '10k.':
-                        case 'ntc_10k.':
+                        case 10000:
                             mode = '10 kΩ';
                             break;
-                        case '47k.':
-                        case 'ntc_47k.':
+                        case 47000:
                             mode = '47 kΩ';
                             break;
-                        case '100k.':
-                        case 'ntc_100k.':
+                        case 100000:
                             mode = '100 kΩ';
                             break;
-                        case 'HI_Z.':
-                        case 'ntc_hi_z.':
+                        case 0:
                             mode = 'Ignore NTC';
                             break;
                     }
@@ -630,6 +626,18 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             ntcThermistor: mode,
                         });
                     }
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx adc ntc beta', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        ntcBeta: parseToNumber(res),
+                    });
                 },
                 noop
             )
@@ -1488,35 +1496,57 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 );
             }
         });
-    const setChargerNTCThermistor = (mode: NTCThermistor) =>
+    const setChargerNTCThermistor = (
+        mode: NTCThermistor,
+        autoSetBeta?: boolean
+    ) =>
         new Promise<void>((resolve, reject) => {
             emitPartialEvent<Charger>('onChargerUpdate', {
                 ntcThermistor: mode,
             });
+
+            let value = 0;
+            let ntcBeta = 0;
+            switch (mode) {
+                case '100 kΩ':
+                    value = 100000;
+                    ntcBeta = 4250;
+                    break;
+                case '47 kΩ':
+                    value = 47000;
+                    ntcBeta = 4050;
+                    break;
+                case '10 kΩ':
+                    value = 10000;
+                    ntcBeta = 3380;
+                    break;
+                case 'Ignore NTC':
+                    value = 0;
+                    break;
+            }
+
+            if (autoSetBeta && mode !== 'Ignore NTC') {
+                emitPartialEvent<Charger>('onChargerUpdate', {
+                    ntcBeta,
+                });
+            }
 
             if (pmicState === 'ek-disconnected') {
                 resolve();
             } else {
                 setChargerEnabled(false)
                     .then(() => {
-                        let value = '';
-                        switch (mode) {
-                            case '100 kΩ':
-                                value = 'ntc_100k';
-                                break;
-                            case '47 kΩ':
-                                value = 'ntc_47k';
-                                break;
-                            case '10 kΩ':
-                                value = 'ntc_10k';
-                                break;
-                            case 'Ignore NTC':
-                                value = 'ntc_hi_z';
-                                break;
-                        }
                         sendCommand(
-                            `npmx adc ntc set ${value}`,
-                            () => resolve(),
+                            `npmx adc ntc type set ${value}`,
+                            () => {
+                                if (autoSetBeta && mode !== 'Ignore NTC') {
+                                    setChargerNTCBeta(ntcBeta)
+                                        .then(resolve)
+                                        .catch(reject);
+                                } else {
+                                    resolve();
+                                }
+                            },
                             () => {
                                 requestUpdate.chargerNTCThermistor();
                                 reject();
@@ -1527,6 +1557,32 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         requestUpdate.chargerNTCThermistor();
                         reject();
                     });
+            }
+        });
+
+    const setChargerNTCBeta = (ntcBeta: number) =>
+        new Promise<void>((resolve, reject) => {
+            emitPartialEvent<Charger>('onChargerUpdate', {
+                ntcBeta,
+            });
+
+            if (pmicState === 'ek-disconnected') {
+                resolve();
+            } else {
+                setChargerEnabled(false)
+                    .then(() =>
+                        sendCommand(
+                            `npmx adc ntc beta set ${ntcBeta}`,
+                            () => {
+                                resolve();
+                            },
+                            () => {
+                                requestUpdate.chargerNTCBeta();
+                                reject();
+                            }
+                        )
+                    )
+                    .catch(reject);
             }
         });
 
@@ -2719,7 +2775,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sendCommand('npmx charger discharging_current get'),
         chargerEnabledRecharging: () =>
             sendCommand('npmx charger module recharge get'),
-        chargerNTCThermistor: () => sendCommand('npmx adc ntc get'),
+        chargerNTCThermistor: () => sendCommand('npmx adc ntc type get'),
+        chargerNTCBeta: () => sendCommand('npmx adc ntc beta get'),
         chargerTChgStop: () => sendCommand('npmx charger die_temp stop get'),
         chargerTChgResume: () =>
             sendCommand('npmx charger die_temp resume get'),
@@ -2818,6 +2875,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         setChargerEnabledRecharging(charger.enableRecharging);
                         setChargerVTrickleFast(charger.vTrickleFast);
                         setChargerNTCThermistor(charger.ntcThermistor);
+                        setChargerNTCBeta(charger.ntcBeta);
                         setChargerTChgResume(charger.tChgResume);
                         setChargerTChgStop(charger.tChgStop);
                         setChargerVTermR(charger.vTermR);
@@ -3006,6 +3064,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setChargerBatLim,
         setChargerEnabledRecharging,
         setChargerNTCThermistor,
+        setChargerNTCBeta,
         setChargerTChgStop,
         setChargerTChgResume,
         setChargerCurrentCool,

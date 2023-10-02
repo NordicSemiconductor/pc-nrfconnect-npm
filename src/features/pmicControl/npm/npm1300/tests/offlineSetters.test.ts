@@ -142,6 +142,23 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         });
     });
 
+    test('Set setChargerNTCBeta', async () => {
+        await pmic.setChargerNTCBeta(3380);
+
+        expect(mockOnChargerUpdate).toBeCalledTimes(1);
+        expect(mockOnChargerUpdate).toBeCalledWith({
+            ntcBeta: 3380,
+        });
+    });
+
+    test('Set setChargerNTCThermistor', async () => {
+        await pmic.setChargerNTCThermistor('100 kΩ');
+
+        expect(mockOnChargerUpdate).toBeCalledTimes(1);
+        expect(mockOnChargerUpdate).toBeCalledWith({
+            ntcThermistor: '100 kΩ',
+        });
+    });
     test.each(PMIC_1300_BUCKS)('Set setBuckVOut index: %p', async index => {
         await pmic.setBuckVOutNormal(index, 1.2);
 

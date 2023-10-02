@@ -17,6 +17,8 @@ and this project adheres to
     -   Read Thermal Regulation state ?
 -   Support JEITA
     -   Read and Write vTermR
+    -   Read and Write tCold, tCool, tWarm, tHot
+    -   Read and Write NTC Beta
 -   Charger BatLim configuration
 -   LDO
     -   Soft Starter enable

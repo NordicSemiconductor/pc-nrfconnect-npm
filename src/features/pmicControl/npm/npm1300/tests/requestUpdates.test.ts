@@ -122,7 +122,19 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx adc ntc get',
+            'npmx adc ntc type get',
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update chargerNTCBeta', () => {
+        pmic.requestUpdate.chargerNTCBeta();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            'npmx adc ntc beta get',
             expect.anything(),
             undefined,
             true
