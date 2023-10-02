@@ -62,7 +62,6 @@ export default () => {
                     placement="right-start"
                 >
                     <Button
-                        disabled
                         variant="secondary"
                         className="w-100"
                         onClick={() => dispatch(saveFileDialog())}

@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
 
 import { getRange } from '../../../../utils/helpers';
@@ -2754,70 +2755,79 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
 
             const action = () => {
-                if (config.charger) {
-                    const charger = config.charger;
-                    setChargerVTerm(charger.vTerm);
-                    setChargerIChg(charger.iChg);
-                    setChargerEnabled(charger.enabled);
-                    setChargerITerm(charger.iTerm);
-                    setChargerBatLim(charger.batLim);
-                    setChargerEnabledRecharging(charger.enableRecharging);
-                    setChargerVTrickleFast(charger.vTrickleFast);
-                    setChargerNTCThermistor(charger.ntcThermistor);
-                    setChargerTChgResume(charger.tChgResume);
-                    setChargerTChgStop(charger.tChgStop);
-                    setChargerVTermR(charger.vTermR);
+                try {
+                    if (config.charger) {
+                        const charger = config.charger;
+                        setChargerVTerm(charger.vTerm);
+                        setChargerIChg(charger.iChg);
+                        setChargerEnabled(charger.enabled);
+                        setChargerITerm(charger.iTerm);
+                        setChargerBatLim(charger.batLim);
+                        setChargerEnabledRecharging(charger.enableRecharging);
+                        setChargerVTrickleFast(charger.vTrickleFast);
+                        setChargerNTCThermistor(charger.ntcThermistor);
+                        setChargerTChgResume(charger.tChgResume);
+                        setChargerTChgStop(charger.tChgStop);
+                        setChargerVTermR(charger.vTermR);
+                    }
+
+                    config.bucks.forEach((buck, index) => {
+                        setBuckVOutNormal(index, buck.vOutNormal);
+                        setBuckMode(index, buck.mode);
+                        setBuckEnabled(index, buck.enabled);
+                        setBuckModeControl(index, buck.modeControl);
+                        setBuckVOutRetention(index, buck.vOutRetention);
+                        setBuckRetentionControl(index, buck.retentionControl);
+                        setBuckOnOffControl(index, buck.onOffControl);
+                        setBuckActiveDischargeEnabled(
+                            index,
+                            buck.activeDischargeEnabled
+                        );
+                    });
+
+                    config.ldos.forEach((ldo, index) => {
+                        setLdoVoltage(index, ldo.voltage);
+                        setLdoMode(index, ldo.mode);
+                        setLdoEnabled(index, ldo.enabled);
+                        setLdoSoftStartEnabled(index, ldo.softStartEnabled);
+                        setLdoSoftStart(index, ldo.softStart);
+                    });
+
+                    config.gpios.forEach((gpio, index) => {
+                        setGpioMode(index, gpio.mode);
+                        setGpioPull(index, gpio.pull);
+                        setGpioDrive(index, gpio.drive);
+                        setGpioOpenDrain(index, gpio.openDrain);
+                        setGpioDebounce(index, gpio.debounce);
+                    });
+
+                    config.leds.forEach((led, index) => {
+                        setLedMode(index, led.mode);
+                    });
+
+                    setPOFEnabled(config.pof.enable);
+                    setPOFPolarity(config.pof.polarity);
+                    setPOFThreshold(config.pof.threshold);
+
+                    setTimerConfigMode(config.timerConfig.mode);
+                    setTimerConfigPrescaler(config.timerConfig.prescaler);
+                    setTimerConfigPeriod(config.timerConfig.period);
+
+                    setShipModeTimeToActive(config.ship.timeToActive);
+                    setShipInvertPolarity(config.ship.invPolarity);
+                    setShipLongPressReset(config.ship.longPressReset);
+                    setShipTwoButtonReset(config.ship.twoButtonReset);
+
+                    setFuelGaugeEnabled(config.fuelGauge);
+                } catch (error) {
+                    logger.error('Invalid File.');
                 }
-
-                config.bucks.forEach((buck, index) => {
-                    setBuckVOutNormal(index, buck.vOutNormal);
-                    setBuckMode(index, buck.mode);
-                    setBuckEnabled(index, buck.enabled);
-                    setBuckModeControl(index, buck.modeControl);
-                    setBuckVOutRetention(index, buck.vOutRetention);
-                    setBuckRetentionControl(index, buck.retentionControl);
-                    setBuckOnOffControl(index, buck.onOffControl);
-                    setBuckActiveDischargeEnabled(
-                        index,
-                        buck.activeDischargeEnabled
-                    );
-                });
-
-                config.ldos.forEach((ldo, index) => {
-                    setLdoVoltage(index, ldo.voltage);
-                    setLdoMode(index, ldo.mode);
-                    setLdoEnabled(index, ldo.enabled);
-                    setLdoSoftStartEnabled(index, ldo.softStartEnabled);
-                    setLdoSoftStart(index, ldo.softStart);
-                });
-
-                config.gpios.forEach((gpio, index) => {
-                    setGpioMode(index, gpio.mode);
-                    setGpioPull(index, gpio.pull);
-                    setGpioDrive(index, gpio.drive);
-                    setGpioOpenDrain(index, gpio.openDrain);
-                    setGpioDebounce(index, gpio.debounce);
-                });
-
-                config.leds.forEach((led, index) => {
-                    setLedMode(index, led.mode);
-                });
-
-                setPOFEnabled(config.pof.enable);
-                setPOFPolarity(config.pof.polarity);
-                setPOFThreshold(config.pof.threshold);
-
-                setTimerConfigMode(config.timerConfig.mode);
-                setTimerConfigPrescaler(config.timerConfig.prescaler);
-                setTimerConfigPeriod(config.timerConfig.period);
-
-                setShipModeTimeToActive(config.ship.timeToActive);
-                setShipInvertPolarity(config.ship.invPolarity);
-                setShipLongPressReset(config.ship.longPressReset);
-                setShipTwoButtonReset(config.ship.twoButtonReset);
-
-                setFuelGaugeEnabled(config.fuelGauge);
             };
+
+            if (config.firmwareVersion == null) {
+                logger.error('Invalid File.');
+                return;
+            }
 
             if (
                 dialogHandler &&

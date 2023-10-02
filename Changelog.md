@@ -36,6 +36,9 @@ and this project adheres to
 -   Enter Hibernate Mode
 -   Configure Long Press Reset
 -   Configure Two Button Reset
+-   Export app confiuration to:
+    -   JSON (to reused in nPM powerUP)
+    -   overlay for NCS development
 
 ### Changed
 

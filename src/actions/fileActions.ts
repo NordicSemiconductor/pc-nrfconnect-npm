@@ -11,11 +11,11 @@ import {
     OpenDialogReturnValue,
     SaveDialogOptions,
 } from 'electron';
-import Store from 'electron-store';
 import fs from 'fs';
 import path from 'path';
 
 import { RootState } from '../appReducer';
+import overlay from '../features/pmicControl/npm/overlay/overlay';
 import { NpmExport } from '../features/pmicControl/npm/types';
 
 const saveSettings =
@@ -24,12 +24,6 @@ const saveSettings =
         const currentState = getState().app.pmicControl;
 
         if (!currentState.npmDevice) return;
-
-        const pathObject = path.parse(filePath);
-        const store = new Store<NpmExport>({
-            cwd: pathObject.dir,
-            name: pathObject.name,
-        });
 
         const out: NpmExport = {
             charger: currentState.charger
@@ -49,7 +43,11 @@ const saveSettings =
                 currentState.fuelGaugeChargingSamplingRate,
         };
 
-        store.set(out);
+        if (filePath.endsWith('.JSON')) {
+            fs.writeFileSync(filePath, JSON.stringify(out, null, 2));
+        } else if (filePath.endsWith('.overlay')) {
+            fs.writeFileSync(filePath, overlay(out, currentState.npmDevice));
+        }
     };
 
 const parseFile =
@@ -59,12 +57,7 @@ const parseFile =
 
         const pathObject = path.parse(filePath);
         if (pathObject.ext === '.json') {
-            const store = new Store<NpmExport>({
-                cwd: pathObject.dir,
-                name: pathObject.name,
-            });
-
-            const config = store.store;
+            const config = fs.readFileSync(filePath) as unknown as NpmExport;
             currentState.npmDevice?.applyConfig(config);
         }
     };
@@ -156,6 +149,10 @@ export const saveFileDialog = (): AppThunk => dispatch => {
             {
                 name: 'JSON',
                 extensions: ['json'],
+            },
+            {
+                name: 'Overlay',
+                extensions: ['overlay'],
             },
         ],
     }).then(

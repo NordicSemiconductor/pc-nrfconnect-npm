@@ -222,10 +222,10 @@ export const USBDetectStatusValues = [
     '1.5A High Power',
     '3A High Power',
 ] as const;
-export type USBdetectStatus = (typeof USBDetectStatusValues)[number];
+export type USBDetectStatus = (typeof USBDetectStatusValues)[number];
 
 export type USBPower = {
-    detectStatus: USBdetectStatus;
+    detectStatus: USBDetectStatus;
     currentLimiter: number;
 };
 
