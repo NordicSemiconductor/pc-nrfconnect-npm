@@ -752,13 +752,7 @@ export const documentation: Documentation = {
         ],
         ExportConfiguration: [
             {
-                title: (
-                    <span>
-                        Export Configuration
-                        <br />
-                        (Coming Soon!)
-                    </span>
-                ),
+                title: <span>Export Configuration</span>,
                 content: [
                     <p key="p1">
                         Exports the full configuration of the PMIC based on the

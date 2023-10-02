@@ -7,6 +7,7 @@
 import {
     Buck,
     Charger,
+    GPIOValues,
     Ldo,
     LED,
     LEDMode,
@@ -38,13 +39,10 @@ const ledModeToOverlay = (mode: LEDMode) => {
     switch (mode) {
         case 'Charger error':
             return 'error';
-            break;
         case 'Charging':
             return 'charging';
-            break;
         case 'Host':
             return 'host';
-            break;
     }
 };
 
@@ -55,9 +53,9 @@ npm1300_ek_charger: charger {
     compatible = "nordic,npm1300-charger";
     term-microvolt = <${toMicro(charger.vTerm)}>;
     term-warm-microvolt = <${toMicro(charger.vTermR)}>;
-    term-current-percent = <${charger.iTerm}>;
+    term-current-percent = <${Number.parseInt(charger.iTerm, 10)}>;
     current-microamp = <${toMicro(charger.iChg)}>;
-    trickle-microvolt = <${toMicro(charger.vTrickleFast)}>
+    trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
     dischg-limit-microamp = <1000000>;
     vbus-limit-microamp = <500000>;
     thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
@@ -81,9 +79,27 @@ npm1300_ek_buck${index + 1}: BUCK${index + 1} {
     )}>;
     regulator-init-microvolt =  <${toMicro(buck.vOutNormal)}>;
     retention-microvolt = <${toMicro(buck.vOutRetention)}>;
-    enable-gpios = <&npm1300_ek_gpio 1 GPIO_ACTIVE_LOW>;
-    retention-gpios = <&npm1300_ek_gpio 2 GPIO_ACTIVE_HIGH>;
-    pwm-gpios = <&npm1300_ek_gpio 2 GPIO_ACTIVE_LOW>;
+    ${
+        buck.onOffControl !== 'Off'
+            ? `enable-gpios = <&npm1300_ek_gpio ${GPIOValues.findIndex(
+                  v => v === buck.onOffControl
+              )} GPIO_ACTIVE_HIGH>;`
+            : ''
+    }
+    ${
+        buck.retentionControl !== 'Off'
+            ? `retention-gpios = <&npm1300_ek_gpio ${GPIOValues.findIndex(
+                  v => v === buck.retentionControl
+              )} GPIO_ACTIVE_HIGH>;`
+            : ''
+    }
+    ${
+        buck.modeControl !== 'Auto'
+            ? `pwm-gpios= <&npm1300_ek_gpio ${GPIOValues.findIndex(
+                  v => v === buck.modeControl
+              )} GPIO_ACTIVE_HIGH>;`
+            : ''
+    }
 };
 `;
 
@@ -98,7 +114,7 @@ npm1300_ek_ldo${index + 1}: LDO${index + 1} {
     regulator-initial-mode = <${
         ldo.mode === 'LDO' ? 'NPM1300_LDSW_MODE_LDO' : 'NPM1300_LDSW_MODE_LDSW'
     }>;
-    enable-gpios = <&npm1300_ek_gpio 2 GPIO_ACTIVE_LOW>;
+    // enable-gpios = <&npm1300_ek_gpio 2 GPIO_ACTIVE_LOW>;
 };
 `;
 
@@ -108,9 +124,9 @@ npm1300_ek_leds: leds {
     ${leds
         .map(
             (led, index) =>
-                `nordic,led${index}-mode = ${ledModeToOverlay(led.mode)};`
+                `nordic,led${index}-mode = "${ledModeToOverlay(led.mode)}";`
         )
-        .join('\n')}
+        .join('    \n')}
 };
 `;
 
@@ -147,15 +163,6 @@ export default (npmConfig: NpmExport, npmDevice: NpmDevice) => `/*
        };
 
        ${generateCharger(npmConfig.charger)}
-
-       npm1300_ek_buttons: buttons {
-           compatible = "gpio-keys";
-           pmic_button0: pmic_button_0 {
-               gpios = < &npm1300_ek_gpio 0 GPIO_ACTIVE_HIGH>;
-               label = "Pmic button switch 0";
-           zephyr,code = <INPUT_KEY_0>;
-           };
-       };
 
        ${generateLEDs(npmConfig.leds)}
    };
