@@ -61,7 +61,7 @@ const initialState: pmicControlState = {
     pof: {
         enable: true,
         threshold: 2.8,
-        polarity: 'Active heigh',
+        polarity: 'Active high',
     },
     timerConfig: {
         mode: 'Boot monitor',

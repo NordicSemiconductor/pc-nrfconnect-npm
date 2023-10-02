@@ -157,7 +157,7 @@ export type LED = {
     mode: LEDMode;
 };
 
-export const POFPolarityValues = ['Active low', 'Active heigh'] as const;
+export const POFPolarityValues = ['Active low', 'Active high'] as const;
 export type POFPolarity = (typeof POFPolarityValues)[number];
 
 export type POF = {

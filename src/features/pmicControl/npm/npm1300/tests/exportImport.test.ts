@@ -79,7 +79,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     const initPOF: POF = {
         enable: true,
         threshold: 2.8,
-        polarity: 'Active heigh',
+        polarity: 'Active high',
     };
 
     const initTimerConfig: TimerConfig = {
