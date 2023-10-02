@@ -56,7 +56,7 @@ export default ({
 
     const currentCoolItems: DropdownItem[] = [
         {
-            value: 'iCHG',
+            value: 'iCool',
             label: (
                 <div>
                     I<span className="subscript">COOL</span>
@@ -64,7 +64,7 @@ export default ({
             ),
         },
         {
-            value: 'iCool',
+            value: 'iCHG',
             label: (
                 <div>
                     I<span className="subscript">CHG</span>
@@ -328,7 +328,7 @@ export default ({
                     )
                 }
                 selectedItem={
-                    currentCoolItems[charger.currentCool === 'iCHG' ? 0 : 1]
+                    currentCoolItems[charger.currentCool === 'iCHG' ? 1 : 0]
                 }
                 disabled={disabled}
             />

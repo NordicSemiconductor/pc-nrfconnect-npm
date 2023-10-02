@@ -11,6 +11,7 @@ import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
 import DashboardControl from './components/Dashboard/DashboardControl';
 import DeviceSelector from './components/DeviceSelector';
+import GPIOs from './components/GPIOs/GPIOs';
 import Graph from './components/Graph/Graph';
 import ProfilingWizard from './components/Profiling/Dialog/ProfilingWizard';
 import Profiles from './components/Profiling/ProfilingProjects/Profiles';
@@ -48,6 +49,10 @@ render(
             {
                 name: 'Regulators',
                 Main: Regulators,
+            },
+            {
+                name: 'GPIOs',
+                Main: GPIOs,
             },
             {
                 name: 'System Features',

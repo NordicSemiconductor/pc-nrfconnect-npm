@@ -41,7 +41,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         enabled: true,
         enableRecharging: true,
         iTerm: '20%',
-        batLim: 1340,
+        iBatLim: 1340,
         ntcThermistor: '10 kΩ',
         tChgStop: 10,
         tChgResume: 110,
@@ -79,7 +79,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     const initPOF: POF = {
         enable: true,
         threshold: 2.8,
-        polarity: 'Active heigh',
+        polarity: 'Active high',
     };
 
     const initTimerConfig: TimerConfig = {
@@ -102,7 +102,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             iChg: 32,
             enabled: false,
             iTerm: '10%',
-            batLim: 1340,
+            iBatLim: 1340,
             enableRecharging: false,
             ntcThermistor: '10 kΩ',
             tChgStop: 10,
@@ -204,7 +204,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         timerConfig: initTimerConfig,
         ship: initShip,
         fuelGauge: true,
-        firmwareVersion: '0.9.2+6',
+        firmwareVersion: '0.9.2+8',
         deviceType: 'npm1300',
         fuelGaugeChargingSamplingRate: 1000,
     };

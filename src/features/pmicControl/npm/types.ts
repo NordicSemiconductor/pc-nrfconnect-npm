@@ -45,7 +45,7 @@ export const ITermValues = ['10%', '20%'] as const;
 export type ITerm = (typeof ITermValues)[number];
 
 export const VTrickleFastValues = [2.5, 2.9] as const;
-export const NTCValues = ['HI Z', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
+export const NTCValues = ['Ignore NTC', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
 export type VTrickleFast = (typeof VTrickleFastValues)[number];
 export type NTCThermistor = (typeof NTCValues)[number];
 
@@ -86,7 +86,7 @@ export type Charger = {
     enabled: boolean;
     enableRecharging: boolean;
     iTerm: ITerm;
-    batLim: number;
+    iBatLim: number;
     ntcThermistor: NTCThermistor;
     tChgStop: number;
     tChgResume: number;
@@ -157,7 +157,7 @@ export type LED = {
     mode: LEDMode;
 };
 
-export const POFPolarityValues = ['Active low', 'Active heigh'] as const;
+export const POFPolarityValues = ['Active low', 'Active high'] as const;
 export type POFPolarity = (typeof POFPolarityValues)[number];
 
 export type POF = {

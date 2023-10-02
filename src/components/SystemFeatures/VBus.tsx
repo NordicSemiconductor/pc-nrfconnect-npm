@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import {
     Card,
+    classNames,
     NumberInputSliderWithUnit,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
@@ -31,11 +32,21 @@ export default ({ npmDevice, usbPower, disabled }: GPIOProperties) => {
                         V<span className="subscript">BUS</span> input current
                         limiter
                     </span>
-
-                    <div className="d-flex">{`${usbPower.detectStatus}`}</div>
                 </div>
             }
         >
+            <div
+                className={`tw-preflight tw-flex tw-flex-col tw-gap-0.5 ${classNames(
+                    disabled && 'tw-text-gray-300'
+                )}`}
+            >
+                <div className="tw-flex tw-justify-between tw-pb-0.5 tw-text-xs">
+                    <span className="tw-font-medium">USB Detect Status</span>
+                    <span className="tw-text-right">
+                        {usbPower.detectStatus}
+                    </span>
+                </div>
+            </div>
             <NumberInputSliderWithUnit
                 label="Current Limiter"
                 disabled={disabled}

@@ -12,8 +12,6 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
-    getGPIOs,
-    getLEDs,
     getNpmDevice,
     getPOF,
     getShip,
@@ -21,16 +19,14 @@ import {
     getUsbPower,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
-import GPIO from '../GPIO/GPIO';
-import LEDs from '../LEDs/LEDs';
-import SafetyAndLowPower from '../SafetyAndLowPower/SafetyAndLowPower';
-import VBus from '../VBus/VBus';
+import PowerFailure from './PowerFailure';
+import ResetControl from './ResetControl';
+import Timer from './Timer';
+import VBus from './VBus';
 
 export default ({ active }: PaneProps) => {
     const disabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
-    const gpios = useSelector(getGPIOs);
-    const leds = useSelector(getLEDs);
     const pof = useSelector(getPOF);
     const ship = useSelector(getShip);
     const usbPower = useSelector(getUsbPower);
@@ -39,26 +35,25 @@ export default ({ active }: PaneProps) => {
     return active ? (
         <MasonryLayout className="masonry-layout" minWidth={300}>
             {npmDevice && (
-                <SafetyAndLowPower
+                <PowerFailure
                     npmDevice={npmDevice}
                     pof={pof}
-                    ship={ship}
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice && (
+                <Timer
+                    npmDevice={npmDevice}
                     timerConfig={timerConfig}
                     disabled={disabled}
                 />
             )}
-            {npmDevice &&
-                gpios.map((gpio, index) => (
-                    <GPIO
-                        gpio={gpio}
-                        npmDevice={npmDevice}
-                        key={`GPIO${1 + index}`}
-                        index={index}
-                        disabled={disabled}
-                    />
-                ))}
             {npmDevice && (
-                <LEDs npmDevice={npmDevice} leds={leds} disabled={disabled} />
+                <ResetControl
+                    npmDevice={npmDevice}
+                    ship={ship}
+                    disabled={disabled}
+                />
             )}
             {npmDevice && (
                 <VBus

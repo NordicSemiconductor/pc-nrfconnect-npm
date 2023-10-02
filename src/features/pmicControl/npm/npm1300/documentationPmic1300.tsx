@@ -598,7 +598,7 @@ export const documentation: Documentation = {
                     </p>,
                     <p key="p2">
                         <strong>Green light:</strong> Charger charging if
-                        charging if charging is enabled, temperature below T
+                        charging is enabled, temperature below T
                         <span className="subscript">CHGRESUME</span>.
                     </p>,
                 ],

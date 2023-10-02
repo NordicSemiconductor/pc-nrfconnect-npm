@@ -65,7 +65,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         await pmic.setChargerBatLim(1000);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).toBeCalledWith({ batLim: 1000 });
+        expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
     });
 
     test('Set setChargerEnabledRecharging ', async () => {
