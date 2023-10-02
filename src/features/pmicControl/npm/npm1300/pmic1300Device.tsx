@@ -544,6 +544,59 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         releaseAll.push(
             shellParser.registerCommandCallback(
                 toRegex(
+                    'npmx charger ntc_temperature cold',
+                    true,
+                    undefined,
+                    '-?[0-9]+'
+                ),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        tCold: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger ntc_temperature cool', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        tCool: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger ntc_temperature warm', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        tWarm: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger ntc_temperature hot', true),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        tHot: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
                     'npmx adc ntc',
                     true,
                     undefined,

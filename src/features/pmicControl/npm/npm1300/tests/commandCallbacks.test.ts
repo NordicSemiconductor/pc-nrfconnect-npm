@@ -283,6 +283,70 @@ describe('PMIC 1300 - Command callbacks', () => {
         }
     );
 
+    test.each(['get', 'set 20'])(
+        'npmx charger ntc_temperature cold %p',
+        append => {
+            const command = `npmx charger ntc_temperature cold ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess('Value: 20 *C', command);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).nthCalledWith(1, {
+                tCold: 20,
+            });
+        }
+    );
+
+    test.each(['get', 'set 20'])(
+        'npmx charger ntc_temperature cool %p',
+        append => {
+            const command = `npmx charger ntc_temperature cool ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess('Value: 20 *C', command);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).nthCalledWith(1, {
+                tCool: 20,
+            });
+        }
+    );
+
+    test.each(['get', 'set 20'])(
+        'npmx charger ntc_temperature cold %p',
+        append => {
+            const command = `npmx charger ntc_temperature warm ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess('Value: 20 *C', command);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).nthCalledWith(1, {
+                tWarm: 20,
+            });
+        }
+    );
+
+    test.each(['get', 'set 20'])(
+        'npmx charger ntc_temperature hot %p',
+        append => {
+            const command = `npmx charger ntc_temperature hot ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess('Value: 20 *C', command);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).nthCalledWith(1, {
+                tHot: 20,
+            });
+        }
+    );
+
     test.each(
         [true, false]
             .map(enabled => [
