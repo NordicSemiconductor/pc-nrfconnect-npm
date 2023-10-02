@@ -122,7 +122,19 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx adc ntc get',
+            'npmx adc ntc type get',
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
+    test('Request update chargerNTCBeta', () => {
+        pmic.requestUpdate.chargerNTCBeta();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            'npmx adc ntc beta get',
             expect.anything(),
             undefined,
             true
@@ -153,48 +165,48 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test.skip('Request update chargerTCold', () => {
+    test('Request update chargerTCold', () => {
         pmic.requestUpdate.chargerTCold();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx adc ntc get',
+            'npmx charger ntc_temperature cold get',
             expect.anything(),
             undefined,
             true
         );
     });
 
-    test.skip('Request update chargerTCool', () => {
+    test('Request update chargerTCool', () => {
         pmic.requestUpdate.chargerTCool();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx adc ntc get',
+            'npmx charger ntc_temperature cool get',
             expect.anything(),
             undefined,
             true
         );
     });
 
-    test.skip('Request update chargerTWarm', () => {
+    test('Request update chargerTWarm', () => {
         pmic.requestUpdate.chargerTWarm();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx adc ntc get',
+            'npmx charger ntc_temperature warm get',
             expect.anything(),
             undefined,
             true
         );
     });
 
-    test.skip('Request update chargerTHot', () => {
+    test('Request update chargerTHot', () => {
         pmic.requestUpdate.chargerTHot();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx adc ntc get',
+            'npmx charger ntc_temperature hot get',
             expect.anything(),
             undefined,
             true

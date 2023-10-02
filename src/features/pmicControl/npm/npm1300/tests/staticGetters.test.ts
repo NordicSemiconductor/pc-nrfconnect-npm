@@ -97,6 +97,14 @@ describe('PMIC 1300 - Static getters', () => {
             decimals: 1,
             step: 0.1,
         }));
+
+    test('Charger NTC Beta Range', () =>
+        expect(pmic.getChargerNTCBetaRange()).toStrictEqual({
+            min: 0,
+            max: 4294967295,
+            decimals: 0,
+            step: 1,
+        }));
 });
 
 export {};

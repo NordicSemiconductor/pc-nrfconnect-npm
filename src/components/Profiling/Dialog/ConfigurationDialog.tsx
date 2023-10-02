@@ -53,7 +53,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const dispatch = useDispatch();
     const maxLength = 20;
 
-    const ntcThermistorItems = [...NTCValues].map(item => ({
+    const ntcThermistorItems = NTCValues.map(item => ({
         label: `${item}`,
         value: `${item}`,
     }));

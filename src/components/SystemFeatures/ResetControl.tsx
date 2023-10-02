@@ -26,7 +26,7 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
     <Card
         title={
             <div className="tw-flex tw-justify-between">
-                <span>Reset control</span>
+                <span>Reset and Low Power control</span>
             </div>
         }
     >

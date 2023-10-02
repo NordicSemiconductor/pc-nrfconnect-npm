@@ -59,7 +59,7 @@ npm1300_ek_charger: charger {
     dischg-limit-microamp = <1000000>;
     vbus-limit-microamp = <500000>;
     thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
-    thermistor-beta = <3380>;
+    thermistor-beta = <${charger.ntcBeta}>;
     ${charger.enableRecharging ? '' : '// disable-recharge;'}
     ${charger.enabled ? 'charging-enable;' : ''}
     thermistor-cold-millidegrees = <${toMilli(charger.tCold)}>;
