@@ -1583,15 +1583,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTCold();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger ntc_temperature cold set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerTCold();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1603,15 +1602,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTCool();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger ntc_temperature cool set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerTCool();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1623,15 +1621,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTWarm();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger ntc_temperature warm set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerTWarm();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -1643,15 +1640,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTHot();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger ntc_temperature hot set ${value}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerTHot();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -2677,10 +2673,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerCurrentCool: () => console.log('Not Implemented'),
         chargerVTermR: () =>
             sendCommand('npmx charger termination_voltage warm get'),
-        chargerTCold: () => console.log('Not Implemented'),
-        chargerTCool: () => console.log('Not Implemented'),
-        chargerTWarm: () => console.log('Not Implemented'),
-        chargerTHot: () => console.log('Not Implemented'),
+        chargerTCold: () =>
+            sendCommand('npmx charger ntc_temperature cold get'),
+        chargerTCool: () =>
+            sendCommand('npmx charger ntc_temperature cool get'),
+        chargerTWarm: () =>
+            sendCommand('npmx charger ntc_temperature warm get'),
+        chargerTHot: () => sendCommand('npmx charger ntc_temperature hot get'),
 
         gpioMode: (index: number) => sendCommand(`npmx gpio mode get ${index}`),
         gpioPull: (index: number) => sendCommand(`npmx gpio pull get ${index}`),

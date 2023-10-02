@@ -232,44 +232,44 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
 
-        test.skip('Set setChargerTCold', async () => {
+        test('Set setChargerTCold', async () => {
             await pmic.setChargerTCold(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger trickle set 2500`,
+                `npmx charger ntc_temperature cold set 90`,
                 expect.anything(),
                 undefined,
                 true
             );
         });
 
-        test.skip('Set setChargerTCool', async () => {
+        test('Set setChargerTCool', async () => {
             await pmic.setChargerTCool(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger trickle set 2500`,
+                `npmx charger ntc_temperature cool set 90`,
                 expect.anything(),
                 undefined,
                 true
             );
         });
 
-        test.skip('Set setChargerTWarm', async () => {
+        test('Set setChargerTWarm', async () => {
             await pmic.setChargerTWarm(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger trickle set 2500`,
+                `npmx charger ntc_temperature warm set 90`,
                 expect.anything(),
                 undefined,
                 true
             );
         });
 
-        test.skip('Set setChargerTHot', async () => {
+        test('Set setChargerTHot', async () => {
             await pmic.setChargerTHot(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger trickle set 2500`,
+                `npmx charger ntc_temperature hot set 90`,
                 expect.anything(),
                 undefined,
                 true
@@ -1788,13 +1788,13 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
-        test.skip('Set setChargerTCold - Fail immediately', async () => {
+        test('Set setChargerTCold - Fail immediately', async () => {
             await expect(pmic.setChargerTCold(90)).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 90`,
+                `npmx charger ntc_temperature cold set 90`,
                 expect.anything(),
                 undefined,
                 true
@@ -1803,7 +1803,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger module charger get',
+                'npmx charger ntc_temperature cold get',
                 expect.anything(),
                 undefined,
                 true
@@ -1813,13 +1813,13 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
-        test.skip('Set setChargerTCool - Fail immediately', async () => {
+        test('Set setChargerTCool - Fail immediately', async () => {
             await expect(pmic.setChargerTCool(90)).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 90`,
+                `npmx charger ntc_temperature cool set 90`,
                 expect.anything(),
                 undefined,
                 true
@@ -1828,7 +1828,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger module charger get',
+                'npmx charger ntc_temperature cool get',
                 expect.anything(),
                 undefined,
                 true
@@ -1838,13 +1838,13 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
-        test.skip('Set setChargerTWarm - Fail immediately', async () => {
+        test('Set setChargerTWarm - Fail immediately', async () => {
             await expect(pmic.setChargerTWarm(90)).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 90`,
+                `npmx charger ntc_temperature warm set 90`,
                 expect.anything(),
                 undefined,
                 true
@@ -1853,7 +1853,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger module charger get',
+                'npmx charger ntc_temperature warm get',
                 expect.anything(),
                 undefined,
                 true
@@ -1863,13 +1863,13 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
-        test.skip('Set setChargerTHot - Fail immediately', async () => {
-            await expect(pmic.setChargerTWarm(90)).rejects.toBeUndefined();
+        test('Set setChargerTHot - Fail immediately', async () => {
+            await expect(pmic.setChargerTHot(90)).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 90`,
+                `npmx charger ntc_temperature hot set 90`,
                 expect.anything(),
                 undefined,
                 true
@@ -1878,7 +1878,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger module charger get',
+                'npmx charger ntc_temperature hot get',
                 expect.anything(),
                 undefined,
                 true
