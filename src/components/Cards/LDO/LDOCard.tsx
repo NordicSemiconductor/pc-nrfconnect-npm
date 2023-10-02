@@ -132,7 +132,7 @@ export default ({
                         onToggle={value =>
                             npmDevice.setLdoSoftStartEnabled(index, value)
                         }
-                        disabled={disabled}
+                        disabled={disabled || ldo.mode === 'LDO'}
                     />
                     <Dropdown
                         label="Soft Start Current"
@@ -155,7 +155,7 @@ export default ({
                                 ) ?? 0
                             ]
                         }
-                        disabled={disabled}
+                        disabled={disabled || ldo.mode === 'LDO'}
                     />
                 </>
             )}
