@@ -186,7 +186,7 @@ describe('PMIC 1300 - Command callbacks', () => {
         {
             append: 'set ntc_hi_z',
             successReturn: 'Value: HI_Z.',
-            ntcThermistor: 'HI Z' as NTCThermistor,
+            ntcThermistor: 'Ignore NTC' as NTCThermistor,
         },
     ])(
         'npmx charger ntc thermistor %p',

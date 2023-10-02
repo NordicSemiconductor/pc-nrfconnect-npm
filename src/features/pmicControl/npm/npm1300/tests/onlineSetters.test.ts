@@ -193,7 +193,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 cliMode: 'ntc_47k',
             },
             {
-                mode: 'HI Z',
+                mode: 'Ignore NTC',
                 cliMode: 'ntc_hi_z',
             },
         ] as { mode: NTCThermistor; cliMode: string }[])(
@@ -1630,7 +1630,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 cliMode: 'ntc_47k',
             },
             {
-                mode: 'HI Z',
+                mode: 'Ignore NTC',
                 cliMode: 'ntc_hi_z',
             },
         ] as { mode: NTCThermistor; cliMode: string }[])(

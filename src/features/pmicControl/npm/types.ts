@@ -45,7 +45,7 @@ export const ITermValues = ['10%', '20%'] as const;
 export type ITerm = (typeof ITermValues)[number];
 
 export const VTrickleFastValues = [2.5, 2.9] as const;
-export const NTCValues = ['HI Z', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
+export const NTCValues = ['Ignore NTC', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
 export type VTrickleFast = (typeof VTrickleFastValues)[number];
 export type NTCThermistor = (typeof NTCValues)[number];
 

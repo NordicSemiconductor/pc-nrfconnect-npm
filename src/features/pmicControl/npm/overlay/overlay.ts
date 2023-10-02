@@ -30,7 +30,7 @@ const thermistorTypeToOverlay = (value: NTCThermistor) => {
         case '47 kΩ':
             return 47000;
             break;
-        case 'HI Z':
+        case 'Ignore NTC':
             return 10000; // TODO: get confirmation from Andy Sinclair
     }
 };
