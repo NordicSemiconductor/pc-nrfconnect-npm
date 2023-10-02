@@ -3016,6 +3016,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             decimals: 0,
             step: 1,
         }),
+        getChargerNTCBetaRange: () => ({
+            min: 0,
+            max: 4294967295,
+            decimals: 0,
+            step: 1,
+        }),
 
         getBuckVoltageRange: () => ({
             min: 1,

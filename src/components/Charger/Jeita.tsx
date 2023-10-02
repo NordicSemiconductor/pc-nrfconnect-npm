@@ -378,12 +378,7 @@ export default ({
                     NTC Beta
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
-                            range={{
-                                min: 0,
-                                max: 4294967295,
-                                decimals: undefined,
-                                step: undefined,
-                            }}
+                            range={npmDevice.getChargerNTCBetaRange()}
                             value={internalNTCBeta}
                             onChange={setInternalNTCBeta}
                             onChangeComplete={npmDevice.setChargerNTCBeta}

@@ -384,6 +384,7 @@ export type NpmDevice = {
     getChargerJeitaRange: () => RangeType;
     getChargerChipThermalRange: () => RangeType;
     getChargerIBatLimRange: () => RangeType;
+    getChargerNTCBetaRange: () => RangeType;
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
