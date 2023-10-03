@@ -366,7 +366,24 @@ export const baseNpmDevice: IBaseNpmDevice = (
                     true
                 );
             }),
-
+        isPMICPowered: () =>
+            new Promise<boolean>((resolve, reject) => {
+                shellParser?.enqueueRequest(
+                    'npm_pmic_ping check',
+                    {
+                        onSuccess: result => {
+                            resolve(result === 'Pinging PMIC succeeded');
+                        },
+                        onError: reject,
+                        onTimeout: error => {
+                            reject(error);
+                            console.warn(error);
+                        },
+                    },
+                    undefined,
+                    true
+                );
+            }),
         getUptimeOverflowCounter: () => uptimeOverflowCounter,
         setUptimeOverflowCounter: (value: number) => {
             uptimeOverflowCounter = value;

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
@@ -72,6 +72,7 @@ import {
 import { Buck, GPIO, Ldo, LED, LEDModeValues, PmicDialog } from './types';
 
 export default () => {
+    const [isPMICPowered, setPMICPowered] = useState(false);
     const shellParser = useSelector(getShellParser);
     const npmDevice = useSelector(getNpmDeviceSlice);
     const dispatch = useDispatch();
@@ -96,11 +97,17 @@ export default () => {
             npmDevice.isSupportedVersion().then(result => {
                 dispatch(setSupportedVersion(result.supported));
             });
+            npmDevice.isPMICPowered().then(setPMICPowered);
         }
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        if (npmDevice && pmicState === 'pmic-connected' && supportedVersion) {
+        if (
+            isPMICPowered &&
+            npmDevice &&
+            pmicState === 'pmic-connected' &&
+            supportedVersion
+        ) {
             npmDevice.requestUpdate.usbPowered();
 
             if (npmDevice.hasCharger()) {
@@ -178,7 +185,7 @@ export default () => {
             npmDevice.getBatteryProfiler()?.isProfiling();
             npmDevice.setBatteryStatusCheckEnabled(true);
         }
-    }, [dispatch, npmDevice, pmicState, supportedVersion]);
+    }, [dispatch, isPMICPowered, npmDevice, pmicState, supportedVersion]);
 
     useEffect(() => {
         if (npmDevice) {
