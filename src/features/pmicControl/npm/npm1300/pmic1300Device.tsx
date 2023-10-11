@@ -85,7 +85,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         dialogHandler,
         eventEmitter,
         devices,
-        '0.9.2+8'
+        '0.9.2+11'
     );
     const batteryProfiler = shellParser
         ? BatteryProfiler(shellParser, eventEmitter)
@@ -942,7 +942,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
-                                activeDischargeEnabled: parseToBoolean(res),
+                                activeDischarge: parseToBoolean(res),
                             },
                             i
                         );
@@ -1033,6 +1033,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             'onLdoUpdate',
                             {
                                 softStart: parseToNumber(res) as SoftStart,
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx ldsw active_discharge enable', true, i),
+                    res => {
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                activeDischarge: parseToBoolean(res),
                             },
                             i
                         );
@@ -2060,7 +2076,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
-                        activeDischargeEnabled,
+                        activeDischarge: activeDischargeEnabled,
                     },
                     index
                 );
@@ -2073,7 +2089,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     }`,
                     () => resolve(),
                     () => {
-                        requestUpdate.buckActiveDischargeEnabled(index);
+                        requestUpdate.buckActiveDischarge(index);
                         reject();
                     }
                 );
@@ -2281,6 +2297,31 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     () => resolve(),
                     () => {
                         requestUpdate.ldoSoftStart(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
+    const setLdoActiveDischarge = (index: number, activeDischarge: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        activeDischarge,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw active_discharge enable set ${index} ${
+                        activeDischarge ? '1' : '0'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ldoActiveDischarge(index);
                         reject();
                     }
                 );
@@ -2816,7 +2857,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sendCommand(`npmx buck gpio retention get ${index}`),
         buckEnabled: (index: number) =>
             sendCommand(`npmx buck status power get ${index}`),
-        buckActiveDischargeEnabled: (index: number) =>
+        buckActiveDischarge: (index: number) =>
             sendCommand(`npmx buck active_discharge get ${index}`),
 
         ldoVoltage: (index: number) =>
@@ -2827,6 +2868,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sendCommand(`npmx ldsw soft_start enable get ${index}`),
         ldoSoftStart: (index: number) =>
             sendCommand(`npmx ldsw soft_start current get ${index}`),
+        ldoActiveDischarge: (index: number) =>
+            sendCommand(`npmx ldsw active_discharge enable get ${index}`),
 
         pofEnable: () => sendCommand(`npmx pof enable get`),
         pofPolarity: () => sendCommand(`npmx pof polarity get`),
@@ -2891,7 +2934,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         setBuckOnOffControl(index, buck.onOffControl);
                         setBuckActiveDischargeEnabled(
                             index,
-                            buck.activeDischargeEnabled
+                            buck.activeDischarge
                         );
                     });
 
@@ -2901,6 +2944,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         setLdoEnabled(index, ldo.enabled);
                         setLdoSoftStartEnabled(index, ldo.softStartEnabled);
                         setLdoSoftStart(index, ldo.softStart);
+                        setLdoActiveDischarge(index, ldo.activeDischarge);
                     });
 
                     config.gpios.forEach((gpio, index) => {
@@ -3086,12 +3130,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setBuckModeControl,
         setBuckOnOffControl,
         setBuckRetentionControl,
-        setBuckActiveDischargeEnabled,
+        setBuckActiveDischarge: setBuckActiveDischargeEnabled,
         setLdoVoltage,
         setLdoEnabled,
         setLdoMode,
         setLdoSoftStartEnabled,
         setLdoSoftStart,
+        setLdoActiveDischarge,
         setGpioMode,
         setGpioPull,
         setGpioDrive,

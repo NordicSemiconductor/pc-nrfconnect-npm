@@ -748,31 +748,31 @@ Battery models stored in database:
 
     test.each(
         PMIC_1300_BUCKS.map(index => [
-            ...[true, false].map(enabled =>
+            ...[true, false].map(activeDischarge =>
                 [
                     {
                         index,
                         append: `get ${index}`,
-                        enabled,
+                        activeDischarge,
                     },
                     {
                         index,
-                        append: `set ${index} ${enabled ? '1' : '0'} `,
-                        enabled,
+                        append: `set ${index} ${activeDischarge ? '1' : '0'} `,
+                        activeDischarge,
                     },
                 ].flat()
             ),
         ]).flat()
-    )('npmx buck active_discharge %p', ({ index, append, enabled }) => {
+    )('npmx buck active_discharge %p', ({ index, append, activeDischarge }) => {
         const command = `npmx buck active_discharge ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${enabled ? '1' : '0'}`, command);
+        callback?.onSuccess(`Value: ${activeDischarge ? '1' : '0'}`, command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { activeDischargeEnabled: enabled },
+            data: { activeDischarge },
             index,
         });
     });
@@ -923,6 +923,43 @@ Battery models stored in database:
             index,
         });
     });
+
+    test.each(
+        PMIC_1300_LDOS.map(index => [
+            ...[true, false].map(activeDischarge =>
+                [
+                    {
+                        index,
+                        append: `get ${index}`,
+                        activeDischarge,
+                    },
+                    {
+                        index,
+                        append: `set ${index} ${activeDischarge ? '1' : '0'} `,
+                        activeDischarge,
+                    },
+                ].flat()
+            ),
+        ]).flat()
+    )(
+        'npmx ldsw active_discharge enable %p',
+        ({ index, append, activeDischarge }) => {
+            const command = `npmx ldsw active_discharge enable ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess(
+                `Value: ${activeDischarge ? '1' : '0'}`,
+                command
+            );
+
+            expect(mockOnLdoUpdate).toBeCalledTimes(1);
+            expect(mockOnLdoUpdate).toBeCalledWith({
+                data: { activeDischarge },
+                index,
+            });
+        }
+    );
 
     test.each(
         PMIC_1300_GPIOS.map(index =>

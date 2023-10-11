@@ -107,7 +107,7 @@ export type Buck = {
     onOffControl: BuckOnOffControl;
     retentionControl: BuckRetentionControl;
     enabled: boolean;
-    activeDischargeEnabled: boolean;
+    activeDischarge: boolean;
 };
 
 export type Ldo = {
@@ -116,6 +116,7 @@ export type Ldo = {
     mode: LdoMode;
     softStartEnabled: boolean;
     softStart: SoftStart;
+    activeDischarge: boolean;
 };
 
 export const GPIOModeValues = [
@@ -419,13 +420,14 @@ export type NpmDevice = {
         buckOnOffControl: (index: number) => void;
         buckRetentionControl: (index: number) => void;
         buckEnabled: (index: number) => void;
-        buckActiveDischargeEnabled: (index: number) => void;
+        buckActiveDischarge: (index: number) => void;
 
         ldoVoltage: (index: number) => void;
         ldoEnabled: (index: number) => void;
         ldoMode: (index: number) => void;
         ldoSoftStartEnabled: (index: number) => void;
         ldoSoftStart: (index: number) => void;
+        ldoActiveDischarge: (index: number) => void;
 
         gpioMode: (index: number) => void;
         gpioPull: (index: number) => void;
@@ -490,16 +492,14 @@ export type NpmDevice = {
         mode: BuckRetentionControl
     ) => Promise<void>;
     setBuckEnabled: (index: number, state: boolean) => Promise<void>;
-    setBuckActiveDischargeEnabled: (
-        index: number,
-        state: boolean
-    ) => Promise<void>;
+    setBuckActiveDischarge: (index: number, state: boolean) => Promise<void>;
 
     setLdoVoltage: (index: number, value: number) => Promise<void>;
     setLdoEnabled: (index: number, state: boolean) => Promise<void>;
     setLdoMode: (index: number, mode: LdoMode) => Promise<void>;
     setLdoSoftStartEnabled: (index: number, enabled: boolean) => Promise<void>;
     setLdoSoftStart: (index: number, softStart: SoftStart) => Promise<void>;
+    setLdoActiveDischarge: (index: number, state: boolean) => Promise<void>;
 
     setGpioMode: (index: number, mode: GPIOMode) => Promise<void>;
     setGpioPull: (index: number, mode: GPIOPullMode) => Promise<void>;

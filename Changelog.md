@@ -23,6 +23,7 @@ and this project adheres to
 -   LDO
     -   Soft Starter enable
     -   Soft Starter current
+    -   Active Discharge
 -   Bucks Active Output Capacitor Discharge
 -   POF
     -   Enable POF

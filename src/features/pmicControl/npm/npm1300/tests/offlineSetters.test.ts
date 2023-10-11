@@ -245,11 +245,11 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     test.each(PMIC_1300_BUCKS)(
         'Set setBuckActiveDischargeEnabled index: %p',
         async index => {
-            await pmic.setBuckActiveDischargeEnabled(index, false);
+            await pmic.setBuckActiveDischarge(index, false);
 
             expect(mockOnBuckUpdate).toBeCalledTimes(1);
             expect(mockOnBuckUpdate).toBeCalledWith({
-                data: { activeDischargeEnabled: false },
+                data: { activeDischarge: false },
                 index,
             });
         }
@@ -301,6 +301,19 @@ describe('PMIC 1300 - Setters Offline tests', () => {
             index,
         });
     });
+
+    test.each(PMIC_1300_LDOS)(
+        'Set setLdoActiveDischarge index: %p',
+        async index => {
+            await pmic.setLdoActiveDischarge(index, true);
+
+            expect(mockOnLdoUpdate).toBeCalledTimes(1);
+            expect(mockOnLdoUpdate).toBeCalledWith({
+                data: { activeDischarge: true },
+                index,
+            });
+        }
+    );
 
     test.each(PMIC_1300_GPIOS)('Set setGpioMode index: %p', async index => {
         await pmic.setGpioMode(index, 'Input');

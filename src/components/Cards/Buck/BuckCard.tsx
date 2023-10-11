@@ -200,12 +200,9 @@ export default ({
                     />
                     <Toggle
                         label="Active Output Capacitor Discharge"
-                        isToggled={buck.activeDischargeEnabled}
+                        isToggled={buck.activeDischarge}
                         onToggle={value =>
-                            npmDevice.setBuckActiveDischargeEnabled(
-                                index,
-                                value
-                            )
+                            npmDevice.setBuckActiveDischarge(index, value)
                         }
                         disabled={disabled}
                     />

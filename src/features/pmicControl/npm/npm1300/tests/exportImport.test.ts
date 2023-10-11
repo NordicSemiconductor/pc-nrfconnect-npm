@@ -62,7 +62,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         modeControl: 'GPIO0',
         onOffControl: 'GPIO0',
         retentionControl: 'GPIO0',
-        activeDischargeEnabled: false,
+        activeDischarge: false,
     };
 
     const initLdo: Ldo = {
@@ -71,6 +71,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         enabled: true,
         softStartEnabled: true,
         softStart: 25,
+        activeDischarge: false,
     };
 
     const initLed: LED = {
@@ -125,7 +126,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 modeControl: 'GPIO0',
                 onOffControl: 'GPIO1',
                 retentionControl: 'GPIO2',
-                activeDischargeEnabled: false,
+                activeDischarge: false,
             },
             {
                 vOutNormal: 2,
@@ -135,7 +136,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 modeControl: 'GPIO1',
                 onOffControl: 'GPIO2',
                 retentionControl: 'GPIO3',
-                activeDischargeEnabled: false,
+                activeDischarge: false,
             },
         ],
         ldos: [
@@ -145,6 +146,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 enabled: false,
                 softStartEnabled: true,
                 softStart: 25,
+                activeDischarge: false,
             },
             {
                 voltage: 2,
@@ -152,6 +154,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 enabled: false,
                 softStartEnabled: true,
                 softStart: 25,
+                activeDischarge: false,
             },
         ],
         gpios: [
@@ -206,7 +209,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         timerConfig: initTimerConfig,
         ship: initShip,
         fuelGauge: true,
-        firmwareVersion: '0.9.2+8',
+        firmwareVersion: '0.9.2+11',
         deviceType: 'npm1300',
         fuelGaugeChargingSamplingRate: 1000,
     };
@@ -322,7 +325,7 @@ describe('PMIC 1300 - Apply Config ', () => {
 
         expect(mockOnChargerUpdate).toBeCalledTimes(12);
         expect(mockOnBuckUpdate).toBeCalledTimes(18); // 7 states + 1 (mode change on vOut) * 2 Bucks
-        expect(mockOnLdoUpdate).toBeCalledTimes(10);
+        expect(mockOnLdoUpdate).toBeCalledTimes(12);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);
