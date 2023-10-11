@@ -19,7 +19,9 @@ and this project adheres to
     -   Read and Write vTermR
     -   Read and Write tCold, tCool, tWarm, tHot
     -   Read and Write NTC Beta
--   Charger BatLim configuration
+-   Charger
+    -   BatLim configuration
+    -   Cool Current
 -   LDO
     -   Soft Starter enable
     -   Soft Starter current

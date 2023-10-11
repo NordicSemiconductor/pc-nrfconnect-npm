@@ -213,12 +213,12 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test.skip('Request update chargerCurrentCool', () => {
+    test('Request update chargerCurrentCool', () => {
         pmic.requestUpdate.chargerCurrentCool();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx adc ntc get',
+            'npmx charger module full_cool get',
             expect.anything(),
             undefined,
             true
