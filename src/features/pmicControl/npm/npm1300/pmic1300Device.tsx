@@ -32,6 +32,7 @@ import {
     BuckOnOffControl,
     BuckRetentionControl,
     ChargeCurrentCool,
+    ChargeCurrentCoolValues,
     Charger,
     GPIO,
     GPIODrive,
@@ -576,6 +577,24 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 res => {
                     emitPartialEvent<Charger>('onChargerUpdate', {
                         tWarm: parseToNumber(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx charger module full_cool',
+                    true,
+                    undefined,
+                    '(0|1)'
+                ),
+                res => {
+                    emitPartialEvent<Charger>('onChargerUpdate', {
+                        currentCool:
+                            ChargeCurrentCoolValues[parseToNumber(res)],
                     });
                 },
                 noop
@@ -1669,15 +1688,16 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 });
                 resolve();
             } else {
-                reject(new Error('Not implemented'));
-                // sendCommand(
-                //     `npmx charger module recharge set ${value}`,
-                //     () => resolve(),
-                //     () => {
-                //         requestUpdate.chargerTChgResume();
-                //         reject();
-                //     }
-                // );
+                sendCommand(
+                    `npmx charger module full_cool set ${
+                        mode === 'iCool' ? '0' : '1'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.chargerCurrentCool();
+                        reject();
+                    }
+                );
             }
         });
 
@@ -2821,7 +2841,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerTChgStop: () => sendCommand('npmx charger die_temp stop get'),
         chargerTChgResume: () =>
             sendCommand('npmx charger die_temp resume get'),
-        chargerCurrentCool: () => console.log('Not Implemented'),
+        chargerCurrentCool: () =>
+            sendCommand('npmx charger module full_cool get'),
         chargerVTermR: () =>
             sendCommand('npmx charger termination_voltage warm get'),
         chargerTCold: () =>
@@ -2916,6 +2937,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         setChargerITerm(charger.iTerm);
                         setChargerBatLim(charger.iBatLim);
                         setChargerEnabledRecharging(charger.enableRecharging);
+                        setChargerCurrentCool(charger.currentCool);
                         setChargerVTrickleFast(charger.vTrickleFast);
                         setChargerNTCThermistor(charger.ntcThermistor);
                         setChargerNTCBeta(charger.ntcBeta);

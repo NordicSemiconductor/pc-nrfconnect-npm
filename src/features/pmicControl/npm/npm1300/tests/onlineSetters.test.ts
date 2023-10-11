@@ -5,6 +5,7 @@
  */
 
 import {
+    ChargeCurrentCoolValues,
     GPIODriveValues,
     GPIOModeValues,
     GPIOPullValues,
@@ -372,11 +373,16 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
 
-        test.skip('Set setChargerCurrentCool', async () => {
-            await pmic.setChargerCurrentCool('iCHG');
+        test.each(
+            ChargeCurrentCoolValues.map((value, index) => ({
+                value,
+                index,
+            }))
+        )('Set setChargerCurrentCool', async ({ value, index }) => {
+            await pmic.setChargerCurrentCool(value);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger trickle set 2500`,
+                `npmx charger module full_cool set ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -2078,32 +2084,40 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
-        test.skip('Set setChargerCurrentCool - Fail immediately', async () => {
-            await expect(
-                pmic.setChargerCurrentCool('iCHG')
-            ).rejects.toBeUndefined();
+        test.each(
+            ChargeCurrentCoolValues.map((value, index) => ({
+                value,
+                index,
+            }))
+        )(
+            'Set setChargerCurrentCool - Fail immediately',
+            async ({ value, index }) => {
+                await expect(
+                    pmic.setChargerCurrentCool(value)
+                ).rejects.toBeUndefined();
 
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx charger module charger set 90`,
-                expect.anything(),
-                undefined,
-                true
-            );
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx charger module full_cool set ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
 
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                'npmx charger module charger get',
-                expect.anything(),
-                undefined,
-                true
-            );
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    'npmx charger module full_cool get',
+                    expect.anything(),
+                    undefined,
+                    true
+                );
 
-            // Updates should only be emitted when we get response
-            expect(mockOnChargerUpdate).toBeCalledTimes(0);
-        });
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            }
+        );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckVOut - Fail immediately - index: %p',

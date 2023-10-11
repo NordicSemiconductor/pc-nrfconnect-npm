@@ -57,7 +57,8 @@ export type CCProfilingState =
     | 'ThermalError'
     | 'Ready';
 
-export type ChargeCurrentCool = 'iCHG' | 'iCool';
+export const ChargeCurrentCoolValues = ['iCool', 'iCHG'] as const;
+export type ChargeCurrentCool = (typeof ChargeCurrentCoolValues)[number];
 
 export type ProfilingEvent = {
     timestamp: number;
