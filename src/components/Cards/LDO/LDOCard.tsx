@@ -157,6 +157,14 @@ export default ({
                         }
                         disabled={disabled || ldo.mode === 'LDO'}
                     />
+                    <Toggle
+                        label="Active Discharge"
+                        isToggled={ldo.activeDischarge}
+                        onToggle={value =>
+                            npmDevice.setLdoActiveDischarge(index, value)
+                        }
+                        disabled={disabled}
+                    />
                 </>
             )}
         </Card>

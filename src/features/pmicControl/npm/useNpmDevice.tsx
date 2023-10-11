@@ -138,7 +138,7 @@ export default () => {
                 npmDevice.requestUpdate.buckEnabled(i);
                 npmDevice.requestUpdate.buckModeControl(i);
                 npmDevice.requestUpdate.buckOnOffControl(i);
-                npmDevice.requestUpdate.buckActiveDischargeEnabled(i);
+                npmDevice.requestUpdate.buckActiveDischarge(i);
             }
 
             for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
@@ -147,6 +147,7 @@ export default () => {
                 npmDevice.requestUpdate.ldoEnabled(i);
                 npmDevice.requestUpdate.ldoSoftStartEnabled(i);
                 npmDevice.requestUpdate.ldoSoftStart(i);
+                npmDevice.requestUpdate.ldoActiveDischarge(i);
             }
 
             for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
@@ -226,7 +227,7 @@ export default () => {
                         modeControl: 'Auto',
                         onOffControl: 'Off',
                         retentionControl: 'Off',
-                        activeDischargeEnabled: false,
+                        activeDischarge: false,
                     });
                 }
                 dispatch(setBucks(emptyBuck));
@@ -239,6 +240,7 @@ export default () => {
                         enabled: false,
                         softStartEnabled: true,
                         softStart: 25,
+                        activeDischarge: false,
                     });
                 }
                 dispatch(setLdos(emptyLdos));

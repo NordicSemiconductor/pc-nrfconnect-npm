@@ -324,7 +324,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_BUCKS)(
         'Request update buckActiveDischargeEnabled index: %p',
         index => {
-            pmic.requestUpdate.buckActiveDischargeEnabled(index);
+            pmic.requestUpdate.buckActiveDischarge(index);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -799,14 +799,14 @@ describe('PMIC 1300 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _unique?: boolean
             ) => {
-                callbacks?.onSuccess('app_version=0.9.2+8', command);
+                callbacks?.onSuccess('app_version=0.9.2+11', command);
                 return Promise.resolve();
             }
         );
 
         await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
             supported: true,
-            version: '0.9.2+8',
+            version: '0.9.2+11',
         });
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);

@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-npm",
-    "version": "0.9.2-pre4",
+    "version": "0.9.2-pre5",
     "description": "EXPERIMENTAL: Evaluate and implement Nordic's PMICs​",
     "displayName": "nPM PowerUP​",
     "homepage": "https://github.com/NordicPlayground/pc-nrfconnect-npm",
