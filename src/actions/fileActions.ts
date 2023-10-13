@@ -147,12 +147,12 @@ export const saveFileDialog = (): AppThunk => dispatch => {
         title: 'Save Device Settings',
         filters: [
             {
-                name: 'JSON',
-                extensions: ['json'],
-            },
-            {
                 name: 'Overlay',
                 extensions: ['overlay'],
+            },
+            {
+                name: 'JSON',
+                extensions: ['json'],
             },
         ],
     }).then(

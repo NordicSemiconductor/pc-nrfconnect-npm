@@ -35,7 +35,7 @@ import {
 export const REST_DURATION = 900; // seconds
 export const REPORTING_RATE = 1000;
 export const PROFILE_FOLDER_PREFIX = 'profile_';
-``;
+
 export const generateDefaultProjectPath = (profile: Profile) =>
     path.join(profile.baseDirectory, profile.name, 'profileSettings.json');
 
@@ -132,6 +132,8 @@ export const saveProjectSettings =
             ...projectToSave,
             appVersion: packageJsons.version,
         };
+
+        fs.mkdirSync(path.dirname(filePath), { recursive: true });
         fs.writeFileSync(filePath, JSON.stringify(project, null, 2));
 
         // Abort any ongoing processes with the same project file name
