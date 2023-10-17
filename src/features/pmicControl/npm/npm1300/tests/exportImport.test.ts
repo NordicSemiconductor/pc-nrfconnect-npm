@@ -17,6 +17,7 @@ import {
     ShipModeConfig,
     TimerConfig,
 } from '../../types';
+import { npm1300FWVersion } from '../pmic1300Device';
 import { setupMocksBase } from './helpers';
 
 describe('PMIC 1300 - Apply Config ', () => {
@@ -209,7 +210,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         timerConfig: initTimerConfig,
         ship: initShip,
         fuelGauge: true,
-        firmwareVersion: '0.9.2+11',
+        firmwareVersion: npm1300FWVersion,
         deviceType: 'npm1300',
         fuelGaugeChargingSamplingRate: 1000,
     };
