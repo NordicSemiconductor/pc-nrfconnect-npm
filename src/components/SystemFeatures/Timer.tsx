@@ -58,6 +58,10 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
             return `~${split.hours} hr${split.hours > 1 ? 's' : ''}`;
         }
 
+        if (split.minutes) {
+            return `~${split.minutes} min${split.minutes > 1 ? 's' : ''}`;
+        }
+
         if (split.seconds) {
             return `~${split.seconds} second${split.seconds > 1 ? 's' : ''}`;
         }
