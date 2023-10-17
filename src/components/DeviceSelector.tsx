@@ -12,9 +12,11 @@ import {
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { DeviceTraits } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import path from 'path';
 
 import { closeDevice, openDevice } from '../actions/deviceActions';
 import { npm1300DeviceSetup } from '../features/pmicControl/npm/deviceSetups';
+import { npm1300FWVersion } from '../features/pmicControl/npm/npm1300/pmic1300Device';
 import {
     isNpm1300SerialApplicationMode,
     isNpm1300SerialRecoverMode,
@@ -37,7 +39,9 @@ const deviceSetupConfig: DeviceSetupConfig = {
         npm1300DeviceSetup({
             key: 'nPM1300',
             description: '',
-            hex: getAppFile('fw/app_signed_0.9.2+11.hex'),
+            hex: getAppFile(
+                path.join('fw', `app_signed_${npm1300FWVersion}.hex`)
+            ),
         }),
     ],
     confirmMessage:

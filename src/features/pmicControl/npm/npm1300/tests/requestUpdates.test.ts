@@ -7,6 +7,7 @@
 import { ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { BatteryModel } from '../../types';
+import { npm1300FWVersion } from '../pmic1300Device';
 import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
@@ -799,14 +800,17 @@ describe('PMIC 1300 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _unique?: boolean
             ) => {
-                callbacks?.onSuccess('app_version=0.9.2+11', command);
+                callbacks?.onSuccess(
+                    `app_version=${npm1300FWVersion}`,
+                    command
+                );
                 return Promise.resolve();
             }
         );
 
         await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
             supported: true,
-            version: '0.9.2+11',
+            version: npm1300FWVersion,
         });
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);

@@ -72,6 +72,8 @@ import {
     VTrickleFast,
 } from '../types';
 
+export const npm1300FWVersion = '0.9.2+12';
+
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();
     const devices = {
@@ -86,7 +88,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         dialogHandler,
         eventEmitter,
         devices,
-        '0.9.2+11'
+        npm1300FWVersion
     );
     const batteryProfiler = shellParser
         ? BatteryProfiler(shellParser, eventEmitter)
@@ -1847,7 +1849,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckVOut-1',
-                    message: `Buck 2 powers the I2C communication required by this app. A voltage lower than 1.6 V might cause issues with the app connection. 
+                    message: `Buck 2 powers the I2C communication required by this app. A voltage lower than 1.6 V might cause issues with the app connection.
                     Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, don't ask again",
@@ -2069,7 +2071,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
                     doNotAskAgainStoreID: 'pmic1300-setBuckEnabled-1',
-                    message: `Disabling the buck 2 might effect I2C communications to the PMIC chip and hance you might get 
+                    message: `Disabling the buck 2 might effect I2C communications to the PMIC chip and hance you might get
                 disconnected from the app. Are you sure you want to continue?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, don't ask again",
@@ -3013,7 +3015,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
                     message: `The configuration was intended for firmware version ${
                         config.firmwareVersion
-                    }. Device is running a different version. 
+                    }. Device is running a different version.
                     ${baseDevice.getSupportedVersion()}. Do you still want to apply this configuration?`,
                     confirmLabel: 'Yes',
                     optionalLabel: "Yes, don't ask again",
