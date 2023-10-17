@@ -40,6 +40,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         mockOnTimerConfigUpdate,
         mockOnShipUpdate,
         mockEnqueueRequest,
+        mockOnUsbPower,
         pmic,
     } = setupMocksWithShellParser();
     describe('Setters and effects state - success', () => {
@@ -1342,6 +1343,22 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
             }
         );
+
+        test('Set vBusinCurrentLimiter', async () => {
+            await pmic.setVBusinCurrentLimiter(5);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).nthCalledWith(
+                1,
+                `npmx vbusin current_limit set 5000`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnUsbPower).toBeCalledTimes(0);
+        });
     });
 
     describe('Setters and effects state - error', () => {
@@ -3333,6 +3350,32 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
             // Updates should only be emitted when we get response
             expect(mockOnActiveBatteryModelUpdate).toBeCalledTimes(0);
+        });
+
+        test('Set vBusinCurrentLimiter - Fail immediately', async () => {
+            await expect(
+                pmic.setVBusinCurrentLimiter(5)
+            ).rejects.toBeUndefined();
+
+            expect(mockEnqueueRequest).toBeCalledTimes(2);
+            expect(mockEnqueueRequest).nthCalledWith(
+                1,
+                `npmx vbusin current_limit set 5000`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npmx vbusin current_limit get`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnUsbPower).toBeCalledTimes(0);
         });
     });
 });

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Card,
     classNames,
@@ -13,16 +13,20 @@ import {
 
 import { NpmDevice, USBPower } from '../../features/pmicControl/npm/types';
 
-interface GPIOProperties {
+interface VBusProperties {
     npmDevice: NpmDevice;
     usbPower: USBPower;
     disabled: boolean;
 }
 
-export default ({ npmDevice, usbPower, disabled }: GPIOProperties) => {
+export default ({ npmDevice, usbPower, disabled }: VBusProperties) => {
     const [internalCurrentLimiter, setInternalCurrentLimiter] = useState(
         usbPower.currentLimiter
     );
+
+    useEffect(() => {
+        setInternalCurrentLimiter(usbPower.currentLimiter);
+    }, [usbPower]);
 
     return (
         <Card
@@ -53,7 +57,7 @@ export default ({ npmDevice, usbPower, disabled }: GPIOProperties) => {
                 range={npmDevice.getUSBCurrentLimiterRange()}
                 value={internalCurrentLimiter}
                 onChange={setInternalCurrentLimiter}
-                onChangeComplete={() => {}}
+                onChangeComplete={npmDevice.setVBusinCurrentLimiter}
                 unit="A"
             />
         </Card>

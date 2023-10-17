@@ -179,6 +179,8 @@ export default () => {
             npmDevice.requestUpdate.activeBatteryModel();
             npmDevice.requestUpdate.storedBatteryModel();
 
+            npmDevice.requestUpdate.vbusinCurrentLimiter();
+
             npmDevice.getHardcodedBatteryModels().then(models => {
                 dispatch(setHardcodedBatterModels(models));
             });

@@ -16,6 +16,7 @@ import {
     POF,
     ShipModeConfig,
     TimerConfig,
+    USBPower,
 } from '../../types';
 import { npm1300FWVersion } from '../pmic1300Device';
 import { setupMocksBase } from './helpers';
@@ -32,6 +33,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         mockOnTimerConfigUpdate,
         mockOnFuelGaugeUpdate,
         mockDialogHandler,
+        mockOnUsbPower,
         pmic,
     } = setupMocksBase();
 
@@ -96,6 +98,10 @@ describe('PMIC 1300 - Apply Config ', () => {
         invPolarity: false,
         longPressReset: true,
         twoButtonReset: true,
+    };
+
+    const initUSBPower: Omit<USBPower, 'detectStatus'> = {
+        currentLimiter: 100,
     };
 
     const sampleConfig: NpmExport = {
@@ -213,6 +219,9 @@ describe('PMIC 1300 - Apply Config ', () => {
         firmwareVersion: npm1300FWVersion,
         deviceType: 'npm1300',
         fuelGaugeChargingSamplingRate: 1000,
+        usbPower: {
+            currentLimiter: 500,
+        },
     };
 
     const initGPIO: GPIO = {
@@ -231,6 +240,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     let pof: POF = { ...initPOF };
     let ship: ShipModeConfig = { ...initShip };
     let timerConfig = { ...initTimerConfig };
+    let usbPower = { ...initUSBPower };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -313,6 +323,15 @@ describe('PMIC 1300 - Apply Config ', () => {
                 };
             }
         );
+
+        mockOnUsbPower.mockImplementation(
+            (partialUpdate: Partial<USBPower>) => {
+                usbPower = {
+                    ...usbPower,
+                    ...partialUpdate,
+                };
+            }
+        );
     });
 
     const verifyApplyConfig = () => {
@@ -335,6 +354,8 @@ describe('PMIC 1300 - Apply Config ', () => {
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
         expect(mockOnFuelGaugeUpdate).toBeCalledWith(true);
+
+        expect(mockOnUsbPower).toBeCalledTimes(1);
     };
 
     test('Apply Correct config', () => {
