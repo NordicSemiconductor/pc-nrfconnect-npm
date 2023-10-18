@@ -41,6 +41,7 @@ const saveSettings =
             deviceType: currentState.npmDevice.getDeviceType(),
             fuelGaugeChargingSamplingRate:
                 currentState.fuelGaugeChargingSamplingRate,
+            usbPower: currentState.usbPower,
         };
 
         if (filePath.endsWith('.JSON')) {

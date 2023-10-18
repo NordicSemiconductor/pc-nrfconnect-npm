@@ -452,6 +452,8 @@ export type NpmDevice = {
         storedBatteryModel: () => void;
 
         usbPowered: () => void;
+
+        vbusinCurrentLimiter: () => void;
     };
 
     setChargerVTerm: (value: number) => Promise<void>;
@@ -531,6 +533,8 @@ export type NpmDevice = {
 
     getBatteryProfiler: () => BatteryProfiler | undefined;
     setAutoRebootDevice: (autoReboot: boolean) => void;
+
+    setVBusinCurrentLimiter: (amps: number) => Promise<void>;
 } & BaseNpmDevice;
 
 export interface PmicDialog {
@@ -569,6 +573,7 @@ export interface NpmExport {
     firmwareVersion: string;
     deviceType: NpmModel;
     fuelGaugeChargingSamplingRate: number;
+    usbPower: Omit<USBPower, 'detectStatus'>;
 }
 
 export interface LoggingEvent {

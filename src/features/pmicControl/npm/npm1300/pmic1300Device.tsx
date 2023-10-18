@@ -70,7 +70,7 @@ import {
     VTrickleFast,
 } from '../types';
 
-export const npm1300FWVersion = '0.9.2+12';
+export const npm1300FWVersion = '0.9.2+13';
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();
@@ -1315,6 +1315,18 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 toRegex('npmx ship mode (ship|hibernate)'),
                 () => {
                     eventEmitter.emit('onReboot', true);
+                },
+                noop
+            )
+        );
+
+        releaseAll.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx vbusin current_limit', true),
+                res => {
+                    eventEmitter.emit('onUsbPower', {
+                        currentLimiter: parseToNumber(res) / 1000,
+                    });
                 },
                 noop
             )
@@ -2785,6 +2797,25 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             );
         });
 
+    const setVBusinCurrentLimiter = (amps: number) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<USBPower>('onUsbPower', {
+                    currentLimiter: amps,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx vbusin current_limit set ${amps * 1000}`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.vbusinCurrentLimiter();
+                        reject();
+                    }
+                );
+            }
+        });
+
     const requestUpdate = {
         pmicChargingState: () => sendCommand('npmx charger status get'),
         chargerVTerm: () =>
@@ -2872,6 +2903,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
 
         usbPowered: () => sendCommand(`npmx vbusin status cc get`),
+
+        vbusinCurrentLimiter: () =>
+            sendCommand(`npmx vbusin current_limit get`),
     };
 
     return {
@@ -2957,6 +2991,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     setShipTwoButtonReset(config.ship.twoButtonReset);
 
                     setFuelGaugeEnabled(config.fuelGauge);
+
+                    setVBusinCurrentLimiter(config.usbPower.currentLimiter);
                 } catch (error) {
                     logger.error('Invalid File.');
                 }
@@ -3144,6 +3180,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         enterShipHibernateMode: () => sendCommand(`npmx ship mode hibernate`),
 
         setActiveBatteryModel,
+
+        setVBusinCurrentLimiter,
 
         getHardcodedBatteryModels: () =>
             new Promise<BatteryModel[]>((resolve, reject) => {

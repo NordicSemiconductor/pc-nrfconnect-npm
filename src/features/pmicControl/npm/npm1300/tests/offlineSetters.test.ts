@@ -26,6 +26,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
         mockOnShipUpdate,
+        mockOnUsbPower,
         pmic,
     } = setupMocksBase();
 
@@ -437,6 +438,13 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
         expect(mockOnFuelGaugeUpdate).toBeCalledWith(false);
+    });
+
+    test('Set VBusin currentLimiter', async () => {
+        await pmic.setVBusinCurrentLimiter(500);
+
+        expect(mockOnUsbPower).toBeCalledTimes(1);
+        expect(mockOnUsbPower).toBeCalledWith({ currentLimiter: 500 });
     });
 });
 

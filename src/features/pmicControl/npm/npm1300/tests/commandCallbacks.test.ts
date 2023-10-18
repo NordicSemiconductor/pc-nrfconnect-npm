@@ -1373,5 +1373,18 @@ Battery models stored in database:
             twoButtonReset: enable,
         });
     });
+
+    test.each(['get', 'set 500'])('npmx vbusin current_limit %p', append => {
+        const command = `npmx vbusin current_limit ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: 500 mA.`, command);
+
+        expect(mockOnUsbPower).toBeCalledTimes(1);
+        expect(mockOnUsbPower).toBeCalledWith({
+            currentLimiter: 0.5,
+        });
+    });
 });
 export {};
