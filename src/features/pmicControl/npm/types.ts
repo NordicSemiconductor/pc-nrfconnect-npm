@@ -57,9 +57,6 @@ export type CCProfilingState =
     | 'ThermalError'
     | 'Ready';
 
-export const ChargeCurrentCoolValues = ['iCool', 'iCHG'] as const;
-export type ChargeCurrentCool = (typeof ChargeCurrentCoolValues)[number];
-
 export type ProfilingEvent = {
     timestamp: number;
     data: ProfilingEventData;
@@ -92,7 +89,6 @@ export type Charger = {
     ntcBeta: number;
     tChgStop: number;
     tChgResume: number;
-    currentCool: ChargeCurrentCool;
     vTermR: number;
     tCold: number;
     tCool: number;
@@ -407,7 +403,6 @@ export type NpmDevice = {
         chargerNTCBeta: () => void;
         chargerTChgStop: () => void;
         chargerTChgResume: () => void;
-        chargerCurrentCool: () => void;
         chargerVTermR: () => void;
         chargerTCold: () => void;
         chargerTCool: () => void;
@@ -473,7 +468,6 @@ export type NpmDevice = {
     setChargerNTCBeta: (btcBeta: number) => Promise<void>;
     setChargerTChgStop: (value: number) => Promise<void>;
     setChargerTChgResume: (value: number) => Promise<void>;
-    setChargerCurrentCool: (mode: ChargeCurrentCool) => Promise<void>;
     setChargerVTermR: (value: number) => Promise<void>;
     setChargerTCold: (value: number) => Promise<void>;
     setChargerTCool: (value: number) => Promise<void>;

@@ -133,15 +133,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         expect(mockOnChargerUpdate).toBeCalledWith({ vTermR: 3.55 });
     });
 
-    test('Set setChargerCurrentCool', async () => {
-        await pmic.setChargerCurrentCool('iCool');
-
-        expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).toBeCalledWith({
-            currentCool: 'iCool',
-        });
-    });
-
     test('Set setChargerNTCBeta', async () => {
         await pmic.setChargerNTCBeta(3380);
 
