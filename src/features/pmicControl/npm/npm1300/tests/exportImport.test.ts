@@ -322,7 +322,7 @@ describe('PMIC 1300 - Apply Config ', () => {
 
         expect(gpios).toStrictEqual(sampleConfig.gpios);
 
-        expect(mockOnChargerUpdate).toBeCalledTimes(12);
+        expect(mockOnChargerUpdate).toBeCalledTimes(16);
         expect(mockOnBuckUpdate).toBeCalledTimes(18); // 7 states + 1 (mode change on vOut) * 2 Bucks
         expect(mockOnLdoUpdate).toBeCalledTimes(12);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);

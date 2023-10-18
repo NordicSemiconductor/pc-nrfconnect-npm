@@ -2902,6 +2902,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         setChargerTChgResume(charger.tChgResume);
                         setChargerTChgStop(charger.tChgStop);
                         setChargerVTermR(charger.vTermR);
+                        setChargerTCold(charger.tCold);
+                        setChargerTCool(charger.tCool);
+                        setChargerTWarm(charger.tWarm);
+                        setChargerTHot(charger.tHot);
                     }
 
                     config.bucks.forEach((buck, index) => {
