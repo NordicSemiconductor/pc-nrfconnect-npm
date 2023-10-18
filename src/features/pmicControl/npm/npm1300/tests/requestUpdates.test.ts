@@ -214,18 +214,6 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test('Request update chargerCurrentCool', () => {
-        pmic.requestUpdate.chargerCurrentCool();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx charger module full_cool get',
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
     test('Request update chargerVTermR', () => {
         pmic.requestUpdate.chargerVTermR();
 

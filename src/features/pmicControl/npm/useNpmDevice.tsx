@@ -123,7 +123,6 @@ export default () => {
                 npmDevice.requestUpdate.chargerNTCBeta();
                 npmDevice.requestUpdate.chargerTChgStop();
                 npmDevice.requestUpdate.chargerTChgResume();
-                npmDevice.requestUpdate.chargerCurrentCool();
                 npmDevice.requestUpdate.chargerVTermR();
                 npmDevice.requestUpdate.chargerTCold();
                 npmDevice.requestUpdate.chargerTCool();
@@ -207,7 +206,6 @@ export default () => {
                             ntcBeta: 3380,
                             tChgStop: 110,
                             tChgResume: 100,
-                            currentCool: 'iCool',
                             vTermR: 3.6,
                             tCold: 0,
                             tCool: 10,

@@ -10,7 +10,6 @@ import {
     Card,
     classNames,
     Dropdown,
-    DropdownItem,
     NumberInlineInput,
     NumberInputSliderWithUnit,
     Slider,
@@ -19,7 +18,6 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    ChargeCurrentCool,
     Charger,
     NpmDevice,
     NTCThermistor,
@@ -56,25 +54,6 @@ export default ({
         charger.tWarm,
         charger.tHot,
     ]);
-
-    const currentCoolItems: DropdownItem[] = [
-        {
-            value: 'iCool',
-            label: (
-                <div>
-                    I<span className="subscript">COOL</span>
-                </div>
-            ),
-        },
-        {
-            value: 'iCHG',
-            label: (
-                <div>
-                    I<span className="subscript">CHG</span>
-                </div>
-            ),
-        },
-    ];
 
     const updateNpmDeviceJeitaTemps = () => {
         if (internalJeitaTemps[0] !== charger.tCold)
@@ -191,8 +170,7 @@ export default ({
                             Cool
                         </span>
                         <span>
-                            I<span className="subscript">COOL</span> or I
-                            <span className="subscript">CHG</span>
+                            I<span className="subscript">COOL</span>
                         </span>
                         <span>
                             V<span className="subscript">TERM</span>
@@ -317,23 +295,6 @@ export default ({
                 range={npmDevice.getChargerVTermRRange()}
                 onChange={value => setInternalVTermr(value)}
                 onChangeComplete={npmDevice.setChargerVTermR}
-                disabled={disabled}
-            />
-            <Dropdown
-                label={
-                    <DocumentationTooltip card={card} item="CoolCurrent">
-                        <span>Cool current</span>
-                    </DocumentationTooltip>
-                }
-                items={currentCoolItems}
-                onSelect={item =>
-                    npmDevice.setChargerCurrentCool(
-                        item.value as ChargeCurrentCool
-                    )
-                }
-                selectedItem={
-                    currentCoolItems[charger.currentCool === 'iCHG' ? 1 : 0]
-                }
                 disabled={disabled}
             />
             <Dropdown

@@ -8,7 +8,6 @@ import {
     BatteryModel,
     BuckModeControlValues,
     BuckOnOffControlValues,
-    ChargeCurrentCoolValues,
     GPIODriveValues,
     GPIOModeValues,
     GPIOPullValues,
@@ -112,24 +111,6 @@ describe('PMIC 1300 - Command callbacks', () => {
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).nthCalledWith(1, {
             enableRecharging: true,
-        });
-    });
-
-    test.each(
-        ChargeCurrentCoolValues.map((value, index) => [
-            { append: 'get', value, index },
-            { append: `set ${index}`, value, index },
-        ]).flat()
-    )('npmx charger module full_cool %p', ({ append, value, index }) => {
-        const command = `npmx charger module full_cool ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-        callback?.onSuccess(`Value: ${index}.`, command);
-
-        expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).nthCalledWith(1, {
-            currentCool: value,
         });
     });
 
