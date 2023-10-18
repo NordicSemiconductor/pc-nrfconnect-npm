@@ -76,7 +76,6 @@ export default () => {
                     item="LoadConfiguration"
                 >
                     <Button
-                        disabled
                         variant="secondary"
                         // disabled={pmicConnection !== 'pmic-connected'}
                         className="w-100"
