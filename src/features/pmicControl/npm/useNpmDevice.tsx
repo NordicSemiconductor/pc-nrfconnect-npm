@@ -553,6 +553,7 @@ export default () => {
                     if (!success) {
                         dispatch(clearWaitForDevice());
                     } else {
+                        setPMICPowered(false);
                         dispatch<AppThunk>((dis, getState) => {
                             const previousWaitForDevice =
                                 getState().deviceAutoSelect.waitForDevice;
