@@ -315,6 +315,22 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
+        onResetReason: (handler: (success: string) => void) => {
+            eventEmitter.on('onResetReason', handler);
+            return () => {
+                eventEmitter.removeListener('onResetReason', handler);
+            };
+        },
+
+        onChargerError: (
+            handler: (payload: string, error?: string) => void
+        ) => {
+            eventEmitter.on('onChargerError', handler);
+            return () => {
+                eventEmitter.removeListener('onChargerError', handler);
+            };
+        },
+
         hasCharger: () => devices.charger ?? false,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,

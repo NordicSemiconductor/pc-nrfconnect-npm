@@ -227,6 +227,33 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             case 'EVENTSVBUSIN0SET':
                 processEventVBus0Set(irqEvent);
                 break;
+            case 'EVENTSBCHARGER1SET':
+                if (irqEvent.event === 'EVENTCHGERROR') {
+                    shellParser?.enqueueRequest(
+                        'npmx errlog check',
+                        {
+                            onSuccess: res =>
+                                eventEmitter.emit('onChargerError', res),
+                            onError: () => {
+                                eventEmitter.emit('onChargerError', 'UNKNOWN');
+                                logger.warn(
+                                    'error message unable to read error from device'
+                                );
+                            },
+                            onTimeout: () => {
+                                eventEmitter.emit('onChargerError', 'UNKNOWN');
+                                logger.warn('Reading latest error timed out.');
+                            },
+                        },
+                        undefined,
+                        true
+                    );
+                }
+                eventEmitter.emit('onChargerError');
+                break;
+            case 'RSTCAUSE':
+                eventEmitter.emit('onResetReason', irqEvent.event);
+                break;
         }
     };
 

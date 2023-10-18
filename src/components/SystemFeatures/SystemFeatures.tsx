@@ -19,6 +19,7 @@ import {
     getUsbPower,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
+import ErrorStatuses from './ErrorStatuses';
 import PowerFailure from './PowerFailure';
 import ResetControl from './ResetControl';
 import Timer from './Timer';
@@ -62,6 +63,7 @@ export default ({ active }: PaneProps) => {
                     disabled={disabled}
                 />
             )}
+            {npmDevice && <ErrorStatuses disabled={disabled} />}
         </MasonryLayout>
     ) : null;
 };
