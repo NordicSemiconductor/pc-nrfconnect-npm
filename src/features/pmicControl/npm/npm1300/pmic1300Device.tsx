@@ -875,7 +875,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             releaseAll.push(
                 shellParser.registerCommandCallback(
-                    toRegex('npmx buck gpio on_off', true, i, '(-?[0-9]+) (0)'),
+                    toRegex('npmx buck gpio on_off', true, i, '(-1|[0-4]) (0)'),
                     res => {
                         const result = parseToNumber(res);
                         emitPartialEvent<Buck>(
@@ -897,7 +897,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         'npmx buck gpio retention',
                         true,
                         i,
-                        '(-?[0-9]+) (0)'
+                        '(-1|[0-4]) (0)'
                     ),
                     res => {
                         const result = parseToNumber(res);
@@ -920,7 +920,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         'npmx buck gpio pwm_force',
                         true,
                         i,
-                        '(-?[0-9]+) (0)'
+                        '(-1|[0-4]) (0)'
                     ),
                     res => {
                         const result = parseToNumber(res);
@@ -1061,7 +1061,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             releaseAll.push(
                 shellParser.registerCommandCallback(
-                    toRegex('npmx ldsw enable_gpio', true, i, '(-?[0-9]+) (0)'),
+                    toRegex('npmx ldsw enable_gpio', true, i, '(-1|[0-4]) (0)'),
                     res => {
                         const result = parseToNumber(res);
                         emitPartialEvent<Ldo>(
