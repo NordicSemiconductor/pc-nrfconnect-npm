@@ -58,7 +58,7 @@ export const DocumentationTooltip = ({
             {children}
         </Overlay>
     ) : (
-        <span className="line-title">{item}</span>
+        <span className="line-title">{children}</span>
     );
 };
 
