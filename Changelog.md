@@ -19,9 +19,7 @@ and this project adheres to
     -   Read and Write vTermR
     -   Read and Write tCold, tCool, tWarm, tHot
     -   Read and Write NTC Beta
--   Charger
-    -   BatLim configuration
-    -   Cool Current
+-   Charger BatLim configuration
 -   LDO
     -   Soft Starter enable
     -   Soft Starter current
@@ -35,6 +33,7 @@ and this project adheres to
     -   Mode
     -   Prescaler
     -   Period
+    -   tShipTimeToActive
 -   VBus
     -   Input current detection
 -   Enter Ship Mode

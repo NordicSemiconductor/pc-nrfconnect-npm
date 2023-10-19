@@ -8,12 +8,15 @@ import React from 'react';
 import {
     Button,
     Card,
+    Dropdown,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     NpmDevice,
     ShipModeConfig,
+    TimeToActive,
+    TimeToActiveValues,
 } from '../../features/pmicControl/npm/types';
 
 interface GPIOProperties {
@@ -21,6 +24,11 @@ interface GPIOProperties {
     ship: ShipModeConfig;
     disabled: boolean;
 }
+
+const timerShipToActiveItems = TimeToActiveValues.map(item => ({
+    label: `${item} ms`,
+    value: `${item}`,
+}));
 
 export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
     <Card
@@ -48,6 +56,33 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
             disabled={disabled}
             isToggled={ship.twoButtonReset}
         />
+        <Dropdown
+            label={
+                <>
+                    T<span className="subscript">ShipToActive</span>
+                </>
+            }
+            items={timerShipToActiveItems}
+            onSelect={item =>
+                npmDevice.setShipModeTimeToActive(
+                    Number.parseInt(item.value, 10) as TimeToActive
+                )
+            }
+            selectedItem={
+                timerShipToActiveItems[
+                    Math.max(
+                        0,
+                        timerShipToActiveItems.findIndex(
+                            item =>
+                                Number.parseInt(item.value, 10) ===
+                                ship.timeToActive
+                        )
+                    ) ?? 0
+                ]
+            }
+            disabled={disabled}
+        />
+
         <Button
             variant="secondary"
             className="tw-my-2 tw-w-full"
