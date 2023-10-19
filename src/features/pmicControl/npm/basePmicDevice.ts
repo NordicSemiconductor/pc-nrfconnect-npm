@@ -308,10 +308,26 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
-        onUsbPower: (handler: (payload: USBPower) => void) => {
+        onUsbPower: (handler: (payload: Partial<USBPower>) => void) => {
             eventEmitter.on('onUsbPower', handler);
             return () => {
                 eventEmitter.removeListener('onUsbPower', handler);
+            };
+        },
+
+        onResetReason: (handler: (success: string) => void) => {
+            eventEmitter.on('onResetReason', handler);
+            return () => {
+                eventEmitter.removeListener('onResetReason', handler);
+            };
+        },
+
+        onChargerError: (
+            handler: (payload: string, error?: string) => void
+        ) => {
+            eventEmitter.on('onChargerError', handler);
+            return () => {
+                eventEmitter.removeListener('onChargerError', handler);
             };
         },
 

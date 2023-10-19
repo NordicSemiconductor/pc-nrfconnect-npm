@@ -51,6 +51,8 @@ interface pmicControlState {
     fuelGaugeChargingSamplingRate: number;
     fuelGaugeNotChargingSamplingRate: number;
     fuelGaugeReportingRate: number;
+    resetReason?: string;
+    chargerError?: string;
 }
 
 const initialState: pmicControlState = {
@@ -271,6 +273,12 @@ const pmicControlSlice = createSlice({
         setFuelGaugeReportingRate(state, action: PayloadAction<number>) {
             state.fuelGaugeReportingRate = action.payload;
         },
+        setResetReason(state, action: PayloadAction<string>) {
+            state.resetReason = action.payload;
+        },
+        setChargerError(state, action: PayloadAction<string>) {
+            state.chargerError = action.payload;
+        },
     },
 });
 
@@ -348,6 +356,10 @@ export const getFuelGaugeNotChargingSamplingRate = (state: RootState) =>
     state.app.pmicControl.fuelGaugeNotChargingSamplingRate;
 export const getFuelGaugeReportingRate = (state: RootState) =>
     state.app.pmicControl.fuelGaugeReportingRate;
+export const getReserReason = (state: RootState) =>
+    state.app.pmicControl.resetReason;
+export const getChargerError = (state: RootState) =>
+    state.app.pmicControl.chargerError;
 
 export const {
     setNpmDevice,
@@ -385,5 +397,7 @@ export const {
     setFuelGaugeChargingSamplingRate,
     setFuelGaugeNotChargingSamplingRate,
     setFuelGaugeReportingRate,
+    setResetReason,
+    setChargerError: setErrorMessage,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;

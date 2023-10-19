@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared/typings/generated/src/Parsers/shellParser';
+
 import { PmicChargingState, USBDetectStatusValues } from '../../types';
 import { setupMocksWithShellParser } from './helpers';
 
@@ -70,7 +72,10 @@ describe('PMIC 1300 - Logging', () => {
             mockOnAdcSample,
             mockOnBeforeReboot,
             mockOnUsbPower,
+            mockOnResetReason,
+            mockChargerError,
             mockOnChargingStatusUpdate,
+            mockEnqueueRequest,
             pmic,
         } = setupMocksWithShellParser();
 
@@ -81,7 +86,10 @@ describe('PMIC 1300 - Logging', () => {
             mockOnAdcSample = setupMock.mockOnAdcSample;
             mockOnBeforeReboot = setupMock.mockOnBeforeReboot;
             mockOnUsbPower = setupMock.mockOnUsbPower;
+            mockOnResetReason = setupMock.mockOnResetReason;
+            mockChargerError = setupMock.mockChargerError;
             mockOnChargingStatusUpdate = setupMock.mockOnChargingStatusUpdate;
+            mockEnqueueRequest = setupMock.mockEnqueueRequest;
             pmic = setupMock.pmic;
         });
 
@@ -214,6 +222,41 @@ describe('PMIC 1300 - Logging', () => {
                 } as PmicChargingState);
             }
         );
+
+        test('Reset Cause Reason', () => {
+            eventHandlers.mockOnShellLoggingEventHandler(
+                `[00:00:00.038,238] <inf> module_pmic_irq: type=RSTCAUSE,bit=SWRESET`
+            );
+
+            expect(mockOnResetReason).toBeCalledTimes(1);
+            expect(mockOnResetReason).toBeCalledWith('SWRESET');
+        });
+
+        test('Charger Error', () => {
+            jest.clearAllMocks();
+            mockEnqueueRequest.mockClear();
+            mockEnqueueRequest.mockImplementationOnce(
+                (
+                    command: string,
+                    callbacks?: Callbacks,
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    _timeout?: number,
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    _unique?: boolean
+                ) => {
+                    expect(command).toBe('npmx errlog check');
+                    callbacks?.onSuccess('some error', command);
+                    return Promise.resolve();
+                }
+            );
+
+            eventHandlers.mockOnShellLoggingEventHandler(
+                `[00:00:06.189,514] <inf> module_pmic_irq: type=EVENTSBCHARGER1SET,bit=EVENTCHGERROR`
+            );
+
+            expect(mockChargerError).toBeCalledTimes(1);
+            expect(mockChargerError).toBeCalledWith('some error');
+        });
     });
 });
 

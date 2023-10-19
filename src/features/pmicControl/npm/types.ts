@@ -324,7 +324,15 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     onUsbPower: (
-        handler: (payload: USBPower, error?: string) => void
+        handler: (payload: Partial<USBPower>, error?: string) => void
+    ) => () => void;
+
+    onResetReason: (
+        handler: (payload: string, error?: string) => void
+    ) => () => void;
+
+    onChargerError: (
+        handler: (payload: string, error?: string) => void
     ) => () => void;
 
     onFuelGaugeUpdate: (handler: (payload: boolean) => void) => () => void;

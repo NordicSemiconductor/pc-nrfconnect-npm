@@ -83,6 +83,16 @@ export const setupMocksBase = (
         (_partialUpdate: Partial<USBPower>) => {}
     );
 
+    const mockOnResetReason = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_msg: string) => {}
+    );
+
+    const mockChargerError = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_msg: string) => {}
+    );
+
     const mockOnLoggingEvent = jest.fn(() => {});
     const mockOnPmicStateChange = jest.fn(() => {});
     const mockOnReboot = jest.fn(() => {});
@@ -104,6 +114,8 @@ export const setupMocksBase = (
     pmic.onLoggingEvent(mockOnLoggingEvent);
     pmic.onPmicStateChange(mockOnPmicStateChange);
     pmic.onReboot(mockOnReboot);
+    pmic.onResetReason(mockOnResetReason);
+    pmic.onChargerError(mockChargerError);
     pmic.onStoredBatteryModelUpdate(mockOnStoredBatteryModelUpdate);
     pmic.onUsbPower(mockOnUsbPower);
 
@@ -125,6 +137,8 @@ export const setupMocksBase = (
         mockOnLoggingEvent,
         mockOnPmicStateChange,
         mockOnReboot,
+        mockOnResetReason,
+        mockChargerError,
         mockOnStoredBatteryModelUpdate,
         mockOnUsbPower,
         pmic,
