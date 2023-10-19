@@ -74,6 +74,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         softStartEnabled: true,
         softStart: 25,
         activeDischarge: false,
+        onOffControl: 'GPIO0',
     };
 
     const initLed: LED = {
@@ -152,6 +153,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 softStartEnabled: true,
                 softStart: 25,
                 activeDischarge: false,
+                onOffControl: 'GPIO1',
             },
             {
                 voltage: 2,
@@ -160,6 +162,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 softStartEnabled: true,
                 softStart: 25,
                 activeDischarge: false,
+                onOffControl: 'GPIO2',
             },
         ],
         gpios: [
@@ -343,7 +346,7 @@ describe('PMIC 1300 - Apply Config ', () => {
 
         expect(mockOnChargerUpdate).toBeCalledTimes(16);
         expect(mockOnBuckUpdate).toBeCalledTimes(18); // 7 states + 1 (mode change on vOut) * 2 Bucks
-        expect(mockOnLdoUpdate).toBeCalledTimes(12);
+        expect(mockOnLdoUpdate).toBeCalledTimes(14);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);

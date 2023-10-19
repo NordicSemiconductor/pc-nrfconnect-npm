@@ -114,8 +114,13 @@ npm1300_ek_ldo${index + 1}: LDO${index + 1} {
     regulator-initial-mode = <${
         ldo.mode === 'LDO' ? 'NPM1300_LDSW_MODE_LDO' : 'NPM1300_LDSW_MODE_LDSW'
     }>;
-    // enable-gpios = <&npm1300_ek_gpio 2 GPIO_ACTIVE_LOW>;
-};
+    enable-gpio = <${
+        ldo.onOffControl !== 'SW'
+            ? `enable-gpio = <&npm1300_ek_gpio ${GPIOValues.findIndex(
+                  v => v === ldo.onOffControl
+              )} GPIO_ACTIVE_HIGH>;`
+            : ''
+    };
 `;
 
 const generateLEDs = (leds: LED[]) => `

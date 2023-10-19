@@ -307,6 +307,19 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         }
     );
 
+    test.each(PMIC_1300_LDOS)(
+        'Set setLdoOnOffControl index: %p',
+        async index => {
+            await pmic.setLdoOnOffControl(index, 'SW');
+
+            expect(mockOnLdoUpdate).toBeCalledTimes(1);
+            expect(mockOnLdoUpdate).toBeCalledWith({
+                data: { onOffControl: 'SW' },
+                index,
+            });
+        }
+    );
+
     test.each(PMIC_1300_GPIOS)('Set setGpioMode index: %p', async index => {
         await pmic.setGpioMode(index, 'Input');
 
