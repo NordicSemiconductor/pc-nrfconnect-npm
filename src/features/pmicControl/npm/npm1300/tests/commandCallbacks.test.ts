@@ -12,6 +12,7 @@ import {
     GPIOModeValues,
     GPIOPullValues,
     GPIOValues,
+    LdoOnOffControlValues,
     LEDModeValues,
     NTCThermistor,
     PmicChargingState,
@@ -960,6 +961,40 @@ Battery models stored in database:
             });
         }
     );
+
+    test.each(
+        PMIC_1300_LDOS.map(index => [
+            ...[-1, 0, 1, 2, 3, 4].map(value =>
+                [
+                    {
+                        index,
+                        append: `get ${index}`,
+                        value,
+                    },
+                    {
+                        index,
+                        append: `set ${index} ${value} 0`,
+                        value,
+                    },
+                ].flat()
+            ),
+        ]).flat()
+    )('npmx ldsw active_discharge enable %p', ({ index, append, value }) => {
+        const command = `npmx ldsw enable_gpio ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${value} 0`, command);
+
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: {
+                onOffControl:
+                    value === -1 ? LdoOnOffControlValues[0] : GPIOValues[value],
+            },
+            index,
+        });
+    });
 
     test.each(
         PMIC_1300_GPIOS.map(index =>

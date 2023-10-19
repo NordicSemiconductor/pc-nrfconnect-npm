@@ -975,6 +975,24 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnLdoUpdate).toBeCalledTimes(0);
         });
 
+        test.each(PMIC_1300_LDOS)(
+            'Set setLdoOnOffControl index: %p',
+            async index => {
+                await pmic.setLdoOnOffControl(index, 'GPIO2');
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx ldsw enable_gpio set ${index} 2 0`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
         test.each(
             PMIC_1300_GPIOS.map(index =>
                 GPIOModeValues.map((mode, modeIndex) => ({
@@ -2638,6 +2656,36 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
                     `npmx ldsw active_discharge enable get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each(PMIC_1300_LDOS)(
+            'Set setLdoOnOffControl - Fail immediately - index: %p',
+            async index => {
+                await expect(
+                    pmic.setLdoOnOffControl(index, 'GPIO2')
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `npmx ldsw enable_gpio set ${index} 2 0`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npmx ldsw enable_gpio get ${index}`,
                     expect.anything(),
                     undefined,
                     true
