@@ -318,7 +318,7 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     onUsbPower: (
-        handler: (payload: USBPower, error?: string) => void
+        handler: (payload: Partial<USBPower>, error?: string) => void
     ) => () => void;
 
     onResetReason: (

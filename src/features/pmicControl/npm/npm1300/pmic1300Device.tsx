@@ -249,7 +249,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         true
                     );
                 }
-                eventEmitter.emit('onChargerError');
                 break;
             case 'RSTCAUSE':
                 eventEmitter.emit('onResetReason', irqEvent.event);

@@ -308,7 +308,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
-        onUsbPower: (handler: (payload: USBPower) => void) => {
+        onUsbPower: (handler: (payload: Partial<USBPower>) => void) => {
             eventEmitter.on('onUsbPower', handler);
             return () => {
                 eventEmitter.removeListener('onUsbPower', handler);
