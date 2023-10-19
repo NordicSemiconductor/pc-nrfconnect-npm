@@ -16,7 +16,10 @@ import {
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
+    GPIOValues,
     Ldo,
+    LdoOnOffControl,
+    LdoOnOffControlValues,
     NpmDevice,
     SoftStart,
     SoftStartValues,
@@ -52,6 +55,16 @@ export default ({
     const [internalVLdo, setInternalVLdo] = useState(ldo.voltage);
 
     const modeItems = ['LDO', 'Load Switch'];
+
+    const numberOfGPIOs = npmDevice.getNumberOfGPIOs() ?? 0;
+    const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
+
+    const LdoOnOffControlItems = [...LdoOnOffControlValues, ...gpioNames].map(
+        item => ({
+            label: item,
+            value: item,
+        })
+    );
 
     // NumberInputSliderWithUnit do not use ldo.<prop> as value as we send only at on change complete
     useEffect(() => {
@@ -162,6 +175,34 @@ export default ({
                         isToggled={ldo.activeDischarge}
                         onToggle={value =>
                             npmDevice.setLdoActiveDischarge(index, value)
+                        }
+                        disabled={disabled}
+                    />
+                    <Dropdown
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="OnOffControl"
+                            >
+                                <span>On/Off Control</span>
+                            </DocumentationTooltip>
+                        }
+                        items={LdoOnOffControlItems}
+                        onSelect={item => {
+                            npmDevice.setLdoOnOffControl(
+                                index,
+                                item.value as LdoOnOffControl
+                            );
+                        }}
+                        selectedItem={
+                            LdoOnOffControlItems[
+                                Math.max(
+                                    0,
+                                    LdoOnOffControlItems.findIndex(
+                                        item => item.value === ldo.onOffControl
+                                    )
+                                ) ?? 0
+                            ]
                         }
                         disabled={disabled}
                     />

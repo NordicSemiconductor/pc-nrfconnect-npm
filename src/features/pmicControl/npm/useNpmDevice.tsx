@@ -147,6 +147,7 @@ export default () => {
                 npmDevice.requestUpdate.ldoSoftStartEnabled(i);
                 npmDevice.requestUpdate.ldoSoftStart(i);
                 npmDevice.requestUpdate.ldoActiveDischarge(i);
+                npmDevice.requestUpdate.ldoOnOffControl(i);
             }
 
             for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
@@ -241,6 +242,7 @@ export default () => {
                         softStartEnabled: true,
                         softStart: 25,
                         activeDischarge: false,
+                        onOffControl: 'Off',
                     });
                 }
                 dispatch(setLdos(emptyLdos));

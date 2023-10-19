@@ -44,6 +44,7 @@ import {
     ITerm,
     Ldo,
     LdoMode,
+    LdoOnOffControl,
     LED,
     LEDMode,
     LEDModeValues,
@@ -1050,6 +1051,24 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             'onLdoUpdate',
                             {
                                 activeDischarge: parseToBoolean(res),
+                            },
+                            i
+                        );
+                    },
+                    noop
+                )
+            );
+
+            releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex('npmx ldsw enable_gpio', true, i, '(-?[0-9]+) (0)'),
+                    res => {
+                        const result = parseToNumber(res);
+                        emitPartialEvent<Ldo>(
+                            'onLdoUpdate',
+                            {
+                                onOffControl:
+                                    result === -1 ? 'Off' : GPIOValues[result],
                             },
                             i
                         );
@@ -2321,6 +2340,31 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    const setLdoOnOffControl = (index: number, onOffControl: LdoOnOffControl) =>
+        new Promise<void>((resolve, reject) => {
+            if (pmicState === 'ek-disconnected') {
+                emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        onOffControl,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                sendCommand(
+                    `npmx ldsw enable_gpio set ${index} ${GPIOValues.findIndex(
+                        v => v === onOffControl
+                    )} 0`,
+                    () => resolve(),
+                    () => {
+                        requestUpdate.ldoOnOffControl(index);
+                        reject();
+                    }
+                );
+            }
+        });
+
     const setGpioMode = (index: number, mode: GPIOMode) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
@@ -2881,6 +2925,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sendCommand(`npmx ldsw soft_start current get ${index}`),
         ldoActiveDischarge: (index: number) =>
             sendCommand(`npmx ldsw active_discharge enable get ${index}`),
+        ldoOnOffControl: (index: number) =>
+            sendCommand(`npmx ldsw enable_gpio get ${index}`),
 
         pofEnable: () => sendCommand(`npmx pof enable get`),
         pofPolarity: () => sendCommand(`npmx pof polarity get`),
@@ -2963,6 +3009,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         setLdoSoftStartEnabled(index, ldo.softStartEnabled);
                         setLdoSoftStart(index, ldo.softStart);
                         setLdoActiveDischarge(index, ldo.activeDischarge);
+                        setLdoOnOffControl(index, ldo.onOffControl);
                     });
 
                     config.gpios.forEach((gpio, index) => {
@@ -3156,6 +3203,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setLdoSoftStartEnabled,
         setLdoSoftStart,
         setLdoActiveDischarge,
+        setLdoOnOffControl,
         setGpioMode,
         setGpioPull,
         setGpioDrive,
