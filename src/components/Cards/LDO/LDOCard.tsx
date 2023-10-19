@@ -179,14 +179,7 @@ export default ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label={
-                            <DocumentationTooltip
-                                card={card}
-                                item="OnOffControl"
-                            >
-                                <span>On/Off Control</span>
-                            </DocumentationTooltip>
-                        }
+                        label="On/Off Control"
                         items={LdoOnOffControlItems}
                         onSelect={item => {
                             npmDevice.setLdoOnOffControl(
