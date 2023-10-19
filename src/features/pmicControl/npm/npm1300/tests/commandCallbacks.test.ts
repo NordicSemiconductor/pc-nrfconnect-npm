@@ -979,7 +979,7 @@ Battery models stored in database:
                 ].flat()
             ),
         ]).flat()
-    )('npmx ldsw active_discharge enable %p', ({ index, append, value }) => {
+    )('npmx ldsw enable_gpio %p', ({ index, append, value }) => {
         const command = `npmx ldsw enable_gpio ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
