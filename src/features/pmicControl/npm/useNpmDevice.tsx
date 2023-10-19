@@ -242,7 +242,7 @@ export default () => {
                         softStartEnabled: true,
                         softStart: 25,
                         activeDischarge: false,
-                        onOffControl: 'Off',
+                        onOffControl: 'SW',
                     });
                 }
                 dispatch(setLdos(emptyLdos));

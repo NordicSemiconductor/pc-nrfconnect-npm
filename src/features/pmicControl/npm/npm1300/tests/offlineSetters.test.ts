@@ -310,11 +310,11 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     test.each(PMIC_1300_LDOS)(
         'Set setLdoOnOffControl index: %p',
         async index => {
-            await pmic.setLdoOnOffControl(index, 'Off');
+            await pmic.setLdoOnOffControl(index, 'SW');
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { onOffControl: 'Off' },
+                data: { onOffControl: 'SW' },
                 index,
             });
         }

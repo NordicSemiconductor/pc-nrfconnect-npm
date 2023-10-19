@@ -20,7 +20,7 @@ export const GPIOValues = [
     'GPIO5',
 ] as const;
 
-export const LdoOnOffControlValues = ['Off'] as const;
+export const LdoOnOffControlValues = ['SW'] as const;
 
 export const BuckModeControlValues = ['Auto'] as const; // TODO 'PWM', 'PFM'
 export const BuckOnOffControlValues = ['Off'] as const;

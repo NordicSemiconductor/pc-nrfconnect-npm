@@ -1068,7 +1068,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             'onLdoUpdate',
                             {
                                 onOffControl:
-                                    result === -1 ? 'Off' : GPIOValues[result],
+                                    result === -1 ? 'SW' : GPIOValues[result],
                             },
                             i
                         );
