@@ -36,9 +36,9 @@ export default ({ active }: PaneProps) => {
     return active ? (
         <MasonryLayout className="masonry-layout" minWidth={300}>
             {npmDevice && (
-                <PowerFailure
+                <ResetControl
                     npmDevice={npmDevice}
-                    pof={pof}
+                    ship={ship}
                     disabled={disabled}
                 />
             )}
@@ -50,9 +50,9 @@ export default ({ active }: PaneProps) => {
                 />
             )}
             {npmDevice && (
-                <ResetControl
+                <PowerFailure
                     npmDevice={npmDevice}
-                    ship={ship}
+                    pof={pof}
                     disabled={disabled}
                 />
             )}
