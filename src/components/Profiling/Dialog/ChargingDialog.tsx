@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
     clearWaitForDevice,
+    describeError,
     DialogButton,
     GenericDialog,
     Group,
@@ -119,45 +120,34 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         disabled={
                             !batteryFull || usbPowered || !batteryConnected
                         }
-                        onClick={() => {
+                        onClick={async () => {
                             dispatch(setProfilingStage('Resting'));
-                            npmDevice?.setAutoRebootDevice(false);
-                            npmDevice
-                                ?.setChargerEnabled(false)
-                                .then(() => {
-                                    npmDevice
-                                        ?.getBatteryProfiler()
-                                        ?.setProfile(
-                                            REPORTING_RATE, // iBat
-                                            REPORTING_RATE * 8, // tBat
-                                            profile.vLowerCutOff,
-                                            [
-                                                ...profile.restingProfiles,
-                                                ...profile.profilingProfiles,
-                                            ]
-                                        )
-                                        .then(() => {
-                                            npmDevice
-                                                ?.getBatteryProfiler()
-                                                ?.startProfiling();
-                                        })
-                                        .catch(message => {
-                                            dispatch(
-                                                setCompleteStep({
-                                                    message,
-                                                    level: 'danger',
-                                                })
-                                            );
-                                        });
-                                })
-                                .catch(message => {
-                                    dispatch(
-                                        setCompleteStep({
-                                            message,
-                                            level: 'danger',
-                                        })
+                            try {
+                                await npmDevice?.setPOFThreshold(2.6);
+                                npmDevice?.setAutoRebootDevice(false);
+                                await npmDevice?.setChargerEnabled(false);
+                                await npmDevice
+                                    ?.getBatteryProfiler()
+                                    ?.setProfile(
+                                        REPORTING_RATE, // iBat
+                                        REPORTING_RATE * 8, // tBat
+                                        profile.vLowerCutOff,
+                                        [
+                                            ...profile.restingProfiles,
+                                            ...profile.profilingProfiles,
+                                        ]
                                     );
-                                });
+                                await npmDevice
+                                    ?.getBatteryProfiler()
+                                    ?.startProfiling();
+                            } catch (e) {
+                                dispatch(
+                                    setCompleteStep({
+                                        message: describeError(e),
+                                        level: 'danger',
+                                    })
+                                );
+                            }
                         }}
                     >
                         Continue
