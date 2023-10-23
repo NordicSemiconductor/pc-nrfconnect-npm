@@ -222,7 +222,7 @@ export type BatteryModel = {
 
 export const USBDetectStatusValues = [
     'No USB connection',
-    'USB 0.1/0.5 mA',
+    'USB 100/500 mA',
     '1.5A High Power',
     '3A High Power',
 ] as const;

@@ -131,7 +131,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 break;
             case 'Default USB 100/500mA':
                 eventEmitter.emit('onUsbPower', {
-                    detectStatus: 'USB 0.1/0.5 mA',
+                    detectStatus: 'USB 100/500 mA',
                 } as USBPower);
                 break;
             case '1.5A High Power':
