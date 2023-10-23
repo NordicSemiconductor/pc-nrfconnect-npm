@@ -55,13 +55,11 @@ export default ({
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
-    const [internalBatLim, setInternalBatLim] = useState(charger.iBatLim);
 
     // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVTerm(charger.vTerm);
         setInternalIChg(charger.iChg);
-        setInternalBatLim(charger.iBatLim);
     }, [charger]);
 
     return (
@@ -131,20 +129,6 @@ export default ({
 
             {!summary && (
                 <>
-                    <NumberInputSliderWithUnit
-                        label={
-                            <div>
-                                <span>IBAT</span>
-                                <span className="subscript">LIM</span>
-                            </div>
-                        }
-                        unit="mA"
-                        disabled={disabled}
-                        range={npmDevice.getChargerIBatLimRange()}
-                        value={internalBatLim}
-                        onChange={setInternalBatLim}
-                        onChangeComplete={v => npmDevice.setChargerBatLim(v)}
-                    />
                     <Toggle
                         label={
                             <DocumentationTooltip

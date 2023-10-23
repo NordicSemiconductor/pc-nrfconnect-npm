@@ -126,17 +126,6 @@ describe('PMIC 1300 - Command callbacks', () => {
         expect(mockOnChargerUpdate).nthCalledWith(1, { iTerm: '20%' });
     });
 
-    test.each(['get', 'set 1000'])('npmx charger iTerm %p', append => {
-        const command = `npmx charger discharging_current ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-        callback?.onSuccess('Value: 1000mA.', command);
-
-        expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).nthCalledWith(1, { iBatLim: 1000 });
-    });
-
     test.each(['get', 'set 100'])('npmx charger die_temp resume %p', append => {
         const command = `npmx charger die_temp resume ${append}`;
         const callback =
