@@ -12,6 +12,7 @@ import {
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     NpmDevice,
     ShipModeConfig,
@@ -35,16 +36,22 @@ const invPolarityItems = [true, false].map(item => ({
     label: `${item ? 'Active High' : 'Active Low'}`,
 }));
 
+const card = 'resetControl';
+
 export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
     <Card
         title={
             <div className="tw-flex tw-justify-between">
-                <span>Reset and Low Power control</span>
+                Reset and Low Power control
             </div>
         }
     >
         <Dropdown
-            label="SHPHLD pin polarity"
+            label={
+                <DocumentationTooltip card={card} item="SHPHLDPinPolarity">
+                    SHPHLD pin polarity
+                </DocumentationTooltip>
+            }
             items={invPolarityItems}
             onSelect={item =>
                 npmDevice.setShipInvertPolarity(item.value === 'true')
@@ -57,13 +64,21 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
             }
         />
         <Toggle
-            label="Long Press Reset"
+            label={
+                <DocumentationTooltip card={card} item="LongPressReset">
+                    Long Press Reset
+                </DocumentationTooltip>
+            }
             onToggle={npmDevice.setShipLongPressReset}
             disabled={disabled}
             isToggled={ship.longPressReset}
         />
         <Toggle
-            label="Two Button Reset"
+            label={
+                <DocumentationTooltip card={card} item="TwoButtonReset">
+                    Two Button Reset
+                </DocumentationTooltip>
+            }
             onToggle={npmDevice.setShipTwoButtonReset}
             disabled={disabled}
             isToggled={ship.twoButtonReset}
@@ -95,25 +110,29 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
             disabled={disabled}
         />
 
-        <Button
-            variant="secondary"
-            className="tw-my-2 tw-w-full"
-            onClick={() => {
-                npmDevice.enterShipMode();
-            }}
-            disabled={disabled}
-        >
-            Enter Ship Mode
-        </Button>
-        <Button
-            variant="secondary"
-            className="tw-my-1 tw-w-full"
-            onClick={() => {
-                npmDevice.enterShipHibernateMode();
-            }}
-            disabled={disabled}
-        >
-            Enter Hibernate Mode
-        </Button>
+        <DocumentationTooltip card={card} item="EnterShipMode">
+            <Button
+                variant="secondary"
+                className="tw-w-full"
+                onClick={() => {
+                    npmDevice.enterShipMode();
+                }}
+                disabled={disabled}
+            >
+                Enter Ship Mode
+            </Button>
+        </DocumentationTooltip>
+        <DocumentationTooltip card={card} item="EnterHibernateMode">
+            <Button
+                variant="secondary"
+                className="tw-w-full"
+                onClick={() => {
+                    npmDevice.enterShipHibernateMode();
+                }}
+                disabled={disabled}
+            >
+                Enter Hibernate Mode
+            </Button>
+        </DocumentationTooltip>
     </Card>
 );

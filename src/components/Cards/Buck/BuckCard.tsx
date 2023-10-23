@@ -199,7 +199,14 @@ export default ({
                         onChangeComplete={onRetVOutChange}
                     />
                     <Toggle
-                        label="Active Output Capacitor Discharge"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="ActiveOutputCapacitorDischarge"
+                            >
+                                Active Output Capacitor Discharge
+                            </DocumentationTooltip>
+                        }
                         isToggled={buck.activeDischarge}
                         onToggle={value =>
                             npmDevice.setBuckActiveDischarge(index, value)

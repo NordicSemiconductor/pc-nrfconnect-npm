@@ -12,6 +12,7 @@ import {
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     NpmDevice,
     POF,
@@ -40,11 +41,15 @@ export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
         setInternalPOFThreshold(pof.threshold);
     }, [pof]);
 
+    const card = 'powerFailure';
+
     return (
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
-                    <span>Power Failure</span>
+                    <DocumentationTooltip card={card} item="PowerFailure">
+                        Power Failure
+                    </DocumentationTooltip>
 
                     <div className="d-flex">
                         <Toggle
@@ -59,10 +64,12 @@ export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
         >
             <NumberInputSliderWithUnit
                 label={
-                    <div>
-                        <span>VSYS</span>
-                        <span className="subscript">POF</span>
-                    </div>
+                    <DocumentationTooltip card={card} item="VSYSPOF">
+                        <>
+                            VSYS
+                            <span className="subscript">POF</span>
+                        </>
+                    </DocumentationTooltip>
                 }
                 unit="V"
                 disabled={disabled}
@@ -72,7 +79,11 @@ export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
                 onChangeComplete={npmDevice.setPOFThreshold}
             />
             <Dropdown
-                label="POF Polarity"
+                label={
+                    <DocumentationTooltip card={card} item="POFPolarity">
+                        POF Polarity
+                    </DocumentationTooltip>
+                }
                 items={pofPolarityValuesItems}
                 onSelect={item =>
                     npmDevice.setPOFPolarity(item.value as POFPolarity)

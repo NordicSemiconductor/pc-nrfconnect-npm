@@ -11,6 +11,7 @@ import {
     NumberInputSliderWithUnit,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { NpmDevice, USBPower } from '../../features/pmicControl/npm/types';
 
 interface VBusProperties {
@@ -28,14 +29,21 @@ export default ({ npmDevice, usbPower, disabled }: VBusProperties) => {
         setInternalCurrentLimiter(usbPower.currentLimiter);
     }, [usbPower]);
 
+    const card = 'vBUS';
+
     return (
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
-                    <span>
-                        V<span className="subscript">BUS</span> input current
-                        limiter
-                    </span>
+                    <DocumentationTooltip
+                        card={card}
+                        item="VbUSInputCurrentLimiter"
+                    >
+                        <>
+                            V<span className="subscript">BUS</span> input
+                            current limiter
+                        </>
+                    </DocumentationTooltip>
                 </div>
             }
         >
@@ -45,14 +53,22 @@ export default ({ npmDevice, usbPower, disabled }: VBusProperties) => {
                 )}`}
             >
                 <div className="tw-flex tw-justify-between tw-pb-0.5 tw-text-xs">
-                    <span className="tw-font-medium">USB Detect Status</span>
+                    <DocumentationTooltip card={card} item="USBDetectStatus">
+                        <span className="tw-font-medium">
+                            USB Detect Status
+                        </span>
+                    </DocumentationTooltip>
                     <span className="tw-text-right">
                         {usbPower.detectStatus}
                     </span>
                 </div>
             </div>
             <NumberInputSliderWithUnit
-                label="Current Limiter"
+                label={
+                    <DocumentationTooltip card={card} item="CurrentLimiter">
+                        Current Limiter
+                    </DocumentationTooltip>
+                }
                 disabled={disabled}
                 range={npmDevice.getUSBCurrentLimiterRange()}
                 value={internalCurrentLimiter}
