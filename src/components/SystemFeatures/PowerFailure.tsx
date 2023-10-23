@@ -45,15 +45,18 @@ export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
             title={
                 <div className="tw-flex tw-justify-between">
                     <span>Power Failure</span>
+
+                    <div className="d-flex">
+                        <Toggle
+                            label="POF Enabled"
+                            onToggle={npmDevice.setPOFEnabled}
+                            disabled={disabled}
+                            isToggled={pof.enable}
+                        />
+                    </div>
                 </div>
             }
         >
-            <Toggle
-                label="POF Enabled"
-                onToggle={npmDevice.setPOFEnabled}
-                disabled={disabled}
-                isToggled={pof.enable}
-            />
             <NumberInputSliderWithUnit
                 label={
                     <div>
