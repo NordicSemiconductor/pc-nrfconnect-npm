@@ -64,6 +64,18 @@ const buckDoc = (n: number) => ({
             ],
         },
     ],
+    ActiveOutputCapacitorDischarge: [
+        {
+            title: 'Active Output Capacitor Discharge',
+            content: [
+                <p key="p1">
+                    Active discharge using R
+                    <span className="subscript">DISCH</span> from the output
+                    capacitors when converter is disabled.
+                </p>,
+            ],
+        },
+    ],
     ModeControl: [
         {
             title: 'Buck Mode Control',
@@ -143,6 +155,35 @@ const ldoDoc = () => ({
         {
             title: 'Range',
             content: [<p key="p1">1.0 V to 3.3 V in 100 mV steps</p>],
+        },
+    ],
+    SoftStartEnable: [
+        {
+            title: 'Soft Start Enable',
+            content: [
+                <p key="p1">
+                    Limit load switch current for 1.8 ms when load switch is
+                    enabled.
+                </p>,
+            ],
+        },
+    ],
+    SoftStartCurrent: [
+        {
+            title: 'Soft Start Current',
+            content: [<p key="p1">Soft start current limit.</p>],
+        },
+    ],
+    ActiveDischarge: [
+        {
+            title: 'Active Discharge',
+            content: [
+                <p key="p1">
+                    Active discharge using R
+                    <span className="subscript">LSPD</span> when load switch is
+                    disabled.
+                </p>,
+            ],
         },
     ],
 });
@@ -420,6 +461,254 @@ export const documentation: Documentation = {
             },
         ],
     },
+    powerFailure: {
+        PowerFailure: [
+            {
+                title: 'Power Failure',
+                content: [
+                    <p key="p1">
+                        The power-fail comparator (POF) provides the host with
+                        an early warning of an impending power supply failure.
+                        The POF signals the application when the supply voltage
+                        drops below VSYS<span className="subscript">POF</span>{' '}
+                        threshold. The POF does not reset the system, but gives
+                        the CPU time to prepare for an orderly power-down.
+                        <br />
+                        <br />
+                        Enable GPIO Mode “Output power loss warning” for the
+                        desired GPIO in the GPIOS tab.
+                    </p>,
+                ],
+            },
+        ],
+        VSYSPOF: [
+            {
+                title: (
+                    <>
+                        VSYS<span className="subscript">POF</span>
+                    </>
+                ),
+                content: [
+                    <p key="p1">
+                        Threshold to trigger a power failure.
+                        <br />
+                        <br />
+                        Range 2.6V to 3.5V in 100mV steps.
+                    </p>,
+                ],
+            },
+        ],
+        POFPolarity: [
+            {
+                title: 'POF Polarity',
+                content: [
+                    <p key="p1">
+                        Polarity of the GPIO output configured as “Output power
+                        loss warning”.
+                    </p>,
+                ],
+            },
+        ],
+    },
+    timer: {
+        Timer: [
+            {
+                title: 'Timer',
+                content: [
+                    <p key="p1">
+                        TIMER is a 24-bit timer running at the frequency of the
+                        timer clock, fTIMER, and has a prescaler. TIMER only
+                        runs one timer at a time because it is shared for all
+                        functions. The wake-up timer is intended for use during
+                        Hibernate mode to wake the system at a programmable
+                        interval. The watchdog timer and general purpose timer
+                        are to be used when the system is not in ship or
+                        hibernate mode.
+                    </p>,
+                ],
+            },
+        ],
+        TimeMode: [
+            {
+                title: 'Time Mode',
+                content: [
+                    <p key="p1">
+                        TIMER can be used in different ways, depending on
+                        configuration.
+                        <br />• General purpose timer
+                        <br />• Watchdog warning
+                        <br />• Watchdog reset
+                        <br />• Wake-up timer (Hibernate mode)
+                        <br />• Boot monitor
+                    </p>,
+                ],
+            },
+        ],
+        TimePrescaler: [
+            {
+                title: 'Time Prescaler',
+                content: [
+                    <p key="p1">
+                        Configure timer prescaler. Fast uses a 2ms prescaler,
+                        while slow uses a 16ms prescaler.
+                    </p>,
+                ],
+            },
+        ],
+        TimePeriod: [
+            {
+                title: 'Time Period',
+                content: [
+                    <p key="p1">
+                        Configure timer period.
+                        <br />
+                        <br />
+                        Range is 2ms to 9 hours in 2ms steps in fast mode, and
+                        16ms to 3 days in 16ms steps in slow mode.
+                    </p>,
+                ],
+            },
+        ],
+    },
+    resetControl: {
+        SHPHLDPinPolarity: [
+            {
+                title: 'SHPHLD pin polarity',
+                content: [
+                    <p key="p1">
+                        Configures polarity of the SHPHLD pin, either Active Low
+                        or Active High.
+                    </p>,
+                ],
+            },
+        ],
+        LongPressReset: [
+            {
+                title: 'Long Press Reset',
+                content: [
+                    <p key="p1">
+                        A long press (&gt; t
+                        <span className="subscript">RESETBUT</span>) of the
+                        button causes a power cycle and resets the whole system.
+                        This feature is enabled by default after power-up.
+                    </p>,
+                ],
+            },
+        ],
+        TwoButtonReset: [
+            {
+                title: 'Two Button Reset',
+                content: [
+                    <p key="p1">
+                        A two-button reset is implemented by connecting one
+                        button to the SHPHLD pin and another button to GPIO0.
+                    </p>,
+                ],
+            },
+        ],
+        EnterShipMode: [
+            {
+                title: 'Enter Ship Mode',
+                content: [
+                    <p key="p1">
+                        Device enters ship mode, isolating the battery from the
+                        system to minimize quiescent current. Device wakes up
+                        from ship mode either by pulling pin SHPHLD low for a
+                        minimum period of t
+                        <span className="subscript">ShipToActive</span> or by
+                        connecting USB PMIC.
+                        <br />
+                        <br />
+                        On the nPM1300-EK, press the button marked SHPHLD/RESET
+                        to wake up the device.
+                        <br />
+                        <br />
+                        USB PMIC cable needs to be disconnected for the device
+                        to enter ship mode.
+                    </p>,
+                ],
+            },
+        ],
+        EnterHibernationMode: [
+            {
+                title: 'Enter Hibernation Mode',
+                content: [
+                    <p key="p1">
+                        Device enters hibernate mode, isolating the battery from
+                        the system to minimize quiescent current. Device wakes
+                        up from hibernate mode either by pulling pin SHPHLD low
+                        for a minimum period of t
+                        <span className="subscript">ShipToActive</span>, by
+                        connecting USB PMIC or from a wakeup timer (if
+                        configured).
+                        <br />
+                        <br />
+                        On the nPM1300-EK, press the button marked SHPHLD/RESET
+                        to wake up the device.
+                        <br />
+                        <br />
+                        USB PMIC cable needs to be disconnected for the device
+                        to enter ship mode.
+                    </p>,
+                ],
+            },
+        ],
+    },
+    vBUS: {
+        VBusInputCurrentLimiter: [
+            {
+                title: (
+                    <>
+                        V<span className="subscript">BUS</span> input current
+                        limiter
+                    </>
+                ),
+                content: [
+                    <p key="p1">
+                        The VBUS input current limiter manages VBUS current
+                        limitation and charger detection for USB Type- C
+                        compatible chargers. USB PMIC needs to be disconnected
+                        for the device to enter ship mode.
+                    </p>,
+                ],
+            },
+        ],
+        USBDetectStatus: [
+            {
+                title: 'USB Detect Status',
+                content: [
+                    <p key="p1">
+                        When the device is plugged into a wall adaptor or USB
+                        power source, USB port detection runs automatically to
+                        detect the USB port max current capabilities.
+                        <br />
+                        <br />
+                        The available USB detect status’ are:
+                        <ul className="tw-ml-6 tw-list-disc">
+                            <li>USB 100/500 mA</li>
+                            <li>1.5A High Power</li>
+                            <li>3A High Power</li>
+                            <li>No USB connection</li>
+                        </ul>
+                    </p>,
+                ],
+            },
+        ],
+        CurrentLimiter: [
+            {
+                title: 'Current Limiter',
+                content: [
+                    <p key="p1">
+                        There are two USB compliant, accurate current limits:
+                        IBUS100MA (100 mA) and IBUS500MA (500 mA). In addition,
+                        there are current limits in 100 mA steps from 600 mA to
+                        1500 mA. The 1500 mA limit is compatible with USB
+                        Type-C. The default current limit is IBUS100MA (100 mA).
+                    </p>,
+                ],
+            },
+        ],
+    },
     charger: {
         Charger: [
             {
@@ -637,22 +926,6 @@ export const documentation: Documentation = {
                 ],
             },
         ],
-        CoolCurrent: [
-            {
-                title: 'Cool Current',
-                content: [
-                    <p key="p1">
-                        Sets charging current in “Cool” temperature region. Ichg
-                        uses the configure I
-                        <span className="subscript">CHG</span> current. I
-                        <span className="subscript">COOL</span>
-                        sets charging current in “Cool” temperature region to
-                        50% of I<span className="subscript">CHG</span>. Default
-                        setting is I<span className="subscript">COOL</span>.
-                    </p>,
-                ],
-            },
-        ],
         NTCThermistor: [
             {
                 title: 'NTC thermistor',
@@ -664,6 +937,35 @@ export const documentation: Documentation = {
                         thermistor is chosen, the NTC pin must be connected to
                         GND and the battery pack must have a thermal fuse for
                         safety.
+                    </p>,
+                ],
+            },
+        ],
+        DefaultNTCBeta: [
+            {
+                title: 'Default NTC Beta',
+                content: [
+                    <p key="p1">
+                        Use default value for NTC Beta
+                        <br />
+                        <br />
+                        Default:
+                        <ul className="tw-ml-6 tw-list-disc">
+                            <li>10 kΩ: 3380</li>
+                            <li>47 kΩ: 4050</li>
+                            <li>100 kΩ: 4250</li>
+                        </ul>
+                    </p>,
+                ],
+            },
+        ],
+        NTCBeta: [
+            {
+                title: 'NTC Beta',
+                content: [
+                    <p key="p1">
+                        Configure NTC beta value matching battery NTC
+                        resistance.
                     </p>,
                 ],
             },
@@ -755,11 +1057,19 @@ export const documentation: Documentation = {
                 title: <span>Export Configuration</span>,
                 content: [
                     <p key="p1">
-                        Exports the full configuration of the PMIC based on the
-                        nPM PowerUP settings. You can choose to export to NCS or
-                        to a bare-metal project. This also saves the nPM PowerUP
-                        configuration, making it easy to resume by using the
-                        “Load Configuration” option.
+                        Exports the nPM1300 configuration based on the nPM
+                        PowerUP settings. Choose .overlay to export to a nRF
+                        Connect SDK project, or .json to save the nPM PowerUP
+                        configuration for later use in nPM PowerUP using the
+                        &quot;Load Configuration&quot; option.
+                        <br />
+                        <br />
+                        For more details on how to import the overlay file to
+                        nRF Connect SDK please refer to{' '}
+                        <ExternalLink
+                            label="Importing an overlay from nPM PowerUP"
+                            href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/device_guides/working_with_pmic/npm1300/developing.html"
+                        />
                     </p>,
                 ],
             },

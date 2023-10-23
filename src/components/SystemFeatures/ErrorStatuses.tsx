@@ -35,7 +35,7 @@ export default ({ disabled }: { disabled: boolean }) => {
     const chargerError = useSelector(getChargerError);
 
     return (
-        <Card title="Errors">
+        <Card title={<div className="tw-flex tw-justify-between">Errors</div>}>
             <div
                 className={`tw-preflight tw-flex tw-flex-col tw-gap-0.5 ${classNames(
                     disabled && 'tw-text-gray-300'

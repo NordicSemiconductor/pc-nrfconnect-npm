@@ -11,6 +11,7 @@ import {
     NumberInputSliderWithUnit,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     NpmDevice,
     TimerConfig,
@@ -74,16 +75,24 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
         setInternalTimerPeriod(timerConfig.period * prescalerMultiplier);
     }, [timerConfig, prescalerMultiplier]);
 
+    const card = 'timer';
+
     return (
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
-                    <span>Timer</span>
+                    <DocumentationTooltip card={card} item="Timer">
+                        Timer
+                    </DocumentationTooltip>
                 </div>
             }
         >
             <Dropdown
-                label="Time Mode"
+                label={
+                    <DocumentationTooltip card={card} item="TimeMode">
+                        Time Mode
+                    </DocumentationTooltip>
+                }
                 items={timerModeValuesItems}
                 onSelect={item =>
                     npmDevice.setTimerConfigMode(item.value as TimerMode)
@@ -102,7 +111,11 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
             />
 
             <Dropdown
-                label="Time Prescaler"
+                label={
+                    <DocumentationTooltip card={card} item="TimePrescaler">
+                        Timer Prescaler
+                    </DocumentationTooltip>
+                }
                 items={timerPrescalerItems}
                 onSelect={item =>
                     npmDevice.setTimerConfigPrescaler(
@@ -122,7 +135,11 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
                 disabled={disabled}
             />
             <NumberInputSliderWithUnit
-                label="Time Period"
+                label={
+                    <DocumentationTooltip card={card} item="TimePeriod">
+                        Timer Period
+                    </DocumentationTooltip>
+                }
                 unit={
                     <span>{`ms${timeString ? ` (${timeString})` : ''}`} </span>
                 }

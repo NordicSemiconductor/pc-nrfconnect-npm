@@ -140,7 +140,14 @@ export default ({
             {!summary && (
                 <>
                     <Toggle
-                        label="Soft Start Enable"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="SoftStartEnable"
+                            >
+                                Soft Start Enable
+                            </DocumentationTooltip>
+                        }
                         isToggled={ldo.softStartEnabled}
                         onToggle={value =>
                             npmDevice.setLdoSoftStartEnabled(index, value)
@@ -148,7 +155,14 @@ export default ({
                         disabled={disabled || ldo.mode === 'LDO'}
                     />
                     <Dropdown
-                        label="Soft Start Current"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="SoftStartCurrent"
+                            >
+                                Soft Start Current
+                            </DocumentationTooltip>
+                        }
                         items={softStartItems}
                         onSelect={item =>
                             npmDevice.setLdoSoftStart(
@@ -171,7 +185,14 @@ export default ({
                         disabled={disabled || ldo.mode === 'LDO'}
                     />
                     <Toggle
-                        label="Active Discharge"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="ActiveDischarge"
+                            >
+                                Active Discharge
+                            </DocumentationTooltip>
+                        }
                         isToggled={ldo.activeDischarge}
                         onToggle={value =>
                             npmDevice.setLdoActiveDischarge(index, value)

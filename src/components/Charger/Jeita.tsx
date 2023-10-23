@@ -332,11 +332,17 @@ export default ({
                         true
                     );
                 }}
-                label="Auto NTC Beta"
+                label={
+                    <DocumentationTooltip card={card} item="DefaultNTCBeta">
+                        Default NTC Beta
+                    </DocumentationTooltip>
+                }
             />
             {!autoNTCBeta && (
-                <div className="tw-flex tw-justify-between">
-                    NTC Beta
+                <div className="tw-flex tw-justify-between tw-text-xs">
+                    <DocumentationTooltip card={card} item="NTCBeta">
+                        NTC Beta
+                    </DocumentationTooltip>
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
                             range={npmDevice.getChargerNTCBetaRange()}
