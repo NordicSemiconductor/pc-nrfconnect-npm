@@ -89,7 +89,6 @@ export type Charger = {
     enabled: boolean;
     enableRecharging: boolean;
     iTerm: ITerm;
-    iBatLim: number;
     ntcThermistor: NTCThermistor;
     ntcBeta: number;
     tChgStop: number;
@@ -396,7 +395,6 @@ export type NpmDevice = {
     getChargerVTermRRange: () => number[];
     getChargerJeitaRange: () => RangeType;
     getChargerChipThermalRange: () => RangeType;
-    getChargerIBatLimRange: () => RangeType;
     getChargerNTCBetaRange: () => RangeType;
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
@@ -476,7 +474,6 @@ export type NpmDevice = {
     setChargerEnabled: (state: boolean) => Promise<void>;
     setChargerVTrickleFast: (value: VTrickleFast) => Promise<void>;
     setChargerITerm: (iTerm: ITerm) => Promise<void>;
-    setChargerBatLim: (lim: number) => Promise<void>;
     setChargerEnabledRecharging: (enabled: boolean) => Promise<void>;
     setChargerNTCThermistor: (
         mode: NTCThermistor,
