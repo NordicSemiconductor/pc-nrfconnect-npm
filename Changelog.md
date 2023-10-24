@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.9.2 - UNRELEASED
+## 1.0.0 - 2023-10-25
 
 ### Added
 
@@ -14,7 +14,7 @@ and this project adheres to
 -   Support for Chip Thermal Regulation
     -   Read and Write Tchgresume
     -   Read and Write Tchgstop
-    -   Read Thermal Regulation state ?
+    -   Read Thermal Regulation state
 -   Support JEITA
     -   Read and Write vTermR
     -   Read and Write tCold, tCool, tWarm, tHot
@@ -39,7 +39,7 @@ and this project adheres to
 -   Enter Hibernate Mode
 -   Configure Long Press Reset
 -   Configure Two Button Reset
--   Export app confiuration to:
+-   Export app configuration to:
     -   JSON (to reused in nPM powerUP)
     -   overlay for NCS development
 

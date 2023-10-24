@@ -71,7 +71,7 @@ import {
     VTrickleFast,
 } from '../types';
 
-export const npm1300FWVersion = '0.9.2+15';
+export const npm1300FWVersion = '0.9.2+16';
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();

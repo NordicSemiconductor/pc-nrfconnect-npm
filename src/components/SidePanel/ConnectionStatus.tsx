@@ -14,6 +14,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
+    getErrorLogs,
     getNpmDevice,
     getPmicState,
     getUsbPower,
@@ -38,6 +39,7 @@ export default () => {
     const npmDevice = useSelector(getNpmDevice);
     const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
     const batteryConnected = useSelector(isBatteryConnected);
+    const errorLogs = useSelector(getErrorLogs);
     const dispatch = useDispatch();
 
     const [pauseFor10Ms, setPauseFor100ms] = useState(paused);
@@ -142,6 +144,24 @@ export default () => {
                 },
             ];
             pmicStep.state = 'warning';
+        } else if (
+            errorLogs &&
+            ((errorLogs.sensorError && errorLogs.sensorError.length > 0) ||
+                (errorLogs.sensorError && errorLogs.sensorError.length > 0))
+        ) {
+            pmicStep.caption = [
+                {
+                    id: '1',
+                    caption:
+                        "Errors detected. Check 'System Features' tab for more information",
+                },
+                {
+                    id: '2',
+                    caption: 'clear error log',
+                    action: () => npmDevice?.clearErrorLogs(true),
+                },
+            ];
+            pmicStep.state = 'failure';
         } else if (!usbPowered) {
             pmicStep.caption =
                 'Not powered by USB PMIC. Charging is not possible';

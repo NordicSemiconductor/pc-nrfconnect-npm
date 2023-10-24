@@ -336,6 +336,8 @@ export type BaseNpmDevice = {
         handler: (payload: Partial<ErrorLogs>, error?: string) => void
     ) => () => void;
 
+    clearErrorLogs: (errorOnly?: boolean) => void;
+
     onFuelGaugeUpdate: (handler: (payload: boolean) => void) => () => void;
 
     onActiveBatteryModelUpdate: (

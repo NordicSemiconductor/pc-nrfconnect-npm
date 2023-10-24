@@ -325,6 +325,20 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
+        clearErrorLogs: (errorOnly?: boolean) => {
+            if (errorOnly)
+                eventEmitter.emit('onErrorLogs', {
+                    chargerError: [],
+                    sensorError: [],
+                });
+            else
+                eventEmitter.emit('onErrorLogs', {
+                    resetCause: [],
+                    chargerError: [],
+                    sensorError: [],
+                });
+        },
+
         hasCharger: () => devices.charger ?? false,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
