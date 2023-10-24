@@ -9,6 +9,7 @@ import {
     Device,
     getPersistentStore,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import EventEmitter from 'events';
 import { v4 as uuid } from 'uuid';
 
 import { dequeueDialog, requestDialog } from '../pmicControlSlice';
@@ -16,6 +17,7 @@ import {
     BatteryModel,
     BatteryModelCharacterization,
     LoggingEvent,
+    PartialUpdate,
     PmicDialog,
 } from './types';
 
@@ -226,3 +228,17 @@ export const isNpm1300SerialRecoverMode = (device: Device) =>
 export const MAX_TIMESTAMP = 2 ** 32 - 1; //  2^32
 export const DOWNLOAD_BATTERY_PROFILE_DIALOG_ID = 'downloadBatteryProfile';
 export const GENERATE_BATTERY_PROFILE_DIALOG_ID = 'generateBatteryProfile';
+
+export class NpmEventEmitter extends EventEmitter {
+    emitPartialEvent<T>(eventName: string, data: Partial<T>, index?: number) {
+        this.emit(
+            eventName,
+            index !== undefined
+                ? ({
+                      index,
+                      data,
+                  } as PartialUpdate<T>)
+                : data
+        );
+    }
+}
