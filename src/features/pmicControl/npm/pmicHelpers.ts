@@ -11,6 +11,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { v4 as uuid } from 'uuid';
 
+import { RootState } from '../../../appReducer';
 import { dequeueDialog, requestDialog } from '../pmicControlSlice';
 import {
     BatteryModel,
@@ -202,11 +203,11 @@ export const updateAdcTimings =
         samplingRate?: number;
         chargingSamplingRate?: number;
         reportInterval?: number;
-    }): AppThunk =>
+    }): AppThunk<RootState> =>
     (_, getState) => {
         getState().app.pmicControl.npmDevice?.startAdcSample(
             reportInterval ?? getState().app.pmicControl.fuelGaugeReportingRate,
-            getState().app.pmicControl.chargers[0].enabled
+            getState().app.pmicControl.charger?.enabled
                 ? chargingSamplingRate ??
                       getState().app.pmicControl.fuelGaugeChargingSamplingRate
                 : samplingRate ??
