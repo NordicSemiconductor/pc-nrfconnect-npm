@@ -6,7 +6,6 @@
 
 import React from 'react';
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import EventEmitter from 'events';
 
 import { getRange } from '../../../../utils/helpers';
 import { baseNpmDevice } from '../basePmicDevice';
@@ -15,6 +14,7 @@ import {
     isModuleDataPair,
     MAX_TIMESTAMP,
     noop,
+    NpmEventEmitter,
     parseBatteryModel,
     parseColonBasedAnswer,
     parseLogData,
@@ -50,7 +50,6 @@ import {
     LEDModeValues,
     LoggingEvent,
     NTCThermistor,
-    PartialUpdate,
     PmicChargingState,
     PmicDialog,
     PmicState,
@@ -74,7 +73,8 @@ import {
 export const npm1300FWVersion = '1.0.1+0';
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
-    const eventEmitter = new EventEmitter();
+    const eventEmitter = new NpmEventEmitter();
+
     const devices = {
         noOfBucks: 2,
         charger: true,
@@ -376,22 +376,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             supplementModeActive: (value & 0x80) > 0,
         } as PmicChargingState);
 
-    const emitPartialEvent = <T,>(
-        eventName: string,
-        data: Partial<T>,
-        index?: number
-    ) => {
-        eventEmitter.emit(
-            eventName,
-            index !== undefined
-                ? ({
-                      index,
-                      data,
-                  } as PartialUpdate<T>)
-                : data
-        );
-    };
-
     const releaseAll: (() => void)[] = [];
 
     if (shellParser) {
@@ -474,7 +458,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 toRegex('npmx charger termination_voltage normal', true),
                 res => {
                     const value = parseToNumber(res);
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         vTerm: value / 1000, // mv to V
                     });
                 },
@@ -487,7 +471,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 toRegex('npmx charger termination_voltage warm', true),
                 res => {
                     const value = parseToNumber(res);
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         vTermR: value / 1000, // mv to V
                     });
                 },
@@ -500,7 +484,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 toRegex('npmx charger charger_current', true),
                 res => {
                     const value = parseToNumber(res);
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         iChg: value,
                     });
                 },
@@ -528,7 +512,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '(1|0)'
                 ),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         enableRecharging: parseToBoolean(res),
                     });
                 },
@@ -545,7 +529,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '(1|0)'
                 ),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         enabled: parseToBoolean(res),
                     });
                 },
@@ -560,9 +544,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     const result = parseToNumber(res) / 1000;
 
                     if (result === 2.5 || result === 2.9) {
-                        emitPartialEvent<Charger>('onChargerUpdate', {
-                            vTrickleFast: result,
-                        });
+                        eventEmitter.emitPartialEvent<Charger>(
+                            'onChargerUpdate',
+                            {
+                                vTrickleFast: result,
+                            }
+                        );
                     }
                 },
                 noop
@@ -581,9 +568,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     const result = parseToNumber(res);
 
                     if (result === 10 || result === 20) {
-                        emitPartialEvent<Charger>('onChargerUpdate', {
-                            iTerm: `${result}%`,
-                        });
+                        eventEmitter.emitPartialEvent<Charger>(
+                            'onChargerUpdate',
+                            {
+                                iTerm: `${result}%`,
+                            }
+                        );
                     }
                 },
                 noop
@@ -594,7 +584,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx charger die_temp stop', true),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tChgStop: parseToNumber(res),
                     });
                 },
@@ -606,7 +596,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx charger die_temp resume', true),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tChgResume: parseToNumber(res),
                     });
                 },
@@ -623,7 +613,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '-?[0-9]+'
                 ),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tCold: parseToNumber(res),
                     });
                 },
@@ -635,7 +625,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx charger ntc_temperature cool', true),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tCool: parseToNumber(res),
                     });
                 },
@@ -647,7 +637,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx charger ntc_temperature warm', true),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tWarm: parseToNumber(res),
                     });
                 },
@@ -659,7 +649,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx charger ntc_temperature hot', true),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tHot: parseToNumber(res),
                     });
                 },
@@ -695,9 +685,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     }
 
                     if (mode) {
-                        emitPartialEvent<Charger>('onChargerUpdate', {
-                            ntcThermistor: mode,
-                        });
+                        eventEmitter.emitPartialEvent<Charger>(
+                            'onChargerUpdate',
+                            {
+                                ntcThermistor: mode,
+                            }
+                        );
                     }
                 },
                 noop
@@ -708,7 +701,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx adc ntc beta', true),
                 res => {
-                    emitPartialEvent<Charger>('onChargerUpdate', {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         ntcBeta: parseToNumber(res),
                     });
                 },
@@ -868,7 +861,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '(0|1|2|3)'
                 ),
                 res => {
-                    emitPartialEvent<USBPower>('onUsbPower', {
+                    eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
                         detectStatus: USBDetectStatusValues[parseToNumber(res)],
                     });
                 },
@@ -882,7 +875,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx buck voltage normal', true, i),
                     res => {
                         const value = parseToNumber(res);
-                        emitPartialEvent<Buck>(
+                        eventEmitter.emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
                                 vOutNormal: value / 1000, // mV to V
@@ -899,7 +892,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx buck voltage retention', true, i),
                     res => {
                         const value = parseToNumber(res);
-                        emitPartialEvent<Buck>(
+                        eventEmitter.emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
                                 vOutRetention: value / 1000, // mV to V
@@ -916,7 +909,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx buck vout select', true, i),
                     res => {
                         const value = parseToNumber(res);
-                        emitPartialEvent<Buck>(
+                        eventEmitter.emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
                                 mode: value === 0 ? 'vSet' : 'software',
@@ -932,7 +925,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx buck status power', true, i),
                     res => {
-                        emitPartialEvent<Buck>(
+                        eventEmitter.emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
                                 enabled: parseToBoolean(res),
@@ -949,7 +942,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx buck gpio on_off', true, i, '(-1|[0-4]) (0)'),
                     res => {
                         const result = parseToNumber(res);
-                        emitPartialEvent<Buck>(
+                        eventEmitter.emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
                                 onOffControl:
@@ -972,7 +965,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     ),
                     res => {
                         const result = parseToNumber(res);
-                        emitPartialEvent<Buck>(
+                        eventEmitter.emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
                                 retentionControl:
@@ -995,7 +988,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     ),
                     res => {
                         const result = parseToNumber(res);
-                        emitPartialEvent<Buck>(
+                        eventEmitter.emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
                                 modeControl:
@@ -1012,7 +1005,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx buck active_discharge', true, i, '(0|1)'),
                     res => {
-                        emitPartialEvent<Buck>(
+                        eventEmitter.emitPartialEvent<Buck>(
                             'onBuckUpdate',
                             {
                                 activeDischarge: parseToBoolean(res),
@@ -1030,7 +1023,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx ldsw', true, i),
                     res => {
-                        emitPartialEvent<Ldo>(
+                        eventEmitter.emitPartialEvent<Ldo>(
                             'onLdoUpdate',
                             {
                                 enabled: parseToBoolean(res),
@@ -1046,7 +1039,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx ldsw mode', true, i),
                     res => {
-                        emitPartialEvent<Ldo>(
+                        eventEmitter.emitPartialEvent<Ldo>(
                             'onLdoUpdate',
                             {
                                 mode:
@@ -1065,7 +1058,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx ldsw ldo_voltage', true, i),
                     res => {
-                        emitPartialEvent<Ldo>(
+                        eventEmitter.emitPartialEvent<Ldo>(
                             'onLdoUpdate',
                             {
                                 voltage: parseToNumber(res) / 1000, // mV to V
@@ -1081,7 +1074,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx ldsw soft_start enable', true, i, '(0|1)'),
                     res => {
-                        emitPartialEvent<Ldo>(
+                        eventEmitter.emitPartialEvent<Ldo>(
                             'onLdoUpdate',
                             {
                                 softStartEnabled: parseToBoolean(res),
@@ -1102,7 +1095,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         '(25|50|75|100)'
                     ),
                     res => {
-                        emitPartialEvent<Ldo>(
+                        eventEmitter.emitPartialEvent<Ldo>(
                             'onLdoUpdate',
                             {
                                 softStart: parseToNumber(res) as SoftStart,
@@ -1118,7 +1111,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx ldsw active_discharge enable', true, i),
                     res => {
-                        emitPartialEvent<Ldo>(
+                        eventEmitter.emitPartialEvent<Ldo>(
                             'onLdoUpdate',
                             {
                                 activeDischarge: parseToBoolean(res),
@@ -1135,7 +1128,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     toRegex('npmx ldsw enable_gpio', true, i, '(-1|[0-4]) (0)'),
                     res => {
                         const result = parseToNumber(res);
-                        emitPartialEvent<Ldo>(
+                        eventEmitter.emitPartialEvent<Ldo>(
                             'onLdoUpdate',
                             {
                                 onOffControl:
@@ -1156,7 +1149,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     res => {
                         const mode = GPIOModeValues[parseToNumber(res)];
                         if (mode) {
-                            emitPartialEvent<GPIO>(
+                            eventEmitter.emitPartialEvent<GPIO>(
                                 'onGPIOUpdate',
                                 {
                                     mode,
@@ -1175,7 +1168,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     res => {
                         const pull = GPIOPullValues[parseToNumber(res)];
                         if (pull) {
-                            emitPartialEvent<GPIO>(
+                            eventEmitter.emitPartialEvent<GPIO>(
                                 'onGPIOUpdate',
                                 {
                                     pull,
@@ -1192,7 +1185,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx gpio drive', true, i, '(1|6)'),
                     res => {
-                        emitPartialEvent<GPIO>(
+                        eventEmitter.emitPartialEvent<GPIO>(
                             'onGPIOUpdate',
                             {
                                 drive: parseToNumber(res) as GPIODrive,
@@ -1208,7 +1201,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx gpio open_drain', true, i, '(0|1)'),
                     res => {
-                        emitPartialEvent<GPIO>(
+                        eventEmitter.emitPartialEvent<GPIO>(
                             'onGPIOUpdate',
                             {
                                 openDrain: parseToBoolean(res),
@@ -1224,7 +1217,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 shellParser.registerCommandCallback(
                     toRegex('npmx gpio debounce', true, i, '(0|1)'),
                     res => {
-                        emitPartialEvent<GPIO>(
+                        eventEmitter.emitPartialEvent<GPIO>(
                             'onGPIOUpdate',
                             {
                                 debounce: parseToBoolean(res),
@@ -1244,7 +1237,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     res => {
                         const mode = LEDModeValues[parseToNumber(res)];
                         if (mode) {
-                            emitPartialEvent<LED>(
+                            eventEmitter.emitPartialEvent<LED>(
                                 'onLEDUpdate',
                                 {
                                     mode,
@@ -1262,7 +1255,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx pof enable', true, undefined, '(0|1)'),
                 res => {
-                    emitPartialEvent<POF>('onPOFUpdate', {
+                    eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                         enable: parseToBoolean(res),
                     });
                 },
@@ -1274,7 +1267,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx pof polarity', true, undefined, '(0|1)'),
                 res => {
-                    emitPartialEvent<POF>('onPOFUpdate', {
+                    eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                         polarity: POFPolarityValues[parseToNumber(res)],
                     });
                 },
@@ -1286,7 +1279,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx pof threshold', true),
                 res => {
-                    emitPartialEvent<POF>('onPOFUpdate', {
+                    eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                         threshold: parseToNumber(res) / 1000, // mV to V
                     });
                 },
@@ -1298,9 +1291,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx timer config mode', true, undefined, '[0-4]'),
                 res => {
-                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
-                        mode: TimerModeValues[parseToNumber(res)],
-                    });
+                    eventEmitter.emitPartialEvent<TimerConfig>(
+                        'onTimerConfigUpdate',
+                        {
+                            mode: TimerModeValues[parseToNumber(res)],
+                        }
+                    );
                 },
                 noop
             )
@@ -1315,9 +1311,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '[0-1]'
                 ),
                 res => {
-                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
-                        prescaler: TimerPrescalerValues[parseToNumber(res)],
-                    });
+                    eventEmitter.emitPartialEvent<TimerConfig>(
+                        'onTimerConfigUpdate',
+                        {
+                            prescaler: TimerPrescalerValues[parseToNumber(res)],
+                        }
+                    );
                 },
                 noop
             )
@@ -1327,9 +1326,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx timer config period', true),
                 res => {
-                    emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
-                        period: parseToNumber(res),
-                    });
+                    eventEmitter.emitPartialEvent<TimerConfig>(
+                        'onTimerConfigUpdate',
+                        {
+                            period: parseToNumber(res),
+                        }
+                    );
                 },
                 noop
             )
@@ -1344,9 +1346,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     '(16|32|64|96|304|608|1008|3008)'
                 ),
                 res => {
-                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                        timeToActive: parseToNumber(res) as TimeToActive,
-                    });
+                    eventEmitter.emitPartialEvent<ShipModeConfig>(
+                        'onShipUpdate',
+                        {
+                            timeToActive: parseToNumber(res) as TimeToActive,
+                        }
+                    );
                 },
                 noop
             )
@@ -1356,9 +1361,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx ship config inv_polarity', true),
                 res => {
-                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                        invPolarity: parseToBoolean(res),
-                    });
+                    eventEmitter.emitPartialEvent<ShipModeConfig>(
+                        'onShipUpdate',
+                        {
+                            invPolarity: parseToBoolean(res),
+                        }
+                    );
                 },
                 noop
             )
@@ -1368,9 +1376,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx ship config inv_polarity', true),
                 res => {
-                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                        invPolarity: parseToBoolean(res),
-                    });
+                    eventEmitter.emitPartialEvent<ShipModeConfig>(
+                        'onShipUpdate',
+                        {
+                            invPolarity: parseToBoolean(res),
+                        }
+                    );
                 },
                 noop
             )
@@ -1380,9 +1391,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx ship reset long_press', true),
                 res => {
-                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                        longPressReset: parseToBoolean(res),
-                    });
+                    eventEmitter.emitPartialEvent<ShipModeConfig>(
+                        'onShipUpdate',
+                        {
+                            longPressReset: parseToBoolean(res),
+                        }
+                    );
                 },
                 noop
             )
@@ -1392,9 +1406,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             shellParser.registerCommandCallback(
                 toRegex('npmx ship reset two_buttons', true),
                 res => {
-                    emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                        twoButtonReset: parseToBoolean(res),
-                    });
+                    eventEmitter.emitPartialEvent<ShipModeConfig>(
+                        'onShipUpdate',
+                        {
+                            twoButtonReset: parseToBoolean(res),
+                        }
+                    );
                 },
                 noop
             )
@@ -1459,7 +1476,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const setChargerVTerm = (value: number) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', {
+            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 vTerm: value,
             });
 
@@ -1488,7 +1505,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const setChargerIChg = (value: number) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', {
+            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 iChg: value,
             });
 
@@ -1515,7 +1532,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const setChargerVTrickleFast = (value: VTrickleFast) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', {
+            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 vTrickleFast: value,
             });
 
@@ -1542,7 +1559,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const setChargerITerm = (iTerm: ITerm) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', {
+            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 iTerm,
             });
 
@@ -1573,7 +1590,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerEnabledRecharging = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     enableRecharging: enabled,
                 });
                 resolve();
@@ -1593,7 +1610,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         autoSetBeta?: boolean
     ) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', {
+            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 ntcThermistor: mode,
             });
 
@@ -1618,7 +1635,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
 
             if (autoSetBeta && mode !== 'Ignore NTC') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     ntcBeta,
                 });
             }
@@ -1654,7 +1671,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const setChargerNTCBeta = (ntcBeta: number) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Charger>('onChargerUpdate', {
+            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 ntcBeta,
             });
 
@@ -1681,7 +1698,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerEnabled = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     enabled,
                 });
                 resolve();
@@ -1702,7 +1719,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerTChgStop = (value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     tChgStop: value,
                 });
                 resolve();
@@ -1721,7 +1738,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerTChgResume = (value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     tChgResume: value,
                 });
                 resolve();
@@ -1740,7 +1757,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerVTermR = (value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     vTermR: value,
                 });
                 resolve();
@@ -1759,7 +1776,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerTCold = (value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     tCold: value,
                 });
                 resolve();
@@ -1778,7 +1795,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerTCool = (value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     tCool: value,
                 });
                 resolve();
@@ -1797,7 +1814,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerTWarm = (value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     tWarm: value,
                 });
                 resolve();
@@ -1816,7 +1833,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setChargerTHot = (value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Charger>('onChargerUpdate', {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                     tHot: value,
                 });
                 resolve();
@@ -1836,7 +1853,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
-                    emitPartialEvent<Buck>(
+                    eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
                             vOutNormal: value,
@@ -1844,7 +1861,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         index
                     );
 
-                    emitPartialEvent<Buck>(
+                    eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
                             mode: 'software',
@@ -1907,7 +1924,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setBuckVOutRetention = (index: number, value: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>(
+                eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         vOutRetention: value,
@@ -1932,7 +1949,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
-                    emitPartialEvent<Buck>(
+                    eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
                             mode,
@@ -1988,7 +2005,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setBuckModeControl = (index: number, modeControl: BuckModeControl) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>(
+                eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         modeControl,
@@ -2017,7 +2034,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     ) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>(
+                eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         onOffControl,
@@ -2046,7 +2063,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     ) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>(
+                eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         retentionControl,
@@ -2073,7 +2090,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
-                    emitPartialEvent<Buck>(
+                    eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
                             enabled,
@@ -2129,7 +2146,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     ) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Buck>(
+                eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         activeDischarge: activeDischargeEnabled,
@@ -2154,7 +2171,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const setLdoVoltage = (index: number, voltage: number) =>
         new Promise<void>((resolve, reject) => {
-            emitPartialEvent<Ldo>(
+            eventEmitter.emitPartialEvent<Ldo>(
                 'onLdoUpdate',
                 {
                     voltage,
@@ -2188,7 +2205,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setLdoEnabled = (index: number, enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Ldo>(
+                eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         enabled,
@@ -2211,7 +2228,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (pmicState === 'ek-disconnected') {
-                    emitPartialEvent<Ldo>(
+                    eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
                             mode,
@@ -2314,7 +2331,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setLdoSoftStartEnabled = (index: number, enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Ldo>(
+                eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         softStartEnabled: enabled,
@@ -2339,7 +2356,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setLdoSoftStart = (index: number, softStart: SoftStart) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Ldo>(
+                eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         softStart,
@@ -2362,7 +2379,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setLdoActiveDischarge = (index: number, activeDischarge: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Ldo>(
+                eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         activeDischarge,
@@ -2387,7 +2404,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setLdoOnOffControl = (index: number, onOffControl: LdoOnOffControl) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<Ldo>(
+                eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         onOffControl,
@@ -2412,7 +2429,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setGpioMode = (index: number, mode: GPIOMode) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<GPIO>(
+                eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
                     {
                         mode,
@@ -2437,7 +2454,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setGpioPull = (index: number, pull: GPIOPullMode) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<GPIO>(
+                eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
                     {
                         pull,
@@ -2462,7 +2479,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setGpioDrive = (index: number, drive: GPIODrive) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<GPIO>(
+                eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
                     {
                         drive,
@@ -2485,7 +2502,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setGpioOpenDrain = (index: number, openDrain: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<GPIO>(
+                eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
                     {
                         openDrain,
@@ -2510,7 +2527,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setGpioDebounce = (index: number, debounce: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<GPIO>(
+                eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
                     {
                         debounce,
@@ -2550,7 +2567,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setLedMode = (index: number, mode: LEDMode) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<LED>(
+                eventEmitter.emitPartialEvent<LED>(
                     'onLEDUpdate',
                     {
                         mode,
@@ -2575,7 +2592,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setPOFEnabled = (enable: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<POF>('onPOFUpdate', {
+                eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                     enable,
                 });
                 resolve();
@@ -2594,7 +2611,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setPOFThreshold = (threshold: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<POF>('onPOFUpdate', {
+                eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                     threshold,
                 });
                 resolve();
@@ -2613,7 +2630,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setPOFPolarity = (polarity: POFPolarity) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<POF>('onPOFUpdate', {
+                eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                     polarity,
                 });
                 resolve();
@@ -2634,9 +2651,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setTimerConfigMode = (mode: TimerMode) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
-                    mode,
-                });
+                eventEmitter.emitPartialEvent<TimerConfig>(
+                    'onTimerConfigUpdate',
+                    {
+                        mode,
+                    }
+                );
                 resolve();
             } else {
                 sendCommand(
@@ -2655,9 +2675,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setTimerConfigPrescaler = (prescaler: TimerPrescaler) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
-                    prescaler,
-                });
+                eventEmitter.emitPartialEvent<TimerConfig>(
+                    'onTimerConfigUpdate',
+                    {
+                        prescaler,
+                    }
+                );
                 resolve();
             } else {
                 sendCommand(
@@ -2676,9 +2699,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setTimerConfigPeriod = (period: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<TimerConfig>('onTimerConfigUpdate', {
-                    period,
-                });
+                eventEmitter.emitPartialEvent<TimerConfig>(
+                    'onTimerConfigUpdate',
+                    {
+                        period,
+                    }
+                );
                 resolve();
             } else {
                 sendCommand(
@@ -2695,7 +2721,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setShipModeTimeToActive = (timeToActive: TimeToActive) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
                     timeToActive,
                 });
                 resolve();
@@ -2714,7 +2740,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setShipInvertPolarity = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
                     invPolarity: enabled,
                 });
                 resolve();
@@ -2733,7 +2759,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setShipLongPressReset = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
                     longPressReset: enabled,
                 });
                 resolve();
@@ -2752,7 +2778,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setShipTwoButtonReset = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<ShipModeConfig>('onShipUpdate', {
+                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
                     twoButtonReset: enabled,
                 });
                 resolve();
@@ -2888,7 +2914,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const setVBusinCurrentLimiter = (amps: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
-                emitPartialEvent<USBPower>('onUsbPower', {
+                eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
                     currentLimiter: amps,
                 });
                 resolve();
