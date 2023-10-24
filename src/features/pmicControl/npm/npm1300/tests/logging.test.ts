@@ -72,8 +72,7 @@ describe('PMIC 1300 - Logging', () => {
             mockOnAdcSample,
             mockOnBeforeReboot,
             mockOnUsbPower,
-            mockOnResetReason,
-            mockChargerError,
+            mockOnErrorLogs,
             mockOnChargingStatusUpdate,
             mockEnqueueRequest,
             pmic,
@@ -86,8 +85,7 @@ describe('PMIC 1300 - Logging', () => {
             mockOnAdcSample = setupMock.mockOnAdcSample;
             mockOnBeforeReboot = setupMock.mockOnBeforeReboot;
             mockOnUsbPower = setupMock.mockOnUsbPower;
-            mockOnResetReason = setupMock.mockOnResetReason;
-            mockChargerError = setupMock.mockChargerError;
+            mockOnErrorLogs = setupMock.mockOnErrorLogs;
             mockOnChargingStatusUpdate = setupMock.mockOnChargingStatusUpdate;
             mockEnqueueRequest = setupMock.mockEnqueueRequest;
             pmic = setupMock.pmic;
@@ -228,8 +226,11 @@ describe('PMIC 1300 - Logging', () => {
                 `[00:00:00.038,238] <inf> module_pmic_irq: type=RSTCAUSE,bit=SWRESET`
             );
 
-            expect(mockOnResetReason).toBeCalledTimes(1);
-            expect(mockOnResetReason).toBeCalledWith('SWRESET');
+            expect(mockOnErrorLogs).toBeCalledTimes(1);
+
+            expect(mockOnErrorLogs).toBeCalledWith({
+                resetCause: ['SWRESET'],
+            });
         });
 
         test('Charger Error', () => {
@@ -245,7 +246,17 @@ describe('PMIC 1300 - Logging', () => {
                     _unique?: boolean
                 ) => {
                     expect(command).toBe('npmx errlog check');
-                    callbacks?.onSuccess('some error', command);
+                    callbacks?.onSuccess(
+                        `RSTCAUSE:
+                        Shipmode exit
+                        CHARGER_ERROR:
+                        NTC sensor error
+                        VBAT Sensor Error
+                        SENSOR_ERROR:
+                        NTC sensor error 2
+                        VBAT Sensor Error 2`,
+                        command
+                    );
                     return Promise.resolve();
                 }
             );
@@ -254,8 +265,20 @@ describe('PMIC 1300 - Logging', () => {
                 `[00:00:06.189,514] <inf> module_pmic_irq: type=EVENTSBCHARGER1SET,bit=EVENTCHGERROR`
             );
 
-            expect(mockChargerError).toBeCalledTimes(1);
-            expect(mockChargerError).toBeCalledWith('some error');
+            expect(mockOnErrorLogs).toBeCalledTimes(4);
+            expect(mockOnErrorLogs).nthCalledWith(1, {
+                chargerError: [],
+                sensorError: [],
+            });
+            expect(mockOnErrorLogs).nthCalledWith(2, {
+                resetCause: ['Shipmode exit'],
+            });
+            expect(mockOnErrorLogs).nthCalledWith(3, {
+                chargerError: ['NTC sensor error', 'VBAT Sensor Error'],
+            });
+            expect(mockOnErrorLogs).nthCalledWith(4, {
+                sensorError: ['NTC sensor error 2', 'VBAT Sensor Error 2'],
+            });
         });
     });
 });

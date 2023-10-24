@@ -33,7 +33,7 @@ import {
     setBatteryConnected,
     setBucks,
     setCharger,
-    setErrorMessage,
+    setErrorLogs,
     setFuelGauge,
     setFuelGaugeChargingSamplingRate,
     setFuelGaugeNotChargingSamplingRate,
@@ -46,7 +46,6 @@ import {
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
-    setResetReason,
     setStoredBatterModel,
     setSupportedVersion,
     updateBuck,
@@ -401,14 +400,8 @@ export default () => {
             );
 
             releaseAll.push(
-                npmDevice.onResetReason(payload => {
-                    dispatch(setResetReason(payload));
-                })
-            );
-
-            releaseAll.push(
-                npmDevice.onChargerError(payload => {
-                    dispatch(setErrorMessage(payload));
+                npmDevice.onErrorLogs(payload => {
+                    dispatch(setErrorLogs(payload));
                 })
             );
 

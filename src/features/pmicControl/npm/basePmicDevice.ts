@@ -14,6 +14,7 @@ import {
     BatteryModel,
     Buck,
     Charger,
+    ErrorLogs,
     GPIO,
     IBaseNpmDevice,
     Ldo,
@@ -315,19 +316,12 @@ export const baseNpmDevice: IBaseNpmDevice = (
             };
         },
 
-        onResetReason: (handler: (success: string) => void) => {
-            eventEmitter.on('onResetReason', handler);
-            return () => {
-                eventEmitter.removeListener('onResetReason', handler);
-            };
-        },
-
-        onChargerError: (
-            handler: (payload: string, error?: string) => void
+        onErrorLogs: (
+            handler: (payload: Partial<ErrorLogs>, error?: string) => void
         ) => {
-            eventEmitter.on('onChargerError', handler);
+            eventEmitter.on('onErrorLogs', handler);
             return () => {
-                eventEmitter.removeListener('onChargerError', handler);
+                eventEmitter.removeListener('onErrorLogs', handler);
             };
         },
 
