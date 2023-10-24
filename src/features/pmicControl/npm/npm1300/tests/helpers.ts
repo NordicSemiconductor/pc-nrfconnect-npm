@@ -12,6 +12,7 @@ import {
 import {
     Buck,
     Charger,
+    ErrorLogs,
     GPIO,
     Ldo,
     LED,
@@ -83,14 +84,9 @@ export const setupMocksBase = (
         (_partialUpdate: Partial<USBPower>) => {}
     );
 
-    const mockOnResetReason = jest.fn(
+    const mockOnErrorLogs = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_msg: string) => {}
-    );
-
-    const mockChargerError = jest.fn(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_msg: string) => {}
+        (_msg: Partial<ErrorLogs>) => {}
     );
 
     const mockOnLoggingEvent = jest.fn(() => {});
@@ -114,8 +110,7 @@ export const setupMocksBase = (
     pmic.onLoggingEvent(mockOnLoggingEvent);
     pmic.onPmicStateChange(mockOnPmicStateChange);
     pmic.onReboot(mockOnReboot);
-    pmic.onResetReason(mockOnResetReason);
-    pmic.onChargerError(mockChargerError);
+    pmic.onErrorLogs(mockOnErrorLogs);
     pmic.onStoredBatteryModelUpdate(mockOnStoredBatteryModelUpdate);
     pmic.onUsbPower(mockOnUsbPower);
 
@@ -137,8 +132,7 @@ export const setupMocksBase = (
         mockOnLoggingEvent,
         mockOnPmicStateChange,
         mockOnReboot,
-        mockOnResetReason,
-        mockChargerError,
+        mockOnErrorLogs,
         mockOnStoredBatteryModelUpdate,
         mockOnUsbPower,
         pmic,

@@ -233,6 +233,12 @@ export type USBPower = {
     currentLimiter: number;
 };
 
+export type ErrorLogs = {
+    resetCause?: string[];
+    chargerError?: string[];
+    sensorError?: string[];
+};
+
 // 'pmic-connected' -> Shell ok - PMIC Online
 // 'pmic-disconnected' -> Shell ok - PMIC disconnected
 // 'pmic-pending-reboot' -> Shell ok - PMIC need restart to proceed
@@ -326,12 +332,8 @@ export type BaseNpmDevice = {
         handler: (payload: Partial<USBPower>, error?: string) => void
     ) => () => void;
 
-    onResetReason: (
-        handler: (payload: string, error?: string) => void
-    ) => () => void;
-
-    onChargerError: (
-        handler: (payload: string, error?: string) => void
+    onErrorLogs: (
+        handler: (payload: Partial<ErrorLogs>, error?: string) => void
     ) => () => void;
 
     onFuelGaugeUpdate: (handler: (payload: boolean) => void) => () => void;

@@ -71,7 +71,7 @@ import {
     VTrickleFast,
 } from '../types';
 
-export const npm1300FWVersion = '0.9.2+14';
+export const npm1300FWVersion = '0.9.2+15';
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();
@@ -230,19 +230,73 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 break;
             case 'EVENTSBCHARGER1SET':
                 if (irqEvent.event === 'EVENTCHGERROR') {
+                    eventEmitter.emit('onErrorLogs', {
+                        chargerError: [],
+                        sensorError: [],
+                    });
+
                     shellParser?.enqueueRequest(
                         'npmx errlog check',
                         {
-                            onSuccess: res =>
-                                eventEmitter.emit('onChargerError', res),
+                            onSuccess: res => {
+                                let errors: string[] = [];
+                                let currentState = '';
+
+                                const emit = () => {
+                                    switch (currentState) {
+                                        case 'RSTCAUSE:':
+                                            eventEmitter.emit('onErrorLogs', {
+                                                resetCause: errors,
+                                            });
+                                            logger.warn(
+                                                `Reset cause: ${errors.join(
+                                                    ', '
+                                                )}`
+                                            );
+                                            break;
+                                        case 'CHARGER_ERROR:':
+                                            eventEmitter.emit('onErrorLogs', {
+                                                chargerError: errors,
+                                            });
+                                            logger.error(
+                                                `Charger Errors: ${errors.join(
+                                                    ', '
+                                                )}`
+                                            );
+                                            break;
+                                        case 'SENSOR_ERROR:':
+                                            eventEmitter.emit('onErrorLogs', {
+                                                sensorError: errors,
+                                            });
+                                            logger.error(
+                                                `Sensor Errors: ${errors.join(
+                                                    ', '
+                                                )}`
+                                            );
+                                            break;
+                                    }
+                                };
+                                const split = res?.split('\n');
+                                split
+                                    ?.map(item => item.trim())
+                                    .forEach(item => {
+                                        if (item.match(/[A-Z_]+:/)) {
+                                            if (currentState) emit();
+                                            currentState = item;
+                                            errors = [];
+                                        } else {
+                                            errors.push(item);
+                                        }
+                                    });
+
+                                emit();
+                            },
                             onError: () => {
-                                eventEmitter.emit('onChargerError', 'UNKNOWN');
                                 logger.warn(
                                     'error message unable to read error from device'
                                 );
                             },
                             onTimeout: () => {
-                                eventEmitter.emit('onChargerError', 'UNKNOWN');
                                 logger.warn('Reading latest error timed out.');
                             },
                         },
@@ -252,7 +306,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
                 break;
             case 'RSTCAUSE':
-                eventEmitter.emit('onResetReason', irqEvent.event);
+                eventEmitter.emit('onErrorLogs', {
+                    resetCause: [irqEvent.event],
+                });
+                logger.warn(`Reset cause: ${irqEvent.event}`);
                 break;
         }
     };
