@@ -6,9 +6,17 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Card, classNames } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    Button,
+    Card,
+    classNames,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { getErrorLogs } from '../../features/pmicControl/pmicControlSlice';
+import {
+    getErrorLogs,
+    getNpmDevice,
+    getPmicState,
+} from '../../features/pmicControl/pmicControlSlice';
 
 export const LineData = ({
     title,
@@ -33,10 +41,23 @@ export const LineData = ({
 
 export default ({ disabled }: { disabled: boolean }) => {
     const errorLogs = useSelector(getErrorLogs);
+    const npmDevice = useSelector(getNpmDevice);
+    const pmicState = useSelector(getPmicState);
 
     return (
         <Card
-            title={<div className="tw-flex tw-justify-between">Error Logs</div>}
+            title={
+                <div className="tw-flex tw-justify-between">
+                    <div>Reset & Error Logs</div>
+                    <Button
+                        variant="secondary"
+                        onClick={() => npmDevice?.clearErrorLogs()}
+                        disabled={pmicState !== 'pmic-connected'}
+                    >
+                        Clear logs
+                    </Button>
+                </div>
+            }
         >
             <div
                 className={`tw-preflight tw-flex tw-flex-col tw-gap-0.5 ${classNames(

@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { getWaitingForDeviceTimeout } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     getPmicState,
@@ -19,6 +20,7 @@ export default () => {
     const supportedVersion = useSelector(isSupportedVersion);
     const pmicState = useSelector(getPmicState);
     const profilingState = useSelector(getCcProfilingState);
+    const rebooting = useSelector(getWaitingForDeviceTimeout);
 
     const [pauseFor100Ms, setPauseFor100Ms] = useState(paused);
     const disabled =
@@ -27,7 +29,8 @@ export default () => {
         pmicState === 'pmic-pending-reboot' ||
         pmicState === 'pmic-pending-rebooting' ||
         profilingState === 'Running' ||
-        pauseFor100Ms;
+        pauseFor100Ms ||
+        rebooting;
 
     useEffect(() => {
         const t = setTimeout(() => {
