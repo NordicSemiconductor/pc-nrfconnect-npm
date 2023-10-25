@@ -111,15 +111,15 @@ describe('PMIC 1300 - Apply Config ', () => {
             enabled: false,
             iTerm: '10%',
             enableRecharging: false,
-            ntcThermistor: '10 kΩ',
-            ntcBeta: 3380,
-            tChgStop: 10,
-            tChgResume: 110,
-            vTermR: 4,
-            tCold: 1,
-            tCool: 12,
-            tWarm: 47,
-            tHot: 69,
+            ntcThermistor: '100 kΩ',
+            ntcBeta: 3480,
+            tChgStop: 20,
+            tChgResume: 120,
+            vTermR: 5,
+            tCold: 10,
+            tCool: 20,
+            tWarm: 50,
+            tHot: 80,
         },
         bucks: [
             {
@@ -130,7 +130,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 modeControl: 'GPIO0',
                 onOffControl: 'GPIO1',
                 retentionControl: 'GPIO2',
-                activeDischarge: false,
+                activeDischarge: true,
             },
             {
                 vOutNormal: 2,
@@ -140,7 +140,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 modeControl: 'GPIO1',
                 onOffControl: 'GPIO2',
                 retentionControl: 'GPIO3',
-                activeDischarge: false,
+                activeDischarge: true,
             },
         ],
         ldos: [
@@ -148,17 +148,17 @@ describe('PMIC 1300 - Apply Config ', () => {
                 voltage: 1,
                 mode: 'ldoSwitch',
                 enabled: false,
-                softStartEnabled: true,
-                softStart: 25,
-                activeDischarge: false,
+                softStartEnabled: false,
+                softStart: 50,
+                activeDischarge: true,
                 onOffControl: 'GPIO1',
             },
             {
                 voltage: 2,
                 mode: 'ldoSwitch',
                 enabled: false,
-                softStartEnabled: true,
-                softStart: 25,
+                softStartEnabled: false,
+                softStart: 100,
                 activeDischarge: false,
                 onOffControl: 'GPIO2',
             },
@@ -211,9 +211,22 @@ describe('PMIC 1300 - Apply Config ', () => {
                 mode: 'Not used',
             },
         ],
-        pof: initPOF,
-        timerConfig: initTimerConfig,
-        ship: initShip,
+        pof: {
+            enable: false,
+            threshold: 2.4,
+            polarity: 'Active low',
+        },
+        timerConfig: {
+            mode: 'General purpose',
+            prescaler: 'Fast',
+            period: 10,
+        },
+        ship: {
+            timeToActive: 16,
+            invPolarity: true,
+            longPressReset: false,
+            twoButtonReset: false,
+        },
         fuelGauge: true,
         firmwareVersion: npm1300FWVersion,
         deviceType: 'npm1300',
@@ -357,41 +370,41 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnUsbPower).toBeCalledTimes(1);
     };
 
-    test('Apply Correct config', () => {
-        pmic.applyConfig(sampleConfig);
+    test('Apply Correct config', async () => {
+        await pmic.applyConfig(sampleConfig);
         verifyApplyConfig();
     });
 
-    test('Apply wrong firmware version -- Yes', () => {
+    test('Apply wrong firmware version -- Yes', async () => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
             dialog.onConfirm();
         });
 
-        pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
+        await pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
 
         expect(mockDialogHandler).toBeCalledTimes(1);
 
         verifyApplyConfig();
     });
 
-    test("Apply wrong firmware version -- Yes, Don't ask again", () => {
+    test("Apply wrong firmware version -- Yes, Don't ask again", async () => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
             if (dialog.onOptional) dialog.onOptional();
         });
 
-        pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
+        await pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
 
         expect(mockDialogHandler).toBeCalledTimes(1);
 
         verifyApplyConfig();
     });
 
-    test('Apply wrong firmware version -- Cancel', () => {
+    test('Apply wrong firmware version -- Cancel', async () => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
             dialog.onCancel();
         });
 
-        pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
+        await pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });
 
         expect(mockDialogHandler).toBeCalledTimes(1);
 

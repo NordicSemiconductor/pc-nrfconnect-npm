@@ -183,11 +183,15 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                             cancelLabel: 'No',
                             optionalLabel: "Yes, don't ask again",
                             title: 'Important notice!',
-                            onConfirm: () => resolve(action()),
+                            onConfirm: () => {
+                                resolve(action());
+                            },
                             onCancel: () => {
                                 reject(new Error('Device setup cancelled'));
                             },
-                            onOptional: action,
+                            onOptional: () => {
+                                action();
+                            },
                         };
 
                         dispatch(dialogHandler(information));

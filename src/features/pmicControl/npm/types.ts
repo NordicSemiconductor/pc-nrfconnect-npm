@@ -568,9 +568,9 @@ export interface PmicDialog {
     cancelDisabled?: boolean;
     cancelClosesDialog?: boolean;
     title: string;
-    onConfirm: () => void;
-    onCancel: () => void;
-    onOptional?: () => void;
+    onConfirm: () => void | Promise<void>;
+    onCancel: () => void | Promise<void>;
+    onOptional?: () => void | Promise<void>;
     doNotAskAgainStoreID?: string;
     progress?: number;
 }
