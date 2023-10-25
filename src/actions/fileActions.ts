@@ -44,7 +44,7 @@ const saveSettings =
             usbPower: currentState.usbPower,
         };
 
-        if (filePath.endsWith('.JSON')) {
+        if (filePath.endsWith('.json')) {
             fs.writeFileSync(filePath, JSON.stringify(out, null, 2));
         } else if (filePath.endsWith('.overlay')) {
             fs.writeFileSync(filePath, overlay(out, currentState.npmDevice));
