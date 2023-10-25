@@ -48,11 +48,12 @@ and this project adheres to
 -   Battery profiling can now support a minimum Discharge cut-off voltage of
     2.65v
 -   Improved Battery profiling load profile
+-   nPM PowerUP now uses nrfutil device for all device operations.
 
 ### Fixed
 
 -   Buck 2 vOut warning is triggered at 1.6V
--   App crashed if a invalid `Profile Project` project json is loaded
+-   App crashed if an invalid `Profile Project` project json is loaded
 
 ## 0.9.1 - 2023-07-17
 

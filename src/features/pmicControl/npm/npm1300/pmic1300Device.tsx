@@ -71,7 +71,7 @@ import {
     VTrickleFast,
 } from '../types';
 
-export const npm1300FWVersion = '1.0.0+0';
+export const npm1300FWVersion = '1.0.1+0';
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new EventEmitter();
@@ -3005,119 +3005,178 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             batteryProfiler?.release();
             releaseAll.forEach(release => release());
         },
-        applyConfig: config => {
-            if (config.deviceType !== 'npm1300') {
-                return;
-            }
-
-            const action = () => {
-                try {
-                    if (config.charger) {
-                        const charger = config.charger;
-                        setChargerVTerm(charger.vTerm);
-                        setChargerIChg(charger.iChg);
-                        setChargerEnabled(charger.enabled);
-                        setChargerITerm(charger.iTerm);
-                        setChargerEnabledRecharging(charger.enableRecharging);
-                        setChargerVTrickleFast(charger.vTrickleFast);
-                        setChargerNTCThermistor(charger.ntcThermistor);
-                        setChargerNTCBeta(charger.ntcBeta);
-                        setChargerTChgResume(charger.tChgResume);
-                        setChargerTChgStop(charger.tChgStop);
-                        setChargerVTermR(charger.vTermR);
-                        setChargerTCold(charger.tCold);
-                        setChargerTCool(charger.tCool);
-                        setChargerTWarm(charger.tWarm);
-                        setChargerTHot(charger.tHot);
-                    }
-
-                    config.bucks.forEach((buck, index) => {
-                        setBuckVOutNormal(index, buck.vOutNormal);
-                        setBuckMode(index, buck.mode);
-                        setBuckEnabled(index, buck.enabled);
-                        setBuckModeControl(index, buck.modeControl);
-                        setBuckVOutRetention(index, buck.vOutRetention);
-                        setBuckRetentionControl(index, buck.retentionControl);
-                        setBuckOnOffControl(index, buck.onOffControl);
-                        setBuckActiveDischargeEnabled(
-                            index,
-                            buck.activeDischarge
-                        );
-                    });
-
-                    config.ldos.forEach((ldo, index) => {
-                        setLdoVoltage(index, ldo.voltage);
-                        setLdoMode(index, ldo.mode);
-                        setLdoEnabled(index, ldo.enabled);
-                        setLdoSoftStartEnabled(index, ldo.softStartEnabled);
-                        setLdoSoftStart(index, ldo.softStart);
-                        setLdoActiveDischarge(index, ldo.activeDischarge);
-                        setLdoOnOffControl(index, ldo.onOffControl);
-                    });
-
-                    config.gpios.forEach((gpio, index) => {
-                        setGpioMode(index, gpio.mode);
-                        setGpioPull(index, gpio.pull);
-                        setGpioDrive(index, gpio.drive);
-                        setGpioOpenDrain(index, gpio.openDrain);
-                        setGpioDebounce(index, gpio.debounce);
-                    });
-
-                    config.leds.forEach((led, index) => {
-                        setLedMode(index, led.mode);
-                    });
-
-                    setPOFEnabled(config.pof.enable);
-                    setPOFPolarity(config.pof.polarity);
-                    setPOFThreshold(config.pof.threshold);
-
-                    setTimerConfigMode(config.timerConfig.mode);
-                    setTimerConfigPrescaler(config.timerConfig.prescaler);
-                    setTimerConfigPeriod(config.timerConfig.period);
-
-                    setShipModeTimeToActive(config.ship.timeToActive);
-                    setShipInvertPolarity(config.ship.invPolarity);
-                    setShipLongPressReset(config.ship.longPressReset);
-                    setShipTwoButtonReset(config.ship.twoButtonReset);
-
-                    setFuelGaugeEnabled(config.fuelGauge);
-
-                    setVBusinCurrentLimiter(config.usbPower.currentLimiter);
-                } catch (error) {
-                    logger.error('Invalid File.');
+        applyConfig: config =>
+            new Promise<void>(resolve => {
+                if (config.deviceType !== 'npm1300') {
+                    resolve();
+                    return;
                 }
-            };
 
-            if (config.firmwareVersion == null) {
-                logger.error('Invalid File.');
-                return;
-            }
+                const action = async () => {
+                    try {
+                        if (config.charger) {
+                            const charger = config.charger;
+                            await setChargerVTerm(charger.vTerm);
+                            await setChargerIChg(charger.iChg);
+                            await setChargerITerm(charger.iTerm);
+                            await setChargerEnabledRecharging(
+                                charger.enableRecharging
+                            );
+                            await setChargerVTrickleFast(charger.vTrickleFast);
+                            await setChargerNTCThermistor(
+                                charger.ntcThermistor
+                            );
+                            await setChargerNTCBeta(charger.ntcBeta);
+                            await setChargerTChgResume(charger.tChgResume);
+                            await setChargerTChgStop(charger.tChgStop);
+                            await setChargerVTermR(charger.vTermR);
+                            await setChargerTCold(charger.tCold);
+                            await setChargerTCool(charger.tCool);
+                            await setChargerTWarm(charger.tWarm);
+                            await setChargerTHot(charger.tHot);
+                            await setChargerEnabled(charger.enabled);
+                        }
 
-            if (
-                dialogHandler &&
-                config.firmwareVersion !== baseDevice.getSupportedVersion()
-            ) {
-                const warningDialog: PmicDialog = {
-                    doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
-                    message: `The configuration was intended for firmware version ${
-                        config.firmwareVersion
-                    }. Device is running a different version.
-                    ${baseDevice.getSupportedVersion()}. Do you still want to apply this configuration?`,
-                    confirmLabel: 'Yes',
-                    optionalLabel: "Yes, don't ask again",
-                    cancelLabel: 'No',
-                    title: 'Warning',
-                    onConfirm: action,
-                    onCancel: () => {},
-                    onOptional: action,
+                        await Promise.all(
+                            config.bucks.map((buck, index) =>
+                                (async () => {
+                                    await setBuckVOutNormal(
+                                        index,
+                                        buck.vOutNormal
+                                    );
+                                    await setBuckEnabled(index, buck.enabled);
+                                    await setBuckModeControl(
+                                        index,
+                                        buck.modeControl
+                                    );
+                                    await setBuckVOutRetention(
+                                        index,
+                                        buck.vOutRetention
+                                    );
+                                    await setBuckRetentionControl(
+                                        index,
+                                        buck.retentionControl
+                                    );
+                                    await setBuckOnOffControl(
+                                        index,
+                                        buck.onOffControl
+                                    );
+                                    await setBuckActiveDischargeEnabled(
+                                        index,
+                                        buck.activeDischarge
+                                    );
+                                    await setBuckMode(index, buck.mode);
+                                })()
+                            )
+                        );
+
+                        await Promise.all(
+                            config.ldos.map((ldo, index) =>
+                                (async () => {
+                                    await setLdoVoltage(index, ldo.voltage);
+                                    await setLdoEnabled(index, ldo.enabled);
+                                    await setLdoSoftStartEnabled(
+                                        index,
+                                        ldo.softStartEnabled
+                                    );
+                                    await setLdoSoftStart(index, ldo.softStart);
+                                    await setLdoActiveDischarge(
+                                        index,
+                                        ldo.activeDischarge
+                                    );
+                                    await setLdoOnOffControl(
+                                        index,
+                                        ldo.onOffControl
+                                    );
+                                    await setLdoMode(index, ldo.mode);
+                                })()
+                            )
+                        );
+
+                        await Promise.all(
+                            config.gpios.map((gpio, index) =>
+                                (async () => {
+                                    await setGpioMode(index, gpio.mode);
+                                    await setGpioPull(index, gpio.pull);
+                                    await setGpioDrive(index, gpio.drive);
+                                    await setGpioOpenDrain(
+                                        index,
+                                        gpio.openDrain
+                                    );
+                                    await setGpioDebounce(index, gpio.debounce);
+                                })()
+                            )
+                        );
+
+                        await Promise.all(
+                            config.leds.map((led, index) =>
+                                setLedMode(index, led.mode)
+                            )
+                        );
+
+                        await setPOFEnabled(config.pof.enable);
+                        await setPOFPolarity(config.pof.polarity);
+                        await setPOFThreshold(config.pof.threshold);
+
+                        await setTimerConfigMode(config.timerConfig.mode);
+                        await setTimerConfigPrescaler(
+                            config.timerConfig.prescaler
+                        );
+                        await setTimerConfigPeriod(config.timerConfig.period);
+
+                        await setShipModeTimeToActive(config.ship.timeToActive);
+                        await setShipInvertPolarity(config.ship.invPolarity);
+                        await setShipLongPressReset(config.ship.longPressReset);
+                        await setShipTwoButtonReset(config.ship.twoButtonReset);
+
+                        await setFuelGaugeEnabled(config.fuelGauge);
+
+                        await setVBusinCurrentLimiter(
+                            config.usbPower.currentLimiter
+                        );
+                    } catch (error) {
+                        logger.error('Invalid File.');
+                    }
                 };
 
-                dialogHandler(warningDialog);
-                return;
-            }
+                if (config.firmwareVersion == null) {
+                    logger.error('Invalid File.');
+                    resolve();
+                    return;
+                }
 
-            action();
-        },
+                if (
+                    dialogHandler &&
+                    config.firmwareVersion !== baseDevice.getSupportedVersion()
+                ) {
+                    const warningDialog: PmicDialog = {
+                        doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
+                        message: `The configuration was intended for firmware version ${
+                            config.firmwareVersion
+                        }. Device is running a different version.
+                    ${baseDevice.getSupportedVersion()}. Do you still want to apply this configuration?`,
+                        confirmLabel: 'Yes',
+                        optionalLabel: "Yes, don't ask again",
+                        cancelLabel: 'No',
+                        title: 'Warning',
+                        onConfirm: async () => {
+                            await action();
+                            resolve();
+                        },
+                        onCancel: () => {
+                            resolve();
+                        },
+                        onOptional: async () => {
+                            await action();
+                            resolve();
+                        },
+                    };
+
+                    dialogHandler(warningDialog);
+                } else {
+                    action().finally(resolve);
+                }
+            }),
 
         getDeviceType: () => 'npm1300',
         getConnectionState: () => pmicState,
