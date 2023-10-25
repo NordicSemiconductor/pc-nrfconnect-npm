@@ -33,9 +33,6 @@ import {
     LoggingEvent,
     PmicDialog,
     PmicState,
-    POF,
-    POFPolarity,
-    POFPolarityValues,
     ProfileDownload,
     ShipModeConfig,
     TimerConfig,
@@ -51,6 +48,7 @@ import setupBucks from './buck';
 import setupCharger from './charger';
 import setupGpio from './gpio';
 import setupLdo from './ldo';
+import setupPof from './pof';
 
 export const npm1300FWVersion = '1.0.1+0';
 
@@ -397,6 +395,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         devices.noOfGPIOs
     );
 
+    const { pofGet, pofSet, pofCallbacks, pofRanges } = setupPof(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
     const releaseAll: (() => void)[] = [];
 
     if (shellParser) {
@@ -661,41 +666,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             );
         }
 
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx pof enable', true, undefined, '(0|1)'),
-                res => {
-                    eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                        enable: parseToBoolean(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx pof polarity', true, undefined, '(0|1)'),
-                res => {
-                    eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                        polarity: POFPolarityValues[parseToNumber(res)],
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx pof threshold', true),
-                res => {
-                    eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                        threshold: parseToNumber(res) / 1000, // mV to V
-                    });
-                },
-                noop
-            )
-        );
+        releaseAll.push(...pofCallbacks);
 
         releaseAll.push(
             shellParser.registerCommandCallback(
@@ -886,65 +857,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     () => resolve(),
                     () => {
                         requestUpdate.ledMode(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setPOFEnabled = (enable: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                    enable,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx pof enable set ${enable ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.pofEnable();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setPOFThreshold = (threshold: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                    threshold,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx pof threshold set ${threshold * 1000}`, // V to mV
-                    () => resolve(),
-                    () => {
-                        requestUpdate.pofThreshold();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setPOFPolarity = (polarity: POFPolarity) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                    polarity,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx pof polarity set ${POFPolarityValues.findIndex(
-                        p => p === polarity
-                    )}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.pofPolarity();
                         reject();
                     }
                 );
@@ -1242,10 +1154,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         ...ldoGet,
         ...gpioGet,
-
-        pofEnable: () => sendCommand(`npmx pof enable get`),
-        pofPolarity: () => sendCommand(`npmx pof polarity get`),
-        pofThreshold: () => sendCommand(`npmx pof threshold get`),
+        ...pofGet,
 
         timerConfigMode: () => sendCommand(`npmx timer config mode get`),
         timerConfigPrescaler: () =>
@@ -1456,13 +1365,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...chargerRanges,
         ...buckRanges,
         ...ldoRanges,
-
-        getPOFThresholdRange: () => ({
-            min: 2.6,
-            max: 3.5,
-            decimals: 1,
-            step: 0.1,
-        }),
+        ...pofRanges,
 
         getUSBCurrentLimiterRange: () => [
             0.1,
@@ -1482,9 +1385,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoSet,
         ...gpioSet,
         setLedMode,
-        setPOFEnabled,
-        setPOFThreshold,
-        setPOFPolarity,
+        ...pofSet,
         setTimerConfigMode,
         setTimerConfigPrescaler,
         setTimerConfigPeriod,
