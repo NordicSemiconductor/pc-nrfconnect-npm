@@ -406,12 +406,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
+    const offlineMode = !shellParser;
     const { buckGet, buckSet, buckCallbacks } = setupBucks(
         shellParser,
         eventEmitter,
         sendCommand,
         dialogHandler,
-        pmicState === 'ek-disconnected',
+        offlineMode,
         devices.noOfBucks
     );
 
