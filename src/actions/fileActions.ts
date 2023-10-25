@@ -58,7 +58,9 @@ const parseFile =
 
         const pathObject = path.parse(filePath);
         if (pathObject.ext === '.json') {
-            const config = fs.readFileSync(filePath) as unknown as NpmExport;
+            const config = JSON.parse(
+                fs.readFileSync(filePath).toString()
+            ) as unknown as NpmExport;
             currentState.npmDevice?.applyConfig(config);
         }
     };
