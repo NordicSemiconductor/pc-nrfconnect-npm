@@ -403,7 +403,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const offlineMode = !shellParser;
 
-    const { buckGet, buckSet, buckCallbacks } = setupBucks(
+    const { buckGet, buckSet, buckCallbacks, buckRanges } = setupBucks(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -412,7 +412,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         devices.noOfBucks
     );
 
-    const { ldoGet, ldoSet, ldoCallbacks } = setupLdo(
+    const { ldoGet, ldoSet, ldoCallbacks, ldoRanges } = setupLdo(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -2393,24 +2393,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             step: 1,
         }),
 
-        getBuckVoltageRange: () => ({
-            min: 1,
-            max: 3.3,
-            decimals: 1,
-        }),
-
-        getBuckRetVOutRange: () => ({
-            min: 1,
-            max: 3,
-            decimals: 1,
-        }),
-
-        getLdoVoltageRange: () => ({
-            min: 1,
-            max: 3.3,
-            decimals: 1,
-            step: 0.1,
-        }),
+        ...chargerRanges,
+        ...buckRanges,
+        ...ldoRanges,
 
         getPOFThresholdRange: () => ({
             min: 2.6,

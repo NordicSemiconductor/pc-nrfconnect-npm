@@ -26,4 +26,17 @@ export default (
     buckGet: buckGet(sendCommand),
     buckSet: buckSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
     buckCallbacks: buckCallbacks(shellParser, eventEmitter, noOfBucks),
+    buckRanges: {
+        getBuckVoltageRange: () => ({
+            min: 1,
+            max: 3.3,
+            decimals: 1,
+        }),
+
+        getBuckRetVOutRange: () => ({
+            min: 1,
+            max: 3,
+            decimals: 1,
+        }),
+    },
 });

@@ -26,4 +26,12 @@ export default (
     ldoGet: ldoGet(sendCommand),
     ldoSet: ldoSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
     ldoCallbacks: ldoCallbacks(shellParser, eventEmitter, noOfBucks),
+    ldoRanges: {
+        getLdoVoltageRange: () => ({
+            min: 1,
+            max: 3.3,
+            decimals: 1,
+            step: 0.1,
+        }),
+    },
 });
