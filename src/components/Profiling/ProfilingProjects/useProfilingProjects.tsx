@@ -6,7 +6,6 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import fs from 'fs';
 
 import {
     addConfirmBeforeClose,
@@ -19,7 +18,6 @@ import {
     updateProfilingProject,
 } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { readProjectSettingsFromFile, reloadRecentProjects } from '../helpers';
-import { ProfilingProject, zodProfilingProject } from '../types';
 
 export const useProfilingProjects = () => {
     const dispatch = useDispatch();
@@ -69,42 +67,13 @@ export const useProfilingProjects = () => {
         );
 
         recentProjects.forEach(recentProject => {
-            if (fs.existsSync(recentProject)) {
-                try {
-                    const profilingProject = JSON.parse(
-                        fs.readFileSync(recentProject).toString()
-                    ) as ProfilingProject;
-
-                    zodProfilingProject.parse(profilingProject);
-
-                    dispatch(
-                        updateProfilingProject({
-                            path: recentProject,
-                            settings: profilingProject ?? undefined,
-                            error:
-                                profilingProject === undefined
-                                    ? 'fileMissing'
-                                    : undefined,
-                        })
-                    );
-                } catch (error) {
-                    dispatch(
-                        updateProfilingProject({
-                            path: recentProject,
-                            settings: undefined,
-                            error: 'fileCorrupted',
-                        })
-                    );
-                }
-
-                return;
-            }
+            const profilingProject = readProjectSettingsFromFile(recentProject);
 
             dispatch(
                 updateProfilingProject({
                     path: recentProject,
-                    settings: undefined,
-                    error: 'fileMissing',
+                    settings: profilingProject.settings,
+                    error: profilingProject.error,
                 })
             );
         });
