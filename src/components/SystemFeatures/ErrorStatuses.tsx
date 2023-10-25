@@ -12,6 +12,7 @@ import {
     classNames,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     getErrorLogs,
     getNpmDevice,
@@ -64,15 +65,29 @@ export default ({ disabled }: { disabled: boolean }) => {
                     disabled && 'tw-text-gray-300'
                 )}`}
             >
-                <LineData title="Reset Cause" value={errorLogs?.resetCause} />
-                <LineData
-                    title="Charger Errors"
-                    value={errorLogs?.chargerError}
-                />
-                <LineData
-                    title="Sensor Errors"
-                    value={errorLogs?.sensorError}
-                />
+                <DocumentationTooltip card="ResetErrorLogs" item="ResetCause">
+                    <LineData
+                        title="Reset Cause"
+                        value={errorLogs?.resetCause}
+                    />
+                </DocumentationTooltip>
+
+                <DocumentationTooltip
+                    card="ResetErrorLogs"
+                    item="ChargerErrors"
+                >
+                    <LineData
+                        title="Charger Errors"
+                        value={errorLogs?.chargerError}
+                    />
+                </DocumentationTooltip>
+
+                <DocumentationTooltip card="ResetErrorLogs" item="SensorErrors">
+                    <LineData
+                        title="Sensor Errors"
+                        value={errorLogs?.sensorError}
+                    />
+                </DocumentationTooltip>
             </div>
         </Card>
     );
