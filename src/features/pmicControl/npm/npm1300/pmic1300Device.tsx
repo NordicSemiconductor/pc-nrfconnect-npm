@@ -37,7 +37,6 @@ import {
     LEDMode,
     LEDModeValues,
     LoggingEvent,
-    PmicChargingState,
     PmicDialog,
     PmicState,
     POF,
