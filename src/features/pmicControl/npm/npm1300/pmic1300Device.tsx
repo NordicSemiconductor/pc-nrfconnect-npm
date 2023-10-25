@@ -25,7 +25,6 @@ import {
     AdcSample,
     AdcSampleSettings,
     BatteryModel,
-    Charger,
     GPIO,
     GPIODrive,
     GPIOMode,
@@ -34,12 +33,10 @@ import {
     GPIOPullValues,
     INpmDevice,
     IrqEvent,
-    ITerm,
     LED,
     LEDMode,
     LEDModeValues,
     LoggingEvent,
-    NTCThermistor,
     PmicChargingState,
     PmicDialog,
     PmicState,
@@ -56,9 +53,9 @@ import {
     TimeToActive,
     USBDetectStatusValues,
     USBPower,
-    VTrickleFast,
 } from '../types';
 import setupBucks from './buck';
+import setupCharger from './charger';
 import setupLdo from './ldo';
 
 export const npm1300FWVersion = '1.0.1+0';
@@ -333,12 +330,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
-    const processModulePmicCharger = ({ message }: LoggingEvent) => {
-        const messageParts = message.split('=');
-        const value = Number.parseInt(messageParts[1], 10);
-        emitOnChargingStatusUpdate(value);
-    };
-
     const startAdcSample = (intervalMs: number, samplingRate: number) => {
         sendCommand(`npm_adc sample ${samplingRate} ${intervalMs}`);
     };
@@ -346,26 +337,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const stopAdcSample = () => {
         sendCommand(`npm_adc sample 0`);
     };
-
-    const emitOnChargingStatusUpdate = (value: number) =>
-        eventEmitter.emit('onChargingStatusUpdate', {
-            // eslint-disable-next-line no-bitwise
-            batteryDetected: (value & 0x01) > 0,
-            // eslint-disable-next-line no-bitwise
-            batteryFull: (value & 0x02) > 0,
-            // eslint-disable-next-line no-bitwise
-            trickleCharge: (value & 0x04) > 0,
-            // eslint-disable-next-line no-bitwise
-            constantCurrentCharging: (value & 0x08) > 0,
-            // eslint-disable-next-line no-bitwise
-            constantVoltageCharging: (value & 0x10) > 0,
-            // eslint-disable-next-line no-bitwise
-            batteryRechargeNeeded: (value & 0x20) > 0,
-            // eslint-disable-next-line no-bitwise
-            dieTempHigh: (value & 0x40) > 0,
-            // eslint-disable-next-line no-bitwise
-            supplementModeActive: (value & 0x80) > 0,
-        } as PmicChargingState);
 
     const sendCommand = (
         command: string,
@@ -403,6 +374,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const offlineMode = !shellParser;
 
+    const { chargerGet, chargerSet, chargerCallbacks, chargerRanges } =
+        setupCharger(shellParser, eventEmitter, sendCommand, offlineMode);
+
     const { buckGet, buckSet, buckCallbacks, buckRanges } = setupBucks(
         shellParser,
         eventEmitter,
@@ -438,7 +412,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             processModulePmicIrq(loggingEvent);
                             break;
                         case 'module_pmic_charger':
-                            processModulePmicCharger(loggingEvent);
+                            // Handled in charger callbacks
                             break;
                         case 'module_fg':
                             processModuleFuelGauge(loggingEvent);
@@ -498,261 +472,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
 
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger termination_voltage normal', true),
-                res => {
-                    const value = parseToNumber(res);
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vTerm: value / 1000, // mv to V
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger termination_voltage warm', true),
-                res => {
-                    const value = parseToNumber(res);
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vTermR: value / 1000, // mv to V
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger charger_current', true),
-                res => {
-                    const value = parseToNumber(res);
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iChg: value,
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger status', true),
-                res => {
-                    const value = parseToNumber(res);
-                    emitOnChargingStatusUpdate(value);
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx charger module recharge',
-                    true,
-                    undefined,
-                    '(1|0)'
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        enableRecharging: parseToBoolean(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx charger module charger',
-                    true,
-                    undefined,
-                    '(1|0)'
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        enabled: parseToBoolean(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger trickle', true, undefined, '(2500|2900)'),
-                res => {
-                    const result = parseToNumber(res) / 1000;
-
-                    if (result === 2.5 || result === 2.9) {
-                        eventEmitter.emitPartialEvent<Charger>(
-                            'onChargerUpdate',
-                            {
-                                vTrickleFast: result,
-                            }
-                        );
-                    }
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx charger termination_current',
-                    true,
-                    undefined,
-                    '(10|20)'
-                ),
-                res => {
-                    const result = parseToNumber(res);
-
-                    if (result === 10 || result === 20) {
-                        eventEmitter.emitPartialEvent<Charger>(
-                            'onChargerUpdate',
-                            {
-                                iTerm: `${result}%`,
-                            }
-                        );
-                    }
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger die_temp stop', true),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tChgStop: parseToNumber(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger die_temp resume', true),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tChgResume: parseToNumber(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx charger ntc_temperature cold',
-                    true,
-                    undefined,
-                    '-?[0-9]+'
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tCold: parseToNumber(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger ntc_temperature cool', true),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tCool: parseToNumber(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger ntc_temperature warm', true),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tWarm: parseToNumber(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger ntc_temperature hot', true),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tHot: parseToNumber(res),
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx adc ntc type',
-                    true,
-                    undefined,
-                    '(0|10000|47000|100000)'
-                ),
-                res => {
-                    const result = parseToNumber(res);
-
-                    let mode: NTCThermistor | null = null;
-                    switch (result) {
-                        case 10000:
-                            mode = '10 kΩ';
-                            break;
-                        case 47000:
-                            mode = '47 kΩ';
-                            break;
-                        case 100000:
-                            mode = '100 kΩ';
-                            break;
-                        case 0:
-                            mode = 'Ignore NTC';
-                            break;
-                    }
-
-                    if (mode) {
-                        eventEmitter.emitPartialEvent<Charger>(
-                            'onChargerUpdate',
-                            {
-                                ntcThermistor: mode,
-                            }
-                        );
-                    }
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx adc ntc beta', true),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        ntcBeta: parseToNumber(res),
-                    });
-                },
-                noop
-            )
-        );
+        releaseAll.push(...chargerCallbacks);
 
         releaseAll.push(
             shellParser.registerCommandCallback(
@@ -1214,381 +934,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
     }
-
-    const setChargerVTerm = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                vTerm: value,
-            });
-
-            if (pmicState === 'ek-disconnected') {
-                resolve();
-            } else {
-                setChargerEnabled(false)
-                    .then(() => {
-                        sendCommand(
-                            `npmx charger termination_voltage normal set ${
-                                value * 1000
-                            }`, // mv to V
-                            () => resolve(),
-                            () => {
-                                requestUpdate.chargerVTerm();
-                                reject();
-                            }
-                        );
-                    })
-                    .catch(() => {
-                        requestUpdate.chargerVTerm();
-                        reject();
-                    });
-            }
-        });
-
-    const setChargerIChg = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                iChg: value,
-            });
-
-            if (pmicState === 'ek-disconnected') {
-                resolve();
-            } else {
-                setChargerEnabled(false)
-                    .then(() =>
-                        sendCommand(
-                            `npmx charger charger_current set ${value}`,
-                            () => resolve(),
-                            () => {
-                                requestUpdate.chargerIChg();
-                                reject();
-                            }
-                        )
-                    )
-                    .catch(() => {
-                        requestUpdate.chargerIChg();
-                        reject();
-                    });
-            }
-        });
-
-    const setChargerVTrickleFast = (value: VTrickleFast) =>
-        new Promise<void>((resolve, reject) => {
-            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                vTrickleFast: value,
-            });
-
-            if (pmicState === 'ek-disconnected') {
-                resolve();
-            } else {
-                setChargerEnabled(false)
-                    .then(() => {
-                        sendCommand(
-                            `npmx charger trickle set ${value * 1000}`,
-                            () => resolve(),
-                            () => {
-                                requestUpdate.chargerVTrickleFast();
-                                reject();
-                            }
-                        );
-                    })
-                    .catch(() => {
-                        requestUpdate.chargerVTrickleFast();
-                        reject();
-                    });
-            }
-        });
-
-    const setChargerITerm = (iTerm: ITerm) =>
-        new Promise<void>((resolve, reject) => {
-            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                iTerm,
-            });
-
-            if (pmicState === 'ek-disconnected') {
-                resolve();
-            } else {
-                setChargerEnabled(false)
-                    .then(() => {
-                        sendCommand(
-                            `npmx charger termination_current set ${Number.parseInt(
-                                iTerm,
-                                10
-                            )}`,
-                            () => resolve(),
-                            () => {
-                                requestUpdate.chargerITerm();
-                                reject();
-                            }
-                        );
-                    })
-                    .catch(() => {
-                        requestUpdate.chargerITerm();
-                        reject();
-                    });
-            }
-        });
-
-    const setChargerEnabledRecharging = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    enableRecharging: enabled,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger module recharge set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.chargerEnabledRecharging();
-                        reject();
-                    }
-                );
-            }
-        });
-    const setChargerNTCThermistor = (
-        mode: NTCThermistor,
-        autoSetBeta?: boolean
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                ntcThermistor: mode,
-            });
-
-            let value = 0;
-            let ntcBeta = 0;
-            switch (mode) {
-                case '100 kΩ':
-                    value = 100000;
-                    ntcBeta = 4250;
-                    break;
-                case '47 kΩ':
-                    value = 47000;
-                    ntcBeta = 4050;
-                    break;
-                case '10 kΩ':
-                    value = 10000;
-                    ntcBeta = 3380;
-                    break;
-                case 'Ignore NTC':
-                    value = 0;
-                    break;
-            }
-
-            if (autoSetBeta && mode !== 'Ignore NTC') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    ntcBeta,
-                });
-            }
-
-            if (pmicState === 'ek-disconnected') {
-                resolve();
-            } else {
-                setChargerEnabled(false)
-                    .then(() => {
-                        sendCommand(
-                            `npmx adc ntc type set ${value}`,
-                            () => {
-                                if (autoSetBeta && mode !== 'Ignore NTC') {
-                                    setChargerNTCBeta(ntcBeta)
-                                        .then(resolve)
-                                        .catch(reject);
-                                } else {
-                                    resolve();
-                                }
-                            },
-                            () => {
-                                requestUpdate.chargerNTCThermistor();
-                                reject();
-                            }
-                        );
-                    })
-                    .catch(() => {
-                        requestUpdate.chargerNTCThermistor();
-                        reject();
-                    });
-            }
-        });
-
-    const setChargerNTCBeta = (ntcBeta: number) =>
-        new Promise<void>((resolve, reject) => {
-            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                ntcBeta,
-            });
-
-            if (pmicState === 'ek-disconnected') {
-                resolve();
-            } else {
-                setChargerEnabled(false)
-                    .then(() =>
-                        sendCommand(
-                            `npmx adc ntc beta set ${ntcBeta}`,
-                            () => {
-                                resolve();
-                            },
-                            () => {
-                                requestUpdate.chargerNTCBeta();
-                                reject();
-                            }
-                        )
-                    )
-                    .catch(reject);
-            }
-        });
-
-    const setChargerEnabled = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    enabled,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger module charger set ${enabled ? '1' : '0'}`,
-                    () => {
-                        resolve();
-                    },
-                    () => {
-                        requestUpdate.chargerEnabled();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setChargerTChgStop = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    tChgStop: value,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger die_temp stop set ${value}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.chargerTChgStop();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setChargerTChgResume = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    tChgResume: value,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger die_temp resume set ${value}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.chargerTChgResume();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setChargerVTermR = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    vTermR: value,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger termination_voltage warm set ${value * 1000}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.chargerVTermR();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setChargerTCold = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    tCold: value,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger ntc_temperature cold set ${value}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.chargerTCold();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setChargerTCool = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    tCool: value,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger ntc_temperature cool set ${value}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.chargerTCool();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setChargerTWarm = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    tWarm: value,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger ntc_temperature warm set ${value}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.chargerTWarm();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setChargerTHot = (value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    tHot: value,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx charger ntc_temperature hot set ${value}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.chargerTHot();
-                        reject();
-                    }
-                );
-            }
-        });
 
     const setGpioMode = (index: number, mode: GPIOMode) =>
         new Promise<void>((resolve, reject) => {
@@ -2095,31 +1440,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         });
 
     const requestUpdate = {
-        pmicChargingState: () => sendCommand('npmx charger status get'),
-        chargerVTerm: () =>
-            sendCommand('npmx charger termination_voltage normal get'),
-        chargerIChg: () => sendCommand('npmx charger charger_current get'),
-        chargerEnabled: () => sendCommand('npmx charger module charger get'),
-        chargerVTrickleFast: () => sendCommand('npmx charger trickle get'),
-        chargerITerm: () => sendCommand('npmx charger termination_current get'),
-        chargerBatLim: () =>
-            sendCommand('npmx charger discharging_current get'),
-        chargerEnabledRecharging: () =>
-            sendCommand('npmx charger module recharge get'),
-        chargerNTCThermistor: () => sendCommand('npmx adc ntc type get'),
-        chargerNTCBeta: () => sendCommand('npmx adc ntc beta get'),
-        chargerTChgStop: () => sendCommand('npmx charger die_temp stop get'),
-        chargerTChgResume: () =>
-            sendCommand('npmx charger die_temp resume get'),
-        chargerVTermR: () =>
-            sendCommand('npmx charger termination_voltage warm get'),
-        chargerTCold: () =>
-            sendCommand('npmx charger ntc_temperature cold get'),
-        chargerTCool: () =>
-            sendCommand('npmx charger ntc_temperature cool get'),
-        chargerTWarm: () =>
-            sendCommand('npmx charger ntc_temperature warm get'),
-        chargerTHot: () => sendCommand('npmx charger ntc_temperature hot get'),
+        ...chargerGet,
 
         gpioMode: (index: number) => sendCommand(`npmx gpio mode get ${index}`),
         gpioPull: (index: number) => sendCommand(`npmx gpio pull get ${index}`),
@@ -2346,53 +1667,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         startAdcSample,
         stopAdcSample,
 
-        getChargerVoltageRange: () =>
-            getRange([
-                {
-                    min: 3.5,
-                    max: 3.65,
-                    step: 0.05,
-                },
-                {
-                    min: 4.0,
-                    max: 4.45,
-                    step: 0.05,
-                },
-            ]).map(v => Number(v.toFixed(2))),
-        getChargerVTermRRange: () =>
-            getRange([
-                {
-                    min: 3.5,
-                    max: 3.65,
-                    step: 0.05,
-                },
-                {
-                    min: 4.0,
-                    max: 4.45,
-                    step: 0.05,
-                },
-            ]).map(v => Number(v.toFixed(2))),
-        getChargerJeitaRange: () => ({
-            min: -20,
-            max: 60,
-        }),
-        getChargerChipThermalRange: () => ({
-            min: 50,
-            max: 110,
-        }),
-        getChargerCurrentRange: () => ({
-            min: 32,
-            max: 800,
-            decimals: 0,
-            step: 2,
-        }),
-        getChargerNTCBetaRange: () => ({
-            min: 0,
-            max: 4294967295,
-            decimals: 0,
-            step: 1,
-        }),
-
         ...chargerRanges,
         ...buckRanges,
         ...ldoRanges,
@@ -2417,21 +1691,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         requestUpdate,
 
-        setChargerVTerm,
-        setChargerIChg,
-        setChargerEnabled,
-        setChargerVTrickleFast,
-        setChargerITerm,
-        setChargerEnabledRecharging,
-        setChargerNTCThermistor,
-        setChargerNTCBeta,
-        setChargerTChgStop,
-        setChargerTChgResume,
-        setChargerVTermR,
-        setChargerTCold,
-        setChargerTCool,
-        setChargerTWarm,
-        setChargerTHot,
+        ...chargerSet,
         ...buckSet,
         ...ldoSet,
         setGpioMode,
