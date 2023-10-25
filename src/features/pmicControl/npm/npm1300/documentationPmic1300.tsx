@@ -997,6 +997,110 @@ export const documentation: Documentation = {
             },
         ],
     },
+    ResetErrorLogs: {
+        ResetCause: [
+            {
+                title: 'Reset Cause',
+                content: [
+                    <p key="p1">
+                        <ul className="tw-ml-6 tw-list-disc">
+                            <li>SHIPMODEXIT: Reset caused by shipmode exit.</li>
+                            <li>
+                                BOOTMONITORTIMEOUT: Reset caused by boot monitor
+                                timeout.
+                            </li>
+                            <li>
+                                WATCHDOGTIMEOUT: Reset caused by watchdog
+                                timeout.
+                            </li>
+                            <li>
+                                LONGPRESSTIMEOUT: Reset caused by SHPHLD long
+                                press.
+                            </li>
+                            <li>
+                                THERMASHUTDOWN: Reset caused by thermal
+                                shutdown.
+                            </li>
+                            <li>
+                                VSYSLOW: Reset caused by POF (Power Failure) or
+                                V<span className="subscript">SYS</span> low.
+                            </li>
+                            <li>SWRESET: Reset caused by a software reset.</li>
+                        </ul>
+                    </p>,
+                ],
+            },
+        ],
+        ChargerErrors: [
+            {
+                title: 'Charger Errors',
+                content: [
+                    <p key="p1">
+                        <ul className="tw-ml-6 tw-list-disc">
+                            <li>NTCSENSORERR: NTC thermistor sensor error.</li>
+                            <li>
+                                VBATSENSORERR: V
+                                <span className="subscript">BAT</span> sensor
+                                error.
+                            </li>
+                            <li>
+                                VBATLOW: V<span className="subscript">BAT</span>{' '}
+                                low error.
+                            </li>
+                            <li>VTRICKLE: Vtrickle error.</li>
+                            <li>MEASTIMEOUT: Measurement timeout error.</li>
+                            <li>CHARGETIMEOUT: Charge timeout error.</li>
+                            <li>TRICKLETIMEOUT: Trickle timeout error.</li>
+                        </ul>
+                    </p>,
+                ],
+            },
+        ],
+        SensorErrors: [
+            {
+                title: 'Sensor Errors',
+                content: [
+                    <p key="p1">
+                        SENSORVTRICKLE: Vtrickle sensor value during error.
+                        SENSORVBATLOW: VbatLow sensor value during error.
+                        <ul className="tw-ml-6 tw-list-disc">
+                            <li>
+                                SENSORNTCCOLD: NTC thermistor Cold sensor value
+                                during error.
+                            </li>
+                            <li>
+                                SENSORNTCCOOL: NTC thermistor Cool sensor value
+                                during error.
+                            </li>
+                            <li>
+                                SENSORNTCHOT: NTC thermistor Hot sensor value
+                                during error.
+                            </li>
+                            <li>
+                                SENSORVTERM: V
+                                <span className="subscript">term</span> sensor
+                                value during error.
+                            </li>
+                            <li>
+                                SENSORRECHARGE: Recharge sensor value during
+                                error.
+                            </li>
+                            <li>
+                                SENSORVTRICKLE: V
+                                <span className="subscript">trickle</span>{' '}
+                                sensor value during error.
+                            </li>
+                            <li>
+                                SENSORVBATLOW: V
+                                <span className="subscript">batLow</span> sensor
+                                value during error.
+                            </li>
+                        </ul>
+                    </p>,
+                ],
+            },
+        ],
+    },
     sidePanel: {
         ActiveBatteryModel: [
             {
