@@ -26,11 +26,6 @@ import {
     AdcSample,
     AdcSampleSettings,
     BatteryModel,
-    Buck,
-    BuckMode,
-    BuckModeControl,
-    BuckOnOffControl,
-    BuckRetentionControl,
     Charger,
     GPIO,
     GPIODrive,
@@ -69,6 +64,7 @@ import {
     USBPower,
     VTrickleFast,
 } from '../types';
+import setupBucks from './buck';
 
 export const npm1300FWVersion = '1.0.1+0';
 
@@ -375,6 +371,49 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             // eslint-disable-next-line no-bitwise
             supplementModeActive: (value & 0x80) > 0,
         } as PmicChargingState);
+
+    const sendCommand = (
+        command: string,
+        onSuccess: (response: string, command: string) => void = noop,
+        onError: (response: string, command: string) => void = noop,
+        unique = true
+    ) => {
+        if (pmicState !== 'ek-disconnected') {
+            shellParser?.enqueueRequest(
+                command,
+                {
+                    onSuccess,
+                    onError: (error, cmd) => {
+                        if (
+                            error.includes('IO error') &&
+                            pmicState === 'pmic-connected'
+                        ) {
+                            pmicState = 'pmic-disconnected';
+                            eventEmitter.emit('onPmicStateChange', pmicState);
+                        }
+                        onError(error, cmd);
+                    },
+                    onTimeout: error => {
+                        if (onError) onError(error, command);
+                        console.warn(error);
+                    },
+                },
+                undefined,
+                unique
+            );
+        } else {
+            onError('No Shell connection', command);
+        }
+    };
+
+    const { buckGet, buckSet, buckCallbacks } = setupBucks(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        dialogHandler,
+        pmicState === 'ek-disconnected',
+        devices.noOfBucks
+    );
 
     const releaseAll: (() => void)[] = [];
 
@@ -869,154 +908,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
 
-        for (let i = 0; i < devices.noOfBucks; i += 1) {
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx buck voltage normal', true, i),
-                    res => {
-                        const value = parseToNumber(res);
-                        eventEmitter.emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                vOutNormal: value / 1000, // mV to V
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx buck voltage retention', true, i),
-                    res => {
-                        const value = parseToNumber(res);
-                        eventEmitter.emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                vOutRetention: value / 1000, // mV to V
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx buck vout select', true, i),
-                    res => {
-                        const value = parseToNumber(res);
-                        eventEmitter.emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                mode: value === 0 ? 'vSet' : 'software',
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx buck status power', true, i),
-                    res => {
-                        eventEmitter.emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                enabled: parseToBoolean(res),
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx buck gpio on_off', true, i, '(-1|[0-4]) (0)'),
-                    res => {
-                        const result = parseToNumber(res);
-                        eventEmitter.emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                onOffControl:
-                                    result === -1 ? 'Off' : GPIOValues[result],
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex(
-                        'npmx buck gpio retention',
-                        true,
-                        i,
-                        '(-1|[0-4]) (0)'
-                    ),
-                    res => {
-                        const result = parseToNumber(res);
-                        eventEmitter.emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                retentionControl:
-                                    result === -1 ? 'Off' : GPIOValues[result],
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex(
-                        'npmx buck gpio pwm_force',
-                        true,
-                        i,
-                        '(-1|[0-4]) (0)'
-                    ),
-                    res => {
-                        const result = parseToNumber(res);
-                        eventEmitter.emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                modeControl:
-                                    result === -1 ? 'Auto' : GPIOValues[result],
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx buck active_discharge', true, i, '(0|1)'),
-                    res => {
-                        eventEmitter.emitPartialEvent<Buck>(
-                            'onBuckUpdate',
-                            {
-                                activeDischarge: parseToBoolean(res),
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-        }
+        releaseAll.push(...buckCallbacks);
 
         for (let i = 0; i < devices.noOfLdos; i += 1) {
             releaseAll.push(
@@ -1440,40 +1332,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         );
     }
 
-    const sendCommand = (
-        command: string,
-        onSuccess: (response: string, command: string) => void = noop,
-        onError: (response: string, command: string) => void = noop,
-        unique = true
-    ) => {
-        if (pmicState !== 'ek-disconnected') {
-            shellParser?.enqueueRequest(
-                command,
-                {
-                    onSuccess,
-                    onError: (error, cmd) => {
-                        if (
-                            error.includes('IO error') &&
-                            pmicState === 'pmic-connected'
-                        ) {
-                            pmicState = 'pmic-disconnected';
-                            eventEmitter.emit('onPmicStateChange', pmicState);
-                        }
-                        onError(error, cmd);
-                    },
-                    onTimeout: error => {
-                        if (onError) onError(error, command);
-                        console.warn(error);
-                    },
-                },
-                undefined,
-                unique
-            );
-        } else {
-            onError('No Shell connection', command);
-        }
-    };
-
     const setChargerVTerm = (value: number) =>
         new Promise<void>((resolve, reject) => {
             eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
@@ -1843,326 +1701,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     () => resolve(),
                     () => {
                         requestUpdate.chargerTHot();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setBuckVOutNormal = (index: number, value: number) => {
-        const action = () =>
-            new Promise<void>((resolve, reject) => {
-                if (pmicState === 'ek-disconnected') {
-                    eventEmitter.emitPartialEvent<Buck>(
-                        'onBuckUpdate',
-                        {
-                            vOutNormal: value,
-                        },
-                        index
-                    );
-
-                    eventEmitter.emitPartialEvent<Buck>(
-                        'onBuckUpdate',
-                        {
-                            mode: 'software',
-                        },
-                        index
-                    );
-
-                    resolve();
-                } else {
-                    sendCommand(
-                        `npmx buck voltage normal set ${index} ${value * 1000}`,
-                        () =>
-                            sendCommand(
-                                `npmx buck vout select set ${index} 1`,
-                                () => resolve(),
-                                () => {
-                                    requestUpdate.buckMode(index);
-                                    reject();
-                                }
-                            ),
-                        () => {
-                            requestUpdate.buckVOutNormal(index);
-                            reject();
-                        }
-                    );
-                }
-            });
-
-        if (
-            dialogHandler &&
-            pmicState !== 'ek-disconnected' &&
-            index === 1 &&
-            value <= 1.6
-        ) {
-            return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicDialog = {
-                    type: 'alert',
-                    doNotAskAgainStoreID: 'pmic1300-setBuckVOut-1',
-                    message: `Buck 2 powers the I2C communication required by this app. A voltage lower than 1.6 V might cause issues with the app connection.
-                    Are you sure you want to continue?`,
-                    confirmLabel: 'Yes',
-                    optionalLabel: "Yes, don't ask again",
-                    cancelLabel: 'No',
-                    title: 'Warning',
-                    onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: () => {
-                        requestUpdate.buckVOutNormal(index);
-                        reject();
-                    },
-                    onOptional: () => action().then(resolve).catch(reject),
-                };
-
-                dialogHandler(warningDialog);
-            });
-        }
-
-        return action();
-    };
-
-    const setBuckVOutRetention = (index: number, value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Buck>(
-                    'onBuckUpdate',
-                    {
-                        vOutRetention: value,
-                    },
-                    index
-                );
-
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx buck voltage retention set ${index} ${value * 1000}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.buckVOutRetention(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setBuckMode = (index: number, mode: BuckMode) => {
-        const action = () =>
-            new Promise<void>((resolve, reject) => {
-                if (pmicState === 'ek-disconnected') {
-                    eventEmitter.emitPartialEvent<Buck>(
-                        'onBuckUpdate',
-                        {
-                            mode,
-                        },
-                        index
-                    );
-                    resolve();
-                } else {
-                    sendCommand(
-                        `npmx buck vout select set ${index} ${
-                            mode === 'software' ? 1 : 0
-                        }`,
-                        () => {
-                            requestUpdate.buckVOutNormal(index);
-                            resolve();
-                        },
-                        () => {
-                            requestUpdate.buckMode(index);
-                            reject();
-                        }
-                    );
-                }
-            });
-
-        // TODO Check software voltage as well
-        if (
-            dialogHandler &&
-            pmicState !== 'ek-disconnected' &&
-            index === 1 &&
-            mode === 'software'
-        ) {
-            return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicDialog = {
-                    type: 'alert',
-                    doNotAskAgainStoreID: 'pmic1300-setBuckVOut-0',
-                    message: `Buck 2 powers the I2C communication required by this app. A software voltage might be already set to less then 1.6 V . Are you sure you want to continue?`,
-                    confirmLabel: 'Yes',
-                    optionalLabel: "Yes, don't ask again",
-                    cancelLabel: 'No',
-                    title: 'Warning',
-                    onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: reject,
-                    onOptional: () => action().then(resolve).catch(reject),
-                };
-
-                dialogHandler(warningDialog);
-            });
-        }
-
-        return action();
-    };
-
-    const setBuckModeControl = (index: number, modeControl: BuckModeControl) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Buck>(
-                    'onBuckUpdate',
-                    {
-                        modeControl,
-                    },
-                    index
-                );
-
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx buck gpio pwm_force set ${index} ${GPIOValues.findIndex(
-                        v => v === modeControl
-                    )} 0`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.buckModeControl(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setBuckOnOffControl = (
-        index: number,
-        onOffControl: BuckOnOffControl
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Buck>(
-                    'onBuckUpdate',
-                    {
-                        onOffControl,
-                    },
-                    index
-                );
-
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx buck gpio on_off set ${index} ${GPIOValues.findIndex(
-                        v => v === onOffControl
-                    )} 0`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.buckOnOffControl(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setBuckRetentionControl = (
-        index: number,
-        retentionControl: BuckRetentionControl
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Buck>(
-                    'onBuckUpdate',
-                    {
-                        retentionControl,
-                    },
-                    index
-                );
-
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx buck gpio retention set ${index} ${GPIOValues.findIndex(
-                        v => v === retentionControl
-                    )} 0`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.buckRetentionControl(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setBuckEnabled = (index: number, enabled: boolean) => {
-        const action = () =>
-            new Promise<void>((resolve, reject) => {
-                if (pmicState === 'ek-disconnected') {
-                    eventEmitter.emitPartialEvent<Buck>(
-                        'onBuckUpdate',
-                        {
-                            enabled,
-                        },
-                        index
-                    );
-                    resolve();
-                } else {
-                    sendCommand(
-                        `npmx buck status power set ${index} ${
-                            enabled ? '1' : '0'
-                        }`,
-                        () => resolve(),
-                        () => {
-                            requestUpdate.buckEnabled(index);
-                            reject();
-                        }
-                    );
-                }
-            });
-
-        if (
-            dialogHandler &&
-            pmicState !== 'ek-disconnected' &&
-            index === 1 &&
-            !enabled
-        ) {
-            return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicDialog = {
-                    type: 'alert',
-                    doNotAskAgainStoreID: 'pmic1300-setBuckEnabled-1',
-                    message: `Disabling the buck 2 might effect I2C communications to the PMIC chip and hance you might get
-                disconnected from the app. Are you sure you want to continue?`,
-                    confirmLabel: 'Yes',
-                    optionalLabel: "Yes, don't ask again",
-                    cancelLabel: 'No',
-                    title: 'Warning',
-                    onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: reject,
-                    onOptional: () => action().then(resolve).catch(reject),
-                };
-
-                dialogHandler(warningDialog);
-            });
-        }
-
-        return action();
-    };
-
-    const setBuckActiveDischargeEnabled = (
-        index: number,
-        activeDischargeEnabled: boolean
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<Buck>(
-                    'onBuckUpdate',
-                    {
-                        activeDischarge: activeDischargeEnabled,
-                    },
-                    index
-                );
-
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx buck active_discharge set ${index} ${
-                        activeDischargeEnabled ? '1' : '0'
-                    }`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.buckActiveDischarge(index);
                         reject();
                     }
                 );
@@ -2966,24 +2504,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         gpioDebounce: (index: number) =>
             sendCommand(`npmx gpio debounce get ${index}`),
 
-        ledMode: (index: number) => sendCommand(`npmx leds mode get ${index}`),
+        ...buckGet,
 
-        buckVOutNormal: (index: number) =>
-            sendCommand(`npmx buck voltage normal get ${index}`),
-        buckVOutRetention: (index: number) =>
-            sendCommand(`npmx buck voltage retention get ${index}`),
-        buckMode: (index: number) =>
-            sendCommand(`npmx buck vout select get ${index}`),
-        buckModeControl: (index: number) =>
-            sendCommand(`npmx buck gpio pwm_force get ${index}`),
-        buckOnOffControl: (index: number) =>
-            sendCommand(`npmx buck gpio on_off get ${index}`),
-        buckRetentionControl: (index: number) =>
-            sendCommand(`npmx buck gpio retention get ${index}`),
-        buckEnabled: (index: number) =>
-            sendCommand(`npmx buck status power get ${index}`),
-        buckActiveDischarge: (index: number) =>
-            sendCommand(`npmx buck active_discharge get ${index}`),
+        ledMode: (index: number) => sendCommand(`npmx leds mode get ${index}`),
 
         ldoVoltage: (index: number) =>
             sendCommand(`npmx ldsw ldo_voltage get ${index}`),
@@ -3023,7 +2546,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         vbusinCurrentLimiter: () =>
             sendCommand(`npmx vbusin current_limit get`),
     };
-
     return {
         ...baseDevice,
         release: () => {
@@ -3310,14 +2832,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         setChargerTCool,
         setChargerTWarm,
         setChargerTHot,
-        setBuckVOutNormal,
-        setBuckVOutRetention,
-        setBuckMode,
-        setBuckEnabled,
-        setBuckModeControl,
-        setBuckOnOffControl,
-        setBuckRetentionControl,
-        setBuckActiveDischarge: setBuckActiveDischargeEnabled,
+        ...buckSet,
         setLdoVoltage,
         setLdoEnabled,
         setLdoMode,
