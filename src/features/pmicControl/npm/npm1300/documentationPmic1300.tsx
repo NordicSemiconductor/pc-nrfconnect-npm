@@ -381,7 +381,13 @@ export const documentation: Documentation = {
     battery: {
         TimeToFull: [
             {
-                title: 'Time to full',
+                title: (
+                    <span>
+                        Time to full
+                        <br />
+                        (Experimental)
+                    </span>
+                ),
                 content: [
                     <p key="p1">
                         Load profile and rate of change of state-of-charge is
@@ -393,7 +399,13 @@ export const documentation: Documentation = {
         ],
         TimeToEmpty: [
             {
-                title: 'Time to empty',
+                title: (
+                    <span>
+                        Time to empty
+                        <br />
+                        (Experimental)
+                    </span>
+                ),
                 content: [
                     <p key="p1">
                         Load profile and rate of change of state-of-charge is
@@ -1180,13 +1192,7 @@ export const documentation: Documentation = {
         ],
         LoadConfiguration: [
             {
-                title: (
-                    <span>
-                        Load Configuration
-                        <br />
-                        (Coming Soon!)
-                    </span>
-                ),
+                title: 'Load Configuration',
                 content: [
                     <p key="p1">
                         Loads a saved nPM PowerUP configuration and updates all
