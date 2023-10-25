@@ -25,12 +25,6 @@ import {
     AdcSample,
     AdcSampleSettings,
     BatteryModel,
-    GPIO,
-    GPIODrive,
-    GPIOMode,
-    GPIOModeValues,
-    GPIOPullMode,
-    GPIOPullValues,
     INpmDevice,
     IrqEvent,
     LED,
@@ -55,6 +49,7 @@ import {
 } from '../types';
 import setupBucks from './buck';
 import setupCharger from './charger';
+import setupGpio from './gpio';
 import setupLdo from './ldo';
 
 export const npm1300FWVersion = '1.0.1+0';
@@ -394,6 +389,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         devices.noOfLdos
     );
 
+    const { gpioGet, gpioSet, gpioCallbacks } = setupGpio(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode,
+        devices.noOfGPIOs
+    );
+
     const releaseAll: (() => void)[] = [];
 
     if (shellParser) {
@@ -635,94 +638,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(...buckCallbacks);
         releaseAll.push(...ldoCallbacks);
-
-        for (let i = 0; i < devices.noOfGPIOs; i += 1) {
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx gpio mode', true, i, '[0-9]'),
-                    res => {
-                        const mode = GPIOModeValues[parseToNumber(res)];
-                        if (mode) {
-                            eventEmitter.emitPartialEvent<GPIO>(
-                                'onGPIOUpdate',
-                                {
-                                    mode,
-                                },
-                                i
-                            );
-                        }
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx gpio pull', true, i, '(0|1|2)'),
-                    res => {
-                        const pull = GPIOPullValues[parseToNumber(res)];
-                        if (pull) {
-                            eventEmitter.emitPartialEvent<GPIO>(
-                                'onGPIOUpdate',
-                                {
-                                    pull,
-                                },
-                                i
-                            );
-                        }
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx gpio drive', true, i, '(1|6)'),
-                    res => {
-                        eventEmitter.emitPartialEvent<GPIO>(
-                            'onGPIOUpdate',
-                            {
-                                drive: parseToNumber(res) as GPIODrive,
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx gpio open_drain', true, i, '(0|1)'),
-                    res => {
-                        eventEmitter.emitPartialEvent<GPIO>(
-                            'onGPIOUpdate',
-                            {
-                                openDrain: parseToBoolean(res),
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx gpio debounce', true, i, '(0|1)'),
-                    res => {
-                        eventEmitter.emitPartialEvent<GPIO>(
-                            'onGPIOUpdate',
-                            {
-                                debounce: parseToBoolean(res),
-                            },
-                            i
-                        );
-                    },
-                    noop
-                )
-            );
-        }
+        releaseAll.push(...gpioCallbacks);
 
         for (let i = 0; i < devices.noOfLEDs; i += 1) {
             releaseAll.push(
@@ -933,127 +849,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
     }
-
-    const setGpioMode = (index: number, mode: GPIOMode) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<GPIO>(
-                    'onGPIOUpdate',
-                    {
-                        mode,
-                    },
-                    index
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx gpio mode set ${index} ${GPIOModeValues.findIndex(
-                        m => m === mode
-                    )}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.gpioMode(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setGpioPull = (index: number, pull: GPIOPullMode) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<GPIO>(
-                    'onGPIOUpdate',
-                    {
-                        pull,
-                    },
-                    index
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx gpio pull set ${index} ${GPIOPullValues.findIndex(
-                        p => p === pull
-                    )}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.gpioPull(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setGpioDrive = (index: number, drive: GPIODrive) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<GPIO>(
-                    'onGPIOUpdate',
-                    {
-                        drive,
-                    },
-                    index
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx gpio drive set ${index} ${drive}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.gpioDrive(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setGpioOpenDrain = (index: number, openDrain: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<GPIO>(
-                    'onGPIOUpdate',
-                    {
-                        openDrain,
-                    },
-                    index
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx gpio open_drain set ${index} ${
-                        openDrain ? '1' : '0'
-                    }`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.gpioOpenDrain(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setGpioDebounce = (index: number, debounce: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<GPIO>(
-                    'onGPIOUpdate',
-                    {
-                        debounce,
-                    },
-                    index
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx gpio debounce set ${index} ${debounce ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.gpioDebounce(index);
-                        reject();
-                    }
-                );
-            }
-        });
 
     const setFuelGaugeEnabled = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
@@ -1441,20 +1236,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const requestUpdate = {
         ...chargerGet,
 
-        gpioMode: (index: number) => sendCommand(`npmx gpio mode get ${index}`),
-        gpioPull: (index: number) => sendCommand(`npmx gpio pull get ${index}`),
-        gpioDrive: (index: number) =>
-            sendCommand(`npmx gpio drive get ${index}`),
-        gpioOpenDrain: (index: number) =>
-            sendCommand(`npmx gpio open_drain get ${index}`),
-        gpioDebounce: (index: number) =>
-            sendCommand(`npmx gpio debounce get ${index}`),
-
         ...buckGet,
 
         ledMode: (index: number) => sendCommand(`npmx leds mode get ${index}`),
 
         ...ldoGet,
+        ...gpioGet,
 
         pofEnable: () => sendCommand(`npmx pof enable get`),
         pofPolarity: () => sendCommand(`npmx pof polarity get`),
@@ -1693,11 +1480,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...chargerSet,
         ...buckSet,
         ...ldoSet,
-        setGpioMode,
-        setGpioPull,
-        setGpioDrive,
-        setGpioOpenDrain,
-        setGpioDebounce,
+        ...gpioSet,
         setLedMode,
         setPOFEnabled,
         setPOFThreshold,
