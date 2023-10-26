@@ -17,7 +17,6 @@ import {
     parseBatteryModel,
     parseColonBasedAnswer,
     parseLogData,
-    parseToBoolean,
     parseToNumber,
     toRegex,
 } from '../pmicHelpers';
@@ -34,21 +33,17 @@ import {
     PmicDialog,
     PmicState,
     ProfileDownload,
-    ShipModeConfig,
-    TimerConfig,
-    TimerMode,
-    TimerModeValues,
-    TimerPrescaler,
-    TimerPrescalerValues,
-    TimeToActive,
     USBDetectStatusValues,
     USBPower,
 } from '../types';
 import setupBucks from './buck';
 import setupCharger from './charger';
+import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo from './ldo';
 import setupPof from './pof';
+import setupShipMode from './shipMode';
+import setupTimer from './timer';
 
 export const npm1300FWVersion = '1.0.1+0';
 
@@ -73,8 +68,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ? BatteryProfiler(shellParser, eventEmitter)
         : undefined;
     let lastUptime = 0;
-    let profileDownloadInProgress = false;
-    let profileDownloadAborting = false;
     let autoReboot = true;
 
     let pmicState: PmicState = shellParser
@@ -305,23 +298,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
-    const processModuleFuelGauge = ({ message }: LoggingEvent) => {
-        if (message === 'Battery model timeout') {
-            shellParser?.setShellEchos(true);
-
-            profileDownloadAborting = true;
-            if (profileDownloadInProgress) {
-                profileDownloadInProgress = false;
-                const payload: ProfileDownload = {
-                    state: 'aborted',
-                    alertMessage: message,
-                };
-
-                eventEmitter.emit('onProfileDownloadUpdate', payload);
-            }
-        }
-    };
-
     const startAdcSample = (intervalMs: number, samplingRate: number) => {
         sendCommand(`npm_adc sample ${samplingRate} ${intervalMs}`);
     };
@@ -402,6 +378,27 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
+    const { shipModeGet, shipModeSet, shipModeCallbacks } = setupShipMode(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
+    const { timerGet, timerSet, timerCallbacks } = setupTimer(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
+    const { fuelGaugeGet, fuelGaugeSet, fuelGaugeCallbacks } = setupFuelGauge(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
     const releaseAll: (() => void)[] = [];
 
     if (shellParser) {
@@ -422,7 +419,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             // Handled in charger callbacks
                             break;
                         case 'module_fg':
-                            processModuleFuelGauge(loggingEvent);
+                            // Handled in fuelGauge callbacks
                             break;
                     }
 
@@ -480,149 +477,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         );
 
         releaseAll.push(...chargerCallbacks);
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('fuel_gauge', true, undefined, '(1|0)'),
-
-                res => {
-                    eventEmitter.emit('onFuelGauge', parseToBoolean(res));
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('fuel_gauge model download begin'),
-                () => shellParser?.setShellEchos(false),
-                () => shellParser?.setShellEchos(true)
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('fuel_gauge model download apply'),
-                res => {
-                    if (profileDownloadInProgress) {
-                        profileDownloadInProgress = false;
-                        const profileDownload: ProfileDownload = {
-                            state: 'applied',
-                            alertMessage: parseColonBasedAnswer(res),
-                        };
-                        eventEmitter.emit(
-                            'onProfileDownloadUpdate',
-                            profileDownload
-                        );
-                    }
-                    shellParser?.setShellEchos(true);
-                },
-                res => {
-                    if (profileDownloadInProgress) {
-                        profileDownloadInProgress = false;
-                        const profileDownload: ProfileDownload = {
-                            state: 'failed',
-                            alertMessage: parseColonBasedAnswer(res),
-                        };
-                        eventEmitter.emit(
-                            'onProfileDownloadUpdate',
-                            profileDownload
-                        );
-                    }
-                    shellParser?.setShellEchos(true);
-                }
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('fuel_gauge model download abort'),
-                res => {
-                    if (profileDownloadInProgress) {
-                        profileDownloadInProgress = false;
-                        const profileDownload: ProfileDownload = {
-                            state: 'aborted',
-                            alertMessage: parseColonBasedAnswer(res),
-                        };
-                        eventEmitter.emit(
-                            'onProfileDownloadUpdate',
-                            profileDownload
-                        );
-                    }
-
-                    shellParser?.setShellEchos(true);
-                },
-                res => {
-                    if (profileDownloadInProgress) {
-                        profileDownloadInProgress = false;
-                        const profileDownload: ProfileDownload = {
-                            state: 'failed',
-                            alertMessage: parseColonBasedAnswer(res),
-                        };
-                        eventEmitter.emit(
-                            'onProfileDownloadUpdate',
-                            profileDownload
-                        );
-                    }
-
-                    shellParser?.setShellEchos(true);
-                }
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'fuel_gauge model',
-                    true,
-                    undefined,
-                    '"[A-Za-z0-9\\s]+"'
-                ),
-                res => {
-                    eventEmitter.emit(
-                        'onActiveBatteryModelUpdate',
-                        parseBatteryModel(parseColonBasedAnswer(res))
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('fuel_gauge model store'),
-                () => {
-                    requestUpdate.storedBatteryModel();
-                    requestUpdate.activeBatteryModel();
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('fuel_gauge model list'),
-                res => {
-                    const models = res.split(
-                        'Battery models stored in database:'
-                    );
-                    if (models.length < 2) {
-                        eventEmitter.emit(
-                            'onStoredBatteryModelUpdate',
-                            undefined
-                        );
-                        return;
-                    }
-                    const stringModels = models[1].trim().split('\n');
-                    const list = stringModels.map(parseBatteryModel);
-                    eventEmitter.emit(
-                        'onStoredBatteryModelUpdate',
-                        list.length !== 0 ? list : undefined
-                    );
-                },
-                noop
-            )
-        );
+        releaseAll.push(...fuelGaugeCallbacks);
 
         releaseAll.push(
             shellParser.registerCommandCallback(
@@ -667,146 +522,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         }
 
         releaseAll.push(...pofCallbacks);
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx timer config mode', true, undefined, '[0-4]'),
-                res => {
-                    eventEmitter.emitPartialEvent<TimerConfig>(
-                        'onTimerConfigUpdate',
-                        {
-                            mode: TimerModeValues[parseToNumber(res)],
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx timer config prescaler',
-                    true,
-                    undefined,
-                    '[0-1]'
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<TimerConfig>(
-                        'onTimerConfigUpdate',
-                        {
-                            prescaler: TimerPrescalerValues[parseToNumber(res)],
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx timer config period', true),
-                res => {
-                    eventEmitter.emitPartialEvent<TimerConfig>(
-                        'onTimerConfigUpdate',
-                        {
-                            period: parseToNumber(res),
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx ship config time',
-                    true,
-                    undefined,
-                    '(16|32|64|96|304|608|1008|3008)'
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            timeToActive: parseToNumber(res) as TimeToActive,
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx ship config inv_polarity', true),
-                res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            invPolarity: parseToBoolean(res),
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx ship config inv_polarity', true),
-                res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            invPolarity: parseToBoolean(res),
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx ship reset long_press', true),
-                res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            longPressReset: parseToBoolean(res),
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx ship reset two_buttons', true),
-                res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            twoButtonReset: parseToBoolean(res),
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx ship mode (ship|hibernate)'),
-                () => {
-                    eventEmitter.emit('onReboot', true);
-                },
-                noop
-            )
-        );
+        releaseAll.push(...timerCallbacks);
+        releaseAll.push(...shipModeCallbacks);
 
         releaseAll.push(
             shellParser.registerCommandCallback(
@@ -820,23 +537,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
     }
-
-    const setFuelGaugeEnabled = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emit('onFuelGauge', enabled);
-                resolve();
-            } else {
-                sendCommand(
-                    `fuel_gauge set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.fuelGauge();
-                        reject();
-                    }
-                );
-            }
-        });
 
     const setLedMode = (index: number, mode: LEDMode) =>
         new Promise<void>((resolve, reject) => {
@@ -861,248 +561,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     }
                 );
             }
-        });
-
-    const setTimerConfigMode = (mode: TimerMode) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<TimerConfig>(
-                    'onTimerConfigUpdate',
-                    {
-                        mode,
-                    }
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx timer config mode set ${TimerModeValues.findIndex(
-                        m => m === mode
-                    )}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.timerConfigMode();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setTimerConfigPrescaler = (prescaler: TimerPrescaler) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<TimerConfig>(
-                    'onTimerConfigUpdate',
-                    {
-                        prescaler,
-                    }
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx timer config prescaler set ${TimerPrescalerValues.findIndex(
-                        p => p === prescaler
-                    )}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.timerConfigPrescaler();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setTimerConfigPeriod = (period: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<TimerConfig>(
-                    'onTimerConfigUpdate',
-                    {
-                        period,
-                    }
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx timer config period set ${period}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.timerConfigPeriod();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setShipModeTimeToActive = (timeToActive: TimeToActive) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                    timeToActive,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx ship config time set ${timeToActive}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.shipModeTimeToActive();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setShipInvertPolarity = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                    invPolarity: enabled,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx ship config inv_polarity set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.shipInvertPolarity();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setShipLongPressReset = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                    longPressReset: enabled,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx ship reset long_press set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.shipLongPressReset();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setShipTwoButtonReset = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                    twoButtonReset: enabled,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx ship reset two_buttons set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.shipTwoButtonReset();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const downloadFuelGaugeProfile = (profile: Buffer) => {
-        const chunkSize = 256;
-        const chunks = Math.ceil(profile.byteLength / chunkSize);
-
-        return new Promise<void>((resolve, reject) => {
-            const downloadData = (chunk = 0) => {
-                sendCommand(
-                    `fuel_gauge model download "${profile
-                        .subarray(chunk * chunkSize, (chunk + 1) * chunkSize)
-                        .toString()
-                        .replaceAll('"', '\\"')}"`,
-                    () => {
-                        const profileDownload: ProfileDownload = {
-                            state: 'downloading',
-                            completeChunks: chunk + 1,
-                            totalChunks: Math.ceil(
-                                profile.byteLength / chunkSize
-                            ),
-                        };
-                        eventEmitter.emit(
-                            'onProfileDownloadUpdate',
-                            profileDownload
-                        );
-
-                        if (
-                            profileDownloadInProgress &&
-                            !profileDownloadAborting &&
-                            chunk + 1 !== chunks
-                        ) {
-                            downloadData(chunk + 1);
-                        } else {
-                            resolve();
-                            requestUpdate.activeBatteryModel();
-                        }
-                    },
-                    res => {
-                        () => {
-                            if (profileDownloadInProgress) {
-                                profileDownloadInProgress = false;
-                                profileDownloadAborting = false;
-                                const profileDownload: ProfileDownload = {
-                                    state: 'failed',
-                                    alertMessage: parseColonBasedAnswer('res'),
-                                };
-                                eventEmitter.emit(
-                                    'onProfileDownloadUpdate',
-                                    profileDownload
-                                );
-                            }
-                            reject(res);
-                        };
-                    },
-                    false
-                );
-            };
-
-            profileDownloadInProgress = true;
-            profileDownloadAborting = false;
-            sendCommand(
-                'fuel_gauge model download begin',
-                () => downloadData(),
-                () => reject()
-            );
-        });
-    };
-
-    const abortDownloadFuelGaugeProfile = () =>
-        new Promise<void>((resolve, reject) => {
-            const profileDownload: ProfileDownload = {
-                state: 'aborting',
-            };
-            eventEmitter.emit('onProfileDownloadUpdate', profileDownload);
-
-            profileDownloadAborting = true;
-            sendCommand(
-                `fuel_gauge model download abort`,
-                () => {
-                    resolve();
-                },
-                () => {
-                    reject();
-                }
-            );
-        });
-
-    const applyDownloadFuelGaugeProfile = () =>
-        new Promise<void>((resolve, reject) => {
-            sendCommand(
-                `fuel_gauge model download apply 0`,
-                () => {
-                    resolve();
-                },
-                () => reject()
-            );
         });
 
     const setActiveBatteryModel = (name: string) =>
@@ -1155,22 +613,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoGet,
         ...gpioGet,
         ...pofGet,
-
-        timerConfigMode: () => sendCommand(`npmx timer config mode get`),
-        timerConfigPrescaler: () =>
-            sendCommand(`npmx timer config prescaler get`),
-        timerConfigPeriod: () => sendCommand(`npmx timer config period get`),
-
-        shipModeTimeToActive: () => sendCommand(`npmx ship config time get`),
-        shipInvertPolarity: () =>
-            sendCommand(`npmx ship config inv_polarity get`),
-        shipLongPressReset: () => sendCommand(`npmx ship reset long_press get`),
-        shipTwoButtonReset: () =>
-            sendCommand(`npmx ship reset two_buttons get`),
-
-        fuelGauge: () => sendCommand('fuel_gauge get'),
-        activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
-        storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
+        ...timerGet,
+        ...shipModeGet,
+        ...fuelGaugeGet,
 
         usbPowered: () => sendCommand(`npmx vbusin status cc get`),
 
@@ -1386,19 +831,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...gpioSet,
         setLedMode,
         ...pofSet,
-        setTimerConfigMode,
-        setTimerConfigPrescaler,
-        setTimerConfigPeriod,
-        setShipInvertPolarity,
-        setShipModeTimeToActive,
-        setShipLongPressReset,
-        setShipTwoButtonReset,
-
-        setFuelGaugeEnabled,
-        downloadFuelGaugeProfile,
-
-        enterShipMode: () => sendCommand(`npmx ship mode ship`),
-        enterShipHibernateMode: () => sendCommand(`npmx ship mode hibernate`),
+        ...timerSet,
+        ...shipModeSet,
+        ...fuelGaugeSet,
 
         setActiveBatteryModel,
 
@@ -1441,9 +876,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 eventEmitter.removeListener('onProfileDownloadUpdate', handler);
             };
         },
-
-        abortDownloadFuelGaugeProfile,
-        applyDownloadFuelGaugeProfile,
 
         getBatteryProfiler: () => batteryProfiler,
         setAutoRebootDevice: v => {
