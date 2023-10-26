@@ -640,56 +640,65 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     try {
                         if (config.charger) {
                             const charger = config.charger;
-                            await setChargerVTerm(charger.vTerm);
-                            await setChargerIChg(charger.iChg);
-                            await setChargerITerm(charger.iTerm);
-                            await setChargerEnabledRecharging(
+                            await chargerSet.setChargerVTerm(charger.vTerm);
+                            await chargerSet.setChargerIChg(charger.iChg);
+                            await chargerSet.setChargerITerm(charger.iTerm);
+                            await chargerSet.setChargerEnabledRecharging(
                                 charger.enableRecharging
                             );
-                            await setChargerVTrickleFast(charger.vTrickleFast);
-                            await setChargerNTCThermistor(
+                            await chargerSet.setChargerVTrickleFast(
+                                charger.vTrickleFast
+                            );
+                            await chargerSet.setChargerNTCThermistor(
                                 charger.ntcThermistor
                             );
-                            await setChargerNTCBeta(charger.ntcBeta);
-                            await setChargerTChgResume(charger.tChgResume);
-                            await setChargerTChgStop(charger.tChgStop);
-                            await setChargerVTermR(charger.vTermR);
-                            await setChargerTCold(charger.tCold);
-                            await setChargerTCool(charger.tCool);
-                            await setChargerTWarm(charger.tWarm);
-                            await setChargerTHot(charger.tHot);
-                            await setChargerEnabled(charger.enabled);
+                            await chargerSet.setChargerNTCBeta(charger.ntcBeta);
+                            await chargerSet.setChargerTChgResume(
+                                charger.tChgResume
+                            );
+                            await chargerSet.setChargerTChgStop(
+                                charger.tChgStop
+                            );
+                            await chargerSet.setChargerVTermR(charger.vTermR);
+                            await chargerSet.setChargerTCold(charger.tCold);
+                            await chargerSet.setChargerTCool(charger.tCool);
+                            await chargerSet.setChargerTWarm(charger.tWarm);
+                            await chargerSet.setChargerTHot(charger.tHot);
+                            await chargerSet.setChargerEnabled(charger.enabled);
                         }
 
                         await Promise.all(
                             config.bucks.map((buck, index) =>
                                 (async () => {
-                                    await setBuckVOutNormal(
+                                    await buckSet.setBuckVOutNormal(
                                         index,
                                         buck.vOutNormal
                                     );
-                                    await setBuckEnabled(index, buck.enabled);
-                                    await setBuckModeControl(
+                                    await buckSet.setBuckEnabled(
+                                        index,
+                                        buck.enabled
+                                    );
+                                    await buckSet.setBuckModeControl(
                                         index,
                                         buck.modeControl
                                     );
-                                    await setBuckVOutRetention(
+                                    await buckSet.setBuckVOutRetention(
                                         index,
                                         buck.vOutRetention
                                     );
-                                    await setBuckRetentionControl(
+                                    await buckSet.setBuckRetentionControl(
                                         index,
                                         buck.retentionControl
                                     );
-                                    await setBuckOnOffControl(
+                                    await buckSet.setBuckOnOffControl(
                                         index,
                                         buck.onOffControl
                                     );
-                                    await setBuckActiveDischargeEnabled(
+                                    await buckSet.setBuckActiveDischarge(
                                         index,
                                         buck.activeDischarge
                                     );
-                                    await setBuckMode(index, buck.mode);
+                                    await buckSet.setBuckMode(index, buck.mode);
                                 })()
                             )
                         );
@@ -697,22 +706,31 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         await Promise.all(
                             config.ldos.map((ldo, index) =>
                                 (async () => {
-                                    await setLdoVoltage(index, ldo.voltage);
-                                    await setLdoEnabled(index, ldo.enabled);
-                                    await setLdoSoftStartEnabled(
+                                    await ldoSet.setLdoVoltage(
+                                        index,
+                                        ldo.voltage
+                                    );
+                                    await ldoSet.setLdoEnabled(
+                                        index,
+                                        ldo.enabled
+                                    );
+                                    await ldoSet.setLdoSoftStartEnabled(
                                         index,
                                         ldo.softStartEnabled
                                     );
-                                    await setLdoSoftStart(index, ldo.softStart);
-                                    await setLdoActiveDischarge(
+                                    await ldoSet.setLdoSoftStart(
+                                        index,
+                                        ldo.softStart
+                                    );
+                                    await ldoSet.setLdoActiveDischarge(
                                         index,
                                         ldo.activeDischarge
                                     );
-                                    await setLdoOnOffControl(
+                                    await ldoSet.setLdoOnOffControl(
                                         index,
                                         ldo.onOffControl
                                     );
-                                    await setLdoMode(index, ldo.mode);
+                                    await ldoSet.setLdoMode(index, ldo.mode);
                                 })()
                             )
                         );
@@ -720,14 +738,20 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         await Promise.all(
                             config.gpios.map((gpio, index) =>
                                 (async () => {
-                                    await setGpioMode(index, gpio.mode);
-                                    await setGpioPull(index, gpio.pull);
-                                    await setGpioDrive(index, gpio.drive);
-                                    await setGpioOpenDrain(
+                                    await gpioSet.setGpioMode(index, gpio.mode);
+                                    await gpioSet.setGpioPull(index, gpio.pull);
+                                    await gpioSet.setGpioDrive(
+                                        index,
+                                        gpio.drive
+                                    );
+                                    await gpioSet.setGpioOpenDrain(
                                         index,
                                         gpio.openDrain
                                     );
-                                    await setGpioDebounce(index, gpio.debounce);
+                                    await gpioSet.setGpioDebounce(
+                                        index,
+                                        gpio.debounce
+                                    );
                                 })()
                             )
                         );
@@ -738,22 +762,36 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             )
                         );
 
-                        await setPOFEnabled(config.pof.enable);
-                        await setPOFPolarity(config.pof.polarity);
-                        await setPOFThreshold(config.pof.threshold);
+                        await pofSet.setPOFEnabled(config.pof.enable);
+                        await pofSet.setPOFPolarity(config.pof.polarity);
+                        await pofSet.setPOFThreshold(config.pof.threshold);
 
-                        await setTimerConfigMode(config.timerConfig.mode);
-                        await setTimerConfigPrescaler(
+                        await timerSet.setTimerConfigMode(
+                            config.timerConfig.mode
+                        );
+                        await timerSet.setTimerConfigPrescaler(
                             config.timerConfig.prescaler
                         );
-                        await setTimerConfigPeriod(config.timerConfig.period);
+                        await timerSet.setTimerConfigPeriod(
+                            config.timerConfig.period
+                        );
 
-                        await setShipModeTimeToActive(config.ship.timeToActive);
-                        await setShipInvertPolarity(config.ship.invPolarity);
-                        await setShipLongPressReset(config.ship.longPressReset);
-                        await setShipTwoButtonReset(config.ship.twoButtonReset);
+                        await shipModeSet.setShipModeTimeToActive(
+                            config.ship.timeToActive
+                        );
+                        await shipModeSet.setShipInvertPolarity(
+                            config.ship.invPolarity
+                        );
+                        await shipModeSet.setShipLongPressReset(
+                            config.ship.longPressReset
+                        );
+                        await shipModeSet.setShipTwoButtonReset(
+                            config.ship.twoButtonReset
+                        );
 
-                        await setFuelGaugeEnabled(config.fuelGauge);
+                        await fuelGaugeSet.setFuelGaugeEnabled(
+                            config.fuelGauge
+                        );
 
                         await setVBusinCurrentLimiter(
                             config.usbPower.currentLimiter
