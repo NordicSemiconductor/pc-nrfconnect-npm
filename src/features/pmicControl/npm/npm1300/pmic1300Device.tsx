@@ -563,27 +563,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
-    const setActiveBatteryModel = (name: string) =>
-        new Promise<void>((resolve, reject) => {
-            sendCommand(
-                `fuel_gauge model set "${name}"`,
-                () => resolve(),
-                () => {
-                    requestUpdate.activeBatteryModel();
-                    reject();
-                }
-            );
-        });
-
-    const setBatteryStatusCheckEnabled = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            sendCommand(
-                `npm_chg_status_check set ${enabled ? '1' : '0'}`,
-                () => resolve(),
-                () => reject()
-            );
-        });
-
     const setVBusinCurrentLimiter = (amps: number) =>
         new Promise<void>((resolve, reject) => {
             if (pmicState === 'ek-disconnected') {
@@ -873,8 +852,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...shipModeSet,
         ...fuelGaugeSet,
 
-        setActiveBatteryModel,
-
         setVBusinCurrentLimiter,
 
         getHardcodedBatteryModels: () =>
@@ -903,8 +880,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     true
                 );
             }),
-
-        setBatteryStatusCheckEnabled,
 
         onProfileDownloadUpdate: (
             handler: (payload: ProfileDownload, error?: string) => void

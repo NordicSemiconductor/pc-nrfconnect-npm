@@ -27,7 +27,7 @@ export const fuelGaugeSet = (
     ) => void,
     offlineMode: boolean
 ) => {
-    const { fuelGauge } = fuelGaugeGet(sendCommand);
+    const { fuelGauge, activeBatteryModel } = fuelGaugeGet(sendCommand);
 
     const setFuelGaugeEnabled = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
@@ -46,7 +46,30 @@ export const fuelGaugeSet = (
             }
         });
 
+    const setActiveBatteryModel = (name: string) =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `fuel_gauge model set "${name}"`,
+                () => resolve(),
+                () => {
+                    activeBatteryModel();
+                    reject();
+                }
+            );
+        });
+
+    const setBatteryStatusCheckEnabled = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `npm_chg_status_check set ${enabled ? '1' : '0'}`,
+                () => resolve(),
+                () => reject()
+            );
+        });
+
     return {
         setFuelGaugeEnabled,
+        setActiveBatteryModel,
+        setBatteryStatusCheckEnabled,
     };
 };

@@ -24,6 +24,10 @@ export const profileDownloadCallbacks = (
 ) => {
     const cleanupCallbacks = [];
 
+    // Reset when new npm device is created
+    profileDownloadInProgress = false;
+    profileDownloadAborting = false;
+
     if (shellParser) {
         cleanupCallbacks.push(
             shellParser.onShellLoggingEvent(logEvent => {
