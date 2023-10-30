@@ -930,25 +930,19 @@ Battery models stored in database:
                 ].flat()
             ),
         ]).flat()
-    )(
-        'npmx ldsw active_discharge enable %p',
-        ({ index, append, activeDischarge }) => {
-            const command = `npmx ldsw active_discharge enable ${append}`;
-            const callback =
-                eventHandlers.mockRegisterCommandCallbackHandler(command);
+    )('npmx ldsw active_discharge %p', ({ index, append, activeDischarge }) => {
+        const command = `npmx ldsw active_discharge ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-            callback?.onSuccess(
-                `Value: ${activeDischarge ? '1' : '0'}`,
-                command
-            );
+        callback?.onSuccess(`Value: ${activeDischarge ? '1' : '0'}`, command);
 
-            expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { activeDischarge },
-                index,
-            });
-        }
-    );
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: { activeDischarge },
+            index,
+        });
+    });
 
     test.each(
         PMIC_1300_LDOS.map(index => [
@@ -967,8 +961,8 @@ Battery models stored in database:
                 ].flat()
             ),
         ]).flat()
-    )('npmx ldsw enable_gpio %p', ({ index, append, value }) => {
-        const command = `npmx ldsw enable_gpio ${append}`;
+    )('npmx ldsw gpio %p', ({ index, append, value }) => {
+        const command = `npmx ldsw gpio ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 

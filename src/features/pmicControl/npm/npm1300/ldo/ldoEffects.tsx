@@ -32,9 +32,9 @@ export const ldoGet = (
     ldoSoftStart: (index: number) =>
         sendCommand(`npmx ldsw soft_start current get ${index}`),
     ldoActiveDischarge: (index: number) =>
-        sendCommand(`npmx ldsw active_discharge enable get ${index}`),
+        sendCommand(`npmx ldsw active_discharge get ${index}`),
     ldoOnOffControl: (index: number) =>
-        sendCommand(`npmx ldsw enable_gpio get ${index}`),
+        sendCommand(`npmx ldsw gpio get ${index}`),
 });
 
 export const ldoSet = (
@@ -274,7 +274,7 @@ export const ldoSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx ldsw active_discharge enable set ${index} ${
+                    `npmx ldsw active_discharge set ${index} ${
                         activeDischarge ? '1' : '0'
                     }`,
                     () => resolve(),
@@ -299,7 +299,7 @@ export const ldoSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx ldsw enable_gpio set ${index} ${GPIOValues.findIndex(
+                    `npmx ldsw gpio set ${index} ${GPIOValues.findIndex(
                         v => v === onOffControl
                     )} 0`,
                     () => resolve(),

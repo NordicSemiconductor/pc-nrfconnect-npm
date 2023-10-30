@@ -413,7 +413,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw active_discharge enable get ${index}`,
+                `npmx ldsw active_discharge get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -428,7 +428,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw enable_gpio get ${index}`,
+                `npmx ldsw gpio get ${index}`,
                 expect.anything(),
                 undefined,
                 true
