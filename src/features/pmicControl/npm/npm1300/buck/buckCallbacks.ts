@@ -74,7 +74,7 @@ const setupSingleBuck = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx buck status power', true, i),
+            toRegex('npmx buck status all', true, i),
             res => {
                 eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',

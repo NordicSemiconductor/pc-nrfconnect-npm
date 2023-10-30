@@ -24,7 +24,7 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio mode', true, i, '[0-9]'),
+            toRegex('npmx gpio config mode', true, i, '[0-9]'),
             res => {
                 const mode = GPIOModeValues[parseToNumber(res)];
                 if (mode) {
@@ -43,7 +43,7 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio pull', true, i, '(0|1|2)'),
+            toRegex('npmx gpio config pull', true, i, '(0|1|2)'),
             res => {
                 const pull = GPIOPullValues[parseToNumber(res)];
                 if (pull) {
@@ -62,7 +62,7 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio drive', true, i, '(1|6)'),
+            toRegex('npmx gpio config drive', true, i, '(1|6)'),
             res => {
                 eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
@@ -78,7 +78,7 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio open_drain', true, i, '(0|1)'),
+            toRegex('npmx gpio config open_drain', true, i, '(0|1)'),
             res => {
                 eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
@@ -94,7 +94,7 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio debounce', true, i, '(0|1)'),
+            toRegex('npmx gpio config debounce', true, i, '(0|1)'),
             res => {
                 eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',

@@ -616,7 +616,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx buck enable %p', ({ index, append, enabled }) => {
-        const command = `npmx buck status power ${append}`;
+        const command = `npmx buck status all ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -995,8 +995,8 @@ Battery models stored in database:
                 },
             ]).flat()
         ).flat()
-    )('npmx gpio mode %p', ({ index, append, mode, modeIndex }) => {
-        const command = `npmx gpio mode ${append}`;
+    )('npmx gpio config mode %p', ({ index, append, mode, modeIndex }) => {
+        const command = `npmx gpio config mode ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1026,8 +1026,8 @@ Battery models stored in database:
                 },
             ]).flat()
         ).flat()
-    )('npmx gpio pull %p', ({ index, append, pull, pullIndex }) => {
-        const command = `npmx gpio pull ${append}`;
+    )('npmx gpio config pull %p', ({ index, append, pull, pullIndex }) => {
+        const command = `npmx gpio config pull ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1055,8 +1055,8 @@ Battery models stored in database:
                 },
             ]).flat()
         ).flat()
-    )('npmx gpio drive %p', ({ index, append, drive }) => {
-        const command = `npmx gpio drive ${append}`;
+    )('npmx gpio config drive %p', ({ index, append, drive }) => {
+        const command = `npmx gpio config drive ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1086,8 +1086,8 @@ Battery models stored in database:
                 ])
                 .flat()
         ).flat()
-    )('npmx gpio debounce %p', ({ index, append, debounce }) => {
-        const command = `npmx gpio debounce ${append}`;
+    )('npmx gpio config debounce %p', ({ index, append, debounce }) => {
+        const command = `npmx gpio config debounce ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1117,8 +1117,8 @@ Battery models stored in database:
                 ])
                 .flat()
         ).flat()
-    )('npmx gpio open_drain %p', ({ index, append, openDrain }) => {
-        const command = `npmx gpio open_drain ${append}`;
+    )('npmx gpio config open_drain %p', ({ index, append, openDrain }) => {
+        const command = `npmx gpio config open_drain ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 

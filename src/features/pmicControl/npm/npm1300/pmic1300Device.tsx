@@ -209,7 +209,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     });
 
                     shellParser?.enqueueRequest(
-                        'npmx errlog check',
+                        'npmx errlog get',
                         {
                             onSuccess: res => {
                                 let errors: string[] = [];

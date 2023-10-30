@@ -35,7 +35,7 @@ export const buckGet = (
     buckRetentionControl: (index: number) =>
         sendCommand(`npmx buck gpio retention get ${index}`),
     buckEnabled: (index: number) =>
-        sendCommand(`npmx buck status power get ${index}`),
+        sendCommand(`npmx buck status all get ${index}`),
     buckActiveDischarge: (index: number) =>
         sendCommand(`npmx buck active_discharge get ${index}`),
 });
@@ -307,7 +307,7 @@ export const buckSet = (
                     resolve();
                 } else {
                     sendCommand(
-                        `npmx buck status power set ${index} ${
+                        `npmx buck status all set ${index} ${
                             enabled ? '1' : '0'
                         }`,
                         () => resolve(),

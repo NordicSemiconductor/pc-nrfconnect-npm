@@ -21,13 +21,16 @@ export const gpioGet = (
         onError?: (response: string, command: string) => void
     ) => void
 ) => ({
-    gpioMode: (index: number) => sendCommand(`npmx gpio mode get ${index}`),
-    gpioPull: (index: number) => sendCommand(`npmx gpio pull get ${index}`),
-    gpioDrive: (index: number) => sendCommand(`npmx gpio drive get ${index}`),
+    gpioMode: (index: number) =>
+        sendCommand(`npmx gpio config mode get ${index}`),
+    gpioPull: (index: number) =>
+        sendCommand(`npmx gpio config pull get ${index}`),
+    gpioDrive: (index: number) =>
+        sendCommand(`npmx gpio config drive get ${index}`),
     gpioOpenDrain: (index: number) =>
-        sendCommand(`npmx gpio open_drain get ${index}`),
+        sendCommand(`npmx gpio config open_drain get ${index}`),
     gpioDebounce: (index: number) =>
-        sendCommand(`npmx gpio debounce get ${index}`),
+        sendCommand(`npmx gpio config debounce get ${index}`),
 });
 
 export const gpioSet = (
@@ -55,7 +58,7 @@ export const gpioSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx gpio mode set ${index} ${GPIOModeValues.findIndex(
+                    `npmx gpio config mode set ${index} ${GPIOModeValues.findIndex(
                         m => m === mode
                     )}`,
                     () => resolve(),
@@ -80,7 +83,7 @@ export const gpioSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx gpio pull set ${index} ${GPIOPullValues.findIndex(
+                    `npmx gpio config pull set ${index} ${GPIOPullValues.findIndex(
                         p => p === pull
                     )}`,
                     () => resolve(),
@@ -105,7 +108,7 @@ export const gpioSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx gpio drive set ${index} ${drive}`,
+                    `npmx gpio config drive set ${index} ${drive}`,
                     () => resolve(),
                     () => {
                         gpioDrive(index);
@@ -128,7 +131,7 @@ export const gpioSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx gpio open_drain set ${index} ${
+                    `npmx gpio config open_drain set ${index} ${
                         openDrain ? '1' : '0'
                     }`,
                     () => resolve(),
@@ -153,7 +156,9 @@ export const gpioSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx gpio debounce set ${index} ${debounce ? '1' : '0'}`,
+                    `npmx gpio config debounce set ${index} ${
+                        debounce ? '1' : '0'
+                    }`,
                     () => resolve(),
                     () => {
                         gpioDebounce(index);

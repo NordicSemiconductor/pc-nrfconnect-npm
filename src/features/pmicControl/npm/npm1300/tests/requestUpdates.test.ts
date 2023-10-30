@@ -332,7 +332,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck status power get ${index}`,
+                `npmx buck status all get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -441,7 +441,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio mode get ${index}`,
+            `npmx gpio config mode get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -453,7 +453,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio pull get ${index}`,
+            `npmx gpio config pull get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -465,7 +465,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio drive get ${index}`,
+            `npmx gpio config drive get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -479,7 +479,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio debounce get ${index}`,
+                `npmx gpio config debounce get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -494,7 +494,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio open_drain get ${index}`,
+                `npmx gpio config open_drain get ${index}`,
                 expect.anything(),
                 undefined,
                 true
