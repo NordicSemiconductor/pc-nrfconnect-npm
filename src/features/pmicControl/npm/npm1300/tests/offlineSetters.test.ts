@@ -381,8 +381,8 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ prescaler: 'Fast' });
     });
 
-    test('Set set ship config period ', async () => {
-        await pmic.setTimerConfigPeriod(1000);
+    test('Set set ship config compare ', async () => {
+        await pmic.setTimerConfigCompare(1000);
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ period: 1000 });

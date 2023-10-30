@@ -1189,12 +1189,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
         });
 
-        test('Set timer config period %p', async () => {
-            await pmic.setTimerConfigPeriod(1000);
+        test('Set timer config compare %p', async () => {
+            await pmic.setTimerConfigCompare(1000);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx timer config period set 1000`,
+                `npmx timer config compare set 1000`,
                 expect.anything(),
                 undefined,
                 true
@@ -3041,12 +3041,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.setTimerConfigPeriod(1000)
+                pmic.setTimerConfigCompare(1000)
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx timer config period set 1000`,
+                `npmx timer config compare set 1000`,
                 expect.anything(),
                 undefined,
                 true
@@ -3055,7 +3055,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx timer config period get`,
+                `npmx timer config compare get`,
                 expect.anything(),
                 undefined,
                 true

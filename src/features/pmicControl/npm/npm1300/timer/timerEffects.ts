@@ -22,7 +22,7 @@ export const timerGet = (
 ) => ({
     timerConfigMode: () => sendCommand(`npmx timer config mode get`),
     timerConfigPrescaler: () => sendCommand(`npmx timer config prescaler get`),
-    timerConfigPeriod: () => sendCommand(`npmx timer config period get`),
+    timerConfigCompare: () => sendCommand(`npmx timer config compare get`),
 });
 
 export const timerSet = (
@@ -34,7 +34,7 @@ export const timerSet = (
     ) => void,
     offlineMode: boolean
 ) => {
-    const { timerConfigMode, timerConfigPrescaler, timerConfigPeriod } =
+    const { timerConfigMode, timerConfigPrescaler, timerConfigCompare } =
         timerGet(sendCommand);
 
     const setTimerConfigMode = (mode: TimerMode) =>
@@ -85,7 +85,7 @@ export const timerSet = (
             }
         });
 
-    const setTimerConfigPeriod = (period: number) =>
+    const setTimerConfigCompare = (period: number) =>
         new Promise<void>((resolve, reject) => {
             if (offlineMode) {
                 eventEmitter.emitPartialEvent<TimerConfig>(
@@ -97,10 +97,10 @@ export const timerSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx timer config period set ${period}`,
+                    `npmx timer config compare set ${period}`,
                     () => resolve(),
                     () => {
-                        timerConfigPeriod();
+                        timerConfigCompare();
                         reject();
                     }
                 );
@@ -110,6 +110,6 @@ export const timerSet = (
     return {
         setTimerConfigMode,
         setTimerConfigPrescaler,
-        setTimerConfigPeriod,
+        setTimerConfigCompare,
     };
 };

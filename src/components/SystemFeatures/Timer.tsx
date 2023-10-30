@@ -153,7 +153,7 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
                 value={internalTimerPeriod}
                 onChange={setInternalTimerPeriod}
                 onChangeComplete={v =>
-                    npmDevice.setTimerConfigPeriod(v / prescalerMultiplier)
+                    npmDevice.setTimerConfigCompare(v / prescalerMultiplier)
                 }
             />
         </Card>

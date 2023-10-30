@@ -1282,8 +1282,8 @@ Battery models stored in database:
         }
     );
 
-    test.each([`get`, `set 2800`])('npmx timer config period %p', append => {
-        const command = `npmx timer config period ${append}`;
+    test.each([`get`, `set 2800`])('npmx timer config compare %p', append => {
+        const command = `npmx timer config compare ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 

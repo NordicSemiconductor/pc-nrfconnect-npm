@@ -751,7 +751,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         await timerSet.setTimerConfigPrescaler(
                             config.timerConfig.prescaler
                         );
-                        await timerSet.setTimerConfigPeriod(
+                        await timerSet.setTimerConfigCompare(
                             config.timerConfig.period
                         );
 

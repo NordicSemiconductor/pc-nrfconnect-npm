@@ -574,12 +574,12 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test('Request update timerConfigPeriod', () => {
-        pmic.requestUpdate.timerConfigPeriod();
+    test('Request update timerConfigCompare', () => {
+        pmic.requestUpdate.timerConfigCompare();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx timer config period get`,
+            `npmx timer config compare get`,
             expect.anything(),
             undefined,
             true
