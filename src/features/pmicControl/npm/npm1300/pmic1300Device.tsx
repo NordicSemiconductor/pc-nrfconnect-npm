@@ -503,7 +503,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         for (let i = 0; i < devices.noOfLEDs; i += 1) {
             releaseAll.push(
                 shellParser.registerCommandCallback(
-                    toRegex('npmx leds mode', true, i, '[0-3]'),
+                    toRegex('npmx led mode', true, i, '[0-3]'),
                     res => {
                         const mode = LEDModeValues[parseToNumber(res)];
                         if (mode) {
@@ -551,7 +551,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 resolve();
             } else {
                 sendCommand(
-                    `npmx leds mode set ${index} ${LEDModeValues.findIndex(
+                    `npmx led mode set ${index} ${LEDModeValues.findIndex(
                         m => m === mode
                     )}`,
                     () => resolve(),
@@ -587,7 +587,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         ...buckGet,
 
-        ledMode: (index: number) => sendCommand(`npmx leds mode get ${index}`),
+        ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
 
         ...ldoGet,
         ...gpioGet,

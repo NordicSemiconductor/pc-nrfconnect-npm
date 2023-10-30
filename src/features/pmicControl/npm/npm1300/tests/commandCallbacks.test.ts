@@ -1155,8 +1155,8 @@ Battery models stored in database:
                 },
             ]).flat()
         ).flat()
-    )('npmx leds mode %p', ({ index, append, mode, modeIndex }) => {
-        const command = `npmx leds mode ${append}`;
+    )('npmx led mode %p', ({ index, append, mode, modeIndex }) => {
+        const command = `npmx led mode ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 

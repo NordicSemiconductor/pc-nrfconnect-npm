@@ -507,7 +507,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx leds mode get ${index}`,
+            `npmx led mode get ${index}`,
             expect.anything(),
             undefined,
             true
