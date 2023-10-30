@@ -14,13 +14,13 @@ export const chargerGet = (
         onError?: (response: string, command: string) => void
     ) => void
 ) => ({
-    pmicChargingState: () => sendCommand('npmx charger status get'),
+    pmicChargingState: () => sendCommand('npmx charger status all get'),
 
     chargerVTerm: () =>
         sendCommand('npmx charger termination_voltage normal get'),
-    chargerIChg: () => sendCommand('npmx charger charger_current get'),
+    chargerIChg: () => sendCommand('npmx charger charging_current get'),
     chargerEnabled: () => sendCommand('npmx charger module charger get'),
-    chargerVTrickleFast: () => sendCommand('npmx charger trickle get'),
+    chargerVTrickleFast: () => sendCommand('npmx charger trickle_voltage get'),
     chargerITerm: () => sendCommand('npmx charger termination_current get'),
     chargerBatLim: () => sendCommand('npmx charger discharging_current get'),
     chargerEnabledRecharging: () =>
@@ -105,7 +105,7 @@ export const chargerSet = (
                 setChargerEnabled(false)
                     .then(() =>
                         sendCommand(
-                            `npmx charger charger_current set ${value}`,
+                            `npmx charger charging_current set ${value}`,
                             () => resolve(),
                             () => {
                                 chargerIChg();
@@ -132,7 +132,7 @@ export const chargerSet = (
                 setChargerEnabled(false)
                     .then(() => {
                         sendCommand(
-                            `npmx charger trickle set ${value * 1000}`,
+                            `npmx charger trickle_voltage set ${value * 1000}`,
                             () => resolve(),
                             () => {
                                 chargerVTrickleFast();

@@ -91,7 +91,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger charger_current set 32`,
+                `npmx charger charging_current set 32`,
                 expect.anything(),
                 undefined,
                 true
@@ -102,7 +102,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             await pmic.setChargerVTrickleFast(2.5);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger trickle set 2500`,
+                `npmx charger trickle_voltage set 2500`,
                 expect.anything(),
                 undefined,
                 true
@@ -1440,7 +1440,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger charger_current get`,
+                `npmx charger charging_current get`,
                 expect.anything(),
                 undefined,
                 true
@@ -1468,7 +1468,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger charger_current set 32`,
+                `npmx charger charging_current set 32`,
                 expect.anything(),
                 undefined,
                 true
@@ -1477,7 +1477,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger charger_current get`,
+                `npmx charger charging_current get`,
                 expect.anything(),
                 undefined,
                 true
@@ -1512,7 +1512,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger trickle get`,
+                `npmx charger trickle_voltage get`,
                 expect.anything(),
                 undefined,
                 true
@@ -1544,7 +1544,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger trickle set 2500`,
+                `npmx charger trickle_voltage set 2500`,
                 expect.anything(),
                 undefined,
                 true
@@ -1553,7 +1553,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger trickle get`,
+                `npmx charger trickle_voltage get`,
                 expect.anything(),
                 undefined,
                 true

@@ -91,16 +91,19 @@ describe('PMIC 1300 - Command callbacks', () => {
         }
     );
 
-    test.each(['get', 'set 400'])('npmx charger charger_current %p', append => {
-        const command = `npmx charger charger_current ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
+    test.each(['get', 'set 400'])(
+        'npmx charger charging_current %p',
+        append => {
+            const command = `npmx charger charging_current ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess('Value: 400 mA', command);
+            callback?.onSuccess('Value: 400 mA', command);
 
-        expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).nthCalledWith(1, { iChg: 400 });
-    });
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).nthCalledWith(1, { iChg: 400 });
+        }
+    );
 
     test.each(['get', 'set 1'])('npmx charger enable recharging %p', append => {
         const command = `npmx charger module recharge ${append}`;
@@ -212,14 +215,10 @@ describe('PMIC 1300 - Command callbacks', () => {
                     append: 'get',
                     value: setValue,
                 },
-                {
-                    append: `set ${setValue}`,
-                    value: setValue,
-                },
             ])
             .flat()
     )('npmx charger status %p', ({ append, value }) => {
-        const command = `npmx charger status ${append}`;
+        const command = `npmx charger status all ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 

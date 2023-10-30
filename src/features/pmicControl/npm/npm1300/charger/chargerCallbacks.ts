@@ -83,7 +83,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger charger_current', true),
+                toRegex('npmx charger charging_current', true),
                 res => {
                     const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
@@ -96,7 +96,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger status', true),
+                toRegex('npmx charger status all get', false),
                 res => {
                     const value = parseToNumber(res);
                     emitOnChargingStatusUpdate(value);
@@ -141,7 +141,12 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger trickle', true, undefined, '(2500|2900)'),
+                toRegex(
+                    'npmx charger trickle_voltage',
+                    true,
+                    undefined,
+                    '(2500|2900)'
+                ),
                 res => {
                     const result = parseToNumber(res) / 1000;
 

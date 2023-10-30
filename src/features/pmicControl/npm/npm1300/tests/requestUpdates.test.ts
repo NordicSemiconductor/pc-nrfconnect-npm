@@ -28,7 +28,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx charger status get',
+            'npmx charger status all get',
             expect.anything(),
             undefined,
             true
@@ -52,7 +52,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx charger charger_current get',
+            'npmx charger charging_current get',
             expect.anything(),
             undefined,
             true
@@ -76,7 +76,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx charger trickle get',
+            'npmx charger trickle_voltage get',
             expect.anything(),
             undefined,
             true
