@@ -17,7 +17,6 @@ import {
 } from '../types';
 
 const toMicro = (value: number) => value * 1000000;
-const toMilli = (value: number) => value * 1000;
 
 const thermistorTypeToOverlay = (value: NTCThermistor) => {
     switch (value) {
@@ -62,10 +61,6 @@ npm1300_ek_charger: charger {
     thermistor-beta = <${charger.ntcBeta}>;
     ${charger.enableRecharging ? '' : '// disable-recharge;'}
     ${charger.enabled ? 'charging-enable;' : ''}
-    thermistor-cold-millidegrees = <${toMilli(charger.tCold)}>;
-    thermistor-cool-millidegrees = <${toMilli(charger.tCool)}>;
-    thermistor-warm-millidegrees = <${toMilli(charger.tWarm)}>;
-    thermistor-hot-millidegrees = <${toMilli(charger.tHot)}>;
 };`
         : '';
 
