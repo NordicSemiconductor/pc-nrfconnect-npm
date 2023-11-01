@@ -54,7 +54,7 @@ npm1300_ek_charger: charger {
     term-microvolt = <${toMicro(charger.vTerm)}>;
     term-warm-microvolt = <${toMicro(charger.vTermR)}>;
     // term-current-percent = <${Number.parseInt(charger.iTerm, 10)}>;
-    current-microamp = <${toMicro(charger.iChg)}>;
+    current-microamp = <${toMicro(charger.iChg / 1000)}>;
     // trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
     dischg-limit-microamp = <1000000>;
     vbus-limit-microamp = <500000>;
