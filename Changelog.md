@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Fixed
 
--   Wrong conversion of value in overlay for for charger current-microamp
+-   Wrong conversion of value in overlay for charger current-microamp
 -   Removed overlay properties for thermistor-cold-millidegrees,
     thermistor-cool-millidegrees, thermistor-warm-millidegrees,
     thermistor-hot-millidegrees as conversion from millidegrees to register
