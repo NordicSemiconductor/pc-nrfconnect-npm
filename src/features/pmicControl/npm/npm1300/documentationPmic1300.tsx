@@ -38,8 +38,8 @@ const buckDoc = (n: number) => ({
                     only).
                 </p>,
                 <p key="p3">
-                    When software is used to set voltage level the range is 1.0
-                    V to 3.3 V, in 100 mV steps.
+                    When software is used to set voltage level, the range is 1.0
+                    V to 3.3 V, in 100-mV steps.
                 </p>,
             ],
         },
@@ -71,7 +71,7 @@ const buckDoc = (n: number) => ({
                 <p key="p1">
                     Active discharge using R
                     <span className="subscript">DISCH</span> from the output
-                    capacitors when converter is disabled.
+                    capacitors when the converter is disabled.
                 </p>,
             ],
         },
@@ -81,12 +81,12 @@ const buckDoc = (n: number) => ({
             title: 'Buck Mode Control',
             content: [
                 <p key="p1">
-                    Configures BUCK mode. The BUCK can be in forced PFM
-                    (hysteretic) mode, forced PWM (pulse width modulation) mode,
-                    or automatic mode (default). In automatic mode the BUCK
-                    selects PFM mode for low load currents, and PWM mode for
+                    Configures BUCK mode. The BUCK can be in the forced PFM
+                    (hysteretic) mode, the forced PWM (pulse width modulation) mode,
+                    or in the automatic mode (default). In the automatic mode, the BUCK
+                    selects the PFM mode for low load currents, and the PWM mode for
                     high load currents, to ensure the highest efficiency across
-                    the whole load current range. PWM mode can be enabled and
+                    the whole load current range. The PWM mode can be enabled and
                     disabled using a GPIO pin if GPIO[n] is selected.
                 </p>,
             ],
@@ -115,7 +115,7 @@ const buckDoc = (n: number) => ({
                     <span className="subscript">{`OUT${n}`}</span> sets the BUCK
                     output voltage level in active/normal mode, while RET
                     <span className="subscript">{`VOUT${n}`}</span> sets the
-                    BUCK output voltage level in retention/sleep mode.
+                    BUCK output voltage level in the retention/sleep mode.
                 </p>,
             ],
         },
@@ -128,7 +128,7 @@ const ldoDoc = () => ({
             title: 'Load Switch/LDO',
             content: [
                 <p key="p1">
-                    The load switch can function either as a switch or an LDO.
+                    The load switch can function as either a switch or an LDO.
                 </p>,
                 <p key="p2">
                     As a switch, it supports an input voltage range from 1.0 V
@@ -137,7 +137,7 @@ const ldoDoc = () => ({
                 <p key="p3">
                     As an LDO, it supports an input voltage range from 2.6 V to
                     5.5 V, and an output voltage range from 1.0 V to 3.3 V, in
-                    100 mV steps up to 50 mA.
+                    100-mV steps and up to 50 mA.
                 </p>,
             ],
         },
@@ -154,7 +154,7 @@ const ldoDoc = () => ({
         },
         {
             title: 'Range',
-            content: [<p key="p1">1.0 V to 3.3 V in 100 mV steps</p>],
+            content: [<p key="p1">1.0 V to 3.3 V, in 100-mV steps</p>],
         },
     ],
     SoftStartEnable: [
@@ -162,7 +162,7 @@ const ldoDoc = () => ({
             title: 'Soft Start Enable',
             content: [
                 <p key="p1">
-                    Limit load switch current for 1.8 ms when load switch is
+                    Limit the load switch current for 1.8 ms when the load switch is
                     enabled.
                 </p>,
             ],
@@ -171,7 +171,7 @@ const ldoDoc = () => ({
     SoftStartCurrent: [
         {
             title: 'Soft Start Current',
-            content: [<p key="p1">Soft start current limit.</p>],
+            content: [<p key="p1">The current limit for the soft start.</p>],
         },
     ],
     ActiveDischarge: [
@@ -180,7 +180,7 @@ const ldoDoc = () => ({
             content: [
                 <p key="p1">
                     Active discharge using R
-                    <span className="subscript">LSPD</span> when load switch is
+                    <span className="subscript">LSPD</span> when the load switch is
                     disabled.
                 </p>,
             ],
@@ -195,19 +195,19 @@ const gpioDoc = (n: number) => ({
             content: [
                 <p key="p1">Selects the GPIO mode. Available options are:</p>,
                 <p key="p2">
-                    <strong>Input</strong> – In this mode {`GPIO${n}`} is used
+                    <strong>Input</strong> – In this mode,{' '}{`GPIO${n}`} is used
                     to control the BUCKs or Load Switches. Refer to the
                     respective controls to configure what {`GPIO${n}`} should
                     control. The {`GPIO${n}`} can also be used as a
                     general-purpose input in this mode.
                 </p>,
                 <p key="p3">
-                    <strong>Input Rising Edge</strong> – In this mode{' '}
-                    {`GPIO${n}`} is used to generate an event on rising edge.
+                    <strong>Input Rising Edge</strong> – In this mode,{' '}
+                    {`GPIO${n}`} is used to generate an event on the rising edge.
                 </p>,
                 <p key="p4">
-                    <strong>Input Falling Edge</strong> – In this mode{' '}
-                    {`GPIO${n}`} is used to generate an event on falling edge.
+                    <strong>Input Falling Edge</strong> – In this mode,{' '}
+                    {`GPIO${n}`} is used to generate an event on the falling edge.
                 </p>,
                 <p key="p5">
                     <strong>Output High</strong> – Sets {`GPIO${n}`} output
@@ -218,17 +218,17 @@ const gpioDoc = (n: number) => ({
                 </p>,
                 <p key="p7">
                     <strong>Output Interrupt</strong> – Configures {`GPIO${n}`}{' '}
-                    to issue an interrupt. Requires wanted interrupts to be
+                    to issue an interrupt. The wanted interrupts must be
                     enabled in “Interrupt Configuration”.
                 </p>,
                 <p key="p8">
                     <strong>Output Reset</strong> – Configure {`GPIO${n}`} as
-                    Reset (NRESETOUT from watchdog.
+                    Reset (NRESETOUT) from the watchdog.
                 </p>,
                 <p key="p9">
                     <strong>Output POF</strong> – Configure {`GPIO${n}`} to
                     issue a warning when a power loss occurs. Requires POF
-                    warning to be enabled
+                    warning to be enabled.
                 </p>,
             ],
         },
@@ -299,8 +299,8 @@ export const documentation: Documentation = {
                         intended to be used for accurate current measurements.
                     </p>,
                     <p key="p3">
-                        A positive value indicates a load on the battery - it is
-                        discharging, while a negative value indicates that the
+                        A positive value indicates a load on the battery (it is
+                        discharging), while a negative value indicates that the
                         battery is being charged.
                     </p>,
                 ],
@@ -364,13 +364,13 @@ export const documentation: Documentation = {
                     <p key="p1">
                         When V<span className="subscript">BAT</span> reaches V
                         <span className="subscript">TERM </span>
-                        constant voltage, charging starts. The battery voltage
+                        constant voltage, the charging starts. The battery voltage
                         is maintained at V
                         <span className="subscript">TERM </span>
                         while monitoring current flow into the battery. When
-                        current into the battery drops below I
+                        the current into the battery drops below I
                         <span className="subscript">TERM</span> (by default 10%
-                        of I<span className="subscript">CHG</span>) charging is
+                        of I<span className="subscript">CHG</span>), the charging is
                         complete.
                     </p>,
                     <p key="p2">N/A: Charger is not charging.</p>,
@@ -390,8 +390,8 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Load profile and rate of change of state-of-charge is
-                        used to estimate time until battery is full, in hours
+                        Load profile and the rate of change of state-of-charge are
+                        used to estimate the time until the battery is full, in hours
                         and minutes.
                     </p>,
                 ],
@@ -408,8 +408,8 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Load profile and rate of change of state-of-charge is
-                        used to estimate time until battery is empty, in hours
+                        Load profile and the rate of change of state-of-charge are
+                        used to estimate the time until the battery is empty, in hours
                         and minutes.
                     </p>,
                 ],
@@ -421,7 +421,7 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Battery voltage, current, and temperature are used to
-                        calculate the battery state-of-charge.
+                        calculate the battery’s state-of-charge.
                     </p>,
                 ],
             },
@@ -435,7 +435,7 @@ export const documentation: Documentation = {
                     <p key="p1">
                         The nPM1300 fuel gauge algorithm adjusts to correct for
                         possible initialization errors due to a stressed
-                        battery, or unexpected reset conditions. Typically the
+                        battery or unexpected reset conditions. Typically, the
                         impact of these errors is minor and the predictions will
                         converge to an accurate value within a few minutes of
                         normal operation.
@@ -464,7 +464,7 @@ export const documentation: Documentation = {
                     <p key="p1">
                         The nPM1300 fuel gauge algorithm adjusts to correct for
                         possible initialization errors due to a stressed
-                        battery, or unexpected reset conditions. Typically the
+                        battery or unexpected reset conditions. Typically, the
                         impact of these errors is minor and the predictions will
                         converge to an accurate value within a few minutes of
                         normal operation.
@@ -505,7 +505,7 @@ export const documentation: Documentation = {
                         Threshold to trigger a power failure.
                         <br />
                         <br />
-                        Range 2.6V to 3.5V in 100mV steps.
+                        Range: 2.6 V to 3.5 V, in 100-mV steps.
                     </p>,
                 ],
             },
@@ -532,10 +532,10 @@ export const documentation: Documentation = {
                         timer clock, fTIMER, and has a prescaler. TIMER only
                         runs one timer at a time because it is shared for all
                         functions. The wake-up timer is intended for use during
-                        Hibernate mode to wake the system at a programmable
-                        interval. The watchdog timer and general purpose timer
-                        are to be used when the system is not in ship or
-                        hibernate mode.
+                        the Hibernate Mode to wake the system up at a programmable
+                        interval. The watchdog timer and the general purpose timer
+                        are to be used when the system is not in the Ship Mode or the
+                        Hibernate Mode.
                     </p>,
                 ],
             },
@@ -550,7 +550,7 @@ export const documentation: Documentation = {
                         <br />• General purpose timer
                         <br />• Watchdog warning
                         <br />• Watchdog reset
-                        <br />• Wake-up timer (Hibernate mode)
+                        <br />• Wake-up timer (Hibernate Mode)
                         <br />• Boot monitor
                     </p>,
                 ],
@@ -561,8 +561,8 @@ export const documentation: Documentation = {
                 title: 'Time Prescaler',
                 content: [
                     <p key="p1">
-                        Configure timer prescaler. Fast uses a 2ms prescaler,
-                        while slow uses a 16ms prescaler.
+                        Configure timer prescaler. The fast one uses a 2-ms prescaler,
+                        while the slow one uses a 16-ms prescaler.
                     </p>,
                 ],
             },
@@ -572,11 +572,11 @@ export const documentation: Documentation = {
                 title: 'Time Period',
                 content: [
                     <p key="p1">
-                        Configure timer period.
+                        Configure the timer period.
                         <br />
                         <br />
-                        Range is 2ms to 9 hours in 2ms steps in fast mode, and
-                        16ms to 3 days in 16ms steps in slow mode.
+                        Range is 2 ms to 9 hours in 2-ms steps in the fast mode, and
+                        16 ms to 3 days in 16-ms steps in the slow mode.
                     </p>,
                 ],
             },
@@ -588,7 +588,7 @@ export const documentation: Documentation = {
                 title: 'SHPHLD pin polarity',
                 content: [
                     <p key="p1">
-                        Configures polarity of the SHPHLD pin, either Active Low
+                        Configure polarity of the SHPHLD pin, either Active Low
                         or Active High.
                     </p>,
                 ],
@@ -623,9 +623,9 @@ export const documentation: Documentation = {
                 title: 'Enter Ship Mode',
                 content: [
                     <p key="p1">
-                        Device enters ship mode, isolating the battery from the
-                        system to minimize quiescent current. Device wakes up
-                        from ship mode either by pulling pin SHPHLD low for a
+                        Activate the Ship Mode, isolating the battery from the
+                        system to minimize quiescent current. The device wakes up
+                        from the Ship Mode either by pulling pin SHPHLD low for a
                         minimum period of t
                         <span className="subscript">ShipToActive</span> or by
                         connecting USB PMIC.
@@ -636,7 +636,7 @@ export const documentation: Documentation = {
                         <br />
                         <br />
                         USB PMIC cable needs to be disconnected for the device
-                        to enter ship mode.
+                        to enter the Ship Mode.
                     </p>,
                 ],
             },
@@ -646,12 +646,12 @@ export const documentation: Documentation = {
                 title: 'Enter Hibernation Mode',
                 content: [
                     <p key="p1">
-                        Device enters hibernate mode, isolating the battery from
-                        the system to minimize quiescent current. Device wakes
-                        up from hibernate mode either by pulling pin SHPHLD low
+                        Activate the Hibernate Mode, isolating the battery from
+                        the system to minimize quiescent current. The device wakes
+                        up from the Hibernate Mode either by pulling the pin SHPHLD low
                         for a minimum period of t
                         <span className="subscript">ShipToActive</span>, by
-                        connecting USB PMIC or from a wakeup timer (if
+                        connecting USB PMIC, or from a wake-up timer (if
                         configured).
                         <br />
                         <br />
@@ -660,7 +660,7 @@ export const documentation: Documentation = {
                         <br />
                         <br />
                         USB PMIC cable needs to be disconnected for the device
-                        to enter ship mode.
+                        to enter the Ship Mode.
                     </p>,
                 ],
             },
@@ -678,9 +678,9 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         The VBUS input current limiter manages VBUS current
-                        limitation and charger detection for USB Type- C
+                        limitation and charger detection for USB Type-C
                         compatible chargers. USB PMIC needs to be disconnected
-                        for the device to enter ship mode.
+                        for the device to enter the Ship Mode.
                     </p>,
                 ],
             },
@@ -690,16 +690,16 @@ export const documentation: Documentation = {
                 title: 'USB Detect Status',
                 content: [
                     <p key="p1">
-                        When the device is plugged into a wall adaptor or USB
-                        power source, USB port detection runs automatically to
+                        When the device is plugged into a wall adaptor or an USB
+                        power source, the USB port detection runs automatically to
                         detect the USB port max current capabilities.
                         <br />
                         <br />
-                        The available USB detect status’ are:
+                        The available USB detect statuses are:
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>USB 100/500 mA</li>
-                            <li>1.5A High Power</li>
-                            <li>3A High Power</li>
+                            <li>1.5 A High Power</li>
+                            <li>3 A High Power</li>
                             <li>No USB connection</li>
                         </ul>
                     </p>,
@@ -713,7 +713,7 @@ export const documentation: Documentation = {
                     <p key="p1">
                         There are two USB compliant, accurate current limits:
                         IBUS100MA (100 mA) and IBUS500MA (500 mA). In addition,
-                        there are current limits in 100 mA steps from 600 mA to
+                        there are current limits in 100-mA steps from 600 mA to
                         1500 mA. The 1500 mA limit is compatible with USB
                         Type-C. The default current limit is IBUS100MA (100 mA).
                     </p>,
@@ -727,7 +727,7 @@ export const documentation: Documentation = {
                 title: 'Charger',
                 content: [
                     <p key="p1">
-                        JEITA compliant linear charger for Li-ion, Li-poly, and
+                        JEITA-compliant linear charger for Li-ion, Li-poly, and
                         LiFePO4 battery chemistries. Bidirectional power FET for
                         dynamic power-path management.
                     </p>,
@@ -758,7 +758,7 @@ export const documentation: Documentation = {
                 title: 'Range',
                 content: [
                     <p key="p1">
-                        3.50 V to 3.65 V, and 4.00 V to 4.45 V, in 50mV steps
+                        3.50 V to 3.65 V, and 4.00 V to 4.45 V, in 50-mV steps.
                     </p>,
                 ],
             },
@@ -781,7 +781,7 @@ export const documentation: Documentation = {
             },
             {
                 title: 'Range',
-                content: [<p key="p1">32 mA to 800 mA, in 2 mA steps</p>],
+                content: [<p key="p1">32 mA to 800 mA, in 2 mA steps.</p>],
             },
         ],
         EnableRecharging: [
@@ -789,11 +789,11 @@ export const documentation: Documentation = {
                 title: 'Enable Recharging',
                 content: [
                     <p key="p1">
-                        After charging is completed and V
+                        After the charging is completed and V
                         <span className="subscript">BAT</span> decreases below V
                         <span className="subscript">RECHARGE</span> (95% of V
-                        <span className="subscript">TERM</span>) automatic
-                        recharge is started, if enabled (and if charger is
+                        <span className="subscript">TERM</span>), the automatic
+                        recharge is started, if enabled (and if the charger is
                         enabled).
                     </p>,
                 ],
@@ -809,12 +809,12 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Sets the charging termination current level as a % of I
+                        Sets the charging termination current level as a percent of I
                         <span className="subscript">CHG</span>, either 10%
                         (default) or 20%. When the charging mode is “Constant
                         Voltage”, the current flow into the battery is
                         monitored. When the current drops below I
-                        <span className="subscript">TERM</span> , charging is
+                        <span className="subscript">TERM</span>, the charging is
                         complete.
                     </p>,
                 ],
@@ -854,7 +854,7 @@ export const documentation: Documentation = {
                 title: 'Charger Thermal Regulation',
                 content: [
                     <p key="p1">
-                        Configures the die temperature monitoring which is
+                        Configures the die temperature monitoring, which is
                         active during charging.
                     </p>,
                 ],
@@ -898,8 +898,8 @@ export const documentation: Documentation = {
                         <span className="subscript">CHGSTOP</span>.
                     </p>,
                     <p key="p2">
-                        <strong>Green light:</strong> Charger charging if
-                        charging is enabled, temperature below T
+                        <strong>Green light:</strong> Charging ongoing (if
+                         enabled), temperature below T
                         <span className="subscript">CHGRESUME</span>.
                     </p>,
                 ],
@@ -914,7 +914,7 @@ export const documentation: Documentation = {
                     <p key="p1">
                         This section configures the different battery
                         temperature thresholds according to JEITA. The default
-                        values matches the JEITA guideline.
+                        values match the JEITA guidelines.
                     </p>,
                 ],
             },
@@ -929,7 +929,7 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Set termination voltage for the “Warm” temperature
+                        Set the termination voltage for the “Warm” temperature
                         region. Can be set equal to V
                         <span className="subscript">TERM</span> if reduced
                         termination voltage in “Warm” temperature region is not
@@ -988,7 +988,7 @@ export const documentation: Documentation = {
             {
                 title: 'LEDs',
                 content: [
-                    <p key="p1">nPM1300 have 3 5mA LED drivers.</p>,
+                    <p key="p1">nPM1300 have three 5-mA LED drivers.</p>,
                     <p key="p2">
                         These can be configured as:
                         <ul className="tw-ml-6 tw-list-disc">
@@ -1016,28 +1016,27 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         <ul className="tw-ml-6 tw-list-disc">
-                            <li>SHIPMODEXIT: Reset caused by shipmode exit.</li>
+                            <li>SHIPMODEXIT: Exit the Ship Mode.</li>
                             <li>
-                                BOOTMONITORTIMEOUT: Reset caused by boot monitor
+                                BOOTMONITORTIMEOUT: Boot monitor
                                 timeout.
                             </li>
                             <li>
-                                WATCHDOGTIMEOUT: Reset caused by watchdog
+                                WATCHDOGTIMEOUT: Watchdog
                                 timeout.
                             </li>
                             <li>
-                                LONGPRESSTIMEOUT: Reset caused by SHPHLD long
-                                press.
+                                LONGPRESSTIMEOUT: Long press of the SHPHLD/RESET button.
                             </li>
                             <li>
-                                THERMASHUTDOWN: Reset caused by thermal
+                                THERMASHUTDOWN: Thermal
                                 shutdown.
                             </li>
                             <li>
-                                VSYSLOW: Reset caused by POF (Power Failure) or
+                                VSYSLOW: POF (Power Failure) or
                                 V<span className="subscript">SYS</span> low.
                             </li>
-                            <li>SWRESET: Reset caused by a software reset.</li>
+                            <li>SWRESET: Software reset.</li>
                         </ul>
                     </p>,
                 ],
@@ -1150,10 +1149,10 @@ export const documentation: Documentation = {
                         estimation across voltage, current, and temperature
                         range for the specific battery used. The result of the
                         battery profiling is a battery model. To evaluate the
-                        battery model in nPM PowerUP use the 'Write Battery
+                        battery model in nPM PowerUP, use the 'Write Battery
                         Model' option to upload the battery model .json file. To
                         continue development and implementation on your own
-                        design use the battery model .inc file. Refer to NCS
+                        design, use the battery model .inc file. See the NCS
                         documentation for more details: `}
                         <ExternalLink
                             label=" nPM1300: Fuel gauge — nRF Connect SDK 2.4.99 documentation"
@@ -1181,7 +1180,7 @@ export const documentation: Documentation = {
                         <br />
                         <br />
                         For more details on how to import the overlay file to
-                        nRF Connect SDK please refer to{' '}
+                        the nRF Connect SDK, see{' '}
                         <ExternalLink
                             label="Importing an overlay from nPM PowerUP"
                             href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/device_guides/working_with_pmic/npm1300/developing.html"
@@ -1217,10 +1216,9 @@ export const documentation: Documentation = {
                 title: 'Record Events',
                 content: [
                     <p key="p1">
-                        Records all terminal log events, including commands
+                        Records all terminal log events in CSV files, including commands
                         executed, battery voltage, current temperature, voltage,
-                        state-of-charge, time to empty and time to full in csv
-                        files.
+                        state-of-charge, time to empty, and time to full.
                     </p>,
                 ],
             },
@@ -1254,8 +1252,8 @@ export const documentation: Documentation = {
                 title: 'Temperature',
                 content: [
                     <p key="p1">
-                        The battery profiling temperatures. Temperatures between
-                        0°C to 60°C, in steps of 1°C, are supported.
+                        The battery profiling temperatures. Supported remperatures range from
+                        0°C to 60°C, in steps of 1°C.
                     </p>,
                     <p key="p2">
                         {' '}
