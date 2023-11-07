@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { App, render } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import usageData from '@nordicsemiconductor/pc-nrfconnect-shared/src/utils/usageData';
 
 import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
@@ -23,9 +24,10 @@ import NpmGenericDialog from './features/pmicControl/npm/NpmGenericDialog';
 
 import './index.scss';
 
+usageData.enableTelemetry();
+
 render(
     <App
-        reportUsageData
         appReducer={appReducer}
         deviceSelect={<DeviceSelector />}
         sidePanel={

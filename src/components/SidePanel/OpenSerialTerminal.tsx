@@ -63,7 +63,6 @@ const openSerialTerminal = (device: Device, serialPortPath: string) => {
         { name: 'pc-nrfconnect-serial-terminal', source: 'official' },
         {
             device: {
-                serialNumber: device.serialNumber,
                 serialPortPath,
             },
         }
