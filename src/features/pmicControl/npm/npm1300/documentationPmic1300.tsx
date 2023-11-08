@@ -1019,7 +1019,7 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         <ul className="tw-ml-6 tw-list-disc">
-                            <li>SHIPMODEXIT: Exit the Ship Mode.</li>
+                            <li>SHIPMODEXIT: Ship Mode exit.</li>
                             <li>BOOTMONITORTIMEOUT: Boot monitor timeout.</li>
                             <li>WATCHDOGTIMEOUT: Watchdog timeout.</li>
                             <li>
