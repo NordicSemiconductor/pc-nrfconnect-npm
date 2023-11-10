@@ -34,8 +34,9 @@ interface LdoCardProperties {
     defaultSummary?: boolean;
 }
 
-const softStartItems = SoftStartValues.map(item => ({
-    label: `${item} mA`,
+const tempSoftStartValues = [10, 20, 35, 50];
+const softStartItems = SoftStartValues.map((item, index) => ({
+    label: `${tempSoftStartValues[index]} mA`,
     value: `${item}`,
 }));
 
