@@ -139,21 +139,6 @@ export default ({
 
             {!summary && (
                 <>
-                    <Toggle
-                        label={
-                            <DocumentationTooltip
-                                card={card}
-                                item="SoftStartEnable"
-                            >
-                                Soft Start Enable
-                            </DocumentationTooltip>
-                        }
-                        isToggled={ldo.softStartEnabled}
-                        onToggle={value =>
-                            npmDevice.setLdoSoftStartEnabled(index, value)
-                        }
-                        disabled={disabled || ldo.mode === 'LDO'}
-                    />
                     <Dropdown
                         label={
                             <DocumentationTooltip
