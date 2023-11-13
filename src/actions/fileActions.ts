@@ -6,6 +6,7 @@
 
 import { dialog, getCurrentWindow } from '@electron/remote';
 import { AppThunk } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import usageData from '@nordicsemiconductor/pc-nrfconnect-shared/src/utils/usageData';
 import {
     OpenDialogOptions,
     OpenDialogReturnValue,
@@ -43,6 +44,10 @@ const saveSettings =
                 currentState.fuelGaugeChargingSamplingRate,
             usbPower: currentState.usbPower,
         };
+
+        usageData.sendUsageData('Export Configuartion', {
+            config: out,
+        });
 
         if (filePath.endsWith('.json')) {
             fs.writeFileSync(filePath, JSON.stringify(out, null, 2));
