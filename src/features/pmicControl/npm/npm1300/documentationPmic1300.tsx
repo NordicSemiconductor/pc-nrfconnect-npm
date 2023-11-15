@@ -1019,7 +1019,7 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         <ul className="tw-ml-6 tw-list-disc">
-                            <li>SHIPMODEXIT: Ship Mode exit.</li>
+                            <li>SHIPMODEXIT: Reset by Ship Mode exit.</li>
                             <li>BOOTMONITORTIMEOUT: Boot monitor timeout.</li>
                             <li>WATCHDOGTIMEOUT: Watchdog timeout.</li>
                             <li>
@@ -1067,39 +1067,37 @@ export const documentation: Documentation = {
                 title: 'Sensor Errors',
                 content: [
                     <p key="p1">
-                        SENSORVTRICKLE: Vtrickle sensor value during error.
-                        SENSORVBATLOW: VbatLow sensor value during error.
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>
-                                SENSORNTCCOLD: NTC thermistor Cold sensor value
-                                during error.
+                                SENSORNTCCOLD: Error triggered by NTC thermistor
+                                Cold sensor value.
                             </li>
                             <li>
-                                SENSORNTCCOOL: NTC thermistor Cool sensor value
-                                during error.
+                                SENSORNTCCOOL: Error triggered by NTC thermistor
+                                Cool sensor value.
                             </li>
                             <li>
-                                SENSORNTCHOT: NTC thermistor Hot sensor value
-                                during error.
+                                SENSORNTCHOT: Error triggered by NTC thermistor
+                                Hot sensor value.
                             </li>
                             <li>
-                                SENSORVTERM: V
+                                SENSORVTERM: Error triggered by V
                                 <span className="subscript">term</span> sensor
-                                value during error.
+                                value.
                             </li>
                             <li>
-                                SENSORRECHARGE: Recharge sensor value during
-                                error.
+                                SENSORRECHARGE: Error triggered by Recharge
+                                sensor value.
                             </li>
                             <li>
-                                SENSORVTRICKLE: V
+                                SENSORVTRICKLE: Error triggered by V
                                 <span className="subscript">trickle</span>{' '}
-                                sensor value during error.
+                                sensor value.
                             </li>
                             <li>
-                                SENSORVBATLOW: V
+                                SENSORVBATLOW: Error triggered by V
                                 <span className="subscript">batLow</span> sensor
-                                value during error.
+                                value.
                             </li>
                         </ul>
                     </p>,
