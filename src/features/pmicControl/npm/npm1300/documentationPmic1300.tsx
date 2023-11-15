@@ -488,8 +488,8 @@ export const documentation: Documentation = {
                         drops below VSYS<span className="subscript">POF</span>{' '}
                         threshold. The POF does not reset the system, but gives
                         the CPU time to prepare for an orderly power-down.
-                        <br />
-                        <br />
+                    </p>,
+                    <p key="p2">
                         Enable GPIO Mode “Output power loss warning” for the
                         desired GPIO in the GPIOS tab.
                     </p>,
@@ -504,12 +504,8 @@ export const documentation: Documentation = {
                     </>
                 ),
                 content: [
-                    <p key="p1">
-                        Threshold to trigger a power failure.
-                        <br />
-                        <br />
-                        Range: 2.6 V to 3.5 V, in 100-mV steps.
-                    </p>,
+                    <p key="p1">Threshold to trigger a power failure.</p>,
+                    <p key="p2">Range: 2.6 V to 3.5 V, in 100-mV steps.</p>,
                 ],
             },
         ],
@@ -550,11 +546,13 @@ export const documentation: Documentation = {
                     <p key="p1">
                         TIMER can be used in different ways, depending on
                         configuration.
-                        <br />• General purpose timer
-                        <br />• Watchdog warning
-                        <br />• Watchdog reset
-                        <br />• Wake-up timer (Hibernate Mode)
-                        <br />• Boot monitor
+                        <ul className="tw-ml-6 tw-list-disc">
+                            <li>General purpose timer</li>
+                            <li>Watchdog warning</li>
+                            <li>Watchdog reset</li>
+                            <li>Wake-up timer (Hibernate Mode)</li>
+                            <li>Boot monitor</li>
+                        </ul>
                     </p>,
                 ],
             },
@@ -574,10 +572,8 @@ export const documentation: Documentation = {
             {
                 title: 'Time Period',
                 content: [
-                    <p key="p1">
-                        Configure the timer period.
-                        <br />
-                        <br />
+                    <p key="p1">Configure the timer period.</p>,
+                    <p key="p2">
                         Range is 2 ms to 9 hours in 2-ms steps in the fast mode,
                         and 16 ms to 3 days in 16-ms steps in the slow mode.
                     </p>,
@@ -632,12 +628,12 @@ export const documentation: Documentation = {
                         for a minimum period of t
                         <span className="subscript">ShipToActive</span> or by
                         connecting USB PMIC.
-                        <br />
-                        <br />
+                    </p>,
+                    <p key="p2">
                         On the nPM1300-EK, press the button marked SHPHLD/RESET
                         to wake up the device.
-                        <br />
-                        <br />
+                    </p>,
+                    <p key="p3">
                         USB PMIC cable needs to be disconnected for the device
                         to enter the Ship Mode.
                     </p>,
@@ -656,12 +652,12 @@ export const documentation: Documentation = {
                         <span className="subscript">ShipToActive</span>, by
                         connecting USB PMIC, or from a wake-up timer (if
                         configured).
-                        <br />
-                        <br />
+                    </p>,
+                    <p key="p2">
                         On the nPM1300-EK, press the button marked SHPHLD/RESET
                         to wake up the device.
-                        <br />
-                        <br />
+                    </p>,
+                    <p key="p3">
                         USB PMIC cable needs to be disconnected for the device
                         to enter the Ship Mode.
                     </p>,
@@ -696,8 +692,8 @@ export const documentation: Documentation = {
                         When the device is plugged into a wall adaptor or an USB
                         power source, the USB port detection runs automatically
                         to detect the USB port max current capabilities.
-                        <br />
-                        <br />
+                    </p>,
+                    <p key="p2">
                         The available USB detect statuses are:
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>USB 100/500 mA</li>
@@ -960,11 +956,9 @@ export const documentation: Documentation = {
             {
                 title: 'Default NTC Beta',
                 content: [
-                    <p key="p1">
-                        Use default value for NTC Beta
-                        <br />
-                        <br />
-                        Default:
+                    <p key="p1">Use default value for NTC Beta.</p>,
+                    <p key="p2">
+                        Defaults:
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>10 kΩ: 3380</li>
                             <li>47 kΩ: 4050</li>
@@ -1170,8 +1164,8 @@ export const documentation: Documentation = {
                         Connect SDK project, or .json to save the nPM PowerUP
                         configuration for later use in nPM PowerUP using the
                         &quot;Load Configuration&quot; option.
-                        <br />
-                        <br />
+                    </p>,
+                    <p key="p2">
                         For more details on how to import the overlay file to
                         the nRF Connect SDK, see{' '}
                         <ExternalLink
