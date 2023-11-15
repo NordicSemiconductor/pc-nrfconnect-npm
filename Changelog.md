@@ -10,8 +10,9 @@ and this project adheres to
 
 ### Changed
 
--   nPM PowerUp now uses nrfutil device 2.0.2
--   Soft Start Current range is now at 10mA 20mA 35mA 50mA
+-   nPM PowerUp now uses nrfutil device v2.0.3
+-   Soft Start Current range is now at 10mA 20mA 35mA 50mA.
+-   Tooltip text has been improved.
 
 ### Removed
 
