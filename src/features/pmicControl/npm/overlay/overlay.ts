@@ -72,7 +72,11 @@ npm1300_ek_buck${index + 1}: BUCK${index + 1} {
     regulator-max-microvolt = <${toMicro(
         npmDevice.getBuckVoltageRange(index).max
     )}>;
-    regulator-init-microvolt =  <${toMicro(buck.vOutNormal)}>;
+    ${
+        buck.mode !== 'vSet'
+            ? `regulator-init-microvolt =  <${toMicro(buck.vOutNormal)}>;`
+            : ''
+    }
     retention-microvolt = <${toMicro(buck.vOutRetention)}>;
     ${
         buck.onOffControl !== 'Off'
@@ -106,6 +110,11 @@ npm1300_ek_ldo${index + 1}: LDO${index + 1} {
     regulator-max-microvolt = <${toMicro(
         npmDevice.getLdoVoltageRange(index).max
     )}>;
+    ${
+        ldo.mode === 'LDO'
+            ? `regulator-init-microvolt = <${toMicro(ldo.voltage)}>;`
+            : ''
+    }
     regulator-initial-mode = <${
         ldo.mode === 'LDO' ? 'NPM1300_LDSW_MODE_LDO' : 'NPM1300_LDSW_MODE_LDSW'
     }>;
@@ -116,6 +125,7 @@ npm1300_ek_ldo${index + 1}: LDO${index + 1} {
               )} GPIO_ACTIVE_HIGH>;`
             : ''
     }
+    ${ldo.enabled ? 'regulator-boot-on;' : ''}
 };
 `;
 
