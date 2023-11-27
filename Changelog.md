@@ -8,11 +8,20 @@ and this project adheres to
 
 ## 1.1.0 - UNRELEASED
 
+### Added
+
+-   Added `regular-init-microvolt` and `regulator-boot-enable` to NCS overlay.
+
 ### Changed
 
 -   nPM PowerUp now uses nrfutil device v2.0.3
 -   Soft Start Current range is now at 10mA 20mA 35mA 50mA.
 -   Tooltip text has been improved.
+-   `Export configuration` file save dialog now has default filename.
+
+### Fixed
+
+-   Removed `regulator-init-microvolt` from NCS overlay if `VSETn` is selected.
 
 ### Removed
 
