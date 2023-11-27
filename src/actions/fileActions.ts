@@ -153,6 +153,7 @@ export const selectDirectoryDialog = () =>
 export const saveFileDialog = (): AppThunk => dispatch => {
     showSaveDialog({
         title: 'Save Device Settings',
+        defaultPath: 'config.overlay',
         filters: [
             {
                 name: 'Overlay',
