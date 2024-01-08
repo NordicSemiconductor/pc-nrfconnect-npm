@@ -6,11 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.1.1 - 2023-12-14
+## 1.1.1 - 2024-01-08
 
 ## Added
 
--   Persist state of `show log` panel
+-   Persist state of `show log` panel.
+
+### Fixed
+
+-   Duplication of the events sent by analytics.
 
 ## 1.1.0 - 2023-12-07
 
