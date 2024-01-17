@@ -258,7 +258,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx buck vout select get ${index}`,
+            `npmx buck vout_select get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -272,7 +272,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio pwm_force get ${index}`,
+                `npmx buck gpio pwm_force index get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -287,7 +287,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio on_off get ${index}`,
+                `npmx buck gpio on_off index get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -332,7 +332,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck status all get ${index}`,
+                `npmx buck status get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -357,7 +357,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ldsw get ${index}`,
+            `npmx ldsw status get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -428,7 +428,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw gpio get ${index}`,
+                `npmx ldsw gpio index get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -519,7 +519,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx pof enable get`,
+            `npmx pof status get`,
             expect.anything(),
             undefined,
             true

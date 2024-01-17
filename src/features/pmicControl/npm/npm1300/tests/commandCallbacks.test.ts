@@ -616,7 +616,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx buck enable %p', ({ index, append, enabled }) => {
-        const command = `npmx buck status all ${append}`;
+        const command = `npmx buck status ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 

@@ -27,15 +27,15 @@ export const buckGet = (
     buckVOutRetention: (index: number) =>
         sendCommand(`npmx buck voltage retention get ${index}`),
     buckMode: (index: number) =>
-        sendCommand(`npmx buck vout select get ${index}`),
+        sendCommand(`npmx buck vout_select get ${index}`),
     buckModeControl: (index: number) =>
-        sendCommand(`npmx buck gpio pwm_force get ${index}`),
+        sendCommand(`npmx buck gpio pwm_force index get ${index}`),
     buckOnOffControl: (index: number) =>
-        sendCommand(`npmx buck gpio on_off get ${index}`),
+        sendCommand(`npmx buck gpio on_off index get ${index}`),
     buckRetentionControl: (index: number) =>
         sendCommand(`npmx buck gpio retention get ${index}`),
     buckEnabled: (index: number) =>
-        sendCommand(`npmx buck status all get ${index}`),
+        sendCommand(`npmx buck status get ${index}`),
     buckActiveDischarge: (index: number) =>
         sendCommand(`npmx buck active_discharge get ${index}`),
 });
@@ -87,7 +87,7 @@ export const buckSet = (
                         `npmx buck voltage normal set ${index} ${value * 1000}`,
                         () =>
                             sendCommand(
-                                `npmx buck vout select set ${index} 1`,
+                                `npmx buck vout_select set ${index} 1`,
                                 () => resolve(),
                                 () => {
                                     buckMode(index);
@@ -166,7 +166,7 @@ export const buckSet = (
                     resolve();
                 } else {
                     sendCommand(
-                        `npmx buck vout select set ${index} ${
+                        `npmx buck vout_select set ${index} ${
                             mode === 'software' ? 1 : 0
                         }`,
                         () => {
@@ -223,7 +223,7 @@ export const buckSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx buck gpio pwm_force set ${index} ${GPIOValues.findIndex(
+                    `npmx buck gpio pwm_force index set ${index} ${GPIOValues.findIndex(
                         v => v === modeControl
                     )} 0`,
                     () => resolve(),
@@ -252,7 +252,7 @@ export const buckSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx buck gpio on_off set ${index} ${GPIOValues.findIndex(
+                    `npmx buck gpio on_off index set ${index} ${GPIOValues.findIndex(
                         v => v === onOffControl
                     )} 0`,
                     () => resolve(),
@@ -281,7 +281,7 @@ export const buckSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx buck gpio retention set ${index} ${GPIOValues.findIndex(
+                    `npmx buck gpio retention index set ${index} ${GPIOValues.findIndex(
                         v => v === retentionControl
                     )} 0`,
                     () => resolve(),
@@ -307,9 +307,7 @@ export const buckSet = (
                     resolve();
                 } else {
                     sendCommand(
-                        `npmx buck status all set ${index} ${
-                            enabled ? '1' : '0'
-                        }`,
+                        `npmx buck status set ${index} ${enabled ? '1' : '0'}`,
                         () => resolve(),
                         () => {
                             buckEnabled(index);
