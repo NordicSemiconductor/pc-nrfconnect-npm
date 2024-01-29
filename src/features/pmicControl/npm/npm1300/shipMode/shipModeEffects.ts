@@ -15,7 +15,6 @@ export const shipModeGet = (
     ) => void
 ) => ({
     shipModeTimeToActive: () => sendCommand(`npmx ship config time get`),
-    shipInvertPolarity: () => sendCommand(`npmx ship config inv_polarity get`),
     shipLongPressReset: () => sendCommand(`npmx ship reset long_press get`),
     shipTwoButtonReset: () => sendCommand(`npmx ship reset two_buttons get`),
 });
@@ -29,12 +28,8 @@ export const shipModeSet = (
     ) => void,
     offlineMode: boolean
 ) => {
-    const {
-        shipModeTimeToActive,
-        shipInvertPolarity,
-        shipLongPressReset,
-        shipTwoButtonReset,
-    } = shipModeGet(sendCommand);
+    const { shipModeTimeToActive, shipLongPressReset, shipTwoButtonReset } =
+        shipModeGet(sendCommand);
 
     const setShipModeTimeToActive = (timeToActive: TimeToActive) =>
         new Promise<void>((resolve, reject) => {
@@ -49,25 +44,6 @@ export const shipModeSet = (
                     () => resolve(),
                     () => {
                         shipModeTimeToActive();
-                        reject();
-                    }
-                );
-            }
-        });
-
-    const setShipInvertPolarity = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                    invPolarity: enabled,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx ship config inv_polarity set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        shipInvertPolarity();
                         reject();
                     }
                 );
@@ -114,7 +90,6 @@ export const shipModeSet = (
 
     return {
         setShipModeTimeToActive,
-        setShipInvertPolarity,
         setShipLongPressReset,
         setShipTwoButtonReset,
         enterShipMode: () => sendCommand(`npmx ship mode ship`),

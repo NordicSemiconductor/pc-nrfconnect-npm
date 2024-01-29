@@ -1333,32 +1333,6 @@ Battery models stored in database:
                 },
             ])
             .flat()
-    )('npmx ship config inv_polarity %p', ({ append, enable }) => {
-        const command = `npmx ship config inv_polarity ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-        callback?.onSuccess(`Value: ${enable ? '1' : '0'}.`, command);
-
-        expect(mockOnShipUpdate).toBeCalledTimes(1);
-        expect(mockOnShipUpdate).toBeCalledWith({
-            invPolarity: enable,
-        });
-    });
-
-    test.each(
-        [true, false]
-            .map(enable => [
-                {
-                    append: `get`,
-                    enable,
-                },
-                {
-                    append: `set ${enable ? '1' : '0'}`,
-                    enable,
-                },
-            ])
-            .flat()
     )('npmx ship reset long_press %p', ({ append, enable }) => {
         const command = `npmx ship reset long_press ${append}`;
         const callback =

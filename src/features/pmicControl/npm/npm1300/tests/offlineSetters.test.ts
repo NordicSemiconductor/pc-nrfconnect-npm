@@ -395,13 +395,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         expect(mockOnShipUpdate).toBeCalledWith({ timeToActive: 16 });
     });
 
-    test('Set set timer config inv_polarity ', async () => {
-        await pmic.setShipInvertPolarity(false);
-
-        expect(mockOnShipUpdate).toBeCalledTimes(1);
-        expect(mockOnShipUpdate).toBeCalledWith({ invPolarity: false });
-    });
-
     test('Set set timer reset long_press ', async () => {
         await pmic.setShipLongPressReset(false);
 

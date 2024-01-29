@@ -459,7 +459,6 @@ export type NpmDevice = {
         timerConfigPeriod: () => void;
 
         shipModeTimeToActive: () => void;
-        shipInvertPolarity: () => void;
         shipLongPressReset: () => void;
         shipTwoButtonReset: () => void;
 
@@ -532,7 +531,6 @@ export type NpmDevice = {
     setTimerConfigPeriod: (period: number) => Promise<void>;
 
     setShipModeTimeToActive: (time: TimeToActive) => Promise<void>;
-    setShipInvertPolarity: (state: boolean) => Promise<void>;
     setShipLongPressReset: (state: boolean) => Promise<void>;
     setShipTwoButtonReset: (state: boolean) => Promise<void>;
 

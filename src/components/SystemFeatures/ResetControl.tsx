@@ -31,11 +31,6 @@ const timerShipToActiveItems = TimeToActiveValues.map(item => ({
     value: `${item}`,
 }));
 
-const invPolarityItems = [true, false].map(item => ({
-    value: `${item}`,
-    label: `${item ? 'Active High' : 'Active Low'}`,
-}));
-
 const card = 'resetControl';
 
 export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
@@ -46,23 +41,6 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
             </div>
         }
     >
-        <Dropdown
-            label={
-                <DocumentationTooltip card={card} item="SHPHLDPinPolarity">
-                    SHPHLD pin polarity
-                </DocumentationTooltip>
-            }
-            items={invPolarityItems}
-            onSelect={item =>
-                npmDevice.setShipInvertPolarity(item.value === 'true')
-            }
-            disabled={disabled}
-            selectedItem={
-                invPolarityItems.find(
-                    item => item.value === `${ship.invPolarity}`
-                ) ?? invPolarityItems[0]
-            }
-        />
         <Toggle
             label={
                 <DocumentationTooltip card={card} item="LongPressReset">

@@ -758,9 +758,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         await shipModeSet.setShipModeTimeToActive(
                             config.ship.timeToActive
                         );
-                        await shipModeSet.setShipInvertPolarity(
-                            config.ship.invPolarity
-                        );
                         await shipModeSet.setShipLongPressReset(
                             config.ship.longPressReset
                         );
