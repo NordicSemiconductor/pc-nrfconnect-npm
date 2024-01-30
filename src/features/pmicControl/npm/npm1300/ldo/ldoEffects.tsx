@@ -301,7 +301,7 @@ export const ldoSet = (
                 sendCommand(
                     `npmx ldsw gpio index set ${index} ${GPIOValues.findIndex(
                         v => v === onOffControl
-                    )} 0`,
+                    )}`,
                     () => resolve(),
                     () => {
                         ldoOnOffControl(index);

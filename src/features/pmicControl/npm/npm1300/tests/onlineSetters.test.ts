@@ -585,7 +585,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck gpio pwm_force index set ${index} 2 0`,
+                    `npmx buck gpio pwm_force index set ${index} 2`,
                     expect.anything(),
                     undefined,
                     true
@@ -603,7 +603,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck gpio on_off index set ${index} 2 0`,
+                    `npmx buck gpio on_off index set ${index} 2`,
                     expect.anything(),
                     undefined,
                     true
@@ -621,7 +621,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck gpio retention index set ${index} 2 0`,
+                    `npmx buck gpio retention index set ${index} 2`,
                     expect.anything(),
                     undefined,
                     true
@@ -958,7 +958,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx ldsw gpio index set ${index} 2 0`,
+                    `npmx ldsw gpio index set ${index} 2`,
                     expect.anything(),
                     undefined,
                     true
@@ -2156,7 +2156,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck gpio pwm_force index set ${index} 2 0`,
+                    `npmx buck gpio pwm_force index set ${index} 2`,
                     expect.anything(),
                     undefined,
                     true
@@ -2186,7 +2186,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck gpio on_off index set ${index} 2 0`,
+                    `npmx buck gpio on_off index set ${index} 2`,
                     expect.anything(),
                     undefined,
                     true
@@ -2216,7 +2216,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck gpio retention index set ${index} 2 0`,
+                    `npmx buck gpio retention index set ${index} 2`,
                     expect.anything(),
                     undefined,
                     true
@@ -2587,7 +2587,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx ldsw gpio index set ${index} 2 0`,
+                    `npmx ldsw gpio index set ${index} 2`,
                     expect.anything(),
                     undefined,
                     true
