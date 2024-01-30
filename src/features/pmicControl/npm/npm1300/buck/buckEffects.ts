@@ -29,7 +29,7 @@ export const buckGet = (
     buckMode: (index: number) =>
         sendCommand(`npmx buck vout_select get ${index}`),
     buckModeControl: (index: number) =>
-        sendCommand(`npmx buck gpio pwm_force index get ${index}`),
+        sendCommand(`powerup_buck mode get ${index}`),
     buckOnOffControl: (index: number) =>
         sendCommand(`npmx buck gpio on_off index get ${index}`),
     buckRetentionControl: (index: number) =>
@@ -223,9 +223,7 @@ export const buckSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx buck gpio pwm_force index set ${index} ${GPIOValues.findIndex(
-                        v => v === modeControl
-                    )}`,
+                    `powerup_buck mode set ${index} ${modeControl}`,
                     () => resolve(),
                     () => {
                         buckModeControl(index);

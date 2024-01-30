@@ -9,11 +9,12 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     noop,
     NpmEventEmitter,
+    parseColonBasedAnswer,
     parseToBoolean,
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { Buck, GPIOValues } from '../../types';
+import { Buck, BuckModeControl, GPIOValues } from '../../types';
 
 const setupSingleBuck = (
     shellParser: ShellParser,
@@ -126,14 +127,13 @@ const setupSingleBuck = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx buck gpio pwm_force index', true, i, '(-1|[0-4])'),
+            toRegex('powerup_buck mode', true, i, '(\\w+)'),
             res => {
-                const result = parseToNumber(res);
+                const result = parseColonBasedAnswer(res);
                 eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
-                        modeControl:
-                            result === -1 ? 'Auto' : GPIOValues[result],
+                        modeControl: result as BuckModeControl,
                     },
                     i
                 );
