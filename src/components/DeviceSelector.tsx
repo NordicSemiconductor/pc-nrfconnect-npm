@@ -11,7 +11,7 @@ import {
     getAppFile,
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { DeviceTraits } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { DeviceTraits } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import path from 'path';
 
 import { closeDevice, openDevice } from '../actions/deviceActions';
