@@ -582,17 +582,6 @@ export const documentation: Documentation = {
         ],
     },
     resetControl: {
-        SHPHLDPinPolarity: [
-            {
-                title: 'SHPHLD pin polarity',
-                content: [
-                    <p key="p1">
-                        Configure polarity of the SHPHLD pin, either Active Low
-                        or Active High.
-                    </p>,
-                ],
-            },
-        ],
         LongPressReset: [
             {
                 title: 'Long Press Reset',
