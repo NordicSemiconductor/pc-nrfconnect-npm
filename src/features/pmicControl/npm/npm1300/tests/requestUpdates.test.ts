@@ -598,18 +598,6 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test('Request update shipInvertPolarity', () => {
-        pmic.requestUpdate.shipInvertPolarity();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship config inv_polarity get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
     test('Request update shipLongPressReset', () => {
         pmic.requestUpdate.shipLongPressReset();
 

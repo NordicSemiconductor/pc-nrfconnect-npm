@@ -172,7 +172,6 @@ export default () => {
             npmDevice.requestUpdate.timerConfigPrescaler();
 
             npmDevice.requestUpdate.shipModeTimeToActive();
-            npmDevice.requestUpdate.shipInvertPolarity();
             npmDevice.requestUpdate.shipLongPressReset();
             npmDevice.requestUpdate.shipTwoButtonReset();
 

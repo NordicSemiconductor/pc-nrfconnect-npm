@@ -44,36 +44,6 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx ship config inv_polarity', true),
-                res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            invPolarity: parseToBoolean(res),
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx ship config inv_polarity', true),
-                res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            invPolarity: parseToBoolean(res),
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
                 toRegex('npmx ship reset long_press', true),
                 res => {
                     eventEmitter.emitPartialEvent<ShipModeConfig>(
