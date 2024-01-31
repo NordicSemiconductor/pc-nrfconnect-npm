@@ -68,16 +68,23 @@ export default ({
     time,
     progress,
     ready = false,
+    alpha = 0.5,
 }: {
     time: number;
     progress: number;
     ready?: boolean;
+    alpha?: number;
 }) => {
     const eta = useRef(0);
+    const previousProgress = useRef(progress);
+
+    if (previousProgress.current > progress) {
+        eta.current = 0;
+    }
+
     if (ready) progress === 100;
 
     if (progress > 0 && progress <= 100) {
-        const alpha = 0.05;
         const newEta = (100 / progress) * time - time;
         eta.current = alpha * newEta + (1.0 - alpha) * eta.current;
     } else {

@@ -16,7 +16,7 @@ import {
     shellParser,
     xTerminalShellParserWrapper,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import { Terminal } from 'xterm-headless';
 
 import { RootState } from '../../../appReducer';

@@ -4,26 +4,25 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import {
-    AppThunk,
-    getAppDir,
-    getAppFile,
-} from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { spawn } from 'child_process';
+import { AppThunk, logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { getModule } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 
 import { RootState } from '../../appReducer';
 import {
     generateDefaultProjectPath,
     readAndUpdateProjectSettings,
+    readProjectSettingsFromFile,
 } from '../../components/Profiling/helpers';
 import {
     ProfilingProject,
     ProfilingProjectProfile,
 } from '../../components/Profiling/types';
 import { generateTempFolder, stringToFile } from '../helpers';
+import generate from '../nrfutil/npm/generate';
+import merge from '../nrfutil/npm/merge';
 import { Profile } from '../pmicControl/npm/types';
 import {
     addProjectProfileProgress,
@@ -39,18 +38,7 @@ const generateProfileName = (
         profile.temperature < 0 ? 'n' : 'p'
     }${profile.temperature}`;
 
-const NRFUTIL_HOME = path.join(
-    getAppDir(),
-    'resources',
-    'nrfutil-npm',
-    os.platform()
-);
-
-let nrfUtilVersion = 'unknown';
-
-const NRFUTIL_BINARY = getAppFile(
-    path.join('resources', 'nrfutil-npm', os.platform(), 'bin', 'nrfutil-npm')
-);
+let nrfUtilVersion: string | undefined;
 
 export const startProcessingCsv =
     (profile: Profile, index: number): AppThunk<RootState> =>
@@ -74,18 +62,160 @@ export const startProcessingCsv =
         dispatch(generateParamsFromCSV(profilingProjectPath, index));
     };
 export const generateParamsFromCSV =
-    (projectAbsolutePath: string, index: number): AppThunk =>
-    dispatch => {
-        const pathObject = path.parse(NRFUTIL_BINARY);
-        if (!fs.existsSync(pathObject.dir)) {
+    (
+        projectAbsolutePath: string,
+        index: number
+    ): AppThunk<RootState, Promise<void>> =>
+    async dispatch => {
+        const project = readProjectSettingsFromFile(projectAbsolutePath);
+
+        if (!project || !project.settings) {
+            throw new Error('Invalid project index');
+        }
+        const profile = project.settings?.profiles[index];
+
+        if (!profile || !profile.csvPath) {
+            throw new Error('no csv path');
+        }
+
+        const csvPathAbsolute = path.resolve(
+            projectAbsolutePath,
+            profile.csvPath
+        );
+
+        if (!fs.existsSync(csvPathAbsolute)) {
+            throw new Error('csv file does not exists');
+        }
+
+        const tempFolder = generateTempFolder();
+
+        const newCSVFileName = `${generateProfileName(
+            project.settings,
+            profile
+        )}.csv`;
+
+        const inputFile = path.join(tempFolder, newCSVFileName);
+        fs.copyFileSync(csvPathAbsolute, inputFile);
+
+        const resultsFolder = path.join(tempFolder, 'Results');
+
+        fs.mkdirSync(resultsFolder);
+
+        const cancelController = new AbortController();
+
+        dispatch(
+            addProjectProfileProgress({
+                path: projectAbsolutePath,
+                index,
+                message: 'Processing has started',
+                progress: 0,
+                cancel: () => {
+                    cancelController.abort();
+                    dispatch(
+                        removeProjectProfileProgress({
+                            path: projectAbsolutePath,
+                            index,
+                        })
+                    );
+                },
+            })
+        );
+
+        try {
+            await generate(
+                inputFile,
+                resultsFolder,
+                project.settings.vUpperCutOff,
+                project.settings.vLowerCutOff,
+                progress => {
+                    dispatch(
+                        updateProjectProfileProgress({
+                            path: projectAbsolutePath,
+                            index,
+                            message: progress.description,
+                            progress: progress.stepProgressPercentage,
+                        })
+                    );
+                },
+                cancelController
+            );
+
+            profile.paramsJson = undefined;
+            profile.batteryJson = undefined;
+            profile.batteryInc = undefined;
+
+            const batteryModelJsonPath = path.join(
+                resultsFolder,
+                'battery_model.json'
+            );
+            const batteryModelIncPath = path.join(
+                resultsFolder,
+                'battery_model.inc'
+            );
+
+            const paramsPath = path.join(
+                resultsFolder,
+                `${generateProfileName(project.settings, profile)}_params.json`
+            );
+
+            if (
+                fs.existsSync(batteryModelJsonPath) &&
+                fs.existsSync(paramsPath)
+            ) {
+                if (nrfUtilVersion) {
+                    const module = await getModule('npm');
+                    nrfUtilVersion = (await module.getModuleVersion()).version;
+                }
+                dispatch(
+                    readAndUpdateProjectSettings(projectAbsolutePath, proj => {
+                        proj.profiles[index].batteryJson = fs.readFileSync(
+                            batteryModelJsonPath,
+                            'utf8'
+                        );
+                        proj.profiles[index].batteryInc = fs.readFileSync(
+                            batteryModelIncPath,
+                            'utf8'
+                        );
+
+                        proj.profiles[index].batteryJson = fs.readFileSync(
+                            batteryModelJsonPath,
+                            'utf8'
+                        );
+
+                        proj.profiles[index].paramsJson = fs.readFileSync(
+                            paramsPath,
+                            'utf8'
+                        );
+
+                        proj.profiles[index].nrfUtilVersion = nrfUtilVersion;
+
+                        dispatch(
+                            removeProjectProfileProgress({
+                                path: projectAbsolutePath,
+                                index,
+                            })
+                        );
+
+                        return proj;
+                    })
+                );
+            }
+
+            if (fs.existsSync(tempFolder)) {
+                fs.rmSync(tempFolder, {
+                    recursive: true,
+                    force: true,
+                });
+            }
+        } catch (error) {
+            logger.error(describeError(error));
             dispatch(
-                addProjectProfileProgress({
+                updateProjectProfileProgress({
                     path: projectAbsolutePath,
                     index,
                     message:
-                        'This operation is not supported by your operating system. The profile must be processed on Windows or Linux.',
-                    progress: 100,
-                    errorLevel: 'warning',
+                        'Something went wrong while processing the data. Please try again.',
+                    errorLevel: 'error',
                     cancel: () => {
                         dispatch(
                             removeProjectProfileProgress({
@@ -96,394 +226,80 @@ export const generateParamsFromCSV =
                     },
                 })
             );
-            return;
         }
-
-        dispatch(
-            readAndUpdateProjectSettings(projectAbsolutePath, project => {
-                const profile = project.profiles[index];
-
-                if (!profile.csvPath) {
-                    throw new Error('no csv path');
-                }
-
-                const csvPathAbsolute = path.resolve(
-                    projectAbsolutePath,
-                    profile.csvPath
-                );
-
-                if (!fs.existsSync(csvPathAbsolute)) {
-                    throw new Error('csv file does not exists');
-                }
-
-                const tempFolder = generateTempFolder();
-
-                const newCSVFileName = `${generateProfileName(
-                    project,
-                    project.profiles[index]
-                )}.csv`;
-
-                const inputFile = path.join(tempFolder, newCSVFileName);
-                fs.copyFileSync(csvPathAbsolute, inputFile);
-
-                const resultsFolder = path.join(tempFolder, 'Results');
-
-                fs.mkdirSync(resultsFolder);
-
-                let knowFailure = false;
-
-                const processProgress = (data: string) => {
-                    console.log(data);
-                    const progressMatch = data.match(
-                        /Processing cycle [0-9]+ \/ [0-9]+/
-                    );
-                    if (progressMatch) {
-                        const fraction = progressMatch[0].replace(
-                            'Processing cycle',
-                            ''
-                        );
-                        const denominator = Number.parseInt(
-                            fraction.split('/')[1],
-                            10
-                        );
-                        const nominator = Number.parseInt(
-                            fraction.split('/')[0],
-                            10
-                        );
-                        dispatch(
-                            updateProjectProfileProgress({
-                                path: projectAbsolutePath,
-                                index,
-                                message: `Processing cycle ${nominator} / ${denominator}`,
-                                progress: (nominator / denominator) * 100,
-                            })
-                        );
-                    } else if (
-                        data.includes(
-                            'Battery voltage does not cross the defined low cut off voltage. Please define higher cut off level and run again.'
-                        )
-                    ) {
-                        knowFailure = true;
-                        dispatch(
-                            updateProjectProfileProgress({
-                                path: projectAbsolutePath,
-                                index,
-                                message: `The smallest voltage in the collected profile data is bigger than the defined discharged cutoff voltage. Please define a correct discharged cutoff voltage and run again.`,
-                                errorLevel: 'error',
-                                cancel: () => {
-                                    dispatch(
-                                        removeProjectProfileProgress({
-                                            path: projectAbsolutePath,
-                                            index,
-                                        })
-                                    );
-                                },
-                            })
-                        );
-                    }
-                };
-
-                const env = { ...process.env };
-                env.NRFUTIL_HOME = NRFUTIL_HOME;
-
-                const processCSV = spawn(
-                    NRFUTIL_BINARY,
-                    [
-                        'generate',
-                        '--input-file',
-                        inputFile,
-                        '--output-directory',
-                        resultsFolder,
-                        '--v-cutoff-high',
-                        project.vUpperCutOff.toString(),
-                        '--v-cutoff-low',
-                        project.vLowerCutOff.toString(),
-                    ],
-                    {
-                        env,
-                    }
-                );
-
-                profile.paramsJson = undefined;
-                profile.batteryJson = undefined;
-                profile.batteryInc = undefined;
-
-                dispatch(
-                    addProjectProfileProgress({
-                        path: projectAbsolutePath,
-                        index,
-                        message: 'Processing has started',
-                        progress: 0,
-                        cancel: () => {
-                            processCSV.kill('SIGINT');
-                            dispatch(
-                                removeProjectProfileProgress({
-                                    path: projectAbsolutePath,
-                                    index,
-                                })
-                            );
-                        },
-                    })
-                );
-
-                processCSV.stdout.on('data', data => {
-                    processProgress(data.toString());
-                });
-
-                processCSV.stderr.on('data', data => {
-                    processProgress(data.toString());
-                });
-
-                processCSV.on('close', () => {
-                    dispatch(
-                        readAndUpdateProjectSettings(
-                            projectAbsolutePath,
-                            proj => {
-                                const batteryModelJsonPath = path.join(
-                                    resultsFolder,
-                                    'battery_model.json'
-                                );
-                                const batteryModelIncPath = path.join(
-                                    resultsFolder,
-                                    'battery_model.inc'
-                                );
-                                const paramsPath = path.join(
-                                    resultsFolder,
-                                    `${generateProfileName(
-                                        proj,
-                                        project.profiles[index]
-                                    )}_params.json`
-                                );
-
-                                if (
-                                    fs.existsSync(batteryModelJsonPath) &&
-                                    fs.existsSync(paramsPath)
-                                ) {
-                                    proj.profiles[index].batteryJson =
-                                        fs.readFileSync(
-                                            batteryModelJsonPath,
-                                            'utf8'
-                                        );
-                                    proj.profiles[index].batteryInc =
-                                        fs.readFileSync(
-                                            batteryModelIncPath,
-                                            'utf8'
-                                        );
-
-                                    proj.profiles[index].batteryJson =
-                                        fs.readFileSync(
-                                            batteryModelJsonPath,
-                                            'utf8'
-                                        );
-
-                                    proj.profiles[index].paramsJson =
-                                        fs.readFileSync(paramsPath, 'utf8');
-
-                                    proj.profiles[index].nrfUtilVersion =
-                                        nrfUtilVersion;
-
-                                    dispatch(
-                                        removeProjectProfileProgress({
-                                            path: projectAbsolutePath,
-                                            index,
-                                        })
-                                    );
-                                } else if (!knowFailure) {
-                                    dispatch(
-                                        updateProjectProfileProgress({
-                                            path: projectAbsolutePath,
-                                            index,
-                                            message:
-                                                'Something went wrong while processing the data. Please try again.',
-                                            errorLevel: 'error',
-                                            cancel: () => {
-                                                dispatch(
-                                                    removeProjectProfileProgress(
-                                                        {
-                                                            path: projectAbsolutePath,
-                                                            index,
-                                                        }
-                                                    )
-                                                );
-                                            },
-                                        })
-                                    );
-                                }
-
-                                return proj;
-                            }
-                        )
-                    );
-
-                    if (fs.existsSync(tempFolder)) {
-                        fs.rmSync(tempFolder, {
-                            recursive: true,
-                            force: true,
-                        });
-                    }
-                });
-
-                return project;
-            })
-        );
     };
 
-export const getVersion = () =>
-    new Promise<string>((resolve, reject) => {
-        const pathObject = path.parse(NRFUTIL_BINARY);
-        if (!fs.existsSync(pathObject.dir)) {
-            reject(new Error('OS not supported'));
-            return;
-        }
-
-        const tempFolder = generateTempFolder();
-        const resultsFolder = path.join(tempFolder, 'Results');
-        fs.mkdirSync(resultsFolder);
-
-        const args = ['--version'];
-
-        const env = { ...process.env };
-        env.NRFUTIL_HOME = NRFUTIL_HOME;
-
-        const processCSV = spawn(NRFUTIL_BINARY, args, {
-            env,
-        });
-
-        let result = '';
-        let error = false;
-
-        processCSV.stdout.on('data', data => {
-            result += data.toString();
-            error = error || false;
-        });
-
-        processCSV.stderr.on('data', data => {
-            result += data.toString();
-        });
-
-        processCSV.on('close', () => {
-            if (!error) {
-                resolve(result);
-            } else {
-                reject(result);
-            }
-        });
-    });
-
-export const mergeBatteryParams = (
+export const mergeBatteryParams = async (
     project: ProfilingProject,
     profiles: ProfilingProjectProfile[]
-) =>
-    new Promise<{ json: string; inc: string }>((resolve, reject) => {
-        const pathObject = path.parse(NRFUTIL_BINARY);
-        if (!fs.existsSync(pathObject.dir)) {
-            reject(
-                new Error(
-                    'This operation is not supported by your operating system. Export a merged file on Windows or Linux. And use the Write batter model from the side bar'
-                )
+) => {
+    if (profiles.length === 0) {
+        throw new Error('Nothing to process');
+    }
+
+    if (
+        profiles.length === 1 &&
+        profiles[0].batteryJson &&
+        profiles[0].batteryInc
+    ) {
+        return {
+            json: profiles[0].batteryJson,
+            inc: profiles[0].batteryInc,
+        };
+    }
+
+    const tempFolder = generateTempFolder();
+    const resultsFolder = path.join(tempFolder, 'Results');
+    fs.mkdirSync(resultsFolder);
+
+    const inputFiles = profiles
+        .filter(profile => profile.paramsJson)
+        .map(profile => {
+            const paramsPath = path.join(
+                tempFolder,
+                `${generateProfileName(project, profile)}_params.json`
             );
-            return;
-        }
-
-        if (profiles.length === 0) {
-            return;
-        }
-
-        if (
-            profiles.length === 1 &&
-            profiles[0].batteryJson &&
-            profiles[0].batteryInc
-        ) {
-            resolve({
-                json: profiles[0].batteryJson,
-                inc: profiles[0].batteryInc,
-            });
-            return;
-        }
-
-        const tempFolder = generateTempFolder();
-        const resultsFolder = path.join(tempFolder, 'Results');
-        fs.mkdirSync(resultsFolder);
-
-        const args = [
-            'merge',
-            '--output-directory',
-            resultsFolder,
-            '--v-cutoff-high',
-            project.vUpperCutOff.toString(),
-            '--v-cutoff-low',
-            project.vLowerCutOff.toString(),
-        ];
-
-        profiles.forEach(profile => {
-            if (profile.paramsJson) {
-                const paramsPath = path.join(
+            stringToFile(
+                path.join(
                     tempFolder,
                     `${generateProfileName(project, profile)}_params.json`
-                );
-                stringToFile(
-                    path.join(
-                        tempFolder,
-                        `${generateProfileName(project, profile)}_params.json`
-                    ),
-                    profile.paramsJson
-                );
-
-                args.push('--input-file', paramsPath);
-            }
-        });
-
-        const env = { ...process.env };
-        env.NRFUTIL_HOME = NRFUTIL_HOME;
-
-        const processCSV = spawn(NRFUTIL_BINARY, args, {
-            env,
-        });
-
-        processCSV.stdout.on('data', data => {
-            console.log(`stdout: ${data}`);
-        });
-
-        processCSV.stderr.on('data', data => {
-            console.error(`stderr: ${data}`);
-        });
-
-        processCSV.on('close', () => {
-            const batteryModelJsonPath = path.join(
-                resultsFolder,
-                'battery_model.json'
+                ),
+                profile.paramsJson as string
             );
 
-            const batteryModelIncPath = path.join(
-                resultsFolder,
-                'battery_model.inc'
-            );
-
-            if (
-                fs.existsSync(batteryModelJsonPath) &&
-                fs.existsSync(batteryModelIncPath)
-            ) {
-                resolve({
-                    json: fs.readFileSync(batteryModelJsonPath, 'utf8'),
-                    inc: fs.readFileSync(batteryModelIncPath, 'utf8'),
-                });
-            } else {
-                reject(new Error('Something went wrong'));
-            }
-
-            if (fs.existsSync(tempFolder)) {
-                fs.rmSync(tempFolder, {
-                    recursive: true,
-                    force: true,
-                });
-            }
+            return paramsPath;
         });
-    });
 
-getVersion()
-    .then(version => {
-        nrfUtilVersion = version;
-    })
-    .catch(() => {
-        nrfUtilVersion = 'unknown';
-    });
+    await merge(
+        inputFiles,
+        resultsFolder,
+        project.vUpperCutOff,
+        project.vLowerCutOff,
+        console.log
+    );
+
+    const batteryModelJsonPath = path.join(resultsFolder, 'battery_model.json');
+
+    const batteryModelIncPath = path.join(resultsFolder, 'battery_model.inc');
+
+    if (
+        fs.existsSync(batteryModelJsonPath) &&
+        fs.existsSync(batteryModelIncPath)
+    ) {
+        const result = {
+            json: fs.readFileSync(batteryModelJsonPath, 'utf8'),
+            inc: fs.readFileSync(batteryModelIncPath, 'utf8'),
+        };
+
+        if (fs.existsSync(tempFolder)) {
+            fs.rmSync(tempFolder, {
+                recursive: true,
+                force: true,
+            });
+        }
+
+        return result;
+    }
+
+    throw new Error('Something went wrong');
+};

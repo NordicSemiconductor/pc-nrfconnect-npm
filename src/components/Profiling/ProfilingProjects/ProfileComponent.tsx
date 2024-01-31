@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
@@ -57,12 +57,23 @@ export default ({
         resolution: 1000,
     });
 
+    const previousProgress = useRef(progress?.progress);
+
     useEffect(() => {
         if (!isRunning && progress?.progress === 0 && !progress.errorLevel) {
+            reset();
+        }
+        if (
+            previousProgress.current &&
+            progress?.progress != null &&
+            previousProgress.current > progress.progress
+        ) {
             reset();
         } else if (isRunning && (!progress || progress.errorLevel)) {
             pause();
         }
+
+        previousProgress.current = progress?.progress;
     }, [progress, reset, pause, isRunning]);
 
     const message = <span>{`Temperature: ${profile.temperature}°C`}</span>;
@@ -162,6 +173,7 @@ export default ({
                         <TimeComponent
                             time={time}
                             progress={progress.progress ?? 0}
+                            alpha={0.1}
                         />
                         <Button
                             className="ml-2"
