@@ -14,7 +14,7 @@ export const pofGet = (
         onError?: (response: string, command: string) => void
     ) => void
 ) => ({
-    pofEnable: () => sendCommand(`npmx pof enable get`),
+    pofEnable: () => sendCommand(`npmx pof status get`),
     pofPolarity: () => sendCommand(`npmx pof polarity get`),
     pofThreshold: () => sendCommand(`npmx pof threshold get`),
 });
@@ -39,7 +39,7 @@ export const pofSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx pof enable set ${enable ? '1' : '0'}`,
+                    `npmx pof status set ${enable ? '1' : '0'}`,
                     () => resolve(),
                     () => {
                         pofEnable();

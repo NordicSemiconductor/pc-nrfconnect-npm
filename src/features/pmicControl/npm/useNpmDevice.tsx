@@ -168,7 +168,7 @@ export default () => {
             npmDevice.requestUpdate.pofThreshold();
 
             npmDevice.requestUpdate.timerConfigMode();
-            npmDevice.requestUpdate.timerConfigPeriod();
+            npmDevice.requestUpdate.timerConfigCompare();
             npmDevice.requestUpdate.timerConfigPrescaler();
 
             npmDevice.requestUpdate.shipModeTimeToActive();

@@ -91,16 +91,19 @@ describe('PMIC 1300 - Command callbacks', () => {
         }
     );
 
-    test.each(['get', 'set 400'])('npmx charger charger_current %p', append => {
-        const command = `npmx charger charger_current ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
+    test.each(['get', 'set 400'])(
+        'npmx charger charging_current %p',
+        append => {
+            const command = `npmx charger charging_current ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess('Value: 400 mA', command);
+            callback?.onSuccess('Value: 400 mA', command);
 
-        expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).nthCalledWith(1, { iChg: 400 });
-    });
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).nthCalledWith(1, { iChg: 400 });
+        }
+    );
 
     test.each(['get', 'set 1'])('npmx charger enable recharging %p', append => {
         const command = `npmx charger module recharge ${append}`;
@@ -212,14 +215,10 @@ describe('PMIC 1300 - Command callbacks', () => {
                     append: 'get',
                     value: setValue,
                 },
-                {
-                    append: `set ${setValue}`,
-                    value: setValue,
-                },
             ])
             .flat()
     )('npmx charger status %p', ({ append, value }) => {
-        const command = `npmx charger status ${append}`;
+        const command = `npmx charger status all ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -617,7 +616,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx buck enable %p', ({ index, append, enabled }) => {
-        const command = `npmx buck status power ${append}`;
+        const command = `npmx buck status ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -931,25 +930,19 @@ Battery models stored in database:
                 ].flat()
             ),
         ]).flat()
-    )(
-        'npmx ldsw active_discharge enable %p',
-        ({ index, append, activeDischarge }) => {
-            const command = `npmx ldsw active_discharge enable ${append}`;
-            const callback =
-                eventHandlers.mockRegisterCommandCallbackHandler(command);
+    )('npmx ldsw active_discharge %p', ({ index, append, activeDischarge }) => {
+        const command = `npmx ldsw active_discharge ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-            callback?.onSuccess(
-                `Value: ${activeDischarge ? '1' : '0'}`,
-                command
-            );
+        callback?.onSuccess(`Value: ${activeDischarge ? '1' : '0'}`, command);
 
-            expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { activeDischarge },
-                index,
-            });
-        }
-    );
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: { activeDischarge },
+            index,
+        });
+    });
 
     test.each(
         PMIC_1300_LDOS.map(index => [
@@ -968,8 +961,8 @@ Battery models stored in database:
                 ].flat()
             ),
         ]).flat()
-    )('npmx ldsw enable_gpio %p', ({ index, append, value }) => {
-        const command = `npmx ldsw enable_gpio ${append}`;
+    )('npmx ldsw gpio %p', ({ index, append, value }) => {
+        const command = `npmx ldsw gpio ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1002,8 +995,8 @@ Battery models stored in database:
                 },
             ]).flat()
         ).flat()
-    )('npmx gpio mode %p', ({ index, append, mode, modeIndex }) => {
-        const command = `npmx gpio mode ${append}`;
+    )('npmx gpio config mode %p', ({ index, append, mode, modeIndex }) => {
+        const command = `npmx gpio config mode ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1033,8 +1026,8 @@ Battery models stored in database:
                 },
             ]).flat()
         ).flat()
-    )('npmx gpio pull %p', ({ index, append, pull, pullIndex }) => {
-        const command = `npmx gpio pull ${append}`;
+    )('npmx gpio config pull %p', ({ index, append, pull, pullIndex }) => {
+        const command = `npmx gpio config pull ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1062,8 +1055,8 @@ Battery models stored in database:
                 },
             ]).flat()
         ).flat()
-    )('npmx gpio drive %p', ({ index, append, drive }) => {
-        const command = `npmx gpio drive ${append}`;
+    )('npmx gpio config drive %p', ({ index, append, drive }) => {
+        const command = `npmx gpio config drive ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1093,8 +1086,8 @@ Battery models stored in database:
                 ])
                 .flat()
         ).flat()
-    )('npmx gpio debounce %p', ({ index, append, debounce }) => {
-        const command = `npmx gpio debounce ${append}`;
+    )('npmx gpio config debounce %p', ({ index, append, debounce }) => {
+        const command = `npmx gpio config debounce ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1124,8 +1117,8 @@ Battery models stored in database:
                 ])
                 .flat()
         ).flat()
-    )('npmx gpio open_drain %p', ({ index, append, openDrain }) => {
-        const command = `npmx gpio open_drain ${append}`;
+    )('npmx gpio config open_drain %p', ({ index, append, openDrain }) => {
+        const command = `npmx gpio config open_drain ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1155,8 +1148,8 @@ Battery models stored in database:
                 },
             ]).flat()
         ).flat()
-    )('npmx leds mode %p', ({ index, append, mode, modeIndex }) => {
-        const command = `npmx leds mode ${append}`;
+    )('npmx led mode %p', ({ index, append, mode, modeIndex }) => {
+        const command = `npmx led mode ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1289,8 +1282,8 @@ Battery models stored in database:
         }
     );
 
-    test.each([`get`, `set 2800`])('npmx timer config period %p', append => {
-        const command = `npmx timer config period ${append}`;
+    test.each([`get`, `set 2800`])('npmx timer config compare %p', append => {
+        const command = `npmx timer config compare ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 

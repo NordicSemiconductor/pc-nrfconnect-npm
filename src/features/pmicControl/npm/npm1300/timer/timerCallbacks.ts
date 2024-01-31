@@ -62,7 +62,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx timer config period', true),
+                toRegex('npmx timer config compare', true),
                 res => {
                     eventEmitter.emitPartialEvent<TimerConfig>(
                         'onTimerConfigUpdate',

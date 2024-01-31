@@ -25,16 +25,16 @@ export const ldoGet = (
 ) => ({
     ldoVoltage: (index: number) =>
         sendCommand(`npmx ldsw ldo_voltage get ${index}`),
-    ldoEnabled: (index: number) => sendCommand(`npmx ldsw get ${index}`),
+    ldoEnabled: (index: number) => sendCommand(`npmx ldsw status get ${index}`),
     ldoMode: (index: number) => sendCommand(`npmx ldsw mode get ${index}`),
     ldoSoftStartEnabled: (index: number) =>
         sendCommand(`npmx ldsw soft_start enable get ${index}`),
     ldoSoftStart: (index: number) =>
         sendCommand(`npmx ldsw soft_start current get ${index}`),
     ldoActiveDischarge: (index: number) =>
-        sendCommand(`npmx ldsw active_discharge enable get ${index}`),
+        sendCommand(`npmx ldsw active_discharge get ${index}`),
     ldoOnOffControl: (index: number) =>
-        sendCommand(`npmx ldsw enable_gpio get ${index}`),
+        sendCommand(`npmx ldsw gpio index get ${index}`),
 });
 
 export const ldoSet = (
@@ -203,7 +203,7 @@ export const ldoSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx ldsw set ${index} ${enabled ? '1' : '0'}`,
+                    `npmx ldsw status set ${index} ${enabled ? '1' : '0'}`,
                     () => resolve(),
                     () => {
                         ldoEnabled(index);
@@ -274,7 +274,7 @@ export const ldoSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx ldsw active_discharge enable set ${index} ${
+                    `npmx ldsw active_discharge set ${index} ${
                         activeDischarge ? '1' : '0'
                     }`,
                     () => resolve(),
@@ -299,9 +299,9 @@ export const ldoSet = (
                 resolve();
             } else {
                 sendCommand(
-                    `npmx ldsw enable_gpio set ${index} ${GPIOValues.findIndex(
+                    `npmx ldsw gpio index set ${index} ${GPIOValues.findIndex(
                         v => v === onOffControl
-                    )} 0`,
+                    )}`,
                     () => resolve(),
                     () => {
                         ldoOnOffControl(index);

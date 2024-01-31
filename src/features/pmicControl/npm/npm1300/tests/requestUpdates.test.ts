@@ -28,7 +28,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx charger status get',
+            'npmx charger status all get',
             expect.anything(),
             undefined,
             true
@@ -52,7 +52,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx charger charger_current get',
+            'npmx charger charging_current get',
             expect.anything(),
             undefined,
             true
@@ -76,7 +76,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx charger trickle get',
+            'npmx charger trickle_voltage get',
             expect.anything(),
             undefined,
             true
@@ -258,7 +258,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx buck vout select get ${index}`,
+            `npmx buck vout_select get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -272,7 +272,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio pwm_force get ${index}`,
+                `npmx buck gpio pwm_force index get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -287,7 +287,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio on_off get ${index}`,
+                `npmx buck gpio on_off index get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -332,7 +332,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck status power get ${index}`,
+                `npmx buck status get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -357,7 +357,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ldsw get ${index}`,
+            `npmx ldsw status get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -413,7 +413,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw active_discharge enable get ${index}`,
+                `npmx ldsw active_discharge get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -428,7 +428,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw enable_gpio get ${index}`,
+                `npmx ldsw gpio index get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -441,7 +441,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio mode get ${index}`,
+            `npmx gpio config mode get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -453,7 +453,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio pull get ${index}`,
+            `npmx gpio config pull get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -465,7 +465,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio drive get ${index}`,
+            `npmx gpio config drive get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -479,7 +479,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio debounce get ${index}`,
+                `npmx gpio config debounce get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -494,7 +494,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio open_drain get ${index}`,
+                `npmx gpio config open_drain get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -507,7 +507,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx leds mode get ${index}`,
+            `npmx led mode get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -519,7 +519,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx pof enable get`,
+            `npmx pof status get`,
             expect.anything(),
             undefined,
             true
@@ -574,12 +574,12 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test('Request update timerConfigPeriod', () => {
-        pmic.requestUpdate.timerConfigPeriod();
+    test('Request update timerConfigCompare', () => {
+        pmic.requestUpdate.timerConfigCompare();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx timer config period get`,
+            `npmx timer config compare get`,
             expect.anything(),
             undefined,
             true

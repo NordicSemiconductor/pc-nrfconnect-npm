@@ -245,7 +245,7 @@ describe('PMIC 1300 - Logging', () => {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     _unique?: boolean
                 ) => {
-                    expect(command).toBe('npmx errlog check');
+                    expect(command).toBe('npmx errlog get');
                     callbacks?.onSuccess(
                         `RSTCAUSE:
                         Shipmode exit

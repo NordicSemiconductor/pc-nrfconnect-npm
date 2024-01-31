@@ -456,7 +456,7 @@ export type NpmDevice = {
 
         timerConfigMode: () => void;
         timerConfigPrescaler: () => void;
-        timerConfigPeriod: () => void;
+        timerConfigCompare: () => void;
 
         shipModeTimeToActive: () => void;
         shipInvertPolarity: () => void;
@@ -529,7 +529,7 @@ export type NpmDevice = {
 
     setTimerConfigMode: (mode: TimerMode) => Promise<void>;
     setTimerConfigPrescaler: (prescaler: TimerPrescaler) => Promise<void>;
-    setTimerConfigPeriod: (period: number) => Promise<void>;
+    setTimerConfigCompare: (period: number) => Promise<void>;
 
     setShipModeTimeToActive: (time: TimeToActive) => Promise<void>;
     setShipInvertPolarity: (state: boolean) => Promise<void>;

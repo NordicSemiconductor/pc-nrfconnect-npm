@@ -104,7 +104,7 @@ const setupSingleLdo = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx ldsw active_discharge enable', true, i),
+            toRegex('npmx ldsw active_discharge', true, i),
             res => {
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
@@ -120,7 +120,7 @@ const setupSingleLdo = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx ldsw enable_gpio', true, i, '(-1|[0-4]) (0)'),
+            toRegex('npmx ldsw gpio', true, i, '(-1|[0-4]) (0)'),
             res => {
                 const result = parseToNumber(res);
                 eventEmitter.emitPartialEvent<Ldo>(
