@@ -8,9 +8,17 @@ and this project adheres to
 
 ## 1.2.0 - UNRELEASED
 
+## Added
+
+-   Add Support to generate battery models on Mac (Intel and ARM64)
+
+## Removed
+
+-   SHPHLD pin polarity configuration
+
 ## Changed
 
--   Updated nrfutil CLI
+-   Updated Firmware to use NPMX 1.0.0
 
 ## 1.1.1 - 2024-01-08
 
