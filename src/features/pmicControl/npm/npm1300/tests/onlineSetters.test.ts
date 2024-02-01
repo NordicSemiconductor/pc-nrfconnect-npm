@@ -2207,7 +2207,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx buck gpio retention get ${index}`,
+                    `npmx buck gpio retention index get ${index}`,
                     expect.anything(),
                     undefined,
                     true

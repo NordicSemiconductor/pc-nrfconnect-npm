@@ -33,7 +33,7 @@ export const buckGet = (
     buckOnOffControl: (index: number) =>
         sendCommand(`npmx buck gpio on_off index get ${index}`),
     buckRetentionControl: (index: number) =>
-        sendCommand(`npmx buck gpio retention get ${index}`),
+        sendCommand(`npmx buck gpio retention index get ${index}`),
     buckEnabled: (index: number) =>
         sendCommand(`npmx buck status get ${index}`),
     buckActiveDischarge: (index: number) =>

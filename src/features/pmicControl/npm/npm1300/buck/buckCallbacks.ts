@@ -57,7 +57,7 @@ const setupSingleBuck = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx buck vout select', true, i),
+            toRegex('npmx buck vout_select', true, i),
             res => {
                 const value = parseToNumber(res);
                 eventEmitter.emitPartialEvent<Buck>(
@@ -90,7 +90,7 @@ const setupSingleBuck = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx buck gpio on_off', true, i, '(-1|[0-4]) (0)'),
+            toRegex('npmx buck gpio on_off index', true, i, '(-1|[0-4])'),
             res => {
                 const result = parseToNumber(res);
                 eventEmitter.emitPartialEvent<Buck>(
@@ -108,7 +108,7 @@ const setupSingleBuck = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx buck gpio retention', true, i, '(-1|[0-4]) (0)'),
+            toRegex('npmx buck gpio retention index', true, i, '(-1|[0-4])'),
             res => {
                 const result = parseToNumber(res);
                 eventEmitter.emitPartialEvent<Buck>(
@@ -126,7 +126,7 @@ const setupSingleBuck = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx buck gpio pwm_force', true, i, '(-1|[0-4]) (0)'),
+            toRegex('npmx buck gpio pwm_force index', true, i, '(-1|[0-4])'),
             res => {
                 const result = parseToNumber(res);
                 eventEmitter.emitPartialEvent<Buck>(

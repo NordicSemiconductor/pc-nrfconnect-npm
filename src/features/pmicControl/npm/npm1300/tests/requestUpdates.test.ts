@@ -302,7 +302,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio retention get ${index}`,
+                `npmx buck gpio retention index get ${index}`,
                 expect.anything(),
                 undefined,
                 true

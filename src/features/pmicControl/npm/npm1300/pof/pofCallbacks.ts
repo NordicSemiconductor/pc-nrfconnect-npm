@@ -24,7 +24,7 @@ export default (
     if (shellParser) {
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx pof enable', true, undefined, '(0|1)'),
+                toRegex('npmx pof status', true, undefined, '(0|1)'),
                 res => {
                     eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                         enable: parseToBoolean(res),
