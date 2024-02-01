@@ -585,7 +585,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx buck vout select %p', ({ index, append, value }) => {
-        const command = `npmx buck vout select ${append}`;
+        const command = `npmx buck vout_select ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -647,7 +647,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx buck mode control %p', ({ index, append, value }) => {
-        const command = `npmx buck gpio pwm_force ${append}`;
+        const command = `npmx buck gpio pwm_force index ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -681,7 +681,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx buck on/off control %p', ({ index, append, value }) => {
-        const command = `npmx buck gpio on_off ${append}`;
+        const command = `npmx buck gpio on_off index ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -717,7 +717,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx buck retention control %p', ({ index, append, value }) => {
-        const command = `npmx buck gpio retention ${append}`;
+        const command = `npmx buck gpio retention index ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -784,7 +784,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx ldsw %p', ({ index, append, enabled }) => {
-        const command = `npmx ldsw ${append}`;
+        const command = `npmx ldsw status ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -962,7 +962,7 @@ Battery models stored in database:
             ),
         ]).flat()
     )('npmx ldsw gpio %p', ({ index, append, value }) => {
-        const command = `npmx ldsw gpio ${append}`;
+        const command = `npmx ldsw gpio index ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -1175,8 +1175,8 @@ Battery models stored in database:
                 },
             ])
             .flat()
-    )('npmx pof enable %p', ({ append, enable }) => {
-        const command = `npmx pof enable ${append}`;
+    )('npmx pof status %p', ({ append, enable }) => {
+        const command = `npmx pof status ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
