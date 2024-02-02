@@ -71,7 +71,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         mode: 'LDO',
         enabled: true,
         softStartEnabled: true,
-        softStart: 25,
+        softStart: 20,
         activeDischarge: false,
         onOffControl: 'GPIO0',
     };
@@ -158,7 +158,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 mode: 'ldoSwitch',
                 enabled: false,
                 softStartEnabled: false,
-                softStart: 100,
+                softStart: 50,
                 activeDischarge: false,
                 onOffControl: 'GPIO2',
             },

@@ -17,6 +17,7 @@ import {
 } from '../types';
 
 const toMicro = (value: number) => value * 1000000;
+const toMilli = (value: number) => value * 1000;
 
 const thermistorTypeToOverlay = (value: NTCThermistor) => {
     switch (value) {
@@ -118,6 +119,7 @@ npm1300_ek_ldo${index + 1}: LDO${index + 1} {
     regulator-initial-mode = <${
         ldo.mode === 'LDO' ? 'NPM1300_LDSW_MODE_LDO' : 'NPM1300_LDSW_MODE_LDSW'
     }>;
+    // soft-start-microamp = <${toMilli(ldo.softStart)}>;
     ${
         ldo.onOffControl !== 'SW'
             ? `enable-gpios = <&npm1300_ek_gpio ${GPIOValues.findIndex(

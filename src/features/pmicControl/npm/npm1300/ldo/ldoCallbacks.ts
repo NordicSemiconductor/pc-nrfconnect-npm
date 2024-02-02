@@ -88,7 +88,7 @@ const setupSingleLdo = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx ldsw soft_start current', true, i, '(25|50|75|100)'),
+            toRegex('npmx ldsw soft_start current', true, i, '(10|20|35|50)'),
             res => {
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
