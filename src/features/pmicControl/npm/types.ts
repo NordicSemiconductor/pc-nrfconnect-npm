@@ -29,7 +29,7 @@ export const BuckRetentionControlValues = ['Off'] as const;
 type GPIONames = (typeof GPIOValues)[number];
 export type RebootMode = 'cold' | 'warm';
 export type LdoMode = 'ldoSwitch' | 'LDO';
-export const SoftStartValues = [25, 50, 75, 100] as const;
+export const SoftStartValues = [10, 20, 35, 50] as const;
 export type SoftStart = (typeof SoftStartValues)[number];
 export type LdoOnOffControl =
     | (typeof LdoOnOffControlValues)[number]

@@ -239,7 +239,7 @@ export default () => {
                         mode: 'ldoSwitch',
                         enabled: false,
                         softStartEnabled: true,
-                        softStart: 25,
+                        softStart: 20,
                         activeDischarge: false,
                         onOffControl: 'SW',
                     });
