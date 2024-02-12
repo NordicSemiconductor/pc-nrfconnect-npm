@@ -6,7 +6,6 @@
 
 import {
     BatteryModel,
-    BuckModeControlValues,
     BuckOnOffControlValues,
     GPIODriveValues,
     GPIOModeValues,
@@ -631,7 +630,16 @@ Battery models stored in database:
 
     test.each(
         PMIC_1300_BUCKS.map(index => [
-            ...[-1, 0, 1, 2, 3, 4].map(value =>
+            ...[
+                'Auto',
+                'PWM',
+                'PFM',
+                'GPIO0',
+                'GPIO1',
+                'GPIO2',
+                'GPIO3',
+                'GPIO4',
+            ].map(value =>
                 [
                     {
                         index,
@@ -640,24 +648,23 @@ Battery models stored in database:
                     },
                     {
                         index,
-                        append: `set ${index} ${value} 0`,
+                        append: `set ${index} ${value}`,
                         value,
                     },
                 ].flat()
             ),
         ]).flat()
     )('npmx buck mode control %p', ({ index, append, value }) => {
-        const command = `npmx buck gpio pwm_force index ${append}`;
+        const command = `powerup_buck mode ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${value} 0.`, command);
+        callback?.onSuccess(`Value: ${value}`, command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
             data: {
-                modeControl:
-                    value === -1 ? BuckModeControlValues[0] : GPIOValues[value],
+                modeControl: value,
             },
             index,
         });

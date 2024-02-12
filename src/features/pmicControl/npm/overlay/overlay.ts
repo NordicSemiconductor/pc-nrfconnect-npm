@@ -94,10 +94,20 @@ npm1300_ek_buck${index + 1}: BUCK${index + 1} {
             : ''
     }
     ${
-        buck.modeControl !== 'Auto'
+        buck.modeControl.startsWith('GPIO')
             ? `pwm-gpios= <&npm1300_ek_gpio ${GPIOValues.findIndex(
                   v => v === buck.modeControl
               )} GPIO_ACTIVE_HIGH>;`
+            : ''
+    }
+    ${
+        buck.modeControl === 'PWM'
+            ? 'regulator-initial-mode = <NPM1300_BUCK_MODE_PWM>;'
+            : ''
+    }
+    ${
+        buck.modeControl === 'PFM'
+            ? '// regulator-initial-mode = <NPM1300_BUCK_MODE_PFM>;'
             : ''
     }
 };

@@ -22,7 +22,7 @@ export const GPIOValues = [
 
 export const LdoOnOffControlValues = ['SW'] as const;
 
-export const BuckModeControlValues = ['Auto'] as const; // TODO 'PWM', 'PFM'
+export const BuckModeControlValues = ['Auto', 'PWM', 'PFM'] as const;
 export const BuckOnOffControlValues = ['Off'] as const;
 export const BuckRetentionControlValues = ['Off'] as const;
 

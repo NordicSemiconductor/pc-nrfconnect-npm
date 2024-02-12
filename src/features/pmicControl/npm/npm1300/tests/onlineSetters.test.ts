@@ -585,7 +585,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck gpio pwm_force index set ${index} 2`,
+                    `powerup_buck mode set ${index} GPIO2`,
                     expect.anything(),
                     undefined,
                     true
@@ -2138,7 +2138,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx buck gpio pwm_force index set ${index} 2`,
+                    `powerup_buck mode set ${index} GPIO2`,
                     expect.anything(),
                     undefined,
                     true
@@ -2147,7 +2147,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx buck gpio pwm_force index get ${index}`,
+                    `powerup_buck mode get ${index}`,
                     expect.anything(),
                     undefined,
                     true
