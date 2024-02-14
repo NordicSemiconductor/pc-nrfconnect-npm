@@ -452,7 +452,6 @@ Battery models stored in database:
 
         expect(mockOnStoredBatteryModelUpdate).toBeCalledTimes(1);
         expect(mockOnStoredBatteryModelUpdate).toBeCalledWith([
-            null,
             {
                 name: 'LP803448',
                 characterizations: [
@@ -469,8 +468,8 @@ Battery models stored in database:
                         capacity: 1413.4,
                     },
                 ],
+                slotIndex: 1,
             },
-            null,
         ] as (BatteryModel | null)[]);
     });
 
@@ -495,11 +494,7 @@ Battery models stored in database:
         callback?.onSuccess(response, command);
 
         expect(mockOnStoredBatteryModelUpdate).toBeCalledTimes(1);
-        expect(mockOnStoredBatteryModelUpdate).toBeCalledWith([
-            null,
-            null,
-            null,
-        ]);
+        expect(mockOnStoredBatteryModelUpdate).toBeCalledWith([]);
     });
 
     test.each(USBDetectStatusValues.map((state, index) => ({ state, index })))(
