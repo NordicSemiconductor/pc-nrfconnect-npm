@@ -5,8 +5,11 @@
  */
 
 import React from 'react';
-import { App, render } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import usageData from '@nordicsemiconductor/pc-nrfconnect-shared/src/utils/usageData';
+import {
+    App,
+    render,
+    telemetry,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
@@ -24,7 +27,7 @@ import NpmGenericDialog from './features/pmicControl/npm/NpmGenericDialog';
 
 import './index.scss';
 
-usageData.enableTelemetry();
+telemetry.enableTelemetry();
 
 render(
     <App
