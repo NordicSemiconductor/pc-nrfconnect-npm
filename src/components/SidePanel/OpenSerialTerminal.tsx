@@ -12,7 +12,7 @@ import {
     Device,
     openWindow,
     selectedDevice,
-    usageData,
+    telemetry,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getPmicState } from '../../features/pmicControl/pmicControlSlice';
@@ -58,7 +58,7 @@ export default () => {
 };
 
 const openSerialTerminal = (device: Device, serialPortPath: string) => {
-    usageData.sendUsageData(EventAction.OPEN_SERIAL_TERMINAL);
+    telemetry.sendEvent(EventAction.OPEN_SERIAL_TERMINAL);
     openWindow.openApp(
         { name: 'pc-nrfconnect-serial-terminal', source: 'official' },
         {

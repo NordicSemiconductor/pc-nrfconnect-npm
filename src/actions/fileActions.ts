@@ -5,8 +5,7 @@
  */
 
 import { dialog, getCurrentWindow } from '@electron/remote';
-import { AppThunk } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import usageData from '@nordicsemiconductor/pc-nrfconnect-shared/src/utils/usageData';
+import { AppThunk, telemetry } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     OpenDialogOptions,
     OpenDialogReturnValue,
@@ -45,7 +44,7 @@ const saveSettings =
             usbPower: currentState.usbPower,
         };
 
-        usageData.sendUsageData('Export Configuartion', {
+        telemetry.sendEvent('Export Configuration', {
             config: out,
         });
 

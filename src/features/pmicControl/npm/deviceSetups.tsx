@@ -95,11 +95,18 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                             progress.stepProgressPercentage,
                             progress.message
                         );
-                    }).catch(err => {
-                        if (err && !success) {
-                            reject(err.message);
-                        }
-                    });
+                    })
+                        .then(() => {
+                            onProgress(
+                                100,
+                                'Programming upload complete. Waiting for device to apply firmware and reboot. This take around a minute.'
+                            );
+                        })
+                        .catch(err => {
+                            if (err && !success) {
+                                reject(err.message);
+                            }
+                        });
                     logger.debug('firmware updated finished');
                 }),
         },
