@@ -14,6 +14,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getProfileBuffer } from '../../actions/fileActions';
+import { showDialog } from '../../features/pmicControl/downloadBatteryModelSlice';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     dialogHandler,
@@ -29,7 +30,6 @@ import {
     getStoredBatterModels,
 } from '../../features/pmicControl/pmicControlSlice';
 import { setProfilingStage } from '../../features/pmicControl/profilingSlice';
-import { writeBatterModel } from '../Profiling/helpers';
 
 export default ({ disabled }: { disabled: boolean }) => {
     const dispatch = useDispatch();
@@ -54,35 +54,23 @@ export default ({ disabled }: { disabled: boolean }) => {
 
     const batteryModelItems: DropdownItem[] = useMemo(() => {
         const items = [...hardcodedBatterModels];
-        if (activeBatteryModel) {
-            if (
-                hardcodedBatterModels.filter(
-                    v => v && v.name !== activeBatteryModel.name
-                ).length > 0
-            )
-                items.push(activeBatteryModel);
-        }
 
         storedBatterModels?.forEach(storedBatterModel => {
             if (storedBatterModel) items.push(storedBatterModel);
         });
 
-        const keys = new Set(items.map(item => item.name));
-        return Array.from(keys).map(key => ({
-            label: `${key} (${
-                getClosest(
-                    items.find(batterModel => batterModel.name === key),
-                    latestAdcSample?.tBat ?? 24
-                )?.capacity ?? ''
+        return items.map(batterModel => ({
+            label: `${
+                batterModel?.slotIndex != null
+                    ? `#${batterModel?.slotIndex} `
+                    : ''
+            }${batterModel.name} (${
+                getClosest(batterModel, latestAdcSample?.tBat ?? 24)
+                    ?.capacity ?? ''
             } mAh)`,
-            value: key,
+            value: batterModel.name,
         }));
-    }, [
-        activeBatteryModel,
-        hardcodedBatterModels,
-        latestAdcSample?.tBat,
-        storedBatterModels,
-    ]);
+    }, [hardcodedBatterModels, latestAdcSample?.tBat, storedBatterModels]);
 
     const selectedActiveItemBatteryMode = useMemo(
         () =>
@@ -112,7 +100,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                     npmDevice?.setActiveBatteryModel(item.value);
                 }}
                 selectedItem={selectedActiveItemBatteryMode}
-                disabled={disabled}
+                disabled={disabled || batteryModelItems.length === 0}
             />
             <DocumentationTooltip
                 placement="right-start"
@@ -125,11 +113,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                     onClick={() => {
                         getProfileBuffer()
                             .then(buffer => {
-                                if (npmDevice) {
-                                    dispatch(
-                                        writeBatterModel(buffer, npmDevice)
-                                    );
-                                }
+                                dispatch(showDialog(buffer));
                             })
                             .catch(res => {
                                 dispatch(

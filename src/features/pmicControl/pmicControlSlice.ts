@@ -47,7 +47,7 @@ interface pmicControlState {
     eventRecordingPath?: string;
     activeBatterModel?: BatteryModel;
     hardcodedBatterModels: BatteryModel[];
-    storedBatterModel?: (BatteryModel | null)[];
+    storedBatterModel?: BatteryModel[];
     usbPower: USBPower;
     fuelGaugeChargingSamplingRate: number;
     fuelGaugeNotChargingSamplingRate: number;
@@ -223,10 +223,7 @@ const pmicControlSlice = createSlice({
         setHardcodedBatterModels(state, action: PayloadAction<BatteryModel[]>) {
             state.hardcodedBatterModels = action.payload;
         },
-        setStoredBatterModel(
-            state,
-            action: PayloadAction<(BatteryModel | null)[]>
-        ) {
+        setStoredBatterModel(state, action: PayloadAction<BatteryModel[]>) {
             state.storedBatterModel = action.payload;
         },
         setSupportedVersion(state, action: PayloadAction<boolean | undefined>) {

@@ -22,13 +22,14 @@ import {
     generateParamsFromCSV,
     mergeBatteryParams,
 } from '../../../features/nrfutillNpm/csvProcessing';
+import { showDialog } from '../../../features/pmicControl/downloadBatteryModelSlice';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import {
     getProjectProfileProgress,
     removeRecentProject,
 } from '../../../features/pmicControl/profilingProjectsSlice.';
 import useIsUIDisabled from '../../../features/useIsUIDisabled';
-import { isProfileReadyForProcessing, writeBatterModel } from '../helpers';
+import { isProfileReadyForProcessing } from '../helpers';
 import { ProfilingProject } from '../types';
 import AddEditProfileDialog from './AddEditProfileDialog';
 import AddEditProjectDialog from './AddEditProjectDialog';
@@ -181,10 +182,7 @@ export default ({
                             .then(data => {
                                 if (npmDevice) {
                                     dispatch(
-                                        writeBatterModel(
-                                            Buffer.from(data.json),
-                                            npmDevice
-                                        )
+                                        showDialog(Buffer.from(data.json))
                                     );
                                 }
                                 setGeneratingBatterModel(false);

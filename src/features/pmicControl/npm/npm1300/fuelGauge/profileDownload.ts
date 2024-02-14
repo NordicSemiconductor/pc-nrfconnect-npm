@@ -138,7 +138,8 @@ export const profileDownloadSet = (
         unique?: boolean
     ) => void
 ) => {
-    const { activeBatteryModel } = fuelGaugeGet(sendCommand);
+    const { activeBatteryModel, storedBatteryModel } =
+        fuelGaugeGet(sendCommand);
 
     const abortDownloadFuelGaugeProfile = () =>
         new Promise<void>((resolve, reject) => {
@@ -159,10 +160,10 @@ export const profileDownloadSet = (
             );
         });
 
-    const applyDownloadFuelGaugeProfile = () =>
+    const applyDownloadFuelGaugeProfile = (slot = 0) =>
         new Promise<void>((resolve, reject) => {
             sendCommand(
-                `fuel_gauge model download apply 0`,
+                `fuel_gauge model download apply ${slot}`,
                 () => {
                     resolve();
                 },
@@ -170,7 +171,7 @@ export const profileDownloadSet = (
             );
         });
 
-    const downloadFuelGaugeProfile = (profile: Buffer) => {
+    const downloadFuelGaugeProfile = (profile: Buffer, slot?: number) => {
         const chunkSize = 256;
         const chunks = Math.ceil(profile.byteLength / chunkSize);
 
@@ -188,6 +189,7 @@ export const profileDownloadSet = (
                             totalChunks: Math.ceil(
                                 profile.byteLength / chunkSize
                             ),
+                            slot,
                         };
                         eventEmitter.emit(
                             'onProfileDownloadUpdate',
@@ -202,6 +204,7 @@ export const profileDownloadSet = (
                             downloadData(chunk + 1);
                         } else {
                             resolve();
+                            storedBatteryModel();
                             activeBatteryModel();
                         }
                     },
@@ -213,6 +216,7 @@ export const profileDownloadSet = (
                                 const profileDownload: ProfileDownload = {
                                     state: 'failed',
                                     alertMessage: parseColonBasedAnswer('res'),
+                                    slot,
                                 };
                                 eventEmitter.emit(
                                     'onProfileDownloadUpdate',

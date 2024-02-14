@@ -12,13 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showSaveDialog } from '../../../actions/fileActions';
 import { stringToFile } from '../../../features/helpers';
 import { generateParamsFromCSV } from '../../../features/nrfutillNpm/csvProcessing';
+import { showDialog } from '../../../features/pmicControl/downloadBatteryModelSlice';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
 import useIsUIDisabled from '../../../features/useIsUIDisabled';
 import {
     isProfileReadyForProcessing,
     readAndUpdateProjectSettings,
-    writeBatterModel,
 } from '../helpers';
 import { ProfilingProject } from '../types';
 import AddEditProfileDialog from './AddEditProfileDialog';
@@ -123,10 +123,7 @@ export default ({
                     onClick={() => {
                         if (profile.batteryJson && npmDevice) {
                             dispatch(
-                                writeBatterModel(
-                                    Buffer.from(profile.batteryJson),
-                                    npmDevice
-                                )
+                                showDialog(Buffer.from(profile.batteryJson))
                             );
                         }
                     }}

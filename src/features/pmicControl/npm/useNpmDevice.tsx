@@ -406,9 +406,9 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onProfileDownloadUpdate(payload => {
-                    const progressDialog: PmicDialog = {
+                    const initialProgressDialog: PmicDialog = {
                         uuid: DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
-                        message: `Writing battery profile will reset the current fuel gauge. Click 'Write' to continue.`,
+                        message: `Write battery model.`,
                         confirmDisabled: true,
                         confirmLabel: 'Write',
                         cancelLabel: 'Close',
@@ -424,11 +424,13 @@ export default () => {
                                 payload.completeChunks &&
                                 payload.completeChunks === payload.totalChunks
                             ) {
-                                npmDevice.applyDownloadFuelGaugeProfile();
+                                npmDevice.applyDownloadFuelGaugeProfile(
+                                    payload.slot
+                                );
                             }
                             dispatch(
                                 dialogHandler({
-                                    ...progressDialog,
+                                    ...initialProgressDialog,
                                     cancelLabel: 'Abort',
                                     cancelClosesDialog: false,
                                     onCancel: () => {
@@ -457,7 +459,7 @@ export default () => {
                         case 'aborting':
                             dispatch(
                                 dialogHandler({
-                                    ...progressDialog,
+                                    ...initialProgressDialog,
                                     message: (
                                         <>
                                             <div>Writing battery profile.</div>
@@ -472,7 +474,7 @@ export default () => {
                         case 'aborted':
                             dispatch(
                                 dialogHandler({
-                                    ...progressDialog,
+                                    ...initialProgressDialog,
                                     message: (
                                         <>
                                             <div>Writing battery profile.</div>
@@ -491,7 +493,7 @@ export default () => {
                         case 'applied':
                             dispatch(
                                 dialogHandler({
-                                    ...progressDialog,
+                                    ...initialProgressDialog,
                                     message: (
                                         <>
                                             <div>Writing battery profile.</div>
@@ -510,7 +512,7 @@ export default () => {
                         case 'failed':
                             dispatch(
                                 dialogHandler({
-                                    ...progressDialog,
+                                    ...initialProgressDialog,
                                     message: (
                                         <>
                                             <div>Writing battery profile.</div>

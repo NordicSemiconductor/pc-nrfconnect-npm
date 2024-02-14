@@ -179,7 +179,9 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             setName(event.target.value);
                             const match =
                                 event.target.value.match(/^[a-zA-Z0-9]+$/);
-                            setValidName(!!match);
+                            setValidName(
+                                !!match && event.target.value !== 'default'
+                            );
                         }}
                         value={name}
                     />

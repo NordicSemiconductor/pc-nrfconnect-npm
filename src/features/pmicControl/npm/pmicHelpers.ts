@@ -76,8 +76,13 @@ export const parseToBoolean = (message: string) =>
 
 export const parseBatteryModel = (message: string) => {
     const slot = message.split(':')[1];
+    let slotIndex: number | undefined;
     if (slot && slot.trim() === 'Empty') return null;
     if (slot) {
+        slotIndex = Number.parseInt(
+            message.split(':')[0].replace('Slot ', ''),
+            10
+        );
         message = slot;
     }
 
@@ -127,6 +132,7 @@ export const parseBatteryModel = (message: string) => {
     return {
         name,
         characterizations,
+        slotIndex,
     } as BatteryModel;
 };
 
