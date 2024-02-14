@@ -56,6 +56,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         noOfLdos: 2,
         noOfGPIOs: 5,
         noOfLEDs: 3,
+        noOfBatterySlots: 3,
     };
     const baseDevice = baseNpmDevice(
         shellParser,

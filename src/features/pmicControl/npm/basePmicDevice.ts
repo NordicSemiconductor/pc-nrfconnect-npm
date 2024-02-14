@@ -40,6 +40,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         noOfLdos?: number;
         noOfGPIOs?: number;
         noOfLEDs?: number;
+        noOfBatterySlots?: number;
     },
     supportsVersion: string
 ) => {
@@ -284,7 +285,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         },
 
         onStoredBatteryModelUpdate: (
-            handler: (payload: (BatteryModel | null)[]) => void
+            handler: (payload: BatteryModel[]) => void
         ) => {
             eventEmitter.on('onStoredBatteryModelUpdate', handler);
             return () => {
@@ -344,6 +345,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
         getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,
         getNumberOfLEDs: () => devices.noOfLEDs ?? 0,
+        getNumberOfBatteryModelSlots: () => devices.noOfBatterySlots ?? 0,
 
         isSupportedVersion: () =>
             new Promise<{ supported: boolean; version: string }>(

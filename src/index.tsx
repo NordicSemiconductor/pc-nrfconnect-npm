@@ -15,6 +15,7 @@ import appReducer from './appReducer';
 import Charger from './components/Charger/Charger';
 import DashboardControl from './components/Dashboard/DashboardControl';
 import DeviceSelector from './components/DeviceSelector';
+import SlotSelectionDownloadDialog from './components/FuelGauge/SlotSelectionDownloadDialog';
 import GPIOs from './components/GPIOs/GPIOs';
 import Graph from './components/Graph/Graph';
 import ProfilingWizard from './components/Profiling/Dialog/ProfilingWizard';
@@ -39,6 +40,7 @@ render(
                 <ConfirmCloseDialog />
                 <ProfilingWizard />
                 <NpmGenericDialog />
+                <SlotSelectionDownloadDialog />
             </>
         }
         feedback={{ categories: ['nPM PowerUP', 'nPM1300'] }}

@@ -725,6 +725,7 @@ describe('PMIC 1300 - Request update commands', () => {
                         capacity: 1413.4,
                     },
                 ],
+                slotIndex: undefined,
             },
             {
                 name: 'LP502540',
@@ -734,6 +735,7 @@ describe('PMIC 1300 - Request update commands', () => {
                         capacity: 563.08,
                     },
                 ],
+                slotIndex: undefined,
             },
         ] as BatteryModel[]);
 

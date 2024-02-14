@@ -8,6 +8,7 @@ import { NrfConnectState } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { combineReducers } from 'redux';
 
 import confirmBeforeCloseReducer from './features/confirmBeforeClose/confirmBeforeCloseSlice';
+import downloadBatteryModelSlice from './features/pmicControl/downloadBatteryModelSlice';
 import pmicControlReducer from './features/pmicControl/pmicControlSlice';
 import profilingProjectsReducer from './features/pmicControl/profilingProjectsSlice.';
 import profilingReducer from './features/pmicControl/profilingSlice';
@@ -24,6 +25,7 @@ const appReducer = combineReducers({
     profiling: profilingReducer,
     pmicControl: pmicControlReducer,
     serial: serialReducer,
+    downloadBatteryModel: downloadBatteryModelSlice,
 });
 
 export default appReducer;

@@ -218,6 +218,7 @@ export type BatteryModelCharacterization = {
 export type BatteryModel = {
     name: string;
     characterizations: BatteryModelCharacterization[];
+    slotIndex?: number;
 };
 
 export const USBDetectStatusValues = [
@@ -283,6 +284,7 @@ export interface ProfileDownload {
     completeChunks?: number;
     totalChunks?: number;
     alertMessage?: string;
+    slot?: number;
 }
 
 export type BaseNpmDevice = {
@@ -345,7 +347,7 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     onStoredBatteryModelUpdate: (
-        handler: (payload: (BatteryModel | null)[]) => void
+        handler: (payload: BatteryModel[]) => void
     ) => () => void;
 
     onLoggingEvent: (
@@ -364,6 +366,7 @@ export type BaseNpmDevice = {
     getNumberOfLdos: () => number;
     getNumberOfGPIOs: () => number;
     getNumberOfLEDs: () => number;
+    getNumberOfBatteryModelSlots: () => number;
 
     isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
     getSupportedVersion: () => string;
@@ -538,9 +541,9 @@ export type NpmDevice = {
     enterShipHibernateMode: () => void;
 
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
-    downloadFuelGaugeProfile: (profile: Buffer) => Promise<void>;
+    downloadFuelGaugeProfile: (profile: Buffer, slot?: number) => Promise<void>;
     abortDownloadFuelGaugeProfile: () => Promise<void>;
-    applyDownloadFuelGaugeProfile: () => Promise<void>;
+    applyDownloadFuelGaugeProfile: (slot?: number) => Promise<void>;
     getHardcodedBatteryModels: () => Promise<BatteryModel[]>;
     setActiveBatteryModel: (name: string) => Promise<void>;
 

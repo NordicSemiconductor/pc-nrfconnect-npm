@@ -87,17 +87,14 @@ export default (
                         'Battery models stored in database:'
                     );
                     if (models.length < 2) {
-                        eventEmitter.emit(
-                            'onStoredBatteryModelUpdate',
-                            undefined
-                        );
+                        eventEmitter.emit('onStoredBatteryModelUpdate', []);
                         return;
                     }
                     const stringModels = models[1].trim().split('\n');
                     const list = stringModels.map(parseBatteryModel);
                     eventEmitter.emit(
                         'onStoredBatteryModelUpdate',
-                        list.length !== 0 ? list : undefined
+                        list.filter(item => item != null)
                     );
                 },
                 noop
