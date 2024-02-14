@@ -181,7 +181,6 @@ export default () => {
     const npmDevice = useSelector(getNpmDevice);
 
     const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
-
     useProfilingProjects();
 
     const bundledBatteries = useMemo(() => {
@@ -269,7 +268,10 @@ export default () => {
                     />
                 )}
             </CollapsibleGroup>
-            <CollapsibleGroup heading="Bundled Profiles">
+            <CollapsibleGroup
+                heading="Bundled Profiles"
+                defaultCollapsed={false}
+            >
                 <div className=" tw-flex tw-flex-col tw-gap-4 tw-bg-white tw-p-4">
                     {bundledBatteries.map(bundledBattery => (
                         <BundledBatteryList
