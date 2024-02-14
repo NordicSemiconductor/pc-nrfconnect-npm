@@ -79,9 +79,9 @@ export default ({
     const message = <span>{`Temperature: ${profile.temperature}°C`}</span>;
 
     return (
-        <div className="profile pt-2 pb-2">
-            <div className="d-flex flex-row justify-content-between mt-2 mb-2">
-                <div className="flex-grow-1 mr-4">
+        <div className="profile tw-pb-2 tw-pt-2">
+            <div className="tw-mb-2 tw-mt-2 tw-flex tw-flex-row tw-justify-between">
+                <div className="tw-mr-4 tw-grow">
                     {!dataCollected && (
                         <Alert variant="warning">
                             <strong>Profile is not complete: </strong>

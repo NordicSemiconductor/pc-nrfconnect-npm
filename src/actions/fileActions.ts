@@ -108,7 +108,7 @@ const stream2buffer = (stream: fs.ReadStream) =>
         );
     });
 
-const loadBatteryProfile = (filePath: string) =>
+export const loadBatteryProfile = (filePath: string) =>
     new Promise<Buffer>((resolve, reject) => {
         const readerStream = fs.createReadStream(filePath);
         readerStream.setEncoding('utf8');
