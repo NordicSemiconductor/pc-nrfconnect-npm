@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
@@ -12,8 +12,13 @@ import {
     Dropdown,
     DropdownItem,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import path from 'path';
 
-import { getProfileBuffer } from '../../actions/fileActions';
+import {
+    getProfileBuffer,
+    loadBatteryProfile,
+} from '../../actions/fileActions';
+import { getBundledBatteries } from '../../features/helpers';
 import { showDialog } from '../../features/pmicControl/downloadBatteryModelSlice';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
@@ -60,11 +65,7 @@ export default ({ disabled }: { disabled: boolean }) => {
         });
 
         return items.map(batterModel => ({
-            label: `${
-                batterModel?.slotIndex != null
-                    ? `#${batterModel?.slotIndex} `
-                    : ''
-            }${batterModel.name} (${
+            label: `${batterModel.name} (${
                 getClosest(batterModel, latestAdcSample?.tBat ?? 24)
                     ?.capacity ?? ''
             } mAh)`,
@@ -82,6 +83,54 @@ export default ({ disabled }: { disabled: boolean }) => {
             },
         [activeBatteryModel, batteryModelItems]
     );
+
+    const bundledBatteries = useMemo(
+        () => getBundledBatteries(npmDevice?.getDeviceType() ?? 'npm1300'),
+        [npmDevice]
+    );
+
+    const brandsItems: DropdownItem<string>[] = [
+        {
+            label: 'Select Brand',
+            value: 'n/a',
+        },
+        ...bundledBatteries.map(batt => ({
+            label: batt.brandName,
+            value: batt.brandName,
+        })),
+        {
+            label: 'Custom Model',
+            value: 'Browse',
+        },
+    ];
+
+    const [selectedBrandsItem, setSelectedBrandsItem] = useState(
+        brandsItems[0]
+    );
+
+    const brandsBatteryItems: DropdownItem<string>[] = useMemo(() => {
+        const getModelBatteryList = () => {
+            const model = bundledBatteries.find(
+                batt => batt.brandName === selectedBrandsItem.value
+            );
+            return (
+                model?.fileNames
+                    .filter(name => name.endsWith('.json'))
+                    .map(name => ({
+                        label: path.parse(name).name,
+                        value: path.join(model.folder, `${name}`),
+                    })) ?? []
+            );
+        };
+
+        return [
+            {
+                label: 'Select Model',
+                value: 'n/a',
+            },
+            ...getModelBatteryList(),
+        ];
+    }, [bundledBatteries, selectedBrandsItem]);
 
     return (
         <>
@@ -102,15 +151,11 @@ export default ({ disabled }: { disabled: boolean }) => {
                 selectedItem={selectedActiveItemBatteryMode}
                 disabled={disabled || batteryModelItems.length === 0}
             />
-            <DocumentationTooltip
-                placement="right-start"
-                card="sidePanel"
-                item="WriteBatteryModel"
-            >
-                <Button
-                    variant="secondary"
-                    className="w-100"
-                    onClick={() => {
+            <Dropdown
+                label="Write Battery Model"
+                items={brandsItems}
+                onSelect={item => {
+                    if (item.value === 'Browse') {
                         getProfileBuffer()
                             .then(buffer => {
                                 dispatch(showDialog(buffer));
@@ -140,13 +185,31 @@ export default ({ disabled }: { disabled: boolean }) => {
                                         onCancel: () => {},
                                     })
                                 );
+                            })
+                            .finally(() => {
+                                setSelectedBrandsItem(brandsItems[0]);
                             });
-                    }}
-                    disabled={disabled}
-                >
-                    Write Battery Model
-                </Button>
-            </DocumentationTooltip>
+                    } else {
+                        setSelectedBrandsItem(item);
+                    }
+                }}
+                selectedItem={selectedBrandsItem}
+                disabled={disabled}
+            />
+            <Dropdown
+                items={brandsBatteryItems}
+                onSelect={item => {
+                    loadBatteryProfile(item.value).then(buffer => {
+                        dispatch(showDialog(buffer));
+                    });
+                }}
+                selectedItem={brandsBatteryItems[0]}
+                disabled={
+                    disabled ||
+                    selectedBrandsItem.value === 'n/a' ||
+                    selectedBrandsItem.value === 'Browse'
+                }
+            />
             {profilingSupported && (
                 <DocumentationTooltip
                     placement="right-start"

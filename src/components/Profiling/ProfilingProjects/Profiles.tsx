@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     CollapsibleGroup,
-    getAppDir,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { OpenDialogReturnValue } from 'electron';
 import fs from 'fs';
@@ -20,6 +19,7 @@ import {
     showOpenDialog,
     showSaveDialog,
 } from '../../../actions/fileActions';
+import { getBundledBatteries } from '../../../features/helpers';
 import { showDialog } from '../../../features/pmicControl/downloadBatteryModelSlice';
 import {
     getNpmDevice,
@@ -183,26 +183,10 @@ export default () => {
     const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
     useProfilingProjects();
 
-    const bundledBatteries = useMemo(() => {
-        const modelsPath = path.join(
-            getAppDir(),
-            'resources',
-            'batteryModels',
-            npmDevice?.getDeviceType() ?? 'npm1300'
-        );
-
-        const brands = fs.readdirSync(modelsPath);
-
-        return brands.map(brandFolder => {
-            const fullPath = path.join(modelsPath, brandFolder);
-
-            return {
-                brandName: brandFolder,
-                folder: fullPath,
-                fileNames: fs.readdirSync(fullPath),
-            };
-        });
-    }, [npmDevice]);
+    const bundledBatteries = useMemo(
+        () => getBundledBatteries(npmDevice?.getDeviceType() ?? 'npm1300'),
+        [npmDevice]
+    );
 
     return (
         <div className="projects-container tw-flex tw-flex-col">
