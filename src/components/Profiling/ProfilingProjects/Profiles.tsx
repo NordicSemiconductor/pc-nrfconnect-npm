@@ -190,7 +190,10 @@ export default () => {
 
     return (
         <div className="projects-container tw-flex tw-flex-col">
-            <CollapsibleGroup heading="Custom Profiles" defaultCollapsed>
+            <CollapsibleGroup
+                heading="Custom Profiles"
+                defaultCollapsed={false}
+            >
                 <div className="tw-flex tw-justify-end tw-gap-2">
                     <Button
                         onClick={() => dispatch(reloadRecentProjects())}
@@ -252,10 +255,7 @@ export default () => {
                     />
                 )}
             </CollapsibleGroup>
-            <CollapsibleGroup
-                heading="Bundled Profiles"
-                defaultCollapsed={false}
-            >
+            <CollapsibleGroup heading="Bundled Profiles">
                 <div className=" tw-flex tw-flex-col tw-gap-4 tw-bg-white tw-p-4">
                     {bundledBatteries.map(bundledBattery => (
                         <BundledBatteryList
