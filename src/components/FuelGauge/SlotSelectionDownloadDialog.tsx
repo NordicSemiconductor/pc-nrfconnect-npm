@@ -16,6 +16,7 @@ import {
 import {
     closeDialog,
     getBuffer,
+    getModelName,
     getShowDialog,
 } from '../../features/pmicControl/downloadBatteryModelSlice';
 import {
@@ -30,6 +31,7 @@ export default () => {
     const [slot, setSlot] = useState(0);
     const buffer = useSelector(getBuffer);
     const showDialog = useSelector(getShowDialog);
+    const modelName = useSelector(getModelName);
 
     const items: DropdownItem<number>[] = [];
 
@@ -46,11 +48,9 @@ export default () => {
         });
     }
 
-    console.log(items);
-
     return showDialog ? (
         <GenericDialog
-            title="Write battery model"
+            title={`Write battery model${modelName ? ` - ${modelName}` : ''}`}
             footer={
                 <>
                     <DialogButton

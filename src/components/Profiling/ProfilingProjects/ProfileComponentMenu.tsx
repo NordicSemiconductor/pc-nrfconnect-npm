@@ -123,7 +123,10 @@ export default ({
                     onClick={() => {
                         if (profile.batteryJson && npmDevice) {
                             dispatch(
-                                showDialog(Buffer.from(profile.batteryJson))
+                                showDialog({
+                                    buffer: Buffer.from(profile.batteryJson),
+                                    name: project.name,
+                                })
                             );
                         }
                     }}

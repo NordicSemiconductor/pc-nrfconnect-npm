@@ -59,7 +59,7 @@ const BundledBatteryItem = ({
                         loadBatteryProfile(
                             path.join(rootFolder, `${model.name}.json`)
                         ).then(buffer => {
-                            dispatch(showDialog(buffer));
+                            dispatch(showDialog({ buffer, name: model.name }));
                         });
                     }}
                     disabled={

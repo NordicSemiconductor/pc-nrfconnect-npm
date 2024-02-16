@@ -157,8 +157,13 @@ export default ({ disabled }: { disabled: boolean }) => {
                 onSelect={item => {
                     if (item.value === 'Browse') {
                         getProfileBuffer()
-                            .then(buffer => {
-                                dispatch(showDialog(buffer));
+                            .then(result => {
+                                dispatch(
+                                    showDialog({
+                                        buffer: result.buffer,
+                                        name: path.parse(result.filePath).name,
+                                    })
+                                );
                             })
                             .catch(res => {
                                 dispatch(
@@ -200,7 +205,12 @@ export default ({ disabled }: { disabled: boolean }) => {
                 items={brandsBatteryItems}
                 onSelect={item => {
                     loadBatteryProfile(item.value).then(buffer => {
-                        dispatch(showDialog(buffer));
+                        dispatch(
+                            showDialog({
+                                buffer,
+                                name: path.parse(item.value).name,
+                            })
+                        );
                     });
                 }}
                 selectedItem={brandsBatteryItems[0]}
