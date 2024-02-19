@@ -124,6 +124,18 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
+                toRegex('powerup_charger vbatlow', true, undefined, '(1|0)'),
+                res => {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        enableVBatLow: parseToBoolean(res),
+                    });
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
                 toRegex(
                     'npmx charger module charger',
                     true,

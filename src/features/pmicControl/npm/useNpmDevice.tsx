@@ -119,6 +119,7 @@ export default () => {
                 npmDevice.requestUpdate.chargerITerm();
                 npmDevice.requestUpdate.chargerBatLim();
                 npmDevice.requestUpdate.chargerEnabledRecharging();
+                npmDevice.requestUpdate.chargerEnablevBatLow();
                 npmDevice.requestUpdate.pmicChargingState();
                 npmDevice.requestUpdate.chargerNTCThermistor();
                 npmDevice.requestUpdate.chargerNTCBeta();
@@ -204,6 +205,7 @@ export default () => {
                             enabled: false,
                             iTerm: '10%',
                             enableRecharging: false,
+                            enableVBatLow: false,
                             ntcThermistor: '10 kΩ',
                             ntcBeta: 3380,
                             tChgStop: 110,

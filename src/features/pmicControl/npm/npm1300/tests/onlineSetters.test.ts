@@ -139,6 +139,24 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test.each([true, false])(
+            'Set setChargerEnableVBatLow enabled: %p',
+            async enabled => {
+                await pmic.setChargerEnablevBatLow(enabled);
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `powerup_charger vbatlow set ${enabled ? '1' : '0'}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnChargerUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each([true, false])(
             'Set setChargerEnabled enabled: %p',
             async enabled => {
                 await pmic.setChargerEnabled(enabled);
@@ -1635,6 +1653,34 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
                     `npmx charger module recharge get`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            }
+        );
+
+        test.each([true, false])(
+            'Set setChargerEnableVBatLow - Fail immediately -  enabled: %p',
+            async enabled => {
+                await expect(
+                    pmic.setChargerEnablevBatLow(enabled)
+                ).rejects.toBeUndefined();
+
+                // turn off vbatlow
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).nthCalledWith(
+                    1,
+                    `powerup_charger vbatlow set ${enabled ? '1' : '0'}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `powerup_charger vbatlow get`,
                     expect.anything(),
                     undefined,
                     true

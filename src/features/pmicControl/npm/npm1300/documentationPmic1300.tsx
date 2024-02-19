@@ -787,6 +787,23 @@ export const documentation: Documentation = {
                 ],
             },
         ],
+        EnableVBatLow: [
+            {
+                title: (
+                    <>
+                        <span>Charging Below V</span>
+                        <span className="subscript">BATLOW</span>
+                    </>
+                ),
+                content: [
+                    <p key="p1">
+                        Allow charging of a heavily discharged battery. This
+                        should be configured according to your battery
+                        specification.
+                    </p>,
+                ],
+            },
+        ],
         ITERM: [
             {
                 title: (

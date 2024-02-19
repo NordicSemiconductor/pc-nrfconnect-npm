@@ -25,6 +25,7 @@ export const chargerGet = (
     chargerBatLim: () => sendCommand('npmx charger discharging_current get'),
     chargerEnabledRecharging: () =>
         sendCommand('npmx charger module recharge get'),
+    chargerEnablevBatLow: () => sendCommand('powerup_charger vbatlow get'),
     chargerNTCThermistor: () => sendCommand('npmx adc ntc type get'),
     chargerNTCBeta: () => sendCommand('npmx adc ntc beta get'),
     chargerTChgStop: () => sendCommand('npmx charger die_temp stop get'),
@@ -53,6 +54,7 @@ export const chargerSet = (
         chargerVTrickleFast,
         chargerITerm,
         chargerEnabledRecharging,
+        chargerEnablevBatLow,
         chargerNTCThermistor,
         chargerNTCBeta,
         chargerTChgStop,
@@ -195,6 +197,26 @@ export const chargerSet = (
                 );
             }
         });
+
+    const setChargerEnablevBatLow = (enabled: boolean) =>
+        new Promise<void>((resolve, reject) => {
+            if (offlineMode) {
+                eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    enableVBatLow: enabled,
+                });
+                resolve();
+            } else {
+                sendCommand(
+                    `powerup_charger vbatlow set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        chargerEnablevBatLow();
+                        reject();
+                    }
+                );
+            }
+        });
+
     const setChargerNTCThermistor = (
         mode: NTCThermistor,
         autoSetBeta?: boolean
@@ -446,6 +468,7 @@ export const chargerSet = (
         setChargerVTrickleFast,
         setChargerITerm,
         setChargerEnabledRecharging,
+        setChargerEnablevBatLow,
         setChargerNTCThermistor,
         setChargerNTCBeta,
         setChargerTChgStop,
