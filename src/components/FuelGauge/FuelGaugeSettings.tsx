@@ -119,7 +119,16 @@ export default ({ disabled }: { disabled: boolean }) => {
                     .map(name => ({
                         label: path.parse(name).name,
                         value: path.join(model.folder, `${name}`),
-                    })) ?? []
+                    }))
+                    .sort((a, b) => {
+                        const getMAh = (label: string) => {
+                            const regexMatch = label.match(/(\d+ mAh)/) ?? [
+                                '0',
+                            ];
+                            return Number.parseInt(regexMatch[0], 10);
+                        };
+                        return getMAh(a.label) - getMAh(b.label);
+                    }) ?? []
             );
         };
 
