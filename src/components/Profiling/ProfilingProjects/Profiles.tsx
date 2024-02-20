@@ -129,33 +129,41 @@ const BundledBatteryList = ({
         json: boolean;
     }[] = [];
 
-    bundledBattery.fileNames.forEach(name => {
-        const parsed = path.parse(name);
+    bundledBattery.fileNames
+        .sort((a, b) => {
+            const getMAh = (label: string) => {
+                const regexMatch = label.match(/(\d+ mAh)/) ?? ['0'];
+                return Number.parseInt(regexMatch[0], 10);
+            };
+            return getMAh(a) - getMAh(b);
+        })
+        .forEach(name => {
+            const parsed = path.parse(name);
 
-        if (
-            parsed.ext.toLocaleLowerCase() === '.json' ||
-            parsed.ext.toLocaleLowerCase() === '.inc'
-        ) {
-            let model = models.find(m => m.name === parsed.name);
-            if (!model) {
-                model = {
-                    name: parsed.name,
-                    json: false,
-                    inc: false,
-                };
-                models.push(model);
-            }
+            if (
+                parsed.ext.toLocaleLowerCase() === '.json' ||
+                parsed.ext.toLocaleLowerCase() === '.inc'
+            ) {
+                let model = models.find(m => m.name === parsed.name);
+                if (!model) {
+                    model = {
+                        name: parsed.name,
+                        json: false,
+                        inc: false,
+                    };
+                    models.push(model);
+                }
 
-            switch (parsed.ext.toLocaleLowerCase()) {
-                case '.json':
-                    model.json = true;
-                    break;
-                case '.inc':
-                    model.inc = true;
-                    break;
+                switch (parsed.ext.toLocaleLowerCase()) {
+                    case '.json':
+                        model.json = true;
+                        break;
+                    case '.inc':
+                        model.inc = true;
+                        break;
+                }
             }
-        }
-    });
+        });
 
     return (
         <CollapsibleGroup
