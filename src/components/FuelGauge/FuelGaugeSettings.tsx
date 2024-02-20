@@ -161,7 +161,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 disabled={disabled || batteryModelItems.length === 0}
             />
             <Dropdown
-                label="Write Battery Model"
+                label="Add New Active Battery Model"
                 items={brandsItems}
                 onSelect={item => {
                     if (item.value === 'Browse') {

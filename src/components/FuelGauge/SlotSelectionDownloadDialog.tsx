@@ -50,6 +50,7 @@ export default () => {
 
     return showDialog ? (
         <GenericDialog
+            className="tw-preflight"
             title={`Write battery model${modelName ? ` - ${modelName}` : ''}`}
             footer={
                 <>
@@ -79,18 +80,25 @@ export default () => {
             }
             isVisible
         >
-            <div>
-                {`Writing battery profile will reset the current fuel gauge and
-                overwrite the model in the slot. Click 'Write' to continue.`}
+            <div className="tw-flex tw-flex-col tw-gap-2">
+                <p>
+                    {`This will write a new battery model to the nPM Controller which
+                is running the Fuel Gauge algorithm in nPM PowerUP, and make it
+                available in the "Active Battery Model" dropdown.`}
+                </p>
+                <p>
+                    There are 3 available battery model slots in the nPM
+                    Controller.
+                </p>
+                <Dropdown
+                    label="Select slot"
+                    items={items}
+                    onSelect={item => {
+                        setSlot(item.value);
+                    }}
+                    selectedItem={items[slot]}
+                />
             </div>
-            <Dropdown
-                label="Programming slot"
-                items={items}
-                onSelect={item => {
-                    setSlot(item.value);
-                }}
-                selectedItem={items[slot]}
-            />
         </GenericDialog>
     ) : null;
 };
