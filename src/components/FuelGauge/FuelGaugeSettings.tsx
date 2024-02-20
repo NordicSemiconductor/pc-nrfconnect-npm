@@ -161,7 +161,15 @@ export default ({ disabled }: { disabled: boolean }) => {
                 disabled={disabled || batteryModelItems.length === 0}
             />
             <Dropdown
-                label="Add New Active Battery Model"
+                label={
+                    <DocumentationTooltip
+                        placement="right-start"
+                        card="sidePanel"
+                        item="AddNewActiveBatteryModel"
+                    >
+                        Add New Active Battery Model
+                    </DocumentationTooltip>
+                }
                 items={brandsItems}
                 onSelect={item => {
                     if (item.value === 'Browse') {

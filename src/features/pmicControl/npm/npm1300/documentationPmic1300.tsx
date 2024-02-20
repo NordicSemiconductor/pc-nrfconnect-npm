@@ -1094,24 +1094,36 @@ export const documentation: Documentation = {
                 title: 'Active Battery Model',
                 content: [
                     <p key="p1">
-                        Select a battery model. The battery models cover an
-                        operating voltage range of 3.0 V to 4.2 V for the fuel
-                        gauge. If your battery model is not in the list, select
-                        the model that best matches the capacity of your
-                        battery. This will not give the best state-of-charge
-                        accuracy but enables easy, initial evaluation of the
-                        fuel gauge.
+                        Select the battery model you want to use for Fuel Gauge
+                        evaluation in nPM PowerUP. Please use the &ldquo;Add New
+                        Active Battery Model&ldquo; selection below to add new
+                        battery models. You can use the default battery model
+                        for initial evaluation, this will however not give the
+                        best state-of-charge accuracy.
                     </p>,
                 ],
             },
         ],
-        WriteBatteryModel: [
+        AddNewActiveBatteryModel: [
             {
-                title: 'Write Battery Model',
+                title: 'Add New Active Battery Model',
                 content: [
                     <p key="p1">
-                        You can write a battery model to start evaluating the
-                        nPM PowerUP fuel gauge.
+                        Nordic has profiled batteries from selected battery
+                        vendors. Please select from the below drop down menus to
+                        add one of these to the &ldquo;Active Battery
+                        Model&ldquo; selection.
+                    </p>,
+                    <p key="p2">
+                        You can also add your custom battery model. If your
+                        battery is not listed you can create a battery model for
+                        it by clicking &ldquo;Profile Battery&ldquo;.
+                    </p>,
+                    <p key="p3">
+                        You can also use one of the brand specific battery
+                        models matching the capacity of the battery you use for
+                        quick an easy evaluation. Please note that this will not
+                        give the best state-of-charge accuracy.
                     </p>,
                 ],
             },
