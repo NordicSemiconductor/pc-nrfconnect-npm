@@ -182,7 +182,10 @@ export default ({
                             .then(data => {
                                 if (npmDevice) {
                                     dispatch(
-                                        showDialog(Buffer.from(data.json))
+                                        showDialog({
+                                            buffer: Buffer.from(data.json),
+                                            name: project.name,
+                                        })
                                     );
                                 }
                                 setGeneratingBatterModel(false);

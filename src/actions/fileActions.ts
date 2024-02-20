@@ -108,7 +108,7 @@ const stream2buffer = (stream: fs.ReadStream) =>
         );
     });
 
-const loadBatteryProfile = (filePath: string) =>
+export const loadBatteryProfile = (filePath: string) =>
     new Promise<Buffer>((resolve, reject) => {
         const readerStream = fs.createReadStream(filePath);
         readerStream.setEncoding('utf8');
@@ -117,7 +117,7 @@ const loadBatteryProfile = (filePath: string) =>
     });
 
 export const getProfileBuffer = () =>
-    new Promise<Buffer>((resolve, reject) => {
+    new Promise<{ buffer: Buffer; filePath: string }>((resolve, reject) => {
         showOpenDialog({
             title: 'Select a JSON file',
             filters: [
@@ -129,7 +129,11 @@ export const getProfileBuffer = () =>
             properties: ['openFile'],
         }).then(({ filePaths }: OpenDialogReturnValue) => {
             filePaths.length === 1 &&
-                loadBatteryProfile(filePaths[0]).then(resolve).catch(reject);
+                loadBatteryProfile(filePaths[0])
+                    .then(buffer => {
+                        resolve({ buffer, filePath: filePaths[0] });
+                    })
+                    .catch(reject);
         });
     });
 

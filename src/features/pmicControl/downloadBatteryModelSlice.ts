@@ -10,6 +10,7 @@ import type { RootState } from '../../appReducer';
 
 interface DownloadProfileSlice {
     showDialog: boolean;
+    modelName?: string;
     bufferToWite?: Buffer;
 }
 
@@ -26,9 +27,13 @@ const downloadBatteryProfileSlice = createSlice({
                 ...initialState,
             };
         },
-        showDialog(state, action: PayloadAction<Buffer>) {
+        showDialog(
+            state,
+            action: PayloadAction<{ buffer: Buffer; name?: string }>
+        ) {
             state.showDialog = true;
-            state.bufferToWite = action.payload;
+            state.bufferToWite = action.payload.buffer;
+            state.modelName = action.payload.name;
         },
     },
 });
@@ -37,6 +42,8 @@ export const getShowDialog = (state: RootState) =>
     state.app.downloadBatteryModel.bufferToWite;
 export const getBuffer = (state: RootState) =>
     state.app.downloadBatteryModel.bufferToWite;
+export const getModelName = (state: RootState) =>
+    state.app.downloadBatteryModel.modelName;
 
 export const { closeDialog, showDialog } = downloadBatteryProfileSlice.actions;
 export default downloadBatteryProfileSlice.reducer;
