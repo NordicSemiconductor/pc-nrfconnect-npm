@@ -11,7 +11,7 @@ import {
     DialogButton,
     GenericDialog,
     Group,
-    NumberInputSliderWithUnit,
+    NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import path from 'path';
 
@@ -102,7 +102,7 @@ export default ({
         >
             <Group>
                 <div>
-                    <NumberInputSliderWithUnit
+                    <NumberInput
                         label={
                             <div>
                                 <span>Temperature</span>
@@ -115,6 +115,7 @@ export default ({
                             max: 85,
                         }}
                         onChange={value => setTemperature(value)}
+                        showSlider
                     />
                 </div>
                 <div className="flex-column">

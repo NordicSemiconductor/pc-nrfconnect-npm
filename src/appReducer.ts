@@ -7,7 +7,6 @@
 import { NrfConnectState } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { combineReducers } from 'redux';
 
-import confirmBeforeCloseReducer from './features/confirmBeforeClose/confirmBeforeCloseSlice';
 import downloadBatteryModelSlice from './features/pmicControl/downloadBatteryModelSlice';
 import pmicControlReducer from './features/pmicControl/pmicControlSlice';
 import profilingProjectsReducer from './features/pmicControl/profilingProjectsSlice.';
@@ -20,7 +19,6 @@ type AppState = ReturnType<typeof appReducer>;
 export interface RootState extends NrfConnectState<AppState> {}
 
 const appReducer = combineReducers({
-    confirmBeforeClose: confirmBeforeCloseReducer,
     profilingProjects: profilingProjectsReducer,
     profiling: profilingReducer,
     pmicControl: pmicControlReducer,

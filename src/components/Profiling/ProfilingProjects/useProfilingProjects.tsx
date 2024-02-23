@@ -6,11 +6,11 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
 import {
     addConfirmBeforeClose,
     clearConfirmBeforeClose,
-} from '../../../features/confirmBeforeClose/confirmBeforeCloseSlice';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import {
     getProjectProfileProgress,
     getRecentProjects,

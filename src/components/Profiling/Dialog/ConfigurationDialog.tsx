@@ -13,7 +13,7 @@ import {
     Dropdown,
     GenericDialog,
     Group,
-    NumberInputSliderWithUnit,
+    NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { selectDirectoryDialog } from '../../../actions/fileActions';
@@ -186,7 +186,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         value={name}
                     />
                 </div>
-                <NumberInputSliderWithUnit
+                <NumberInput
+                    showSlider
                     label={
                         <DocumentationTooltip card="charger" item="VTERM">
                             <div>
@@ -206,7 +207,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     onChange={setUpperVCutOff}
                 />
 
-                <NumberInputSliderWithUnit
+                <NumberInput
+                    showSlider
                     label={
                         <DocumentationTooltip card="profiling" item="Capacity">
                             <div>
@@ -225,7 +227,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     onChange={setLowerVCutOff}
                 />
 
-                <NumberInputSliderWithUnit
+                <NumberInput
+                    showSlider
                     label={
                         <DocumentationTooltip card="profiling" item="Capacity">
                             <div>
@@ -244,7 +247,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     }}
                 />
 
-                <NumberInputSliderWithUnit
+                <NumberInput
+                    showSlider
                     label={
                         <DocumentationTooltip card="charger" item="ICHG">
                             <div>
@@ -289,7 +293,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 {temperatures.map((temp, index) => (
                     <React.Fragment key={`temp-${index + 1}`}>
                         <div className="tw-flex tw-flex-row tw-items-center">
-                            <NumberInputSliderWithUnit
+                            <NumberInput
+                                showSlider
                                 className="tw-flex-grow"
                                 label={
                                     <DocumentationTooltip

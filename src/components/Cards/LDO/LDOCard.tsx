@@ -9,7 +9,7 @@ import {
     Card,
     classNames,
     Dropdown,
-    NumberInputSliderWithUnit,
+    NumberInput,
     StateSelector,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -116,7 +116,7 @@ export default ({
                 }
             />
 
-            <NumberInputSliderWithUnit
+            <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="VOUTLDO">
                         <div>
@@ -135,6 +135,7 @@ export default ({
                 onChangeComplete={value =>
                     npmDevice.setLdoVoltage(index, value)
                 }
+                showSlider
             />
 
             {!summary && (

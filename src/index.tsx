@@ -23,7 +23,6 @@ import Profiles from './components/Profiling/ProfilingProjects/Profiles';
 import Regulators from './components/Regulators/Regulators';
 import SidePanel from './components/SidePanel/SidePanel';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
-import ConfirmCloseDialog from './features/confirmBeforeClose/ConfirmCloseDialog';
 import NpmGenericDialog from './features/pmicControl/npm/NpmGenericDialog';
 
 import './index.scss';
@@ -37,7 +36,6 @@ render(
         sidePanel={
             <>
                 <SidePanel />
-                <ConfirmCloseDialog />
                 <ProfilingWizard />
                 <NpmGenericDialog />
                 <SlotSelectionDownloadDialog />
