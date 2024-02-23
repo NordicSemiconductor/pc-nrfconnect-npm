@@ -1095,10 +1095,9 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Select the battery model you want to use for Fuel Gauge
-                        evaluation in nPM PowerUP. Please use the &ldquo;Add New
-                        Active Battery Model&ldquo; selection below to add new
-                        battery models. You can use the default battery model
-                        for initial evaluation, this will however not give the
+                        in nPM PowerUP. To add new battery models, use the Add New
+                        Active Battery Model selection below. You can use the default battery model
+                        for initial evaluation, but this will not give the
                         best state-of-charge accuracy.
                     </p>,
                 ],
@@ -1109,20 +1108,17 @@ export const documentation: Documentation = {
                 title: 'Add New Active Battery Model',
                 content: [
                     <p key="p1">
-                        Nordic has profiled batteries from selected battery
-                        vendors. Please select from the below drop down menus to
-                        add one of these to the &ldquo;Active Battery
-                        Model&ldquo; selection.
+                        Nordic has profiled batteries from selected vendors.
+                        Choose a model from the drop-down menus below to
+                        add it to the Active Battery Model selection.
                     </p>,
                     <p key="p2">
-                        You can also add your custom battery model. If your
-                        battery is not listed you can create a battery model for
-                        it by clicking &ldquo;Profile Battery&ldquo;.
+                        You can also add your own custom battery model. If your
+                        battery is not listed, click Profile Battery to create a new battery model.
                     </p>,
                     <p key="p3">
-                        You can also use one of the brand specific battery
-                        models matching the capacity of the battery you use for
-                        quick an easy evaluation. Please note that this will not
+                        For quick evaluation, you can also use one of the branded battery
+                        models matching the capacity of your battery. However, this will not
                         give the best state-of-charge accuracy.
                     </p>,
                 ],
