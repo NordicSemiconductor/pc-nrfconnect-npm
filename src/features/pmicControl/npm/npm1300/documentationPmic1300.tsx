@@ -1095,10 +1095,10 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Select the battery model you want to use for Fuel Gauge
-                        in nPM PowerUP. To add new battery models, use the Add New
-                        Active Battery Model selection below. You can use the default battery model
-                        for initial evaluation, but this will not give the
-                        best state-of-charge accuracy.
+                        in nPM PowerUP. To add new battery models, use the Add
+                        New Active Battery Model selection below. You can use
+                        the default battery model for initial evaluation, but
+                        this will not give the best state-of-charge accuracy.
                     </p>,
                 ],
             },
@@ -1109,17 +1109,19 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Nordic has profiled batteries from selected vendors.
-                        Choose a model from the drop-down menus below to
-                        add it to the Active Battery Model selection.
+                        Choose a model from the drop-down menus below to add it
+                        to the Active Battery Model selection.
                     </p>,
                     <p key="p2">
                         You can also add your own custom battery model. If your
-                        battery is not listed, click Profile Battery to create a new battery model.
+                        battery is not listed, click Profile Battery to create a
+                        new battery model.
                     </p>,
                     <p key="p3">
-                        For quick evaluation, you can also use one of the branded battery
-                        models matching the capacity of your battery. However, this will not
-                        give the best state-of-charge accuracy.
+                        For quick evaluation, you can also use one of the
+                        branded battery models matching the capacity of your
+                        battery. However, this will not give the best
+                        state-of-charge accuracy.
                     </p>,
                 ],
             },
