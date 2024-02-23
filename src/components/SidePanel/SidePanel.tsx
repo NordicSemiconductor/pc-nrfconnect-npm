@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     CollapsibleGroup,
-    NumberInputSliderWithUnit,
+    NumberInput,
     SidePanel,
     StartStopButton,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -136,7 +136,8 @@ export default () => {
                 />
             </CollapsibleGroup>
             <CollapsibleGroup defaultCollapsed={false} heading="Settings">
-                <NumberInputSliderWithUnit
+                <NumberInput
+                    showSlider
                     label="Reporting Rate"
                     unit="ms"
                     value={fuelGaugeReportingRateInternal}

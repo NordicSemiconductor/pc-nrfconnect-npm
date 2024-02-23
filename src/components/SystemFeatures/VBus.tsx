@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 import {
     Card,
     classNames,
-    NumberInputSliderWithUnit,
+    NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
@@ -63,7 +63,8 @@ export default ({ npmDevice, usbPower, disabled }: VBusProperties) => {
                     </span>
                 </div>
             </div>
-            <NumberInputSliderWithUnit
+            <NumberInput
+                showSlider
                 label={
                     <DocumentationTooltip card={card} item="CurrentLimiter">
                         Current Limiter

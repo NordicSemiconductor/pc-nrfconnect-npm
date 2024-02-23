@@ -11,7 +11,7 @@ import {
     classNames,
     Dropdown,
     NumberInlineInput,
-    NumberInputSliderWithUnit,
+    NumberInput,
     Slider,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -281,7 +281,7 @@ export default ({
                     <span>{npmDevice.getChargerJeitaRange().max}°C</span>
                 </div>
             </div>
-            <NumberInputSliderWithUnit
+            <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="Vtermr">
                         <div>
@@ -296,6 +296,7 @@ export default ({
                 onChange={value => setInternalVTermr(value)}
                 onChangeComplete={npmDevice.setChargerVTermR}
                 disabled={disabled}
+                showSlider
             />
             <Dropdown
                 label={

@@ -11,7 +11,7 @@ import {
     DialogButton,
     GenericDialog,
     Group,
-    NumberInputSliderWithUnit,
+    NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { showSaveDialog } from '../../../actions/fileActions';
@@ -131,7 +131,8 @@ export default ({
                         value={name}
                     />
                 </div>
-                <NumberInputSliderWithUnit
+                <NumberInput
+                    showSlider
                     label={
                         <div>
                             <span>Capacity</span>
@@ -142,7 +143,8 @@ export default ({
                     range={{ min: 32, max: 3000 }}
                     onChange={setCapacity}
                 />
-                <NumberInputSliderWithUnit
+                <NumberInput
+                    showSlider
                     label={
                         <div>
                             <span>V</span>
@@ -159,7 +161,8 @@ export default ({
                     }}
                     onChange={setUpperVCutOff}
                 />
-                <NumberInputSliderWithUnit
+                <NumberInput
+                    showSlider
                     label={
                         <DocumentationTooltip card="profiling" item="Capacity">
                             <div>

@@ -9,7 +9,7 @@ import {
     Card,
     classNames,
     Dropdown,
-    NumberInputSliderWithUnit,
+    NumberInput,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
@@ -94,7 +94,7 @@ export default ({
                 </div>
             }
         >
-            <NumberInputSliderWithUnit
+            <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="VTERM">
                         <div>
@@ -109,8 +109,9 @@ export default ({
                 value={internalVTerm}
                 onChange={setInternalVTerm}
                 onChangeComplete={v => npmDevice.setChargerVTerm(v)}
+                showSlider
             />
-            <NumberInputSliderWithUnit
+            <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="ICHG">
                         <div>
@@ -125,6 +126,7 @@ export default ({
                 value={internalIChg}
                 onChange={setInternalIChg}
                 onChangeComplete={v => npmDevice.setChargerIChg(v)}
+                showSlider
             />
 
             {!summary && (

@@ -8,7 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
     Card,
     Dropdown,
-    NumberInputSliderWithUnit,
+    NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
@@ -134,7 +134,7 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
                 }
                 disabled={disabled}
             />
-            <NumberInputSliderWithUnit
+            <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="TimePeriod">
                         Timer Period
@@ -155,6 +155,7 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
                 onChangeComplete={v =>
                     npmDevice.setTimerConfigCompare(v / prescalerMultiplier)
                 }
+                showSlider
             />
         </Card>
     );

@@ -9,7 +9,7 @@ import {
     Card,
     classNames,
     Dropdown,
-    NumberInputSliderWithUnit,
+    NumberInput,
     StateSelector,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -160,7 +160,7 @@ export default ({
                 disabled={disabled}
             />
 
-            <NumberInputSliderWithUnit
+            <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="VOUT">
                         <div>
@@ -177,10 +177,11 @@ export default ({
                 value={internalVOut}
                 onChange={setInternalVOut}
                 onChangeComplete={onVOutChange}
+                showSlider
             />
             {!summary && (
                 <>
-                    <NumberInputSliderWithUnit
+                    <NumberInput
                         label={
                             <DocumentationTooltip card={card} item="RETVOUT">
                                 <div>
@@ -197,6 +198,7 @@ export default ({
                         value={internalRetVOut}
                         onChange={setInternalRetVOut}
                         onChangeComplete={onRetVOutChange}
+                        showSlider
                     />
                     <Toggle
                         label={

@@ -7,10 +7,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    addConfirmBeforeClose,
     Alert,
+    clearConfirmBeforeClose,
     clearWaitForDevice,
     ConfirmationDialog,
     describeError,
+    isConfirmCloseDialogOpen,
     logger,
     setWaitForDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -18,11 +21,6 @@ import { appendFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
-import {
-    addConfirmBeforeClose,
-    clearConfirmBeforeClose,
-    getShowConfirmCloseDialog,
-} from '../../../features/confirmBeforeClose/confirmBeforeCloseSlice';
 import { Profile } from '../../../features/pmicControl/npm/types';
 import {
     getBucks,
@@ -92,7 +90,7 @@ export default () => {
     const index = useSelector(getProfileIndex);
     const ccProfilingState = useSelector(getCcProfilingState);
     const abortAction = useSelector(getAbort);
-    const showCloseAppDialog = useSelector(getShowConfirmCloseDialog);
+    const confirmCloseDialogOpen = useSelector(isConfirmCloseDialogOpen);
     const pmicState = useSelector(getPmicState);
     const [initializing, setInitializing] = useState(false);
 
@@ -376,32 +374,32 @@ export default () => {
             )}
             {profilingStage === 'Configuration' && (
                 <ConfigurationDialog
-                    isVisible={!abortAction && !showCloseAppDialog}
+                    isVisible={!abortAction && !confirmCloseDialogOpen}
                 />
             )}
             {profilingStage === 'Checklist' && (
                 <ChecklistDialog
-                    isVisible={!abortAction && !showCloseAppDialog}
+                    isVisible={!abortAction && !confirmCloseDialogOpen}
                 />
             )}
             {profilingStage === 'Charging' && (
                 <ChargingDialog
-                    isVisible={!abortAction && !showCloseAppDialog}
+                    isVisible={!abortAction && !confirmCloseDialogOpen}
                 />
             )}
             {profilingStage === 'Resting' && (
                 <RestingDialog
-                    isVisible={!abortAction && !showCloseAppDialog}
+                    isVisible={!abortAction && !confirmCloseDialogOpen}
                 />
             )}
             {profilingStage === 'Profiling' && (
                 <ProfilingDialog
-                    isVisible={!abortAction && !showCloseAppDialog}
+                    isVisible={!abortAction && !confirmCloseDialogOpen}
                 />
             )}
             {profilingStage === 'Complete' && (
                 <CompleteDialog
-                    isVisible={!abortAction && !showCloseAppDialog}
+                    isVisible={!abortAction && !confirmCloseDialogOpen}
                 />
             )}
         </div>

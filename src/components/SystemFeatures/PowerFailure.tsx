@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 import {
     Card,
     Dropdown,
-    NumberInputSliderWithUnit,
+    NumberInput,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
@@ -62,7 +62,8 @@ export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
                 </div>
             }
         >
-            <NumberInputSliderWithUnit
+            <NumberInput
+                showSlider
                 label={
                     <DocumentationTooltip card={card} item="VSYSPOF">
                         <>
