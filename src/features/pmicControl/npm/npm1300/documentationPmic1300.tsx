@@ -1094,24 +1094,34 @@ export const documentation: Documentation = {
                 title: 'Active Battery Model',
                 content: [
                     <p key="p1">
-                        Select a battery model. The battery models cover an
-                        operating voltage range of 3.0 V to 4.2 V for the fuel
-                        gauge. If your battery model is not in the list, select
-                        the model that best matches the capacity of your
-                        battery. This will not give the best state-of-charge
-                        accuracy but enables easy, initial evaluation of the
-                        fuel gauge.
+                        Select the battery model you want to use for Fuel Gauge
+                        in nPM PowerUP. To add new battery models, use the Add
+                        New Active Battery Model selection below. You can use
+                        the default battery model for initial evaluation, but
+                        this will not give the best state-of-charge accuracy.
                     </p>,
                 ],
             },
         ],
-        WriteBatteryModel: [
+        AddNewActiveBatteryModel: [
             {
-                title: 'Write Battery Model',
+                title: 'Add New Active Battery Model',
                 content: [
                     <p key="p1">
-                        You can write a battery model to start evaluating the
-                        nPM PowerUP fuel gauge.
+                        Nordic has profiled batteries from selected vendors.
+                        Choose a model from the drop-down menus below to add it
+                        to the Active Battery Model selection.
+                    </p>,
+                    <p key="p2">
+                        You can also add your own custom battery model. If your
+                        battery is not listed, click Profile Battery to create a
+                        new battery model.
+                    </p>,
+                    <p key="p3">
+                        For quick evaluation, you can also use one of the
+                        branded battery models matching the capacity of your
+                        battery. However, this will not give the best
+                        state-of-charge accuracy.
                     </p>,
                 ],
             },
