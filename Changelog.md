@@ -3,6 +3,11 @@
 ## Added
 
 -   Add Support to generate battery models on Mac (Intel and ARM64)
+-   Warning about closing the app while updating the firmware, which may lead to
+    unwanted consequences.
+-   Pre bundled list of `Renata` batteries models that can be uploaded to the
+    `nPM 1300 EK`. These Models can be found in the side panel under
+    `Add new active battery model`
 
 ## Removed
 
@@ -11,6 +16,9 @@
 ## Changed
 
 -   Updated Firmware to use NPMX 1.0.0
+-   `Lipol` battery model are no longer part of the Firmware but now will need
+    to be uploaded to the `nPM 1300 EK`. These Models can be found in the side
+    panel under `Add new active battery model`
 
 ## 1.1.1 - 2024-01-08
 
