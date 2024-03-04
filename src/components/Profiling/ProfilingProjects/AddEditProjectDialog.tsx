@@ -10,7 +10,6 @@ import {
     classNames,
     DialogButton,
     GenericDialog,
-    Group,
     NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
@@ -111,7 +110,7 @@ export default ({
                 </>
             }
         >
-            <Group>
+            <div className="tw-flex tw-flex-col tw-gap-2">
                 <div
                     className={classNames(
                         'name-input',
@@ -180,7 +179,7 @@ export default ({
                     }}
                     onChange={setLowerVCutOff}
                 />
-            </Group>
+            </div>
         </GenericDialog>
     );
 };

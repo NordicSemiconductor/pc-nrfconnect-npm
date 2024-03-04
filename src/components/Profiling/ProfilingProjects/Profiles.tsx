@@ -6,10 +6,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    Button,
-    CollapsibleGroup,
-} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { Button, Group } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { OpenDialogReturnValue } from 'electron';
 import fs from 'fs';
 import path from 'path';
@@ -166,7 +163,8 @@ const BundledBatteryList = ({
         });
 
     return (
-        <CollapsibleGroup
+        <Group
+            collapsible
             heading={bundledBattery.brandName}
             defaultCollapsed={false}
         >
@@ -179,7 +177,7 @@ const BundledBatteryList = ({
                     />
                 ))}
             </div>
-        </CollapsibleGroup>
+        </Group>
     );
 };
 
@@ -197,8 +195,9 @@ export default () => {
     );
 
     return (
-        <div className="projects-container tw-flex tw-flex-col">
-            <CollapsibleGroup
+        <div className="projects-container tw-flex tw-flex-col tw-gap-4">
+            <Group
+                collapsible
                 heading="Custom Profiles"
                 defaultCollapsed={false}
             >
@@ -262,8 +261,8 @@ export default () => {
                         }}
                     />
                 )}
-            </CollapsibleGroup>
-            <CollapsibleGroup heading="Bundled Profiles">
+            </Group>
+            <Group collapsible heading="Bundled Profiles">
                 <div className=" tw-flex tw-flex-col tw-gap-4 tw-bg-white tw-p-4">
                     {bundledBatteries.map(bundledBattery => (
                         <BundledBatteryList
@@ -272,7 +271,7 @@ export default () => {
                         />
                     ))}
                 </div>
-            </CollapsibleGroup>
+            </Group>
         </div>
     );
 };

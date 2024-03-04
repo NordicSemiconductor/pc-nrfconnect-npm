@@ -12,7 +12,6 @@ import {
     DialogButton,
     Dropdown,
     GenericDialog,
-    Group,
     NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
@@ -164,7 +163,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 </>
             }
         >
-            <Group>
+            <div className="tw-flex tw-flex-col tw-gap-2">
                 <div
                     className={classNames(
                         'name-input',
@@ -346,7 +345,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         )}
                     </React.Fragment>
                 ))}
-            </Group>
+            </div>
         </GenericDialog>
     );
 };

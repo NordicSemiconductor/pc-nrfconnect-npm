@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
-    CollapsibleGroup,
+    Group,
     NumberInput,
     SidePanel,
     StartStopButton,
@@ -55,7 +55,7 @@ export default () => {
 
     return (
         <SidePanel className="side-panel">
-            <CollapsibleGroup defaultCollapsed={false} heading="Actions">
+            <Group collapsible defaultCollapsed={false} heading="Actions">
                 <DocumentationTooltip
                     card={card}
                     item="ExportConfiguration"
@@ -127,15 +127,15 @@ export default () => {
                         started={!!eventRecordingPath}
                     />
                 </DocumentationTooltip>
-            </CollapsibleGroup>
-            <CollapsibleGroup defaultCollapsed={false} heading="Fuel Gauge">
+            </Group>
+            <Group collapsible defaultCollapsed={false} heading="Fuel Gauge">
                 <FuelGaugeSettings
                     disabled={
                         pmicConnection === 'ek-disconnected' || uiDisabled
                     }
                 />
-            </CollapsibleGroup>
-            <CollapsibleGroup defaultCollapsed={false} heading="Settings">
+            </Group>
+            <Group collapsible defaultCollapsed={false} heading="Settings">
                 <NumberInput
                     showSlider
                     label="Reporting Rate"
@@ -154,7 +154,7 @@ export default () => {
                         pmicConnection === 'ek-disconnected' || uiDisabled
                     }
                 />
-            </CollapsibleGroup>
+            </Group>
             <ConnectionStatus />
         </SidePanel>
     );

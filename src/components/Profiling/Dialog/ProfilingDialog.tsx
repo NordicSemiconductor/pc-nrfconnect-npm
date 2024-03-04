@@ -10,7 +10,6 @@ import {
     clearWaitForDevice,
     DialogButton,
     GenericDialog,
-    Group,
     useStopwatch,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
@@ -131,7 +130,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 </>
             }
         >
-            <Group>
+            <div className="tw-flex tw-flex-col tw-gap-2">
                 <RestingProfilingAlerts />
                 <ProfilingTemperatureAlert
                     showOnWarning
@@ -146,7 +145,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     }}
                 />
                 <TimeComponent time={time} progress={progress} />
-            </Group>
+            </div>
         </GenericDialog>
     );
 };
