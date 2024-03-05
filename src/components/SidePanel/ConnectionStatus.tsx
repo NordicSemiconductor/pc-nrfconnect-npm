@@ -7,8 +7,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    CollapsibleGroup,
     getWaitingForDeviceTimeout,
+    Group,
     Step,
     Stepper,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -176,10 +176,10 @@ export default () => {
     }
 
     return (
-        <CollapsibleGroup heading="Connection Status" defaultCollapsed={false}>
+        <Group collapsible heading="Connection Status" defaultCollapsed={false}>
             <div className="connection-status-container">
                 <Stepper steps={[connectionStep, shellStep, pmicStep]} />
             </div>
-        </CollapsibleGroup>
+        </Group>
     );
 };

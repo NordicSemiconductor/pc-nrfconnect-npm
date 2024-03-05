@@ -12,7 +12,6 @@ import {
     DialogButton,
     GenericDialog,
     getWaitingForDeviceTimeout,
-    Group,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
@@ -131,7 +130,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 </>
             }
         >
-            <Group>
+            <div className="tw-flex tw-flex-col tw-gap-2">
                 {adcSample &&
                     adcSample.vBat > profile.vUpperCutOff &&
                     !charger?.enabled && (
@@ -194,7 +193,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         />
                     </>
                 )}
-            </Group>
+            </div>
         </GenericDialog>
     );
 };

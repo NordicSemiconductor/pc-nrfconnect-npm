@@ -14,7 +14,6 @@ import {
     DialogButton,
     GenericDialog,
     getWaitingForDeviceTimeout,
-    Group,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { existsSync, mkdirSync, rmSync } from 'fs';
 import path from 'path';
@@ -411,7 +410,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 </>
             }
         >
-            <Group>
+            <div className="tw-flex tw-flex-col tw-gap-2">
                 {waitingForDevice && (
                     <Alert label="Caution: " variant="warning">
                         Waiting to for device to reconnect...
@@ -454,7 +453,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         ).toFixed(2)}mAh`,
                     }}
                 />
-            </Group>
+            </div>
         </GenericDialog>
     );
 };

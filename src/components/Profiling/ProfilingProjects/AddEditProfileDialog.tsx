@@ -10,7 +10,6 @@ import {
     Button,
     DialogButton,
     GenericDialog,
-    Group,
     NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import path from 'path';
@@ -100,7 +99,7 @@ export default ({
                 </>
             }
         >
-            <Group>
+            <div className="tw-flex tw-flex-col tw-gap-2">
                 <div>
                     <NumberInput
                         label={
@@ -149,7 +148,7 @@ export default ({
                         Select data file
                     </Button>
                 </div>
-            </Group>
+            </div>
         </GenericDialog>
     );
 };

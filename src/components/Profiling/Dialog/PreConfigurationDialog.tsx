@@ -10,7 +10,6 @@ import {
     Alert,
     DialogButton,
     GenericDialog,
-    Group,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { closeProfiling } from '../../../features/pmicControl/profilingSlice';
@@ -34,12 +33,10 @@ export default () => {
                 </DialogButton>
             }
         >
-            <Group>
-                <Alert label="Error: " variant="danger">
-                    nPM-FG board is not connected. Turn off EK and connect
-                    nPM-FG to the EK
-                </Alert>
-            </Group>
+            <Alert label="Error: " variant="danger">
+                nPM-FG board is not connected. Turn off EK and connect nPM-FG to
+                the EK
+            </Alert>
         </GenericDialog>
     );
 };
