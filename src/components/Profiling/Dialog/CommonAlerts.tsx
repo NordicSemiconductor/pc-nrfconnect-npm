@@ -76,7 +76,7 @@ export const ChargingTemperatureAlert = ({
         showOnWarning={showOnWarning}
         expectedTemperature={expectedTemperature}
         currentTemperature={currentTemperature}
-        message={`Before charging, Make sure battery is at room temperature (20°C to 25°C).${
+        message={`Before charging, make sure the battery is at the room temperature (20°C to 25°C).${
             ntcThermistor === 'Ignore NTC'
                 ? ''
                 : ` The current NTC temperature is ${
