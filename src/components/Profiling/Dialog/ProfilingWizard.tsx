@@ -24,7 +24,6 @@ import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { Profile } from '../../../features/pmicControl/npm/types';
 import {
     getBucks,
-    getCharger,
     getFuelGauge,
     getLdos,
     getNpmDevice,
@@ -80,7 +79,6 @@ export default () => {
     const timeOffset = useRef(-1);
 
     const npmDevice = useSelector(getNpmDevice);
-    const charger = useSelector(getCharger);
     const profilingStage = useSelector(getProfilingStage);
     const profile = useSelector(getProfile);
     const batteryConnected = useSelector(isBatteryConnected);
@@ -180,7 +178,7 @@ export default () => {
                         const data = `${
                             (event.timestamp - timeOffset.current) / 1000
                         },${event.data.iLoad},${event.data.vLoad},${
-                            charger?.ntcThermistor === 'Ignore NTC'
+                            profile.ntcThermistor === 'Ignore NTC'
                                 ? profile.temperatures[index]
                                 : event.data.tBat
                         }\r\n`;
@@ -193,7 +191,7 @@ export default () => {
                     }
                 }
             }),
-        [charger, dispatch, index, npmDevice, profile, profilingStage]
+        [dispatch, index, npmDevice, profile, profilingStage]
     );
 
     useEffect(() => {
