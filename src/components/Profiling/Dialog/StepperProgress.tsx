@@ -152,7 +152,7 @@ export default ({
     });
 
     return (
-        <div className="mt-4">
+        <div className="tw-mt-4">
             <Stepper steps={steps} />
         </div>
     );
