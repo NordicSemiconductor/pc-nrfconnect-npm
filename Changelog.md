@@ -22,8 +22,10 @@
 
 ### Fixed
 
--   Profiling a battery with no NTC will now save the user temperature to file instead of saving the fallback value of 25°C.
--   Tooltip for the **NTC thermistor** when configuring a profile. The tooltip is now visible.
+-   Profiling a battery with no NTC will now save the user temperature to file
+    instead of saving the fallback value of 25°C.
+-   Tooltip for the **NTC thermistor** when configuring a profile. The tooltip
+    is now visible.
 
 ## 1.1.1 - 2024-01-08
 
