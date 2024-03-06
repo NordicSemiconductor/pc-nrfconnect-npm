@@ -267,10 +267,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
 
                 <Dropdown
                     label={
-                        <DocumentationTooltip
-                            card="charger"
-                            item="NTCThermistor"
-                        >
+                        <DocumentationTooltip card="JEITA" item="NTCThermistor">
                             <span>NTC thermistor</span>
                         </DocumentationTooltip>
                     }

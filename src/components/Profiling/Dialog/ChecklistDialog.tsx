@@ -188,6 +188,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             </Alert>
                         )}
                         <ChargingTemperatureAlert
+                            ntcThermistor={profile.ntcThermistor}
                             expectedTemperature={22.5}
                             currentTemperature={adcSample?.tBat}
                         />

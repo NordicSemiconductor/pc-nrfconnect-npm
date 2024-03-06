@@ -14,7 +14,10 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { noop } from '../../../features/pmicControl/npm/pmicHelpers';
-import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
+import {
+    getCharger,
+    getNpmDevice,
+} from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
     getCapacityConsumed,
@@ -32,6 +35,7 @@ import {
 import StepperProgress from './StepperProgress';
 
 export default ({ isVisible }: { isVisible: boolean }) => {
+    const charger = useSelector(getCharger);
     const profile = useSelector(getProfile);
     const capacityConsumed = useSelector(getCapacityConsumed);
     const index = useSelector(getProfileIndex);
@@ -100,7 +104,11 @@ export default ({ isVisible }: { isVisible: boolean }) => {
         <GenericDialog
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
-            } @ ${profile.temperatures[index]}°C - NTC ${latestTBat}°C`}
+            } @ ${profile.temperatures[index]}°C${
+                charger?.ntcThermistor !== 'Ignore NTC'
+                    ? ` - NTC ${latestTBat}°C`
+                    : ''
+            }`}
             isVisible={isVisible}
             showSpinner
             closeOnEsc={false}
@@ -133,6 +141,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             <div className="tw-flex tw-flex-col tw-gap-2">
                 <RestingProfilingAlerts />
                 <ProfilingTemperatureAlert
+                    ntcThermistor={profile.ntcThermistor}
                     showOnWarning
                     currentTemperature={latestTBat}
                     expectedTemperature={profile.temperatures[index]}

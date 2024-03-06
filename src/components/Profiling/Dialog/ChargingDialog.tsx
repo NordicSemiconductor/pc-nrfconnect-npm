@@ -214,12 +214,14 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 )}
                 {batteryFull && (
                     <ProfilingTemperatureAlert
+                        ntcThermistor={profile.ntcThermistor}
                         currentTemperature={adcSample?.tBat}
                         expectedTemperature={profile.temperatures[index]}
                     />
                 )}
                 {!batteryFull && (
                     <ChargingTemperatureAlert
+                        ntcThermistor={profile.ntcThermistor}
                         currentTemperature={adcSample?.tBat}
                         expectedTemperature={22.5}
                     />
