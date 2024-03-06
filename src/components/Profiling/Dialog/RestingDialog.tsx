@@ -14,7 +14,10 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { noop } from '../../../features/pmicControl/npm/pmicHelpers';
-import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
+import {
+    getCharger,
+    getNpmDevice,
+} from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
     getLatestTBat,
@@ -31,6 +34,7 @@ import {
 import StepperProgress from './StepperProgress';
 
 export default ({ isVisible }: { isVisible: boolean }) => {
+    const charger = useSelector(getCharger);
     const profile = useSelector(getProfile);
     const index = useSelector(getProfileIndex);
     const npmDevice = useSelector(getNpmDevice);
@@ -47,7 +51,11 @@ export default ({ isVisible }: { isVisible: boolean }) => {
         <GenericDialog
             title={`Battery Profiling ${
                 profile.name.length > 0 ? `- ${profile.name}` : ''
-            } @ ${profile.temperatures[index]}°C - NTC ${latestTBat}°C`}
+            } @ ${profile.temperatures[index]}°C${
+                charger?.ntcThermistor !== 'Ignore NTC'
+                    ? ` - NTC ${latestTBat}°C`
+                    : ''
+            }`}
             isVisible={isVisible}
             className="app-dialog"
             showSpinner
