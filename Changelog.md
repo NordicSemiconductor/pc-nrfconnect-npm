@@ -20,6 +20,12 @@
     need to be uploaded to the nPM 1300 EK. These models can be found in the
     side panel under **Add new active battery model**.
 
+### Fixed
+
+-   Profiling battery's with no NTC will now save the user temperature to file
+    and not 25°C
+-   Tooltip for the **NTC thermistor** when configuring a profile is now visible
+
 ## 1.1.1 - 2024-01-08
 
 ## Added
