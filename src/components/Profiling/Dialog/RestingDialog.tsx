@@ -80,6 +80,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             <div className="tw-flex tw-flex-col tw-gap-2">
                 <RestingProfilingAlerts />
                 <ProfilingTemperatureAlert
+                    ntcThermistor={profile.ntcThermistor}
                     showOnWarning
                     currentTemperature={latestTBat}
                     expectedTemperature={profile.temperatures[index]}

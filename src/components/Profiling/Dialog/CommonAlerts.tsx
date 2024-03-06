@@ -7,6 +7,8 @@
 import React from 'react';
 import { Alert } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { NTCThermistor } from '../../../features/pmicControl/npm/types';
+
 export const RestingProfilingAlerts = () => (
     <>
         <Alert variant="warning" label="Caution: ">
@@ -22,20 +24,30 @@ export const RestingProfilingAlerts = () => (
 );
 
 const TemperatureAlert = ({
+    ntcThermistor,
     showOnWarning = false,
     expectedTemperature,
     currentTemperature,
     message,
 }: {
+    ntcThermistor: NTCThermistor;
     showOnWarning: boolean;
     expectedTemperature: number;
     currentTemperature?: number;
     message: string;
 }) => {
-    const temperatureDelta = Math.abs(
-        (currentTemperature ?? expectedTemperature) - expectedTemperature
-    );
-    if (!showOnWarning || (showOnWarning && temperatureDelta > 2.5)) {
+    const temperatureDelta =
+        ntcThermistor === 'Ignore NTC'
+            ? 0
+            : Math.abs(
+                  (currentTemperature ?? expectedTemperature) -
+                      expectedTemperature
+              );
+    if (
+        !showOnWarning ||
+        (showOnWarning && temperatureDelta > 2.5) ||
+        ntcThermistor === 'Ignore NTC'
+    ) {
         return (
             <Alert
                 label={temperatureDelta > 2.5 ? 'Caution: ' : 'Note: '}
@@ -49,39 +61,53 @@ const TemperatureAlert = ({
 };
 
 export const ChargingTemperatureAlert = ({
+    ntcThermistor,
     showOnWarning = false,
     expectedTemperature,
     currentTemperature,
 }: {
+    ntcThermistor: NTCThermistor;
     showOnWarning?: boolean;
     expectedTemperature: number;
     currentTemperature?: number;
 }) => (
     <TemperatureAlert
+        ntcThermistor={ntcThermistor}
         showOnWarning={showOnWarning}
         expectedTemperature={expectedTemperature}
         currentTemperature={currentTemperature}
-        message={`Before charging, Make sure battery is at room temperature (20°C to 25°C). The current NTC temperature is ${
-            currentTemperature ?? NaN
-        }°C`}
+        message={`Before charging, Make sure battery is at room temperature (20°C to 25°C).${
+            ntcThermistor === 'Ignore NTC'
+                ? ''
+                : ` The current NTC temperature is ${
+                      currentTemperature ?? NaN
+                  }°C`
+        }`}
     />
 );
 
 export const ProfilingTemperatureAlert = ({
+    ntcThermistor,
     showOnWarning = false,
     expectedTemperature,
     currentTemperature,
 }: {
+    ntcThermistor: NTCThermistor;
     expectedTemperature: number;
     showOnWarning?: boolean;
     currentTemperature?: number;
 }) => (
     <TemperatureAlert
+        ntcThermistor={ntcThermistor}
         showOnWarning={showOnWarning}
         expectedTemperature={expectedTemperature}
         currentTemperature={currentTemperature}
-        message={`Make sure battery is in a temperature chamber with a temperature of ${expectedTemperature}°C. Current NTC temperature ${
-            currentTemperature ?? NaN
-        }°C`}
+        message={`Make sure battery is in a temperature chamber with a temperature of ${expectedTemperature}°C.${
+            ntcThermistor === 'Ignore NTC'
+                ? ''
+                : ` The current NTC temperature is ${
+                      currentTemperature ?? NaN
+                  }°C`
+        }`}
     />
 );
