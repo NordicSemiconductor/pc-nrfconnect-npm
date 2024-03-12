@@ -51,16 +51,6 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
             disabled={disabled}
             isToggled={ship.longPressReset}
         />
-        <Toggle
-            label={
-                <DocumentationTooltip card={card} item="TwoButtonReset">
-                    Two Button Reset
-                </DocumentationTooltip>
-            }
-            onToggle={npmDevice.setShipTwoButtonReset}
-            disabled={disabled}
-            isToggled={ship.twoButtonReset}
-        />
         <Dropdown
             label={
                 <>

@@ -74,7 +74,6 @@ const initialState: pmicControlState = {
         timeToActive: 96,
         invPolarity: true,
         longPressReset: false,
-        twoButtonReset: false,
     },
     pmicChargingState: {
         batteryFull: false,

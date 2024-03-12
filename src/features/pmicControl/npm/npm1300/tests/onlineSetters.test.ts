@@ -1260,24 +1260,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test.each([true, false])(
-            'Set ship reset two_buttons %p',
-            async enabled => {
-                await pmic.setShipTwoButtonReset(enabled);
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx ship reset two_buttons set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnShipUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each([true, false])(
             'Set setFuelGaugeEnabled enabled: %p',
             async enabled => {
                 await pmic.setFuelGaugeEnabled(enabled);
@@ -3154,41 +3136,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
                     `npmx ship reset long_press get`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnShipUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each([true, false])(
-            'Set setShipTwoButtonReset - Fail immediately - index: %p',
-            async enabled => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
-
-                await expect(
-                    pmic.setShipTwoButtonReset(enabled)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx ship reset two_buttons set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx ship reset two_buttons get`,
                     expect.anything(),
                     undefined,
                     true

@@ -198,7 +198,6 @@ export type ShipModeConfig = {
     timeToActive: TimeToActive;
     invPolarity: boolean;
     longPressReset: boolean;
-    twoButtonReset: boolean;
 };
 
 export type AdcSample = {
@@ -465,7 +464,6 @@ export type NpmDevice = {
 
         shipModeTimeToActive: () => void;
         shipLongPressReset: () => void;
-        shipTwoButtonReset: () => void;
 
         fuelGauge: () => void;
 
@@ -538,7 +536,6 @@ export type NpmDevice = {
 
     setShipModeTimeToActive: (time: TimeToActive) => Promise<void>;
     setShipLongPressReset: (state: boolean) => Promise<void>;
-    setShipTwoButtonReset: (state: boolean) => Promise<void>;
 
     enterShipMode: () => void;
     enterShipHibernateMode: () => void;

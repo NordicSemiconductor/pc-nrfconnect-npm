@@ -16,7 +16,6 @@ export const shipModeGet = (
 ) => ({
     shipModeTimeToActive: () => sendCommand(`npmx ship config time get`),
     shipLongPressReset: () => sendCommand(`npmx ship reset long_press get`),
-    shipTwoButtonReset: () => sendCommand(`npmx ship reset two_buttons get`),
 });
 
 export const shipModeSet = (
@@ -28,7 +27,7 @@ export const shipModeSet = (
     ) => void,
     offlineMode: boolean
 ) => {
-    const { shipModeTimeToActive, shipLongPressReset, shipTwoButtonReset } =
+    const { shipModeTimeToActive, shipLongPressReset } =
         shipModeGet(sendCommand);
 
     const setShipModeTimeToActive = (timeToActive: TimeToActive) =>
@@ -69,29 +68,9 @@ export const shipModeSet = (
             }
         });
 
-    const setShipTwoButtonReset = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                    twoButtonReset: enabled,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx ship reset two_buttons set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
-                    () => {
-                        shipTwoButtonReset();
-                        reject();
-                    }
-                );
-            }
-        });
-
     return {
         setShipModeTimeToActive,
         setShipLongPressReset,
-        setShipTwoButtonReset,
         enterShipMode: () => sendCommand(`npmx ship mode ship`),
         enterShipHibernateMode: () => sendCommand(`npmx ship mode hibernate`),
     };

@@ -1354,32 +1354,6 @@ Battery models stored in database:
         });
     });
 
-    test.each(
-        [true, false]
-            .map(enable => [
-                {
-                    append: `get`,
-                    enable,
-                },
-                {
-                    append: `set ${enable ? '1' : '0'}`,
-                    enable,
-                },
-            ])
-            .flat()
-    )('npmx ship reset two_buttons %p', ({ append, enable }) => {
-        const command = `npmx ship reset two_buttons ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-        callback?.onSuccess(`Value: ${enable ? '1' : '0'}.`, command);
-
-        expect(mockOnShipUpdate).toBeCalledTimes(1);
-        expect(mockOnShipUpdate).toBeCalledWith({
-            twoButtonReset: enable,
-        });
-    });
-
     test.each(['get', 'set 500'])('npmx vbusin current_limit %p', append => {
         const command = `npmx vbusin current_limit ${append}`;
         const callback =

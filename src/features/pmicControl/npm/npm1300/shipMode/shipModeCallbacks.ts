@@ -59,21 +59,6 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx ship reset two_buttons', true),
-                res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            twoButtonReset: parseToBoolean(res),
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
                 toRegex('npmx ship mode (ship|hibernate)'),
                 () => {
                     eventEmitter.emit('onReboot', true);

@@ -765,9 +765,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         await shipModeSet.setShipLongPressReset(
                             config.ship.longPressReset
                         );
-                        await shipModeSet.setShipTwoButtonReset(
-                            config.ship.twoButtonReset
-                        );
 
                         await fuelGaugeSet.setFuelGaugeEnabled(
                             config.fuelGauge

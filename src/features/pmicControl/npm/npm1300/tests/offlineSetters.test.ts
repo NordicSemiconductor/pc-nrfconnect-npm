@@ -411,13 +411,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         expect(mockOnShipUpdate).toBeCalledWith({ longPressReset: false });
     });
 
-    test('Set set timer reset two_buttons ', async () => {
-        await pmic.setShipTwoButtonReset(false);
-
-        expect(mockOnShipUpdate).toBeCalledTimes(1);
-        expect(mockOnShipUpdate).toBeCalledWith({ twoButtonReset: false });
-    });
-
     test.each(PMIC_1300_GPIOS)(
         'Set setGpioOpenDrain index: %p',
         async index => {
