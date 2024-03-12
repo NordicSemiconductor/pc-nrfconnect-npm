@@ -1,4 +1,10 @@
-## 1.2.0 - UNRELEASED
+## 1.2.1 - 2024-03-13
+
+## Added
+
+-   Support for NRF Connect For Desktop 4.4.1
+
+## 1.2.0 - 2024-03-12
 
 ## Added
 
