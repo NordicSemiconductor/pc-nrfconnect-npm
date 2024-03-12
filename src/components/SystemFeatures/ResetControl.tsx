@@ -9,11 +9,12 @@ import {
     Button,
     Card,
     Dropdown,
-    Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
+    LongPressReset,
+    LongPressResetValues,
     NpmDevice,
     ShipModeConfig,
     TimeToActive,
@@ -31,6 +32,11 @@ const timerShipToActiveItems = TimeToActiveValues.map(item => ({
     value: `${item}`,
 }));
 
+const LongPressResetItems = LongPressResetValues.map(item => ({
+    label: `${item}`.replaceAll('_', ' '),
+    value: `${item}`,
+}));
+
 const card = 'resetControl';
 
 export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
@@ -41,15 +47,27 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
             </div>
         }
     >
-        <Toggle
+        <Dropdown
             label={
                 <DocumentationTooltip card={card} item="LongPressReset">
                     Long Press Reset
                 </DocumentationTooltip>
             }
-            onToggle={npmDevice.setShipLongPressReset}
+            items={LongPressResetItems}
+            onSelect={item =>
+                npmDevice.setShipLongPressReset(item.value as LongPressReset)
+            }
+            selectedItem={
+                LongPressResetItems[
+                    Math.max(
+                        0,
+                        LongPressResetItems.findIndex(
+                            item => item.value === ship.longPressReset
+                        )
+                    ) ?? 0
+                ]
+            }
             disabled={disabled}
-            isToggled={ship.longPressReset}
         />
         <Dropdown
             label={

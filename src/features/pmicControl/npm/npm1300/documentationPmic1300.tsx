@@ -592,6 +592,10 @@ export const documentation: Documentation = {
                         button causes a power cycle and resets the whole system.
                         This feature is enabled by default after power-up.
                     </p>,
+                    <p key="p2">
+                        When two-button reset is selected, both SHPHLD and GPIO0
+                        must be pressed simultaneously to trigger a reset.
+                    </p>,
                 ],
             },
         ],

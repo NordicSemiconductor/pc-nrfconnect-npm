@@ -1241,23 +1241,20 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnShipUpdate).toBeCalledTimes(0);
         });
 
-        test.each([true, false])(
-            'Set ship reset long_press %p',
-            async enabled => {
-                await pmic.setShipLongPressReset(enabled);
+        test('Set ship reset longpress two_button', async () => {
+            await pmic.setShipLongPressReset('two_button');
 
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx ship reset long_press set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `powerup_ship longpress set two_button`,
+                expect.anything(),
+                undefined,
+                true
+            );
 
-                // Updates should only be emitted when we get response
-                expect(mockOnShipUpdate).toBeCalledTimes(0);
-            }
-        );
+            // Updates should only be emitted when we get response
+            expect(mockOnShipUpdate).toBeCalledTimes(0);
+        });
 
         test.each([true, false])(
             'Set setFuelGaugeEnabled enabled: %p',
@@ -3111,40 +3108,35 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnShipUpdate).toBeCalledTimes(0);
         });
 
-        test.each([true, false])(
-            'Set setShipLongPressReset - Fail immediately - index: %p',
-            async enabled => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
+        test('Set setShipLongPressReset - Fail immediately - index: %p', async () => {
+            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
+                dialog.onConfirm();
+            });
 
-                await expect(
-                    pmic.setShipLongPressReset(enabled)
-                ).rejects.toBeUndefined();
+            await expect(
+                pmic.setShipLongPressReset('one_button')
+            ).rejects.toBeUndefined();
 
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx ship reset long_press set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+            expect(mockEnqueueRequest).toBeCalledTimes(2);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `powerup_ship longpress set one_button`,
+                expect.anything(),
+                undefined,
+                true
+            );
 
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx ship reset long_press get`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+            // Refresh data due to error
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `powerup_ship longpress get`,
+                expect.anything(),
+                undefined,
+                true
+            );
 
-                // Updates should only be emitted when we get response
-                expect(mockOnShipUpdate).toBeCalledTimes(0);
-            }
-        );
+            // Updates should only be emitted when we get response
+            expect(mockOnShipUpdate).toBeCalledTimes(0);
+        });
 
         test.each([true, false])(
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',

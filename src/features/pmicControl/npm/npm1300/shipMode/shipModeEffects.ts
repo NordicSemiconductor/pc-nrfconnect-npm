@@ -5,7 +5,7 @@
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { ShipModeConfig, TimeToActive } from '../../types';
+import { LongPressReset, ShipModeConfig, TimeToActive } from '../../types';
 
 export const shipModeGet = (
     sendCommand: (
@@ -15,7 +15,7 @@ export const shipModeGet = (
     ) => void
 ) => ({
     shipModeTimeToActive: () => sendCommand(`npmx ship config time get`),
-    shipLongPressReset: () => sendCommand(`npmx ship reset long_press get`),
+    shipLongPressReset: () => sendCommand(`powerup_ship longpress get`),
 });
 
 export const shipModeSet = (
@@ -49,16 +49,16 @@ export const shipModeSet = (
             }
         });
 
-    const setShipLongPressReset = (enabled: boolean) =>
+    const setShipLongPressReset = (longPressReset: LongPressReset) =>
         new Promise<void>((resolve, reject) => {
             if (offlineMode) {
                 eventEmitter.emitPartialEvent<ShipModeConfig>('onShipUpdate', {
-                    longPressReset: enabled,
+                    longPressReset,
                 });
                 resolve();
             } else {
                 sendCommand(
-                    `npmx ship reset long_press set ${enabled ? '1' : '0'}`,
+                    `powerup_ship longpress set ${longPressReset}`,
                     () => resolve(),
                     () => {
                         shipLongPressReset();

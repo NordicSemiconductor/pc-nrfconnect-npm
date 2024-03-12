@@ -96,7 +96,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     const initShip: ShipModeConfig = {
         timeToActive: 96,
         invPolarity: false,
-        longPressReset: true,
+        longPressReset: 'two_button',
     };
 
     const initUSBPower: Omit<USBPower, 'detectStatus'> = {
@@ -225,7 +225,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         ship: {
             timeToActive: 16,
             invPolarity: true,
-            longPressReset: false,
+            longPressReset: 'one_button',
         },
         fuelGauge: true,
         firmwareVersion: npm1300FWVersion,

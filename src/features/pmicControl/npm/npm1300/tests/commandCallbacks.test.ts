@@ -13,6 +13,7 @@ import {
     GPIOValues,
     LdoOnOffControlValues,
     LEDModeValues,
+    LongPressResetValues,
     NTCThermistor,
     PmicChargingState,
     POFPolarityValues,
@@ -1329,28 +1330,20 @@ Battery models stored in database:
     });
 
     test.each(
-        [true, false]
-            .map(enable => [
-                {
-                    append: `get`,
-                    enable,
-                },
-                {
-                    append: `set ${enable ? '1' : '0'}`,
-                    enable,
-                },
-            ])
-            .flat()
-    )('npmx ship reset long_press %p', ({ append, enable }) => {
-        const command = `npmx ship reset long_press ${append}`;
+        LongPressResetValues.map(value => [
+            { append: `get`, value },
+            { append: `set ${value}`, value },
+        ])
+    )('powerup_ship longpress %p', ({ append, value }) => {
+        const command = `powerup_ship longpress ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${enable ? '1' : '0'}.`, command);
+        callback?.onSuccess(`Value: ${value}`, command);
 
         expect(mockOnShipUpdate).toBeCalledTimes(1);
         expect(mockOnShipUpdate).toBeCalledWith({
-            longPressReset: enable,
+            longPressReset: value,
         });
     });
 

@@ -615,7 +615,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship reset long_press get`,
+            `powerup_ship longpress get`,
             expect.anything(),
             undefined,
             true
