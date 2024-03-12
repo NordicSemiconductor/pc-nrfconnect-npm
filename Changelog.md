@@ -1,12 +1,12 @@
 ## 1.2.1 - 2024-03-13
 
-## Added
+### Added
 
 -   Support for NRF Connect For Desktop 4.4.1
 
 ## 1.2.0 - 2024-03-12
 
-## Added
+### Added
 
 -   Add Support to generate battery models on Mac (Intel and ARM64)
 -   Warning about closing the app while updating the firmware, which may lead to
@@ -15,11 +15,11 @@
     nPM 1300 EK. These models can be found in the side panel under **Add new
     active battery model**.
 
-## Removed
+### Removed
 
 -   SHPHLD pin polarity configuration
 
-## Changed
+### Changed
 
 -   Updated Firmware to use NPMX 1.0.0
 -   The Lipol battery models are no longer part of the firmware, and will now
@@ -35,7 +35,7 @@
 
 ## 1.1.1 - 2024-01-08
 
-## Added
+### Added
 
 -   Persist state of `show log` panel.
 
