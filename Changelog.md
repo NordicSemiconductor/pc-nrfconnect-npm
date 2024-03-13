@@ -2,13 +2,13 @@
 
 ### Added
 
--   Support for NRF Connect For Desktop 4.4.1.
+-   Support for nRF Connect for Desktop 4.4.1.
 
 ## 1.2.0 - 2024-03-12
 
 ### Added
 
--   Add Support to generate battery models on Mac (Intel and ARM64)
+-   Add Support to generate battery models on Mac (Intel and ARM64).
 -   Warning about closing the app while updating the firmware, which may lead to
     unwanted consequences.
 -   Pre-bundled list of the Renata battery models that can be uploaded to the
@@ -17,11 +17,11 @@
 
 ### Removed
 
--   SHPHLD pin polarity configuration
+-   SHPHLD pin polarity configuration.
 
 ### Changed
 
--   Updated Firmware to use NPMX 1.0.0
+-   Updated Firmware to use NPMX 1.0.0.
 -   The Lipol battery models are no longer part of the firmware, and will now
     need to be uploaded to the nPM 1300 EK. These models can be found in the
     side panel under **Add new active battery model**.
