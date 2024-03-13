@@ -14,6 +14,7 @@ import {
     NpmDevice,
     NpmExport,
     NTCThermistor,
+    ShipModeConfig,
 } from '../types';
 
 const toMicro = (value: number) => value * 1000000;
@@ -154,6 +155,11 @@ npm1300_ek_leds: leds {
 };
 `;
 
+const generateMfd = (ship: ShipModeConfig) => `
+    // long-press-reset = "${ship.longPressReset}";
+    // ship-to-active-time = <${ship.timeToActive}>;
+`;
+
 export default (npmConfig: NpmExport, npmDevice: NpmDevice) => `/*
 * Copyright (C) 2023 Nordic Semiconductor ASA
 * SPDX-License-Identifier: Apache-2.0
@@ -166,6 +172,8 @@ export default (npmConfig: NpmExport, npmDevice: NpmDevice) => `/*
    npm1300_ek_pmic: pmic@6b {
        compatible = "nordic,npm1300";
        reg = <0x6b>;
+
+       ${generateMfd(npmConfig.ship)}
 
        npm1300_ek_gpio: gpio-controller {
            compatible = "nordic,npm1300-gpio";
