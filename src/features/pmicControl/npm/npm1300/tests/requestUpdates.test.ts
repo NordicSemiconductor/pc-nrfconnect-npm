@@ -118,6 +118,18 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
+    test('Request update chargerEnableVBatLow', () => {
+        pmic.requestUpdate.chargerEnablevBatLow();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            'powerup_charger vbatlow get',
+            expect.anything(),
+            undefined,
+            true
+        );
+    });
+
     test('Request update chargerNTCThermistor', () => {
         pmic.requestUpdate.chargerNTCThermistor();
 

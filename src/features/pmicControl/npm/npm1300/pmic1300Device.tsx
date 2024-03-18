@@ -626,6 +626,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             await chargerSet.setChargerEnabledRecharging(
                                 charger.enableRecharging
                             );
+                            await chargerSet.setChargerEnablevBatLow(
+                                charger.enableVBatLow
+                            );
                             await chargerSet.setChargerVTrickleFast(
                                 charger.vTrickleFast
                             );

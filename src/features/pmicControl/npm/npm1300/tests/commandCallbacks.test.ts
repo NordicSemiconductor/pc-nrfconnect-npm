@@ -117,6 +117,19 @@ describe('PMIC 1300 - Command callbacks', () => {
         });
     });
 
+    test.each(['get', 'set 1'])('powerup_charger vbatlow %p', append => {
+        const command = `powerup_charger vbatlow ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess('Value: 1.', command);
+
+        expect(mockOnChargerUpdate).toBeCalledTimes(1);
+        expect(mockOnChargerUpdate).nthCalledWith(1, {
+            enableVBatLow: true,
+        });
+    });
+
     test.each(['get', 'set 20'])('npmx charger iTerm %p', append => {
         const command = `npmx charger termination_current ${append}`;
         const callback =

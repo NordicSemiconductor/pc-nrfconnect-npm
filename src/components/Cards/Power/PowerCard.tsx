@@ -146,6 +146,24 @@ export default ({
                         }
                         disabled={disabled}
                     />
+                    <Toggle
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="EnableVBatLow"
+                            >
+                                <>
+                                    <span>Charging Below V</span>
+                                    <span className="subscript">BATLOW</span>
+                                </>
+                            </DocumentationTooltip>
+                        }
+                        isToggled={charger.enableVBatLow}
+                        onToggle={value =>
+                            npmDevice.setChargerEnablevBatLow(value)
+                        }
+                        disabled={disabled}
+                    />
                     <Dropdown
                         label={
                             <DocumentationTooltip card="charger" item="ITERM">

@@ -71,6 +71,15 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         });
     });
 
+    test('Set setChargerEnableVBatLow ', async () => {
+        await pmic.setChargerEnablevBatLow(true);
+
+        expect(mockOnChargerUpdate).toBeCalledTimes(1);
+        expect(mockOnChargerUpdate).toBeCalledWith({
+            enableVBatLow: true,
+        });
+    });
+
     test('Set setChargerEnabled', async () => {
         await pmic.setChargerEnabled(true);
 

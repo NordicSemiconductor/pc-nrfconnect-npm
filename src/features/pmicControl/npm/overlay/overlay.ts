@@ -62,6 +62,7 @@ npm1300_ek_charger: charger {
     thermistor-beta = <${charger.ntcBeta}>;
     ${charger.enableRecharging ? '' : '// disable-recharge;'}
     ${charger.enabled ? 'charging-enable;' : ''}
+    ${charger.enableVBatLow ? 'vbatlow-charge-enable;' : ''}
 };`
         : '';
 
