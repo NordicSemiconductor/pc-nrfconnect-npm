@@ -1,3 +1,14 @@
+## 1.2.2 - UNRELEASED
+
+### Changed
+
+-   Updated Firmware to version 1.1.1+0
+
+### Removed
+
+-   Removed the separate toggle for two button reset. This functionality Will be
+    incorporated into the long press configuration instead.
+
 ## 1.2.1 - 2024-03-13
 
 ### Added
