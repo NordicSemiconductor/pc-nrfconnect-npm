@@ -6,7 +6,8 @@
 
 ### Removed
 
--   Removed the separate toggle for the two-button reset. This functionality has been incorporated into the long-press configuration instead.
+-   Removed the separate toggle for the two-button reset. This functionality has
+    been incorporated into the long-press configuration instead.
 
 ## 1.2.1 - 2024-03-13
 
