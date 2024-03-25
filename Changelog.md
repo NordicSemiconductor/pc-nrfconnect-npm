@@ -2,7 +2,7 @@
 
 ### Changed
 
--   Updated Firmware to version 1.1.1+0
+-   Updated firmware to v1.1.1+0.
 
 ### Removed
 
