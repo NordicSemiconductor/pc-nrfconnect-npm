@@ -404,18 +404,11 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         expect(mockOnShipUpdate).toBeCalledWith({ timeToActive: 16 });
     });
 
-    test('Set set timer reset long_press ', async () => {
-        await pmic.setShipLongPressReset(false);
+    test('Set set timer reset longpress ', async () => {
+        await pmic.setShipLongPressReset('disabled');
 
         expect(mockOnShipUpdate).toBeCalledTimes(1);
-        expect(mockOnShipUpdate).toBeCalledWith({ longPressReset: false });
-    });
-
-    test('Set set timer reset two_buttons ', async () => {
-        await pmic.setShipTwoButtonReset(false);
-
-        expect(mockOnShipUpdate).toBeCalledTimes(1);
-        expect(mockOnShipUpdate).toBeCalledWith({ twoButtonReset: false });
+        expect(mockOnShipUpdate).toBeCalledWith({ longPressReset: 'disabled' });
     });
 
     test.each(PMIC_1300_GPIOS)(

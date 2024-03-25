@@ -174,7 +174,6 @@ export default () => {
 
             npmDevice.requestUpdate.shipModeTimeToActive();
             npmDevice.requestUpdate.shipLongPressReset();
-            npmDevice.requestUpdate.shipTwoButtonReset();
 
             npmDevice.requestUpdate.fuelGauge();
             npmDevice.requestUpdate.activeBatteryModel();

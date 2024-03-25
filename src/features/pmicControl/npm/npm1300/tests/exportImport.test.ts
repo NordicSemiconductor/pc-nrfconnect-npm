@@ -96,8 +96,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     const initShip: ShipModeConfig = {
         timeToActive: 96,
         invPolarity: false,
-        longPressReset: true,
-        twoButtonReset: true,
+        longPressReset: 'two_button',
     };
 
     const initUSBPower: Omit<USBPower, 'detectStatus'> = {
@@ -226,8 +225,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         ship: {
             timeToActive: 16,
             invPolarity: true,
-            longPressReset: false,
-            twoButtonReset: false,
+            longPressReset: 'one_button',
         },
         fuelGauge: true,
         firmwareVersion: npm1300FWVersion,
@@ -363,7 +361,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);
-        expect(mockOnShipUpdate).toBeCalledTimes(3);
+        expect(mockOnShipUpdate).toBeCalledTimes(2);
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);

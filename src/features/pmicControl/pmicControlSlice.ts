@@ -73,8 +73,7 @@ const initialState: pmicControlState = {
     ship: {
         timeToActive: 96,
         invPolarity: true,
-        longPressReset: false,
-        twoButtonReset: false,
+        longPressReset: 'one_button',
     },
     pmicChargingState: {
         batteryFull: false,

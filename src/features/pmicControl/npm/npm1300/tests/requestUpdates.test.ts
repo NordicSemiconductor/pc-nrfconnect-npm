@@ -615,19 +615,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship reset long_press get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request update shipTwoButtonReset', () => {
-        pmic.requestUpdate.shipTwoButtonReset();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship reset two_buttons get`,
+            `powerup_ship longpress get`,
             expect.anything(),
             undefined,
             true

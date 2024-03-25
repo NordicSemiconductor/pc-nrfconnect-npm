@@ -592,16 +592,9 @@ export const documentation: Documentation = {
                         button causes a power cycle and resets the whole system.
                         This feature is enabled by default after power-up.
                     </p>,
-                ],
-            },
-        ],
-        TwoButtonReset: [
-            {
-                title: 'Two Button Reset',
-                content: [
-                    <p key="p1">
-                        A two-button reset is implemented by connecting one
-                        button to the SHPHLD pin and another button to GPIO0.
+                    <p key="p2">
+                        When two-button reset is selected, both SHPHLD and GPIO0
+                        must be pressed simultaneously to trigger a reset.
                     </p>,
                 ],
             },

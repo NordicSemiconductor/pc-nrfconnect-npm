@@ -194,11 +194,17 @@ export const TimeToActiveValues = [
 ] as const;
 export type TimeToActive = (typeof TimeToActiveValues)[number];
 
+export const LongPressResetValues = [
+    'one_button',
+    'disabled',
+    'two_button',
+] as const;
+export type LongPressReset = (typeof LongPressResetValues)[number];
+
 export type ShipModeConfig = {
     timeToActive: TimeToActive;
     invPolarity: boolean;
-    longPressReset: boolean;
-    twoButtonReset: boolean;
+    longPressReset: LongPressReset;
 };
 
 export type AdcSample = {
@@ -465,7 +471,6 @@ export type NpmDevice = {
 
         shipModeTimeToActive: () => void;
         shipLongPressReset: () => void;
-        shipTwoButtonReset: () => void;
 
         fuelGauge: () => void;
 
@@ -537,8 +542,7 @@ export type NpmDevice = {
     setTimerConfigCompare: (period: number) => Promise<void>;
 
     setShipModeTimeToActive: (time: TimeToActive) => Promise<void>;
-    setShipLongPressReset: (state: boolean) => Promise<void>;
-    setShipTwoButtonReset: (state: boolean) => Promise<void>;
+    setShipLongPressReset: (state: LongPressReset) => Promise<void>;
 
     enterShipMode: () => void;
     enterShipHibernateMode: () => void;
