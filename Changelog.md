@@ -3,6 +3,8 @@
 ### Changed
 
 -   Updated firmware to v1.1.1+0.
+-   Disconnected battery (vBat < 1V) while profiling this will only trigger a
+    warning.
 
 ### Removed
 
