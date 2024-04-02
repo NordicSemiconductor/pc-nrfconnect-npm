@@ -3,7 +3,7 @@
 [![Build Status](https://dev.azure.com/NordicSemiconductor/Wayland/_apis/build/status/NordicPlayground.pc-nrfconnect-npm?branchName=main)](https://dev.azure.com/NordicSemiconductor/Wayland/_build/results?buildId=56483&view=results)
 [![License](https://img.shields.io/badge/license-Modified%20BSD%20License-blue.svg)](LICENSE)
 
-_nRF Connect nM PowerUP_ is a desktop application intended to work with the
+nRF Connect nPM PowerUP is a desktop application intended to work with the
 nPM1300 EK to allow customers to quickly and efficiently evaluate the nPM1300
 PMIC for their projects. Once connected to an EK, the app gives full control
 over the adjustable settings of the nPM1300 PMIC. Using the included battery
@@ -12,9 +12,9 @@ charging or discharging a battery connected to the EK.
 
 ## Installation
 
-See the
-[InfoCenter](https://infocenter.nordicsemi.com/index.jsp?topic=%2Fstruct_nrftools%2Fstruct%2Fnrftools_nrfconnect.html)
-pages for information on how to install the application.
+nPM PowerUP is installed from nRF Connect for Desktop. For detailed steps, see
+[Installing nRF Connect for Desktop apps](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/installing_apps.html)
+in the nRF Connect from Desktop documentation.
 
 ## Development
 
@@ -30,7 +30,7 @@ Please report issues on the [DevZone](https://devzone.nordicsemi.com) portal.
 ## Contributing
 
 See the
-[infos on contributing](https://nordicsemiconductor.github.io/pc-nrfconnect-docs/contributing)
+[information on contributing](https://nordicsemiconductor.github.io/pc-nrfconnect-docs/contributing)
 for details.
 
 ## License
