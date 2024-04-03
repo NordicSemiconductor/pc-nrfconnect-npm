@@ -223,7 +223,8 @@ export default () => {
                 npmDevice?.getBatteryProfiler()?.stopProfiling();
                 dispatch(
                     setCompleteStep({
-                        level: 'danger',
+                        level:
+                            profilingStage === 'Resting' ? 'danger' : 'warning',
                         message: `  The profiling process was interrupted, as battery was disconnected while ${profilingStage}.`,
                     })
                 );
