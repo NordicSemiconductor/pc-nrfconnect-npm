@@ -3,7 +3,8 @@
 ### Changed
 
 -   Updated firmware to v1.1.1+0.
--   During profiling, when a battery is considered disconnected (vBat < 1 V), a warning is now issued instead of a terminating error.
+-   During profiling, when a battery is considered disconnected (vBat < 1 V), a
+    warning is now issued instead of a terminating error.
 
 ### Removed
 
