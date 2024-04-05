@@ -33,6 +33,7 @@ render(
     <App
         appReducer={appReducer}
         deviceSelect={<DeviceSelector />}
+        feedbackCategories={['nPM PowerUP', 'nPM1300']}
         sidePanel={
             <>
                 <SidePanel />
@@ -41,7 +42,6 @@ render(
                 <SlotSelectionDownloadDialog />
             </>
         }
-        feedback={{ categories: ['nPM PowerUP', 'nPM1300'] }}
         panes={[
             {
                 name: 'Dashboard',
