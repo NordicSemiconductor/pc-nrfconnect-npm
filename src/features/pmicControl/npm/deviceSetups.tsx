@@ -99,7 +99,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                         .then(() => {
                             onProgress(
                                 100,
-                                'Programming upload complete. Waiting for device to apply firmware and reboot. This take around a minute.'
+                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.'
                             );
                         })
                         .catch(err => {
