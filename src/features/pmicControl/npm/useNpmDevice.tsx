@@ -70,7 +70,7 @@ import {
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
     noop,
 } from './pmicHelpers';
-import { Buck, GPIO, Ldo, LED, LEDModeValues, PmicDialog } from './types';
+import { PmicDialog } from './types';
 
 export default () => {
     const [isPMICPowered, setPMICPowered] = useState(false);
@@ -126,76 +126,13 @@ export default () => {
                 if (!npmDevice) return;
 
                 if (npmDevice.hasCharger()) {
-                    dispatch(
-                        setCharger({
-                            vTerm: npmDevice.getChargerVoltageRange()[0],
-                            vTrickleFast: 2.5,
-                            iChg: npmDevice.getChargerCurrentRange().min,
-                            enabled: false,
-                            iTerm: '10%',
-                            enableRecharging: false,
-                            enableVBatLow: false,
-                            ntcThermistor: '10 kΩ',
-                            ntcBeta: 3380,
-                            tChgStop: 110,
-                            tChgResume: 100,
-                            vTermR: 3.6,
-                            tCold: 0,
-                            tCool: 10,
-                            tWarm: 45,
-                            tHot: 60,
-                        })
-                    );
+                    dispatch(setCharger(npmDevice.chargerDefault()));
                 }
 
-                const emptyBuck: Buck[] = [];
-                for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
-                    emptyBuck.push({
-                        vOutNormal: npmDevice.getBuckVoltageRange(i).min,
-                        vOutRetention: 1,
-                        mode: 'vSet',
-                        enabled: true,
-                        modeControl: 'Auto',
-                        onOffControl: 'Off',
-                        retentionControl: 'Off',
-                        activeDischarge: false,
-                    });
-                }
-                dispatch(setBucks(emptyBuck));
-
-                const emptyLdos: Ldo[] = [];
-                for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
-                    emptyLdos.push({
-                        voltage: npmDevice.getLdoVoltageRange(i).min,
-                        mode: 'ldoSwitch',
-                        enabled: false,
-                        softStartEnabled: true,
-                        softStart: 20,
-                        activeDischarge: false,
-                        onOffControl: 'SW',
-                    });
-                }
-                dispatch(setLdos(emptyLdos));
-
-                const emptyGPIOs: GPIO[] = [];
-                for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
-                    emptyGPIOs.push({
-                        mode: 'Input',
-                        pull: 'Pull up',
-                        drive: 1,
-                        openDrain: false,
-                        debounce: false,
-                    });
-                }
-                dispatch(setGPIOs(emptyGPIOs));
-
-                const emptyLEDs: LED[] = [];
-                for (let i = 0; i < npmDevice.getNumberOfLEDs(); i += 1) {
-                    emptyLEDs.push({
-                        mode: LEDModeValues[i],
-                    });
-                }
-                dispatch(setLEDs(emptyLEDs));
+                dispatch(setBucks(npmDevice.buckDefaults()));
+                dispatch(setLdos(npmDevice.ldoDefaults()));
+                dispatch(setGPIOs(npmDevice.gpioDefaults()));
+                dispatch(setLEDs(npmDevice.ledDefaults()));
             };
 
             const releaseAll: (() => void)[] = [];
