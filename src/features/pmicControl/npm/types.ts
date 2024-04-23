@@ -417,6 +417,7 @@ export type NpmDevice = {
     getUSBCurrentLimiterRange: () => number[];
 
     requestUpdate: {
+        all: () => void;
         pmicChargingState: () => void;
         chargerVTerm: () => void;
         chargerIChg: () => void;

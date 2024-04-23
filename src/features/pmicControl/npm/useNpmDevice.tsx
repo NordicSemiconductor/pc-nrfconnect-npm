@@ -109,77 +109,7 @@ export default () => {
             pmicState === 'pmic-connected' &&
             supportedVersion
         ) {
-            npmDevice.requestUpdate.usbPowered();
-
-            if (npmDevice.hasCharger()) {
-                npmDevice.requestUpdate.chargerVTerm();
-                npmDevice.requestUpdate.chargerIChg();
-                npmDevice.requestUpdate.chargerEnabled();
-                npmDevice.requestUpdate.chargerVTrickleFast();
-                npmDevice.requestUpdate.chargerITerm();
-                npmDevice.requestUpdate.chargerBatLim();
-                npmDevice.requestUpdate.chargerEnabledRecharging();
-                npmDevice.requestUpdate.chargerEnablevBatLow();
-                npmDevice.requestUpdate.pmicChargingState();
-                npmDevice.requestUpdate.chargerNTCThermistor();
-                npmDevice.requestUpdate.chargerNTCBeta();
-                npmDevice.requestUpdate.chargerTChgStop();
-                npmDevice.requestUpdate.chargerTChgResume();
-                npmDevice.requestUpdate.chargerVTermR();
-                npmDevice.requestUpdate.chargerTCold();
-                npmDevice.requestUpdate.chargerTCool();
-                npmDevice.requestUpdate.chargerTWarm();
-                npmDevice.requestUpdate.chargerTHot();
-            }
-
-            for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
-                npmDevice.requestUpdate.buckVOutNormal(i);
-                npmDevice.requestUpdate.buckVOutRetention(i);
-                npmDevice.requestUpdate.buckMode(i);
-                npmDevice.requestUpdate.buckEnabled(i);
-                npmDevice.requestUpdate.buckModeControl(i);
-                npmDevice.requestUpdate.buckOnOffControl(i);
-                npmDevice.requestUpdate.buckActiveDischarge(i);
-            }
-
-            for (let i = 0; i < npmDevice.getNumberOfLdos(); i += 1) {
-                npmDevice.requestUpdate.ldoVoltage(i);
-                npmDevice.requestUpdate.ldoMode(i);
-                npmDevice.requestUpdate.ldoEnabled(i);
-                npmDevice.requestUpdate.ldoSoftStartEnabled(i);
-                npmDevice.requestUpdate.ldoSoftStart(i);
-                npmDevice.requestUpdate.ldoActiveDischarge(i);
-                npmDevice.requestUpdate.ldoOnOffControl(i);
-            }
-
-            for (let i = 0; i < npmDevice.getNumberOfGPIOs(); i += 1) {
-                npmDevice.requestUpdate.gpioMode(i);
-                npmDevice.requestUpdate.gpioPull(i);
-                npmDevice.requestUpdate.gpioDrive(i);
-                npmDevice.requestUpdate.gpioOpenDrain(i);
-                npmDevice.requestUpdate.gpioDebounce(i);
-            }
-
-            for (let i = 0; i < npmDevice.getNumberOfLEDs(); i += 1) {
-                npmDevice.requestUpdate.ledMode(i);
-            }
-
-            npmDevice.requestUpdate.pofEnable();
-            npmDevice.requestUpdate.pofPolarity();
-            npmDevice.requestUpdate.pofThreshold();
-
-            npmDevice.requestUpdate.timerConfigMode();
-            npmDevice.requestUpdate.timerConfigCompare();
-            npmDevice.requestUpdate.timerConfigPrescaler();
-
-            npmDevice.requestUpdate.shipModeTimeToActive();
-            npmDevice.requestUpdate.shipLongPressReset();
-
-            npmDevice.requestUpdate.fuelGauge();
-            npmDevice.requestUpdate.activeBatteryModel();
-            npmDevice.requestUpdate.storedBatteryModel();
-
-            npmDevice.requestUpdate.vbusinCurrentLimiter();
+            npmDevice.requestUpdate.all();
 
             npmDevice.getHardcodedBatteryModels().then(models => {
                 dispatch(setHardcodedBatterModels(models));
