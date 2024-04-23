@@ -6,10 +6,45 @@
 
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { PmicDialog } from '../../types';
+import { Buck, PmicDialog } from '../../types';
 import buckCallbacks from './buckCallbacks';
 import { buckGet, buckSet } from './buckEffects';
+
+export const buckDefaults = (noOfBucks: number): Buck[] => {
+    const defaultBucks: Buck[] = [];
+    for (let i = 0; i < noOfBucks; i += 1) {
+        defaultBucks.push({
+            vOutNormal: getBuckVoltageRange(i).min,
+            vOutRetention: 1,
+            mode: 'vSet',
+            enabled: true,
+            modeControl: 'Auto',
+            onOffControl: 'Off',
+            retentionControl: 'Off',
+            activeDischarge: false,
+        });
+    }
+
+    return defaultBucks;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getBuckVoltageRange = (i: number) =>
+    ({
+        min: 1,
+        max: 3.3,
+        decimals: 1,
+    } as RangeType);
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getBuckRetVOutRange = (i: number) =>
+    ({
+        min: 1,
+        max: 3,
+        decimals: 1,
+    } as RangeType);
 
 export default (
     shellParser: ShellParser | undefined,
@@ -27,16 +62,7 @@ export default (
     buckSet: buckSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
     buckCallbacks: buckCallbacks(shellParser, eventEmitter, noOfBucks),
     buckRanges: {
-        getBuckVoltageRange: () => ({
-            min: 1,
-            max: 3.3,
-            decimals: 1,
-        }),
-
-        getBuckRetVOutRange: () => ({
-            min: 1,
-            max: 3,
-            decimals: 1,
-        }),
+        getBuckVoltageRange,
+        getBuckRetVOutRange,
     },
 });
