@@ -36,11 +36,11 @@ import {
     USBDetectStatusValues,
     USBPower,
 } from '../types';
-import setupBucks from './buck';
-import setupCharger from './charger';
+import setupBucks, { buckDefaults } from './buck';
+import setupCharger, { chargerDefaults as chargerDefault } from './charger';
 import setupFuelGauge from './fuelGauge';
-import setupGpio from './gpio';
-import setupLdo from './ldo';
+import setupGpio, { gpioDefaults } from './gpio';
+import setupLdo, { ldoDefaults } from './ldo';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timer';
@@ -982,5 +982,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
             autoReboot = v;
         },
+
+        // Default settings
+        buckDefaults: () => buckDefaults(devices.noOfBucks),
+        ldoDefaults: () => ldoDefaults(devices.noOfLdos),
+        gpioDefaults: () => gpioDefaults(devices.noOfGPIOs),
+        ledDefaults: () => ledDefaults(devices.noOfLEDs),
+        chargerDefault: () => chargerDefault(),
     };
 };
