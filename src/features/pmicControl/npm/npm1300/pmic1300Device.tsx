@@ -583,6 +583,17 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    // Return a set of default LED settings
+    const ledDefaults = (noOfLeds: number): LED[] => {
+        const defaultLEDs: LED[] = [];
+        for (let i = 0; i < noOfLeds; i += 1) {
+            defaultLEDs.push({
+                mode: LEDModeValues[i],
+            });
+        }
+        return defaultLEDs;
+    };
+
     const requestUpdate = {
         all: () => {
             // Request all updates for nPM1300
