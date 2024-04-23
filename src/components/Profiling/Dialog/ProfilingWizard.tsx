@@ -16,6 +16,7 @@ import {
     isConfirmCloseDialogOpen,
     logger,
     setWaitForDevice,
+    telemetry,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { appendFileSync, writeFileSync } from 'fs';
 import path from 'path';
@@ -37,6 +38,7 @@ import {
     closeProfiling,
     getAbort,
     getCcProfilingState,
+    getCompleteStep,
     getProfile,
     getProfileIndex,
     getProfilingStage,
@@ -93,6 +95,7 @@ export default () => {
     const confirmCloseDialogOpen = useSelector(isConfirmCloseDialogOpen);
     const pmicState = useSelector(getPmicState);
     const [initializing, setInitializing] = useState(false);
+    const completeStep = useSelector(getCompleteStep);
 
     const dispatch = useDispatch();
 
@@ -193,6 +196,31 @@ export default () => {
             }),
         [dispatch, index, npmDevice, profile, profilingStage]
     );
+
+    useEffect(() => {
+        switch (profilingStage) {
+            case 'Complete':
+                telemetry.sendEvent(`Profiling (${profilingStage})`, {
+                    ...profile,
+                    temperature: profile.temperatures[index],
+                    ...completeStep,
+                });
+                break;
+            case 'Charging':
+            case 'Checklist':
+            case 'Profiling':
+            case 'Resting':
+                telemetry.sendEvent(`Profiling (${profilingStage})`, {
+                    ...profile,
+                    temperature: profile.temperatures[index],
+                });
+                break;
+            case 'Configuration':
+            case 'MissingSyncBoard':
+                telemetry.sendEvent(`Profiling (${profilingStage})`);
+                break;
+        }
+    }, [completeStep, index, profile, profilingStage]);
 
     useEffect(() => {
         if (
