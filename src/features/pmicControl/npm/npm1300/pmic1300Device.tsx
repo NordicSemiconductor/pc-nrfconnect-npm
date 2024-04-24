@@ -36,11 +36,11 @@ import {
     USBDetectStatusValues,
     USBPower,
 } from '../types';
-import setupBucks from './buck';
-import setupCharger from './charger';
+import setupBucks, { buckDefaults } from './buck';
+import setupCharger, { chargerDefaults as chargerDefault } from './charger';
 import setupFuelGauge from './fuelGauge';
-import setupGpio from './gpio';
-import setupLdo from './ldo';
+import setupGpio, { gpioDefaults } from './gpio';
+import setupLdo, { ldoDefaults } from './ldo';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timer';
@@ -583,7 +583,92 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
+    // Return a set of default LED settings
+    const ledDefaults = (noOfLeds: number): LED[] => {
+        const defaultLEDs: LED[] = [];
+        for (let i = 0; i < noOfLeds; i += 1) {
+            defaultLEDs.push({
+                mode: LEDModeValues[i],
+            });
+        }
+        return defaultLEDs;
+    };
+
     const requestUpdate = {
+        all: () => {
+            // Request all updates for nPM1300
+
+            requestUpdate.usbPowered();
+
+            if (devices.charger) {
+                requestUpdate.chargerVTerm();
+                requestUpdate.chargerIChg();
+                requestUpdate.chargerEnabled();
+                requestUpdate.chargerVTrickleFast();
+                requestUpdate.chargerITerm();
+                requestUpdate.chargerBatLim();
+                requestUpdate.chargerEnabledRecharging();
+                requestUpdate.chargerEnablevBatLow();
+                requestUpdate.pmicChargingState();
+                requestUpdate.chargerNTCThermistor();
+                requestUpdate.chargerNTCBeta();
+                requestUpdate.chargerTChgStop();
+                requestUpdate.chargerTChgResume();
+                requestUpdate.chargerVTermR();
+                requestUpdate.chargerTCold();
+                requestUpdate.chargerTCool();
+                requestUpdate.chargerTWarm();
+                requestUpdate.chargerTHot();
+            }
+
+            for (let i = 0; i < devices.noOfBucks; i += 1) {
+                requestUpdate.buckVOutNormal(i);
+                requestUpdate.buckVOutRetention(i);
+                requestUpdate.buckMode(i);
+                requestUpdate.buckEnabled(i);
+                requestUpdate.buckModeControl(i);
+                requestUpdate.buckOnOffControl(i);
+                requestUpdate.buckActiveDischarge(i);
+            }
+
+            for (let i = 0; i < devices.noOfLdos; i += 1) {
+                requestUpdate.ldoVoltage(i);
+                requestUpdate.ldoMode(i);
+                requestUpdate.ldoEnabled(i);
+                requestUpdate.ldoSoftStartEnabled(i);
+                requestUpdate.ldoSoftStart(i);
+                requestUpdate.ldoActiveDischarge(i);
+                requestUpdate.ldoOnOffControl(i);
+            }
+
+            for (let i = 0; i < devices.noOfGPIOs; i += 1) {
+                requestUpdate.gpioMode(i);
+                requestUpdate.gpioPull(i);
+                requestUpdate.gpioDrive(i);
+                requestUpdate.gpioOpenDrain(i);
+                requestUpdate.gpioDebounce(i);
+            }
+
+            for (let i = 0; i < devices.noOfLEDs; i += 1) {
+                requestUpdate.ledMode(i);
+            }
+            requestUpdate.pofEnable();
+            requestUpdate.pofPolarity();
+            requestUpdate.pofThreshold();
+
+            requestUpdate.timerConfigMode();
+            requestUpdate.timerConfigCompare();
+            requestUpdate.timerConfigPrescaler();
+
+            requestUpdate.shipModeTimeToActive();
+            requestUpdate.shipLongPressReset();
+
+            requestUpdate.fuelGauge();
+            requestUpdate.activeBatteryModel();
+            requestUpdate.storedBatteryModel();
+
+            requestUpdate.vbusinCurrentLimiter();
+        },
         ...chargerGet,
 
         ...buckGet,
@@ -897,5 +982,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
             autoReboot = v;
         },
+
+        // Default settings
+        buckDefaults: () => buckDefaults(devices.noOfBucks),
+        ldoDefaults: () => ldoDefaults(devices.noOfLdos),
+        gpioDefaults: () => gpioDefaults(devices.noOfGPIOs),
+        ledDefaults: () => ledDefaults(devices.noOfLEDs),
+        chargerDefault: () => chargerDefault(),
     };
 };

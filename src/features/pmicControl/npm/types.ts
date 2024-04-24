@@ -416,7 +416,14 @@ export type NpmDevice = {
     getPOFThresholdRange: () => RangeType;
     getUSBCurrentLimiterRange: () => number[];
 
+    chargerDefault: () => Charger;
+    buckDefaults: () => Buck[];
+    ldoDefaults: () => Ldo[];
+    gpioDefaults: () => GPIO[];
+    ledDefaults: () => LED[];
+
     requestUpdate: {
+        all: () => void;
         pmicChargingState: () => void;
         chargerVTerm: () => void;
         chargerIChg: () => void;
