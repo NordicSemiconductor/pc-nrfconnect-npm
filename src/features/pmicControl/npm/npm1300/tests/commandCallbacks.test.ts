@@ -24,6 +24,7 @@ import {
     USBDetectStatusValues,
 } from '../../types';
 import {
+    helpers,
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
@@ -141,6 +142,83 @@ describe('PMIC 1300 - Command callbacks', () => {
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).nthCalledWith(1, { iTerm: '20%' });
     });
+
+    test.each(['get', 'set 1340'])('npmx charger iBatLim %p', append => {
+        const command = `npmx charger discharging_current ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess('Value: 1340mA.', command);
+
+        expect(mockOnChargerUpdate).toBeCalledTimes(1);
+        expect(mockOnChargerUpdate).nthCalledWith(1, { iBatLim: 1340 });
+    });
+
+    test('npmx charger iBatLim apx result', () => {
+        const command = `npmx charger discharging_current set 271`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(
+            'Info: Requested value was 271 but reading will return 300 due to approximations.',
+            command
+        );
+
+        expect(mockOnChargerUpdate).toBeCalledTimes(1);
+        expect(mockOnChargerUpdate).nthCalledWith(1, { iBatLim: 271 });
+    });
+
+    test.each(['get', 'set 1000'])(
+        'npmx charger iBatLim closes to High should overwrite ans set it to high %p',
+        async append => {
+            const command = `npmx charger discharging_current ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            mockEnqueueRequest.mockImplementation(
+                helpers.registerCommandCallbackSuccess
+            );
+
+            await callback?.onSuccess('Value: 1000mA.', command);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(2);
+            expect(mockOnChargerUpdate).nthCalledWith(1, { iBatLim: 1000 });
+            expect(mockOnChargerUpdate).nthCalledWith(2, { iBatLim: 1340 });
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npmx charger discharging_current set 1340`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        }
+    );
+
+    test.each(['get', 'set 300'])(
+        'npmx charger iBatLim closes to High should overwrite ans set it to low %p',
+        async append => {
+            const command = `npmx charger discharging_current ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            mockEnqueueRequest.mockImplementation(
+                helpers.registerCommandCallbackSuccess
+            );
+
+            await callback?.onSuccess('Value: 300mA.', command);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(2);
+            expect(mockOnChargerUpdate).nthCalledWith(1, { iBatLim: 300 });
+            expect(mockOnChargerUpdate).nthCalledWith(2, { iBatLim: 271 });
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npmx charger discharging_current set 271`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        }
+    );
 
     test.each(['get', 'set 100'])('npmx charger die_temp resume %p', append => {
         const command = `npmx charger die_temp resume ${append}`;

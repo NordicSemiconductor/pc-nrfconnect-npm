@@ -18,6 +18,7 @@ export const chargerDefaults = (): Charger => ({
     iChg: chargerCurrentRange.min,
     enabled: false,
     iTerm: '10%',
+    iBatLim: 1340,
     enableRecharging: false,
     enableVBatLow: false,
     ntcThermistor: '10 kΩ',
@@ -30,6 +31,22 @@ export const chargerDefaults = (): Charger => ({
     tWarm: 45,
     tHot: 60,
 });
+
+const chargerIBatLimRange = () => {
+    const result: number[] & { toLabel?: (v: number) => string } = [1340, 271];
+    result.toLabel = (v: number) => {
+        switch (v) {
+            case 1340:
+                return 'High';
+            case 271:
+                return 'Low';
+            default:
+                return 'Manual';
+        }
+    };
+
+    return result;
+};
 
 const chargerVoltageRange = getRange([
     {
@@ -81,6 +98,7 @@ const chargerRanges = () => ({
         decimals: 0,
         step: 1,
     }),
+    getChargerIBatLimRange: chargerIBatLimRange,
 });
 
 export default (
@@ -95,6 +113,11 @@ export default (
 ) => ({
     chargerGet: chargerGet(sendCommand),
     chargerSet: chargerSet(eventEmitter, sendCommand, offlineMode),
-    chargerCallbacks: chargerCallbacks(shellParser, eventEmitter),
+    chargerCallbacks: chargerCallbacks(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    ),
     chargerRanges: chargerRanges(),
 });

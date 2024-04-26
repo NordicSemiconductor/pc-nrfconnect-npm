@@ -119,7 +119,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerEnableVBatLow', () => {
-        pmic.requestUpdate.chargerEnablevBatLow();
+        pmic.requestUpdate.chargerEnabledVBatLow();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

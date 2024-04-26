@@ -98,6 +98,30 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
 
+        test('Set setChargerBatLim', async () => {
+            await pmic.setChargerBatLim(1000);
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
+
+            // turn off charging
+            expect(mockEnqueueRequest).toBeCalledTimes(2);
+            expect(mockEnqueueRequest).nthCalledWith(
+                1,
+                `npmx charger module charger set 0`,
+                expect.anything(),
+                undefined,
+                true
+            );
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npmx charger discharging_current set 1000`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        });
+
         test('Set setChargerVTrickleFast', async () => {
             await pmic.setChargerVTrickleFast(2.5);
 
@@ -139,9 +163,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test.each([true, false])(
-            'Set setChargerEnableVBatLow enabled: %p',
+            'Set setChargerEnabledVBatLow enabled: %p',
             async enabled => {
-                await pmic.setChargerEnablevBatLow(enabled);
+                await pmic.setChargerEnabledVBatLow(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -1467,6 +1491,75 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
 
+        test('Set setChargerBatLim onError case 1 - Fail immediately', async () => {
+            await expect(pmic.setChargerBatLim(1000)).rejects.toBeUndefined();
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
+
+            expect(mockEnqueueRequest).toBeCalledTimes(3);
+            expect(mockEnqueueRequest).nthCalledWith(
+                1,
+                `npmx charger module charger set 0`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Refresh data due to error
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npmx charger module charger get`,
+                expect.anything(),
+                undefined,
+                true
+            );
+            expect(mockEnqueueRequest).nthCalledWith(
+                3,
+                `npmx charger discharging_current get`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        });
+
+        test('Set setChargerBatLim onError case 2 - Fail on second command', async () => {
+            mockEnqueueRequest.mockImplementationOnce(
+                helpers.registerCommandCallbackSuccess
+            );
+
+            await expect(pmic.setChargerBatLim(1000)).rejects.toBeUndefined();
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(1);
+            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
+
+            // turn off charging
+            expect(mockEnqueueRequest).toBeCalledTimes(3);
+            expect(mockEnqueueRequest).nthCalledWith(
+                1,
+                `npmx charger module charger set 0`,
+                expect.anything(),
+                undefined,
+                true
+            );
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npmx charger discharging_current set 1000`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Refresh data due to error
+            expect(mockEnqueueRequest).nthCalledWith(
+                3,
+                `npmx charger discharging_current get`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        });
+
         test('Set setChargerVTrickleFast onError case 1 - Fail immediately', async () => {
             await expect(
                 pmic.setChargerVTrickleFast(2.5)
@@ -1643,7 +1736,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerEnableVBatLow - Fail immediately -  enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setChargerEnablevBatLow(enabled)
+                    pmic.setChargerEnabledVBatLow(enabled)
                 ).rejects.toBeUndefined();
 
                 // turn off vbatlow

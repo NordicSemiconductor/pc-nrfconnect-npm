@@ -62,6 +62,13 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: '10%' });
     });
 
+    test('Set setChargerBatLim', async () => {
+        await pmic.setChargerBatLim(1000);
+
+        expect(mockOnChargerUpdate).toBeCalledTimes(1);
+        expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
+    });
+
     test('Set setChargerEnabledRecharging ', async () => {
         await pmic.setChargerEnabledRecharging(true);
 
@@ -71,8 +78,8 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         });
     });
 
-    test('Set setChargerEnableVBatLow ', async () => {
-        await pmic.setChargerEnablevBatLow(true);
+    test('Set setChargerEnabledBatLow ', async () => {
+        await pmic.setChargerEnabledVBatLow(true);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({

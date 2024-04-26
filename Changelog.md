@@ -1,4 +1,8 @@
-## 1.2.2 - UNRELEASED
+## 1.3.0 - UNRELEASED
+
+### Added
+
+-   Charger BatLim configuration
 
 ### Changed
 

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { isFixedListRangeWithLabel } from '../../types';
 import { PMIC_1300_BUCKS, PMIC_1300_LDOS, setupMocksBase } from './helpers';
 
 describe('PMIC 1300 - Static getters', () => {
@@ -56,6 +57,18 @@ describe('PMIC 1300 - Static getters', () => {
             decimals: 0,
             step: 2,
         }));
+
+    test('Charger Current Range', () => {
+        const range = pmic.getChargerIBatLimRange();
+
+        expect(isFixedListRangeWithLabel(range)).toBeTruthy();
+        if (isFixedListRangeWithLabel(range)) {
+            expect(range.toLabel?.(1340)).toBe('High');
+            expect(range.toLabel?.(271)).toBe('Low');
+            expect(range.toLabel?.(1000)).toBe('Manual');
+            expect(range.map(v => v.valueOf())).toStrictEqual([1340, 271]);
+        }
+    });
 
     test.each(PMIC_1300_BUCKS)('Buck Voltage Range index: %p', index =>
         expect(pmic.getBuckVoltageRange(index)).toStrictEqual({

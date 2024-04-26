@@ -25,7 +25,7 @@ export const chargerGet = (
     chargerBatLim: () => sendCommand('npmx charger discharging_current get'),
     chargerEnabledRecharging: () =>
         sendCommand('npmx charger module recharge get'),
-    chargerEnablevBatLow: () => sendCommand('powerup_charger vbatlow get'),
+    chargerEnabledVBatLow: () => sendCommand('powerup_charger vbatlow get'),
     chargerNTCThermistor: () => sendCommand('npmx adc ntc type get'),
     chargerNTCBeta: () => sendCommand('npmx adc ntc beta get'),
     chargerTChgStop: () => sendCommand('npmx charger die_temp stop get'),
@@ -53,8 +53,9 @@ export const chargerSet = (
         chargerEnabled,
         chargerVTrickleFast,
         chargerITerm,
+        chargerBatLim,
         chargerEnabledRecharging,
-        chargerEnablevBatLow,
+        chargerEnabledVBatLow,
         chargerNTCThermistor,
         chargerNTCBeta,
         chargerTChgStop,
@@ -179,6 +180,33 @@ export const chargerSet = (
             }
         });
 
+    const setChargerBatLim = (iBatLim: number) =>
+        new Promise<void>((resolve, reject) => {
+            eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                iBatLim,
+            });
+
+            if (offlineMode) {
+                resolve();
+            } else {
+                setChargerEnabled(false)
+                    .then(() => {
+                        sendCommand(
+                            `npmx charger discharging_current set ${iBatLim}`,
+                            () => resolve(),
+                            () => {
+                                chargerBatLim();
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
+                        chargerBatLim();
+                        reject();
+                    });
+            }
+        });
+
     const setChargerEnabledRecharging = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (offlineMode) {
@@ -198,7 +226,7 @@ export const chargerSet = (
             }
         });
 
-    const setChargerEnablevBatLow = (enabled: boolean) =>
+    const setChargerEnabledVBatLow = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
             if (offlineMode) {
                 eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
@@ -210,7 +238,7 @@ export const chargerSet = (
                     `powerup_charger vbatlow set ${enabled ? '1' : '0'}`,
                     () => resolve(),
                     () => {
-                        chargerEnablevBatLow();
+                        chargerEnabledVBatLow();
                         reject();
                     }
                 );
@@ -467,8 +495,9 @@ export const chargerSet = (
         setChargerEnabled,
         setChargerVTrickleFast,
         setChargerITerm,
+        setChargerBatLim,
         setChargerEnabledRecharging,
-        setChargerEnablevBatLow,
+        setChargerEnabledVBatLow,
         setChargerNTCThermistor,
         setChargerNTCBeta,
         setChargerTChgStop,

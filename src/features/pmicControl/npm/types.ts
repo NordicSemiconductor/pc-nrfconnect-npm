@@ -90,6 +90,7 @@ export type Charger = {
     enableRecharging: boolean;
     enableVBatLow: boolean;
     iTerm: ITerm;
+    iBatLim: number;
     ntcThermistor: NTCThermistor;
     ntcBeta: number;
     tChgStop: number;
@@ -294,6 +295,26 @@ export interface ProfileDownload {
     slot?: number;
 }
 
+export type FixedListRange = number[] | FixedListRangeWithLabel;
+export type FixedListRangeWithLabel = number[] & {
+    toLabel: (value: number) => string;
+};
+
+export type RangeOrFixedListRange = RangeType | FixedListRange;
+
+export const isFixedListRange = (
+    range: RangeOrFixedListRange
+): range is FixedListRange => Array.isArray(range);
+
+export const isFixedListRangeWithLabel = (
+    range: RangeOrFixedListRange
+): range is FixedListRangeWithLabel =>
+    Array.isArray(range) &&
+    (range as FixedListRangeWithLabel).toLabel !== undefined;
+
+export const isRangeType = (range: RangeOrFixedListRange): range is RangeType =>
+    !Array.isArray(range);
+
 export type BaseNpmDevice = {
     kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
@@ -409,6 +430,11 @@ export type NpmDevice = {
     getChargerVTermRRange: () => number[];
     getChargerJeitaRange: () => RangeType;
     getChargerChipThermalRange: () => RangeType;
+    getChargerIBatLimRange: () =>
+        | RangeType
+        | (number[] & {
+              toLabel?: (value: number) => string;
+          });
     getChargerNTCBetaRange: () => RangeType;
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
@@ -432,7 +458,7 @@ export type NpmDevice = {
         chargerITerm: () => void;
         chargerBatLim: () => void;
         chargerEnabledRecharging: () => void;
-        chargerEnablevBatLow: () => void;
+        chargerEnabledVBatLow: () => void;
         chargerNTCThermistor: () => void;
         chargerNTCBeta: () => void;
         chargerTChgStop: () => void;
@@ -494,8 +520,9 @@ export type NpmDevice = {
     setChargerEnabled: (state: boolean) => Promise<void>;
     setChargerVTrickleFast: (value: VTrickleFast) => Promise<void>;
     setChargerITerm: (iTerm: ITerm) => Promise<void>;
+    setChargerBatLim: (lim: number) => Promise<void>;
     setChargerEnabledRecharging: (enabled: boolean) => Promise<void>;
-    setChargerEnablevBatLow: (enabled: boolean) => Promise<void>;
+    setChargerEnabledVBatLow: (enabled: boolean) => Promise<void>;
     setChargerNTCThermistor: (
         mode: NTCThermistor,
         autoSetBeta?: boolean

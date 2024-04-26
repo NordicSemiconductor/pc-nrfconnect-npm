@@ -15,11 +15,23 @@ import {
     toRegex,
 } from '../../pmicHelpers';
 import { Charger, NTCThermistor, PmicChargingState } from '../../types';
+import { chargerSet } from './chargerEffects';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
+    sendCommand: (
+        command: string,
+        onSuccess?: (response: string, command: string) => void,
+        onError?: (response: string, command: string) => void
+    ) => void,
+    offlineMode: boolean
 ) => {
+    const { setChargerBatLim } = chargerSet(
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
     const cleanupCallbacks = [];
 
     const emitOnChargingStatusUpdate = (value: number) =>
@@ -192,6 +204,46 @@ export default (
                             {
                                 iTerm: `${result}%`,
                             }
+                        );
+                    }
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger discharging_current', true),
+                async res => {
+                    let iBatLim: number = parseToNumber(res);
+
+                    // this command will approximate and given we
+                    // only have high and low of no error was thrown
+                    //  we can assume that what was requeued was set
+                    if (Number.isNaN(iBatLim)) {
+                        const requested = res.match(/\d+/)?.[0];
+
+                        if (!requested) {
+                            console.error(
+                                'unable to parse response. UI might be out of sync'
+                            );
+                            return;
+                        }
+                        iBatLim = Number.parseInt(requested, 10);
+                    }
+
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iBatLim,
+                    });
+
+                    if (iBatLim !== 1340 && iBatLim !== 271) {
+                        await setChargerBatLim(
+                            [1340, 271]
+                                .map(v => ({
+                                    diff: Math.abs(v - iBatLim),
+                                    value: v,
+                                }))
+                                .sort((a, b) => a.diff - b.diff)[0].value
                         );
                     }
                 },

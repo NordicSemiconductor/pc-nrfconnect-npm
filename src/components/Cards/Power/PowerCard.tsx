@@ -16,6 +16,7 @@ import {
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Charger,
+    isFixedListRangeWithLabel,
     ITerm,
     ITermValues,
     NpmDevice,
@@ -55,12 +56,16 @@ export default ({
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
+    const [internalBatLim, setInternalBatLim] = useState(charger.iBatLim);
 
     // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVTerm(charger.vTerm);
         setInternalIChg(charger.iChg);
+        setInternalBatLim(charger.iBatLim);
     }, [charger]);
+
+    const chargerIBatLimRange = npmDevice.getChargerIBatLimRange();
 
     return (
         <Card
@@ -131,6 +136,48 @@ export default ({
 
             {!summary && (
                 <>
+                    {isFixedListRangeWithLabel(chargerIBatLimRange) &&
+                    chargerIBatLimRange.toLabel !== undefined ? (
+                        <Dropdown
+                            items={chargerIBatLimRange.map(v => ({
+                                value: v.valueOf(),
+                                label: chargerIBatLimRange.toLabel(v),
+                            }))}
+                            label={
+                                <div>
+                                    <span>IBAT</span>
+                                    <span className="subscript">LIM</span>
+                                </div>
+                            }
+                            disabled={disabled}
+                            onSelect={v => npmDevice.setChargerBatLim(v.value)}
+                            selectedItem={{
+                                value: charger.iBatLim,
+                                label: chargerIBatLimRange.toLabel(
+                                    charger.iBatLim
+                                ),
+                            }}
+                        />
+                    ) : (
+                        <NumberInput
+                            label={
+                                <div>
+                                    <span>IBAT</span>
+                                    <span className="subscript">LIM</span>
+                                </div>
+                            }
+                            unit="mA"
+                            disabled={disabled}
+                            range={npmDevice.getChargerIBatLimRange()}
+                            value={internalBatLim}
+                            onChange={setInternalBatLim}
+                            onChangeComplete={v =>
+                                npmDevice.setChargerBatLim(v)
+                            }
+                            showSlider
+                        />
+                    )}
+
                     <Toggle
                         label={
                             <DocumentationTooltip
@@ -160,7 +207,7 @@ export default ({
                         }
                         isToggled={charger.enableVBatLow}
                         onToggle={value =>
-                            npmDevice.setChargerEnablevBatLow(value)
+                            npmDevice.setChargerEnabledVBatLow(value)
                         }
                         disabled={disabled}
                     />
