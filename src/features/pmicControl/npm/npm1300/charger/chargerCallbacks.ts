@@ -15,23 +15,11 @@ import {
     toRegex,
 } from '../../pmicHelpers';
 import { Charger, NTCThermistor, PmicChargingState } from '../../types';
-import { chargerSet } from './chargerEffects';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    offlineMode: boolean
+    eventEmitter: NpmEventEmitter
 ) => {
-    const { setChargerBatLim } = chargerSet(
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
     const cleanupCallbacks = [];
 
     const emitOnChargingStatusUpdate = (value: number) =>
@@ -214,7 +202,7 @@ export default (
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
                 toRegex('npmx charger discharging_current', true),
-                async res => {
+                res => {
                     let iBatLim: number = parseToNumber(res);
 
                     // this command will approximate and given we
@@ -235,17 +223,6 @@ export default (
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         iBatLim,
                     });
-
-                    if (iBatLim !== 1340 && iBatLim !== 271) {
-                        await setChargerBatLim(
-                            [1340, 271]
-                                .map(v => ({
-                                    diff: Math.abs(v - iBatLim),
-                                    value: v,
-                                }))
-                                .sort((a, b) => a.diff - b.diff)[0].value
-                        );
-                    }
                 },
                 noop
             )

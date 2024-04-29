@@ -139,10 +139,24 @@ export default ({
                     {isFixedListRangeWithLabel(chargerIBatLimRange) &&
                     chargerIBatLimRange.toLabel !== undefined ? (
                         <Dropdown
-                            items={chargerIBatLimRange.map(v => ({
-                                value: v.valueOf(),
-                                label: chargerIBatLimRange.toLabel(v),
-                            }))}
+                            items={[
+                                ...(!chargerIBatLimRange.find(
+                                    v => v === charger.iBatLim
+                                )
+                                    ? [
+                                          {
+                                              value: charger.iBatLim,
+                                              label: chargerIBatLimRange.toLabel(
+                                                  charger.iBatLim
+                                              ),
+                                          },
+                                      ]
+                                    : []),
+                                ...chargerIBatLimRange.map(v => ({
+                                    value: v.valueOf(),
+                                    label: chargerIBatLimRange.toLabel(v),
+                                })),
+                            ]}
                             label={
                                 <div>
                                     <span>IBAT</span>

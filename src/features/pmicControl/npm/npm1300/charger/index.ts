@@ -41,7 +41,7 @@ const chargerIBatLimRange = () => {
             case 271:
                 return 'Low';
             default:
-                return 'Manual';
+                return `Manual (${v} mA)`;
         }
     };
 
@@ -113,11 +113,6 @@ export default (
 ) => ({
     chargerGet: chargerGet(sendCommand),
     chargerSet: chargerSet(eventEmitter, sendCommand, offlineMode),
-    chargerCallbacks: chargerCallbacks(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    ),
+    chargerCallbacks: chargerCallbacks(shellParser, eventEmitter),
     chargerRanges: chargerRanges(),
 });
