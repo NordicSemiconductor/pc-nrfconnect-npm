@@ -182,7 +182,7 @@ export default ({
                             }
                             unit="mA"
                             disabled={disabled}
-                            range={npmDevice.getChargerIBatLimRange()}
+                            range={chargerIBatLimRange}
                             value={internalBatLim}
                             onChange={setInternalBatLim}
                             onChangeComplete={v =>

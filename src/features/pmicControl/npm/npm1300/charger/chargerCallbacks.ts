@@ -213,7 +213,7 @@ export default (
 
                         if (!requested) {
                             console.error(
-                                'unable to parse response. UI might be out of sync'
+                                'Unable to parse response. UI might be out of sync.'
                             );
                             return;
                         }

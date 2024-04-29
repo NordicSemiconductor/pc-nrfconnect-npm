@@ -2,7 +2,7 @@
 
 ### Added
 
--   Charger BatLim configuration
+-   Charger Battery Limit (BatLim) configuration.
 
 ### Changed
 
