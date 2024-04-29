@@ -17,6 +17,10 @@
 -   Removed the separate toggle for the two-button reset. This functionality has
     been incorporated into the long-press configuration instead.
 
+### Fixed
+
+-   JEITA VTermr slider is disabled when not usable.
+
 ## 1.2.1 - 2024-03-13
 
 ### Added

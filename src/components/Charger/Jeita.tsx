@@ -276,6 +276,7 @@ export default ({
                                 i => v => updateInternal(i, v)
                             )}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={disabled}
                         />
                     </div>
                     <span>{npmDevice.getChargerJeitaRange().max}°C</span>
