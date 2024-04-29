@@ -818,6 +818,25 @@ export const documentation: Documentation = {
                 ],
             },
         ],
+        IBATLIM: [
+            {
+                title: (
+                    <>
+                        <span>IBAT</span>
+                        <span className="subscript">LIM</span>
+                    </>
+                ),
+                content: [
+                    <p key="p1">
+                        For best fuel gauge accuracy it is advised to use
+                        <span>IBAT</span>
+                        <span className="subscript">LIM_LOW</span> for
+                        applications with a lower maximum battery discharge
+                        current than 150mA.
+                    </p>,
+                ],
+            },
+        ],
         VTrickleFast: [
             {
                 title: (

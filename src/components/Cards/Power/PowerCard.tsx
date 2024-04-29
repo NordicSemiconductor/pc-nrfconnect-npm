@@ -158,10 +158,15 @@ export default ({
                                 })),
                             ]}
                             label={
-                                <div>
-                                    <span>IBAT</span>
-                                    <span className="subscript">LIM</span>
-                                </div>
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="IBATLIM"
+                                >
+                                    <div>
+                                        <span>IBAT</span>
+                                        <span className="subscript">LIM</span>
+                                    </div>
+                                </DocumentationTooltip>
                             }
                             disabled={disabled}
                             onSelect={v => npmDevice.setChargerBatLim(v.value)}
@@ -175,10 +180,15 @@ export default ({
                     ) : (
                         <NumberInput
                             label={
-                                <div>
-                                    <span>IBAT</span>
-                                    <span className="subscript">LIM</span>
-                                </div>
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="IBATLIM"
+                                >
+                                    <div>
+                                        <span>IBAT</span>
+                                        <span className="subscript">LIM</span>
+                                    </div>
+                                </DocumentationTooltip>
                             }
                             unit="mA"
                             disabled={disabled}
