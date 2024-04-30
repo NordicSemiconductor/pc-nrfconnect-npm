@@ -207,7 +207,10 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
             expect(mockOnBuckUpdate).toBeCalledTimes(1);
             expect(mockOnBuckUpdate).toBeCalledWith({
-                data: { onOffControl: 'Off' },
+                data: {
+                    onOffControl: 'Off',
+                    onOffSoftwareControlEnabled: true,
+                },
                 index,
             });
         }
@@ -316,7 +319,10 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { onOffControl: 'SW' },
+                data: {
+                    onOffControl: 'SW',
+                    onOffSoftwareControlEnabled: true,
+                },
                 index,
             });
         }
