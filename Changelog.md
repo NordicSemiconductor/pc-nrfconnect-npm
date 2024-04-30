@@ -19,7 +19,7 @@
 
 ### Fixed
 
--   JEITA VTermr slider is disabled when not usable.
+-   JEITA V_TERMR slider is disabled when not usable.
 
 ## 1.2.1 - 2024-03-13
 
