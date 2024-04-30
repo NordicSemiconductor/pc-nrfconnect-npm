@@ -126,7 +126,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         const adcSample: AdcSample = {
             timestamp,
             vBat: 0,
-            iBat: 0,
+            iBat: NaN,
             tBat: 0,
             soc: NaN,
             tte: NaN,
@@ -143,7 +143,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     adcSample.vBat = fixed(2, pair[1]);
                     break;
                 case 'ibat':
-                    adcSample.iBat = fixed(2, Number(pair[1]) * 1000);
+                    adcSample.iBat = fixed(2, Number(pair[1] ?? NaN) * 1000);
                     break;
                 case 'tbat':
                     adcSample.tBat = fixed(1, pair[1]);
