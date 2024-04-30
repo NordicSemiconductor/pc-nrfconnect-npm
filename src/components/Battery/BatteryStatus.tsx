@@ -77,7 +77,9 @@ export default ({ disabled }: { disabled: boolean }) => {
             <LineData
                 title="Current"
                 value={
-                    batteryConnected && latestAdcSample
+                    batteryConnected &&
+                    latestAdcSample?.iBat != null &&
+                    !Number.isNaN(latestAdcSample?.iBat)
                         ? `${latestAdcSample?.iBat < 0 ? '—' : ''}${Math.round(
                               Math.abs(latestAdcSample?.iBat ?? 0)
                           )} mA`
