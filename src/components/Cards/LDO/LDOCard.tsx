@@ -86,7 +86,9 @@ export default ({
                             onToggle={value =>
                                 npmDevice.setLdoEnabled(index, value)
                             }
-                            disabled={disabled}
+                            disabled={
+                                disabled || !ldo.onOffSoftwareControlEnabled
+                            }
                         />
                         <span
                             className={classNames(

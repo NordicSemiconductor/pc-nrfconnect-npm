@@ -99,6 +99,7 @@ const setupSingleBuck = (
                     {
                         onOffControl:
                             result === -1 ? 'Off' : GPIOValues[result],
+                        onOffSoftwareControlEnabled: result === -1, // Disable on GPIO control, enable on SW control
                     },
                     i
                 );

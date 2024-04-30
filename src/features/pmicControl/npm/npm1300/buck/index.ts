@@ -22,6 +22,7 @@ export const buckDefaults = (noOfBucks: number): Buck[] => {
             enabled: true,
             modeControl: 'Auto',
             onOffControl: 'Off',
+            onOffSoftwareControlEnabled: true,
             retentionControl: 'Off',
             activeDischarge: false,
         });

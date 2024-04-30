@@ -710,6 +710,7 @@ Battery models stored in database:
                     value === -1
                         ? BuckOnOffControlValues[0]
                         : GPIOValues[value],
+                onOffSoftwareControlEnabled: value === -1,
             },
             index,
         });
@@ -989,6 +990,7 @@ Battery models stored in database:
             data: {
                 onOffControl:
                     value === -1 ? LdoOnOffControlValues[0] : GPIOValues[value],
+                onOffSoftwareControlEnabled: value === -1,
             },
             index,
         });

@@ -63,6 +63,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         enabled: false,
         modeControl: 'GPIO0',
         onOffControl: 'GPIO0',
+        onOffSoftwareControlEnabled: false,
         retentionControl: 'GPIO0',
         activeDischarge: false,
     };
@@ -75,6 +76,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         softStart: 20,
         activeDischarge: false,
         onOffControl: 'GPIO0',
+        onOffSoftwareControlEnabled: false,
     };
 
     const initLed: LED = {
@@ -130,6 +132,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 enabled: true,
                 modeControl: 'GPIO0',
                 onOffControl: 'GPIO1',
+                onOffSoftwareControlEnabled: false,
                 retentionControl: 'GPIO2',
                 activeDischarge: true,
             },
@@ -140,6 +143,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 enabled: true,
                 modeControl: 'GPIO1',
                 onOffControl: 'GPIO2',
+                onOffSoftwareControlEnabled: false,
                 retentionControl: 'GPIO3',
                 activeDischarge: true,
             },
@@ -153,6 +157,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 softStart: 50,
                 activeDischarge: true,
                 onOffControl: 'GPIO1',
+                onOffSoftwareControlEnabled: false,
             },
             {
                 voltage: 2,
@@ -162,6 +167,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 softStart: 50,
                 activeDischarge: false,
                 onOffControl: 'GPIO2',
+                onOffSoftwareControlEnabled: false,
             },
         ],
         gpios: [

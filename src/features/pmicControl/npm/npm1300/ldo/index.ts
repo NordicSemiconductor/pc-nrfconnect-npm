@@ -23,6 +23,7 @@ export const ldoDefaults = (noOfLdos: number): Ldo[] => {
             softStart: 20,
             activeDischarge: false,
             onOffControl: 'SW',
+            onOffSoftwareControlEnabled: true,
         });
     }
     return defaultLDOs;

@@ -107,6 +107,7 @@ export type Buck = {
     mode: BuckMode;
     modeControl: BuckModeControl;
     onOffControl: BuckOnOffControl;
+    onOffSoftwareControlEnabled: boolean;
     retentionControl: BuckRetentionControl;
     enabled: boolean;
     activeDischarge: boolean;
@@ -120,6 +121,7 @@ export type Ldo = {
     softStart: SoftStart;
     activeDischarge: boolean;
     onOffControl: LdoOnOffControl;
+    onOffSoftwareControlEnabled: boolean;
 };
 
 export const GPIOModeValues = [
