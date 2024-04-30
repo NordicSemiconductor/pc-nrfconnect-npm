@@ -16,6 +16,7 @@ import {
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Charger,
+    isFixedListRangeWithLabel,
     ITerm,
     ITermValues,
     NpmDevice,
@@ -55,12 +56,16 @@ export default ({
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
+    const [internalBatLim, setInternalBatLim] = useState(charger.iBatLim);
 
     // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVTerm(charger.vTerm);
         setInternalIChg(charger.iChg);
+        setInternalBatLim(charger.iBatLim);
     }, [charger]);
+
+    const chargerIBatLimRange = npmDevice.getChargerIBatLimRange();
 
     return (
         <Card
@@ -131,6 +136,72 @@ export default ({
 
             {!summary && (
                 <>
+                    {isFixedListRangeWithLabel(chargerIBatLimRange) &&
+                    chargerIBatLimRange.toLabel !== undefined ? (
+                        <Dropdown
+                            items={[
+                                ...(!chargerIBatLimRange.find(
+                                    v => v === charger.iBatLim
+                                )
+                                    ? [
+                                          {
+                                              value: charger.iBatLim,
+                                              label: chargerIBatLimRange.toLabel(
+                                                  charger.iBatLim
+                                              ),
+                                          },
+                                      ]
+                                    : []),
+                                ...chargerIBatLimRange.map(v => ({
+                                    value: v.valueOf(),
+                                    label: chargerIBatLimRange.toLabel(v),
+                                })),
+                            ]}
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="IBATLIM"
+                                >
+                                    <div>
+                                        <span>IBAT</span>
+                                        <span className="subscript">LIM</span>
+                                    </div>
+                                </DocumentationTooltip>
+                            }
+                            disabled={disabled}
+                            onSelect={v => npmDevice.setChargerBatLim(v.value)}
+                            selectedItem={{
+                                value: charger.iBatLim,
+                                label: chargerIBatLimRange.toLabel(
+                                    charger.iBatLim
+                                ),
+                            }}
+                        />
+                    ) : (
+                        <NumberInput
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="IBATLIM"
+                                >
+                                    <div>
+                                        <span>IBAT</span>
+                                        <span className="subscript">LIM</span>
+                                    </div>
+                                </DocumentationTooltip>
+                            }
+                            unit="mA"
+                            disabled={disabled}
+                            range={chargerIBatLimRange}
+                            value={internalBatLim}
+                            onChange={setInternalBatLim}
+                            onChangeComplete={v =>
+                                npmDevice.setChargerBatLim(v)
+                            }
+                            showSlider
+                        />
+                    )}
+
                     <Toggle
                         label={
                             <DocumentationTooltip
@@ -160,7 +231,7 @@ export default ({
                         }
                         isToggled={charger.enableVBatLow}
                         onToggle={value =>
-                            npmDevice.setChargerEnablevBatLow(value)
+                            npmDevice.setChargerEnabledVBatLow(value)
                         }
                         disabled={disabled}
                     />

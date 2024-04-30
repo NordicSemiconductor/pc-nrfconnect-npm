@@ -201,6 +201,35 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
+                toRegex('npmx charger discharging_current', true),
+                res => {
+                    let iBatLim: number = parseToNumber(res);
+
+                    // this command will approximate and given we
+                    // only have high and low of no error was thrown
+                    //  we can assume that what was requeued was set
+                    if (Number.isNaN(iBatLim)) {
+                        const requested = res.match(/\d+/)?.[0];
+
+                        if (!requested) {
+                            console.error(
+                                'Unable to parse response. UI might be out of sync.'
+                            );
+                            return;
+                        }
+                        iBatLim = Number.parseInt(requested, 10);
+                    }
+
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iBatLim,
+                    });
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
                 toRegex('npmx charger die_temp stop', true),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {

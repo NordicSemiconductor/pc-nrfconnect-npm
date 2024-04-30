@@ -608,7 +608,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 requestUpdate.chargerITerm();
                 requestUpdate.chargerBatLim();
                 requestUpdate.chargerEnabledRecharging();
-                requestUpdate.chargerEnablevBatLow();
+                requestUpdate.chargerEnabledVBatLow();
                 requestUpdate.pmicChargingState();
                 requestUpdate.chargerNTCThermistor();
                 requestUpdate.chargerNTCBeta();
@@ -708,10 +708,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             await chargerSet.setChargerVTerm(charger.vTerm);
                             await chargerSet.setChargerIChg(charger.iChg);
                             await chargerSet.setChargerITerm(charger.iTerm);
+                            await chargerSet.setChargerBatLim(charger.iBatLim);
                             await chargerSet.setChargerEnabledRecharging(
                                 charger.enableRecharging
                             );
-                            await chargerSet.setChargerEnablevBatLow(
+                            await chargerSet.setChargerEnabledVBatLow(
                                 charger.enableVBatLow
                             );
                             await chargerSet.setChargerVTrickleFast(
