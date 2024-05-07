@@ -108,6 +108,7 @@ export type Buck = {
     mode: BuckMode;
     modeControl: BuckModeControl;
     onOffControl: BuckOnOffControl;
+    onOffSoftwareControlEnabled: boolean;
     retentionControl: BuckRetentionControl;
     enabled: boolean;
     activeDischarge: boolean;
@@ -121,6 +122,7 @@ export type Ldo = {
     softStart: SoftStart;
     activeDischarge: boolean;
     onOffControl: LdoOnOffControl;
+    onOffSoftwareControlEnabled: boolean;
 };
 
 export const GPIOModeValues = [
@@ -619,10 +621,13 @@ export interface PmicDialog {
 
 export type NpmModel = 'npm1300';
 
+export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
+export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
+
 export interface NpmExport {
     charger?: Charger;
-    bucks: Buck[];
-    ldos: Ldo[];
+    bucks: BuckExport[];
+    ldos: LdoExport[];
     gpios: GPIO[];
     leds: LED[];
     pof: POF;

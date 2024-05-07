@@ -12,6 +12,7 @@ import {
     Ldo,
     LdoMode,
     LdoOnOffControl,
+    LdoOnOffControlValues,
     PmicDialog,
     SoftStart,
 } from '../../types';
@@ -293,6 +294,8 @@ export const ldoSet = (
                     'onLdoUpdate',
                     {
                         onOffControl,
+                        onOffSoftwareControlEnabled:
+                            onOffControl === LdoOnOffControlValues[0],
                     },
                     index
                 );

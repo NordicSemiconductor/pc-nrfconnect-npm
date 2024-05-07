@@ -18,6 +18,8 @@ import {
     TimerConfig,
     USBPower,
 } from '../../types';
+import { toBuckExport } from '../buck';
+import { toLdoExport } from '../ldo';
 import { npm1300FWVersion } from '../pmic1300Device';
 import { setupMocksBase } from './helpers';
 
@@ -64,6 +66,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         enabled: false,
         modeControl: 'GPIO0',
         onOffControl: 'GPIO0',
+        onOffSoftwareControlEnabled: false,
         retentionControl: 'GPIO0',
         activeDischarge: false,
     };
@@ -76,6 +79,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         softStart: 20,
         activeDischarge: false,
         onOffControl: 'GPIO0',
+        onOffSoftwareControlEnabled: false,
     };
 
     const initLed: LED = {
@@ -351,9 +355,9 @@ describe('PMIC 1300 - Apply Config ', () => {
     const verifyApplyConfig = () => {
         expect(charger).toStrictEqual(sampleConfig.charger);
 
-        expect(bucks).toStrictEqual(sampleConfig.bucks);
+        expect(bucks.map(toBuckExport)).toStrictEqual(sampleConfig.bucks);
 
-        expect(ldos).toStrictEqual(sampleConfig.ldos);
+        expect(ldos.map(toLdoExport)).toStrictEqual(sampleConfig.ldos);
 
         expect(gpios).toStrictEqual(sampleConfig.gpios);
 

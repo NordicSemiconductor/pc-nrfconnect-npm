@@ -132,7 +132,9 @@ export default ({
                             label="Enable"
                             isToggled={buck.enabled}
                             onToggle={value => onBuckToggle(value)}
-                            disabled={disabled || buck.onOffControl !== 'Off'}
+                            disabled={
+                                disabled || !buck.onOffSoftwareControlEnabled
+                            }
                         />
                         <span
                             className={classNames(

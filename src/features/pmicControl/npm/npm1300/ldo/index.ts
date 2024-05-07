@@ -8,7 +8,7 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Ldo, PmicDialog } from '../../types';
+import { Ldo, LdoExport, PmicDialog } from '../../types';
 import ldoCallbacks from './ldoCallbacks';
 import { ldoGet, ldoSet } from './ldoEffects';
 
@@ -23,10 +23,21 @@ export const ldoDefaults = (noOfLdos: number): Ldo[] => {
             softStart: 20,
             activeDischarge: false,
             onOffControl: 'SW',
+            onOffSoftwareControlEnabled: true,
         });
     }
     return defaultLDOs;
 };
+
+export const toLdoExport = (ldo: Ldo): LdoExport => ({
+    voltage: ldo.voltage,
+    enabled: ldo.enabled,
+    mode: ldo.mode,
+    softStartEnabled: ldo.softStartEnabled,
+    softStart: ldo.softStart,
+    activeDischarge: ldo.activeDischarge,
+    onOffControl: ldo.onOffControl,
+});
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getLdoVoltageRange = (i: number) =>

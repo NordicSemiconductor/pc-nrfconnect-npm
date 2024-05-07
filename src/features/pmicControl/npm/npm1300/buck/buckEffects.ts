@@ -10,6 +10,7 @@ import {
     BuckMode,
     BuckModeControl,
     BuckOnOffControl,
+    BuckOnOffControlValues,
     BuckRetentionControl,
     GPIOValues,
     PmicDialog,
@@ -243,6 +244,8 @@ export const buckSet = (
                     'onBuckUpdate',
                     {
                         onOffControl,
+                        onOffSoftwareControlEnabled:
+                            onOffControl === BuckOnOffControlValues[0],
                     },
                     index
                 );

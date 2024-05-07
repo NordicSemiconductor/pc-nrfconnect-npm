@@ -15,6 +15,8 @@ import fs from 'fs';
 import path from 'path';
 
 import { RootState } from '../appReducer';
+import { toBuckExport } from '../features/pmicControl/npm/npm1300/buck';
+import { toLdoExport } from '../features/pmicControl/npm/npm1300/ldo';
 import overlay from '../features/pmicControl/npm/overlay/overlay';
 import { NpmExport } from '../features/pmicControl/npm/types';
 
@@ -29,8 +31,8 @@ const saveSettings =
             charger: currentState.charger
                 ? { ...currentState.charger }
                 : undefined,
-            bucks: [...currentState.bucks],
-            ldos: [...currentState.ldos],
+            bucks: [...currentState.bucks.map(toBuckExport)],
+            ldos: [...currentState.ldos.map(toLdoExport)],
             gpios: [...currentState.gpios],
             leds: [...currentState.leds],
             pof: currentState.pof,
@@ -41,7 +43,7 @@ const saveSettings =
             deviceType: currentState.npmDevice.getDeviceType(),
             fuelGaugeChargingSamplingRate:
                 currentState.fuelGaugeChargingSamplingRate,
-            usbPower: currentState.usbPower,
+            usbPower: { currentLimiter: currentState.usbPower.currentLimiter },
         };
 
         telemetry.sendEvent('Export Configuration', {
