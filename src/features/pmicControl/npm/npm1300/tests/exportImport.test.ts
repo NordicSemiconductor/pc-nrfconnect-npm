@@ -18,6 +18,8 @@ import {
     TimerConfig,
     USBPower,
 } from '../../types';
+import { toBuckExport } from '../buck';
+import { toLdoExport } from '../ldo';
 import { npm1300FWVersion } from '../pmic1300Device';
 import { setupMocksBase } from './helpers';
 
@@ -132,7 +134,6 @@ describe('PMIC 1300 - Apply Config ', () => {
                 enabled: true,
                 modeControl: 'GPIO0',
                 onOffControl: 'GPIO1',
-                onOffSoftwareControlEnabled: false,
                 retentionControl: 'GPIO2',
                 activeDischarge: true,
             },
@@ -143,7 +144,6 @@ describe('PMIC 1300 - Apply Config ', () => {
                 enabled: true,
                 modeControl: 'GPIO1',
                 onOffControl: 'GPIO2',
-                onOffSoftwareControlEnabled: false,
                 retentionControl: 'GPIO3',
                 activeDischarge: true,
             },
@@ -157,7 +157,6 @@ describe('PMIC 1300 - Apply Config ', () => {
                 softStart: 50,
                 activeDischarge: true,
                 onOffControl: 'GPIO1',
-                onOffSoftwareControlEnabled: false,
             },
             {
                 voltage: 2,
@@ -167,7 +166,6 @@ describe('PMIC 1300 - Apply Config ', () => {
                 softStart: 50,
                 activeDischarge: false,
                 onOffControl: 'GPIO2',
-                onOffSoftwareControlEnabled: false,
             },
         ],
         gpios: [
@@ -355,9 +353,9 @@ describe('PMIC 1300 - Apply Config ', () => {
     const verifyApplyConfig = () => {
         expect(charger).toStrictEqual(sampleConfig.charger);
 
-        expect(bucks).toStrictEqual(sampleConfig.bucks);
+        expect(bucks.map(toBuckExport)).toStrictEqual(sampleConfig.bucks);
 
-        expect(ldos).toStrictEqual(sampleConfig.ldos);
+        expect(ldos.map(toLdoExport)).toStrictEqual(sampleConfig.ldos);
 
         expect(gpios).toStrictEqual(sampleConfig.gpios);
 

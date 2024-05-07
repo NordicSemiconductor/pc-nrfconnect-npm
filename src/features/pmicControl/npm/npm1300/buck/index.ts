@@ -8,7 +8,7 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Buck, PmicDialog } from '../../types';
+import { Buck, BuckExport, PmicDialog } from '../../types';
 import buckCallbacks from './buckCallbacks';
 import { buckGet, buckSet } from './buckEffects';
 
@@ -30,6 +30,17 @@ export const buckDefaults = (noOfBucks: number): Buck[] => {
 
     return defaultBucks;
 };
+
+export const toBuckExport = (buck: Buck): BuckExport => ({
+    vOutNormal: buck.vOutNormal,
+    vOutRetention: buck.vOutRetention,
+    mode: buck.mode,
+    modeControl: buck.modeControl,
+    onOffControl: buck.onOffControl,
+    retentionControl: buck.retentionControl,
+    enabled: buck.enabled,
+    activeDischarge: buck.activeDischarge,
+});
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getBuckVoltageRange = (i: number) =>

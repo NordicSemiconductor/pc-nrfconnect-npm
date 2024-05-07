@@ -594,10 +594,13 @@ export interface PmicDialog {
 
 export type NpmModel = 'npm1300';
 
+export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
+export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
+
 export interface NpmExport {
     charger?: Charger;
-    bucks: Buck[];
-    ldos: Ldo[];
+    bucks: BuckExport[];
+    ldos: LdoExport[];
     gpios: GPIO[];
     leds: LED[];
     pof: POF;

@@ -5,10 +5,10 @@
  */
 
 import {
-    Buck,
+    BuckExport,
     Charger,
     GPIOValues,
-    Ldo,
+    LdoExport,
     LED,
     LEDMode,
     NpmDevice,
@@ -67,7 +67,11 @@ npm1300_ek_charger: charger {
 };`
         : '';
 
-const generateBuck = (buck: Buck, index: number, npmDevice: NpmDevice) => `
+const generateBuck = (
+    buck: BuckExport,
+    index: number,
+    npmDevice: NpmDevice
+) => `
 npm1300_ek_buck${index + 1}: BUCK${index + 1} {
     regulator-min-microvolt = <${toMicro(
         npmDevice.getBuckVoltageRange(index).min
@@ -115,7 +119,7 @@ npm1300_ek_buck${index + 1}: BUCK${index + 1} {
 };
 `;
 
-const generateLDO = (ldo: Ldo, index: number, npmDevice: NpmDevice) => `
+const generateLDO = (ldo: LdoExport, index: number, npmDevice: NpmDevice) => `
 npm1300_ek_ldo${index + 1}: LDO${index + 1} {
     regulator-min-microvolt = <${toMicro(
         npmDevice.getLdoVoltageRange(index).min
