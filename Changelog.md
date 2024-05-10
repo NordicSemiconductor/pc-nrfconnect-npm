@@ -1,12 +1,10 @@
-## 1.3.0 - UNRELEASED
-
-### Added
-
--   Charger Battery Limit (BatLim) configuration.
+## 1.2.2 - 2024-03-10
 
 ### Changed
 
--   Updated firmware to v1.1.1+0.
+-   Updated firmware to v1.2.0+0
+-   iBat current < 15 mA will it not rendered on the graph or the Battery status
+    card
 -   During profiling, when a battery is considered disconnected (vBat < 1 V), a
     warning is now issued instead of a terminating error.
 -   Moved feedback tab to a dialog which can be opened by going to the about tab
