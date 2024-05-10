@@ -201,7 +201,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger discharging_current', true),
+                toRegex('npm_adc fullscale', true),
                 res => {
                     let iBatLim: number = parseToNumber(res);
 

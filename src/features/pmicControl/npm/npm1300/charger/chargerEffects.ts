@@ -22,7 +22,7 @@ export const chargerGet = (
     chargerEnabled: () => sendCommand('npmx charger module charger get'),
     chargerVTrickleFast: () => sendCommand('npmx charger trickle_voltage get'),
     chargerITerm: () => sendCommand('npmx charger termination_current get'),
-    chargerBatLim: () => sendCommand('npmx charger discharging_current get'),
+    chargerBatLim: () => sendCommand('npm_adc fullscale get'),
     chargerEnabledRecharging: () =>
         sendCommand('npmx charger module recharge get'),
     chargerEnabledVBatLow: () => sendCommand('powerup_charger vbatlow get'),
@@ -192,7 +192,7 @@ export const chargerSet = (
                 setChargerEnabled(false)
                     .then(() => {
                         sendCommand(
-                            `npmx charger discharging_current set ${iBatLim}`,
+                            `npm_adc fullscale set ${iBatLim}`,
                             () => resolve(),
                             () => {
                                 chargerBatLim();

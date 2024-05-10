@@ -33,12 +33,12 @@ export const chargerDefaults = (): Charger => ({
 });
 
 const chargerIBatLimRange = () => {
-    const result: number[] & { toLabel?: (v: number) => string } = [1340, 271];
+    const result: number[] & { toLabel?: (v: number) => string } = [1340, 270];
     result.toLabel = (v: number) => {
         switch (v) {
             case 1340:
                 return 'High';
-            case 271:
+            case 270:
                 return 'Low';
             default:
                 return `Manual (${v} mA)`;
