@@ -1,8 +1,4 @@
-## 1.3.0 - UNRELEASED
-
-### Added
-
--   Charger Battery Limit (BatLim) configuration.
+## 1.2.2 - 2024-03-10
 
 ### Changed
 
