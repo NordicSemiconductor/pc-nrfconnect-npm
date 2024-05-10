@@ -7,6 +7,8 @@
 ### Changed
 
 -   Updated firmware to v1.2.0+0
+-   iBat current < 15 mA will it not rendered on the graph or the Battery status
+    card
 -   During profiling, when a battery is considered disconnected (vBat < 1 V), a
     warning is now issued instead of a terminating error.
 -   Moved feedback tab to a dialog which can be opened by going to the about tab
