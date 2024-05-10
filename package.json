@@ -6,7 +6,7 @@
     "homepage": "https://github.com/NordicPlayground/pc-nrfconnect-npm",
     "repository": {
         "type": "git",
-        "url": "https://github.com/NordicSemiconductor/pc-nrfconnect-npm"
+        "url": "https://github.com/NordicSemiconductor/pc-nrfconnect-npm-private"
     },
     "author": "Nordic Semiconductor ASA",
     "license": "SEE LICENSE IN LICENSE",
