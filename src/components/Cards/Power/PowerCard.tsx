@@ -16,7 +16,7 @@ import {
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Charger,
-    // isFixedListRangeWithLabel,
+    isFixedListRangeWithLabel,
     ITerm,
     ITermValues,
     NpmDevice,
@@ -56,16 +56,16 @@ export default ({
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
-    // const [internalBatLim, setInternalBatLim] = useState(charger.iBatLim);
+    const [internalBatLim, setInternalBatLim] = useState(charger.iBatLim);
 
     // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVTerm(charger.vTerm);
         setInternalIChg(charger.iChg);
-        // setInternalBatLim(charger.iBatLim);
+        setInternalBatLim(charger.iBatLim);
     }, [charger]);
 
-    // const chargerIBatLimRange = npmDevice.getChargerIBatLimRange();
+    const chargerIBatLimRange = npmDevice.getChargerIBatLimRange();
 
     return (
         <Card
@@ -136,7 +136,7 @@ export default ({
 
             {!summary && (
                 <>
-                    {/* {isFixedListRangeWithLabel(chargerIBatLimRange) &&
+                    {isFixedListRangeWithLabel(chargerIBatLimRange) &&
                     chargerIBatLimRange.toLabel !== undefined ? (
                         <Dropdown
                             items={[
@@ -200,7 +200,7 @@ export default ({
                             }
                             showSlider
                         />
-                    )} */}
+                    )}
 
                     <Toggle
                         label={
