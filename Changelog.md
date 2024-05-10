@@ -6,7 +6,7 @@
 
 ### Changed
 
--   Updated firmware to v1.1.1+0.
+-   Updated firmware to v1.2.0+0
 -   During profiling, when a battery is considered disconnected (vBat < 1 V), a
     warning is now issued instead of a terminating error.
 -   Moved feedback tab to a dialog which can be opened by going to the about tab
