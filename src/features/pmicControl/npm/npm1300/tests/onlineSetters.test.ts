@@ -115,7 +115,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger discharging_current set 1000`,
+                `npm_adc fullscale set 1000`,
                 expect.anything(),
                 undefined,
                 true
@@ -1516,7 +1516,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger discharging_current get`,
+                `npm_adc fullscale get`,
                 expect.anything(),
                 undefined,
                 true
@@ -1544,7 +1544,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger discharging_current set 1000`,
+                `npm_adc fullscale set 1000`,
                 expect.anything(),
                 undefined,
                 true
@@ -1553,7 +1553,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger discharging_current get`,
+                `npm_adc fullscale get`,
                 expect.anything(),
                 undefined,
                 true
