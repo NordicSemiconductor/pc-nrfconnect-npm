@@ -619,7 +619,7 @@ export interface PmicDialog {
     progress?: number;
 }
 
-export type NpmModel = 'npm1300';
+export type NpmModel = 'npm1300' | 'npm2100';
 
 export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
 export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
