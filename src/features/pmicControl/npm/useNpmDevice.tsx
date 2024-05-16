@@ -31,6 +31,7 @@ import {
     isSupportedVersion,
     setActiveBatterModel,
     setBatteryConnected,
+    setBoosts,
     setBucks,
     setCharger,
     setErrorLogs,
@@ -48,6 +49,7 @@ import {
     setPmicState,
     setStoredBatterModel,
     setSupportedVersion,
+    updateBoost,
     updateBuck,
     updateCharger,
     updateGPIOs,
@@ -129,6 +131,7 @@ export default () => {
                     dispatch(setCharger(npmDevice.chargerDefault()));
                 }
 
+                dispatch(setBoosts(npmDevice.getBoosts?.().defaults ?? []));
                 dispatch(setBucks(npmDevice.buckDefaults()));
                 dispatch(setLdos(npmDevice.ldoDefaults()));
                 dispatch(setGPIOs(npmDevice.gpioDefaults()));
@@ -209,6 +212,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onBuckUpdate(payload => {
                     dispatch(updateBuck(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onBoostUpdate(payload => {
+                    dispatch(updateBoost(payload));
                 })
             );
 

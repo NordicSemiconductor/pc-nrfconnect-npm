@@ -32,6 +32,6 @@ export const getNpmDevice = (
                 onError: reject,
             });
         } else {
-            resolve(getNPM1300(undefined, dialogHandler));
+            resolve(getNPM2100(undefined, dialogHandler));
         }
     });
