@@ -1,3 +1,13 @@
+## 1.3.0 - Unreleased
+
+### Added
+
+-   Added IBat Lim high and low configuration options.
+
+### Changed
+
+-   Updated firmware to v1.2.1+0
+
 ## 1.2.2 - 2024-03-10
 
 ### Changed
