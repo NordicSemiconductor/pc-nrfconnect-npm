@@ -828,7 +828,7 @@ export const documentation: Documentation = {
                         <span>IBAT</span>
                         <span className="subscript">LIM_LOW</span> for
                         applications with a lower maximum battery discharge
-                        current than 150 mA.
+                        current than 200 mA.
                     </p>,
                 ],
             },
