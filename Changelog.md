@@ -3,7 +3,7 @@
 ### Added
 
 -   Added IBat Lim high and low configuration options.
--   Profiling now support additional VTerm values 3.50V, 3.55V, 3.60V, 3.65V.
+-   Profiling now supports additional VTerm values: 3.50 V, 3.55 V, 3.60 V, and 3.65 V.
 
 ### Changed
 
