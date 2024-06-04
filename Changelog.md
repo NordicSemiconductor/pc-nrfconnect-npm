@@ -8,7 +8,7 @@
 
 ### Changed
 
--   Updated firmware to v1.2.2+0
+-   Updated firmware to v1.2.3+0
 
 ## 1.2.2 - 2024-03-10
 

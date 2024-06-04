@@ -45,7 +45,7 @@ import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timer';
 
-export const npm1300FWVersion = '1.2.2+0';
+export const npm1300FWVersion = '1.2.3+0';
 
 export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new NpmEventEmitter();
