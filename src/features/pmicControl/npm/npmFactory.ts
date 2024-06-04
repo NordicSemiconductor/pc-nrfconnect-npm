@@ -7,6 +7,7 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getNPM1300 } from './npm1300/pmic1300Device';
+import { getNPM2100 } from './npm2100/pmic2100Device';
 import { NpmDevice, PmicDialog } from './types';
 
 export const getNpmDevice = (
@@ -20,6 +21,9 @@ export const getNpmDevice = (
                     switch (response) {
                         case 'hw_version=npm1300ek_nrf5340_cpuapp':
                             resolve(getNPM1300(shellParser, dialogHandler));
+                            break;
+                        case 'hw_version=npm2100ek_nrf5340_cpuapp':
+                            resolve(getNPM2100(shellParser, dialogHandler));
                             break;
                         default:
                             reject(new Error('Unknown hardware'));

@@ -45,18 +45,18 @@ import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timer';
 
-export const npm2100FWVersion = '1.1.1+0';
+export const npm2100FWVersion = '0.1.0+3703497161';
 
 export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new NpmEventEmitter();
 
     const devices = {
-        noOfBucks: 2,
-        charger: true,
-        noOfLdos: 2,
-        noOfGPIOs: 5,
-        noOfLEDs: 3,
-        noOfBatterySlots: 3,
+        noOfBucks: 0,
+        charger: false,
+        noOfLdos: 1,
+        noOfGPIOs: 2,
+        noOfLEDs: 0,
+        noOfBatterySlots: 1,
     };
     const baseDevice = baseNpmDevice(
         shellParser,
@@ -632,13 +632,17 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             }
 
             for (let i = 0; i < devices.noOfLdos; i += 1) {
-                requestUpdate.ldoVoltage(i);
-                requestUpdate.ldoMode(i);
-                requestUpdate.ldoEnabled(i);
-                requestUpdate.ldoSoftStartEnabled(i);
-                requestUpdate.ldoSoftStart(i);
-                requestUpdate.ldoActiveDischarge(i);
-                requestUpdate.ldoOnOffControl(i);
+                requestUpdate.ldoVoltage();
+                requestUpdate.ldoEnabled();
+                requestUpdate.ldoMode();
+                requestUpdate.ldoModeCtrl();
+                requestUpdate.ldoPinSel();
+                requestUpdate.ldoSoftStartLdo();
+                requestUpdate.ldoSoftStartLoadSw();
+                requestUpdate.ldoPinMode();
+                requestUpdate.ldoOcp();
+                requestUpdate.ldoLdoRamp();
+                requestUpdate.ldoLdoHalt();
             }
 
             for (let i = 0; i < devices.noOfGPIOs; i += 1) {
@@ -783,23 +787,63 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                                         index,
                                         ldo.enabled
                                     );
-                                    await ldoSet.setLdoSoftStartEnabled(
-                                        index,
-                                        ldo.softStartEnabled
-                                    );
-                                    await ldoSet.setLdoSoftStart(
-                                        index,
-                                        ldo.softStart
-                                    );
-                                    await ldoSet.setLdoActiveDischarge(
-                                        index,
-                                        ldo.activeDischarge
-                                    );
-                                    await ldoSet.setLdoOnOffControl(
-                                        index,
-                                        ldo.onOffControl
-                                    );
                                     await ldoSet.setLdoMode(index, ldo.mode);
+
+                                    if (ldo.modeControl) {
+                                        await ldoSet.setLdoModeControl(
+                                            index,
+                                            ldo.modeControl
+                                        );
+                                    }
+
+                                    if (ldo.pinSel) {
+                                        await ldoSet.setLdoPinSel(
+                                            index,
+                                            ldo.pinSel
+                                        );
+                                    }
+
+                                    if (ldo.ldoSoftStart) {
+                                        await ldoSet.setLdoSoftstart(
+                                            index,
+                                            ldo.ldoSoftStart
+                                        );
+                                    }
+
+                                    if (ldo.loadSwitchSoftStart) {
+                                        await ldoSet.setLoadSwitchSoftstart(
+                                            index,
+                                            ldo.loadSwitchSoftStart
+                                        );
+                                    }
+
+                                    if (ldo.pinMode) {
+                                        await ldoSet.setLdoPinMode(
+                                            index,
+                                            ldo.pinMode
+                                        );
+                                    }
+
+                                    if (ldo.ocpEnabled) {
+                                        await ldoSet.setLdoOcpEnabled(
+                                            index,
+                                            ldo.ocpEnabled
+                                        );
+                                    }
+
+                                    if (ldo.ldoRampEnabled) {
+                                        await ldoSet.setLdoRampEnabled(
+                                            index,
+                                            ldo.ldoRampEnabled
+                                        );
+                                    }
+
+                                    if (ldo.ldoHaltEnabled) {
+                                        await ldoSet.setLdoHaltEnabled(
+                                            index,
+                                            ldo.ldoHaltEnabled
+                                        );
+                                    }
                                 })()
                             )
                         );

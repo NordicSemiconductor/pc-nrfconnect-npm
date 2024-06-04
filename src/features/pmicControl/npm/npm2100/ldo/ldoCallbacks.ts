@@ -9,11 +9,26 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     noop,
     NpmEventEmitter,
-    parseToBoolean,
+    onOffRegex,
+    parseColonBasedAnswer,
+    parseOnOff,
     parseToNumber,
     toRegex,
+    toValueRegex,
 } from '../../pmicHelpers';
-import { GPIOValues, Ldo, SoftStart } from '../../types';
+import { Ldo, LdoModeValues } from '../../types';
+import {
+    nPM2100GPIOControlMode,
+    nPM2100GPIOControlModeValues,
+    nPM2100GPIOControlPinSelect,
+    nPM2100GPIOControlPinSelectValues,
+    nPM2100LdoModeControl,
+    nPM2100LdoModeControlValues,
+    nPM2100LDOSoftStart,
+    nPM2100LDOSoftStartValues,
+    nPM2100LoadSwitchSoftStart,
+    nPM2100LoadSwitchSoftStartValues,
+} from '../types';
 
 const setupSingleLdo = (
     shellParser: ShellParser,
@@ -22,41 +37,10 @@ const setupSingleLdo = (
 ) => {
     const cleanupCallbacks = [];
 
+    // Vout
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx ldsw status', true, i),
-            res => {
-                eventEmitter.emitPartialEvent<Ldo>(
-                    'onLdoUpdate',
-                    {
-                        enabled: parseToBoolean(res),
-                    },
-                    i
-                );
-            },
-            noop
-        )
-    );
-
-    cleanupCallbacks.push(
-        shellParser.registerCommandCallback(
-            toRegex('npmx ldsw mode', true, i),
-            res => {
-                eventEmitter.emitPartialEvent<Ldo>(
-                    'onLdoUpdate',
-                    {
-                        mode: parseToNumber(res) === 0 ? 'ldoSwitch' : 'LDO',
-                    },
-                    i
-                );
-            },
-            noop
-        )
-    );
-
-    cleanupCallbacks.push(
-        shellParser.registerCommandCallback(
-            toRegex('npmx ldsw ldo_voltage', true, i),
+            toRegex('npm2100 ldosw vout', true, undefined),
             res => {
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
@@ -70,14 +54,137 @@ const setupSingleLdo = (
         )
     );
 
+    // Enable
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx ldsw soft_start enable', true, i, '(0|1)'),
+            toRegex('npm2100 ldosw enable', true, undefined, onOffRegex),
+            res => {
+                console.log('callback for ldosw enable %s', res);
+                eventEmitter.emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        enabled: parseOnOff(res),
+                    },
+                    i
+                );
+            },
+            noop
+        )
+    );
+
+    // Mode
+    cleanupCallbacks.push(
+        shellParser.registerCommandCallback(
+            toRegex(
+                'npm2100 ldosw mode',
+                true,
+                undefined,
+                toValueRegex(LdoModeValues)
+            ),
             res => {
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        softStartEnabled: parseToBoolean(res),
+                        mode:
+                            parseColonBasedAnswer(res).toUpperCase() === 'LDO'
+                                ? 'LDO'
+                                : 'load_switch',
+                    },
+                    i
+                );
+            },
+            noop
+        )
+    );
+
+    // Modectrl
+    cleanupCallbacks.push(
+        shellParser.registerCommandCallback(
+            toRegex(
+                'npm2100 ldosw modectrl',
+                true,
+                undefined,
+                toValueRegex(nPM2100LdoModeControlValues)
+            ),
+            res => {
+                eventEmitter.emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        modeControl: parseColonBasedAnswer(
+                            res
+                        ) as nPM2100LdoModeControl,
+                    },
+                    i
+                );
+            },
+            noop
+        )
+    );
+
+    // Pinsel
+    cleanupCallbacks.push(
+        shellParser.registerCommandCallback(
+            toRegex(
+                'npm2100 ldosw pinsel',
+                true,
+                undefined,
+                toValueRegex(nPM2100GPIOControlPinSelectValues)
+            ),
+            res => {
+                eventEmitter.emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        pinSel: parseColonBasedAnswer(
+                            res
+                        ) as nPM2100GPIOControlPinSelect,
+                    },
+                    i
+                );
+            },
+            noop
+        )
+    );
+
+    // Softstart LDO
+    cleanupCallbacks.push(
+        shellParser.registerCommandCallback(
+            toRegex(
+                'npm2100 ldosw softstart LDO',
+                true,
+                undefined,
+                toValueRegex(nPM2100LDOSoftStartValues)
+            ),
+            res => {
+                eventEmitter.emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        ldoSoftStart: parseColonBasedAnswer(
+                            res
+                        ) as nPM2100LDOSoftStart,
+                    },
+                    i
+                );
+            },
+            noop
+        )
+    );
+
+    // Softstart loadsw
+    cleanupCallbacks.push(
+        shellParser.registerCommandCallback(
+            toRegex(
+                'npm2100 ldosw softstart LOADSW',
+                true,
+                undefined,
+                toValueRegex(nPM2100LoadSwitchSoftStartValues)
+            ),
+            res => {
+                eventEmitter.emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        loadSwitchSoftStart: parseColonBasedAnswer(
+                            res
+                        ) as nPM2100LoadSwitchSoftStart,
                     },
                     i
                 );
@@ -88,12 +195,19 @@ const setupSingleLdo = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx ldsw soft_start current', true, i, '(10|20|35|50)'),
+            toRegex(
+                'npm2100 ldosw pinmode',
+                true,
+                undefined,
+                toValueRegex(nPM2100GPIOControlModeValues)
+            ),
             res => {
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        softStart: parseToNumber(res) as SoftStart,
+                        pinMode: parseColonBasedAnswer(
+                            res
+                        ) as nPM2100GPIOControlMode,
                     },
                     i
                 );
@@ -102,14 +216,15 @@ const setupSingleLdo = (
         )
     );
 
+    // OCP - Over Current Protection
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx ldsw active_discharge', true, i),
+            toRegex('npm2100 ldosw ocp', true, undefined, onOffRegex),
             res => {
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        activeDischarge: parseToBoolean(res),
+                        ocpEnabled: parseOnOff(res),
                     },
                     i
                 );
@@ -118,16 +233,32 @@ const setupSingleLdo = (
         )
     );
 
+    // LDO Ramping
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx ldsw gpio index', true, i, '(-1|[0-4])'),
+            toRegex('npm2100 ldosw ldoramp', true, undefined, onOffRegex),
             res => {
-                const result = parseToNumber(res);
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        onOffControl: result === -1 ? 'SW' : GPIOValues[result],
-                        onOffSoftwareControlEnabled: result === -1, // Disable on GPIO control, enable on SW control
+                        ldoRampEnabled: parseOnOff(res),
+                    },
+                    i
+                );
+            },
+            noop
+        )
+    );
+
+    // LDO Halt Ramping
+    cleanupCallbacks.push(
+        shellParser.registerCommandCallback(
+            toRegex('npm2100 ldosw ldohalt', true, undefined, onOffRegex),
+            res => {
+                eventEmitter.emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        ldoHaltEnabled: parseOnOff(res),
                     },
                     i
                 );

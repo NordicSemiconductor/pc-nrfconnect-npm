@@ -391,7 +391,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_LDOS)(
         'Request update ldoSoftStartEnabled index: %p',
         index => {
-            pmic.requestUpdate.ldoSoftStartEnabled(index);
+            pmic.requestUpdate.ldoSoftStartEnabled?.(index);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -406,7 +406,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_LDOS)(
         'Request update ldoSoftStart index: %p',
         index => {
-            pmic.requestUpdate.ldoSoftStart(index);
+            pmic.requestUpdate.ldoSoftStart?.(index);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -421,7 +421,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_LDOS)(
         'Request update ldoActiveDischarge index: %p',
         index => {
-            pmic.requestUpdate.ldoActiveDischarge(index);
+            pmic.requestUpdate.ldoActiveDischarge?.(index);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -436,7 +436,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_LDOS)(
         'Request update ldoOnOffControl index: %p',
         index => {
-            pmic.requestUpdate.ldoOnOffControl(index);
+            pmic.requestUpdate.ldoOnOffControl?.(index);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
