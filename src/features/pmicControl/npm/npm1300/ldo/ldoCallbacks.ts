@@ -13,7 +13,7 @@ import {
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { GPIOValues, Ldo, SoftStart } from '../../types';
+import { GPIOValues, Ldo, Npm1300LoadSwitchSoftStart } from '../../types';
 
 const setupSingleLdo = (
     shellParser: ShellParser,
@@ -45,7 +45,7 @@ const setupSingleLdo = (
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        mode: parseToNumber(res) === 0 ? 'ldoSwitch' : 'LDO',
+                        mode: parseToNumber(res) === 0 ? 'load_switch' : 'LDO',
                     },
                     i
                 );
@@ -93,7 +93,9 @@ const setupSingleLdo = (
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        softStart: parseToNumber(res) as SoftStart,
+                        softStart: parseToNumber(
+                            res
+                        ) as Npm1300LoadSwitchSoftStart,
                     },
                     i
                 );

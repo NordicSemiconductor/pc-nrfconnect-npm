@@ -17,7 +17,7 @@ export const ldoDefaults = (noOfLdos: number): Ldo[] => {
     for (let i = 0; i < noOfLdos; i += 1) {
         defaultLDOs.push({
             voltage: getLdoVoltageRange(i).min,
-            mode: 'ldoSwitch',
+            mode: 'load_switch',
             enabled: false,
             softStartEnabled: true,
             softStart: 20,

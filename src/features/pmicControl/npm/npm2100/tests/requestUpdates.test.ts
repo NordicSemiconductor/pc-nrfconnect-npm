@@ -388,66 +388,6 @@ describe('PMIC 2100 - Request update commands', () => {
         );
     });
 
-    test.each(PMIC_2100_LDOS)(
-        'Request update ldoSoftStartEnabled index: %p',
-        index => {
-            pmic.requestUpdate.ldoSoftStartEnabled(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw soft_start enable get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_LDOS)(
-        'Request update ldoSoftStart index: %p',
-        index => {
-            pmic.requestUpdate.ldoSoftStart(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw soft_start current get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_LDOS)(
-        'Request update ldoActiveDischarge index: %p',
-        index => {
-            pmic.requestUpdate.ldoActiveDischarge(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw active_discharge get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_LDOS)(
-        'Request update ldoOnOffControl index: %p',
-        index => {
-            pmic.requestUpdate.ldoOnOffControl(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw gpio index get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
     test.each(PMIC_2100_GPIOS)('Request update gpioMode index: %p', index => {
         pmic.requestUpdate.gpioMode(index);
 

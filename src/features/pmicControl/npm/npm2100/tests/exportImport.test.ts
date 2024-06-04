@@ -153,7 +153,7 @@ describe('PMIC 2100 - Apply Config ', () => {
         ldos: [
             {
                 voltage: 1,
-                mode: 'ldoSwitch',
+                mode: 'load_switch',
                 enabled: false,
                 softStartEnabled: false,
                 softStart: 50,
@@ -162,7 +162,7 @@ describe('PMIC 2100 - Apply Config ', () => {
             },
             {
                 voltage: 2,
-                mode: 'ldoSwitch',
+                mode: 'load_switch',
                 enabled: false,
                 softStartEnabled: false,
                 softStart: 50,

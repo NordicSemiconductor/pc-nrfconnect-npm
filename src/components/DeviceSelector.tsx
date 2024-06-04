@@ -15,11 +15,17 @@ import { DeviceTraits } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/
 import path from 'path';
 
 import { closeDevice, openDevice } from '../actions/deviceActions';
-import { npm1300DeviceSetup } from '../features/pmicControl/npm/deviceSetups';
+import {
+    npm1300DeviceSetup,
+    npm2100DeviceSetup,
+} from '../features/pmicControl/npm/deviceSetups';
 import { npm1300FWVersion } from '../features/pmicControl/npm/npm1300/pmic1300Device';
+import { npm2100FWVersion } from '../features/pmicControl/npm/npm2100/pmic2100Device';
 import {
     isNpm1300SerialApplicationMode,
     isNpm1300SerialRecoverMode,
+    isNpm2100SerialApplicationMode,
+    isNpm2100SerialRecoverMode,
 } from '../features/pmicControl/npm/pmicHelpers';
 import { stopEventRecording } from '../features/pmicControl/pmicControlSlice';
 import { setCompleteStep } from '../features/pmicControl/profilingSlice';
@@ -43,9 +49,16 @@ const deviceSetupConfig: DeviceSetupConfig = {
                 path.join('fw', `app_signed_${npm1300FWVersion}.hex`)
             ),
         }),
+        npm2100DeviceSetup({
+            key: 'nPM2100',
+            description: '',
+            hex: getAppFile(
+                path.join('fw', `app_signed_nPM2100_${npm2100FWVersion}.hex`)
+            ),
+        }),
     ],
     confirmMessage:
-        'Programming required. The nPM1300 EK FW version does not match the required FW version.',
+        'Programming required. The nPM EK firmware version does not match the required firmware version.',
 };
 
 export default () => {
@@ -83,7 +96,9 @@ export default () => {
             }}
             deviceFilter={device =>
                 isNpm1300SerialRecoverMode(device) ||
-                isNpm1300SerialApplicationMode(device)
+                isNpm1300SerialApplicationMode(device) ||
+                isNpm2100SerialApplicationMode(device) ||
+                isNpm2100SerialRecoverMode(device)
             }
         />
     );

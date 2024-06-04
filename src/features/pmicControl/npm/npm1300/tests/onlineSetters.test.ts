@@ -846,7 +846,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     }
                 );
 
-            await pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO');
+            await pmic.setLdoMode(index, mode === 0 ? 'load_switch' : 'LDO');
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -931,7 +931,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setLdoSoftStart %p', async ({ index, enabled }) => {
-            await pmic.setLdoSoftStartEnabled(index, enabled);
+            await pmic.setLdoSoftStartEnabled?.(index, enabled);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -955,7 +955,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setLdoSoftStart %p', async ({ index, softStart }) => {
-            await pmic.setLdoSoftStart(index, softStart);
+            await pmic.setLdoSoftStart?.(index, softStart);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -977,7 +977,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setLdoEnabled %p', async ({ index, enabled }) => {
-            await pmic.setLdoActiveDischarge(index, enabled);
+            await pmic.setLdoActiveDischarge?.(index, enabled);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -996,7 +996,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_LDOS)(
             'Set setLdoOnOffControl index: %p',
             async index => {
-                await pmic.setLdoOnOffControl(index, 'GPIO2');
+                await pmic.setLdoOnOffControl?.(index, 'GPIO2');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -2540,7 +2540,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO')
+                    pmic.setLdoMode(index, mode === 0 ? 'load_switch' : 'LDO')
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2576,7 +2576,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoSoftStartEnabled - Fail immediately - %p',
             async ({ index, enabled }) => {
                 await expect(
-                    pmic.setLdoSoftStartEnabled(index, enabled)
+                    pmic.setLdoSoftStartEnabled?.(index, enabled)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2614,7 +2614,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoEnabled - Fail immediately - %p',
             async ({ index, softStart }) => {
                 await expect(
-                    pmic.setLdoSoftStart(index, softStart)
+                    pmic.setLdoSoftStart?.(index, softStart)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2650,7 +2650,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoEnabled - Fail immediately - %p',
             async ({ index, activeDischarge }) => {
                 await expect(
-                    pmic.setLdoActiveDischarge(index, activeDischarge)
+                    pmic.setLdoActiveDischarge?.(index, activeDischarge)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2681,7 +2681,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoOnOffControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setLdoOnOffControl(index, 'GPIO2')
+                    pmic.setLdoOnOffControl?.(index, 'GPIO2')
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);

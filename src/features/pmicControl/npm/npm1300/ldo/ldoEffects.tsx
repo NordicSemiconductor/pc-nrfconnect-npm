@@ -13,8 +13,8 @@ import {
     LdoMode,
     LdoOnOffControl,
     LdoOnOffControlValues,
+    Npm1300LoadSwitchSoftStart,
     PmicDialog,
-    SoftStart,
 } from '../../types';
 
 export const ldoGet = (
@@ -73,7 +73,7 @@ export const ldoSet = (
                 } else {
                     sendCommand(
                         `npmx ldsw mode set ${index} ${
-                            mode === 'ldoSwitch' ? '0' : '1'
+                            mode === 'load_switch' ? '0' : '1'
                         }`,
                         () => resolve(),
                         () => {
@@ -239,7 +239,10 @@ export const ldoSet = (
             }
         });
 
-    const setLdoSoftStart = (index: number, softStart: SoftStart) =>
+    const setLdoSoftStart = (
+        index: number,
+        softStart: Npm1300LoadSwitchSoftStart
+    ) =>
         new Promise<void>((resolve, reject) => {
             if (offlineMode) {
                 eventEmitter.emitPartialEvent<Ldo>(
