@@ -631,19 +631,17 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 requestUpdate.buckActiveDischarge(i);
             }
 
-            for (let i = 0; i < devices.noOfLdos; i += 1) {
-                requestUpdate.ldoVoltage();
-                requestUpdate.ldoEnabled();
-                requestUpdate.ldoMode();
-                requestUpdate.ldoModeCtrl();
-                requestUpdate.ldoPinSel();
-                requestUpdate.ldoSoftStartLdo();
-                requestUpdate.ldoSoftStartLoadSw();
-                requestUpdate.ldoPinMode();
-                requestUpdate.ldoOcp();
-                requestUpdate.ldoLdoRamp();
-                requestUpdate.ldoLdoHalt();
-            }
+            requestUpdate.ldoVoltage();
+            requestUpdate.ldoEnabled();
+            requestUpdate.ldoMode();
+            requestUpdate.ldoModeCtrl();
+            requestUpdate.ldoPinSel();
+            requestUpdate.ldoSoftStartLdo();
+            requestUpdate.ldoSoftStartLoadSw();
+            requestUpdate.ldoPinMode();
+            requestUpdate.ldoOcp();
+            requestUpdate.ldoLdoRamp();
+            requestUpdate.ldoLdoHalt();
 
             for (let i = 0; i < devices.noOfGPIOs; i += 1) {
                 requestUpdate.gpioMode(i);
