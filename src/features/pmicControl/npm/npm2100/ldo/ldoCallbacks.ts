@@ -59,7 +59,6 @@ const setupSingleLdo = (
         shellParser.registerCommandCallback(
             toRegex('npm2100 ldosw enable', true, undefined, onOffRegex),
             res => {
-                console.log('callback for ldosw enable %s', res);
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
