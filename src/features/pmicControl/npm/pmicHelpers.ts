@@ -74,15 +74,8 @@ export const parseToNumber = (message: string) =>
 export const parseToBoolean = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10) === 1;
 
-export const parseOnOff = (message: string): boolean => {
-    const msg = parseColonBasedAnswer(message);
-
-    console.log('parseOnOff: message="%s"', msg);
-
-    return msg.toLowerCase() === 'on';
-
-    // parseColonBasedAnswer(message).toLowerCase() === 'on';
-};
+export const parseOnOff = (message: string): boolean =>
+    parseColonBasedAnswer(message).toLowerCase() === 'on';
 
 export const parseBatteryModel = (message: string) => {
     const slot = message.split(':')[1];
@@ -262,12 +255,6 @@ export const GENERATE_BATTERY_PROFILE_DIALOG_ID = 'generateBatteryProfile';
 
 export class NpmEventEmitter extends EventEmitter {
     emitPartialEvent<T>(eventName: string, data: Partial<T>, index?: number) {
-        console.log(
-            'Emitting event: %s containing data: %o on index: %s',
-            eventName,
-            data,
-            index
-        );
         this.emit(
             eventName,
             index !== undefined
