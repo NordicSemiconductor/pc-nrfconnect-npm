@@ -26,7 +26,7 @@ import {
 import { getNPM2100 } from '../pmic2100Device';
 
 export const PMIC_2100_BUCKS = [0, 1];
-export const PMIC_2100_LDOS = [0, 1];
+export const PMIC_2100_LDOS = [0];
 export const PMIC_2100_GPIOS = [0, 1, 2, 3, 4];
 export const PMIC_2100_LEDS = [0, 1, 2];
 
