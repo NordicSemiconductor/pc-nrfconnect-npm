@@ -171,28 +171,40 @@ export default () => {
                 })
             );
 
-            releaseAll.push(
-                npmDevice.onChargerUpdate(payload => {
-                    dispatch<AppThunk<RootState>>((_, getState) => {
-                        dispatch(updateCharger(payload));
-                        if (
-                            payload.enabled != null &&
-                            getState().app.profiling.ccProfilingState !==
-                                'Running'
-                        ) {
-                            npmDevice.startAdcSample(
-                                getState().app.pmicControl
-                                    .fuelGaugeReportingRate,
-                                payload.enabled
-                                    ? getState().app.pmicControl
-                                          .fuelGaugeChargingSamplingRate
-                                    : getState().app.pmicControl
-                                          .fuelGaugeNotChargingSamplingRate
-                            );
-                        }
-                    });
-                })
-            );
+            if (!npmDevice.hasCharger()) {
+                dispatch<AppThunk<RootState>>((_, getState) => {
+                    const samplingRate =
+                        getState().app.pmicControl
+                            .fuelGaugeChargingSamplingRate;
+                    const reportingRate =
+                        getState().app.pmicControl.fuelGaugeReportingRate;
+
+                    npmDevice.startAdcSample(reportingRate, samplingRate);
+                });
+            } else {
+                releaseAll.push(
+                    npmDevice.onChargerUpdate(payload => {
+                        dispatch<AppThunk<RootState>>((_, getState) => {
+                            dispatch(updateCharger(payload));
+                            if (
+                                payload.enabled != null &&
+                                getState().app.profiling.ccProfilingState !==
+                                    'Running'
+                            ) {
+                                npmDevice.startAdcSample(
+                                    getState().app.pmicControl
+                                        .fuelGaugeReportingRate,
+                                    payload.enabled
+                                        ? getState().app.pmicControl
+                                              .fuelGaugeChargingSamplingRate
+                                        : getState().app.pmicControl
+                                              .fuelGaugeNotChargingSamplingRate
+                                );
+                            }
+                        });
+                    })
+                );
+            }
 
             releaseAll.push(
                 npmDevice.onFuelGaugeUpdate(payload => {
