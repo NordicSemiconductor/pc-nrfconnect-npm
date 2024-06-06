@@ -16,7 +16,7 @@ import {
     toRegex,
     toValueRegex,
 } from '../../pmicHelpers';
-import { Ldo, LdoModeValues } from '../../types';
+import { Ldo, LdoMode, LdoModeValues } from '../../types';
 import {
     nPM2100GPIOControlMode,
     nPM2100GPIOControlModeValues,
@@ -84,10 +84,7 @@ const setupSingleLdo = (
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        mode:
-                            parseColonBasedAnswer(res).toUpperCase() === 'LDO'
-                                ? 'LDO'
-                                : 'load_switch',
+                        mode: parseColonBasedAnswer(res) as LdoMode,
                     },
                     i
                 );
