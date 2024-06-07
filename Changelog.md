@@ -1,4 +1,10 @@
-## 1.3.0 - UNRELEASED
+## 2.0.0 - Unreleased
+
+### Added
+
+-   Support for nPM2100
+
+## 1.3.0 - 2024-05-10
 
 ### Added
 
