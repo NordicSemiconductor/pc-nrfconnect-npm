@@ -8,8 +8,8 @@ import {
     nPM2100GPIOControlPinSelectValues,
     nPM2100LdoModeControlValues,
     nPM2100LoadSwitchSoftStartValues,
-} from '../types';
-import { PMIC_2100_LDOS, setupMocksWithShellParser } from './helpers';
+} from '../../types';
+import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../helpers';
 
 describe('PMIC 2100 - Command callbacks - LDO', () => {
     const { eventHandlers, mockOnLdoUpdate } = setupMocksWithShellParser();
