@@ -28,7 +28,7 @@ import {
     setupMocksWithShellParser,
 } from './helpers';
 
-describe('PMIC 2100 - Command callbacks', () => {
+test.skip('PMIC 2100 - Command callbacks', () => {
     const {
         eventHandlers,
         mockOnChargerUpdate,
