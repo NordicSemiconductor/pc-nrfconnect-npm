@@ -29,7 +29,6 @@ import {
     nPM2100LoadSwitchSoftStartValues,
 } from '../../../features/pmicControl/npm/npm2100/types';
 import {
-    GPIOValues,
     Ldo,
     LdoOnOffControl,
     LdoOnOffControlValues,
@@ -73,16 +72,6 @@ export default ({
 
     const modeItems = ['LDO', 'Load Switch'];
 
-    const numberOfGPIOs = npmDevice.getNumberOfGPIOs() ?? 0;
-    const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
-
-    const LdoOnOffControlItems = [...LdoOnOffControlValues, ...gpioNames].map(
-        item => ({
-            label: item,
-            value: item,
-        })
-    );
-
     // NumberInputSliderWithUnit do not use ldo.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVLdo(ldo.voltage);
@@ -90,7 +79,6 @@ export default ({
 
     const {
         setLdoActiveDischarge,
-        setLdoOnOffControl,
         setLdoOcpEnabled,
         setLdoRampEnabled,
         setLdoHaltEnabled,
@@ -199,28 +187,6 @@ export default ({
                         disabled={disabled}
                         ldo={ldo}
                         index={index}
-                    />
-
-                    <Dropdown
-                        label="On/Off Control"
-                        items={LdoOnOffControlItems}
-                        onSelect={item => {
-                            setLdoOnOffControl?.(
-                                index,
-                                item.value as LdoOnOffControl
-                            );
-                        }}
-                        selectedItem={
-                            LdoOnOffControlItems[
-                                Math.max(
-                                    0,
-                                    LdoOnOffControlItems.findIndex(
-                                        item => item.value === ldo.onOffControl
-                                    )
-                                ) ?? 0
-                            ]
-                        }
-                        disabled={disabled}
                     />
 
                     {deviceType === 'npm2100' && (
@@ -492,6 +458,18 @@ const OnOffControl = ({
             return (
                 <>
                     <Dropdown
+                        label="Mode Control"
+                        items={ldoModeControllItems}
+                        onSelect={item => {
+                            setLdoModeControl?.(
+                                index,
+                                item.value as nPM2100LdoModeControl
+                            );
+                        }}
+                        selectedItem={selectedModeControlItem}
+                        disabled={disabled}
+                    />
+                    <Dropdown
                         label="Pin Mode"
                         items={ldoModePinModeItems}
                         onSelect={item => {
@@ -513,18 +491,6 @@ const OnOffControl = ({
                             );
                         }}
                         selectedItem={selectedLdoModePinSelect}
-                        disabled={disabled}
-                    />
-                    <Dropdown
-                        label="Mode Control"
-                        items={ldoModeControllItems}
-                        onSelect={item => {
-                            setLdoModeControl?.(
-                                index,
-                                item.value as nPM2100LdoModeControl
-                            );
-                        }}
-                        selectedItem={selectedModeControlItem}
                         disabled={disabled}
                     />
                 </>
