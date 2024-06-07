@@ -195,7 +195,6 @@ export const ldoSet = (
     // Enable
     const setLdoEnabled = (index: number, enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
-            console.log('setLdoEnabled() called');
             if (offlineMode) {
                 eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
