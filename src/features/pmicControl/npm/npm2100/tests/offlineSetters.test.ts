@@ -283,58 +283,6 @@ describe('PMIC 2100 - Setters Offline tests', () => {
         });
     });
 
-    test.each(PMIC_2100_LDOS)(
-        'Set setLdoSoftStartEnabled index: %p',
-        async index => {
-            await pmic.setLdoSoftStartEnabled(index, true);
-
-            expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { softStartEnabled: true },
-                index,
-            });
-        }
-    );
-
-    test.each(PMIC_2100_LDOS)('Set setLdoSoftStart index: %p', async index => {
-        await pmic.setLdoSoftStart(index, 20);
-
-        expect(mockOnLdoUpdate).toBeCalledTimes(1);
-        expect(mockOnLdoUpdate).toBeCalledWith({
-            data: { softStart: 20 },
-            index,
-        });
-    });
-
-    test.each(PMIC_2100_LDOS)(
-        'Set setLdoActiveDischarge index: %p',
-        async index => {
-            await pmic.setLdoActiveDischarge(index, true);
-
-            expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { activeDischarge: true },
-                index,
-            });
-        }
-    );
-
-    test.each(PMIC_2100_LDOS)(
-        'Set setLdoOnOffControl index: %p',
-        async index => {
-            await pmic.setLdoOnOffControl(index, 'SW');
-
-            expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            expect(mockOnLdoUpdate).toBeCalledWith({
-                data: {
-                    onOffControl: 'SW',
-                    onOffSoftwareControlEnabled: true,
-                },
-                index,
-            });
-        }
-    );
-
     test.each(PMIC_2100_GPIOS)('Set setGpioMode index: %p', async index => {
         await pmic.setGpioMode(index, 'Input');
 

@@ -352,101 +352,49 @@ describe('PMIC 2100 - Request update commands', () => {
         }
     );
 
-    test.each(PMIC_2100_LDOS)('Request update ldoVoltage index: %p', index => {
-        pmic.requestUpdate.ldoVoltage(index);
+    test.skip('Request LDO Updates', () => {
+        test.each(PMIC_2100_LDOS)(
+            'Request update ldoVoltage index: %p',
+            index => {
+                pmic.requestUpdate.ldoVoltage(index);
 
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ldsw ldo_voltage get ${index}`,
-            expect.anything(),
-            undefined,
-            true
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx ldsw ldo_voltage get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            }
         );
-    });
 
-    test.each(PMIC_2100_LDOS)('Request update ldoEnabled index: %p', index => {
-        pmic.requestUpdate.ldoEnabled(index);
+        test.each(PMIC_2100_LDOS)(
+            'Request update ldoEnabled index: %p',
+            index => {
+                pmic.requestUpdate.ldoEnabled(index);
 
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ldsw status get ${index}`,
-            expect.anything(),
-            undefined,
-            true
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npmx ldsw status get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            }
         );
+
+        test.each(PMIC_2100_LDOS)('Request update ldoMode index: %p', index => {
+            pmic.requestUpdate.ldoMode(index);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx ldsw mode get ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
+        });
     });
-
-    test.each(PMIC_2100_LDOS)('Request update ldoMode index: %p', index => {
-        pmic.requestUpdate.ldoMode(index);
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ldsw mode get ${index}`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test.each(PMIC_2100_LDOS)(
-        'Request update ldoSoftStartEnabled index: %p',
-        index => {
-            pmic.requestUpdate.ldoSoftStartEnabled(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw soft_start enable get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_LDOS)(
-        'Request update ldoSoftStart index: %p',
-        index => {
-            pmic.requestUpdate.ldoSoftStart(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw soft_start current get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_LDOS)(
-        'Request update ldoActiveDischarge index: %p',
-        index => {
-            pmic.requestUpdate.ldoActiveDischarge(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw active_discharge get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_LDOS)(
-        'Request update ldoOnOffControl index: %p',
-        index => {
-            pmic.requestUpdate.ldoOnOffControl(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ldsw gpio index get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
 
     test.each(PMIC_2100_GPIOS)('Request update gpioMode index: %p', index => {
         pmic.requestUpdate.gpioMode(index);

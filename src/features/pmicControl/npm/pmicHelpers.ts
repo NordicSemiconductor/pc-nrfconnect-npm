@@ -74,6 +74,9 @@ export const parseToNumber = (message: string) =>
 export const parseToBoolean = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10) === 1;
 
+export const parseOnOff = (message: string): boolean =>
+    parseColonBasedAnswer(message).toLowerCase() === 'on';
+
 export const parseBatteryModel = (message: string) => {
     const slot = message.split(':')[1];
     let slotIndex: number | undefined;
@@ -150,6 +153,12 @@ export const toRegex = (
     command = command.replaceAll(' ', '([^\\S\\r\\n])+');
     return `${command}`;
 };
+
+// Generate a regex to match a set of numbers [1,2,3] => '(1|2|3)'
+export const toValueRegex = (values: readonly unknown[]) =>
+    `(${values.join('|')})`;
+
+export const onOffRegex = '([Oo][Nn]|[Oo][Ff][Ff])';
 
 export const dialogHandler =
     (pmicDialog: PmicDialog): AppThunk =>
@@ -230,6 +239,14 @@ export const isNpm1300SerialApplicationMode = (device: Device) =>
 
 export const isNpm1300SerialRecoverMode = (device: Device) =>
     device.usb?.device.descriptor.idProduct === 0x53ac &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
+export const isNpm2100SerialApplicationMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ad &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
+export const isNpm2100SerialRecoverMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ae &&
     device.usb?.device.descriptor.idVendor === 0x1915;
 
 export const MAX_TIMESTAMP = 2 ** 32 - 1; //  2^32
