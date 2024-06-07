@@ -14,15 +14,15 @@ describe('PMIC 2100 - Static getters', () => {
         jest.clearAllMocks();
     });
 
-    test('Has of Charger', () => expect(pmic.hasCharger()).toBeTruthy());
+    test('Has of Charger', () => expect(pmic.hasCharger()).toBeFalsy());
 
-    test('Number of Bucks', () => expect(pmic.getNumberOfBucks()).toBe(2));
+    test('Number of Bucks', () => expect(pmic.getNumberOfBucks()).toBe(0));
 
-    test('Number of LDOs', () => expect(pmic.getNumberOfLdos()).toBe(2));
+    test('Number of LDOs', () => expect(pmic.getNumberOfLdos()).toBe(1));
 
-    test('Number of GPIOs', () => expect(pmic.getNumberOfGPIOs()).toBe(5));
+    test('Number of GPIOs', () => expect(pmic.getNumberOfGPIOs()).toBe(2));
 
-    test('Number of LEDs', () => expect(pmic.getNumberOfLEDs()).toBe(3));
+    test('Number of LEDs', () => expect(pmic.getNumberOfLEDs()).toBe(0));
 
     test('Device Type', () => expect(pmic.getDeviceType()).toBe('npm2100'));
 
