@@ -128,11 +128,8 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         const adcSample: AdcSample = {
             timestamp,
             vBat: 0,
-            iBat: NaN,
-            tBat: 0,
             soc: NaN,
-            tte: NaN,
-            ttf: NaN,
+            tDie: 0,
         };
 
         const fixed = (dp: number, value?: string | number) =>
@@ -144,23 +141,14 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 case 'vbat':
                     adcSample.vBat = fixed(2, pair[1]);
                     break;
-                case 'ibat':
-                    adcSample.iBat = fixed(2, Number(pair[1] ?? NaN) * 1000);
-                    break;
-                case 'tbat':
-                    adcSample.tBat = fixed(1, pair[1]);
+                case 'tdie':
+                    adcSample.tDie = fixed(1, pair[1]);
                     break;
                 case 'soc':
                     adcSample.soc = Math.min(
                         100,
                         Math.max(0, fixed(1, pair[1]))
                     );
-                    break;
-                case 'tte':
-                    adcSample.tte = Number(pair[1] ?? NaN);
-                    break;
-                case 'ttf':
-                    adcSample.ttf = Number(pair[1] ?? NaN);
                     break;
             }
         });
