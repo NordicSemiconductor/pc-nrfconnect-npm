@@ -67,35 +67,51 @@ export default ({ disabled }: { disabled: boolean }) => {
                 docItem="Voltage"
             />
 
-            <LineData
-                title="Current"
-                value={
-                    batteryConnected &&
-                    latestAdcSample?.iBat != null &&
-                    !Number.isNaN(latestAdcSample?.iBat)
-                        ? `${latestAdcSample?.iBat < 0 ? '—' : ''}${Math.round(
-                              Math.abs(latestAdcSample?.iBat ?? 0)
-                          )} mA`
-                        : 'N/A'
-                }
-                docItem="Current"
-            />
-
-            <LineData
-                title="Temperature"
-                value={
-                    batteryConnected && latestAdcSample
-                        ? `${latestAdcSample?.tBat.toFixed(2)}°C`
-                        : 'N/A'
-                }
-                docItem="Temperature"
-            />
+            {latestAdcSample?.iBat !== undefined && (
+                <LineData
+                    title="Current"
+                    docItem="Current"
+                    value={
+                        batteryConnected &&
+                        latestAdcSample?.iBat != null &&
+                        !Number.isNaN(latestAdcSample?.iBat)
+                            ? `${
+                                  latestAdcSample.iBat < 0 ? '—' : ''
+                              }${Math.round(
+                                  Math.abs(latestAdcSample.iBat ?? 0)
+                              )} mA`
+                            : 'N/A'
+                    }
+                />
+            )}
+            {latestAdcSample?.tBat !== undefined && (
+                <LineData
+                    title="Temperature"
+                    docItem="Temperature"
+                    value={
+                        batteryConnected && latestAdcSample
+                            ? `${latestAdcSample.tBat.toFixed(2)}°C`
+                            : 'N/A'
+                    }
+                />
+            )}
+            {latestAdcSample?.tDie !== undefined && (
+                <LineData
+                    title="System Temperature"
+                    docItem="SystemTemperature"
+                    value={
+                        batteryConnected && latestAdcSample
+                            ? `${latestAdcSample.tDie.toFixed(2)}°C`
+                            : 'N/A'
+                    }
+                />
+            )}
 
             {npmDevice?.hasCharger() && (
                 <LineData
                     title="Charging Mode"
-                    value={mode}
                     docItem="ChargingMode"
+                    value={mode}
                 />
             )}
         </div>

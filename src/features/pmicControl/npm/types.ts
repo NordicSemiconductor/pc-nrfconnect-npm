@@ -263,11 +263,12 @@ export type ShipModeConfig = {
 export type AdcSample = {
     timestamp: number;
     vBat: number;
-    iBat: number;
-    tBat: number;
-    soc: number;
-    tte: number;
-    ttf: number;
+    iBat?: number;
+    tBat?: number;
+    tDie?: number;
+    soc?: number;
+    tte?: number;
+    ttf?: number;
 };
 
 export type BatteryModelCharacterization = {
