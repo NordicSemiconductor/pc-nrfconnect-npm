@@ -99,7 +99,7 @@ export const parseBatteryModel = (message: string) => {
     let capacity: number[] = [];
     let name = '';
 
-    if (valuePairs.length !== 3) return null;
+    if (valuePairs.length <= 1) return null;
 
     valuePairs.forEach(value => {
         const pair = value.split('=');
@@ -121,14 +121,20 @@ export const parseBatteryModel = (message: string) => {
                 break;
         }
 
-        while (temperature.length > 0 && capacity.length > 0) {
-            const t = temperature.pop();
-            const q = capacity.pop();
-            if (t !== undefined && q !== undefined)
-                characterizations.push({
-                    temperature: t,
-                    capacity: q,
-                });
+        if (temperature.length > 0 && capacity.length > 0) {
+            while (temperature.length > 0 && capacity.length > 0) {
+                const t = temperature.pop();
+                const q = capacity.pop();
+                if (t !== undefined && q !== undefined)
+                    characterizations.push({
+                        temperature: t,
+                        capacity: q,
+                    });
+            }
+        } else if (capacity.length === 1) {
+            characterizations.push({
+                capacity: capacity[0],
+            });
         }
     });
 

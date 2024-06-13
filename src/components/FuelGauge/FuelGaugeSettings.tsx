@@ -51,8 +51,8 @@ export default ({ disabled }: { disabled: boolean }) => {
         temperature: number
     ) =>
         batteryModel?.characterizations.reduce((prev, curr) =>
-            Math.abs(curr.temperature - temperature) <
-            Math.abs(prev.temperature - temperature)
+            Math.abs(curr.temperature ?? 0 - temperature) <
+            Math.abs(prev.temperature ?? 0 - temperature)
                 ? curr
                 : prev
         ) ?? undefined;

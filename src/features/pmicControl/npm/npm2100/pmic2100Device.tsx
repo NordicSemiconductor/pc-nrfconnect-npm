@@ -387,6 +387,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         shellParser,
         eventEmitter,
         sendCommand,
+        dialogHandler,
         offlineMode
     );
 
@@ -988,6 +989,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                     {
                         onSuccess: result => {
                             const models = result.split(':');
+
                             if (models.length < 3) reject();
                             const stringModels = models[2].trim().split('\n');
                             const list = stringModels.map(parseBatteryModel);
