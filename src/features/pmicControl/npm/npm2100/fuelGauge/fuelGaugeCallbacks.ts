@@ -14,6 +14,7 @@ import {
     parseToBoolean,
     toRegex,
 } from '../../pmicHelpers';
+import { BatteryModel, BatteryModelCharacterization } from '../../types';
 import { fuelGaugeGet } from './fuelGaugeEffects';
 
 export default (
@@ -56,12 +57,12 @@ export default (
                     'fuel_gauge model',
                     true,
                     undefined,
-                    '"[A-Za-z0-9\\s]+"'
+                    '"[A-Za-z0-9_\\s]+"'
                 ),
                 res => {
                     eventEmitter.emit(
                         'onActiveBatteryModelUpdate',
-                        parseBatteryModel(parseColonBasedAnswer(res))
+                        parseNpm2100BatteryModel(parseColonBasedAnswer(res))
                     );
                 },
                 noop
@@ -104,3 +105,23 @@ export default (
 
     return cleanupCallbacks;
 };
+
+// Battery Type response: name="Generic_AA",Q={2000.00 mAh}
+function parseNpm2100BatteryModel(message: string): BatteryModel | undefined {
+    const batteryMessagePattern = /^name="([^"]+)",Q={([^}]+)}$/;
+
+    const matches = batteryMessagePattern.exec(message);
+
+    const name = matches?.[1] as string;
+    const capacity = Number.parseFloat(matches?.[2] as string);
+
+    if (name || capacity) {
+        return {
+            name,
+            batteryClass: 'Primary',
+            characterizations: [{ capacity } as BatteryModelCharacterization],
+        } as BatteryModel;
+    }
+
+    return undefined;
+}

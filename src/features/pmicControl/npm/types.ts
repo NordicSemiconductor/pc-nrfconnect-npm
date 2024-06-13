@@ -272,14 +272,17 @@ export type AdcSample = {
 };
 
 export type BatteryModelCharacterization = {
-    temperature: number;
+    temperature?: number;
     capacity: number;
 };
+
+export type BatteryClass = 'LiPo' | 'Primary';
 
 export type BatteryModel = {
     name: string;
     characterizations: BatteryModelCharacterization[];
     slotIndex?: number;
+    batteryClass?: BatteryClass;
 };
 
 export const USBDetectStatusValues = [

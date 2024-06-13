@@ -32,6 +32,7 @@ import {
 import { getShellParser } from '../../features/serial/serialSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import FuelGaugeSettings from '../FuelGauge/FuelGaugeSettings';
+import PowerSource from '../PowerSource/PowerSource';
 import ConnectionStatus from './ConnectionStatus';
 import OpenSerialTerminal from './OpenSerialTerminal';
 
@@ -128,13 +129,32 @@ export default () => {
                     />
                 </DocumentationTooltip>
             </Group>
-            <Group collapsible defaultCollapsed={false} heading="Fuel Gauge">
-                <FuelGaugeSettings
-                    disabled={
-                        pmicConnection === 'ek-disconnected' || uiDisabled
-                    }
-                />
-            </Group>
+            {npmDevice?.getDeviceType() === 'npm1300' && (
+                <Group
+                    collapsible
+                    defaultCollapsed={false}
+                    heading="Fuel Gauge"
+                >
+                    <FuelGaugeSettings
+                        disabled={
+                            pmicConnection === 'ek-disconnected' || uiDisabled
+                        }
+                    />
+                </Group>
+            )}
+            {npmDevice?.getDeviceType() === 'npm2100' && (
+                <Group
+                    collapsible
+                    defaultCollapsed={false}
+                    heading="Power Source"
+                >
+                    <PowerSource
+                        disabled={
+                            pmicConnection === 'ek-disconnected' || uiDisabled
+                        }
+                    />
+                </Group>
+            )}
             <Group collapsible defaultCollapsed={false} heading="Settings">
                 <NumberInput
                     showSlider

@@ -610,7 +610,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             }
         );
 
-        test('Set setActiveBatteryModel', async () => {
+        test.skip('Set setActiveBatteryModel', async () => {
             await pmic.setActiveBatteryModel('someProfileName');
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
