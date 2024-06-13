@@ -155,187 +155,61 @@ export const baseNpmDevice: IBaseNpmDevice = (
 
     updateUptimeOverflowCounter();
 
+    const setupHandler =
+        <T, WithError extends boolean = false>(name: string) =>
+        (
+            handler: WithError extends true
+                ? (payload: T, error: string) => void
+                : (payload: T) => void
+        ) => {
+            eventEmitter.on(name, handler);
+            return () => {
+                eventEmitter.removeListener(name, handler);
+            };
+        };
     return {
         kernelReset,
         getKernelUptime,
-        onPmicStateChange: (handler: (state: PmicState) => void) => {
-            eventEmitter.on('onPmicStateChange', handler);
-            return () => {
-                eventEmitter.removeListener('onPmicStateChange', handler);
-            };
-        },
-        onAdcSample: (handler: (adcSample: AdcSample) => void) => {
-            eventEmitter.on('onAdcSample', handler);
-            return () => {
-                eventEmitter.removeListener('onAdcSample', handler);
-            };
-        },
-        onAdcSettingsChange: (
-            handler: (adcSample: AdcSampleSettings) => void
-        ) => {
-            eventEmitter.on('onAdcSettingsChange', handler);
-            return () => {
-                eventEmitter.removeListener('onAdcSettingsChange', handler);
-            };
-        },
-        onChargingStatusUpdate: (
-            handler: (payload: PmicChargingState, error?: string) => void
-        ) => {
-            eventEmitter.on('onChargingStatusUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onChargingStatusUpdate', handler);
-            };
-        },
-        onChargerUpdate: (
-            handler: (payload: Partial<Charger>, error?: string) => void
-        ) => {
-            eventEmitter.on('onChargerUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onChargerUpdate', handler);
-            };
-        },
-        onBoostUpdate: (
-            handler: (payload: PartialUpdate<Boost>, error?: string) => void
-        ) => {
-            eventEmitter.on('onBoostUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onBoostUpdate', handler);
-            };
-        },
-        onBuckUpdate: (
-            handler: (payload: PartialUpdate<Buck>, error?: string) => void
-        ) => {
-            eventEmitter.on('onBuckUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onBuckUpdate', handler);
-            };
-        },
-
-        onFuelGaugeUpdate: (handler: (payload: boolean) => void) => {
-            eventEmitter.on('onFuelGauge', handler);
-            return () => {
-                eventEmitter.removeListener('onFuelGauge', handler);
-            };
-        },
-
-        onLdoUpdate: (
-            handler: (payload: PartialUpdate<Ldo>, error?: string) => void
-        ) => {
-            eventEmitter.on('onLdoUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onLdoUpdate', handler);
-            };
-        },
-
-        onGPIOUpdate: (
-            handler: (payload: PartialUpdate<GPIO>, error?: string) => void
-        ) => {
-            eventEmitter.on('onGPIOUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onGPIOUpdate', handler);
-            };
-        },
-
-        onLEDUpdate: (
-            handler: (payload: PartialUpdate<LED>, error?: string) => void
-        ) => {
-            eventEmitter.on('onLEDUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onLEDUpdate', handler);
-            };
-        },
-        onPOFUpdate: (
-            handler: (payload: Partial<POF>, error?: string) => void
-        ) => {
-            eventEmitter.on('onPOFUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onPOFUpdate', handler);
-            };
-        },
-        onTimerConfigUpdate: (
-            handler: (payload: Partial<TimerConfig>, error?: string) => void
-        ) => {
-            eventEmitter.on('onTimerConfigUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onTimerConfigUpdate', handler);
-            };
-        },
-
-        onShipUpdate: (
-            handler: (payload: Partial<ShipModeConfig>, error?: string) => void
-        ) => {
-            eventEmitter.on('onShipUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onShipUpdate', handler);
-            };
-        },
-
-        onLoggingEvent: (
-            handler: (payload: {
-                loggingEvent: LoggingEvent;
-                dataPair: boolean;
-            }) => void
-        ) => {
-            eventEmitter.on('onLoggingEvent', handler);
-            return () => {
-                eventEmitter.removeListener('onLoggingEvent', handler);
-            };
-        },
-
-        onActiveBatteryModelUpdate: (
-            handler: (payload: BatteryModel) => void
-        ) => {
-            eventEmitter.on('onActiveBatteryModelUpdate', handler);
-            return () => {
-                eventEmitter.removeListener(
-                    'onActiveBatteryModelUpdate',
-                    handler
-                );
-            };
-        },
-
-        onStoredBatteryModelUpdate: (
-            handler: (payload: BatteryModel[]) => void
-        ) => {
-            eventEmitter.on('onStoredBatteryModelUpdate', handler);
-            return () => {
-                eventEmitter.removeListener(
-                    'onStoredBatteryModelUpdate',
-                    handler
-                );
-            };
-        },
-
-        onBeforeReboot: (handler: (waitTimeout: number) => void) => {
-            eventEmitter.on('onBeforeReboot', handler);
-            return () => {
-                eventEmitter.removeListener('onBeforeReboot', handler);
-            };
-        },
-
-        onReboot: (handler: (success: boolean) => void) => {
-            eventEmitter.on('onReboot', handler);
-            return () => {
-                eventEmitter.removeListener('onReboot', handler);
-            };
-        },
-
-        onUsbPower: (handler: (payload: Partial<USBPower>) => void) => {
-            eventEmitter.on('onUsbPower', handler);
-            return () => {
-                eventEmitter.removeListener('onUsbPower', handler);
-            };
-        },
-
-        onErrorLogs: (
-            handler: (payload: Partial<ErrorLogs>, error?: string) => void
-        ) => {
-            eventEmitter.on('onErrorLogs', handler);
-            return () => {
-                eventEmitter.removeListener('onErrorLogs', handler);
-            };
-        },
-
+        onPmicStateChange: setupHandler<PmicState>('onPmicStateChange'),
+        onAdcSample: setupHandler<AdcSample>('onAdcSample'),
+        onAdcSettingsChange: setupHandler<AdcSampleSettings>(
+            'onAdcSettingsChange'
+        ),
+        onChargingStatusUpdate: setupHandler<PmicChargingState, true>(
+            'onChargingStatusUpdate'
+        ),
+        onChargerUpdate: setupHandler<Partial<Charger>, true>(
+            'onChargerUpdate'
+        ),
+        onBoostUpdate: setupHandler<PartialUpdate<Boost>, true>(
+            'onBoostUpdate'
+        ),
+        onBuckUpdate: setupHandler<PartialUpdate<Buck>, true>('onBuckUpdate'),
+        onFuelGaugeUpdate: setupHandler<boolean>('onFuelGauge'),
+        onLdoUpdate: setupHandler<PartialUpdate<Ldo>, true>('onLdoUpdate'),
+        onGPIOUpdate: setupHandler<PartialUpdate<GPIO>, true>('onGPIOUpdate'),
+        onLEDUpdate: setupHandler<PartialUpdate<LED>, true>('onLEDUpdate'),
+        onPOFUpdate: setupHandler<Partial<POF>, true>('onPOFUpdate'),
+        onTimerConfigUpdate: setupHandler<Partial<TimerConfig>, true>(
+            'onTimerConfigUpdate'
+        ),
+        onShipUpdate: setupHandler<Partial<ShipModeConfig>, true>(
+            'onShipUpdate'
+        ),
+        onLoggingEvent: setupHandler<{
+            loggingEvent: LoggingEvent;
+            dataPair: boolean;
+        }>('onLoggingEvent'),
+        onActiveBatteryModelUpdate: setupHandler<BatteryModel>(
+            'onActiveBatteryModelUpdate'
+        ),
+        onStoredBatteryModelUpdate: setupHandler<BatteryModel[]>(
+            'onStoredBatteryModelUpdate'
+        ),
+        onBeforeReboot: setupHandler<number>('onBeforeReboot'),
+        onReboot: setupHandler<boolean>('onReboot'),
+        onUsbPower: setupHandler<Partial<USBPower>>('onUsbPower'),
+        onErrorLogs: setupHandler<Partial<ErrorLogs>, true>('onErrorLogs'),
         clearErrorLogs: (errorOnly?: boolean) => {
             if (errorOnly)
                 eventEmitter.emit('onErrorLogs', {
