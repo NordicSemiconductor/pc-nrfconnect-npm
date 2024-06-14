@@ -12,6 +12,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
+    getBoosts,
     getBucks,
     getCharger,
     getLdos,
@@ -20,6 +21,7 @@ import {
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import BatteryCard from '../Cards/Battery/BatteryCard';
 import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
+import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
 import PowerCard from '../Cards/Power/PowerCard';
@@ -29,6 +31,7 @@ export default ({ active }: PaneProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const charger = useSelector(getCharger);
     const bucks = useSelector(getBucks);
+    const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
 
     return active ? (
@@ -38,6 +41,18 @@ export default ({ active }: PaneProps) => {
         >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
+
+            {npmDevice &&
+                boosts.map((boost, index) => (
+                    <BoostCard
+                        boost={boost}
+                        npmDevice={npmDevice}
+                        key={`Boost${1 + index}`}
+                        index={index}
+                        disabled={disabled}
+                        defaultSummary
+                    />
+                ))}
             {npmDevice && charger && (
                 <PowerCard
                     npmDevice={npmDevice}
@@ -63,7 +78,7 @@ export default ({ active }: PaneProps) => {
                     <LDOCard
                         ldo={ldo}
                         npmDevice={npmDevice}
-                        key={`Buck${1 + index}`}
+                        key={`Ldo${1 + index}`}
                         index={index}
                         disabled={disabled}
                         defaultSummary

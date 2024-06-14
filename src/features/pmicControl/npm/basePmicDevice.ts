@@ -12,6 +12,7 @@ import {
     AdcSample,
     AdcSampleSettings,
     BatteryModel,
+    Boost,
     Buck,
     Charger,
     ErrorLogs,
@@ -36,6 +37,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
     eventEmitter: EventEmitter,
     devices: {
         charger?: boolean;
+        noOfBoosts?: number;
         noOfBucks?: number;
         noOfLdos?: number;
         noOfGPIOs?: number;
@@ -192,6 +194,14 @@ export const baseNpmDevice: IBaseNpmDevice = (
                 eventEmitter.removeListener('onChargerUpdate', handler);
             };
         },
+        onBoostUpdate: (
+            handler: (payload: PartialUpdate<Boost>, error?: string) => void
+        ) => {
+            eventEmitter.on('onBoostUpdate', handler);
+            return () => {
+                eventEmitter.removeListener('onBoostUpdate', handler);
+            };
+        },
         onBuckUpdate: (
             handler: (payload: PartialUpdate<Buck>, error?: string) => void
         ) => {
@@ -341,6 +351,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         },
 
         hasCharger: () => devices.charger ?? false,
+        getNumberOfBoosts: () => devices.noOfBoosts ?? 0,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
         getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,

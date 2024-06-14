@@ -10,6 +10,7 @@ import type { RootState } from '../../appReducer';
 import {
     AdcSample,
     BatteryModel,
+    Boost,
     Buck,
     Charger,
     ErrorLogs,
@@ -30,6 +31,7 @@ import {
 interface pmicControlState {
     npmDevice?: NpmDevice;
     charger?: Charger;
+    boosts: Boost[];
     bucks: Buck[];
     ldos: Ldo[];
     gpios: GPIO[];
@@ -56,6 +58,7 @@ interface pmicControlState {
 }
 
 const initialState: pmicControlState = {
+    boosts: [],
     bucks: [],
     ldos: [],
     gpios: [],
@@ -135,6 +138,17 @@ const pmicControlSlice = createSlice({
             action: PayloadAction<AdcSample | undefined>
         ) {
             state.latestAdcSample = action.payload;
+        },
+        setBoosts(state, action: PayloadAction<Boost[]>) {
+            state.boosts = action.payload;
+        },
+        updateBoost(state, action: PayloadAction<PartialUpdate<Boost>>) {
+            if (state.boosts.length >= action.payload.index) {
+                state.boosts[action.payload.index] = {
+                    ...state.boosts[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
         },
         setBucks(state, action: PayloadAction<Buck[]>) {
             state.bucks = action.payload;
@@ -302,6 +316,8 @@ export const getPmicChargingState = (state: RootState) => {
         initialState.pmicChargingState
     );
 };
+
+export const getBoosts = (state: RootState) => state.app.pmicControl.boosts;
 export const getBucks = (state: RootState) => state.app.pmicControl.bucks;
 export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
 export const getGPIOs = (state: RootState) => state.app.pmicControl.gpios;
@@ -359,6 +375,8 @@ export const {
     setLatestAdcSample,
     updateCharger,
     setCharger,
+    setBoosts,
+    updateBoost,
     setBucks,
     updateBuck,
     setLdos,

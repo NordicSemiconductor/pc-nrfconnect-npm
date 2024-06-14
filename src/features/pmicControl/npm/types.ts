@@ -31,6 +31,22 @@ export const GPIOValues = [
 
 export const LdoOnOffControlValues = ['SW'] as const;
 
+export const BoostModeControlValues = [
+    'AUTO',
+    'NOHP',
+    'LP',
+    'HP',
+    'PASS',
+] as const;
+export const BoostPinModeValues = ['LP', 'HP', 'PASS', 'NOHP'] as const;
+export const BoostPinSelectionValues = [
+    'OFF',
+    'GPIO0LO',
+    'GPIO0HI',
+    'GPIO1LO',
+    'GPIO1HI',
+] as const;
+
 export const BuckModeControlValues = ['Auto', 'PWM', 'PFM'] as const;
 export const BuckOnOffControlValues = ['Off'] as const;
 export const BuckRetentionControlValues = ['Off'] as const;
@@ -44,6 +60,12 @@ export type Npm1300LoadSwitchSoftStart = (typeof SoftStartValues)[number];
 export type LdoOnOffControl =
     | (typeof LdoOnOffControlValues)[number]
     | GPIONames;
+
+export const BoostModeValues = ['VSET', 'SOFTWARE'] as const;
+export type BoostMode = (typeof BoostModeValues)[number];
+export type BoostModeControl = (typeof BoostModeControlValues)[number];
+export type BoostPinMode = (typeof BoostPinModeValues)[number];
+export type BoostPinSelection = (typeof BoostPinSelectionValues)[number];
 
 export type BuckMode = 'vSet' | 'software';
 export type BuckModeControl =
@@ -110,6 +132,16 @@ export type Charger = {
     tCool: number;
     tWarm: number;
     tHot: number;
+};
+
+export type Boost = {
+    vOut: number;
+    mode: BoostMode;
+    modeControl: BoostModeControl;
+    pinSelection: BoostPinSelection;
+    pinMode: BoostPinMode;
+    pinModeEnabled: boolean;
+    overCurrentProtection: boolean;
 };
 
 export type Buck = {
@@ -335,6 +367,45 @@ export const isFixedListRangeWithLabel = (
 export const isRangeType = (range: RangeOrFixedListRange): range is RangeType =>
     !Array.isArray(range);
 
+export type Boosts = {
+    get: {
+        all: (index: number) => void;
+        vOut: (index: number) => void;
+        mode: (index: number) => void;
+        modeControl: (index: number) => void;
+        pinSelection: (index: number) => void;
+        pinMode: (index: number) => void;
+        overCurrent: (index: number) => void;
+    };
+    set: {
+        vOut: (index: number, value: number) => Promise<void>;
+        mode: (index: number, mode: BoostMode) => Promise<void>;
+        modeControl: (
+            index: number,
+            modeControl: BoostModeControl
+        ) => Promise<void>;
+        pinSelection: (
+            index: number,
+            pinSelection: BoostPinSelection
+        ) => Promise<void>;
+        pinMode: (index: number, pinMode: BoostPinMode) => Promise<void>;
+        overCurrent: (index: number, enabled: boolean) => Promise<void>;
+    };
+    callbacks: (() => void)[];
+    ranges: {
+        voltageRange: (index: number) => RangeType;
+    };
+    defaults: {
+        vOut: number;
+        mode: BoostMode;
+        modeControl: BoostModeControl;
+        pinSelection: BoostPinSelection;
+        pinMode: BoostPinMode;
+        pinModeEnabled: boolean;
+        overCurrentProtection: boolean;
+    }[];
+};
+
 export type BaseNpmDevice = {
     kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
@@ -352,6 +423,9 @@ export type BaseNpmDevice = {
     ) => () => void;
     onChargerUpdate: (
         handler: (payload: Partial<Charger>, error?: string) => void
+    ) => () => void;
+    onBoostUpdate: (
+        handler: (payload: PartialUpdate<Boost>, error?: string) => void
     ) => () => void;
     onBuckUpdate: (
         handler: (payload: PartialUpdate<Buck>, error?: string) => void
@@ -410,11 +484,14 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     hasCharger: () => boolean;
+    getNumberOfBoosts: () => number;
     getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
     getNumberOfGPIOs: () => number;
     getNumberOfLEDs: () => number;
     getNumberOfBatteryModelSlots: () => number;
+
+    getBoosts?: () => Boosts;
 
     isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
     getSupportedVersion: () => string;
