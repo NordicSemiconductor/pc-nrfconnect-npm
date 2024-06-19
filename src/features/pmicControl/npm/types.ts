@@ -545,6 +545,8 @@ export type NpmDevice = {
     gpioDefaults: () => GPIO[];
     ledDefaults: () => LED[];
 
+    getBatteryConnectedVoltageThreshold: () => number;
+
     requestUpdate: {
         all: () => void;
         pmicChargingState: () => void;

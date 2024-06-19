@@ -148,7 +148,12 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onAdcSample(sample => {
-                    dispatch(setBatteryConnected(sample.vBat > 0));
+                    dispatch(
+                        setBatteryConnected(
+                            sample.vBat >
+                                npmDevice.getBatteryConnectedVoltageThreshold()
+                        )
+                    );
                     dispatch(setLatestAdcSample(sample));
                 })
             );

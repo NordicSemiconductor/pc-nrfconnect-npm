@@ -990,5 +990,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         gpioDefaults: () => gpioDefaults(devices.noOfGPIOs),
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
         chargerDefault: () => chargerDefault(),
+
+        getBatteryConnectedVoltageThreshold: () => 1, // 1V
     };
 };
