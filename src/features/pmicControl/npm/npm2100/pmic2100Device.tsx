@@ -1047,5 +1047,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         chargerDefault: () => chargerDefault(),
 
         getBoosts: () => boosts,
+
+        getBatteryConnectedVoltageThreshold: () => 0, // 0V
     };
 };
