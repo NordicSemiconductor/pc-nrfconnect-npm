@@ -138,6 +138,21 @@ const chartDataTBat: ChartData<'line'> = {
     ],
 };
 
+const chartDataTDie: ChartData<'line'> = {
+    datasets: [
+        {
+            label: 'System Temperature',
+            data: [],
+            borderColor: styles.blue,
+            backgroundColor: styles.blue,
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4,
+            yAxisID: 'y',
+        },
+    ],
+};
+
 const commonOption: ChartOptions<'line'> = {
     parsing: false,
     animation: false,
@@ -171,11 +186,13 @@ export default ({ active }: PaneProps) => {
     const refTBat = useRef<ChartJSOrUndefined<'line'>>();
     const refVBat = useRef<ChartJSOrUndefined<'line'>>();
     const refSoc = useRef<ChartJSOrUndefined<'line'>>();
+    const refTDie = useRef<ChartJSOrUndefined<'line'>>();
 
     const chartIBat = refIBat.current;
     const chartTBat = refTBat.current;
     const chartVBat = refVBat.current;
     const chartSoc = refSoc.current;
+    const chartTDie = refTDie.current;
 
     const npmDevice = useSelector(getNpmDevice);
     const [isLive, setLive] = useState(true);
@@ -300,44 +317,135 @@ export default ({ active }: PaneProps) => {
         []
     );
 
-    const chartMetaData = useMemo(
+    const optionsTDie: ChartOptions<'line'> = useMemo(
         () => ({
-            charts: [chartVBat, chartIBat, chartTBat, chartSoc],
-            options: [optionsVBat, optionsIBat, optionsTBat, optionsSoc],
-            data: [chartDataVBat, chartDataIBat, chartDataTBat, chartDataSoc],
-            refs: [refVBat, refIBat, refTBat, refSoc],
-            labels: ['Voltage', 'Current', 'Temperature', 'State of Charge'],
-            tooltip: [
-                { card: 'batteryStatus', item: 'Voltage' },
-                { card: 'batteryStatus', item: 'Current' },
-                { card: 'batteryStatus', item: 'Temperature' },
-                { card: 'battery', item: 'StateOfCharge' },
-            ],
+            ...commonOption,
+            scales: {
+                ...commonOption.scales,
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    ticks: {
+                        callback(value) {
+                            return `${Number(value).toFixed(2)}°C`;
+                        },
+                        maxTicksLimit: 5,
+                    },
+                    grid: {
+                        drawBorder: true,
+                        drawOnChartArea: true,
+                    },
+                    afterFit: scale => {
+                        scale.width = yAxisWidth;
+                    },
+                },
+            },
         }),
+        []
+    );
+
+    const chartMetaData = useMemo(
+        () => [
+            {
+                chart: chartVBat,
+                options: optionsVBat,
+                data: chartDataVBat,
+                ref: refVBat,
+                label: 'Voltage',
+                tooltip: { card: 'batteryStatus', item: 'Voltage' },
+                sampleKey: 'vBat',
+            },
+            {
+                chart: chartIBat,
+                options: optionsIBat,
+                data: chartDataIBat,
+                ref: refIBat,
+                label: 'Current',
+                tooltip: { card: 'batteryStatus', item: 'Current' },
+                sampleKey: 'iBat',
+            },
+            {
+                chart: chartTBat,
+                options: optionsTBat,
+                data: chartDataTBat,
+                ref: refTBat,
+                label: 'Temperature',
+                tooltip: { card: 'batteryStatus', item: 'Temperature' },
+                sampleKey: 'tBat',
+            },
+            {
+                chart: chartSoc,
+                options: optionsSoc,
+                data: chartDataSoc,
+                ref: refSoc,
+                label: 'State of Charge',
+                tooltip: { card: 'battery', item: 'StateOfCharge' },
+                sampleKey: 'soc',
+            },
+            {
+                chart: chartTDie,
+                options: optionsTDie,
+                data: chartDataTDie,
+                ref: refTDie,
+                label: 'System Temperature',
+                tooltip: {
+                    card: 'batteryStatus',
+                    item: 'SystemTemperature',
+                },
+                sampleKey: 'tDie',
+            },
+        ],
         [
             chartIBat,
             chartSoc,
             chartTBat,
             chartVBat,
+            chartTDie,
             optionsIBat,
             optionsSoc,
             optionsTBat,
             optionsVBat,
+            optionsTDie,
         ]
     );
 
     useEffect(() => {
-        chartMetaData.charts.forEach(chart => {
-            chart?.resetData();
+        chartMetaData.forEach(md => {
+            md.chart?.resetData();
         });
-    }, [chartMetaData.charts, npmDevice]);
+    }, [chartMetaData, npmDevice]);
+
+    const [enabledCharts, setEnabledCharts] = useState<Set<keyof AdcSample>>(
+        new Set()
+    );
 
     useEffect(() => {
         if (!npmDevice) return () => {};
         const releaseOnAdcSampleEvent = npmDevice.onAdcSample(sample => {
-            // order is important
-            const keys: (keyof AdcSample)[] = ['vBat', 'iBat', 'tBat', 'soc'];
-            chartMetaData.charts.forEach((chart, index) => {
+            const newEnabledCharts = new Set<keyof AdcSample>();
+            let missingValues = false;
+            Object.keys(sample).forEach(key => {
+                newEnabledCharts.add(key as keyof AdcSample);
+
+                if (!enabledCharts.has(key as keyof AdcSample)) {
+                    missingValues = true;
+                }
+            });
+            if (missingValues || newEnabledCharts.size !== enabledCharts.size) {
+                setEnabledCharts(newEnabledCharts);
+            }
+        });
+        return releaseOnAdcSampleEvent;
+    }, [chartMetaData, active, npmDevice, enabledCharts]);
+
+    useEffect(() => {
+        if (!npmDevice) return () => {};
+        const releaseOnAdcSampleEvent = npmDevice.onAdcSample(sample => {
+            chartMetaData.forEach(({ chart, sampleKey }) => {
+                if (!enabledCharts.has(sampleKey as keyof AdcSample)) {
+                    return;
+                }
                 const chartStates = chart ? getState(chart) : undefined;
 
                 if (chart && chartStates) {
@@ -345,7 +453,7 @@ export default ({ active }: PaneProps) => {
                         [
                             {
                                 x: sample.timestamp,
-                                y: sample[keys[index]] ?? 0,
+                                y: sample[sampleKey as keyof AdcSample] ?? 0,
                             },
                         ],
                     ]);
@@ -354,10 +462,10 @@ export default ({ active }: PaneProps) => {
         });
 
         return releaseOnAdcSampleEvent;
-    }, [chartMetaData, active, npmDevice]);
+    }, [chartMetaData, active, npmDevice, enabledCharts]);
 
     useEffect(() => {
-        chartMetaData.charts.forEach(chart => {
+        chartMetaData.forEach(({ chart }) => {
             const chartStates = chart ? getState(chart) : undefined;
             const chartOptions = chartStates?.options;
 
@@ -368,20 +476,20 @@ export default ({ active }: PaneProps) => {
     }, [chartMetaData, isLive, active]);
 
     useEffect(() => {
-        chartMetaData.charts.forEach(chart => {
+        chartMetaData.forEach(({ chart }) => {
             const chartStates = chart ? getState(chart) : undefined;
 
             if (chart && chartStates) {
                 chartStates.options.onLiveChange = live => {
                     setLive(live);
-                    chartMetaData.charts.forEach(c => {
-                        if (c !== chart) c?.setLive(live);
+                    chartMetaData.forEach(({ chart: c }) => {
+                        if (chart !== c) c?.setLive(live);
                     });
                 };
                 chartStates.options.onRangeChanged = r => {
                     setRange(r);
-                    chartMetaData.charts.forEach(c => {
-                        if (c !== chart) c?.changeRange(r);
+                    chartMetaData.forEach(({ chart: c }) => {
+                        if (chart !== c) c?.changeRange(r);
                     });
                 };
             }
@@ -389,15 +497,15 @@ export default ({ active }: PaneProps) => {
     }, [chartMetaData, range]);
 
     useEffect(() => {
-        chartMetaData.charts.forEach(chart => {
+        chartMetaData.forEach(({ chart }) => {
             if (active && chart) {
-                chart?.update('none');
+                chart.update('none');
             }
         });
     }, [chartMetaData, active]);
 
     const zoom = (resolution: number) => {
-        chartMetaData.charts.forEach(chart => {
+        chartMetaData.forEach(({ chart }) => {
             const chartStates = chart ? getState(chart) : undefined;
 
             if (chart?.zoom) {
@@ -474,31 +582,34 @@ export default ({ active }: PaneProps) => {
                     />
                 </div>
             </div>
-            {chartMetaData.charts.map((_, index) => (
-                <Fragment key={chartMetaData.labels[index]}>
-                    <div className="d-flex justify-content-center">
-                        <span>
-                            <DocumentationTooltip
-                                card={chartMetaData.tooltip[index].card}
-                                item={chartMetaData.tooltip[index].item}
-                                placement="right-start"
-                            >
-                                <strong>
-                                    <u>{chartMetaData.labels[index]}</u>
-                                </strong>
-                            </DocumentationTooltip>
-                        </span>
-                    </div>
-                    <div className="graph-container">
-                        <Line
-                            width={100 + 1}
-                            options={chartMetaData.options[index]}
-                            data={chartMetaData.data[index]}
-                            ref={chartMetaData.refs[index]}
-                        />
-                    </div>
-                </Fragment>
-            ))}
+            {chartMetaData.map(
+                ({ label, tooltip, options, data, ref, sampleKey }) =>
+                    enabledCharts.has(sampleKey as keyof AdcSample) ? (
+                        <Fragment key={label}>
+                            <div className="d-flex justify-content-center">
+                                <span>
+                                    <DocumentationTooltip
+                                        card={tooltip.card}
+                                        item={tooltip.item}
+                                        placement="right-start"
+                                    >
+                                        <strong>
+                                            <u>{label}</u>
+                                        </strong>
+                                    </DocumentationTooltip>
+                                </span>
+                            </div>
+                            <div className="graph-container">
+                                <Line
+                                    width={100 + 1}
+                                    options={options}
+                                    data={data}
+                                    ref={ref}
+                                />
+                            </div>
+                        </Fragment>
+                    ) : null
+            )}
             <TimeSpanDeltaLine range={range} chartArea={chartArea} />
         </div>
     );
