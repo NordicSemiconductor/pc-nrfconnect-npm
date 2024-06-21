@@ -12,11 +12,13 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
+    getBoosts,
     getBucks,
     getLdos,
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
+import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
 
@@ -24,6 +26,7 @@ export default ({ active }: PaneProps) => {
     const disabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
     const bucks = useSelector(getBucks);
+    const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
 
     return active ? (
@@ -37,6 +40,16 @@ export default ({ active }: PaneProps) => {
                         buck={buck}
                         npmDevice={npmDevice}
                         key={`Buck${1 + index}`}
+                        index={index}
+                        disabled={disabled}
+                    />
+                ))}
+            {npmDevice &&
+                boosts.map((boost, index) => (
+                    <BoostCard
+                        boost={boost}
+                        npmDevice={npmDevice}
+                        key={`Boost${1 + index}`}
                         index={index}
                         disabled={disabled}
                     />

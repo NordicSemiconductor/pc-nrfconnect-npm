@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { classNames } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
@@ -35,8 +35,6 @@ const LineData = ({
 );
 
 export default ({ disabled }: { disabled: boolean }) => {
-    const [iconSize, setIconSize] = useState(0);
-    const iconWrapper = useRef<HTMLDivElement | null>(null);
     const npmDevice = useSelector(getNpmDevice);
 
     const pmicChargingState = useSelector(getPmicChargingState);
@@ -52,11 +50,6 @@ export default ({ disabled }: { disabled: boolean }) => {
     } else if (batteryConnected && pmicChargingState.trickleCharge) {
         mode = 'Trickle';
     }
-
-    useEffect(() => {
-        const newIconSize = (iconWrapper.current?.clientHeight ?? 20) * 0.9;
-        if (newIconSize !== iconSize) setIconSize(newIconSize);
-    }, [iconSize]);
 
     return (
         <div
@@ -74,35 +67,51 @@ export default ({ disabled }: { disabled: boolean }) => {
                 docItem="Voltage"
             />
 
-            <LineData
-                title="Current"
-                value={
-                    batteryConnected &&
-                    latestAdcSample?.iBat != null &&
-                    !Number.isNaN(latestAdcSample?.iBat)
-                        ? `${latestAdcSample?.iBat < 0 ? '—' : ''}${Math.round(
-                              Math.abs(latestAdcSample?.iBat ?? 0)
-                          )} mA`
-                        : 'N/A'
-                }
-                docItem="Current"
-            />
-
-            <LineData
-                title="Temperature"
-                value={
-                    batteryConnected && latestAdcSample
-                        ? `${latestAdcSample?.tBat.toFixed(2)}°C`
-                        : 'N/A'
-                }
-                docItem="Temperature"
-            />
+            {latestAdcSample?.iBat !== undefined && (
+                <LineData
+                    title="Current"
+                    docItem="Current"
+                    value={
+                        batteryConnected &&
+                        latestAdcSample?.iBat != null &&
+                        !Number.isNaN(latestAdcSample?.iBat)
+                            ? `${
+                                  latestAdcSample.iBat < 0 ? '—' : ''
+                              }${Math.round(
+                                  Math.abs(latestAdcSample.iBat ?? 0)
+                              )} mA`
+                            : 'N/A'
+                    }
+                />
+            )}
+            {latestAdcSample?.tBat !== undefined && (
+                <LineData
+                    title="Temperature"
+                    docItem="Temperature"
+                    value={
+                        batteryConnected && latestAdcSample
+                            ? `${latestAdcSample.tBat.toFixed(2)}°C`
+                            : 'N/A'
+                    }
+                />
+            )}
+            {latestAdcSample?.tDie !== undefined && (
+                <LineData
+                    title="System Temperature"
+                    docItem="SystemTemperature"
+                    value={
+                        batteryConnected && latestAdcSample
+                            ? `${latestAdcSample.tDie.toFixed(2)}°C`
+                            : 'N/A'
+                    }
+                />
+            )}
 
             {npmDevice?.hasCharger() && (
                 <LineData
                     title="Charging Mode"
-                    value={mode}
                     docItem="ChargingMode"
+                    value={mode}
                 />
             )}
         </div>
