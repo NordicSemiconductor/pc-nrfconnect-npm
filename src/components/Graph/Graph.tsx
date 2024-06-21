@@ -143,8 +143,8 @@ const chartDataTDie: ChartData<'line'> = {
         {
             label: 'System Temperature',
             data: [],
-            borderColor: styles.blue,
-            backgroundColor: styles.blue,
+            borderColor: styles.red,
+            backgroundColor: styles.red,
             fill: false,
             cubicInterpolationMode: 'monotone',
             tension: 0.4,
