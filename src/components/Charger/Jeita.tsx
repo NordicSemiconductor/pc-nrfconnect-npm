@@ -134,8 +134,8 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat < internalJeitaTemps[0] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat < internalJeitaTemps[0] &&
                                 'tw-bg-indigo-100'
                         )}`}
                     >
@@ -159,10 +159,9 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat >=
-                                    internalJeitaTemps[0] &&
-                                latestAdcSample?.tBat < internalJeitaTemps[1] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat >= internalJeitaTemps[0] &&
+                                latestAdcSample.tBat < internalJeitaTemps[1] &&
                                 'tw-bg-lightBlue-100'
                         )}`}
                     >
@@ -190,9 +189,8 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat >=
-                                    internalJeitaTemps[1] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat >= internalJeitaTemps[1] &&
                                 latestAdcSample?.tBat < internalJeitaTemps[2] &&
                                 'tw-bg-green-100'
                         )}`}
@@ -221,10 +219,9 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat >=
-                                    internalJeitaTemps[2] &&
-                                latestAdcSample?.tBat < internalJeitaTemps[3] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat >= internalJeitaTemps[2] &&
+                                latestAdcSample.tBat < internalJeitaTemps[3] &&
                                 'tw-bg-orange-100'
                         )}`}
                     >
@@ -252,9 +249,8 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat >=
-                                    internalJeitaTemps[3] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat >= internalJeitaTemps[3] &&
                                 'tw-bg-red-100'
                         )}`}
                     >

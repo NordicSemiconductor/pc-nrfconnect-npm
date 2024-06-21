@@ -114,63 +114,51 @@ describe('PMIC 2100 - Logging', () => {
 
         test('Adc Sample Logging event once', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:17.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:17.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001,tte=312,ttf=514'
             );
 
             expect(mockOnAdcSample).toBeCalledTimes(1);
             expect(mockOnAdcSample).toBeCalledWith({
                 timestamp: 17525,
                 vBat: 4.25,
-                iBat: 0.62, // converted to mA
-                tBat: 26.7,
+                tDie: 26.7,
                 soc: 98.7,
-                tte: 312,
-                ttf: 514,
             });
         });
 
         test('Adc Sample Logging event - overflow 1193.046471111111 hrs +', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
             );
 
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:10.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:10.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
             );
 
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:8.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:8.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
             );
 
             expect(mockOnAdcSample).toBeCalledTimes(3);
             expect(mockOnAdcSample).nthCalledWith(1, {
                 timestamp: 16525,
                 vBat: 4.25,
-                iBat: 0.62, // converted to mA
-                tBat: 26.7,
+                tDie: 26.7,
                 soc: 98.7,
-                tte: 312,
-                ttf: 514,
             });
 
             expect(mockOnAdcSample).nthCalledWith(2, {
                 timestamp: 2 ** 32 - 1 + 10525, // 1193hrs 02min 47sec 295ms + 10.525 sec
                 vBat: 4.25,
-                iBat: 0.62, // converted to mA
-                tBat: 26.7,
+                tDie: 26.7,
                 soc: 98.7,
-                tte: 312,
-                ttf: 514,
             });
 
             expect(mockOnAdcSample).nthCalledWith(3, {
                 timestamp: (2 ** 32 - 1) * 2 + 8525, // 1193hrs 02min 47sec 295ms + 8.525 sec
                 vBat: 4.25,
-                iBat: 0.62, // converted to mA
-                tBat: 26.7,
+                tDie: 26.7,
                 soc: 98.7,
-                tte: 312,
-                ttf: 514,
             });
         });
 

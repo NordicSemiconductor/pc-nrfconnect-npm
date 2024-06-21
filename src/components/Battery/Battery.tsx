@@ -109,7 +109,7 @@ const SideText = ({
                                 <span className="line-title">Time to full</span>
                             </DocumentationTooltip>
                             <span className="line-data">
-                                {latestAdcSample &&
+                                {latestAdcSample.ttf &&
                                 !Number.isNaN(latestAdcSample.ttf)
                                     ? `${formatSecondsToString(
                                           latestAdcSample.ttf
@@ -128,7 +128,7 @@ const SideText = ({
                                 </span>
                             </DocumentationTooltip>
                             <span className="line-data">
-                                {latestAdcSample &&
+                                {latestAdcSample?.tte &&
                                 !Number.isNaN(latestAdcSample.tte)
                                     ? `${formatSecondsToString(
                                           latestAdcSample.tte
