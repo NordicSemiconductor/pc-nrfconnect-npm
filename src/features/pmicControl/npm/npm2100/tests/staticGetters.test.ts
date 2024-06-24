@@ -88,8 +88,8 @@ describe('PMIC 2100 - Static getters', () => {
 
     test.each(PMIC_2100_LDOS)('LDO Voltage Range index: %p', index =>
         expect(pmic.getLdoVoltageRange(index)).toStrictEqual({
-            min: 1,
-            max: 3.3,
+            min: 0.8,
+            max: 3,
             decimals: 1,
             step: 0.1,
         })
