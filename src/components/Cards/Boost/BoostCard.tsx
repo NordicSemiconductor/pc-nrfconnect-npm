@@ -82,10 +82,10 @@ export default ({
         { label: 'GPIO1HI', value: 'GPIO1HI' },
     ];
 
-    // NumberInputSliderWithUnit do not use ldo.<prop> as value as we send only at on change complete
+    // NumberInputSliderWithUnit do not use boost.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVBoost(boost.vOut);
-    }, [boost.vOut]);
+    }, [boost]);
 
     return boost ? (
         <Card
