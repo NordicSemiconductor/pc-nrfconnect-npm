@@ -390,8 +390,8 @@ export default ({ active }: PaneProps) => {
                 ref: refTDie,
                 label: 'System Temperature',
                 tooltip: {
-                    card: 'batteryStatus',
-                    item: 'SystemTemperature',
+                    card: 'TBD',
+                    item: 'TBD',
                 },
                 sampleKey: 'tDie',
             },

@@ -14,7 +14,6 @@ import {
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Boost,
     BoostModeControl,
@@ -40,7 +39,6 @@ export default ({
 }) => {
     const [summary, setSummary] = useState(defaultSummary);
 
-    const card = 'boost';
     const boosts = npmDevice.getBoosts?.();
 
     if (!boosts) return null;
@@ -93,9 +91,7 @@ export default ({
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
-                    <DocumentationTooltip card="boost" item="LoadSwitchLDO">
-                        <span>{cardLabel}</span>
-                    </DocumentationTooltip>
+                    <span>{cardLabel}</span>
 
                     <div className="d-flex">
                         <span
@@ -128,12 +124,10 @@ export default ({
 
             <NumberInput
                 label={
-                    <DocumentationTooltip card={card} item="VOUT">
-                        <div>
-                            <span>V</span>
-                            <span className="subscript">OUT</span>
-                        </div>
-                    </DocumentationTooltip>
+                    <div>
+                        <span>V</span>
+                        <span className="subscript">OUT</span>
+                    </div>
                 }
                 unit="V"
                 disabled={disabled}
@@ -147,11 +141,7 @@ export default ({
             {!summary && (
                 <>
                     <Dropdown
-                        label={
-                            <DocumentationTooltip card={card} item="ModeContol">
-                                Mode Control
-                            </DocumentationTooltip>
-                        }
+                        label={<div>Mode Control</div>}
                         items={modeControlItems}
                         onSelect={item =>
                             boosts.set.modeControl(
@@ -199,14 +189,7 @@ export default ({
                         disabled={disabled || !boost.pinModeEnabled}
                     />
                     <Toggle
-                        label={
-                            <DocumentationTooltip
-                                card={card}
-                                item="OverCurrentProtection"
-                            >
-                                Over-Current Protection
-                            </DocumentationTooltip>
-                        }
+                        label={<div>Over-Current Protection</div>}
                         isToggled={boost.overCurrentProtection}
                         onToggle={value => boosts.set.overCurrent(index, value)}
                         disabled={disabled}
