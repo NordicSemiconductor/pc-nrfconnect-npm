@@ -81,38 +81,30 @@ export class BoostSet {
                 this.eventEmitter.emitPartialEvent<Boost>(
                     'onBoostUpdate',
                     {
-                        vOut: value,
+                        mode: 'SOFTWARE',
                     },
                     0
                 );
-
                 this.eventEmitter.emitPartialEvent<Boost>(
                     'onBoostUpdate',
                     {
-                        mode: 'SOFTWARE',
+                        vOut: value,
                     },
                     0
                 );
 
                 resolve();
             } else {
-                this.sendCommand(
-                    `npm2100 boost vout set ${value * 1000}`,
-                    () => {
-                        this.sendCommand(
-                            `npm2100 boost voutsel set SOFTWARE`,
-                            () => resolve(),
-                            () => {
-                                this.get.mode(0);
-                                reject();
-                            }
-                        );
-                    },
-                    () => {
-                        this.get.vOut(0);
-                        reject();
-                    }
-                );
+                this.mode(0, 'SOFTWARE').then(() => {
+                    this.sendCommand(
+                        `npm2100 boost vout set ${value * 1000}`,
+                        () => resolve(),
+                        () => {
+                            this.get.vOut(0);
+                            reject();
+                        }
+                    );
+                });
             }
         });
     }
