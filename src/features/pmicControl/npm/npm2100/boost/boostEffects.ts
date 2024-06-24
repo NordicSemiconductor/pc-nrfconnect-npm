@@ -95,16 +95,24 @@ export class BoostSet {
 
                 resolve();
             } else {
-                this.mode(0, 'SOFTWARE').then(() => {
-                    this.sendCommand(
-                        `npm2100 boost vout set ${value * 1000}`,
-                        () => resolve(),
-                        () => {
-                            this.get.vOut(0);
-                            reject();
-                        }
-                    );
-                });
+                this.sendCommand(
+                    `npm2100 boost voutsel set SOFTWARE`,
+                    () => {
+                        this.get.mode(0);
+                        this.sendCommand(
+                            `npm2100 boost vout set ${value * 1000}`,
+                            () => resolve(),
+                            () => {
+                                this.get.vOut(0);
+                                reject();
+                            }
+                        );
+                    },
+                    () => {
+                        this.get.mode(0);
+                        reject();
+                    }
+                );
             }
         });
     }
