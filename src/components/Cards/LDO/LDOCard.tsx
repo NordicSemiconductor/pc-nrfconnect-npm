@@ -61,7 +61,6 @@ export default ({
     disabled,
 }: LdoCardProperties) => {
     const deviceType = npmDevice.getDeviceType();
-    console.log('Devicetype is %s', deviceType);
 
     const [summary, setSummary] = useState(defaultSummary);
 
