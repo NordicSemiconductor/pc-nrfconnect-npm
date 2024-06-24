@@ -98,7 +98,6 @@ export class BoostSet {
                 this.sendCommand(
                     `npm2100 boost voutsel set SOFTWARE`,
                     () => {
-                        this.get.mode(0);
                         this.sendCommand(
                             `npm2100 boost vout set ${value * 1000}`,
                             () => resolve(),
