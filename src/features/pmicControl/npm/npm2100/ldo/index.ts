@@ -42,8 +42,8 @@ export const toLdoExport = (ldo: Ldo): LdoExport => ({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getLdoVoltageRange = (i: number) =>
     ({
-        min: 1,
-        max: 3.3,
+        min: 0.8,
+        max: 3,
         decimals: 1,
         step: 0.1,
     } as RangeType);
