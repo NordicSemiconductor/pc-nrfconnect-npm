@@ -5,9 +5,6 @@
  */
 
 import {
-    GPIODriveValues,
-    GPIOModeValues,
-    GPIOPullValues,
     LEDModeValues,
     NTCThermistor,
     PmicDialog,
@@ -16,6 +13,7 @@ import {
     TimerModeValues,
     TimerPrescalerValues,
 } from '../../types';
+import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
 import {
     helpers,
     PMIC_1300_BUCKS,

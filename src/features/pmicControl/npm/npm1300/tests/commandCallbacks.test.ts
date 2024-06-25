@@ -7,9 +7,6 @@
 import {
     BatteryModel,
     BuckOnOffControlValues,
-    GPIODriveValues,
-    GPIOModeValues,
-    GPIOPullValues,
     GPIOValues,
     LdoOnOffControlValues,
     LEDModeValues,
@@ -23,6 +20,7 @@ import {
     TimeToActiveValues,
     USBDetectStatusValues,
 } from '../../types';
+import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
 import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,

@@ -12,8 +12,17 @@ import {
     parseToBoolean,
     parseToNumber,
     toRegex,
+    toValueRegex,
 } from '../../pmicHelpers';
-import { GPIO, GPIODrive, GPIOModeValues, GPIOPullValues } from '../../types';
+import { GPIO } from '../../types';
+import {
+    GPIODrive1300,
+    GPIODriveValues,
+    GPIOMode1300,
+    GPIOModeValues,
+    GPIOPull1300,
+    GPIOPullValues,
+} from './types';
 
 const setupSingleGpio = (
     shellParser: ShellParser,
@@ -24,10 +33,15 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio config mode', true, i, '[0-9]'),
+            toRegex(
+                'npmx gpio config mode',
+                true,
+                i,
+                toValueRegex(GPIOModeValues)
+            ),
             res => {
-                const mode = GPIOModeValues[parseToNumber(res)];
-                if (mode) {
+                const mode: GPIOMode1300 = parseToNumber(res);
+                if (mode >= 0 && mode < GPIOModeValues.length) {
                     eventEmitter.emitPartialEvent<GPIO>(
                         'onGPIOUpdate',
                         {
@@ -43,10 +57,15 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio config pull', true, i, '(0|1|2)'),
+            toRegex(
+                'npmx gpio config pull',
+                true,
+                i,
+                toValueRegex(GPIOPullValues)
+            ),
             res => {
-                const pull = GPIOPullValues[parseToNumber(res)];
-                if (pull) {
+                const pull: GPIOPull1300 = parseToNumber(res);
+                if (pull >= 0 && pull < GPIOPullValues.length) {
                     eventEmitter.emitPartialEvent<GPIO>(
                         'onGPIOUpdate',
                         {
@@ -62,15 +81,23 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio config drive', true, i, '(1|6)'),
+            toRegex(
+                'npmx gpio config drive',
+                true,
+                i,
+                toValueRegex(GPIODriveValues)
+            ),
             res => {
-                eventEmitter.emitPartialEvent<GPIO>(
-                    'onGPIOUpdate',
-                    {
-                        drive: parseToNumber(res) as GPIODrive,
-                    },
-                    i
-                );
+                const drive: GPIODrive1300 = parseToNumber(res);
+                if (GPIODriveValues.findIndex(v => v === drive) !== -1) {
+                    eventEmitter.emitPartialEvent<GPIO>(
+                        'onGPIOUpdate',
+                        {
+                            drive: parseToNumber(res),
+                        },
+                        i
+                    );
+                }
             },
             noop
         )
@@ -114,11 +141,11 @@ const setupSingleGpio = (
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    noOfLdos: number
+    noOfGpios: number
 ) => {
     const cleanupCallbacks = [];
     if (shellParser) {
-        for (let i = 0; i < noOfLdos; i += 1) {
+        for (let i = 0; i < noOfGpios; i += 1) {
             cleanupCallbacks.push(
                 ...setupSingleGpio(shellParser, eventEmitter, i)
             );

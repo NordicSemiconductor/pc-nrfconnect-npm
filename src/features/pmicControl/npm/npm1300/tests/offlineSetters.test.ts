@@ -5,6 +5,7 @@
  */
 
 import { PmicDialog } from '../../types';
+import { GPIOMode1300, GPIOPull1300 } from '../gpio/types';
 import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
@@ -336,21 +337,21 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     );
 
     test.each(PMIC_1300_GPIOS)('Set setGpioMode index: %p', async index => {
-        await pmic.gpioModule[index].set.mode('Input');
+        await pmic.gpioModule[index].set.mode(GPIOMode1300.Input);
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
-            data: { mode: 'Input' },
+            data: { mode: GPIOMode1300.Input },
             index,
         });
     });
 
     test.each(PMIC_1300_GPIOS)('Set setGpioPull index: %p', async index => {
-        await pmic.gpioModule[index].set.pull('Pull down');
+        await pmic.gpioModule[index].set.pull(GPIOPull1300['Pull down']);
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
-            data: { pull: 'Pull down' },
+            data: { pull: GPIOPull1300['Pull down'] },
             index,
         });
     });
