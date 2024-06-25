@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-// eslint-disable-next-line max-classes-per-file
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Boost,
@@ -14,50 +13,7 @@ import {
     BoostPinSelection,
     PmicDialog,
 } from '../../types';
-
-export class BoostGet {
-    // eslint-disable-next-line no-useless-constructor
-    constructor(
-        private sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void
-    ) {}
-
-    all(index: number) {
-        this.vOut(index);
-        this.mode(index);
-        this.modeControl(index);
-        this.pinSelection(index);
-        this.pinMode(index);
-        this.overCurrent(index);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    vOut(_: number) {
-        this.sendCommand(`npm2100 boost vout get`);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    mode(_: number) {
-        this.sendCommand(`npm2100 boost mode get`);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    modeControl(_: number) {
-        this.sendCommand(`npm2100 boost voutsel get`);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    pinSelection(_: number) {
-        this.sendCommand(`npm2100 boost pinsel get`);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    pinMode(_: number) {
-        this.sendCommand(`npm2100 boost pinmode get`);
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    overCurrent(_: number) {
-        this.sendCommand(`npm2100 boost ocp get`);
-    }
-}
+import { BoostGet } from './boostGet';
 
 export class BoostSet {
     private get: BoostGet;
@@ -75,7 +31,7 @@ export class BoostSet {
         this.get = new BoostGet(sendCommand);
     }
 
-    vOut(_: number, value: number) {
+    vOut(value: number) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -102,13 +58,13 @@ export class BoostSet {
                             `npm2100 boost vout set ${value * 1000}`,
                             () => resolve(),
                             () => {
-                                this.get.vOut(0);
+                                this.get.vOut();
                                 reject();
                             }
                         );
                     },
                     () => {
-                        this.get.mode(0);
+                        this.get.mode();
                         reject();
                     }
                 );
@@ -116,7 +72,7 @@ export class BoostSet {
         });
     }
 
-    mode(_: number, mode: BoostMode) {
+    mode(mode: BoostMode) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -131,11 +87,11 @@ export class BoostSet {
                 this.sendCommand(
                     `npm2100 boost voutsel set ${mode}`,
                     () => {
-                        this.get.vOut(0);
+                        this.get.vOut();
                         resolve();
                     },
                     () => {
-                        this.get.mode(0);
+                        this.get.mode();
                         reject();
                     }
                 );
@@ -143,7 +99,7 @@ export class BoostSet {
         });
     }
 
-    modeControl(_: number, modeControl: BoostModeControl) {
+    modeControl(modeControl: BoostModeControl) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -160,7 +116,7 @@ export class BoostSet {
                     `npm2100 boost mode set ${modeControl}`,
                     () => resolve(),
                     () => {
-                        this.get.modeControl(0);
+                        this.get.modeControl();
                         reject();
                     }
                 );
@@ -168,7 +124,7 @@ export class BoostSet {
         });
     }
 
-    pinSelection(_: number, pinSelection: BoostPinSelection) {
+    pinSelection(pinSelection: BoostPinSelection) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -186,7 +142,7 @@ export class BoostSet {
                     `npm2100 boost pinsel set ${pinSelection}`,
                     () => resolve(),
                     () => {
-                        this.get.pinSelection(0);
+                        this.get.pinSelection();
                         reject();
                     }
                 );
@@ -194,7 +150,7 @@ export class BoostSet {
         });
     }
 
-    pinMode(_: number, pinMode: BoostPinMode) {
+    pinMode(pinMode: BoostPinMode) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -211,7 +167,7 @@ export class BoostSet {
                     `npm2100 boost pinmode set ${pinMode}`,
                     () => resolve(),
                     () => {
-                        this.get.pinMode(0);
+                        this.get.pinMode();
                         reject();
                     }
                 );
@@ -219,7 +175,7 @@ export class BoostSet {
         });
     }
 
-    overCurrent(_: number, enabled: boolean) {
+    overCurrent(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -235,7 +191,7 @@ export class BoostSet {
                     `npm2100 boost ocp set ${enabled ? 'ON' : 'OFF'}`,
                     () => resolve(),
                     () => {
-                        this.get.overCurrent(0);
+                        this.get.overCurrent();
                         reject();
                     }
                 );

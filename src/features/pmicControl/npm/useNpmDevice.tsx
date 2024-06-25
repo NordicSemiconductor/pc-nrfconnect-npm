@@ -121,20 +121,6 @@ export default () => {
 
     useEffect(() => {
         if (npmDevice) {
-            const initComponents = () => {
-                if (!npmDevice) return;
-
-                if (npmDevice.hasCharger()) {
-                    dispatch(setCharger(npmDevice.chargerDefault()));
-                }
-
-                dispatch(setBoosts(npmDevice.getBoosts?.().defaults ?? []));
-                dispatch(setBucks(npmDevice.buckDefaults()));
-                dispatch(setLdos(npmDevice.ldoDefaults()));
-                dispatch(setGPIOs(npmDevice.gpioDefaults()));
-                dispatch(setLEDs(npmDevice.ledDefaults()));
-            };
-
             const releaseAll: (() => void)[] = [];
 
             releaseAll.push(
@@ -492,8 +478,16 @@ export default () => {
             );
 
             dispatch(setPmicState(npmDevice.getConnectionState()));
-
-            initComponents();
+            if (npmDevice.hasCharger()) {
+                dispatch(setCharger(npmDevice.chargerDefault()));
+            }
+            dispatch(
+                setBoosts(npmDevice.boostModule.map(boost => boost.defaults))
+            );
+            dispatch(setBucks(npmDevice.buckDefaults()));
+            dispatch(setLdos(npmDevice.ldoDefaults()));
+            dispatch(setGPIOs(npmDevice.gpioDefaults()));
+            dispatch(setLEDs(npmDevice.ledDefaults()));
 
             return () => {
                 releaseAll.forEach(release => release());

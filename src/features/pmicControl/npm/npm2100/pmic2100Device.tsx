@@ -36,7 +36,7 @@ import {
     USBDetectStatusValues,
     USBPower,
 } from '../types';
-import getBoosts from './boost';
+import getBoostModule, { numberOfBoosts } from './boost';
 import setupBucks, { buckDefaults } from './buck';
 import setupCharger, { chargerDefaults as chargerDefault } from './charger';
 import setupFuelGauge from './fuelGauge';
@@ -52,7 +52,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new NpmEventEmitter();
 
     const devices = {
-        noOfBoosts: 1,
+        noOfBoosts: numberOfBoosts,
         noOfBucks: 0,
         charger: false,
         noOfLdos: 1,
@@ -584,7 +584,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         return defaultLEDs;
     };
 
-    const boosts = getBoosts(
+    const boostModule = getBoostModule(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -629,7 +629,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 requestUpdate.buckActiveDischarge(i);
             }
 
-            boosts.get.all(0);
+            boostModule.forEach(boost => boost.get.all());
 
             requestUpdate.ldoVoltage();
             requestUpdate.ldoEnabled();
@@ -706,75 +706,24 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
                 const action = async () => {
                     try {
-                        if (config.charger) {
-                            const charger = config.charger;
-                            await chargerSet.setChargerVTerm(charger.vTerm);
-                            await chargerSet.setChargerIChg(charger.iChg);
-                            await chargerSet.setChargerITerm(charger.iTerm);
-                            await chargerSet.setChargerBatLim(charger.iBatLim);
-                            await chargerSet.setChargerEnabledRecharging(
-                                charger.enableRecharging
-                            );
-                            await chargerSet.setChargerEnabledVBatLow(
-                                charger.enableVBatLow
-                            );
-                            await chargerSet.setChargerVTrickleFast(
-                                charger.vTrickleFast
-                            );
-                            await chargerSet.setChargerNTCThermistor(
-                                charger.ntcThermistor
-                            );
-                            await chargerSet.setChargerNTCBeta(charger.ntcBeta);
-                            await chargerSet.setChargerTChgResume(
-                                charger.tChgResume
-                            );
-                            await chargerSet.setChargerTChgStop(
-                                charger.tChgStop
-                            );
-                            await chargerSet.setChargerVTermR(charger.vTermR);
-                            await chargerSet.setChargerTCold(charger.tCold);
-                            await chargerSet.setChargerTCool(charger.tCool);
-                            await chargerSet.setChargerTWarm(charger.tWarm);
-                            await chargerSet.setChargerTHot(charger.tHot);
-                            await chargerSet.setChargerEnabled(charger.enabled);
-                        }
-
                         await Promise.all(
-                            config.bucks.map((buck, index) =>
-                                (async () => {
-                                    await buckSet.setBuckVOutNormal(
-                                        index,
-                                        buck.vOutNormal
-                                    );
-                                    await buckSet.setBuckEnabled(
-                                        index,
-                                        buck.enabled
-                                    );
-                                    await buckSet.setBuckModeControl(
-                                        index,
-                                        buck.modeControl
-                                    );
-                                    await buckSet.setBuckVOutRetention(
-                                        index,
-                                        buck.vOutRetention
-                                    );
-                                    await buckSet.setBuckRetentionControl(
-                                        index,
-                                        buck.retentionControl
-                                    );
-                                    await buckSet.setBuckOnOffControl(
-                                        index,
-                                        buck.onOffControl
-                                    );
-                                    await buckSet.setBuckActiveDischarge(
-                                        index,
-                                        buck.activeDischarge
-                                    );
-                                    await buckSet.setBuckMode(index, buck.mode);
-                                })()
-                            )
+                            config.boosts.map((boost, index) => async () => {
+                                await boostModule[index].set.vOut(boost.vOut);
+                                await boostModule[index].set.mode(boost.mode);
+                                await boostModule[index].set.modeControl(
+                                    boost.modeControl
+                                );
+                                await boostModule[index].set.pinSelection(
+                                    boost.pinSelection
+                                );
+                                await boostModule[index].set.pinMode(
+                                    boost.pinMode
+                                );
+                                await boostModule[index].set.overCurrent(
+                                    boost.overCurrentProtection
+                                );
+                            })
                         );
-
                         await Promise.all(
                             config.ldos.map((ldo, index) =>
                                 (async () => {
@@ -1034,7 +983,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
         chargerDefault: () => chargerDefault(),
 
-        getBoosts: () => boosts,
+        boostModule,
 
         getBatteryConnectedVoltageThreshold: () => 0, // 0V
     };

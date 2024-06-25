@@ -17,33 +17,27 @@ import {
 import {
     Boost,
     BoostModeControl,
+    BoostModule,
     BoostPinMode,
     BoostPinSelection,
-    NpmDevice,
 } from '../../../features/pmicControl/npm/types';
 
 export default ({
-    npmDevice,
     boost,
+    boostModule,
     cardLabel = `BOOST`,
     defaultSummary = false,
     disabled,
-    index,
 }: {
-    npmDevice: NpmDevice;
     boost: Boost;
+    boostModule: BoostModule;
     cardLabel?: string;
     defaultSummary?: boolean;
     disabled: boolean;
-    index: number;
 }) => {
     const [summary, setSummary] = useState(defaultSummary);
 
-    const boosts = npmDevice.getBoosts?.();
-
-    if (!boosts) return null;
-
-    const range = boosts.ranges.voltageRange(index);
+    const range = boostModule.ranges.voltageRange;
 
     const [internalVBoost, setInternalVBoost] = useState(boost.vOut);
 
@@ -115,7 +109,7 @@ export default ({
                 disabled={disabled}
                 items={modeItems}
                 onSelect={i =>
-                    boosts.set.mode(index, i === 0 ? 'SOFTWARE' : 'VSET')
+                    boostModule.set.mode(i === 0 ? 'SOFTWARE' : 'VSET')
                 }
                 selectedItem={
                     boost.mode === 'SOFTWARE' ? modeItems[0] : modeItems[1]
@@ -134,7 +128,7 @@ export default ({
                 range={range}
                 value={internalVBoost}
                 onChange={setInternalVBoost}
-                onChangeComplete={value => boosts.set.vOut(index, value)}
+                onChangeComplete={value => boostModule.set.vOut(value)}
                 showSlider
             />
 
@@ -144,8 +138,7 @@ export default ({
                         label={<div>Mode Control</div>}
                         items={modeControlItems}
                         onSelect={item =>
-                            boosts.set.modeControl(
-                                index,
+                            boostModule.set.modeControl(
                                 item.value as BoostModeControl
                             )
                         }
@@ -160,8 +153,7 @@ export default ({
                         label="GPIO Control - Pin Selection"
                         items={pinSelectionItems}
                         onSelect={item => {
-                            boosts.set.pinSelection(
-                                index,
+                            boostModule.set.pinSelection(
                                 item.value as BoostPinSelection
                             );
                         }}
@@ -176,10 +168,7 @@ export default ({
                         label="GPIO Control - Mode Selection"
                         items={pinModeItems}
                         onSelect={item => {
-                            boosts.set.pinMode(
-                                index,
-                                item.value as BoostPinMode
-                            );
+                            boostModule.set.pinMode(item.value as BoostPinMode);
                         }}
                         selectedItem={
                             pinModeItems.find(
@@ -191,7 +180,7 @@ export default ({
                     <Toggle
                         label={<div>Over-Current Protection</div>}
                         isToggled={boost.overCurrentProtection}
-                        onToggle={value => boosts.set.overCurrent(index, value)}
+                        onToggle={value => boostModule.set.overCurrent(value)}
                         disabled={disabled}
                     />
                 </>

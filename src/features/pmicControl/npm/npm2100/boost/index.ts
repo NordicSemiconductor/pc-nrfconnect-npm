@@ -10,19 +10,20 @@ import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Boost, PmicDialog } from '../../types';
 import boostCallbacks from './boostCallback';
-import { BoostGet, BoostSet } from './boostEffects';
+import { BoostGet } from './boostGet';
+import { BoostSet } from './boostSet';
 
-const boostDefaults = (): Boost[] => [
-    {
-        vOut: voltageRange().min,
-        mode: 'VSET',
-        modeControl: 'AUTO',
-        pinSelection: 'OFF',
-        pinMode: 'HP',
-        pinModeEnabled: false,
-        overCurrentProtection: false,
-    },
-];
+export const numberOfBoosts = 1;
+
+const boostDefaults = (): Boost => ({
+    vOut: voltageRange().min,
+    mode: 'VSET',
+    modeControl: 'AUTO',
+    pinSelection: 'OFF',
+    pinMode: 'HP',
+    pinModeEnabled: false,
+    overCurrentProtection: false,
+});
 
 const voltageRange = () =>
     ({
@@ -41,12 +42,19 @@ export default (
     ) => void,
     dialogHandler: ((dialog: PmicDialog) => void) | null,
     offlineMode: boolean
-) => ({
-    get: new BoostGet(sendCommand),
-    set: new BoostSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
-    callbacks: boostCallbacks(shellParser, eventEmitter),
-    ranges: {
-        voltageRange,
+) => [
+    {
+        get: new BoostGet(sendCommand),
+        set: new BoostSet(
+            eventEmitter,
+            sendCommand,
+            dialogHandler,
+            offlineMode
+        ),
+        callbacks: boostCallbacks(shellParser, eventEmitter),
+        ranges: {
+            voltageRange: voltageRange(),
+        },
+        defaults: boostDefaults(),
     },
-    defaults: boostDefaults(),
-});
+];
