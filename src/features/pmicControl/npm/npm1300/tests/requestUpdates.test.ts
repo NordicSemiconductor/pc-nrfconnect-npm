@@ -527,7 +527,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update pofEnable', () => {
-        pmic.requestUpdate.pofEnable();
+        pmic.pofModule?.get.enable();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -539,7 +539,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update pofPolarity', () => {
-        pmic.requestUpdate.pofPolarity();
+        pmic.pofModule?.get.polarity();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -551,7 +551,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update pofThreshold', () => {
-        pmic.requestUpdate.pofThreshold();
+        pmic.pofModule?.get.threshold();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

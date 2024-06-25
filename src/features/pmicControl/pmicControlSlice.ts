@@ -36,7 +36,7 @@ interface pmicControlState {
     ldos: Ldo[];
     gpios: GPIO[];
     leds: LED[];
-    pof: POF;
+    pof?: POF;
     ship: ShipModeConfig;
     timerConfig: TimerConfig;
     latestAdcSample?: AdcSample;
@@ -63,11 +63,6 @@ const initialState: pmicControlState = {
     ldos: [],
     gpios: [],
     leds: [],
-    pof: {
-        enable: true,
-        threshold: 2.8,
-        polarity: 'Active high',
-    },
     timerConfig: {
         mode: 'Boot monitor',
         prescaler: 'Slow',
@@ -194,14 +189,17 @@ const pmicControlSlice = createSlice({
                 };
             }
         },
-        setPOFs(state, action: PayloadAction<POF>) {
+        setPOFs(state, action: PayloadAction<POF | undefined>) {
             state.pof = action.payload;
         },
         updatePOFs(state, action: PayloadAction<Partial<POF>>) {
-            state.pof = {
-                ...state.pof,
-                ...action.payload,
-            };
+            if (state.npmDevice?.pofModule) {
+                state.pof = {
+                    ...state.npmDevice?.pofModule?.defaults,
+                    ...state.pof,
+                    ...action.payload,
+                };
+            }
         },
         setTimerConfig(state, action: PayloadAction<TimerConfig>) {
             state.timerConfig = action.payload;

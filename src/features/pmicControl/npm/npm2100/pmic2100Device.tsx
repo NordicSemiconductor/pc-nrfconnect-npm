@@ -42,7 +42,6 @@ import setupCharger, { chargerDefaults as chargerDefault } from './charger';
 import setupFuelGauge from './fuelGauge';
 import setupGpio, { gpioDefaults } from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
-import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timer';
 
@@ -57,7 +56,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         charger: false,
         maxEnergyExtraction: true,
         noOfLdos: 1,
-        noOfGPIOs: 2,
+        noOfGPIOs: 0,
         noOfLEDs: 0,
         noOfBatterySlots: 1,
     };
@@ -363,13 +362,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         devices.noOfGPIOs
     );
 
-    const { pofGet, pofSet, pofCallbacks, pofRanges } = setupPof(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
     const { shipModeGet, shipModeSet, shipModeCallbacks } = setupShipMode(
         shellParser,
         eventEmitter,
@@ -513,7 +505,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             );
         }
 
-        releaseAll.push(...pofCallbacks);
         releaseAll.push(...timerCallbacks);
         releaseAll.push(...shipModeCallbacks);
 
@@ -655,9 +646,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             for (let i = 0; i < devices.noOfLEDs; i += 1) {
                 requestUpdate.ledMode(i);
             }
-            requestUpdate.pofEnable();
-            requestUpdate.pofPolarity();
-            requestUpdate.pofThreshold();
 
             requestUpdate.timerConfigMode();
             requestUpdate.timerConfigCompare();
@@ -680,7 +668,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         ...ldoGet,
         ...gpioGet,
-        ...pofGet,
         ...timerGet,
         ...shipModeGet,
         ...fuelGaugeGet,
@@ -824,10 +811,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                             )
                         );
 
-                        await pofSet.setPOFEnabled(config.pof.enable);
-                        await pofSet.setPOFPolarity(config.pof.polarity);
-                        await pofSet.setPOFThreshold(config.pof.threshold);
-
                         await timerSet.setTimerConfigMode(
                             config.timerConfig.mode
                         );
@@ -904,7 +887,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...chargerRanges,
         ...buckRanges,
         ...ldoRanges,
-        ...pofRanges,
 
         getUSBCurrentLimiterRange: () => [
             0.1,
@@ -924,7 +906,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoSet,
         ...gpioSet,
         setLedMode,
-        ...pofSet,
         ...timerSet,
         ...shipModeSet,
         ...fuelGaugeSet,

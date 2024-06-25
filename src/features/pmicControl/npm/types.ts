@@ -401,6 +401,25 @@ export type BoostModule = {
     };
 };
 
+export interface PofModule {
+    get: {
+        all: () => void;
+        enable: () => void;
+        polarity: () => void;
+        threshold: () => void;
+    };
+    set: {
+        all(pof: POF): Promise<void>;
+        enabled(enable: boolean): Promise<void>;
+        threshold(threshold: number): Promise<void>;
+        polarity(polarity: POFPolarity): Promise<void>;
+    };
+    callbacks: (() => void)[];
+    ranges: {
+        threshold: RangeType;
+    };
+    defaults: POF;
+}
 export type BaseNpmDevice = {
     kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
@@ -497,6 +516,7 @@ export type BaseNpmDevice = {
     release: () => void;
 
     boostModule: BoostModule[];
+    pofModule?: PofModule;
 };
 
 export interface INpmDevice extends IBaseNpmDevice {
@@ -532,7 +552,6 @@ export type NpmDevice = {
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
-    getPOFThresholdRange: () => RangeType;
     getUSBCurrentLimiterRange: () => number[];
 
     chargerDefault: () => Charger;
@@ -588,10 +607,6 @@ export type NpmDevice = {
         gpioDebounce: (index: number) => void;
 
         ledMode: (index: number) => void;
-
-        pofEnable: () => void;
-        pofPolarity: () => void;
-        pofThreshold: () => void;
 
         timerConfigMode: () => void;
         timerConfigPrescaler: () => void;
@@ -698,10 +713,6 @@ export type NpmDevice = {
 
     setLedMode: (index: number, mode: LEDMode) => Promise<void>;
 
-    setPOFEnabled: (state: boolean) => Promise<void>;
-    setPOFPolarity: (polarity: POFPolarity) => Promise<void>;
-    setPOFThreshold: (threshold: number) => Promise<void>;
-
     setTimerConfigMode: (mode: TimerMode) => Promise<void>;
     setTimerConfigPrescaler: (prescaler: TimerPrescaler) => Promise<void>;
     setTimerConfigCompare: (period: number) => Promise<void>;
@@ -760,7 +771,7 @@ export interface NpmExport {
     ldos: LdoExport[];
     gpios: GPIO[];
     leds: LED[];
-    pof: POF;
+    pof?: POF;
     ship: ShipModeConfig;
     timerConfig: TimerConfig;
     fuelGauge: boolean;

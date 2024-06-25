@@ -49,9 +49,9 @@ export default ({ active }: PaneProps) => {
                     disabled={disabled}
                 />
             )}
-            {npmDevice && (
+            {npmDevice?.pofModule && pof && (
                 <PowerFailure
-                    npmDevice={npmDevice}
+                    pofModule={npmDevice.pofModule}
                     pof={pof}
                     disabled={disabled}
                 />

@@ -20,7 +20,7 @@ describe('PMIC 2100 - Static getters', () => {
 
     test('Number of LDOs', () => expect(pmic.getNumberOfLdos()).toBe(1));
 
-    test('Number of GPIOs', () => expect(pmic.getNumberOfGPIOs()).toBe(2));
+    test('Number of GPIOs', () => expect(pmic.getNumberOfGPIOs()).toBe(0));
 
     test('Number of LEDs', () => expect(pmic.getNumberOfLEDs()).toBe(0));
 
@@ -94,14 +94,6 @@ describe('PMIC 2100 - Static getters', () => {
             step: 0.1,
         })
     );
-
-    test('Charger Current Range', () =>
-        expect(pmic.getPOFThresholdRange()).toStrictEqual({
-            min: 2.6,
-            max: 3.5,
-            decimals: 1,
-            step: 0.1,
-        }));
 
     test('Charger NTC Beta Range', () =>
         expect(pmic.getChargerNTCBetaRange()).toStrictEqual({
