@@ -8,7 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
-    AppThunk,
+    AppDispatch,
     clearWaitForDevice,
     describeError,
     logger,
@@ -19,7 +19,6 @@ import { appendFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
-import { RootState } from '../../../appReducer';
 import { PROFILE_FOLDER_PREFIX } from '../../../components/Profiling/helpers';
 import { getShellParser } from '../../serial/serialSlice';
 import {
@@ -78,7 +77,7 @@ export default () => {
     const [isPMICPowered, setPMICPowered] = useState(false);
     const shellParser = useSelector(getShellParser);
     const npmDevice = useSelector(getNpmDeviceSlice);
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const supportedVersion = useSelector(isSupportedVersion);
     const pmicState = useSelector(getPmicState);
     const recordEvents = useSelector(getEventRecording);
@@ -92,17 +91,15 @@ export default () => {
     useEffect(() => {
         getNpmDevice(shellParser, pmicDialog =>
             dispatch(dialogHandler(pmicDialog))
-        ).then(dev => dispatch(setNpmDevice(dev)));
-    }, [dispatch, shellParser]);
+        ).then(dev => {
+            dispatch(setNpmDevice(dev));
 
-    useEffect(() => {
-        if (npmDevice) {
-            npmDevice.isSupportedVersion().then(result => {
+            dev.isSupportedVersion().then(result => {
                 dispatch(setSupportedVersion(result.supported));
             });
-            npmDevice.isPMICPowered().then(setPMICPowered);
-        }
-    }, [dispatch, npmDevice]);
+            dev.isPMICPowered().then(setPMICPowered);
+        });
+    }, [dispatch, shellParser]);
 
     useEffect(() => {
         if (
@@ -161,7 +158,7 @@ export default () => {
             releaseAll.push(
                 npmDevice.onAdcSettingsChange(settings => {
                     dispatch(setFuelGaugeReportingRate(settings.reportRate));
-                    dispatch<AppThunk<RootState>>((_, getState) => {
+                    dispatch((_, getState) => {
                         if (getState().app.pmicControl.charger?.enabled) {
                             dispatch(
                                 setFuelGaugeChargingSamplingRate(
@@ -180,7 +177,7 @@ export default () => {
             );
 
             if (!npmDevice.hasCharger()) {
-                dispatch<AppThunk<RootState>>((_, getState) => {
+                dispatch((_, getState) => {
                     const samplingRate =
                         getState().app.pmicControl
                             .fuelGaugeChargingSamplingRate;
@@ -192,7 +189,7 @@ export default () => {
             } else {
                 releaseAll.push(
                     npmDevice.onChargerUpdate(payload => {
-                        dispatch<AppThunk<RootState>>((_, getState) => {
+                        dispatch((_, getState) => {
                             dispatch(updateCharger(payload));
                             if (
                                 payload.enabled != null &&
@@ -428,7 +425,7 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onBeforeReboot(() => {
-                    dispatch<AppThunk>((dis, getState) => {
+                    dispatch((dis, getState) => {
                         const previousWaitForDevice =
                             getState().deviceAutoSelect.waitForDevice;
                         dis(
@@ -459,7 +456,7 @@ export default () => {
                         dispatch(clearWaitForDevice());
                     } else {
                         setPMICPowered(false);
-                        dispatch<AppThunk>((dis, getState) => {
+                        dispatch((dis, getState) => {
                             const previousWaitForDevice =
                                 getState().deviceAutoSelect.waitForDevice;
 
