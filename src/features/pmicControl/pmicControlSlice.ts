@@ -193,9 +193,9 @@ const pmicControlSlice = createSlice({
             state.pof = action.payload;
         },
         updatePOFs(state, action: PayloadAction<Partial<POF>>) {
-            if (state.npmDevice?.pof) {
+            if (state.npmDevice?.pofModule) {
                 state.pof = {
-                    ...state.npmDevice?.pof?.defaults,
+                    ...state.npmDevice?.pofModule?.defaults,
                     ...state.pof,
                     ...action.payload,
                 };

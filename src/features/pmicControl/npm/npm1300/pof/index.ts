@@ -26,12 +26,12 @@ export default (
     set: new PofSet(eventEmitter, sendCommand, offlineMode),
     callbacks: pofCallbacks(shellParser, eventEmitter),
     ranges: {
-        thresholdRange: () => ({
+        threshold: {
             min: 2.6,
             max: 3.5,
             decimals: 1,
             step: 0.1,
-        }),
+        },
     },
     defaults: {
         enable: true,

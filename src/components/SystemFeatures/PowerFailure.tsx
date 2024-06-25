@@ -74,7 +74,7 @@ export default ({ pofModule, pof, disabled }: GPIOProperties) => {
                 }
                 unit="V"
                 disabled={disabled}
-                range={pofModule.ranges.thresholdRange()}
+                range={pofModule.ranges.threshold}
                 value={internalPOFThreshold}
                 onChange={setInternalPOFThreshold}
                 onChangeComplete={pofModule.set.threshold}

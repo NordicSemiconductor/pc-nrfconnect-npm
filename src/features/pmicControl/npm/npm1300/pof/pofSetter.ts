@@ -23,6 +23,11 @@ export class PofSet {
         this.get = new PofGet(sendCommand);
     }
 
+    async all(pof: POF) {
+        await this.enabled(pof.enable);
+        await this.polarity(pof.polarity);
+        await this.threshold(pof.threshold);
+    }
     enabled(enable: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
@@ -43,8 +48,8 @@ export class PofSet {
         });
     }
 
-    threshold = (threshold: number) =>
-        new Promise<void>((resolve, reject) => {
+    threshold(threshold: number) {
+        return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                     threshold,
@@ -61,9 +66,10 @@ export class PofSet {
                 );
             }
         });
+    }
 
-    polarity = (polarity: POFPolarity) =>
-        new Promise<void>((resolve, reject) => {
+    polarity(polarity: POFPolarity) {
+        return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
                     polarity,
@@ -82,4 +88,5 @@ export class PofSet {
                 );
             }
         });
+    }
 }

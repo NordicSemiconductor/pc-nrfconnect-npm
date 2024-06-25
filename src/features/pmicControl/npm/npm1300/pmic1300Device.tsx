@@ -830,9 +830,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         );
 
                         if (config.pof) {
-                            await pofModule.set.enabled(config.pof.enable);
-                            await pofModule.set.polarity(config.pof.polarity);
-                            await pofModule.set.threshold(config.pof.threshold);
+                            await pofModule.set.all(config.pof);
                         }
 
                         await timerSet.setTimerConfigMode(
@@ -990,6 +988,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerDefault: () => chargerDefault(),
 
         getBatteryConnectedVoltageThreshold: () => 1, // 1V
-        pof: pofModule,
+        pofModule,
     };
 };
