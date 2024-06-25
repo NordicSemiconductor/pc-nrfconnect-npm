@@ -11,8 +11,7 @@ export class BoostGet {
             command: string,
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
-        ) => void,
-        private index: number
+        ) => void
     ) {}
 
     all() {
