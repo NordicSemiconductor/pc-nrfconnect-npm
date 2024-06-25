@@ -425,7 +425,7 @@ export interface ChargerModule {
     defaults: Charger;
 }
 
-export type BoostModule = {
+export interface BoostModule {
     get: {
         all: () => void;
         vOut: () => void;
