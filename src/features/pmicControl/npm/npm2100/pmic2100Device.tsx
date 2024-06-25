@@ -36,7 +36,7 @@ import {
     USBDetectStatusValues,
     USBPower,
 } from '../types';
-import getBoosts from './boost';
+import getBoostModule, { numberOfBoosts } from './boost';
 import setupBucks, { buckDefaults } from './buck';
 import setupCharger, { chargerDefaults as chargerDefault } from './charger';
 import setupFuelGauge from './fuelGauge';
@@ -52,7 +52,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new NpmEventEmitter();
 
     const devices = {
-        noOfBoosts: 1,
+        noOfBoosts: numberOfBoosts,
         noOfBucks: 0,
         charger: false,
         noOfLdos: 1,
@@ -584,7 +584,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         return defaultLEDs;
     };
 
-    const boosts = getBoosts(
+    const boostModule = getBoostModule(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -629,7 +629,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 requestUpdate.buckActiveDischarge(i);
             }
 
-            boosts.get.all(0);
+            boostModule.forEach(boost => boost.get.all());
 
             requestUpdate.ldoVoltage();
             requestUpdate.ldoEnabled();
@@ -1034,7 +1034,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
         chargerDefault: () => chargerDefault(),
 
-        getBoosts: () => boosts,
+        boostModule,
 
         getBatteryConnectedVoltageThreshold: () => 0, // 0V
     };
