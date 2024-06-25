@@ -46,6 +46,7 @@ import {
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
+    setPOFs,
     setStoredBatterModel,
     setSupportedVersion,
     updateBoost,
@@ -488,6 +489,7 @@ export default () => {
             dispatch(setLdos(npmDevice.ldoDefaults()));
             dispatch(setGPIOs(npmDevice.gpioDefaults()));
             dispatch(setLEDs(npmDevice.ledDefaults()));
+            dispatch(setPOFs(npmDevice.pof?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());

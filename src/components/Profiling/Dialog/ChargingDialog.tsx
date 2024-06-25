@@ -122,7 +122,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         onClick={async () => {
                             dispatch(setProfilingStage('Resting'));
                             try {
-                                await npmDevice?.setPOFThreshold(2.6);
+                                await npmDevice?.pof?.set.threshold(2.6);
                                 npmDevice?.setAutoRebootDevice(false);
                                 await npmDevice?.setChargerEnabled(false);
                                 await npmDevice

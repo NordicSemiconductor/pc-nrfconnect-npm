@@ -96,7 +96,7 @@ describe('PMIC 1300 - Static getters', () => {
     );
 
     test('Charger Current Range', () =>
-        expect(pmic.getPOFThresholdRange()).toStrictEqual({
+        expect(pmic.pof?.ranges.thresholdRange()).toStrictEqual({
             min: 2.6,
             max: 3.5,
             decimals: 1,

@@ -23,7 +23,6 @@ describe('PMIC 2100 - Setters Offline tests', () => {
         mockOnLdoUpdate,
         mockOnGpioUpdate,
         mockOnLEDUpdate,
-        mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
         mockOnShipUpdate,
         mockOnUsbPower,
@@ -321,20 +320,6 @@ describe('PMIC 2100 - Setters Offline tests', () => {
             data: { debounce: true },
             index,
         });
-    });
-
-    test('Set set pof enable ', async () => {
-        await pmic.setPOFEnabled(true);
-
-        expect(mockOnPOFUpdate).toBeCalledTimes(1);
-        expect(mockOnPOFUpdate).toBeCalledWith({ enable: true });
-    });
-
-    test('Set set pof polarity ', async () => {
-        await pmic.setPOFPolarity('Active low');
-
-        expect(mockOnPOFUpdate).toBeCalledTimes(1);
-        expect(mockOnPOFUpdate).toBeCalledWith({ polarity: 'Active low' });
     });
 
     test('Set set timer config mode ', async () => {
