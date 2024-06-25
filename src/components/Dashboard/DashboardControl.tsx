@@ -46,9 +46,8 @@ export default ({ active }: PaneProps) => {
                 boosts.map((boost, index) => (
                     <BoostCard
                         boost={boost}
-                        npmDevice={npmDevice}
+                        boostModule={npmDevice.boostModule[index]}
                         key={`Boost${1 + index}`}
-                        index={index}
                         disabled={disabled}
                         defaultSummary
                     />

@@ -17,31 +17,25 @@ import {
 import {
     Boost,
     BoostModeControl,
+    BoostModule,
     BoostPinMode,
     BoostPinSelection,
-    NpmDevice,
 } from '../../../features/pmicControl/npm/types';
 
 export default ({
-    npmDevice,
     boost,
+    boostModule,
     cardLabel = `BOOST`,
     defaultSummary = false,
     disabled,
-    index,
 }: {
-    npmDevice: NpmDevice;
     boost: Boost;
+    boostModule: BoostModule;
     cardLabel?: string;
     defaultSummary?: boolean;
     disabled: boolean;
-    index: number;
 }) => {
     const [summary, setSummary] = useState(defaultSummary);
-
-    const boostModule = npmDevice.boostModule[index];
-
-    if (!boostModule) return null;
 
     const range = boostModule.ranges.voltageRange;
 

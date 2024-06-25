@@ -368,7 +368,7 @@ export const isFixedListRangeWithLabel = (
 export const isRangeType = (range: RangeOrFixedListRange): range is RangeType =>
     !Array.isArray(range);
 
-type BoostModule = {
+export type BoostModule = {
     get: {
         all: () => void;
         vOut: () => void;
