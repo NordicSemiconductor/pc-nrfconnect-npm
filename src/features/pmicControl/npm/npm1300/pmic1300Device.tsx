@@ -36,7 +36,7 @@ import {
     USBDetectStatusValues,
     USBPower,
 } from '../types';
-import setupBucks, { buckDefaults } from './buck';
+import setupBucks, { numberOfBucks } from './buck';
 import { ChargerModule } from './charger';
 import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
@@ -51,7 +51,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new NpmEventEmitter();
 
     const devices = {
-        noOfBucks: 2,
+        noOfBucks: numberOfBucks,
         noOfLdos: 2,
         noOfLEDs: 3,
         noOfBatterySlots: 3,
@@ -348,13 +348,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
-    const { buckGet, buckSet, buckCallbacks, buckRanges } = setupBucks(
+    const buckModule = setupBucks(
         shellParser,
         eventEmitter,
         sendCommand,
         dialogHandler,
-        offlineMode,
-        devices.noOfBucks
+        offlineMode
     );
 
     const { ldoGet, ldoSet, ldoCallbacks, ldoRanges } = setupLdo(
@@ -498,7 +497,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
 
-        releaseAll.push(...buckCallbacks);
+        releaseAll.push(...buckModule.map(buck => buck.callbacks).flat());
         releaseAll.push(...ldoCallbacks);
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
 
@@ -603,15 +602,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             chargerModule.get.all();
 
-            for (let i = 0; i < devices.noOfBucks; i += 1) {
-                requestUpdate.buckVOutNormal(i);
-                requestUpdate.buckVOutRetention(i);
-                requestUpdate.buckMode(i);
-                requestUpdate.buckEnabled(i);
-                requestUpdate.buckModeControl(i);
-                requestUpdate.buckOnOffControl(i);
-                requestUpdate.buckActiveDischarge(i);
-            }
+            buckModule.forEach(buck => buck.get.all());
 
             for (let i = 0; i < devices.noOfLdos; i += 1) {
                 requestUpdate.ldoVoltage(i);
@@ -641,8 +632,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             requestUpdate.vbusinCurrentLimiter();
         },
-
-        ...buckGet,
 
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
 
@@ -680,35 +669,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         await Promise.all(
                             config.bucks.map((buck, index) =>
                                 (async () => {
-                                    await buckSet.setBuckVOutNormal(
-                                        index,
-                                        buck.vOutNormal
-                                    );
-                                    await buckSet.setBuckEnabled(
-                                        index,
-                                        buck.enabled
-                                    );
-                                    await buckSet.setBuckModeControl(
-                                        index,
-                                        buck.modeControl
-                                    );
-                                    await buckSet.setBuckVOutRetention(
-                                        index,
-                                        buck.vOutRetention
-                                    );
-                                    await buckSet.setBuckRetentionControl(
-                                        index,
-                                        buck.retentionControl
-                                    );
-                                    await buckSet.setBuckOnOffControl(
-                                        index,
-                                        buck.onOffControl
-                                    );
-                                    await buckSet.setBuckActiveDischarge(
-                                        index,
-                                        buck.activeDischarge
-                                    );
-                                    await buckSet.setBuckMode(index, buck.mode);
+                                    await buckModule[index].set.all(buck);
                                 })()
                             )
                         );
@@ -830,7 +791,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         startAdcSample,
         stopAdcSample,
 
-        ...buckRanges,
         ...ldoRanges,
 
         getUSBCurrentLimiterRange: () => [
@@ -846,7 +806,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         requestUpdate,
 
-        ...buckSet,
+        buckModule,
+
         ...ldoSet,
         setLedMode,
         ...shipModeSet,
@@ -901,7 +862,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         },
 
         // Default settings
-        buckDefaults: () => buckDefaults(devices.noOfBucks),
         ldoDefaults: () => ldoDefaults(devices.noOfLdos),
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
 

@@ -48,21 +48,22 @@ export default ({
     const card = `buck${index + 1}`;
     const [summary, setSummary] = useState(defaultSummary);
 
-    const onVOutChange = (value: number) =>
-        npmDevice.setBuckVOutNormal(index, value);
+    const buckModule = npmDevice.buckModule[index];
+    if (!buckModule) return null;
+
+    const onVOutChange = (value: number) => buckModule.set.vOutNormal(value);
 
     const onRetVOutChange = (value: number) => {
-        npmDevice.setBuckVOutRetention(index, value);
+        buckModule.set.vOutRetention(value);
     };
 
-    const onModeToggle = (mode: BuckMode) => npmDevice.setBuckMode(index, mode);
+    const onModeToggle = (mode: BuckMode) => buckModule.set.mode(mode);
 
-    const onBuckToggle = (value: boolean) =>
-        npmDevice.setBuckEnabled(index, value);
+    const onBuckToggle = (value: boolean) => buckModule.set.enabled(value);
 
-    const voltageRange = npmDevice.getBuckVoltageRange(index);
-    const retVOutRange = npmDevice.getBuckRetVOutRange(index);
     const numberOfGPIOs = npmDevice.gpioModule.length;
+    const voltageRange = buckModule.ranges.voltage;
+    const retVOutRange = buckModule.ranges.retVOut;
 
     const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
 
@@ -213,7 +214,7 @@ export default ({
                         }
                         isToggled={buck.activeDischarge}
                         onToggle={value =>
-                            npmDevice.setBuckActiveDischarge(index, value)
+                            buckModule.set.activeDischarge(value)
                         }
                         disabled={disabled}
                     />
@@ -228,8 +229,7 @@ export default ({
                         }
                         items={modeControlItems}
                         onSelect={item =>
-                            npmDevice.setBuckModeControl(
-                                index,
+                            buckModule.set.modeControl(
                                 item.value as BuckModeControl
                             )
                         }
@@ -256,8 +256,7 @@ export default ({
                         }
                         items={buckOnOffControlItems}
                         onSelect={item => {
-                            npmDevice.setBuckOnOffControl(
-                                index,
+                            buckModule.set.onOffControl(
                                 item.value as BuckOnOffControl
                             );
                         }}
@@ -284,8 +283,7 @@ export default ({
                         }
                         items={buckRetentionControlItems}
                         onSelect={item =>
-                            npmDevice.setBuckRetentionControl(
-                                index,
+                            buckModule.set.retentionControl(
                                 item.value as BuckRetentionControl
                             )
                         }

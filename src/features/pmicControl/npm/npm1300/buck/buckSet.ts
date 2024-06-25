@@ -7,6 +7,7 @@
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Buck,
+    BuckExport,
     BuckMode,
     BuckModeControl,
     BuckOnOffControl,
@@ -15,95 +16,86 @@ import {
     GPIOValues,
     PmicDialog,
 } from '../../types';
+import { BuckGet } from './buckGet';
 
-export const buckGet = (
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void
-) => ({
-    buckVOutNormal: (index: number) =>
-        sendCommand(`npmx buck voltage normal get ${index}`),
-    buckVOutRetention: (index: number) =>
-        sendCommand(`npmx buck voltage retention get ${index}`),
-    buckMode: (index: number) =>
-        sendCommand(`npmx buck vout_select get ${index}`),
-    buckModeControl: (index: number) =>
-        sendCommand(`powerup_buck mode get ${index}`),
-    buckOnOffControl: (index: number) =>
-        sendCommand(`npmx buck gpio on_off index get ${index}`),
-    buckRetentionControl: (index: number) =>
-        sendCommand(`npmx buck gpio retention index get ${index}`),
-    buckEnabled: (index: number) =>
-        sendCommand(`npmx buck status get ${index}`),
-    buckActiveDischarge: (index: number) =>
-        sendCommand(`npmx buck active_discharge get ${index}`),
-});
+export class BuckSet {
+    private get: BuckGet;
 
-export const buckSet = (
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean
-) => {
-    const {
-        buckVOutNormal,
-        buckVOutRetention,
-        buckMode,
-        buckModeControl,
-        buckOnOffControl,
-        buckRetentionControl,
-        buckEnabled,
-        buckActiveDischarge,
-    } = buckGet(sendCommand);
+    constructor(
+        private eventEmitter: NpmEventEmitter,
+        private sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        private dialogHandler: ((dialog: PmicDialog) => void) | null,
+        private offlineMode: boolean,
+        private index: number
+    ) {
+        this.get = new BuckGet(sendCommand, index);
+    }
 
-    const setBuckVOutNormal = (index: number, value: number) => {
+    async all(config: BuckExport) {
+        await this.vOutNormal(config.vOutNormal);
+        await this.enabled(config.enabled);
+        await this.modeControl(config.modeControl);
+        await this.vOutRetention(config.vOutRetention);
+        await this.retentionControl(config.retentionControl);
+        await this.onOffControl(config.onOffControl);
+        await this.activeDischarge(config.activeDischarge);
+        await this.mode(config.mode);
+    }
+
+    vOutNormal(value: number) {
         const action = () =>
             new Promise<void>((resolve, reject) => {
-                if (offlineMode) {
-                    eventEmitter.emitPartialEvent<Buck>(
+                if (this.offlineMode) {
+                    this.eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
                             vOutNormal: value,
                         },
-                        index
+                        this.index
                     );
 
-                    eventEmitter.emitPartialEvent<Buck>(
+                    this.eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
                             mode: 'software',
                         },
-                        index
+                        this.index
                     );
 
                     resolve();
                 } else {
-                    sendCommand(
-                        `npmx buck voltage normal set ${index} ${value * 1000}`,
+                    this.sendCommand(
+                        `npmx buck voltage normal set ${this.index} ${
+                            value * 1000
+                        }`,
                         () =>
-                            sendCommand(
-                                `npmx buck vout_select set ${index} 1`,
+                            this.sendCommand(
+                                `npmx buck vout_select set ${this.index} 1`,
                                 () => resolve(),
                                 () => {
-                                    buckMode(index);
+                                    this.get.mode();
                                     reject();
                                 }
                             ),
                         () => {
-                            buckVOutNormal(index);
+                            this.get.vOutNormal();
                             reject();
                         }
                     );
                 }
             });
 
-        if (dialogHandler && !offlineMode && index === 1 && value <= 1.6) {
+        const dialogHandler = this.dialogHandler;
+        if (
+            dialogHandler &&
+            !this.offlineMode &&
+            this.index === 1 &&
+            value <= 1.6
+        ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
@@ -116,7 +108,7 @@ export const buckSet = (
                     title: 'Warning',
                     onConfirm: () => action().then(resolve).catch(reject),
                     onCancel: () => {
-                        buckVOutNormal(index);
+                        this.get.vOutNormal();
                         reject();
                     },
                     onOptional: () => action().then(resolve).catch(reject),
@@ -127,55 +119,58 @@ export const buckSet = (
         }
 
         return action();
-    };
+    }
 
-    const setBuckVOutRetention = (index: number, value: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Buck>(
+    vOutRetention(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         vOutRetention: value,
                     },
-                    index
+                    this.index
                 );
 
                 resolve();
             } else {
-                sendCommand(
-                    `npmx buck voltage retention set ${index} ${value * 1000}`,
+                this.sendCommand(
+                    `npmx buck voltage retention set ${this.index} ${
+                        value * 1000
+                    }`,
                     () => resolve(),
                     () => {
-                        buckVOutRetention(index);
+                        this.get.vOutRetention();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setBuckMode = (index: number, mode: BuckMode) => {
+    mode(mode: BuckMode) {
         const action = () =>
             new Promise<void>((resolve, reject) => {
-                if (offlineMode) {
-                    eventEmitter.emitPartialEvent<Buck>(
+                if (this.offlineMode) {
+                    this.eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
                             mode,
                         },
-                        index
+                        this.index
                     );
                     resolve();
                 } else {
-                    sendCommand(
-                        `npmx buck vout_select set ${index} ${
+                    this.sendCommand(
+                        `npmx buck vout_select set ${this.index} ${
                             mode === 'software' ? 1 : 0
                         }`,
                         () => {
-                            buckVOutNormal(index);
+                            this.get.vOutNormal();
                             resolve();
                         },
                         () => {
-                            buckMode(index);
+                            this.get.mode();
                             reject();
                         }
                     );
@@ -183,10 +178,11 @@ export const buckSet = (
             });
 
         // TODO Check software voltage as well
+        const dialogHandler = this.dialogHandler;
         if (
             dialogHandler &&
-            !offlineMode &&
-            index === 1 &&
+            !this.offlineMode &&
+            this.index === 1 &&
             mode === 'software'
         ) {
             return new Promise<void>((resolve, reject) => {
@@ -208,117 +204,122 @@ export const buckSet = (
         }
 
         return action();
-    };
+    }
 
-    const setBuckModeControl = (index: number, modeControl: BuckModeControl) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Buck>(
+    modeControl(modeControl: BuckModeControl) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         modeControl,
                     },
-                    index
+                    this.index
                 );
 
                 resolve();
             } else {
-                sendCommand(
-                    `powerup_buck mode set ${index} ${modeControl}`,
+                this.sendCommand(
+                    `powerup_buck mode set ${this.index} ${modeControl}`,
                     () => resolve(),
                     () => {
-                        buckModeControl(index);
+                        this.get.modeControl();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setBuckOnOffControl = (
-        index: number,
-        onOffControl: BuckOnOffControl
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Buck>(
+    onOffControl(onOffControl: BuckOnOffControl) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         onOffControl,
                         onOffSoftwareControlEnabled:
                             onOffControl === BuckOnOffControlValues[0],
                     },
-                    index
+                    this.index
                 );
 
                 resolve();
             } else {
-                sendCommand(
-                    `npmx buck gpio on_off index set ${index} ${GPIOValues.findIndex(
-                        v => v === onOffControl
-                    )}`,
+                this.sendCommand(
+                    `npmx buck gpio on_off index set ${
+                        this.index
+                    } ${GPIOValues.findIndex(v => v === onOffControl)}`,
                     () => resolve(),
                     () => {
-                        buckOnOffControl(index);
+                        this.get.onOffControl();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setBuckRetentionControl = (
-        index: number,
-        retentionControl: BuckRetentionControl
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Buck>(
+    retentionControl(retentionControl: BuckRetentionControl) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         retentionControl,
                     },
-                    index
+                    this.index
                 );
 
                 resolve();
             } else {
-                sendCommand(
-                    `npmx buck gpio retention index set ${index} ${GPIOValues.findIndex(
-                        v => v === retentionControl
-                    )}`,
+                this.sendCommand(
+                    `npmx buck gpio retention index set ${
+                        this.index
+                    } ${GPIOValues.findIndex(v => v === retentionControl)}`,
                     () => resolve(),
                     () => {
-                        buckRetentionControl(index);
+                        this.get.retentionControl();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setBuckEnabled = (index: number, enabled: boolean) => {
+    enabled(enabled: boolean) {
         const action = () =>
             new Promise<void>((resolve, reject) => {
-                if (offlineMode) {
-                    eventEmitter.emitPartialEvent<Buck>(
+                if (this.offlineMode) {
+                    this.eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
                             enabled,
                         },
-                        index
+                        this.index
                     );
                     resolve();
                 } else {
-                    sendCommand(
-                        `npmx buck status set ${index} ${enabled ? '1' : '0'}`,
+                    this.sendCommand(
+                        `npmx buck status set ${this.index} ${
+                            enabled ? '1' : '0'
+                        }`,
                         () => resolve(),
                         () => {
-                            buckEnabled(index);
+                            this.get.enabled();
                             reject();
                         }
                     );
                 }
             });
 
-        if (dialogHandler && !offlineMode && index === 1 && !enabled) {
+        const dialogHandler = this.dialogHandler;
+        if (
+            dialogHandler &&
+            !this.offlineMode &&
+            this.index === 1 &&
+            !enabled
+        ) {
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
@@ -339,45 +340,32 @@ export const buckSet = (
         }
 
         return action();
-    };
+    }
 
-    const setBuckActiveDischarge = (
-        index: number,
-        activeDischargeEnabled: boolean
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Buck>(
+    activeDischarge(activeDischargeEnabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         activeDischarge: activeDischargeEnabled,
                     },
-                    index
+                    this.index
                 );
 
                 resolve();
             } else {
-                sendCommand(
-                    `npmx buck active_discharge set ${index} ${
+                this.sendCommand(
+                    `npmx buck active_discharge set ${this.index} ${
                         activeDischargeEnabled ? '1' : '0'
                     }`,
                     () => resolve(),
                     () => {
-                        buckActiveDischarge(index);
+                        this.get.activeDischarge();
                         reject();
                     }
                 );
             }
         });
-
-    return {
-        setBuckVOutNormal,
-        setBuckVOutRetention,
-        setBuckMode,
-        setBuckModeControl,
-        setBuckOnOffControl,
-        setBuckRetentionControl,
-        setBuckEnabled,
-        setBuckActiveDischarge,
-    };
-};
+    }
+}

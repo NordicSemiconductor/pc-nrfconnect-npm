@@ -15,8 +15,6 @@ describe('PMIC 2100 - Static getters', () => {
 
     test('Has of Charger', () => expect(pmic.chargerModule).toBeUndefined());
 
-    test('Number of Bucks', () => expect(pmic.getNumberOfBucks()).toBe(0));
-
     test('Number of LDOs', () => expect(pmic.getNumberOfLdos()).toBe(1));
 
     test('Number of GPIOs', () => expect(pmic.gpioModule.length).toBe(2));

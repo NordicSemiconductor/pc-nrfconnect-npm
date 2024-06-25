@@ -484,7 +484,7 @@ export default () => {
             dispatch(
                 setBoosts(npmDevice.boostModule.map(boost => boost.defaults))
             );
-            dispatch(setBucks(npmDevice.buckDefaults()));
+            dispatch(setBucks(npmDevice.buckModule.map(buck => buck.defaults)));
             dispatch(setLdos(npmDevice.ldoDefaults()));
             dispatch(
                 setGPIOs(npmDevice.gpioModule.map(module => module.defaults))
@@ -618,9 +618,9 @@ export default () => {
     useEffect(() => {
         if (npmDevice) {
             const t = setInterval(() => {
-                for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
+                for (let i = 0; i < npmDevice.buckModule.length; i += 1) {
                     if (bucks[i].onOffControl !== 'Off') {
-                        npmDevice.requestUpdate.buckEnabled(i);
+                        npmDevice.buckModule[i].get.enabled();
                     }
                 }
             }, 1000);
