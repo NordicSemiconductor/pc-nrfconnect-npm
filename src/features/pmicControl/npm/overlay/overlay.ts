@@ -74,10 +74,10 @@ const generateBuck = (
 ) => `
 npm1300_ek_buck${index + 1}: BUCK${index + 1} {
     regulator-min-microvolt = <${toMicro(
-        npmDevice.getBuckVoltageRange(index).min
+        npmDevice.buckModule[index].ranges.voltage.min
     )}>;
     regulator-max-microvolt = <${toMicro(
-        npmDevice.getBuckVoltageRange(index).max
+        npmDevice.buckModule[index].ranges.voltage.max
     )}>;
     ${
         buck.mode !== 'vSet'

@@ -5,7 +5,6 @@
  */
 
 import {
-    Buck,
     Charger,
     GPIO,
     GPIOExport,
@@ -19,7 +18,6 @@ import {
     TimerConfig,
     USBPower,
 } from '../../types';
-import { toBuckExport } from '../buck';
 import { GPIOMode2100, GPIOPull2100 } from '../gpio/types';
 import { toLdoExport } from '../ldo';
 import { npm2100FWVersion } from '../pmic2100Device';
@@ -59,18 +57,6 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         tCool: 12,
         tWarm: 47,
         tHot: 69,
-    };
-
-    const initBuck: Buck = {
-        vOutNormal: -1,
-        vOutRetention: -1,
-        mode: 'software',
-        enabled: false,
-        modeControl: 'GPIO0',
-        onOffControl: 'GPIO0',
-        onOffSoftwareControlEnabled: false,
-        retentionControl: 'GPIO0',
-        activeDischarge: false,
     };
 
     const initLdo: Ldo = {
@@ -123,28 +109,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             },
         ],
         charger: undefined,
-        bucks: [
-            {
-                vOutNormal: 1,
-                vOutRetention: 1,
-                mode: 'vSet',
-                enabled: true,
-                modeControl: 'GPIO0',
-                onOffControl: 'GPIO1',
-                retentionControl: 'GPIO2',
-                activeDischarge: true,
-            },
-            {
-                vOutNormal: 2,
-                vOutRetention: 2,
-                mode: 'vSet',
-                enabled: true,
-                modeControl: 'GPIO1',
-                onOffControl: 'GPIO2',
-                retentionControl: 'GPIO3',
-                activeDischarge: true,
-            },
-        ],
+        bucks: [],
         ldos: [
             {
                 voltage: 1,
@@ -225,7 +190,6 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     };
 
     let charger: Charger | undefined;
-    let bucks: Buck[] = [];
     let ldos: Ldo[] = [];
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
@@ -238,7 +202,6 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         jest.clearAllMocks();
 
         charger = undefined;
-        bucks = [];
         ldos = [];
         gpios = [];
         leds = [];
@@ -251,15 +214,6 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 charger = {
                     ...(charger ?? initCharger),
                     ...partialUpdate,
-                };
-            }
-        );
-
-        mockOnBuckUpdate.mockImplementation(
-            (partialUpdate: PartialUpdate<Buck>) => {
-                bucks[partialUpdate.index] = {
-                    ...(bucks[partialUpdate.index] ?? initBuck),
-                    ...partialUpdate.data,
                 };
             }
         );
@@ -333,8 +287,6 @@ test.skip('PMIC 2100 - Apply Config ', () => {
 
     const verifyApplyConfig = () => {
         expect(charger).toStrictEqual(sampleConfig.charger);
-
-        expect(bucks.map(toBuckExport)).toStrictEqual(sampleConfig.bucks);
 
         expect(ldos.map(toLdoExport)).toStrictEqual(sampleConfig.ldos);
 

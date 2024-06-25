@@ -239,7 +239,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test.each(PMIC_1300_BUCKS)('Request update buckVOut index: %p', index => {
-        pmic.requestUpdate.buckVOutNormal(index);
+        pmic.buckModule[index].get.vOutNormal();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -253,7 +253,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_BUCKS)(
         'Request update buckVOutRetention index: %p',
         index => {
-            pmic.requestUpdate.buckVOutRetention(index);
+            pmic.buckModule[index].get.vOutRetention();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -266,7 +266,7 @@ describe('PMIC 1300 - Request update commands', () => {
     );
 
     test.each(PMIC_1300_BUCKS)('Request update buckMode index: %p', index => {
-        pmic.requestUpdate.buckMode(index);
+        pmic.buckModule[index].get.mode();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -280,7 +280,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_BUCKS)(
         'Request update buckModeControl index: %p',
         index => {
-            pmic.requestUpdate.buckModeControl(index);
+            pmic.buckModule[index].get.modeControl();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -295,7 +295,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_BUCKS)(
         'Request update buckOnOffControl index: %p',
         index => {
-            pmic.requestUpdate.buckOnOffControl(index);
+            pmic.buckModule[index].get.onOffControl();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -310,7 +310,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_BUCKS)(
         'Request update buckRetentionControl index: %p',
         index => {
-            pmic.requestUpdate.buckRetentionControl(index);
+            pmic.buckModule[index].get.retentionControl();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -325,7 +325,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_BUCKS)(
         'Request update buckActiveDischargeEnabled index: %p',
         index => {
-            pmic.requestUpdate.buckActiveDischarge(index);
+            pmic.buckModule[index].get.activeDischarge();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -340,7 +340,7 @@ describe('PMIC 1300 - Request update commands', () => {
     test.each(PMIC_1300_BUCKS)(
         'Request update buckEnabled index: %p',
         index => {
-            pmic.requestUpdate.buckEnabled(index);
+            pmic.buckModule[index].get.enabled();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
