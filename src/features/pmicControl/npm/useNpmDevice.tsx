@@ -91,17 +91,15 @@ export default () => {
     useEffect(() => {
         getNpmDevice(shellParser, pmicDialog =>
             dispatch(dialogHandler(pmicDialog))
-        ).then(dev => dispatch(setNpmDevice(dev)));
-    }, [dispatch, shellParser]);
+        ).then(dev => {
+            dispatch(setNpmDevice(dev));
 
-    useEffect(() => {
-        if (npmDevice) {
-            npmDevice.isSupportedVersion().then(result => {
+            dev.isSupportedVersion().then(result => {
                 dispatch(setSupportedVersion(result.supported));
             });
-            npmDevice.isPMICPowered().then(setPMICPowered);
-        }
-    }, [dispatch, npmDevice]);
+            dev.isPMICPowered().then(setPMICPowered);
+        });
+    }, [dispatch, shellParser]);
 
     useEffect(() => {
         if (
