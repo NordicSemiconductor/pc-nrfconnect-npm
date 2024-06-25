@@ -20,7 +20,7 @@ describe('PMIC 1300 - Static getters', () => {
 
     test('Number of LDOs', () => expect(pmic.getNumberOfLdos()).toBe(2));
 
-    test('Number of GPIOs', () => expect(pmic.getNumberOfGPIOs()).toBe(5));
+    test('Number of GPIOs', () => expect(pmic.gpioModule.length).toBe(5));
 
     test('Number of LEDs', () => expect(pmic.getNumberOfLEDs()).toBe(3));
 

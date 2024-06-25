@@ -39,7 +39,7 @@ import {
 import setupBucks, { buckDefaults } from './buck';
 import { ChargerModule } from './charger';
 import setupFuelGauge from './fuelGauge';
-import setupGpio, { gpioDefaults } from './gpio';
+import setupGpio from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
@@ -53,7 +53,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
     const devices = {
         noOfBucks: 2,
         noOfLdos: 2,
-        noOfGPIOs: 5,
         noOfLEDs: 3,
         noOfBatterySlots: 3,
     };
@@ -367,12 +366,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         devices.noOfLdos
     );
 
-    const { gpioGet, gpioSet, gpioCallbacks } = setupGpio(
+    const gpioModule = setupGpio(
         shellParser,
         eventEmitter,
         sendCommand,
-        offlineMode,
-        devices.noOfGPIOs
+        offlineMode
     );
 
     const pofModule = setupPof(
@@ -502,7 +500,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(...buckCallbacks);
         releaseAll.push(...ldoCallbacks);
-        releaseAll.push(...gpioCallbacks);
+        releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
 
         for (let i = 0; i < devices.noOfLEDs; i += 1) {
             releaseAll.push(
@@ -625,13 +623,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 requestUpdate.ldoOnOffControl(i);
             }
 
-            for (let i = 0; i < devices.noOfGPIOs; i += 1) {
-                requestUpdate.gpioMode(i);
-                requestUpdate.gpioPull(i);
-                requestUpdate.gpioDrive(i);
-                requestUpdate.gpioOpenDrain(i);
-                requestUpdate.gpioDebounce(i);
-            }
+            gpioModule.forEach(module => module.get.all());
 
             for (let i = 0; i < devices.noOfLEDs; i += 1) {
                 requestUpdate.ledMode(i);
@@ -655,7 +647,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
 
         ...ldoGet,
-        ...gpioGet,
         ...shipModeGet,
         ...fuelGaugeGet,
 
@@ -757,20 +748,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         await Promise.all(
                             config.gpios.map((gpio, index) =>
                                 (async () => {
-                                    await gpioSet.setGpioMode(index, gpio.mode);
-                                    await gpioSet.setGpioPull(index, gpio.pull);
-                                    await gpioSet.setGpioDrive(
-                                        index,
-                                        gpio.drive
-                                    );
-                                    await gpioSet.setGpioOpenDrain(
-                                        index,
-                                        gpio.openDrain
-                                    );
-                                    await gpioSet.setGpioDebounce(
-                                        index,
-                                        gpio.debounce
-                                    );
+                                    await gpioModule[index].set.all(gpio);
                                 })()
                             )
                         );
@@ -870,7 +848,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         ...buckSet,
         ...ldoSet,
-        ...gpioSet,
         setLedMode,
         ...shipModeSet,
         ...fuelGaugeSet,
@@ -926,7 +903,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         // Default settings
         buckDefaults: () => buckDefaults(devices.noOfBucks),
         ldoDefaults: () => ldoDefaults(devices.noOfLdos),
-        gpioDefaults: () => gpioDefaults(devices.noOfGPIOs),
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
 
         getBatteryConnectedVoltageThreshold: () => 1, // 1V
@@ -934,5 +910,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerModule,
         pofModule,
         timerConfigModule,
+        gpioModule,
     };
 };

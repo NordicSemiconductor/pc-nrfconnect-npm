@@ -18,14 +18,13 @@ import {
     GPIODriveValues,
     GPIOMode,
     GPIOModeValues,
+    GpioModule,
     GPIOPullMode,
     GPIOPullValues,
-    NpmDevice,
 } from '../../features/pmicControl/npm/types';
 
 interface GPIOProperties {
-    npmDevice: NpmDevice;
-    index: number;
+    gpioModule: GpioModule;
     gpio: GPIO;
     cardLabel?: string;
     disabled: boolean;
@@ -49,10 +48,9 @@ const gpioPullValues = [...GPIOPullValues].map(item => ({
 const card = 'gpio';
 
 export default ({
-    npmDevice,
-    index,
+    gpioModule,
     gpio,
-    cardLabel = `GPIO${index}`,
+    cardLabel = `GPIO${gpioModule.index}`,
     disabled,
 }: GPIOProperties) => (
     <Card
@@ -68,14 +66,15 @@ export default ({
     >
         <Dropdown
             label={
-                <DocumentationTooltip card={`${card}${index}`} item="Mode">
+                <DocumentationTooltip
+                    card={`${card}${gpioModule.index}`}
+                    item="Mode"
+                >
                     <span>Mode</span>
                 </DocumentationTooltip>
             }
             items={gpioModeValuesItems}
-            onSelect={item =>
-                npmDevice.setGpioMode(index, item.value as GPIOMode)
-            }
+            onSelect={item => gpioModule.set.mode(item.value as GPIOMode)}
             selectedItem={
                 gpioModeValuesItems[
                     Math.max(
@@ -90,14 +89,15 @@ export default ({
         />
         <Dropdown
             label={
-                <DocumentationTooltip card={`${card}${index}`} item="Pull">
+                <DocumentationTooltip
+                    card={`${card}${gpioModule.index}`}
+                    item="Pull"
+                >
                     <span>Pull</span>
                 </DocumentationTooltip>
             }
             items={gpioPullValues}
-            onSelect={item =>
-                npmDevice.setGpioPull(index, item.value as GPIOPullMode)
-            }
+            onSelect={item => gpioModule.set.pull(item.value as GPIOPullMode)}
             selectedItem={
                 gpioPullValues[
                     Math.max(
@@ -112,14 +112,16 @@ export default ({
         />
         <Dropdown
             label={
-                <DocumentationTooltip card={`${card}${index}`} item="Drive">
+                <DocumentationTooltip
+                    card={`${card}${gpioModule.index}`}
+                    item="Drive"
+                >
                     <span>Drive</span>
                 </DocumentationTooltip>
             }
             items={gpioDriveValuesItems}
             onSelect={item =>
-                npmDevice.setGpioDrive(
-                    index,
+                gpioModule.set.drive(
                     Number.parseInt(item.value, 10) as GPIODrive
                 )
             }
@@ -138,22 +140,28 @@ export default ({
         />
         <Toggle
             label={
-                <DocumentationTooltip card={`${card}${index}`} item="OpenDrain">
+                <DocumentationTooltip
+                    card={`${card}${gpioModule.index}`}
+                    item="OpenDrain"
+                >
                     <span>Open Drain</span>
                 </DocumentationTooltip>
             }
             isToggled={gpio.openDrain}
-            onToggle={value => npmDevice.setGpioOpenDrain(index, value)}
+            onToggle={value => gpioModule.set.openDrain(value)}
             disabled={disabled}
         />
         <Toggle
             label={
-                <DocumentationTooltip card={`${card}${index}`} item="Debounce">
+                <DocumentationTooltip
+                    card={`${card}${gpioModule.index}`}
+                    item="Debounce"
+                >
                     <span>Debounce</span>
                 </DocumentationTooltip>
             }
             isToggled={gpio.debounce}
-            onToggle={value => npmDevice.setGpioDebounce(index, value)}
+            onToggle={value => gpioModule.set.debounce(value)}
             disabled={disabled || gpio.mode.startsWith('Output')}
         />
     </Card>

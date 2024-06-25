@@ -41,7 +41,6 @@ export const baseNpmDevice: IBaseNpmDevice = (
         noOfBoosts?: number;
         noOfBucks?: number;
         noOfLdos?: number;
-        noOfGPIOs?: number;
         noOfLEDs?: number;
         noOfBatterySlots?: number;
     },
@@ -230,7 +229,6 @@ export const baseNpmDevice: IBaseNpmDevice = (
         getNumberOfBoosts: () => devices.noOfBoosts ?? 0,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,
-        getNumberOfGPIOs: () => devices.noOfGPIOs ?? 0,
         getNumberOfLEDs: () => devices.noOfLEDs ?? 0,
         getNumberOfBatteryModelSlots: () => devices.noOfBatterySlots ?? 0,
 
@@ -306,5 +304,6 @@ export const baseNpmDevice: IBaseNpmDevice = (
         },
 
         boostModule: [],
+        gpioModule: [],
     };
 };
