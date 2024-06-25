@@ -372,7 +372,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         devices.noOfGPIOs
     );
 
-    const { pofGet, pofSet, pofCallbacks, pofRanges } = setupPof(
+    const pofModule = setupPof(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -522,7 +522,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             );
         }
 
-        releaseAll.push(...pofCallbacks);
+        releaseAll.push(...pofModule.callbacks);
         releaseAll.push(...timerCallbacks);
         releaseAll.push(...shipModeCallbacks);
 
@@ -652,9 +652,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             for (let i = 0; i < devices.noOfLEDs; i += 1) {
                 requestUpdate.ledMode(i);
             }
-            requestUpdate.pofEnable();
-            requestUpdate.pofPolarity();
-            requestUpdate.pofThreshold();
+
+            pofModule.get.all();
 
             requestUpdate.timerConfigMode();
             requestUpdate.timerConfigCompare();
@@ -677,7 +676,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         ...ldoGet,
         ...gpioGet,
-        ...pofGet,
         ...timerGet,
         ...shipModeGet,
         ...fuelGaugeGet,
@@ -831,9 +829,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             )
                         );
 
-                        await pofSet.setPOFEnabled(config.pof.enable);
-                        await pofSet.setPOFPolarity(config.pof.polarity);
-                        await pofSet.setPOFThreshold(config.pof.threshold);
+                        if (config.pof) {
+                            await pofModule.set.enabled(config.pof.enable);
+                            await pofModule.set.polarity(config.pof.polarity);
+                            await pofModule.set.threshold(config.pof.threshold);
+                        }
 
                         await timerSet.setTimerConfigMode(
                             config.timerConfig.mode
@@ -911,7 +911,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...chargerRanges,
         ...buckRanges,
         ...ldoRanges,
-        ...pofRanges,
 
         getUSBCurrentLimiterRange: () => [
             0.1,
@@ -931,7 +930,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoSet,
         ...gpioSet,
         setLedMode,
-        ...pofSet,
         ...timerSet,
         ...shipModeSet,
         ...fuelGaugeSet,
@@ -992,5 +990,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         chargerDefault: () => chargerDefault(),
 
         getBatteryConnectedVoltageThreshold: () => 1, // 1V
+        pof: pofModule,
     };
 };

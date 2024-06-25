@@ -14,14 +14,14 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    NpmDevice,
     POF,
+    PofModule,
     POFPolarity,
     POFPolarityValues,
 } from '../../features/pmicControl/npm/types';
 
 interface GPIOProperties {
-    npmDevice: NpmDevice;
+    pofModule: PofModule;
     pof: POF;
     disabled: boolean;
 }
@@ -31,7 +31,7 @@ const pofPolarityValuesItems = POFPolarityValues.map(item => ({
     value: `${item}`,
 }));
 
-export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
+export default ({ pofModule, pof, disabled }: GPIOProperties) => {
     const [internalPOFThreshold, setInternalPOFThreshold] = useState(
         pof.threshold
     );
@@ -54,7 +54,7 @@ export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
                     <div className="d-flex">
                         <Toggle
                             label="POF Enabled"
-                            onToggle={npmDevice.setPOFEnabled}
+                            onToggle={pofModule.set.enabled}
                             disabled={disabled}
                             isToggled={pof.enable}
                         />
@@ -74,10 +74,10 @@ export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
                 }
                 unit="V"
                 disabled={disabled}
-                range={npmDevice.getPOFThresholdRange()}
+                range={pofModule.ranges.thresholdRange()}
                 value={internalPOFThreshold}
                 onChange={setInternalPOFThreshold}
-                onChangeComplete={npmDevice.setPOFThreshold}
+                onChangeComplete={pofModule.set.threshold}
             />
             <Dropdown
                 label={
@@ -87,7 +87,7 @@ export default ({ npmDevice, pof, disabled }: GPIOProperties) => {
                 }
                 items={pofPolarityValuesItems}
                 onSelect={item =>
-                    npmDevice.setPOFPolarity(item.value as POFPolarity)
+                    pofModule.set.polarity(item.value as POFPolarity)
                 }
                 selectedItem={
                     pofPolarityValuesItems[
