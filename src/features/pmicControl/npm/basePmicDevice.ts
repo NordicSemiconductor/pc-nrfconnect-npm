@@ -37,6 +37,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
     eventEmitter: EventEmitter,
     devices: {
         charger?: boolean;
+        maxEnergyExtraction?: boolean;
         noOfBoosts?: number;
         noOfBucks?: number;
         noOfLdos?: number;
@@ -224,7 +225,8 @@ export const baseNpmDevice: IBaseNpmDevice = (
                 });
         },
 
-        hasCharger: () => devices.charger ?? false,
+        hasCharger: () => !!devices.charger,
+        hasMaxEnergyExtraction: () => !!devices.maxEnergyExtraction,
         getNumberOfBoosts: () => devices.noOfBoosts ?? 0,
         getNumberOfBucks: () => devices.noOfBucks ?? 0,
         getNumberOfLdos: () => devices.noOfLdos ?? 0,

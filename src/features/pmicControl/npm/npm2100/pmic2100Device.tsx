@@ -55,6 +55,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         noOfBoosts: 1,
         noOfBucks: 0,
         charger: false,
+        maxEnergyExtraction: true,
         noOfLdos: 1,
         noOfGPIOs: 2,
         noOfLEDs: 0,

@@ -18,6 +18,7 @@ import DeviceSelector from './components/DeviceSelector';
 import SlotSelectionDownloadDialog from './components/FuelGauge/SlotSelectionDownloadDialog';
 import GPIOs from './components/GPIOs/GPIOs';
 import Graph from './components/Graph/Graph';
+import MaximumEnergyExtractionControls from './components/MEE/MaximumEnergyExtractionControls';
 import ProfilingWizard from './components/Profiling/Dialog/ProfilingWizard';
 import Profiles from './components/Profiling/ProfilingProjects/Profiles';
 import Regulators from './components/Regulators/Regulators';
@@ -62,6 +63,10 @@ render(
             {
                 name: 'System Features',
                 Main: SystemFeatures,
+            },
+            {
+                name: 'MEE',
+                Main: MaximumEnergyExtractionControls,
             },
             {
                 name: 'Profiles',
