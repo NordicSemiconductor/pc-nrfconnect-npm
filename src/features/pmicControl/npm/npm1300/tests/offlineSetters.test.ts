@@ -390,21 +390,21 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set timer config mode ', async () => {
-        await pmic.setTimerConfigMode('Wakeup');
+        await pmic.timerConfigModule?.set.mode('Wakeup');
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ mode: 'Wakeup' });
     });
 
     test('Set set timer config prescaler ', async () => {
-        await pmic.setTimerConfigPrescaler('Fast');
+        await pmic.timerConfigModule?.set.prescaler('Fast');
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ prescaler: 'Fast' });
     });
 
     test('Set set ship config compare ', async () => {
-        await pmic.setTimerConfigCompare(1000);
+        await pmic.timerConfigModule?.set.period(1000);
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ period: 1000 });

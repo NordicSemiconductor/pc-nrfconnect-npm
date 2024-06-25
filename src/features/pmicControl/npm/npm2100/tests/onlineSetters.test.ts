@@ -11,8 +11,6 @@ import {
     LEDModeValues,
     NTCThermistor,
     PmicDialog,
-    TimerModeValues,
-    TimerPrescalerValues,
 } from '../../types';
 import {
     helpers,
@@ -31,7 +29,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
         mockOnFuelGaugeUpdate,
         mockOnGpioUpdate,
         mockOnLEDUpdate,
-        mockOnTimerConfigUpdate,
         mockOnShipUpdate,
         mockEnqueueRequest,
         mockOnUsbPower,
@@ -905,59 +902,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
             // Updates should only be emitted when we get response
             expect(mockOnLEDUpdate).toBeCalledTimes(0);
-        });
-
-        test.each(TimerModeValues.map((mode, index) => ({ mode, index })))(
-            'Set timer config mode %p',
-            async ({ mode, index }) => {
-                await pmic.setTimerConfigMode(mode);
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx timer config mode set ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(
-            TimerPrescalerValues.map((prescaler, index) => ({
-                prescaler,
-                index,
-            }))
-        )('Set timer config mode %p', async ({ prescaler, index }) => {
-            await pmic.setTimerConfigPrescaler(prescaler);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx timer config prescaler set ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-        });
-
-        test('Set timer config compare %p', async () => {
-            await pmic.setTimerConfigCompare(1000);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx timer config compare set 1000`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
         });
 
         test('Set ship config time %p', async () => {
@@ -2362,111 +2306,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 expect(mockOnLEDUpdate).toBeCalledTimes(0);
             }
         );
-
-        test.each(TimerModeValues.map((mode, index) => ({ mode, index })))(
-            'Set setTimerConfigMode - Fail immediately - index: %p',
-            async ({ mode, index }) => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
-
-                await expect(
-                    pmic.setTimerConfigMode(mode)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx timer config mode set ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx timer config mode get`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(
-            TimerPrescalerValues.map((prescaler, index) => ({
-                prescaler,
-                index,
-            }))
-        )(
-            'Set setTimerConfigMode - Fail immediately - index: %p',
-            async ({ prescaler, index }) => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
-
-                await expect(
-                    pmic.setTimerConfigPrescaler(prescaler)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx timer config prescaler set ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx timer config prescaler get`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test('Set setTimerConfigMode - Fail immediately - index: %p', async () => {
-            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onConfirm();
-            });
-
-            await expect(
-                pmic.setTimerConfigCompare(1000)
-            ).rejects.toBeUndefined();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx timer config compare set 1000`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npmx timer config compare get`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-        });
 
         test('Set setShipModeTimeToActive - Fail immediately - index: %p', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {

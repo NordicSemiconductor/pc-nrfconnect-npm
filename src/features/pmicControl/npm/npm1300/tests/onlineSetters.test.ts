@@ -1200,7 +1200,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(TimerModeValues.map((mode, index) => ({ mode, index })))(
             'Set timer config mode %p',
             async ({ mode, index }) => {
-                await pmic.setTimerConfigMode(mode);
+                await pmic.timerConfigModule?.set.mode(mode);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -1221,7 +1221,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 index,
             }))
         )('Set timer config mode %p', async ({ prescaler, index }) => {
-            await pmic.setTimerConfigPrescaler(prescaler);
+            await pmic.timerConfigModule?.set.prescaler(prescaler);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1236,7 +1236,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set timer config compare %p', async () => {
-            await pmic.setTimerConfigCompare(1000);
+            await pmic.timerConfigModule?.set.period(1000);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -3078,7 +3078,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setTimerConfigMode(mode)
+                    pmic.timerConfigModule?.set.mode(mode)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3118,7 +3118,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setTimerConfigPrescaler(prescaler)
+                    pmic.timerConfigModule?.set.prescaler(prescaler)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3149,7 +3149,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.setTimerConfigCompare(1000)
+                pmic.timerConfigModule?.set.period(1000)
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

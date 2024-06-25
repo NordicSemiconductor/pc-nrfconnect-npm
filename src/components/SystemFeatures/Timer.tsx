@@ -13,8 +13,8 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    NpmDevice,
     TimerConfig,
+    TimerConfigModule,
     TimerMode,
     TimerModeValues,
     TimerPrescaler,
@@ -22,8 +22,8 @@ import {
 } from '../../features/pmicControl/npm/types';
 import { splitMS } from '../Profiling/TimeComponent';
 
-interface GPIOProperties {
-    npmDevice: NpmDevice;
+interface TimerConfigProperties {
+    timerConfigModule: TimerConfigModule;
     timerConfig: TimerConfig;
     disabled: boolean;
 }
@@ -38,7 +38,11 @@ const timerPrescalerItems = TimerPrescalerValues.map(item => ({
     value: `${item}`,
 }));
 
-export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
+export default ({
+    timerConfigModule,
+    timerConfig,
+    disabled,
+}: TimerConfigProperties) => {
     const [internalTimerPeriod, setInternalTimerPeriod] = useState(
         timerConfig.period
     );
@@ -95,7 +99,7 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
                 }
                 items={timerModeValuesItems}
                 onSelect={item =>
-                    npmDevice.setTimerConfigMode(item.value as TimerMode)
+                    timerConfigModule.set.mode(item.value as TimerMode)
                 }
                 selectedItem={
                     timerModeValuesItems[
@@ -118,7 +122,7 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
                 }
                 items={timerPrescalerItems}
                 onSelect={item =>
-                    npmDevice.setTimerConfigPrescaler(
+                    timerConfigModule.set.prescaler(
                         item.value as TimerPrescaler
                     )
                 }
@@ -153,7 +157,7 @@ export default ({ npmDevice, timerConfig, disabled }: GPIOProperties) => {
                 value={internalTimerPeriod}
                 onChange={setInternalTimerPeriod}
                 onChangeComplete={v =>
-                    npmDevice.setTimerConfigCompare(v / prescalerMultiplier)
+                    timerConfigModule.set.period(v / prescalerMultiplier)
                 }
                 showSlider
             />

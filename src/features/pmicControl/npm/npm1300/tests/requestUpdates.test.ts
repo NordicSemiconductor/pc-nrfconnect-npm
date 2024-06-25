@@ -563,7 +563,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update timerConfigMode', () => {
-        pmic.requestUpdate.timerConfigMode();
+        pmic.timerConfigModule?.get.mode();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -575,7 +575,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update timerConfigPrescaler', () => {
-        pmic.requestUpdate.timerConfigPrescaler();
+        pmic.timerConfigModule?.get.prescaler();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -586,8 +586,8 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test('Request update timerConfigCompare', () => {
-        pmic.requestUpdate.timerConfigCompare();
+    test('Request update timerConfigPeriod', () => {
+        pmic.timerConfigModule?.get.period();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

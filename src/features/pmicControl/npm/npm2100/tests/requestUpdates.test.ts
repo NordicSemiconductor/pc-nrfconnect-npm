@@ -474,42 +474,6 @@ describe('PMIC 2100 - Request update commands', () => {
         );
     });
 
-    test('Request update timerConfigMode', () => {
-        pmic.requestUpdate.timerConfigMode();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx timer config mode get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request update timerConfigPrescaler', () => {
-        pmic.requestUpdate.timerConfigPrescaler();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx timer config prescaler get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request update timerConfigCompare', () => {
-        pmic.requestUpdate.timerConfigCompare();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx timer config compare get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
     test('Request update shipModeTimeToActive', () => {
         pmic.requestUpdate.shipModeTimeToActive();
 

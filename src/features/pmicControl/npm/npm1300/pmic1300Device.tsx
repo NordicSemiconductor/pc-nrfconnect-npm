@@ -43,7 +43,7 @@ import setupGpio, { gpioDefaults } from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
-import setupTimer from './timer';
+import setupTimer from './timerConfig';
 
 export const npm1300FWVersion = '1.2.3+0';
 
@@ -386,7 +386,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
-    const { timerGet, timerSet, timerCallbacks } = setupTimer(
+    const timerConfigModule = setupTimer(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -523,7 +523,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         }
 
         releaseAll.push(...pofModule.callbacks);
-        releaseAll.push(...timerCallbacks);
+        releaseAll.push(...timerConfigModule.callbacks);
         releaseAll.push(...shipModeCallbacks);
 
         releaseAll.push(
@@ -654,10 +654,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
 
             pofModule.get.all();
-
-            requestUpdate.timerConfigMode();
-            requestUpdate.timerConfigCompare();
-            requestUpdate.timerConfigPrescaler();
+            timerConfigModule.get.all();
 
             requestUpdate.shipModeTimeToActive();
             requestUpdate.shipLongPressReset();
@@ -676,7 +673,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         ...ldoGet,
         ...gpioGet,
-        ...timerGet,
         ...shipModeGet,
         ...fuelGaugeGet,
 
@@ -685,6 +681,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         vbusinCurrentLimiter: () =>
             sendCommand(`npmx vbusin current_limit get`),
     };
+
     return {
         ...baseDevice,
         release: () => {
@@ -833,15 +830,9 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             await pofModule.set.all(config.pof);
                         }
 
-                        await timerSet.setTimerConfigMode(
-                            config.timerConfig.mode
-                        );
-                        await timerSet.setTimerConfigPrescaler(
-                            config.timerConfig.prescaler
-                        );
-                        await timerSet.setTimerConfigCompare(
-                            config.timerConfig.period
-                        );
+                        if (config.timerConfig) {
+                            await timerConfigModule.set.all(config.timerConfig);
+                        }
 
                         await shipModeSet.setShipModeTimeToActive(
                             config.ship.timeToActive
@@ -928,7 +919,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoSet,
         ...gpioSet,
         setLedMode,
-        ...timerSet,
         ...shipModeSet,
         ...fuelGaugeSet,
 
@@ -989,5 +979,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         getBatteryConnectedVoltageThreshold: () => 1, // 1V
         pofModule,
+        timerConfigModule,
     };
 };
