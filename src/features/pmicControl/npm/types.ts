@@ -479,6 +479,7 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     hasCharger: () => boolean;
+    hasMaxEnergyExtraction: () => boolean;
     getNumberOfBoosts: () => number;
     getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
