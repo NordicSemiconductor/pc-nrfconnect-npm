@@ -7,9 +7,6 @@
 import {
     BatteryModel,
     BuckOnOffControlValues,
-    GPIODriveValues,
-    GPIOModeValues,
-    GPIOPullValues,
     GPIOValues,
     LEDModeValues,
     LongPressResetValues,
@@ -21,6 +18,7 @@ import {
     TimeToActiveValues,
     USBDetectStatusValues,
 } from '../../types';
+import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
 import {
     PMIC_2100_BUCKS,
     PMIC_2100_GPIOS,
@@ -815,7 +813,7 @@ Battery models stored in database:
                 },
                 {
                     index,
-                    append: `set ${index} ${modeIndex}`,
+                    append: `set ${index} ${mode}`,
                     mode,
                     modeIndex,
                 },
@@ -837,27 +835,25 @@ Battery models stored in database:
 
     test.each(
         PMIC_2100_GPIOS.map(index =>
-            GPIOPullValues.map((pull, pullIndex) => [
+            GPIOPullValues.map(pull => [
                 {
                     index,
                     append: `get ${index}`,
                     pull,
-                    pullIndex,
                 },
                 {
                     index,
-                    append: `set ${index} ${pullIndex}`,
+                    append: `set ${index} ${pull}`,
                     pull,
-                    pullIndex,
                 },
             ]).flat()
         ).flat()
-    )('npmx gpio config pull %p', ({ index, append, pull, pullIndex }) => {
+    )('npmx gpio config pull %p', ({ index, append, pull }) => {
         const command = `npmx gpio config pull ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${pullIndex}.`, command);
+        callback?.onSuccess(`Value: ${pull}.`, command);
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({

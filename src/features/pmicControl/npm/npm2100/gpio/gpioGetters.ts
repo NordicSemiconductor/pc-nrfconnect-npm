@@ -24,18 +24,18 @@ export class GpioGet {
     }
 
     mode() {
-        this.sendCommand(`npmx gpio config mode get ${this.index}`);
+        this.sendCommand(`npm2100 gpio mode get ${this.index}`);
     }
     pull() {
-        this.sendCommand(`npmx gpio config pull get ${this.index}`);
+        this.sendCommand(`npm2100 gpio pull get ${this.index}`);
     }
     drive() {
-        this.sendCommand(`npmx gpio config drive get ${this.index}`);
+        this.sendCommand(`npm2100 gpio drive get ${this.index}`);
     }
     openDrain() {
-        this.sendCommand(`npmx gpio config open_drain get ${this.index}`);
+        this.sendCommand(`npm2100 gpio opendrain get ${this.index}`);
     }
     debounce() {
-        this.sendCommand(`npmx gpio config debounce get ${this.index}`);
+        this.sendCommand(`npm2100 gpio debounce get ${this.index}`);
     }
 }

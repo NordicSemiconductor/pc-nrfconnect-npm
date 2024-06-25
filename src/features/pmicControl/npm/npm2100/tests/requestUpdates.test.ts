@@ -186,7 +186,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config mode get ${index}`,
+            `npm2100 gpio mode get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -198,7 +198,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config pull get ${index}`,
+            `npm2100 gpio pull get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -210,7 +210,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config drive get ${index}`,
+            `npm2100 gpio drive get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -224,7 +224,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config debounce get ${index}`,
+                `npm2100 gpio debounce get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -239,7 +239,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config open_drain get ${index}`,
+                `npm2100 gpio opendrain get ${index}`,
                 expect.anything(),
                 undefined,
                 true
