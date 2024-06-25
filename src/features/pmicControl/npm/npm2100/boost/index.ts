@@ -42,19 +42,19 @@ export default (
     ) => void,
     dialogHandler: ((dialog: PmicDialog) => void) | null,
     offlineMode: boolean
-) =>
-    [...Array(numberOfBoosts).keys()].map(index => ({
-        get: new BoostGet(sendCommand, index),
+) => [
+    {
+        get: new BoostGet(sendCommand),
         set: new BoostSet(
             eventEmitter,
             sendCommand,
             dialogHandler,
-            offlineMode,
-            index
+            offlineMode
         ),
         callbacks: boostCallbacks(shellParser, eventEmitter),
         ranges: {
             voltageRange: voltageRange(),
         },
         defaults: boostDefaults(),
-    }));
+    },
+];

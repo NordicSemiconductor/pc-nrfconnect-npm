@@ -26,10 +26,9 @@ export class BoostSet {
             onError?: (response: string, command: string) => void
         ) => void,
         private dialogHandler: ((dialog: PmicDialog) => void) | null,
-        private offlineMode: boolean,
-        private index: number
+        private offlineMode: boolean
     ) {
-        this.get = new BoostGet(sendCommand, this.index);
+        this.get = new BoostGet(sendCommand);
     }
 
     vOut(value: number) {
