@@ -492,8 +492,6 @@ export type BaseNpmDevice = {
     getNumberOfLEDs: () => number;
     getNumberOfBatteryModelSlots: () => number;
 
-    getBoosts?: () => Boosts;
-
     isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
     getSupportedVersion: () => string;
     getPmicVersion: () => Promise<number>;
@@ -522,6 +520,8 @@ export type NpmDevice = {
 
     startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
+
+    getBoosts?: () => Boosts;
 
     getChargerCurrentRange: () => RangeType;
     getChargerVoltageRange: () => number[];
