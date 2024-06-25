@@ -35,8 +35,6 @@ export default ({ active }: PaneProps) => {
     const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
 
-    console.log(npmDevice?.hasMaxEnergyExtraction());
-
     return active ? (
         <MasonryLayout
             className="masonry-layout min-height-cards"
@@ -55,9 +53,9 @@ export default ({ active }: PaneProps) => {
                         defaultSummary
                     />
                 ))}
-            {npmDevice && charger && (
+            {npmDevice?.chargerModule && charger && (
                 <PowerCard
-                    npmDevice={npmDevice}
+                    chargerModule={npmDevice.chargerModule}
                     charger={charger}
                     cardLabel="Charger"
                     disabled={disabled}

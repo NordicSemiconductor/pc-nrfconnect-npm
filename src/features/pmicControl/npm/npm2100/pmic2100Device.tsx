@@ -38,7 +38,6 @@ import {
 } from '../types';
 import getBoostModule, { numberOfBoosts } from './boost';
 import setupBucks, { buckDefaults } from './buck';
-import setupCharger, { chargerDefaults as chargerDefault } from './charger';
 import setupFuelGauge from './fuelGauge';
 import setupGpio, { gpioDefaults } from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
@@ -52,7 +51,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     const devices = {
         noOfBoosts: numberOfBoosts,
         noOfBucks: 0,
-        charger: false,
         maxEnergyExtraction: true,
         noOfLdos: 1,
         noOfGPIOs: 0,
@@ -332,9 +330,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
     const offlineMode = !shellParser;
 
-    const { chargerGet, chargerSet, chargerCallbacks, chargerRanges } =
-        setupCharger(shellParser, eventEmitter, sendCommand, offlineMode);
-
     const { buckGet, buckSet, buckCallbacks, buckRanges } = setupBucks(
         shellParser,
         eventEmitter,
@@ -452,7 +447,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
 
-        releaseAll.push(...chargerCallbacks);
         releaseAll.push(...fuelGaugeCallbacks);
 
         releaseAll.push(
@@ -581,27 +575,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
             requestUpdate.usbPowered();
 
-            if (devices.charger) {
-                requestUpdate.chargerVTerm();
-                requestUpdate.chargerIChg();
-                requestUpdate.chargerEnabled();
-                requestUpdate.chargerVTrickleFast();
-                requestUpdate.chargerITerm();
-                requestUpdate.chargerBatLim();
-                requestUpdate.chargerEnabledRecharging();
-                requestUpdate.chargerEnabledVBatLow();
-                requestUpdate.pmicChargingState();
-                requestUpdate.chargerNTCThermistor();
-                requestUpdate.chargerNTCBeta();
-                requestUpdate.chargerTChgStop();
-                requestUpdate.chargerTChgResume();
-                requestUpdate.chargerVTermR();
-                requestUpdate.chargerTCold();
-                requestUpdate.chargerTCool();
-                requestUpdate.chargerTWarm();
-                requestUpdate.chargerTHot();
-            }
-
             for (let i = 0; i < devices.noOfBucks; i += 1) {
                 requestUpdate.buckVOutNormal(i);
                 requestUpdate.buckVOutRetention(i);
@@ -647,7 +620,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
             requestUpdate.vbusinCurrentLimiter();
         },
-        ...chargerGet,
 
         ...buckGet,
 
@@ -860,7 +832,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         startAdcSample,
         stopAdcSample,
 
-        ...chargerRanges,
         ...buckRanges,
         ...ldoRanges,
 
@@ -877,7 +848,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         requestUpdate,
 
-        ...chargerSet,
         ...buckSet,
         ...ldoSet,
         ...gpioSet,
@@ -938,7 +908,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ldoDefaults: () => ldoDefaults(devices.noOfLdos),
         gpioDefaults: () => gpioDefaults(devices.noOfGPIOs),
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
-        chargerDefault: () => chargerDefault(),
 
         boostModule,
 

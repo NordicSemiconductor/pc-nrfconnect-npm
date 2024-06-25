@@ -330,7 +330,6 @@ export interface IBaseNpmDevice {
         dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
         eventEmitter: EventEmitter,
         devices: {
-            charger?: boolean;
             noOfBucks?: number;
             noOfLdos?: number;
             noOfGPIOs?: number;
@@ -367,6 +366,64 @@ export const isFixedListRangeWithLabel = (
 
 export const isRangeType = (range: RangeOrFixedListRange): range is RangeType =>
     !Array.isArray(range);
+
+export interface ChargerModule {
+    get: {
+        all: () => void;
+        state: () => void;
+        vTerm: () => void;
+        iChg: () => void;
+        enabled: () => void;
+        vTrickleFast: () => void;
+        iTerm: () => void;
+        batLim: () => void;
+        enabledRecharging: () => void;
+        enabledVBatLow: () => void;
+        nTCThermistor: () => void;
+        nTCBeta: () => void;
+        tChgStop: () => void;
+        tChgResume: () => void;
+        vTermR: () => void;
+        tCold: () => void;
+        tCool: () => void;
+        tWarm: () => void;
+        tHot: () => void;
+    };
+    set: {
+        all(charger: Charger): Promise<void>;
+        vTerm: (value: number) => Promise<void>;
+        iChg: (value: number) => Promise<void>;
+        enabled: (value: boolean) => Promise<void>;
+        vTrickleFast: (value: VTrickleFast) => Promise<void>;
+        iTerm: (iTerm: ITerm) => Promise<void>;
+        batLim: (value: number) => Promise<void>;
+        enabledRecharging: (value: boolean) => Promise<void>;
+        enabledVBatLow: (value: boolean) => Promise<void>;
+        nTCThermistor: (
+            mode: NTCThermistor,
+            autoSetBeta?: boolean
+        ) => Promise<void>;
+        nTCBeta: (value: number) => Promise<void>;
+        tChgStop: (value: number) => Promise<void>;
+        tChgResume: (value: number) => Promise<void>;
+        vTermR: (value: number) => Promise<void>;
+        tCold: (value: number) => Promise<void>;
+        tCool: (value: number) => Promise<void>;
+        tWarm: (value: number) => Promise<void>;
+        tHot: (value: number) => Promise<void>;
+    };
+    callbacks: (() => void)[];
+    ranges: {
+        voltage: number[];
+        vTermR: number[];
+        jeita: RangeType;
+        chipThermal: RangeType;
+        current: RangeType;
+        nTCBeta: RangeType;
+        iBatLim: FixedListRange;
+    };
+    defaults: Charger;
+}
 
 export type BoostModule = {
     get: {
@@ -515,7 +572,6 @@ export type BaseNpmDevice = {
         handler: (payload: PartialUpdate<Ldo>, error?: string) => void
     ) => () => void;
 
-    hasCharger: () => boolean;
     hasMaxEnergyExtraction: () => boolean;
     getNumberOfBoosts: () => number;
     getNumberOfBucks: () => number;
@@ -533,6 +589,7 @@ export type BaseNpmDevice = {
     setUptimeOverflowCounter: (value: number) => void;
     release: () => void;
 
+    chargerModule?: ChargerModule;
     boostModule: BoostModule[];
     pofModule?: PofModule;
     timerConfigModule?: TimerConfigModule;
@@ -557,23 +614,11 @@ export type NpmDevice = {
     startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
 
-    getChargerCurrentRange: () => RangeType;
-    getChargerVoltageRange: () => number[];
-    getChargerVTermRRange: () => number[];
-    getChargerJeitaRange: () => RangeType;
-    getChargerChipThermalRange: () => RangeType;
-    getChargerIBatLimRange: () =>
-        | RangeType
-        | (number[] & {
-              toLabel?: (value: number) => string;
-          });
-    getChargerNTCBetaRange: () => RangeType;
     getBuckVoltageRange: (index: number) => RangeType;
     getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
     getUSBCurrentLimiterRange: () => number[];
 
-    chargerDefault: () => Charger;
     buckDefaults: () => Buck[];
     ldoDefaults: () => Ldo[];
     gpioDefaults: () => GPIO[];
@@ -583,24 +628,6 @@ export type NpmDevice = {
 
     requestUpdate: {
         all: () => void;
-        pmicChargingState: () => void;
-        chargerVTerm: () => void;
-        chargerIChg: () => void;
-        chargerEnabled: () => void;
-        chargerVTrickleFast: () => void;
-        chargerITerm: () => void;
-        chargerBatLim: () => void;
-        chargerEnabledRecharging: () => void;
-        chargerEnabledVBatLow: () => void;
-        chargerNTCThermistor: () => void;
-        chargerNTCBeta: () => void;
-        chargerTChgStop: () => void;
-        chargerTChgResume: () => void;
-        chargerVTermR: () => void;
-        chargerTCold: () => void;
-        chargerTCool: () => void;
-        chargerTWarm: () => void;
-        chargerTHot: () => void;
 
         buckVOutNormal: (index: number) => void;
         buckVOutRetention: (index: number) => void;
@@ -639,27 +666,6 @@ export type NpmDevice = {
 
         vbusinCurrentLimiter: () => void;
     };
-
-    setChargerVTerm: (value: number) => Promise<void>;
-    setChargerIChg: (value: number) => Promise<void>;
-    setChargerEnabled: (state: boolean) => Promise<void>;
-    setChargerVTrickleFast: (value: VTrickleFast) => Promise<void>;
-    setChargerITerm: (iTerm: ITerm) => Promise<void>;
-    setChargerBatLim: (lim: number) => Promise<void>;
-    setChargerEnabledRecharging: (enabled: boolean) => Promise<void>;
-    setChargerEnabledVBatLow: (enabled: boolean) => Promise<void>;
-    setChargerNTCThermistor: (
-        mode: NTCThermistor,
-        autoSetBeta?: boolean
-    ) => Promise<void>;
-    setChargerNTCBeta: (btcBeta: number) => Promise<void>;
-    setChargerTChgStop: (value: number) => Promise<void>;
-    setChargerTChgResume: (value: number) => Promise<void>;
-    setChargerVTermR: (value: number) => Promise<void>;
-    setChargerTCold: (value: number) => Promise<void>;
-    setChargerTCool: (value: number) => Promise<void>;
-    setChargerTWarm: (value: number) => Promise<void>;
-    setChargerTHot: (value: number) => Promise<void>;
 
     setBuckVOutNormal: (index: number, value: number) => Promise<void>;
     setBuckVOutRetention: (index: number, value: number) => Promise<void>;

@@ -51,7 +51,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
         test('Set setChargerVTerm', async () => {
-            await pmic.setChargerVTerm(3.2);
+            await pmic.chargerModule?.set.vTerm(3.2);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
@@ -75,7 +75,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerIChg', async () => {
-            await pmic.setChargerIChg(32);
+            await pmic.chargerModule?.set.iChg(32);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
@@ -99,7 +99,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerBatLim', async () => {
-            await pmic.setChargerBatLim(1000);
+            await pmic.chargerModule?.set.batLim(1000);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
@@ -123,7 +123,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerVTrickleFast', async () => {
-            await pmic.setChargerVTrickleFast(2.5);
+            await pmic.chargerModule?.set.vTrickleFast(2.5);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger trickle_voltage set 2500`,
@@ -134,7 +134,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerITerm', async () => {
-            await pmic.setChargerITerm('10%');
+            await pmic.chargerModule?.set.iTerm('10%');
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger termination_current set 10`,
@@ -147,7 +147,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'Set setChargerEnabledRecharging enabled: %p',
             async enabled => {
-                await pmic.setChargerEnabledRecharging(enabled);
+                await pmic.chargerModule?.set.enabledRecharging(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -165,7 +165,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'Set setChargerEnabledVBatLow enabled: %p',
             async enabled => {
-                await pmic.setChargerEnabledVBatLow(enabled);
+                await pmic.chargerModule?.set.enabledVBatLow(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -183,7 +183,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'Set setChargerEnabled enabled: %p',
             async enabled => {
-                await pmic.setChargerEnabled(enabled);
+                await pmic.chargerModule?.set.enabled(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -217,7 +217,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         ] as { mode: NTCThermistor; cliMode: number; beta: number }[])(
             'Set setChargerNTCThermistor - auto beta - %p',
             async ({ mode, cliMode, beta }) => {
-                await pmic.setChargerNTCThermistor(mode, true);
+                await pmic.chargerModule?.set.nTCThermistor(mode, true);
 
                 // turn off charging
                 expect(mockEnqueueRequest).toBeCalledTimes(4);
@@ -272,7 +272,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         ] as { mode: NTCThermistor; cliMode: number; beta: number }[])(
             'Set setChargerNTCThermistor - manual beta %p',
             async ({ mode, cliMode }) => {
-                await pmic.setChargerNTCThermistor(mode, false);
+                await pmic.chargerModule?.set.nTCThermistor(mode, false);
 
                 // turn off charging
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -294,7 +294,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setChargerNTCBeta', async () => {
-            await pmic.setChargerNTCBeta(3380);
+            await pmic.chargerModule?.set.nTCBeta(3380);
 
             // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -315,7 +315,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTChgResume', async () => {
-            await pmic.setChargerTChgResume(90);
+            await pmic.chargerModule?.set.tChgResume(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger die_temp resume set 90`,
@@ -326,7 +326,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTChgStop', async () => {
-            await pmic.setChargerTChgStop(90);
+            await pmic.chargerModule?.set.tChgStop(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger die_temp stop set 90`,
@@ -337,7 +337,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCold', async () => {
-            await pmic.setChargerTCold(90);
+            await pmic.chargerModule?.set.tCold(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger ntc_temperature cold set 90`,
@@ -348,7 +348,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCool', async () => {
-            await pmic.setChargerTCool(90);
+            await pmic.chargerModule?.set.tCool(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger ntc_temperature cool set 90`,
@@ -359,7 +359,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTWarm', async () => {
-            await pmic.setChargerTWarm(90);
+            await pmic.chargerModule?.set.tWarm(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger ntc_temperature warm set 90`,
@@ -370,7 +370,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTHot', async () => {
-            await pmic.setChargerTHot(90);
+            await pmic.chargerModule?.set.tHot(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger ntc_temperature hot set 90`,
@@ -381,7 +381,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set chargerVTermR', async () => {
-            await pmic.setChargerVTermR(3.55);
+            await pmic.chargerModule?.set.vTermR(3.55);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger termination_voltage warm set 3550`,
@@ -1354,7 +1354,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
         test('Set setChargerVTerm onError case 1 - Fail immediately', async () => {
-            await expect(pmic.setChargerVTerm(3.2)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.vTerm(3.2)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
@@ -1390,7 +1392,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerVTerm(3.2)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.vTerm(3.2)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
@@ -1423,7 +1427,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerIChg onError case 1 - Fail immediately', async () => {
-            await expect(pmic.setChargerIChg(32)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.iChg(32)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
@@ -1459,7 +1465,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerIChg(32)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.iChg(32)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
@@ -1492,7 +1500,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerBatLim onError case 1 - Fail immediately', async () => {
-            await expect(pmic.setChargerBatLim(1000)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.batLim(1000)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
@@ -1528,7 +1538,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerBatLim(1000)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.batLim(1000)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
@@ -1562,7 +1574,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setChargerVTrickleFast onError case 1 - Fail immediately', async () => {
             await expect(
-                pmic.setChargerVTrickleFast(2.5)
+                pmic.chargerModule?.set.vTrickleFast(2.5)
             ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
@@ -1601,7 +1613,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             await expect(
-                pmic.setChargerVTrickleFast(2.5)
+                pmic.chargerModule?.set.vTrickleFast(2.5)
             ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
@@ -1637,7 +1649,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerITerm  onError case 1 - Fail immediately', async () => {
-            await expect(pmic.setChargerITerm('10%')).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.iTerm('10%')
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: '10%' });
@@ -1672,7 +1686,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerITerm('10%')).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.iTerm('10%')
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: '10%' });
@@ -1708,7 +1724,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerEnabledRecharging - Fail immediately -  enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setChargerEnabledRecharging(enabled)
+                    pmic.chargerModule?.set.enabledRecharging(enabled)
                 ).rejects.toBeUndefined();
 
                 // turn off recharge
@@ -1736,7 +1752,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerEnableVBatLow - Fail immediately -  enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setChargerEnabledVBatLow(enabled)
+                    pmic.chargerModule?.set.enabledVBatLow(enabled)
                 ).rejects.toBeUndefined();
 
                 // turn off vbatlow
@@ -1785,7 +1801,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setChargerNTCThermistor(mode)
+                    pmic.chargerModule?.set.nTCThermistor(mode)
                 ).rejects.toBeUndefined();
 
                 // turn chance ntc thermistor
@@ -1820,7 +1836,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerNTCThermistor - Fail immediately - mode: %p',
             async mode => {
                 await expect(
-                    pmic.setChargerNTCThermistor(mode)
+                    pmic.chargerModule?.set.nTCThermistor(mode)
                 ).rejects.toBeUndefined();
 
                 // turn chance ntc thermistor
@@ -1853,7 +1869,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setChargerNTCBeta - Fail immediately : %p', async () => {
-            await expect(pmic.setChargerNTCBeta(3380)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.nTCBeta(3380)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1879,7 +1897,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerNTCBeta(3380)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.nTCBeta(3380)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1912,7 +1932,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerEnabled - Fail immediately - enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setChargerEnabled(enabled)
+                    pmic.chargerModule?.set.enabled(enabled)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1939,7 +1959,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setChargerTChgResume - Fail immediately', async () => {
-            await expect(pmic.setChargerTChgResume(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tChgResume(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1964,7 +1986,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTChgStop - Fail immediately', async () => {
-            await expect(pmic.setChargerTChgStop(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tChgStop(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1989,7 +2013,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCold - Fail immediately', async () => {
-            await expect(pmic.setChargerTCold(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tCold(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2014,7 +2040,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCool - Fail immediately', async () => {
-            await expect(pmic.setChargerTCool(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tCool(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2039,7 +2067,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTWarm - Fail immediately', async () => {
-            await expect(pmic.setChargerTWarm(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tWarm(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2064,7 +2094,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTHot - Fail immediately', async () => {
-            await expect(pmic.setChargerTHot(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tHot(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2089,7 +2121,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerVTermR - Fail immediately', async () => {
-            await expect(pmic.setChargerVTermR(3.55)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.vTermR(3.55)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(

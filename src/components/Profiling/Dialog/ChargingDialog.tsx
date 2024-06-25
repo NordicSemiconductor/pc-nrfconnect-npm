@@ -124,7 +124,9 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             try {
                                 await npmDevice?.pofModule?.set.threshold(2.6);
                                 npmDevice?.setAutoRebootDevice(false);
-                                await npmDevice?.setChargerEnabled(false);
+                                await npmDevice?.chargerModule?.set.enabled(
+                                    false
+                                );
                                 await npmDevice
                                     ?.getBatteryProfiler()
                                     ?.setProfile(
@@ -204,7 +206,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    npmDevice?.setChargerEnabled(true);
+                                    npmDevice?.chargerModule?.set.enabled(true);
                                 }}
                             >
                                 Turn on

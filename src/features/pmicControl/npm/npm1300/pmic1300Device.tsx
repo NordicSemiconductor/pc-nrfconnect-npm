@@ -37,7 +37,7 @@ import {
     USBPower,
 } from '../types';
 import setupBucks, { buckDefaults } from './buck';
-import setupCharger, { chargerDefaults as chargerDefault } from './charger';
+import { ChargerModule } from './charger';
 import setupFuelGauge from './fuelGauge';
 import setupGpio, { gpioDefaults } from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
@@ -52,7 +52,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const devices = {
         noOfBucks: 2,
-        charger: true,
         noOfLdos: 2,
         noOfGPIOs: 5,
         noOfLEDs: 3,
@@ -343,8 +342,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const offlineMode = !shellParser;
 
-    const { chargerGet, chargerSet, chargerCallbacks, chargerRanges } =
-        setupCharger(shellParser, eventEmitter, sendCommand, offlineMode);
+    const chargerModule = new ChargerModule(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
 
     const { buckGet, buckSet, buckCallbacks, buckRanges } = setupBucks(
         shellParser,
@@ -477,7 +480,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
 
-        releaseAll.push(...chargerCallbacks);
+        releaseAll.push(...chargerModule.callbacks);
         releaseAll.push(...fuelGaugeCallbacks);
 
         releaseAll.push(
@@ -600,26 +603,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             requestUpdate.usbPowered();
 
-            if (devices.charger) {
-                requestUpdate.chargerVTerm();
-                requestUpdate.chargerIChg();
-                requestUpdate.chargerEnabled();
-                requestUpdate.chargerVTrickleFast();
-                requestUpdate.chargerITerm();
-                requestUpdate.chargerBatLim();
-                requestUpdate.chargerEnabledRecharging();
-                requestUpdate.chargerEnabledVBatLow();
-                requestUpdate.pmicChargingState();
-                requestUpdate.chargerNTCThermistor();
-                requestUpdate.chargerNTCBeta();
-                requestUpdate.chargerTChgStop();
-                requestUpdate.chargerTChgResume();
-                requestUpdate.chargerVTermR();
-                requestUpdate.chargerTCold();
-                requestUpdate.chargerTCool();
-                requestUpdate.chargerTWarm();
-                requestUpdate.chargerTHot();
-            }
+            chargerModule.get.all();
 
             for (let i = 0; i < devices.noOfBucks; i += 1) {
                 requestUpdate.buckVOutNormal(i);
@@ -665,7 +649,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             requestUpdate.vbusinCurrentLimiter();
         },
-        ...chargerGet,
 
         ...buckGet,
 
@@ -700,35 +683,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                     try {
                         if (config.charger) {
                             const charger = config.charger;
-                            await chargerSet.setChargerVTerm(charger.vTerm);
-                            await chargerSet.setChargerIChg(charger.iChg);
-                            await chargerSet.setChargerITerm(charger.iTerm);
-                            await chargerSet.setChargerBatLim(charger.iBatLim);
-                            await chargerSet.setChargerEnabledRecharging(
-                                charger.enableRecharging
-                            );
-                            await chargerSet.setChargerEnabledVBatLow(
-                                charger.enableVBatLow
-                            );
-                            await chargerSet.setChargerVTrickleFast(
-                                charger.vTrickleFast
-                            );
-                            await chargerSet.setChargerNTCThermistor(
-                                charger.ntcThermistor
-                            );
-                            await chargerSet.setChargerNTCBeta(charger.ntcBeta);
-                            await chargerSet.setChargerTChgResume(
-                                charger.tChgResume
-                            );
-                            await chargerSet.setChargerTChgStop(
-                                charger.tChgStop
-                            );
-                            await chargerSet.setChargerVTermR(charger.vTermR);
-                            await chargerSet.setChargerTCold(charger.tCold);
-                            await chargerSet.setChargerTCool(charger.tCool);
-                            await chargerSet.setChargerTWarm(charger.tWarm);
-                            await chargerSet.setChargerTHot(charger.tHot);
-                            await chargerSet.setChargerEnabled(charger.enabled);
+                            await chargerModule.set.all(charger);
                         }
 
                         await Promise.all(
@@ -897,7 +852,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         startAdcSample,
         stopAdcSample,
 
-        ...chargerRanges,
         ...buckRanges,
         ...ldoRanges,
 
@@ -914,7 +868,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         requestUpdate,
 
-        ...chargerSet,
         ...buckSet,
         ...ldoSet,
         ...gpioSet,
@@ -975,9 +928,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ldoDefaults: () => ldoDefaults(devices.noOfLdos),
         gpioDefaults: () => gpioDefaults(devices.noOfGPIOs),
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
-        chargerDefault: () => chargerDefault(),
 
         getBatteryConnectedVoltageThreshold: () => 1, // 1V
+
+        chargerModule,
         pofModule,
         timerConfigModule,
     };
