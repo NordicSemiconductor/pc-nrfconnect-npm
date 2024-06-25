@@ -24,7 +24,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update pmicChargingState', () => {
-        pmic.requestUpdate.pmicChargingState();
+        pmic.chargerModule?.get.state();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -36,7 +36,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerVTerm', () => {
-        pmic.requestUpdate.chargerVTerm();
+        pmic.chargerModule?.get.vTerm();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -48,7 +48,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerIChg', () => {
-        pmic.requestUpdate.chargerIChg();
+        pmic.chargerModule?.get.iChg();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -60,7 +60,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerEnabled', () => {
-        pmic.requestUpdate.chargerEnabled();
+        pmic.chargerModule?.get.enabled();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -72,7 +72,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerVTrickleFast', () => {
-        pmic.requestUpdate.chargerVTrickleFast();
+        pmic.chargerModule?.get.vTrickleFast();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -84,7 +84,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerITerm', () => {
-        pmic.requestUpdate.chargerITerm();
+        pmic.chargerModule?.get.iTerm();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -96,7 +96,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerBatLim', () => {
-        pmic.requestUpdate.chargerBatLim();
+        pmic.chargerModule?.get.batLim();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -107,7 +107,7 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
     test('Request update chargerEnabledRecharging', () => {
-        pmic.requestUpdate.chargerEnabledRecharging();
+        pmic.chargerModule?.get.enabledRecharging();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -119,7 +119,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerEnableVBatLow', () => {
-        pmic.requestUpdate.chargerEnabledVBatLow();
+        pmic.chargerModule?.get.enabledVBatLow();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -131,7 +131,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerNTCThermistor', () => {
-        pmic.requestUpdate.chargerNTCThermistor();
+        pmic.chargerModule?.get.nTCThermistor();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -143,7 +143,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerNTCBeta', () => {
-        pmic.requestUpdate.chargerNTCBeta();
+        pmic.chargerModule?.get.nTCBeta();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -155,7 +155,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerTChgResume', () => {
-        pmic.requestUpdate.chargerTChgResume();
+        pmic.chargerModule?.get.tChgResume();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -167,7 +167,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerTChgStop', () => {
-        pmic.requestUpdate.chargerTChgStop();
+        pmic.chargerModule?.get.tChgStop();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -179,7 +179,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerTCold', () => {
-        pmic.requestUpdate.chargerTCold();
+        pmic.chargerModule?.get.tCold();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -191,7 +191,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerTCool', () => {
-        pmic.requestUpdate.chargerTCool();
+        pmic.chargerModule?.get.tCool();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -203,7 +203,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerTWarm', () => {
-        pmic.requestUpdate.chargerTWarm();
+        pmic.chargerModule?.get.tWarm();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -215,7 +215,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerTHot', () => {
-        pmic.requestUpdate.chargerTHot();
+        pmic.chargerModule?.get.tHot();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -227,7 +227,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerVTermR', () => {
-        pmic.requestUpdate.chargerVTermR();
+        pmic.chargerModule?.get.vTermR();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
