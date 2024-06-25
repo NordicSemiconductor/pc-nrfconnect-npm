@@ -302,5 +302,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         release: () => {
             releaseAll.forEach(release => release());
         },
+
+        boostModule: [],
     };
 };

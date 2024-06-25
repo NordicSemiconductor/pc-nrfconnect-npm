@@ -128,7 +128,11 @@ export default () => {
                     dispatch(setCharger(npmDevice.chargerDefault()));
                 }
 
-                dispatch(setBoosts(npmDevice.getBoosts?.().defaults ?? []));
+                dispatch(
+                    setBoosts(
+                        npmDevice.boostModule.map(boost => boost.defaults)
+                    )
+                );
                 dispatch(setBucks(npmDevice.buckDefaults()));
                 dispatch(setLdos(npmDevice.ldoDefaults()));
                 dispatch(setGPIOs(npmDevice.gpioDefaults()));

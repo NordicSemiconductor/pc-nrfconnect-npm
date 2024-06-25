@@ -22,39 +22,40 @@ export class BoostGet {
             command: string,
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
-        ) => void
+        ) => void,
+        private index: number
     ) {}
 
-    all(index: number) {
-        this.vOut(index);
-        this.mode(index);
-        this.modeControl(index);
-        this.pinSelection(index);
-        this.pinMode(index);
-        this.overCurrent(index);
+    all() {
+        this.vOut();
+        this.mode();
+        this.modeControl();
+        this.pinSelection();
+        this.pinMode();
+        this.overCurrent();
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    vOut(_: number) {
+
+    vOut() {
         this.sendCommand(`npm2100 boost vout get`);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    mode(_: number) {
+
+    mode() {
         this.sendCommand(`npm2100 boost mode get`);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    modeControl(_: number) {
+
+    modeControl() {
         this.sendCommand(`npm2100 boost voutsel get`);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    pinSelection(_: number) {
+
+    pinSelection() {
         this.sendCommand(`npm2100 boost pinsel get`);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    pinMode(_: number) {
+
+    pinMode() {
         this.sendCommand(`npm2100 boost pinmode get`);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    overCurrent(_: number) {
+
+    overCurrent() {
         this.sendCommand(`npm2100 boost ocp get`);
     }
 }
@@ -70,12 +71,13 @@ export class BoostSet {
             onError?: (response: string, command: string) => void
         ) => void,
         private dialogHandler: ((dialog: PmicDialog) => void) | null,
-        private offlineMode: boolean
+        private offlineMode: boolean,
+        private index: number
     ) {
-        this.get = new BoostGet(sendCommand);
+        this.get = new BoostGet(sendCommand, this.index);
     }
 
-    vOut(_: number, value: number) {
+    vOut(value: number) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -102,13 +104,13 @@ export class BoostSet {
                             `npm2100 boost vout set ${value * 1000}`,
                             () => resolve(),
                             () => {
-                                this.get.vOut(0);
+                                this.get.vOut();
                                 reject();
                             }
                         );
                     },
                     () => {
-                        this.get.mode(0);
+                        this.get.mode();
                         reject();
                     }
                 );
@@ -116,7 +118,7 @@ export class BoostSet {
         });
     }
 
-    mode(_: number, mode: BoostMode) {
+    mode(mode: BoostMode) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -131,11 +133,11 @@ export class BoostSet {
                 this.sendCommand(
                     `npm2100 boost voutsel set ${mode}`,
                     () => {
-                        this.get.vOut(0);
+                        this.get.vOut();
                         resolve();
                     },
                     () => {
-                        this.get.mode(0);
+                        this.get.mode();
                         reject();
                     }
                 );
@@ -143,7 +145,7 @@ export class BoostSet {
         });
     }
 
-    modeControl(_: number, modeControl: BoostModeControl) {
+    modeControl(modeControl: BoostModeControl) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -160,7 +162,7 @@ export class BoostSet {
                     `npm2100 boost mode set ${modeControl}`,
                     () => resolve(),
                     () => {
-                        this.get.modeControl(0);
+                        this.get.modeControl();
                         reject();
                     }
                 );
@@ -168,7 +170,7 @@ export class BoostSet {
         });
     }
 
-    pinSelection(_: number, pinSelection: BoostPinSelection) {
+    pinSelection(pinSelection: BoostPinSelection) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -186,7 +188,7 @@ export class BoostSet {
                     `npm2100 boost pinsel set ${pinSelection}`,
                     () => resolve(),
                     () => {
-                        this.get.pinSelection(0);
+                        this.get.pinSelection();
                         reject();
                     }
                 );
@@ -194,7 +196,7 @@ export class BoostSet {
         });
     }
 
-    pinMode(_: number, pinMode: BoostPinMode) {
+    pinMode(pinMode: BoostPinMode) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -211,7 +213,7 @@ export class BoostSet {
                     `npm2100 boost pinmode set ${pinMode}`,
                     () => resolve(),
                     () => {
-                        this.get.pinMode(0);
+                        this.get.pinMode();
                         reject();
                     }
                 );
@@ -219,7 +221,7 @@ export class BoostSet {
         });
     }
 
-    overCurrent(_: number, enabled: boolean) {
+    overCurrent(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
@@ -235,7 +237,7 @@ export class BoostSet {
                     `npm2100 boost ocp set ${enabled ? 'ON' : 'OFF'}`,
                     () => resolve(),
                     () => {
-                        this.get.overCurrent(0);
+                        this.get.overCurrent();
                         reject();
                     }
                 );

@@ -368,33 +368,27 @@ export const isFixedListRangeWithLabel = (
 export const isRangeType = (range: RangeOrFixedListRange): range is RangeType =>
     !Array.isArray(range);
 
-export type Boosts = {
+type BoostModule = {
     get: {
-        all: (index: number) => void;
-        vOut: (index: number) => void;
-        mode: (index: number) => void;
-        modeControl: (index: number) => void;
-        pinSelection: (index: number) => void;
-        pinMode: (index: number) => void;
-        overCurrent: (index: number) => void;
+        all: () => void;
+        vOut: () => void;
+        mode: () => void;
+        modeControl: () => void;
+        pinSelection: () => void;
+        pinMode: () => void;
+        overCurrent: () => void;
     };
     set: {
-        vOut: (index: number, value: number) => Promise<void>;
-        mode: (index: number, mode: BoostMode) => Promise<void>;
-        modeControl: (
-            index: number,
-            modeControl: BoostModeControl
-        ) => Promise<void>;
-        pinSelection: (
-            index: number,
-            pinSelection: BoostPinSelection
-        ) => Promise<void>;
-        pinMode: (index: number, pinMode: BoostPinMode) => Promise<void>;
-        overCurrent: (index: number, enabled: boolean) => Promise<void>;
+        vOut: (value: number) => Promise<void>;
+        mode: (mode: BoostMode) => Promise<void>;
+        modeControl: (modeControl: BoostModeControl) => Promise<void>;
+        pinSelection: (pinSelection: BoostPinSelection) => Promise<void>;
+        pinMode: (pinMode: BoostPinMode) => Promise<void>;
+        overCurrent: (enabled: boolean) => Promise<void>;
     };
     callbacks: (() => void)[];
     ranges: {
-        voltageRange: (index: number) => RangeType;
+        voltageRange: RangeType;
     };
     defaults: {
         vOut: number;
@@ -404,7 +398,7 @@ export type Boosts = {
         pinMode: BoostPinMode;
         pinModeEnabled: boolean;
         overCurrentProtection: boolean;
-    }[];
+    };
 };
 
 export type BaseNpmDevice = {
@@ -500,6 +494,8 @@ export type BaseNpmDevice = {
     getUptimeOverflowCounter: () => number;
     setUptimeOverflowCounter: (value: number) => void;
     release: () => void;
+
+    boostModule: BoostModule[];
 };
 
 export interface INpmDevice extends IBaseNpmDevice {
@@ -520,8 +516,6 @@ export type NpmDevice = {
 
     startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
-
-    getBoosts?: () => Boosts;
 
     getChargerCurrentRange: () => RangeType;
     getChargerVoltageRange: () => number[];
