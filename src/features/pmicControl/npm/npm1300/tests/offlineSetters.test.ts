@@ -376,14 +376,14 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set pof enable ', async () => {
-        await pmic.pof?.set.enabled(true);
+        await pmic.pofModule?.set.enabled(true);
 
         expect(mockOnPOFUpdate).toBeCalledTimes(1);
         expect(mockOnPOFUpdate).toBeCalledWith({ enable: true });
     });
 
     test('Set set pof polarity ', async () => {
-        await pmic.pof?.set.polarity('Active low');
+        await pmic.pofModule?.set.polarity('Active low');
 
         expect(mockOnPOFUpdate).toBeCalledTimes(1);
         expect(mockOnPOFUpdate).toBeCalledWith({ polarity: 'Active low' });

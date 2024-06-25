@@ -401,7 +401,7 @@ export type BoostModule = {
     };
 };
 
-export type PofModule = {
+export interface PofModule {
     get: {
         all: () => void;
         enable: () => void;
@@ -409,16 +409,17 @@ export type PofModule = {
         threshold: () => void;
     };
     set: {
+        all(pof: POF): Promise<void>;
         enabled(enable: boolean): Promise<void>;
         threshold(threshold: number): Promise<void>;
         polarity(polarity: POFPolarity): Promise<void>;
     };
     callbacks: (() => void)[];
     ranges: {
-        thresholdRange: () => RangeType;
+        threshold: RangeType;
     };
     defaults: POF;
-};
+}
 export type BaseNpmDevice = {
     kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
@@ -515,6 +516,7 @@ export type BaseNpmDevice = {
     release: () => void;
 
     boostModule: BoostModule[];
+    pofModule?: PofModule;
 };
 
 export interface INpmDevice extends IBaseNpmDevice {
@@ -535,7 +537,6 @@ export type NpmDevice = {
 
     startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
-    pof?: PofModule;
 
     getChargerCurrentRange: () => RangeType;
     getChargerVoltageRange: () => number[];

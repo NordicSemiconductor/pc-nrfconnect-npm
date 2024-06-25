@@ -489,7 +489,7 @@ export default () => {
             dispatch(setLdos(npmDevice.ldoDefaults()));
             dispatch(setGPIOs(npmDevice.gpioDefaults()));
             dispatch(setLEDs(npmDevice.ledDefaults()));
-            dispatch(setPOFs(npmDevice.pof?.defaults));
+            dispatch(setPOFs(npmDevice.pofModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());
