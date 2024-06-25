@@ -24,6 +24,7 @@ import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
+import MaximumEnergyExtraction from '../Cards/MEE/MaximumEnergyExtractionCard';
 import PowerCard from '../Cards/Power/PowerCard';
 
 export default ({ active }: PaneProps) => {
@@ -33,6 +34,8 @@ export default ({ active }: PaneProps) => {
     const bucks = useSelector(getBucks);
     const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
+
+    console.log(npmDevice?.hasMaxEnergyExtraction());
 
     return active ? (
         <MasonryLayout
@@ -59,6 +62,12 @@ export default ({ active }: PaneProps) => {
                     cardLabel="Charger"
                     disabled={disabled}
                     defaultSummary
+                />
+            )}
+            {npmDevice && npmDevice.hasMaxEnergyExtraction() && (
+                <MaximumEnergyExtraction
+                    npmDevice={npmDevice}
+                    disabled={disabled}
                 />
             )}
             {npmDevice &&
