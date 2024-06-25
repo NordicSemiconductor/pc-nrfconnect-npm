@@ -38,7 +38,7 @@ export default ({ active }: PaneProps) => {
                         disabled={disabled}
                     />
                 ))}
-            {npmDevice && (
+            {npmDevice && !!npmDevice.getNumberOfLEDs() && (
                 <LEDs npmDevice={npmDevice} leds={leds} disabled={disabled} />
             )}
         </MasonryLayout>
