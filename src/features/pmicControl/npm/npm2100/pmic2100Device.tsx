@@ -623,20 +623,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                     try {
                         await Promise.all(
                             config.boosts.map((boost, index) => async () => {
-                                await boostModule[index].set.vOut(boost.vOut);
-                                await boostModule[index].set.mode(boost.mode);
-                                await boostModule[index].set.modeControl(
-                                    boost.modeControl
-                                );
-                                await boostModule[index].set.pinSelection(
-                                    boost.pinSelection
-                                );
-                                await boostModule[index].set.pinMode(
-                                    boost.pinMode
-                                );
-                                await boostModule[index].set.overCurrent(
-                                    boost.overCurrentProtection
-                                );
+                                await boostModule[index].set.all(boost);
                             })
                         );
                         await Promise.all(

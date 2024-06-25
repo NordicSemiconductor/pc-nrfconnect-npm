@@ -436,6 +436,7 @@ export interface BoostModule {
         overCurrent: () => void;
     };
     set: {
+        all: (config: Boost) => Promise<void>;
         vOut: (value: number) => Promise<void>;
         mode: (mode: BoostMode) => Promise<void>;
         modeControl: (modeControl: BoostModeControl) => Promise<void>;
