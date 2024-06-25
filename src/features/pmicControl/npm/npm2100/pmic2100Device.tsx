@@ -43,7 +43,6 @@ import setupFuelGauge from './fuelGauge';
 import setupGpio, { gpioDefaults } from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
 import setupShipMode from './shipMode';
-import setupTimer from './timer';
 
 export const npm2100FWVersion = '0.0.0+1346334259';
 
@@ -369,13 +368,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
-    const { timerGet, timerSet, timerCallbacks } = setupTimer(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
     const { fuelGaugeGet, fuelGaugeSet, fuelGaugeCallbacks } = setupFuelGauge(
         shellParser,
         eventEmitter,
@@ -505,7 +497,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             );
         }
 
-        releaseAll.push(...timerCallbacks);
         releaseAll.push(...shipModeCallbacks);
 
         releaseAll.push(
@@ -647,10 +638,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 requestUpdate.ledMode(i);
             }
 
-            requestUpdate.timerConfigMode();
-            requestUpdate.timerConfigCompare();
-            requestUpdate.timerConfigPrescaler();
-
             requestUpdate.shipModeTimeToActive();
             requestUpdate.shipLongPressReset();
 
@@ -668,7 +655,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         ...ldoGet,
         ...gpioGet,
-        ...timerGet,
         ...shipModeGet,
         ...fuelGaugeGet,
 
@@ -811,16 +797,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                             )
                         );
 
-                        await timerSet.setTimerConfigMode(
-                            config.timerConfig.mode
-                        );
-                        await timerSet.setTimerConfigPrescaler(
-                            config.timerConfig.prescaler
-                        );
-                        await timerSet.setTimerConfigCompare(
-                            config.timerConfig.period
-                        );
-
                         await shipModeSet.setShipModeTimeToActive(
                             config.ship.timeToActive
                         );
@@ -906,7 +882,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoSet,
         ...gpioSet,
         setLedMode,
-        ...timerSet,
         ...shipModeSet,
         ...fuelGaugeSet,
 

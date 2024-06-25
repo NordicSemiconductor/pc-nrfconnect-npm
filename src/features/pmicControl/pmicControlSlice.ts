@@ -38,7 +38,7 @@ interface pmicControlState {
     leds: LED[];
     pof?: POF;
     ship: ShipModeConfig;
-    timerConfig: TimerConfig;
+    timerConfig?: TimerConfig;
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
     pmicChargingState: PmicChargingState;
@@ -201,14 +201,17 @@ const pmicControlSlice = createSlice({
                 };
             }
         },
-        setTimerConfig(state, action: PayloadAction<TimerConfig>) {
+        setTimerConfig(state, action: PayloadAction<TimerConfig | undefined>) {
             state.timerConfig = action.payload;
         },
         updateTimerConfig(state, action: PayloadAction<Partial<TimerConfig>>) {
-            state.timerConfig = {
-                ...state.timerConfig,
-                ...action.payload,
-            };
+            if (state.npmDevice?.timerConfigModule) {
+                state.timerConfig = {
+                    ...state.npmDevice.timerConfigModule.defaults,
+                    ...state.timerConfig,
+                    ...action.payload,
+                };
+            }
         },
         setShipModeConfig(state, action: PayloadAction<ShipModeConfig>) {
             state.ship = action.payload;

@@ -42,9 +42,9 @@ export default ({ active }: PaneProps) => {
                     disabled={disabled}
                 />
             )}
-            {npmDevice && (
+            {npmDevice?.timerConfigModule && timerConfig && (
                 <Timer
-                    npmDevice={npmDevice}
+                    timerConfigModule={npmDevice.timerConfigModule}
                     timerConfig={timerConfig}
                     disabled={disabled}
                 />
