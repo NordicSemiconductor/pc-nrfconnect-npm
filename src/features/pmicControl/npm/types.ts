@@ -447,14 +447,7 @@ export type BoostModule = {
     ranges: {
         voltageRange: RangeType;
     };
-    defaults: {
-        vOut: number;
-        mode: BoostMode;
-        modeControl: BoostModeControl;
-        pinSelection: BoostPinSelection;
-        pinMode: BoostPinMode;
-        pinModeEnabled: boolean;
-        overCurrentProtection: boolean;
+    defaults: Boost;
 }
 
 export interface BuckModule {
