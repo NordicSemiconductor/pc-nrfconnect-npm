@@ -28,9 +28,8 @@ const saveSettings =
         if (!currentState.npmDevice) return;
 
         const out: NpmExport = {
-            charger: currentState.charger
-                ? { ...currentState.charger }
-                : undefined,
+            boosts: [...currentState.boosts],
+            charger: currentState.charger,
             bucks: [...currentState.bucks.map(toBuckExport)],
             ldos: [...currentState.ldos.map(toLdoExport)],
             gpios: [...currentState.gpios],

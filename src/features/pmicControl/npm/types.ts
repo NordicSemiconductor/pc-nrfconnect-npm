@@ -753,6 +753,7 @@ export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
 export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
 
 export interface NpmExport {
+    boosts: Boost[];
     charger?: Charger;
     bucks: BuckExport[];
     ldos: LdoExport[];

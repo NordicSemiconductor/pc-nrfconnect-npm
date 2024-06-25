@@ -109,25 +109,18 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     };
 
     const sampleConfig: NpmExport = {
-        charger: {
-            vTerm: 3.5,
-            vTrickleFast: 2.5,
-            iChg: 32,
-            enabled: false,
-            iTerm: '10%',
-            iBatLim: 270,
-            enableRecharging: false,
-            enableVBatLow: false,
-            ntcThermistor: '100 kΩ',
-            ntcBeta: 3480,
-            tChgStop: 20,
-            tChgResume: 120,
-            vTermR: 5,
-            tCold: 10,
-            tCool: 20,
-            tWarm: 50,
-            tHot: 80,
-        },
+        boosts: [
+            {
+                vOut: 1,
+                mode: 'VSET',
+                modeControl: 'AUTO',
+                pinSelection: 'OFF',
+                pinMode: 'HP',
+                pinModeEnabled: false,
+                overCurrentProtection: false,
+            },
+        ],
+        charger: undefined,
         bucks: [
             {
                 vOutNormal: 1,

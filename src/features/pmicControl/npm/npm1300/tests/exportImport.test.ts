@@ -109,6 +109,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     };
 
     const sampleConfig: NpmExport = {
+        boosts: [],
         charger: {
             vTerm: 3.5,
             vTrickleFast: 2.5,
