@@ -359,6 +359,13 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
+    const boostModule = getBoostModule(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
     const releaseAll: (() => void)[] = [];
 
     if (shellParser) {
@@ -455,6 +462,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
 
+        releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
         releaseAll.push(...ldoCallbacks);
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
 
@@ -548,14 +556,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         }
         return defaultLEDs;
     };
-
-    const boostModule = getBoostModule(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        dialogHandler,
-        offlineMode
-    );
 
     const requestUpdate = {
         all: () => {
