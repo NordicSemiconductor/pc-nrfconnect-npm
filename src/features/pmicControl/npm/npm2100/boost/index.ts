@@ -10,7 +10,8 @@ import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Boost, PmicDialog } from '../../types';
 import boostCallbacks from './boostCallback';
-import { BoostGet, BoostSet } from './boostEffects';
+import { BoostGet } from './boostGet';
+import { BoostSet } from './boostSet';
 
 export const numberOfBoosts = 1;
 
