@@ -62,7 +62,7 @@ export default ({
 
     const voltageRange = npmDevice.getBuckVoltageRange(index);
     const retVOutRange = npmDevice.getBuckRetVOutRange(index);
-    const numberOfGPIOs = npmDevice.getNumberOfGPIOs() ?? 0;
+    const numberOfGPIOs = npmDevice.gpioModule.length;
 
     const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
 

@@ -486,7 +486,9 @@ export default () => {
             );
             dispatch(setBucks(npmDevice.buckDefaults()));
             dispatch(setLdos(npmDevice.ldoDefaults()));
-            dispatch(setGPIOs(npmDevice.gpioDefaults()));
+            dispatch(
+                setGPIOs(npmDevice.gpioModule.map(module => module.defaults))
+            );
             dispatch(setLEDs(npmDevice.ledDefaults()));
             dispatch(setPOFs(npmDevice.pofModule?.defaults));
 

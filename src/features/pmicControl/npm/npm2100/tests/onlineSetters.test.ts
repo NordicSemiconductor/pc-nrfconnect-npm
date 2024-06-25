@@ -432,7 +432,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioMode index: %p', async ({ index, mode, modeIndex }) => {
-            await pmic.setGpioMode(index, mode);
+            await pmic.gpioModule[index].set.mode(mode);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -455,7 +455,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioPull index: %p', async ({ index, pull, pullIndex }) => {
-            await pmic.setGpioPull(index, pull);
+            await pmic.gpioModule[index].set.pull(pull);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -477,7 +477,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioDrive index: %p', async ({ index, drive }) => {
-            await pmic.setGpioDrive(index, drive);
+            await pmic.gpioModule[index].set.drive(drive);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -499,7 +499,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioDebounce index: %p', async ({ index, debounce }) => {
-            await pmic.setGpioDebounce(index, debounce);
+            await pmic.gpioModule[index].set.debounce(debounce);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -523,7 +523,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioOpenDrain index: %p', async ({ index, openDrain }) => {
-            await pmic.setGpioOpenDrain(index, openDrain);
+            await pmic.gpioModule[index].set.openDrain(openDrain);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -965,7 +965,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioMode(index, mode)
+                    pmic.gpioModule[index].set.mode(mode)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1007,7 +1007,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioDrive(index, drive)
+                    pmic.gpioModule[index].set.drive(drive)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1050,7 +1050,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioPull(index, pull)
+                    pmic.gpioModule[index].set.pull(pull)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1092,7 +1092,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioDebounce(index, debounce)
+                    pmic.gpioModule[index].set.debounce(debounce)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1136,7 +1136,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioOpenDrain(index, openDrain)
+                    pmic.gpioModule[index].set.openDrain(openDrain)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);

@@ -182,7 +182,7 @@ describe('PMIC 2100 - Request update commands', () => {
     });
 
     test.each(PMIC_2100_GPIOS)('Request update gpioMode index: %p', index => {
-        pmic.requestUpdate.gpioMode(index);
+        pmic.gpioModule[index].get.mode();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -194,7 +194,7 @@ describe('PMIC 2100 - Request update commands', () => {
     });
 
     test.each(PMIC_2100_GPIOS)('Request update gpioPull index: %p', index => {
-        pmic.requestUpdate.gpioPull(index);
+        pmic.gpioModule[index].get.pull();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -206,7 +206,7 @@ describe('PMIC 2100 - Request update commands', () => {
     });
 
     test.each(PMIC_2100_GPIOS)('Request update gpioDrive index: %p', index => {
-        pmic.requestUpdate.gpioDrive(index);
+        pmic.gpioModule[index].get.drive();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -220,7 +220,7 @@ describe('PMIC 2100 - Request update commands', () => {
     test.each(PMIC_2100_GPIOS)(
         'Request update gpioDebounce index: %p',
         index => {
-            pmic.requestUpdate.gpioDebounce(index);
+            pmic.gpioModule[index].get.debounce();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -235,7 +235,7 @@ describe('PMIC 2100 - Request update commands', () => {
     test.each(PMIC_2100_GPIOS)(
         'Request update gpioOpenDrain index: %p',
         index => {
-            pmic.requestUpdate.gpioOpenDrain(index);
+            pmic.gpioModule[index].get.openDrain();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
