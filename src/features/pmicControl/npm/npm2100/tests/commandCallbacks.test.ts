@@ -7,7 +7,7 @@
 import { BatteryModel } from '../../types';
 import {
     GPIODriveValues,
-    GPIOModeKeys,
+    GPIOMode2100,
     GPIOModeValues,
     GPIOPullValues,
 } from '../gpio/types';
@@ -201,32 +201,39 @@ Battery models stored in database:
 
     test.each(
         PMIC_2100_GPIOS.map(index =>
-            GPIOModeValues.map((mode, modeIndex) => [
+            GPIOModeValues.map(mode => [
                 {
                     index,
                     append: `get ${index}`,
                     mode,
-                    modeIndex,
                 },
                 {
                     index,
                     append: `set ${index} ${mode}`,
                     mode,
-                    modeIndex,
                 },
             ]).flat()
         ).flat()
-    )('npm2100 gpio mode %p', ({ index, append, mode, modeIndex }) => {
+    )('npm2100 gpio mode %p', ({ index, append, mode }) => {
         const command = `npm2100 gpio mode ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        const isInput = GPIOModeKeys[modeIndex].toString().startsWith('Input');
+        const isOutput = mode === GPIOMode2100.Output;
+        const isInterrupt =
+            mode === GPIOMode2100['Interrupt output, active high'] ||
+            mode === GPIOMode2100['Interrupt output, active low'];
+
         callback?.onSuccess(`Value: ${mode}.`, command);
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
-            data: { mode, driveEnabled: !isInput, openDrainEnabled: !isInput },
+            data: {
+                mode,
+                driveEnabled: !isInterrupt,
+                openDrainEnabled: isOutput,
+                pullEnabled: !isInterrupt,
+            },
             index,
         });
     });

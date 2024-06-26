@@ -229,6 +229,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         shellParser,
         eventEmitter,
         sendCommand,
+        dialogHandler,
         offlineMode
     );
 
