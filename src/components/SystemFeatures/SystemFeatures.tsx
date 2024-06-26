@@ -11,6 +11,7 @@ import {
     PaneProps,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { SupportedErrorLogs } from '../../features/pmicControl/npm/types';
 import {
     getNpmDevice,
     getPOF,
@@ -63,7 +64,18 @@ export default ({ active }: PaneProps) => {
                     disabled={disabled}
                 />
             )}
-            {npmDevice && <ErrorStatuses disabled={disabled} />}
+            {npmDevice?.supportedErrorLogs &&
+                Object.keys(npmDevice.supportedErrorLogs).some(
+                    k =>
+                        npmDevice.supportedErrorLogs?.[
+                            k as keyof SupportedErrorLogs
+                        ]
+                ) && (
+                    <ErrorStatuses
+                        disabled={disabled}
+                        supportedErrorLogs={npmDevice.supportedErrorLogs}
+                    />
+                )}
         </MasonryLayout>
     ) : null;
 };

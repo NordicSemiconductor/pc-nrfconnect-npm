@@ -306,5 +306,11 @@ export const baseNpmDevice: IBaseNpmDevice = (
         boostModule: [],
         gpioModule: [],
         buckModule: [],
+
+        supportedErrorLogs: {
+            reset: false,
+            charger: false,
+            sensor: false,
+        },
     };
 };

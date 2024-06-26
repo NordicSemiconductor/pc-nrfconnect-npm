@@ -303,6 +303,12 @@ export type ErrorLogs = {
     sensorError?: string[];
 };
 
+export type SupportedErrorLogs = {
+    reset: boolean;
+    charger: boolean;
+    sensor: boolean;
+};
+
 // 'pmic-connected' -> Shell ok - PMIC Online
 // 'pmic-disconnected' -> Shell ok - PMIC disconnected
 // 'pmic-pending-reboot' -> Shell ok - PMIC need restart to proceed
@@ -640,9 +646,11 @@ export type BaseNpmDevice = {
         handler: (payload: Partial<ErrorLogs>, error?: string) => void
     ) => () => void;
 
-    clearErrorLogs: (errorOnly?: boolean) => void;
+    clearErrorLogs?: (errorOnly?: boolean) => void;
 
     onFuelGaugeUpdate: (handler: (payload: boolean) => void) => () => void;
+
+    supportedErrorLogs?: SupportedErrorLogs;
 
     onActiveBatteryModelUpdate: (
         handler: (payload: BatteryModel) => void
