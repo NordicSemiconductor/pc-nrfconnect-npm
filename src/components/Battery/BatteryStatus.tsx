@@ -107,7 +107,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 />
             )}
 
-            {npmDevice?.hasCharger() && (
+            {npmDevice?.chargerModule && (
                 <LineData
                     title="Charging Mode"
                     docItem="ChargingMode"

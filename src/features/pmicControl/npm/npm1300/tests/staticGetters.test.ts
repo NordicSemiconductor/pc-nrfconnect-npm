@@ -14,7 +14,7 @@ describe('PMIC 1300 - Static getters', () => {
         jest.clearAllMocks();
     });
 
-    test('Has of Charger', () => expect(pmic.hasCharger()).toBeTruthy());
+    test('Has of Charger', () => expect(!!pmic.chargerModule).toBeTruthy());
 
     test('Number of Bucks', () => expect(pmic.getNumberOfBucks()).toBe(2));
 
@@ -27,31 +27,31 @@ describe('PMIC 1300 - Static getters', () => {
     test('Device Type', () => expect(pmic.getDeviceType()).toBe('npm1300'));
 
     test('Charger Voltage Range', () =>
-        expect(pmic.getChargerVoltageRange()).toStrictEqual([
+        expect(pmic.chargerModule?.ranges.voltage).toStrictEqual([
             3.5, 3.55, 3.6, 3.65, 4, 4.05, 4.1, 4.15, 4.2, 4.25, 4.3, 4.35, 4.4,
             4.45,
         ]));
 
     test('Charger Voltage Warm Range', () =>
-        expect(pmic.getChargerVTermRRange()).toStrictEqual([
+        expect(pmic.chargerModule?.ranges.vTermR).toStrictEqual([
             3.5, 3.55, 3.6, 3.65, 4, 4.05, 4.1, 4.15, 4.2, 4.25, 4.3, 4.35, 4.4,
             4.45,
         ]));
 
     test('Charger Chip Thermal Range', () =>
-        expect(pmic.getChargerChipThermalRange()).toStrictEqual({
+        expect(pmic.chargerModule?.ranges.chipThermal).toStrictEqual({
             min: 50,
             max: 110,
         }));
 
     test('Charger Jeita Range', () =>
-        expect(pmic.getChargerJeitaRange()).toStrictEqual({
+        expect(pmic.chargerModule?.ranges.jeita).toStrictEqual({
             min: -20,
             max: 60,
         }));
 
     test('Charger Current Range', () =>
-        expect(pmic.getChargerCurrentRange()).toStrictEqual({
+        expect(pmic.chargerModule?.ranges.current).toStrictEqual({
             min: 32,
             max: 800,
             decimals: 0,
@@ -59,10 +59,11 @@ describe('PMIC 1300 - Static getters', () => {
         }));
 
     test('Charger Current Range', () => {
-        const range = pmic.getChargerIBatLimRange();
+        const range = pmic.chargerModule?.ranges.iBatLim;
 
-        expect(isFixedListRangeWithLabel(range)).toBeTruthy();
-        if (isFixedListRangeWithLabel(range)) {
+        expect(range).toBeDefined();
+        expect(isFixedListRangeWithLabel(range!)).toBeTruthy();
+        if (isFixedListRangeWithLabel(range!)) {
             expect(range.toLabel?.(1340)).toBe('High');
             expect(range.toLabel?.(271)).toBe('Low');
             expect(range.toLabel?.(1000)).toBe('Manual (1000 mA)');
@@ -104,7 +105,7 @@ describe('PMIC 1300 - Static getters', () => {
         }));
 
     test('Charger NTC Beta Range', () =>
-        expect(pmic.getChargerNTCBetaRange()).toStrictEqual({
+        expect(pmic.chargerModule?.ranges.nTCBeta).toStrictEqual({
             min: 0,
             max: 4294967295,
             decimals: 0,

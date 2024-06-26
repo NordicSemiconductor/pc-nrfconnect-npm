@@ -69,11 +69,11 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             await npmDevice?.setBuckEnabled(0, false);
 
                             await npmDevice?.setFuelGaugeEnabled(false);
-                            await npmDevice?.setChargerNTCThermistor(
+                            await npmDevice?.chargerModule?.set.nTCThermistor(
                                 profile.ntcThermistor
                             );
-                            await npmDevice
-                                ?.setChargerVTerm(profile.vUpperCutOff)
+                            await npmDevice?.chargerModule?.set
+                                .vTerm(profile.vUpperCutOff)
                                 .catch(message => {
                                     dispatch(
                                         setCompleteStep({
@@ -82,8 +82,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         })
                                     );
                                 });
-                            await npmDevice
-                                ?.setChargerIChg(
+                            await npmDevice?.chargerModule?.set
+                                .iChg(
                                     Math.min(
                                         800,
                                         Math.floor(
@@ -99,8 +99,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         })
                                     );
                                 });
-                            await npmDevice
-                                ?.setChargerEnabled(true)
+                            await npmDevice?.chargerModule?.set
+                                .enabled(true)
                                 .catch(message => {
                                     dispatch(
                                         setCompleteStep({

@@ -163,7 +163,7 @@ export default () => {
                 })
             );
 
-            if (!npmDevice.hasCharger()) {
+            if (!npmDevice.chargerModule) {
                 dispatch((_, getState) => {
                     const samplingRate =
                         getState().app.pmicControl
@@ -479,9 +479,8 @@ export default () => {
             );
 
             dispatch(setPmicState(npmDevice.getConnectionState()));
-            if (npmDevice.hasCharger()) {
-                dispatch(setCharger(npmDevice.chargerDefault()));
-            }
+            dispatch(setCharger(npmDevice.chargerModule?.defaults));
+
             dispatch(
                 setBoosts(npmDevice.boostModule.map(boost => boost.defaults))
             );

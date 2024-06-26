@@ -122,7 +122,7 @@ const pmicControlSlice = createSlice({
         setPmicState(state, action: PayloadAction<PmicState>) {
             state.pmicState = action.payload;
         },
-        setCharger(state, action: PayloadAction<Charger>) {
+        setCharger(state, action: PayloadAction<Charger | undefined>) {
             state.charger = action.payload;
         },
         setPmicChargingState(state, action: PayloadAction<PmicChargingState>) {

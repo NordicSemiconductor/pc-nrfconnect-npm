@@ -54,7 +54,7 @@ export default ({ pofModule, pof, disabled }: GPIOProperties) => {
                     <div className="d-flex">
                         <Toggle
                             label="POF Enabled"
-                            onToggle={pofModule.set.enabled}
+                            onToggle={v => pofModule.set.enabled(v)}
                             disabled={disabled}
                             isToggled={pof.enable}
                         />
@@ -77,7 +77,7 @@ export default ({ pofModule, pof, disabled }: GPIOProperties) => {
                 range={pofModule.ranges.threshold}
                 value={internalPOFThreshold}
                 onChange={setInternalPOFThreshold}
-                onChangeComplete={pofModule.set.threshold}
+                onChangeComplete={v => pofModule.set.threshold(v)}
             />
             <Dropdown
                 label={

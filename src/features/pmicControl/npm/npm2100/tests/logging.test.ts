@@ -6,7 +6,7 @@
 
 import { Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared/typings/generated/src/Parsers/shellParser';
 
-import { PmicChargingState, USBDetectStatusValues } from '../../types';
+import { USBDetectStatusValues } from '../../types';
 import { setupMocksWithShellParser } from './helpers';
 
 jest.useFakeTimers();
@@ -73,7 +73,6 @@ describe('PMIC 2100 - Logging', () => {
             mockOnBeforeReboot,
             mockOnUsbPower,
             mockOnErrorLogs,
-            mockOnChargingStatusUpdate,
             mockEnqueueRequest,
             pmic,
         } = setupMocksWithShellParser();
@@ -86,7 +85,6 @@ describe('PMIC 2100 - Logging', () => {
             mockOnBeforeReboot = setupMock.mockOnBeforeReboot;
             mockOnUsbPower = setupMock.mockOnUsbPower;
             mockOnErrorLogs = setupMock.mockOnErrorLogs;
-            mockOnChargingStatusUpdate = setupMock.mockOnChargingStatusUpdate;
             mockEnqueueRequest = setupMock.mockEnqueueRequest;
             pmic = setupMock.pmic;
         });
@@ -179,35 +177,6 @@ describe('PMIC 2100 - Logging', () => {
                 detectStatus: USBDetectStatusValues[index],
             });
         });
-
-        test.each([0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80])(
-            'Charging status event %p',
-            value => {
-                eventHandlers.mockOnShellLoggingEventHandler(
-                    `[00:28:48.730,346] <inf> module_pmic_charger: charger status=${value}`
-                );
-
-                expect(mockOnChargingStatusUpdate).toBeCalledTimes(1);
-                expect(mockOnChargingStatusUpdate).toBeCalledWith({
-                    // eslint-disable-next-line no-bitwise
-                    batteryDetected: (value & 0x01) > 0,
-                    // eslint-disable-next-line no-bitwise
-                    batteryFull: (value & 0x02) > 0,
-                    // eslint-disable-next-line no-bitwise
-                    trickleCharge: (value & 0x04) > 0,
-                    // eslint-disable-next-line no-bitwise
-                    constantCurrentCharging: (value & 0x08) > 0,
-                    // eslint-disable-next-line no-bitwise
-                    constantVoltageCharging: (value & 0x10) > 0,
-                    // eslint-disable-next-line no-bitwise
-                    batteryRechargeNeeded: (value & 0x20) > 0,
-                    // eslint-disable-next-line no-bitwise
-                    dieTempHigh: (value & 0x40) > 0,
-                    // eslint-disable-next-line no-bitwise
-                    supplementModeActive: (value & 0x80) > 0,
-                } as PmicChargingState);
-            }
-        );
 
         test('Reset Cause Reason', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
