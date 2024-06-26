@@ -26,25 +26,24 @@ import {
     BuckRetentionControl,
     BuckRetentionControlValues,
     GPIOValues,
-    NpmDevice,
 } from '../../../features/pmicControl/npm/types';
 
 interface BuckCardProperties {
-    npmDevice: NpmDevice;
     buck: Buck;
     buckModule: BuckModule;
     cardLabel?: string;
     defaultSummary?: boolean;
     disabled: boolean;
+    numberOfGPIOs?: number;
 }
 
 export default ({
-    npmDevice,
     buck,
     buckModule,
     cardLabel = `BUCK ${buckModule.index + 1}`,
     disabled,
     defaultSummary = false,
+    numberOfGPIOs = 0,
 }: BuckCardProperties) => {
     const card = `buck${buckModule.index + 1}`;
     const [summary, setSummary] = useState(defaultSummary);
@@ -59,7 +58,6 @@ export default ({
 
     const onBuckToggle = (value: boolean) => buckModule.set.enabled(value);
 
-    const numberOfGPIOs = npmDevice.gpioModule.length;
     const voltageRange = buckModule.ranges.voltage;
     const retVOutRange = buckModule.ranges.retVOut;
 
