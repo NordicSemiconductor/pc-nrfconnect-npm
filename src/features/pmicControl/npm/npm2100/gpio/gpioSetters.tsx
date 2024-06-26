@@ -15,7 +15,7 @@ import {
     PmicDialog,
 } from '../../types';
 import { GpioGet } from './gpioGetters';
-import { GPIOMode2100, GPIOModeKeys, GPIOModeValues } from './types';
+import { GPIOMode2100 } from './types';
 
 export class GpioSet {
     private get: GpioGet;
@@ -45,19 +45,19 @@ export class GpioSet {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (this.offlineMode) {
-                    const valueIndex = GPIOModeValues.findIndex(
-                        v => v === mode
-                    );
-                    const isInput = GPIOModeKeys[valueIndex]
-                        .toLowerCase()
-                        .startsWith('input');
+                    const isOutput = mode === GPIOMode2100.Output;
+                    const isInterrupt =
+                        mode ===
+                            GPIOMode2100['Interrupt output, active high'] ||
+                        mode === GPIOMode2100['Interrupt output, active low'];
 
                     this.eventEmitter.emitPartialEvent<GPIO>(
                         'onGPIOUpdate',
                         {
                             mode,
-                            driveEnabled: !isInput,
-                            openDrainEnabled: !isInput,
+                            driveEnabled: !isInterrupt,
+                            openDrainEnabled: isOutput,
+                            pullEnabled: !isInterrupt,
                         },
                         this.index
                     );

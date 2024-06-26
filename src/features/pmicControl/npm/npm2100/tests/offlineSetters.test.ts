@@ -53,8 +53,9 @@ describe('PMIC 2100 - Setters Offline tests', () => {
         expect(mockOnGpioUpdate).toBeCalledWith({
             data: {
                 mode: GPIOMode2100.Input,
-                driveEnabled: false,
+                driveEnabled: true,
                 openDrainEnabled: false,
+                pullEnabled: true,
             },
             index,
         });
