@@ -15,7 +15,8 @@ export class BoostGet {
     ) {}
 
     all() {
-        this.vOut();
+        this.vOutVSet();
+        this.vOutSoftware();
         this.mode();
         this.modeControl();
         this.pinSelection();
@@ -23,8 +24,12 @@ export class BoostGet {
         this.overCurrent();
     }
 
-    vOut() {
-        this.sendCommand(`npm2100 boost vout get`);
+    vOutVSet() {
+        this.sendCommand(`npm2100 boost vout VSET get`);
+    }
+
+    vOutSoftware() {
+        this.sendCommand(`npm2100 boost vout SOFTWARE get`);
     }
 
     mode() {

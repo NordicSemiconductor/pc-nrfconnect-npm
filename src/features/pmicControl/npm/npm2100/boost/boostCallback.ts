@@ -35,13 +35,32 @@ export default (
     if (shellParser) {
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm2100 boost vout', true),
+                toRegex('npm2100 boost vout VSET get'),
                 res => {
+                    console.log('vset', res);
                     const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
                         {
-                            vOut: value / 1000, // mV to V
+                            vOutVSet: value / 1000, // mV to V
+                        },
+                        0
+                    );
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm2100 boost vout SOFTWARE', true),
+                res => {
+                    console.log('soft', res);
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Boost>(
+                        'onBoostUpdate',
+                        {
+                            vOutSoftware: value / 1000, // mV to V
                         },
                         0
                     );
@@ -59,6 +78,7 @@ export default (
                     toValueRegex(BoostModeValues)
                 ),
                 res => {
+                    console.log('mode', res);
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
                         {
