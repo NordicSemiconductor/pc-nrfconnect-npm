@@ -37,7 +37,7 @@ interface pmicControlState {
     gpios: GPIO[];
     leds: LED[];
     pof?: POF;
-    ship: ShipModeConfig;
+    ship?: ShipModeConfig;
     timerConfig?: TimerConfig;
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
@@ -67,11 +67,6 @@ const initialState: pmicControlState = {
         mode: 'Boot monitor',
         prescaler: 'Slow',
         period: 0,
-    },
-    ship: {
-        timeToActive: 96,
-        invPolarity: true,
-        longPressReset: 'one_button',
     },
     pmicChargingState: {
         batteryFull: false,
@@ -213,17 +208,23 @@ const pmicControlSlice = createSlice({
                 };
             }
         },
-        setShipModeConfig(state, action: PayloadAction<ShipModeConfig>) {
+        setShipModeConfig(
+            state,
+            action: PayloadAction<ShipModeConfig | undefined>
+        ) {
             state.ship = action.payload;
         },
         updateShipModeConfig(
             state,
-            action: PayloadAction<Partial<ShipModeConfig>>
+            action: PayloadAction<Partial<ShipModeConfig | undefined>>
         ) {
-            state.ship = {
-                ...state.ship,
-                ...action.payload,
-            };
+            if (state.npmDevice?.shipModeModule) {
+                state.ship = {
+                    ...state.npmDevice?.shipModeModule.defaults,
+                    ...state.ship,
+                    ...action.payload,
+                };
+            }
         },
         setBatteryConnected(state, action: PayloadAction<boolean>) {
             state.batteryConnected = action.payload;

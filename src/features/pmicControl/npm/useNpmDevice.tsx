@@ -47,6 +47,7 @@ import {
     setPmicChargingState,
     setPmicState,
     setPOFs,
+    setShipModeConfig,
     setStoredBatterModel,
     setSupportedVersion,
     updateBoost,
@@ -491,6 +492,7 @@ export default () => {
             );
             dispatch(setLEDs(npmDevice.ledDefaults()));
             dispatch(setPOFs(npmDevice.pofModule?.defaults));
+            dispatch(setShipModeConfig(npmDevice.shipModeModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());

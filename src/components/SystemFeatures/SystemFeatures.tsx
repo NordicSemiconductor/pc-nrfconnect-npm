@@ -35,9 +35,9 @@ export default ({ active }: PaneProps) => {
 
     return active ? (
         <MasonryLayout className="masonry-layout" minWidth={300}>
-            {npmDevice && (
+            {npmDevice?.shipModeModule && ship && (
                 <ResetControl
-                    npmDevice={npmDevice}
+                    shipModeModule={npmDevice?.shipModeModule}
                     ship={ship}
                     disabled={disabled}
                 />
