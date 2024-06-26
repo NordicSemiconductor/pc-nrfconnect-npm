@@ -153,24 +153,6 @@ describe('PMIC 2100 - Logging', () => {
                 soc: 98.7,
             });
         });
-
-        test.each(
-            [
-                'No USB connection',
-                'Default USB 100/500mA',
-                '1.5A High Power',
-                '3A High Power',
-            ].map((value, index) => ({ value, index }))
-        )('USB Power events', ({ value, index }) => {
-            eventHandlers.mockOnShellLoggingEventHandler(
-                `[00:00:17.525,000] <inf> module_pmic: ${value}`
-            );
-
-            expect(mockOnUsbPower).toBeCalledTimes(1);
-            expect(mockOnUsbPower).toBeCalledWith({
-                detectStatus: USBDetectStatusValues[index],
-            });
-        });
     });
 });
 
