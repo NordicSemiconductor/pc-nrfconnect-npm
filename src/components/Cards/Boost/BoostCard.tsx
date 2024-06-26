@@ -80,12 +80,6 @@ export default ({
 
     // NumberInputSliderWithUnit do not use boost.<prop> as value as we send only at on change complete
     useEffect(() => {
-        console.log(
-            'useEffect',
-            boost.mode,
-            boost.vOutVSet,
-            boost.vOutSoftware
-        );
         if (boost.mode === 'Vset') {
             setInternalVBoost(boost.vOutVSet);
         } else {

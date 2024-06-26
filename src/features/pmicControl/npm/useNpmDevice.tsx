@@ -12,6 +12,8 @@ import {
     clearWaitForDevice,
     describeError,
     logger,
+    setPaneDisabled,
+    setPaneHidden,
     setWaitForDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { ipcRenderer } from 'electron';
@@ -73,6 +75,7 @@ import {
     dialogHandler,
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
     noop,
+    SupportsErrorLogs,
 } from './pmicHelpers';
 import { PmicDialog } from './types';
 
@@ -117,7 +120,7 @@ export default () => {
                 dispatch(setHardcodedBatterModels(models));
             });
 
-            npmDevice.getBatteryProfiler()?.isProfiling();
+            npmDevice.getBatteryProfiler?.()?.isProfiling();
             npmDevice.setBatteryStatusCheckEnabled(true);
         }
     }, [dispatch, isPMICPowered, npmDevice, pmicState, supportedVersion]);
@@ -474,7 +477,7 @@ export default () => {
 
             releaseAll.push(
                 npmDevice
-                    .getBatteryProfiler()
+                    .getBatteryProfiler?.()
                     ?.onProfilingStateChange(profiling => {
                         dispatch(setCcProfiling(profiling));
                     }) ?? noop
@@ -618,6 +621,72 @@ export default () => {
         recordEvents,
         recordEventsPath,
     ]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            dispatch(
+                setPaneDisabled({
+                    name: 'Graph',
+                    disabled: pmicState === 'ek-disconnected',
+                })
+            );
+        });
+    }, [dispatch, pmicState]);
+
+    useEffect(() => {
+        if (npmDevice) {
+            setTimeout(() => {
+                console.log({
+                    name: 'Profiles',
+                    hidden: npmDevice.getBatteryProfiler === undefined,
+                });
+                dispatch(
+                    setPaneHidden({
+                        name: 'Charger',
+                        hidden: npmDevice.chargerModule === undefined,
+                    })
+                );
+                dispatch(
+                    setPaneHidden({
+                        name: 'Regulators',
+                        hidden:
+                            npmDevice.boostModule === undefined &&
+                            npmDevice.buckModule === undefined &&
+                            npmDevice.getNumberOfLdos() <= 0, // TODO change to use ldoModule
+                    })
+                );
+                dispatch(
+                    setPaneHidden({
+                        name: 'GPIOs',
+                        hidden: npmDevice.gpioModule === undefined,
+                    })
+                );
+                dispatch(
+                    setPaneHidden({
+                        name: 'System Features',
+                        hidden:
+                            npmDevice.shipModeModule === undefined &&
+                            npmDevice.timerConfigModule === undefined &&
+                            npmDevice.pofModule === undefined &&
+                            npmDevice.usbCurrentLimiterModule === undefined &&
+                            !SupportsErrorLogs(npmDevice),
+                    })
+                );
+                dispatch(
+                    setPaneHidden({
+                        name: 'MEE',
+                        hidden: !npmDevice.hasMaxEnergyExtraction(),
+                    })
+                );
+                dispatch(
+                    setPaneHidden({
+                        name: 'Profiles',
+                        hidden: npmDevice.getBatteryProfiler === undefined,
+                    })
+                );
+            });
+        }
+    }, [dispatch, npmDevice, pmicState]);
 
     useEffect(() => {
         if (npmDevice) {

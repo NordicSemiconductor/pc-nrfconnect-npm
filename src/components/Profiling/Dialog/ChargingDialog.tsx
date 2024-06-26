@@ -129,7 +129,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     false
                                 );
                                 await npmDevice
-                                    ?.getBatteryProfiler()
+                                    ?.getBatteryProfiler?.()
                                     ?.setProfile(
                                         REPORTING_RATE, // iBat
                                         REPORTING_RATE * 8, // tBat
@@ -140,7 +140,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         ]
                                     );
                                 await npmDevice
-                                    ?.getBatteryProfiler()
+                                    ?.getBatteryProfiler?.()
                                     ?.startProfiling();
                             } catch (e) {
                                 dispatch(

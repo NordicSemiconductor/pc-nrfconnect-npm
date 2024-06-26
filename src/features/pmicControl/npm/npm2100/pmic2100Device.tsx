@@ -8,7 +8,6 @@ import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getRange } from '../../../../utils/helpers';
 import { baseNpmDevice } from '../basePmicDevice';
-import { BatteryProfiler } from '../batteryProfiler';
 import {
     isModuleDataPair,
     MAX_TIMESTAMP,
@@ -61,9 +60,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         devices,
         npm2100FWVersion
     );
-    const batteryProfiler = shellParser
-        ? BatteryProfiler(shellParser, eventEmitter)
-        : undefined;
     let lastUptime = 0;
     let autoReboot = true;
 
@@ -73,9 +69,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
     const processModulePmic = ({ message }: LoggingEvent) => {
         switch (message) {
-            case 'Power Failure Warning':
-                batteryProfiler?.pofError();
-                break;
             case 'No response from PMIC.':
                 if (pmicState !== 'pmic-disconnected') {
                     pmicState = 'pmic-disconnected';
@@ -467,7 +460,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...baseDevice,
         release: () => {
             baseDevice.release();
-            batteryProfiler?.release();
             releaseAll.forEach(release => release());
         },
         applyConfig: config =>
@@ -678,7 +670,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             };
         },
 
-        getBatteryProfiler: () => batteryProfiler,
         setAutoRebootDevice: v => {
             if (v && v !== autoReboot && pmicState === 'pmic-pending-reboot') {
                 baseDevice.kernelReset();
