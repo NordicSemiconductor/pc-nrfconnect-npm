@@ -54,8 +54,12 @@ export default (
         defaults: {
             mode: GPIOMode2100.Input,
             pull: GPIOPull2100['Pull up'],
-            drive: 1,
+            pullEnabled: true,
+            drive: GPIODrive2100.High,
+            driveEnabled: false,
             openDrain: false,
+            openDrainEnabled: false,
             debounce: false,
+            debounceEnabled: true,
         },
     }));

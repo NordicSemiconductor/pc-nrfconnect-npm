@@ -19,6 +19,9 @@ export enum GPIOMode1300 {
 export const GPIOModeValues = Object.keys(GPIOMode1300)
     .filter(key => !Number.isNaN(Number(key)))
     .map(Number);
+export const GPIOModeKeys = Object.values(GPIOMode1300).filter(key =>
+    Number.isNaN(Number(key))
+);
 
 export enum GPIOPull1300 {
     'Pull down' = 0,
@@ -28,6 +31,9 @@ export enum GPIOPull1300 {
 export const GPIOPullValues = Object.keys(GPIOPull1300)
     .filter(key => !Number.isNaN(Number(key)))
     .map(Number);
+export const GPIOPullKeys = Object.values(GPIOPull1300).filter(key =>
+    Number.isNaN(Number(key))
+);
 
 export enum GPIODrive1300 {
     '1 mA' = 1,
@@ -36,3 +42,6 @@ export enum GPIODrive1300 {
 export const GPIODriveValues = Object.keys(GPIODrive1300)
     .filter(key => !Number.isNaN(Number(key)))
     .map(Number);
+export const GPIODriveKeys = Object.values(GPIODrive1300).filter(key =>
+    Number.isNaN(Number(key))
+);

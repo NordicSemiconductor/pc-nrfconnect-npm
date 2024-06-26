@@ -8,6 +8,7 @@ import {
     Buck,
     Charger,
     GPIO,
+    GPIOExport,
     Ldo,
     LED,
     NpmExport,
@@ -244,7 +245,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         },
     };
 
-    const initGPIO: GPIO = {
+    const initGPIO: GPIOExport = {
         mode: GPIOMode1300['Input falling edge event'],
         pull: GPIOPull1300['Pull down'],
         drive: 6,
@@ -303,6 +304,11 @@ describe('PMIC 1300 - Apply Config ', () => {
 
         mockOnGpioUpdate.mockImplementation(
             (partialUpdate: PartialUpdate<GPIO>) => {
+                delete partialUpdate.data.pullEnabled;
+                delete partialUpdate.data.debounceEnabled;
+                delete partialUpdate.data.driveEnabled;
+                delete partialUpdate.data.openDrainEnabled;
+
                 gpios[partialUpdate.index] = {
                     ...(gpios[partialUpdate.index] ?? initGPIO),
                     ...partialUpdate.data,

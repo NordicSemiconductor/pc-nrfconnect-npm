@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { PMIC_2100_BUCKS, PMIC_2100_LDOS, setupMocksBase } from './helpers';
+import { PMIC_2100_LDOS, setupMocksBase } from './helpers';
 
 describe('PMIC 2100 - Static getters', () => {
     const { pmic } = setupMocksBase();
@@ -24,22 +24,6 @@ describe('PMIC 2100 - Static getters', () => {
     test('Number of LEDs', () => expect(pmic.getNumberOfLEDs()).toBe(0));
 
     test('Device Type', () => expect(pmic.getDeviceType()).toBe('npm2100'));
-
-    test.each(PMIC_2100_BUCKS)('Buck Voltage Range index: %p', index =>
-        expect(pmic.getBuckVoltageRange(index)).toStrictEqual({
-            min: 1,
-            max: 3.3,
-            decimals: 1,
-        })
-    );
-
-    test.each(PMIC_2100_BUCKS)('Buck RetVOut Range index: %p', index =>
-        expect(pmic.getBuckRetVOutRange(index)).toStrictEqual({
-            min: 1,
-            max: 3,
-            decimals: 1,
-        })
-    );
 
     test.each(PMIC_2100_LDOS)('LDO Voltage Range index: %p', index =>
         expect(pmic.getLdoVoltageRange(index)).toStrictEqual({

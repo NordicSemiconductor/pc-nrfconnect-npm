@@ -42,10 +42,14 @@ const setupSingleGpio = (
             res => {
                 const mode: GPIOMode1300 = parseToNumber(res);
                 if (mode >= 0 && mode < GPIOModeValues.length) {
+                    const isInput = GPIOMode1300[mode].startsWith('Input');
                     eventEmitter.emitPartialEvent<GPIO>(
                         'onGPIOUpdate',
                         {
                             mode,
+                            pullEnabled: isInput,
+                            driveEnabled: !isInput,
+                            debounceEnabled: isInput,
                         },
                         i
                     );

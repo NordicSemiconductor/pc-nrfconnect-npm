@@ -50,10 +50,15 @@ const setupSingleGpio = (
                                 valueIndex
                             ] as keyof typeof GPIOMode2100
                         ];
+                    const isInput =
+                        GPIOModeKeys[valueIndex].startsWith('Input');
+
                     eventEmitter.emitPartialEvent<GPIO>(
                         'onGPIOUpdate',
                         {
                             mode,
+                            driveEnabled: !isInput,
+                            openDrainEnabled: !isInput,
                         },
                         i
                     );
@@ -65,12 +70,7 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex(
-                'npm2100 gpio config pull',
-                true,
-                i,
-                toValueRegex(GPIOPullKeys)
-            ),
+            toRegex('npm2100 gpio pull', true, i, toValueRegex(GPIOPullValues)),
             res => {
                 const valueIndex = GPIOPullValues.findIndex(
                     v => v === parseColonBasedAnswer(res)
@@ -98,7 +98,12 @@ const setupSingleGpio = (
 
     cleanupCallbacks.push(
         shellParser.registerCommandCallback(
-            toRegex('npmx gpio config drive', true, i, '(1|6)'),
+            toRegex(
+                'npm2100 gpio drive',
+                true,
+                i,
+                toValueRegex(GPIODriveValues)
+            ),
             res => {
                 const valueIndex = GPIODriveValues.findIndex(
                     v => v === parseColonBasedAnswer(res)

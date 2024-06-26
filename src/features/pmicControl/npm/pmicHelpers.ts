@@ -65,8 +65,14 @@ export const parseLogData = (
 };
 
 // parse strings like value is: XXX mV
-export const parseColonBasedAnswer = (message: string) =>
-    message.split(':')[1]?.trim();
+export const parseColonBasedAnswer = (message: string) => {
+    const parsed = message.split(':')[1]?.trim();
+    if (parsed.endsWith('.')) {
+        return parsed.substring(0, parsed.length - 1);
+    }
+
+    return parsed;
+};
 
 export const parseToNumber = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10);

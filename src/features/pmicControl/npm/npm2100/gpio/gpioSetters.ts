@@ -8,11 +8,12 @@ import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     GPIO,
     GPIODrive as GPIODriveBase,
+    GPIOExport,
     GPIOMode as GPIOModeBase,
     GPIOPull as GPIOPullModeBase,
 } from '../../types';
 import { GpioGet } from './gpioGetters';
-import { GPIOMode2100 } from './types';
+import { GPIOMode2100, GPIOModeKeys, GPIOModeValues } from './types';
 
 export class GpioSet {
     private get: GpioGet;
@@ -29,7 +30,7 @@ export class GpioSet {
         this.get = new GpioGet(sendCommand, index);
     }
 
-    async all(gpio: GPIO) {
+    async all(gpio: GPIOExport) {
         await this.mode(gpio.mode as GPIOMode2100);
         await this.pull(gpio.pull);
         await this.drive(gpio.drive);
@@ -40,10 +41,15 @@ export class GpioSet {
     mode(mode: GPIOModeBase) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
+                const valueIndex = GPIOModeValues.findIndex(v => v === mode);
+                const isInput = GPIOModeKeys[valueIndex].startsWith('Input');
+
                 this.eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
                     {
                         mode,
+                        driveEnabled: !isInput,
+                        openDrainEnabled: !isInput,
                     },
                     this.index
                 );
