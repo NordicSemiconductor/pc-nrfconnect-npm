@@ -7,7 +7,7 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { GpioModule } from '../../types';
+import { GpioModule, PmicDialog } from '../../types';
 import gpioCallbacks from './gpioCallbacks';
 import { GpioGet } from './gpioGetters';
 import { GpioSet } from './gpioSetters';
@@ -30,12 +30,19 @@ export default (
         onSuccess?: (response: string, command: string) => void,
         onError?: (response: string, command: string) => void
     ) => void,
+    dialogHandler: ((dialog: PmicDialog) => void) | null,
     offlineMode: boolean
 ): GpioModule[] =>
     [...Array(numberOfGPIOs).keys()].map(index => ({
         index,
         get: new GpioGet(sendCommand, index),
-        set: new GpioSet(eventEmitter, sendCommand, offlineMode, index),
+        set: new GpioSet(
+            eventEmitter,
+            sendCommand,
+            offlineMode,
+            dialogHandler,
+            index
+        ),
         callbacks: gpioCallbacks(shellParser, eventEmitter, numberOfGPIOs),
         values: {
             mode: [...GPIOModeKeys].map(item => ({
