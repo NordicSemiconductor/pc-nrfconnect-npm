@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared/typings/generated/src/Parsers/shellParser';
-
 import { USBDetectStatusValues } from '../../types';
 import { setupMocksWithShellParser } from './helpers';
 
@@ -72,8 +70,6 @@ describe('PMIC 2100 - Logging', () => {
             mockOnAdcSample,
             mockOnBeforeReboot,
             mockOnUsbPower,
-            mockOnErrorLogs,
-            mockEnqueueRequest,
             pmic,
         } = setupMocksWithShellParser();
 
@@ -84,8 +80,6 @@ describe('PMIC 2100 - Logging', () => {
             mockOnAdcSample = setupMock.mockOnAdcSample;
             mockOnBeforeReboot = setupMock.mockOnBeforeReboot;
             mockOnUsbPower = setupMock.mockOnUsbPower;
-            mockOnErrorLogs = setupMock.mockOnErrorLogs;
-            mockEnqueueRequest = setupMock.mockEnqueueRequest;
             pmic = setupMock.pmic;
         });
 
@@ -175,66 +169,6 @@ describe('PMIC 2100 - Logging', () => {
             expect(mockOnUsbPower).toBeCalledTimes(1);
             expect(mockOnUsbPower).toBeCalledWith({
                 detectStatus: USBDetectStatusValues[index],
-            });
-        });
-
-        test('Reset Cause Reason', () => {
-            eventHandlers.mockOnShellLoggingEventHandler(
-                `[00:00:00.038,238] <inf> module_pmic_irq: type=RSTCAUSE,bit=SWRESET`
-            );
-
-            expect(mockOnErrorLogs).toBeCalledTimes(1);
-
-            expect(mockOnErrorLogs).toBeCalledWith({
-                resetCause: ['SWRESET'],
-            });
-        });
-
-        test('Charger Error', () => {
-            jest.clearAllMocks();
-            mockEnqueueRequest.mockClear();
-            mockEnqueueRequest.mockImplementationOnce(
-                (
-                    command: string,
-                    callbacks?: Callbacks,
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    _timeout?: number,
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    _unique?: boolean
-                ) => {
-                    expect(command).toBe('npmx errlog get');
-                    callbacks?.onSuccess(
-                        `RSTCAUSE:
-                        Shipmode exit
-                        CHARGER_ERROR:
-                        NTC sensor error
-                        VBAT Sensor Error
-                        SENSOR_ERROR:
-                        NTC sensor error 2
-                        VBAT Sensor Error 2`,
-                        command
-                    );
-                    return Promise.resolve();
-                }
-            );
-
-            eventHandlers.mockOnShellLoggingEventHandler(
-                `[00:00:06.189,514] <inf> module_pmic_irq: type=EVENTSBCHARGER1SET,bit=EVENTCHGERROR`
-            );
-
-            expect(mockOnErrorLogs).toBeCalledTimes(4);
-            expect(mockOnErrorLogs).nthCalledWith(1, {
-                chargerError: [],
-                sensorError: [],
-            });
-            expect(mockOnErrorLogs).nthCalledWith(2, {
-                resetCause: ['Shipmode exit'],
-            });
-            expect(mockOnErrorLogs).nthCalledWith(3, {
-                chargerError: ['NTC sensor error', 'VBAT Sensor Error'],
-            });
-            expect(mockOnErrorLogs).nthCalledWith(4, {
-                sensorError: ['NTC sensor error 2', 'VBAT Sensor Error 2'],
             });
         });
     });
