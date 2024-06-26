@@ -177,110 +177,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                     break;
             }
         });
-
-        doActionOnEvent(event);
-    };
-
-    const doActionOnEvent = (irqEvent: IrqEvent) => {
-        switch (irqEvent.type) {
-            case 'EVENTSVBUSIN0SET':
-                processEventVBus0Set(irqEvent);
-                break;
-            case 'EVENTSBCHARGER1SET':
-                if (irqEvent.event === 'EVENTCHGERROR') {
-                    eventEmitter.emit('onErrorLogs', {
-                        chargerError: [],
-                        sensorError: [],
-                    });
-
-                    shellParser?.enqueueRequest(
-                        'npmx errlog get',
-                        {
-                            onSuccess: res => {
-                                let errors: string[] = [];
-                                let currentState = '';
-
-                                const emit = () => {
-                                    switch (currentState) {
-                                        case 'RSTCAUSE:':
-                                            eventEmitter.emit('onErrorLogs', {
-                                                resetCause: errors,
-                                            });
-                                            logger.warn(
-                                                `Reset cause: ${errors.join(
-                                                    ', '
-                                                )}`
-                                            );
-                                            break;
-                                        case 'CHARGER_ERROR:':
-                                            eventEmitter.emit('onErrorLogs', {
-                                                chargerError: errors,
-                                            });
-                                            logger.error(
-                                                `Charger Errors: ${errors.join(
-                                                    ', '
-                                                )}`
-                                            );
-                                            break;
-                                        case 'SENSOR_ERROR:':
-                                            eventEmitter.emit('onErrorLogs', {
-                                                sensorError: errors,
-                                            });
-                                            logger.error(
-                                                `Sensor Errors: ${errors.join(
-                                                    ', '
-                                                )}`
-                                            );
-                                            break;
-                                    }
-                                };
-                                const split = res?.split('\n');
-                                split
-                                    ?.map(item => item.trim())
-                                    .forEach(item => {
-                                        if (item.match(/[A-Z_]+:/)) {
-                                            if (currentState) emit();
-                                            currentState = item;
-                                            errors = [];
-                                        } else {
-                                            errors.push(item);
-                                        }
-                                    });
-
-                                emit();
-                            },
-                            onError: () => {
-                                logger.warn(
-                                    'error message unable to read error from device'
-                                );
-                            },
-                            onTimeout: () => {
-                                logger.warn('Reading latest error timed out.');
-                            },
-                        },
-                        undefined,
-                        true
-                    );
-                }
-                break;
-            case 'RSTCAUSE':
-                eventEmitter.emit('onErrorLogs', {
-                    resetCause: [irqEvent.event],
-                });
-                logger.warn(`Reset cause: ${irqEvent.event}`);
-                break;
-        }
-    };
-
-    const processEventVBus0Set = (irqEvent: IrqEvent) => {
-        switch (irqEvent.event) {
-            case 'EVENTVBUSREMOVED':
-                eventEmitter.emit('onUsbPowered', false);
-                break;
-            case 'EVENTVBUSDETECTED':
-                eventEmitter.emit('onUsbPowered', true);
-                break;
-        }
     };
 
     const startAdcSample = (intervalMs: number, samplingRate: number) => {
@@ -517,25 +413,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
-    const setVBusinCurrentLimiter = (amps: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
-                    currentLimiter: amps,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx vbusin current_limit set ${amps * 1000}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.vbusinCurrentLimiter();
-                        reject();
-                    }
-                );
-            }
-        });
-
     // Return a set of default LED settings
     const ledDefaults = (noOfLeds: number): LED[] => {
         const defaultLEDs: LED[] = [];
@@ -576,8 +453,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             requestUpdate.fuelGauge();
             requestUpdate.activeBatteryModel();
             requestUpdate.storedBatteryModel();
-
-            requestUpdate.vbusinCurrentLimiter();
         },
 
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
@@ -586,9 +461,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...fuelGaugeGet,
 
         usbPowered: () => sendCommand(`npmx vbusin status cc get`),
-
-        vbusinCurrentLimiter: () =>
-            sendCommand(`npmx vbusin current_limit get`),
     };
 
     return {
@@ -701,10 +573,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                         await fuelGaugeSet.setFuelGaugeEnabled(
                             config.fuelGauge
                         );
-
-                        await setVBusinCurrentLimiter(
-                            config.usbPower.currentLimiter
-                        );
                     } catch (error) {
                         logger.error('Invalid File.');
                     }
@@ -772,8 +640,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoSet,
         setLedMode,
         ...fuelGaugeSet,
-
-        setVBusinCurrentLimiter,
 
         getHardcodedBatteryModels: () =>
             new Promise<BatteryModel[]>((resolve, reject) => {

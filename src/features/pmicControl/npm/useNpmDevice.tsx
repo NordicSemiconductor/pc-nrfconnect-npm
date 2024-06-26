@@ -50,6 +50,7 @@ import {
     setShipModeConfig,
     setStoredBatterModel,
     setSupportedVersion,
+    setUsbPower,
     updateBoost,
     updateBuck,
     updateCharger,
@@ -493,6 +494,7 @@ export default () => {
             dispatch(setLEDs(npmDevice.ledDefaults()));
             dispatch(setPOFs(npmDevice.pofModule?.defaults));
             dispatch(setShipModeConfig(npmDevice.shipModeModule?.defaults));
+            dispatch(setUsbPower(npmDevice.usbCurrentLimiterModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());

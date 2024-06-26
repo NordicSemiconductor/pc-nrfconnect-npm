@@ -42,7 +42,9 @@ const saveSettings =
             deviceType: currentState.npmDevice.getDeviceType(),
             fuelGaugeChargingSamplingRate:
                 currentState.fuelGaugeChargingSamplingRate,
-            usbPower: { currentLimiter: currentState.usbPower.currentLimiter },
+            usbPower: currentState.usbPower
+                ? { currentLimiter: currentState.usbPower.currentLimiter }
+                : undefined,
         };
 
         telemetry.sendEvent('Export Configuration', {

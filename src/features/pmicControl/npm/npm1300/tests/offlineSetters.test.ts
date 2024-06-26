@@ -461,7 +461,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set VBusin currentLimiter', async () => {
-        await pmic.setVBusinCurrentLimiter(500);
+        await pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(500);
 
         expect(mockOnUsbPower).toBeCalledTimes(1);
         expect(mockOnUsbPower).toBeCalledWith({ currentLimiter: 500 });
