@@ -39,7 +39,8 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const charger = useSelector(getCharger);
     const pmicConnectionState = useSelector(getPmicState);
     const usbPower = useSelector(getUsbPower);
-    const usbPowered = usbPower.detectStatus !== 'No USB connection';
+    const usbPowered =
+        usbPower && usbPower.detectStatus !== 'No USB connection';
     const batteryConnected = useSelector(isBatteryConnected);
     const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
     const index = useSelector(getProfileIndex);

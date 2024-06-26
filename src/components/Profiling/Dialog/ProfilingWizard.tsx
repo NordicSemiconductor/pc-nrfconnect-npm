@@ -85,7 +85,8 @@ export default () => {
     const profile = useSelector(getProfile);
     const batteryConnected = useSelector(isBatteryConnected);
     const usbPower = useSelector(getUsbPower);
-    const usbPowered = usbPower.detectStatus !== 'No USB connection';
+    const usbPowered =
+        usbPower && usbPower.detectStatus !== 'No USB connection';
     const ldos = useSelector(getLdos);
     const bucks = useSelector(getBucks);
     const fuelGauge = useSelector(getFuelGauge);

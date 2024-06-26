@@ -343,18 +343,6 @@ describe('PMIC 2100 - Request update commands', () => {
             true
         );
     });
-
-    test('Request update vBusinCurrentLimiter', () => {
-        pmic.requestUpdate.vbusinCurrentLimiter();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx vbusin current_limit get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
 });
 
 export {};

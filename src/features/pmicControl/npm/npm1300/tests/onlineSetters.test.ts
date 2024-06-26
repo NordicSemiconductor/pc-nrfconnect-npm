@@ -1329,7 +1329,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set vBusinCurrentLimiter', async () => {
-            await pmic.setVBusinCurrentLimiter(5);
+            await pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(5);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -3324,7 +3324,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set vBusinCurrentLimiter - Fail immediately', async () => {
             await expect(
-                pmic.setVBusinCurrentLimiter(5)
+                pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(5)
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

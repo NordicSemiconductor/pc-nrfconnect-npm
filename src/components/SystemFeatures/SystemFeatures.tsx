@@ -56,9 +56,9 @@ export default ({ active }: PaneProps) => {
                     disabled={disabled}
                 />
             )}
-            {npmDevice && (
+            {npmDevice?.usbCurrentLimiterModule && usbPower && (
                 <VBus
-                    npmDevice={npmDevice}
+                    usbCurrentLimiterModule={npmDevice?.usbCurrentLimiterModule}
                     usbPower={usbPower}
                     disabled={disabled}
                 />

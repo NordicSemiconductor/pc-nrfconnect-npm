@@ -33,7 +33,8 @@ export default () => {
     const pmicState = useSelector(getPmicState);
     const supportedVersion = useSelector(isSupportedVersion);
     const usbPower = useSelector(getUsbPower);
-    const usbPowered = usbPower.detectStatus !== 'No USB connection';
+    const usbPowered =
+        usbPower && usbPower.detectStatus !== 'No USB connection';
     const paused = useSelector(isPaused);
     const ccProfilingState = useSelector(getCcProfilingState);
     const npmDevice = useSelector(getNpmDevice);

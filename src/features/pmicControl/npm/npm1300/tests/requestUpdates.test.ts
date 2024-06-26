@@ -860,7 +860,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update vBusinCurrentLimiter', () => {
-        pmic.requestUpdate.vbusinCurrentLimiter();
+        pmic.usbCurrentLimiterModule?.get.vBusInCurrentLimiter();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

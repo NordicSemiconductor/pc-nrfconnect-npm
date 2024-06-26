@@ -567,6 +567,23 @@ export type ShipModeModule = {
     defaults: ShipModeConfig;
 };
 
+export type UsbCurrentLimiterModule = {
+    get: {
+        all: () => void;
+        vBusInCurrentLimiter: () => void;
+        usbPowered: () => void;
+    };
+    set: {
+        all(usb: USBPowerExport): Promise<void>;
+        vBusInCurrentLimiter(amps: number): Promise<void>;
+    };
+    callbacks: (() => void)[];
+    defaults: USBPower;
+    ranges: {
+        vBusInLimiter: number[];
+    };
+};
+
 export type BaseNpmDevice = {
     kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
@@ -665,6 +682,7 @@ export type BaseNpmDevice = {
     shipModeModule?: ShipModeModule;
     timerConfigModule?: TimerConfigModule;
     buckModule: BuckModule[];
+    usbCurrentLimiterModule?: UsbCurrentLimiterModule;
 };
 
 export interface INpmDevice extends IBaseNpmDevice {
@@ -687,7 +705,6 @@ export type NpmDevice = {
     stopAdcSample: () => void;
 
     getLdoVoltageRange: (index: number) => RangeType;
-    getUSBCurrentLimiterRange: () => number[];
 
     ldoDefaults: () => Ldo[];
     ledDefaults: () => LED[];
@@ -711,10 +728,6 @@ export type NpmDevice = {
 
         activeBatteryModel: () => void;
         storedBatteryModel: () => void;
-
-        usbPowered: () => void;
-
-        vbusinCurrentLimiter: () => void;
     };
 
     setLdoVoltage: (index: number, value: number) => Promise<void>;
@@ -774,8 +787,6 @@ export type NpmDevice = {
 
     getBatteryProfiler: () => BatteryProfiler | undefined;
     setAutoRebootDevice: (autoReboot: boolean) => void;
-
-    setVBusinCurrentLimiter: (amps: number) => Promise<void>;
 } & BaseNpmDevice;
 
 export interface PmicDialog {
@@ -807,6 +818,7 @@ export type GPIOExport = Omit<
     GPIO,
     'pullEnabled' | 'driveEnabled' | 'openDrainEnabled' | 'debounceEnabled'
 >;
+export type USBPowerExport = Omit<USBPower, 'detectStatus'>;
 
 export interface NpmExport {
     boosts: Boost[];
@@ -822,7 +834,7 @@ export interface NpmExport {
     firmwareVersion: string;
     deviceType: NpmModel;
     fuelGaugeChargingSamplingRate: number;
-    usbPower: Omit<USBPower, 'detectStatus'>;
+    usbPower?: USBPowerExport;
 }
 
 export interface LoggingEvent {

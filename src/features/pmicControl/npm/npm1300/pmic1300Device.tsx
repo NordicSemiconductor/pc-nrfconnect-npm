@@ -6,7 +6,6 @@
 
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { getRange } from '../../../../utils/helpers';
 import { baseNpmDevice } from '../basePmicDevice';
 import { BatteryProfiler } from '../batteryProfiler';
 import {
@@ -44,6 +43,7 @@ import setupLdo, { ldoDefaults } from './ldo';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timerConfig';
+import setupUsbCurrentLimiter from './usbCurrentLimiterConfig';
 
 export const npm1300FWVersion = '1.1.1+0';
 
@@ -400,6 +400,13 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
+    const usbCurrentLimiterModule = setupUsbCurrentLimiter(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
     const releaseAll: (() => void)[] = [];
 
     if (shellParser) {
@@ -525,18 +532,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         releaseAll.push(...pofModule.callbacks);
         releaseAll.push(...timerConfigModule.callbacks);
         releaseAll.push(...shipModeModule.callbacks);
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx vbusin current_limit', true),
-                res => {
-                    eventEmitter.emit('onUsbPower', {
-                        currentLimiter: parseToNumber(res) / 1000,
-                    });
-                },
-                noop
-            )
-        );
+        releaseAll.push(...usbCurrentLimiterModule.callbacks);
     }
 
     const setLedMode = (index: number, mode: LEDMode) =>
@@ -564,25 +560,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
-    const setVBusinCurrentLimiter = (amps: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
-                    currentLimiter: amps,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx vbusin current_limit set ${amps * 1000}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.vbusinCurrentLimiter();
-                        reject();
-                    }
-                );
-            }
-        });
-
     // Return a set of default LED settings
     const ledDefaults = (noOfLeds: number): LED[] => {
         const defaultLEDs: LED[] = [];
@@ -598,8 +575,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         all: () => {
             // Request all updates for nPM1300
 
-            requestUpdate.usbPowered();
-
+            usbCurrentLimiterModule.get.all();
             chargerModule.get.all();
 
             buckModule.forEach(buck => buck.get.all());
@@ -627,19 +603,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             requestUpdate.fuelGauge();
             requestUpdate.activeBatteryModel();
             requestUpdate.storedBatteryModel();
-
-            requestUpdate.vbusinCurrentLimiter();
         },
 
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
 
         ...ldoGet,
         ...fuelGaugeGet,
-
-        usbPowered: () => sendCommand(`npmx vbusin status cc get`),
-
-        vbusinCurrentLimiter: () =>
-            sendCommand(`npmx vbusin current_limit get`),
     };
 
     return {
@@ -733,9 +702,11 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             config.fuelGauge
                         );
 
-                        await setVBusinCurrentLimiter(
-                            config.usbPower.currentLimiter
-                        );
+                        if (config.usbPower) {
+                            await usbCurrentLimiterModule.set.all(
+                                config.usbPower
+                            );
+                        }
                     } catch (error) {
                         logger.error('Invalid File.');
                     }
@@ -787,17 +758,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         ...ldoRanges,
 
-        getUSBCurrentLimiterRange: () => [
-            0.1,
-            ...getRange([
-                {
-                    min: 0.5,
-                    max: 1.5,
-                    step: 0.1,
-                },
-            ]).map(v => Number(v.toFixed(2))),
-        ],
-
         requestUpdate,
 
         buckModule,
@@ -805,8 +765,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoSet,
         setLedMode,
         ...fuelGaugeSet,
-
-        setVBusinCurrentLimiter,
 
         getHardcodedBatteryModels: () =>
             new Promise<BatteryModel[]>((resolve, reject) => {
