@@ -63,7 +63,7 @@ export default (
             pull: GPIOPull2100['Pull up'],
             pullEnabled: true,
             drive: GPIODrive2100.High,
-            driveEnabled: false,
+            driveEnabled: true,
             openDrain: false,
             openDrainEnabled: false,
             debounce: false,
