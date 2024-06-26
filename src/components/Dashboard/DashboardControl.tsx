@@ -42,6 +42,12 @@ export default ({ active }: PaneProps) => {
         >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
+            {npmDevice && npmDevice.hasMaxEnergyExtraction() && (
+                <MaximumEnergyExtraction
+                    npmDevice={npmDevice}
+                    disabled={disabled}
+                />
+            )}
 
             {npmDevice &&
                 boosts.map((boost, index) => (
@@ -60,12 +66,6 @@ export default ({ active }: PaneProps) => {
                     cardLabel="Charger"
                     disabled={disabled}
                     defaultSummary
-                />
-            )}
-            {npmDevice && npmDevice.hasMaxEnergyExtraction() && (
-                <MaximumEnergyExtraction
-                    npmDevice={npmDevice}
-                    disabled={disabled}
                 />
             )}
             {npmDevice &&
