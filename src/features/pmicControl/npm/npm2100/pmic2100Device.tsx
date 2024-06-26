@@ -517,25 +517,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
-    const setVBusinCurrentLimiter = (amps: number) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
-                    currentLimiter: amps,
-                });
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx vbusin current_limit set ${amps * 1000}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.vbusinCurrentLimiter();
-                        reject();
-                    }
-                );
-            }
-        });
-
     // Return a set of default LED settings
     const ledDefaults = (noOfLeds: number): LED[] => {
         const defaultLEDs: LED[] = [];
@@ -576,8 +557,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             requestUpdate.fuelGauge();
             requestUpdate.activeBatteryModel();
             requestUpdate.storedBatteryModel();
-
-            requestUpdate.vbusinCurrentLimiter();
         },
 
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
@@ -586,9 +565,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...fuelGaugeGet,
 
         usbPowered: () => sendCommand(`npmx vbusin status cc get`),
-
-        vbusinCurrentLimiter: () =>
-            sendCommand(`npmx vbusin current_limit get`),
     };
 
     return {
@@ -701,10 +677,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                         await fuelGaugeSet.setFuelGaugeEnabled(
                             config.fuelGauge
                         );
-
-                        await setVBusinCurrentLimiter(
-                            config.usbPower.currentLimiter
-                        );
                     } catch (error) {
                         logger.error('Invalid File.');
                     }
@@ -772,8 +744,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...ldoSet,
         setLedMode,
         ...fuelGaugeSet,
-
-        setVBusinCurrentLimiter,
 
         getHardcodedBatteryModels: () =>
             new Promise<BatteryModel[]>((resolve, reject) => {

@@ -50,7 +50,7 @@ interface pmicControlState {
     activeBatterModel?: BatteryModel;
     hardcodedBatterModels: BatteryModel[];
     storedBatterModel?: BatteryModel[];
-    usbPower: USBPower;
+    usbPower?: USBPower;
     fuelGaugeChargingSamplingRate: number;
     fuelGaugeNotChargingSamplingRate: number;
     fuelGaugeReportingRate: number;
@@ -82,10 +82,6 @@ const initialState: pmicControlState = {
     fuelGauge: false,
     hardcodedBatterModels: [],
     dialog: [],
-    usbPower: {
-        detectStatus: 'No USB connection',
-        currentLimiter: 0.1,
-    },
     fuelGaugeChargingSamplingRate: 500,
     fuelGaugeNotChargingSamplingRate: 1000,
     fuelGaugeReportingRate: 2000,
@@ -264,14 +260,17 @@ const pmicControlSlice = createSlice({
         stopEventRecording(state) {
             state.eventRecordingPath = undefined;
         },
-        setUsbPower(state, action: PayloadAction<USBPower>) {
+        setUsbPower(state, action: PayloadAction<USBPower | undefined>) {
             state.usbPower = action.payload;
         },
         updateUsbPower(state, action: PayloadAction<Partial<USBPower>>) {
-            state.usbPower = {
-                ...state.usbPower,
-                ...action.payload,
-            };
+            if (state.npmDevice?.usbCurrentLimiterModule) {
+                state.usbPower = {
+                    ...state.npmDevice?.usbCurrentLimiterModule.defaults,
+                    ...state.usbPower,
+                    ...action.payload,
+                };
+            }
         },
         setFuelGaugeChargingSamplingRate(state, action: PayloadAction<number>) {
             state.fuelGaugeChargingSamplingRate = action.payload;
