@@ -345,7 +345,7 @@ export const getStoredBatterModels = (state: RootState) =>
     state.app.pmicControl.storedBatterModel;
 export const getUsbPower = (state: RootState) => state.app.pmicControl.usbPower;
 export const canProfile = (state: RootState) =>
-    state.app.pmicControl.npmDevice?.getBatteryProfiler() !== undefined;
+    state.app.pmicControl.npmDevice?.getBatteryProfiler?.() !== undefined;
 export const isSupportedVersion = (state: RootState) =>
     state.app.pmicControl.pmicState !== 'ek-disconnected'
         ? state.app.pmicControl.supportedVersion

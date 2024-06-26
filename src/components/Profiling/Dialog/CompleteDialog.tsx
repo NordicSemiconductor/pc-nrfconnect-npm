@@ -67,11 +67,11 @@ const finishProfiling = (): AppThunk<RootState> => (dispatch, getState) => {
 
     npmDevice?.setAutoRebootDevice(true);
     npmDevice
-        ?.getBatteryProfiler()
+        ?.getBatteryProfiler?.()
         ?.isProfiling()
         .then(result => {
             if (result) {
-                npmDevice.getBatteryProfiler()?.stopProfiling();
+                npmDevice.getBatteryProfiler?.()?.stopProfiling();
             }
             dispatch(closeProfiling());
         })
@@ -203,11 +203,11 @@ const RestartProfileButton = ({
 
                 npmDevice?.setAutoRebootDevice(true);
                 npmDevice
-                    ?.getBatteryProfiler()
+                    ?.getBatteryProfiler?.()
                     ?.isProfiling()
                     .then(result => {
                         if (result) {
-                            npmDevice.getBatteryProfiler()?.stopProfiling();
+                            npmDevice.getBatteryProfiler?.()?.stopProfiling();
                         }
                         dispatch(restartProfile());
                     })
@@ -240,11 +240,11 @@ const NextProfileButton = ({
                 }
                 npmDevice?.setAutoRebootDevice(true);
                 npmDevice
-                    ?.getBatteryProfiler()
+                    ?.getBatteryProfiler?.()
                     ?.isProfiling()
                     .then(result => {
                         if (result) {
-                            npmDevice.getBatteryProfiler()?.stopProfiling();
+                            npmDevice.getBatteryProfiler?.()?.stopProfiling();
                         }
                         dispatch(nextProfile());
                     })
@@ -274,12 +274,12 @@ const AbortProfileButton = () => {
                             dispatch(clearWaitForDevice());
                         } else {
                             npmDevice
-                                ?.getBatteryProfiler()
+                                ?.getBatteryProfiler?.()
                                 ?.isProfiling()
                                 .then(result => {
                                     if (result) {
                                         npmDevice
-                                            .getBatteryProfiler()
+                                            .getBatteryProfiler?.()
                                             ?.stopProfiling();
                                     }
                                     dispatch(closeProfiling());
