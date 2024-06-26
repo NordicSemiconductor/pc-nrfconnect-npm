@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
-
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Ldo, LdoMode, PmicDialog } from '../../types';
 import {
