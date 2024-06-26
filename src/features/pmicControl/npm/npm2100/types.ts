@@ -31,7 +31,6 @@ export type nPM2100GPIOControlMode =
     (typeof nPM2100GPIOControlModeValues)[number];
 
 export const nPM2100LDOSoftStartValues = [
-    '0mA',
     '25mA',
     '38mA',
     '50mA',
@@ -41,7 +40,6 @@ export const nPM2100LDOSoftStartValues = [
 export type nPM2100LDOSoftStart = (typeof nPM2100LDOSoftStartValues)[number];
 
 export const nPM2100LoadSwitchSoftStartValues = [
-    '0mA',
     '40mA',
     '70mA',
     '75mA',
