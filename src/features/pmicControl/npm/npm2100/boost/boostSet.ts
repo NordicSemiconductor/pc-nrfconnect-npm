@@ -11,7 +11,6 @@ import {
     BoostModeControl,
     BoostPinMode,
     BoostPinSelection,
-    PmicDialog,
 } from '../../types';
 import { BoostGet } from './boostGet';
 
@@ -25,10 +24,18 @@ export class BoostSet {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
         ) => void,
-        private dialogHandler: ((dialog: PmicDialog) => void) | null,
         private offlineMode: boolean
     ) {
         this.get = new BoostGet(sendCommand);
+    }
+
+    async all(config: Boost) {
+        await this.vOut(config.vOut);
+        await this.mode(config.mode);
+        await this.modeControl(config.modeControl);
+        await this.pinSelection(config.pinSelection);
+        await this.pinMode(config.pinMode);
+        await this.overCurrent(config.overCurrentProtection);
     }
 
     vOut(value: number) {

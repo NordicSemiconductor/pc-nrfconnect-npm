@@ -305,5 +305,6 @@ export const baseNpmDevice: IBaseNpmDevice = (
 
         boostModule: [],
         gpioModule: [],
+        buckModule: [],
     };
 };

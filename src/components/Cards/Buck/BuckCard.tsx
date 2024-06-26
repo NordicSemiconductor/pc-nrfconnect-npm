@@ -20,49 +20,46 @@ import {
     BuckMode,
     BuckModeControl,
     BuckModeControlValues,
+    BuckModule,
     BuckOnOffControl,
     BuckOnOffControlValues,
     BuckRetentionControl,
     BuckRetentionControlValues,
     GPIOValues,
-    NpmDevice,
 } from '../../../features/pmicControl/npm/types';
 
 interface BuckCardProperties {
-    index: number;
-    npmDevice: NpmDevice;
     buck: Buck;
+    buckModule: BuckModule;
     cardLabel?: string;
     defaultSummary?: boolean;
     disabled: boolean;
+    numberOfGPIOs?: number;
 }
 
 export default ({
-    npmDevice,
-    index,
     buck,
-    cardLabel = `BUCK ${index + 1}`,
+    buckModule,
+    cardLabel = `BUCK ${buckModule.index + 1}`,
     disabled,
     defaultSummary = false,
+    numberOfGPIOs = 0,
 }: BuckCardProperties) => {
-    const card = `buck${index + 1}`;
+    const card = `buck${buckModule.index + 1}`;
     const [summary, setSummary] = useState(defaultSummary);
 
-    const onVOutChange = (value: number) =>
-        npmDevice.setBuckVOutNormal(index, value);
+    const onVOutChange = (value: number) => buckModule.set.vOutNormal(value);
 
     const onRetVOutChange = (value: number) => {
-        npmDevice.setBuckVOutRetention(index, value);
+        buckModule.set.vOutRetention(value);
     };
 
-    const onModeToggle = (mode: BuckMode) => npmDevice.setBuckMode(index, mode);
+    const onModeToggle = (mode: BuckMode) => buckModule.set.mode(mode);
 
-    const onBuckToggle = (value: boolean) =>
-        npmDevice.setBuckEnabled(index, value);
+    const onBuckToggle = (value: boolean) => buckModule.set.enabled(value);
 
-    const voltageRange = npmDevice.getBuckVoltageRange(index);
-    const retVOutRange = npmDevice.getBuckRetVOutRange(index);
-    const numberOfGPIOs = npmDevice.gpioModule.length;
+    const voltageRange = buckModule.ranges.voltage;
+    const retVOutRange = buckModule.ranges.retVOut;
 
     const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
 
@@ -80,7 +77,10 @@ export default ({
                     'Software'
                 ) : (
                     <>
-                        V<span className="subscript">{`SET${index + 1}`}</span>
+                        V
+                        <span className="subscript">{`SET${
+                            buckModule.index + 1
+                        }`}</span>
                     </>
                 );
             return {
@@ -104,7 +104,10 @@ export default ({
             key: 'Vset',
             renderItem: (
                 <>
-                    V<span className="subscript">{`SET${index + 1}`}</span>
+                    V
+                    <span className="subscript">{`SET${
+                        buckModule.index + 1
+                    }`}</span>
                 </>
             ),
         },
@@ -168,7 +171,7 @@ export default ({
                         <div>
                             <span>V</span>
                             <span className="subscript">{`OUT${
-                                index + 1
+                                buckModule.index + 1
                             }`}</span>
                         </div>
                     </DocumentationTooltip>
@@ -189,7 +192,7 @@ export default ({
                                 <div>
                                     <span>V</span>
                                     <span className="subscript">{`RET${
-                                        index + 1
+                                        buckModule.index + 1
                                     }`}</span>
                                 </div>
                             </DocumentationTooltip>
@@ -213,7 +216,7 @@ export default ({
                         }
                         isToggled={buck.activeDischarge}
                         onToggle={value =>
-                            npmDevice.setBuckActiveDischarge(index, value)
+                            buckModule.set.activeDischarge(value)
                         }
                         disabled={disabled}
                     />
@@ -228,8 +231,7 @@ export default ({
                         }
                         items={modeControlItems}
                         onSelect={item =>
-                            npmDevice.setBuckModeControl(
-                                index,
+                            buckModule.set.modeControl(
                                 item.value as BuckModeControl
                             )
                         }
@@ -255,12 +257,11 @@ export default ({
                             </DocumentationTooltip>
                         }
                         items={buckOnOffControlItems}
-                        onSelect={item => {
-                            npmDevice.setBuckOnOffControl(
-                                index,
+                        onSelect={item =>
+                            buckModule.set.onOffControl(
                                 item.value as BuckOnOffControl
-                            );
-                        }}
+                            )
+                        }
                         selectedItem={
                             buckOnOffControlItems[
                                 Math.max(
@@ -284,8 +285,7 @@ export default ({
                         }
                         items={buckRetentionControlItems}
                         onSelect={item =>
-                            npmDevice.setBuckRetentionControl(
-                                index,
+                            buckModule.set.retentionControl(
                                 item.value as BuckRetentionControl
                             )
                         }

@@ -38,10 +38,10 @@ export default ({ active }: PaneProps) => {
                 bucks.map((buck, index) => (
                     <BuckCard
                         buck={buck}
-                        npmDevice={npmDevice}
+                        buckModule={npmDevice.buckModule[index]}
                         key={`Buck${1 + index}`}
-                        index={index}
                         disabled={disabled}
+                        numberOfGPIOs={npmDevice.gpioModule.length}
                     />
                 ))}
             {npmDevice &&

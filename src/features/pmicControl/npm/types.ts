@@ -425,7 +425,7 @@ export interface ChargerModule {
     defaults: Charger;
 }
 
-export type BoostModule = {
+export interface BoostModule {
     get: {
         all: () => void;
         vOut: () => void;
@@ -436,6 +436,7 @@ export type BoostModule = {
         overCurrent: () => void;
     };
     set: {
+        all: (config: Boost) => Promise<void>;
         vOut: (value: number) => Promise<void>;
         mode: (mode: BoostMode) => Promise<void>;
         modeControl: (modeControl: BoostModeControl) => Promise<void>;
@@ -445,18 +446,44 @@ export type BoostModule = {
     };
     callbacks: (() => void)[];
     ranges: {
-        voltageRange: RangeType;
+        voltage: RangeType;
     };
-    defaults: {
-        vOut: number;
-        mode: BoostMode;
-        modeControl: BoostModeControl;
-        pinSelection: BoostPinSelection;
-        pinMode: BoostPinMode;
-        pinModeEnabled: boolean;
-        overCurrentProtection: boolean;
+    defaults: Boost;
+}
+
+export interface BuckModule {
+    index: number;
+    get: {
+        all: () => void;
+        vOutNormal: () => void;
+        vOutRetention: () => void;
+        mode: () => void;
+        enabled: () => void;
+        modeControl: () => void;
+        onOffControl: () => void;
+        retentionControl: () => void;
+        activeDischarge: () => void;
     };
-};
+    set: {
+        all: (config: BuckExport) => Promise<void>;
+        vOutNormal: (value: number) => Promise<void>;
+        vOutRetention: (value: number) => Promise<void>;
+        mode: (mode: BuckMode) => Promise<void>;
+        modeControl: (modeControl: BuckModeControl) => Promise<void>;
+        onOffControl: (onOffControl: BuckOnOffControl) => Promise<void>;
+        retentionControl: (
+            retentionControl: BuckRetentionControl
+        ) => Promise<void>;
+        enabled: (enabled: boolean) => Promise<void>;
+        activeDischarge: (activeDischarge: boolean) => Promise<void>;
+    };
+    callbacks: (() => void)[];
+    ranges: {
+        voltage: RangeType;
+        retVOut: RangeType;
+    };
+    defaults: Buck;
+}
 
 export type GpioModule = {
     index: number;
@@ -600,8 +627,6 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     hasMaxEnergyExtraction: () => boolean;
-    getNumberOfBoosts: () => number;
-    getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
     getNumberOfLEDs: () => number;
     getNumberOfBatteryModelSlots: () => number;
@@ -620,6 +645,7 @@ export type BaseNpmDevice = {
     boostModule: BoostModule[];
     pofModule?: PofModule;
     timerConfigModule?: TimerConfigModule;
+    buckModule: BuckModule[];
 };
 
 export interface INpmDevice extends IBaseNpmDevice {
@@ -641,12 +667,9 @@ export type NpmDevice = {
     startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
 
-    getBuckVoltageRange: (index: number) => RangeType;
-    getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
     getUSBCurrentLimiterRange: () => number[];
 
-    buckDefaults: () => Buck[];
     ldoDefaults: () => Ldo[];
     ledDefaults: () => LED[];
 
@@ -654,15 +677,6 @@ export type NpmDevice = {
 
     requestUpdate: {
         all: () => void;
-
-        buckVOutNormal: (index: number) => void;
-        buckVOutRetention: (index: number) => void;
-        buckMode: (index: number) => void;
-        buckModeControl: (index: number) => void;
-        buckOnOffControl: (index: number) => void;
-        buckRetentionControl: (index: number) => void;
-        buckEnabled: (index: number) => void;
-        buckActiveDischarge: (index: number) => void;
 
         ldoVoltage: (index: number) => void;
         ldoEnabled: (index: number) => void;
@@ -686,21 +700,6 @@ export type NpmDevice = {
 
         vbusinCurrentLimiter: () => void;
     };
-
-    setBuckVOutNormal: (index: number, value: number) => Promise<void>;
-    setBuckVOutRetention: (index: number, value: number) => Promise<void>;
-    setBuckMode: (index: number, mode: BuckMode) => Promise<void>;
-    setBuckModeControl: (index: number, mode: BuckModeControl) => Promise<void>;
-    setBuckOnOffControl: (
-        index: number,
-        mode: BuckOnOffControl
-    ) => Promise<void>;
-    setBuckRetentionControl: (
-        index: number,
-        mode: BuckRetentionControl
-    ) => Promise<void>;
-    setBuckEnabled: (index: number, state: boolean) => Promise<void>;
-    setBuckActiveDischarge: (index: number, state: boolean) => Promise<void>;
 
     setLdoVoltage: (index: number, value: number) => Promise<void>;
     setLdoEnabled: (index: number, state: boolean) => Promise<void>;

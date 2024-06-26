@@ -8,7 +8,7 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Boost, PmicDialog } from '../../types';
+import { Boost } from '../../types';
 import boostCallbacks from './boostCallback';
 import { BoostGet } from './boostGet';
 import { BoostSet } from './boostSet';
@@ -40,20 +40,14 @@ export default (
         onSuccess?: (response: string, command: string) => void,
         onError?: (response: string, command: string) => void
     ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
     offlineMode: boolean
 ) => [
     {
         get: new BoostGet(sendCommand),
-        set: new BoostSet(
-            eventEmitter,
-            sendCommand,
-            dialogHandler,
-            offlineMode
-        ),
+        set: new BoostSet(eventEmitter, sendCommand, offlineMode),
         callbacks: boostCallbacks(shellParser, eventEmitter),
         ranges: {
-            voltageRange: voltageRange(),
+            voltage: voltageRange(),
         },
         defaults: boostDefaults(),
     },

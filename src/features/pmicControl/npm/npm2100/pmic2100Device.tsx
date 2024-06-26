@@ -37,7 +37,6 @@ import {
     USBPower,
 } from '../types';
 import getBoostModule, { numberOfBoosts } from './boost';
-import setupBucks, { buckDefaults } from './buck';
 import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
@@ -329,15 +328,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
     const offlineMode = !shellParser;
 
-    const { buckGet, buckSet, buckCallbacks, buckRanges } = setupBucks(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        dialogHandler,
-        offlineMode,
-        devices.noOfBucks
-    );
-
     const { ldoGet, ldoSet, ldoCallbacks, ldoRanges } = setupLdo(
         shellParser,
         eventEmitter,
@@ -366,6 +356,13 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         eventEmitter,
         sendCommand,
         dialogHandler,
+        offlineMode
+    );
+
+    const boostModule = getBoostModule(
+        shellParser,
+        eventEmitter,
+        sendCommand,
         offlineMode
     );
 
@@ -465,7 +462,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
 
-        releaseAll.push(...buckCallbacks);
+        releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
         releaseAll.push(...ldoCallbacks);
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
 
@@ -560,29 +557,11 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         return defaultLEDs;
     };
 
-    const boostModule = getBoostModule(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        dialogHandler,
-        offlineMode
-    );
-
     const requestUpdate = {
         all: () => {
             // Request all updates for nPM2100
 
             requestUpdate.usbPowered();
-
-            for (let i = 0; i < devices.noOfBucks; i += 1) {
-                requestUpdate.buckVOutNormal(i);
-                requestUpdate.buckVOutRetention(i);
-                requestUpdate.buckMode(i);
-                requestUpdate.buckEnabled(i);
-                requestUpdate.buckModeControl(i);
-                requestUpdate.buckOnOffControl(i);
-                requestUpdate.buckActiveDischarge(i);
-            }
 
             boostModule.forEach(boost => boost.get.all());
 
@@ -614,8 +593,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             requestUpdate.vbusinCurrentLimiter();
         },
 
-        ...buckGet,
-
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
 
         ...ldoGet,
@@ -646,20 +623,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                     try {
                         await Promise.all(
                             config.boosts.map((boost, index) => async () => {
-                                await boostModule[index].set.vOut(boost.vOut);
-                                await boostModule[index].set.mode(boost.mode);
-                                await boostModule[index].set.modeControl(
-                                    boost.modeControl
-                                );
-                                await boostModule[index].set.pinSelection(
-                                    boost.pinSelection
-                                );
-                                await boostModule[index].set.pinMode(
-                                    boost.pinMode
-                                );
-                                await boostModule[index].set.overCurrent(
-                                    boost.overCurrentProtection
-                                );
+                                await boostModule[index].set.all(boost);
                             })
                         );
                         await Promise.all(
@@ -811,7 +775,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         startAdcSample,
         stopAdcSample,
 
-        ...buckRanges,
         ...ldoRanges,
 
         getUSBCurrentLimiterRange: () => [
@@ -827,7 +790,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         requestUpdate,
 
-        ...buckSet,
         ...ldoSet,
         setLedMode,
         ...shipModeSet,
@@ -883,7 +845,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         },
 
         // Default settings
-        buckDefaults: () => buckDefaults(devices.noOfBucks),
         ldoDefaults: () => ldoDefaults(devices.noOfLdos),
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
 
