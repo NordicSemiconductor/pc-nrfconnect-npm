@@ -446,7 +446,7 @@ export interface BoostModule {
     };
     callbacks: (() => void)[];
     ranges: {
-        voltageRange: RangeType;
+        voltage: RangeType;
     };
     defaults: Boost;
 }
