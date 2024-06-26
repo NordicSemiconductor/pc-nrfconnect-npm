@@ -69,19 +69,22 @@ export const ldoSet = (
                         'onLdoUpdate',
                         {
                             mode,
+                            enabled: false,
                         },
                         index
                     );
                     resolve();
                 } else {
-                    sendCommand(
-                        `npm2100 ldosw mode set ${mode}`,
-                        () => resolve(),
-                        () => {
-                            ldoMode();
-                            reject();
-                        }
-                    );
+                    setLdoEnabled(index, false).then(() => {
+                        sendCommand(
+                            `npm2100 ldosw mode set ${mode}`,
+                            () => resolve(),
+                            () => {
+                                ldoMode();
+                                reject();
+                            }
+                        );
+                    });
                 }
             });
 
