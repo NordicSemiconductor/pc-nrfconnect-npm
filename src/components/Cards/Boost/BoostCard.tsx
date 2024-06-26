@@ -152,11 +152,11 @@ export default ({
                     <Dropdown
                         label="GPIO Control - Pin Selection"
                         items={pinSelectionItems}
-                        onSelect={item => {
+                        onSelect={item =>
                             boostModule.set.pinSelection(
                                 item.value as BoostPinSelection
-                            );
-                        }}
+                            )
+                        }
                         selectedItem={
                             pinSelectionItems.find(
                                 item => item.value === boost.pinSelection
@@ -167,9 +167,9 @@ export default ({
                     <Dropdown
                         label="GPIO Control - Mode Selection"
                         items={pinModeItems}
-                        onSelect={item => {
-                            boostModule.set.pinMode(item.value as BoostPinMode);
-                        }}
+                        onSelect={item =>
+                            boostModule.set.pinMode(item.value as BoostPinMode)
+                        }
                         selectedItem={
                             pinModeItems.find(
                                 item => item.value === boost.pinMode
