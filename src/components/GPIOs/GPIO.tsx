@@ -87,9 +87,7 @@ export default ({
                         item => item.value === gpio.pull
                     ) ?? gpioModule.values.pull[0]
                 }
-                disabled={
-                    disabled || toStringMode(gpio.mode)?.startsWith('Output')
-                }
+                disabled={disabled || !gpio.pullEnabled}
             />
             <Dropdown
                 label={
@@ -107,9 +105,7 @@ export default ({
                         item => item.value === gpio.drive
                     ) ?? gpioModule.values.drive[0]
                 }
-                disabled={
-                    disabled || toStringMode(gpio.mode)?.startsWith('Input')
-                }
+                disabled={disabled || !gpio.driveEnabled}
             />
             <Toggle
                 label={
@@ -122,7 +118,7 @@ export default ({
                 }
                 isToggled={gpio.openDrain}
                 onToggle={value => gpioModule.set.openDrain(value)}
-                disabled={disabled}
+                disabled={disabled || !gpio.openDrainEnabled}
             />
             <Toggle
                 label={
@@ -135,9 +131,7 @@ export default ({
                 }
                 isToggled={gpio.debounce}
                 onToggle={value => gpioModule.set.debounce(value)}
-                disabled={
-                    disabled || toStringMode(gpio.mode)?.startsWith('Output')
-                }
+                disabled={disabled || !gpio.pullEnabled}
             />
         </Card>
     );

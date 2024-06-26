@@ -17,7 +17,7 @@ export const GPIOModeValues = Object.values(GPIOMode2100);
 export enum GPIOPull2100 {
     'Pull down' = 'PULLDOWN',
     'Pull up' = 'PULLUP',
-    'Pull disable' = ' NOPULL',
+    'Pull disable' = 'NOPULL',
 }
 
 export const GPIOPullKeys = Object.keys(GPIOPull2100);

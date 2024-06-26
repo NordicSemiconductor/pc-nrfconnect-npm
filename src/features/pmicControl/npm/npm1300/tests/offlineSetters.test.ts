@@ -341,7 +341,12 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
-            data: { mode: GPIOMode1300.Input },
+            data: {
+                mode: GPIOMode1300.Input,
+                debounceEnabled: true,
+                driveEnabled: false,
+                pullEnabled: true,
+            },
             index,
         });
     });

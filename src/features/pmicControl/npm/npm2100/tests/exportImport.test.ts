@@ -8,6 +8,7 @@ import {
     Buck,
     Charger,
     GPIO,
+    GPIOExport,
     Ldo,
     LED,
     NpmExport,
@@ -215,7 +216,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         },
     };
 
-    const initGPIO: GPIO = {
+    const initGPIO: GPIOExport = {
         mode: GPIOMode2100.Output,
         pull: GPIOPull2100['Pull down'],
         drive: 6,
@@ -274,6 +275,11 @@ test.skip('PMIC 2100 - Apply Config ', () => {
 
         mockOnGpioUpdate.mockImplementation(
             (partialUpdate: PartialUpdate<GPIO>) => {
+                delete partialUpdate.data.pullEnabled;
+                delete partialUpdate.data.debounceEnabled;
+                delete partialUpdate.data.driveEnabled;
+                delete partialUpdate.data.openDrainEnabled;
+
                 gpios[partialUpdate.index] = {
                     ...(gpios[partialUpdate.index] ?? initGPIO),
                     ...partialUpdate.data,

@@ -20,7 +20,12 @@ import {
     TimeToActiveValues,
     USBDetectStatusValues,
 } from '../../types';
-import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
+import {
+    GPIODriveValues,
+    GPIOModeKeys,
+    GPIOModeValues,
+    GPIOPullValues,
+} from '../gpio/types';
 import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
@@ -1042,12 +1047,18 @@ Battery models stored in database:
         const command = `npmx gpio config mode ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
+        const isInput = GPIOModeKeys[modeIndex].toString().startsWith('Input');
 
         callback?.onSuccess(`Value: ${modeIndex}.`, command);
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
-            data: { mode },
+            data: {
+                mode,
+                debounceEnabled: isInput,
+                driveEnabled: !isInput,
+                pullEnabled: isInput,
+            },
             index,
         });
     });

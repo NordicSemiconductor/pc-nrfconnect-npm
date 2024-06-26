@@ -192,9 +192,13 @@ export type GPIODrive = GPIODrive1300 | GPIODrive2100;
 export type GPIO = {
     mode: GPIOMode;
     pull: GPIOPull;
+    pullEnabled: boolean;
     drive: GPIODrive;
+    driveEnabled: boolean;
     openDrain: boolean;
+    openDrainEnabled: boolean;
     debounce: boolean;
+    debounceEnabled: boolean;
 };
 
 export const LEDModeValues = [
@@ -465,7 +469,7 @@ export type GpioModule = {
         debounce: () => void;
     };
     set: {
-        all: (gpio: GPIO) => Promise<void>;
+        all: (gpio: GPIOExport) => Promise<void>;
         mode: (mode: GPIOMode) => Promise<void>;
         pull: (pull: GPIOPull) => Promise<void>;
         drive: (drive: GPIODrive) => Promise<void>;
@@ -790,13 +794,17 @@ export type NpmModel = 'npm1300' | 'npm2100';
 
 export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
 export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
+export type GPIOExport = Omit<
+    GPIO,
+    'pullEnabled' | 'driveEnabled' | 'openDrainEnabled' | 'debounceEnabled'
+>;
 
 export interface NpmExport {
     boosts: Boost[];
     charger?: Charger;
     bucks: BuckExport[];
     ldos: LdoExport[];
-    gpios: GPIO[];
+    gpios: GPIOExport[];
     leds: LED[];
     pof?: POF;
     ship: ShipModeConfig;

@@ -6,21 +6,19 @@
 
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import {
-    GPIODriveKeys,
-    GPIOModeKeys,
-    GPIOPullKeys,
-} from '../../npm2100/gpio/types';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { GpioModule } from '../../types';
 import gpioCallbacks from './gpioCallbacks';
 import { GpioGet } from './gpioGetters';
 import { GpioSet } from './gpioSetters';
 import {
+    GPIODriveKeys,
     GPIODriveValues,
     GPIOMode1300,
+    GPIOModeKeys,
     GPIOModeValues,
     GPIOPull1300,
+    GPIOPullKeys,
     GPIOPullValues,
 } from './types';
 
@@ -58,8 +56,12 @@ export default (
         defaults: {
             mode: GPIOMode1300.Input,
             pull: GPIOPull1300['Pull up'],
+            pullEnabled: true,
             drive: 1,
+            driveEnabled: false,
             openDrain: false,
+            openDrainEnabled: true,
             debounce: false,
+            debounceEnabled: true,
         },
     }));
