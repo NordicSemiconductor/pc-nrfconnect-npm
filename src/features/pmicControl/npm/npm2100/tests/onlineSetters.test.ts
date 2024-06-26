@@ -35,6 +35,10 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioMode index: %p', async ({ index, mode }) => {
+            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
+                dialog.onConfirm();
+            });
+
             await pmic.gpioModule[index].set.mode(mode);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -57,6 +61,10 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioPull index: %p', async ({ index, pull }) => {
+            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
+                dialog.onConfirm();
+            });
+
             await pmic.gpioModule[index].set.pull(pull);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -272,12 +280,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
         )(
             'Set setGpioDrive - Fail immediately - index: %p',
             async ({ index, drive }) => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
-
                 await expect(
                     pmic.gpioModule[index].set.drive(drive)
                 ).rejects.toBeUndefined();
@@ -314,12 +316,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
         )(
             'Set setGpioPull - Fail immediately - index: %p',
             async ({ index, pull }) => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
-
                 await expect(
                     pmic.gpioModule[index].set.pull(pull)
                 ).rejects.toBeUndefined();
@@ -356,12 +352,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
         )(
             'Set setGpioDebounce - Fail immediately - index: %p',
             async ({ index, debounce }) => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
-
                 await expect(
                     pmic.gpioModule[index].set.debounce(debounce)
                 ).rejects.toBeUndefined();
@@ -400,12 +390,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
         )(
             'Set setGpioOpenDrain - Fail immediately - index: %p',
             async ({ index, openDrain }) => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
-
                 await expect(
                     pmic.gpioModule[index].set.openDrain(openDrain)
                 ).rejects.toBeUndefined();

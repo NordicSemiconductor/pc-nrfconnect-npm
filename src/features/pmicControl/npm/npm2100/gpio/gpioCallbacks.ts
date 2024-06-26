@@ -50,8 +50,9 @@ const setupSingleGpio = (
                                 valueIndex
                             ] as keyof typeof GPIOMode2100
                         ];
-                    const isInput =
-                        GPIOModeKeys[valueIndex].startsWith('Input');
+                    const isInput = GPIOModeKeys[valueIndex]
+                        .toLowerCase()
+                        .includes('input');
 
                     eventEmitter.emitPartialEvent<GPIO>(
                         'onGPIOUpdate',
