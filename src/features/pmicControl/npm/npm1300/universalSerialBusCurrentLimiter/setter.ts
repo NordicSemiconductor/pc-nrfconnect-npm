@@ -6,7 +6,7 @@
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { USBPower, USBPowerExport } from '../../types';
-import { UsbCurrentLimiterGet } from './usbCurrentLimiterGetters';
+import { UsbCurrentLimiterGet } from './getter';
 
 export class UsbCurrentLimiterSet {
     private get: UsbCurrentLimiterGet;

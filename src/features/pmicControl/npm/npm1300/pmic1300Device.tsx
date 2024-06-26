@@ -43,7 +43,7 @@ import setupLdo, { ldoDefaults } from './ldo';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timerConfig';
-import setupUsbCurrentLimiter from './usbCurrentLimiter';
+import setupUsbCurrentLimiter from './universalSerialBusCurrentLimiter';
 
 export const npm1300FWVersion = '1.2.3+0';
 
