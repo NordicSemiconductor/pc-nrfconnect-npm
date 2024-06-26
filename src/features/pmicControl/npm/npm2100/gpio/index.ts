@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
@@ -7,23 +7,12 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { GPIO } from '../../types';
+import { GpioModule } from '../../types';
 import gpioCallbacks from './gpioCallbacks';
-import { gpioGet, gpioSet } from './gpioEffects';
+import { GpioGet } from './gpioGetters';
+import { GpioSet } from './gpioSetters';
 
-export const gpioDefaults = (noOfGpios: number): GPIO[] => {
-    const defaultGPIOs: GPIO[] = [];
-    for (let i = 0; i < noOfGpios; i += 1) {
-        defaultGPIOs.push({
-            mode: 'Input',
-            pull: 'Pull up',
-            drive: 1,
-            openDrain: false,
-            debounce: false,
-        });
-    }
-    return defaultGPIOs;
-};
+export const numberOfGPIOs = 2;
 
 export default (
     shellParser: ShellParser | undefined,
@@ -33,10 +22,18 @@ export default (
         onSuccess?: (response: string, command: string) => void,
         onError?: (response: string, command: string) => void
     ) => void,
-    offlineMode: boolean,
-    noOfBucks: number
-) => ({
-    gpioGet: gpioGet(sendCommand),
-    gpioSet: gpioSet(eventEmitter, sendCommand, offlineMode),
-    gpioCallbacks: gpioCallbacks(shellParser, eventEmitter, noOfBucks),
-});
+    offlineMode: boolean
+): GpioModule[] =>
+    [...Array(numberOfGPIOs).keys()].map(index => ({
+        index,
+        get: new GpioGet(sendCommand, index),
+        set: new GpioSet(eventEmitter, sendCommand, offlineMode, index),
+        callbacks: gpioCallbacks(shellParser, eventEmitter, numberOfGPIOs),
+        defaults: {
+            mode: 'Input',
+            pull: 'Pull up',
+            drive: 1,
+            openDrain: false,
+            debounce: false,
+        },
+    }));

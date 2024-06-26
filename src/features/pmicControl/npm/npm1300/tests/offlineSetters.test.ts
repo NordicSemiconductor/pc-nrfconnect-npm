@@ -336,7 +336,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     );
 
     test.each(PMIC_1300_GPIOS)('Set setGpioMode index: %p', async index => {
-        await pmic.setGpioMode(index, 'Input');
+        await pmic.gpioModule[index].set.mode('Input');
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
@@ -346,7 +346,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test.each(PMIC_1300_GPIOS)('Set setGpioPull index: %p', async index => {
-        await pmic.setGpioPull(index, 'Pull down');
+        await pmic.gpioModule[index].set.pull('Pull down');
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
@@ -356,7 +356,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test.each(PMIC_1300_GPIOS)('Set setGpioDrive index: %p', async index => {
-        await pmic.setGpioDrive(index, 1);
+        await pmic.gpioModule[index].set.drive(1);
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
@@ -366,7 +366,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test.each(PMIC_1300_GPIOS)('Set setGpioDebounce index: %p', async index => {
-        await pmic.setGpioDebounce(index, true);
+        await pmic.gpioModule[index].set.debounce(true);
 
         expect(mockOnGpioUpdate).toBeCalledTimes(1);
         expect(mockOnGpioUpdate).toBeCalledWith({
@@ -427,7 +427,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     test.each(PMIC_1300_GPIOS)(
         'Set setGpioOpenDrain index: %p',
         async index => {
-            await pmic.setGpioOpenDrain(index, true);
+            await pmic.gpioModule[index].set.openDrain(true);
 
             expect(mockOnGpioUpdate).toBeCalledTimes(1);
             expect(mockOnGpioUpdate).toBeCalledWith({

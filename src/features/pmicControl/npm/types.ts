@@ -332,7 +332,6 @@ export interface IBaseNpmDevice {
         devices: {
             noOfBucks?: number;
             noOfLdos?: number;
-            noOfGPIOs?: number;
             noOfLEDs?: number;
         },
         supportsVersion: string
@@ -458,6 +457,28 @@ export type BoostModule = {
     };
 };
 
+export type GpioModule = {
+    index: number;
+    get: {
+        all: () => void;
+        mode: () => void;
+        pull: () => void;
+        drive: () => void;
+        openDrain: () => void;
+        debounce: () => void;
+    };
+    set: {
+        all: (gpio: GPIO) => Promise<void>;
+        mode: (mode: GPIOMode) => Promise<void>;
+        pull: (pull: GPIOPullMode) => Promise<void>;
+        drive: (drive: GPIODrive) => Promise<void>;
+        openDrain: (openDrain: boolean) => Promise<void>;
+        debounce: (debounce: boolean) => Promise<void>;
+    };
+    callbacks: (() => void)[];
+    defaults: GPIO;
+};
+
 export interface PofModule {
     get: {
         all: () => void;
@@ -576,7 +597,6 @@ export type BaseNpmDevice = {
     getNumberOfBoosts: () => number;
     getNumberOfBucks: () => number;
     getNumberOfLdos: () => number;
-    getNumberOfGPIOs: () => number;
     getNumberOfLEDs: () => number;
     getNumberOfBatteryModelSlots: () => number;
 
@@ -590,6 +610,7 @@ export type BaseNpmDevice = {
     release: () => void;
 
     chargerModule?: ChargerModule;
+    gpioModule: GpioModule[];
     boostModule: BoostModule[];
     pofModule?: PofModule;
     timerConfigModule?: TimerConfigModule;
@@ -621,7 +642,6 @@ export type NpmDevice = {
 
     buckDefaults: () => Buck[];
     ldoDefaults: () => Ldo[];
-    gpioDefaults: () => GPIO[];
     ledDefaults: () => LED[];
 
     getBatteryConnectedVoltageThreshold: () => number;
@@ -645,12 +665,6 @@ export type NpmDevice = {
         ldoSoftStart?: (index: number) => void;
         ldoActiveDischarge?: (index: number) => void;
         ldoOnOffControl?: (index: number) => void;
-
-        gpioMode: (index: number) => void;
-        gpioPull: (index: number) => void;
-        gpioDrive: (index: number) => void;
-        gpioOpenDrain: (index: number) => void;
-        gpioDebounce: (index: number) => void;
 
         ledMode: (index: number) => void;
 
@@ -725,12 +739,6 @@ export type NpmDevice = {
     setLdoOcpEnabled?: (index: number, ocpEnabled: boolean) => Promise<void>;
     setLdoRampEnabled?: (index: number, rampEnabled: boolean) => Promise<void>;
     setLdoHaltEnabled?: (index: number, haltEnabled: boolean) => Promise<void>;
-
-    setGpioMode: (index: number, mode: GPIOMode) => Promise<void>;
-    setGpioPull: (index: number, mode: GPIOPullMode) => Promise<void>;
-    setGpioDrive: (index: number, drive: GPIODrive) => Promise<void>;
-    setGpioOpenDrain: (index: number, openDrain: boolean) => Promise<void>;
-    setGpioDebounce: (index: number, debounce: boolean) => Promise<void>;
 
     setLedMode: (index: number, mode: LEDMode) => Promise<void>;
 
