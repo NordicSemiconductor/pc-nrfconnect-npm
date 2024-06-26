@@ -156,11 +156,15 @@ export default () => {
                     caption:
                         "Errors detected. Check 'System Features' tab for more information",
                 },
-                {
-                    id: '2',
-                    caption: 'clear error log',
-                    action: () => npmDevice?.clearErrorLogs(true),
-                },
+                ...(npmDevice?.clearErrorLogs !== undefined
+                    ? [
+                          {
+                              id: '2',
+                              caption: 'clear error log',
+                              action: () => npmDevice.clearErrorLogs?.(true),
+                          },
+                      ]
+                    : []),
             ];
             pmicStep.state = 'failure';
         } else if (!usbPowered) {

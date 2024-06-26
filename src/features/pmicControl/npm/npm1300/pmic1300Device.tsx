@@ -818,6 +818,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         getBatteryConnectedVoltageThreshold: () => 1, // 1V
 
+        supportedErrorLogs: {
+            reset: true,
+            charger: true,
+            sensor: true,
+        },
+
         chargerModule,
         pofModule,
         timerConfigModule,
