@@ -8,12 +8,12 @@ import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     GPIO,
     GPIODrive,
-    GPIOMode,
-    GPIOModeValues,
-    GPIOPullMode,
-    GPIOPullValues,
+    GPIOExport,
+    GPIOMode as GPIOModeBase,
+    GPIOPull as GPIOPullModeBase,
 } from '../../types';
 import { GpioGet } from './gpioGetters';
+import { GPIOMode1300, GPIOModeKeys, GPIOModeValues } from './types';
 
 export class GpioSet {
     private get: GpioGet;
@@ -30,30 +30,35 @@ export class GpioSet {
         this.get = new GpioGet(sendCommand, index);
     }
 
-    async all(gpio: GPIO) {
-        await this.mode(gpio.mode);
+    async all(gpio: GPIOExport) {
+        await this.mode(gpio.mode as GPIOMode1300);
         await this.pull(gpio.pull);
         await this.drive(gpio.drive);
         await this.openDrain(gpio.openDrain);
         await this.debounce(gpio.debounce);
     }
 
-    mode(mode: GPIOMode) {
+    mode(mode: GPIOModeBase) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
+                const valueIndex = GPIOModeValues.findIndex(v => v === mode);
+                const isInput = GPIOModeKeys[valueIndex]
+                    .toString()
+                    .startsWith('Input');
                 this.eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
                     {
                         mode,
+                        pullEnabled: isInput,
+                        driveEnabled: !isInput,
+                        debounceEnabled: isInput,
                     },
                     this.index
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx gpio config mode set ${
-                        this.index
-                    } ${GPIOModeValues.findIndex(m => m === mode)}`,
+                    `npmx gpio config mode set ${this.index} ${mode}`,
                     () => resolve(),
                     () => {
                         this.get.mode();
@@ -64,7 +69,7 @@ export class GpioSet {
         });
     }
 
-    pull(pull: GPIOPullMode) {
+    pull(pull: GPIOPullModeBase) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<GPIO>(
@@ -77,9 +82,7 @@ export class GpioSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx gpio config pull set ${
-                        this.index
-                    } ${GPIOPullValues.findIndex(p => p === pull)}`,
+                    `npmx gpio config pull set ${this.index} ${pull}`,
                     () => resolve(),
                     () => {
                         this.get.pull();

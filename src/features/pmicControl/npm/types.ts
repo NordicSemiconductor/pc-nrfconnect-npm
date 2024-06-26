@@ -8,6 +8,16 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
 
 import { RangeType } from '../../../utils/helpers';
+import type {
+    GPIODrive1300,
+    GPIOMode1300,
+    GPIOPull1300,
+} from './npm1300/gpio/types';
+import type {
+    GPIODrive2100,
+    GPIOMode2100,
+    GPIOPull2100,
+} from './npm2100/gpio/types';
 import {
     nPM2100GPIOControlMode,
     nPM2100GPIOControlPinSelect,
@@ -175,32 +185,20 @@ export type Ldo = {
     onOffSoftwareControlEnabled: boolean;
 };
 
-export const GPIOModeValues = [
-    'Input',
-    'Input logic 1',
-    'Input logic 0',
-    'Input rising edge event',
-    'Input falling edge event',
-    'Output interrupt',
-    'Output reset',
-    'Output power loss warning',
-    'Output logic 1',
-    'Output logic 0',
-] as const;
-export type GPIOMode = (typeof GPIOModeValues)[number];
-
-export const GPIOPullValues = ['Pull down', 'Pull up', 'Pull disable'] as const;
-export type GPIOPullMode = (typeof GPIOPullValues)[number];
-
-export const GPIODriveValues = [1, 6] as const;
-export type GPIODrive = (typeof GPIODriveValues)[number];
+export type GPIOMode = GPIOMode1300 | GPIOMode2100;
+export type GPIOPull = GPIOPull1300 | GPIOPull2100;
+export type GPIODrive = GPIODrive1300 | GPIODrive2100;
 
 export type GPIO = {
     mode: GPIOMode;
-    pull: GPIOPullMode;
+    pull: GPIOPull;
+    pullEnabled: boolean;
     drive: GPIODrive;
+    driveEnabled: boolean;
     openDrain: boolean;
+    openDrainEnabled: boolean;
     debounce: boolean;
+    debounceEnabled: boolean;
 };
 
 export const LEDModeValues = [
@@ -471,12 +469,17 @@ export type GpioModule = {
         debounce: () => void;
     };
     set: {
-        all: (gpio: GPIO) => Promise<void>;
+        all: (gpio: GPIOExport) => Promise<void>;
         mode: (mode: GPIOMode) => Promise<void>;
-        pull: (pull: GPIOPullMode) => Promise<void>;
+        pull: (pull: GPIOPull) => Promise<void>;
         drive: (drive: GPIODrive) => Promise<void>;
         openDrain: (openDrain: boolean) => Promise<void>;
         debounce: (debounce: boolean) => Promise<void>;
+    };
+    values: {
+        mode: { label: string; value: GPIOMode }[];
+        pull: { label: string; value: GPIOPull }[];
+        drive: { label: string; value: GPIODrive }[];
     };
     callbacks: (() => void)[];
     defaults: GPIO;
@@ -791,13 +794,17 @@ export type NpmModel = 'npm1300' | 'npm2100';
 
 export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
 export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
+export type GPIOExport = Omit<
+    GPIO,
+    'pullEnabled' | 'driveEnabled' | 'openDrainEnabled' | 'debounceEnabled'
+>;
 
 export interface NpmExport {
     boosts: Boost[];
     charger?: Charger;
     bucks: BuckExport[];
     ldos: LdoExport[];
-    gpios: GPIO[];
+    gpios: GPIOExport[];
     leds: LED[];
     pof?: POF;
     ship: ShipModeConfig;

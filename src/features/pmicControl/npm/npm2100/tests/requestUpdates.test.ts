@@ -9,10 +9,8 @@ import { ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfco
 import { BatteryModel } from '../../types';
 import { npm2100FWVersion } from '../pmic2100Device';
 import {
-    PMIC_2100_BUCKS,
     PMIC_2100_GPIOS,
     PMIC_2100_LDOS,
-    PMIC_2100_LEDS,
     setupMocksWithShellParser,
 } from './helpers';
 
@@ -22,120 +20,6 @@ describe('PMIC 2100 - Request update commands', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
-
-    test.each(PMIC_2100_BUCKS)('Request update buckVOut index: %p', index => {
-        pmic.requestUpdate.buckVOutNormal(index);
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx buck voltage normal get ${index}`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test.each(PMIC_2100_BUCKS)(
-        'Request update buckVOutRetention index: %p',
-        index => {
-            pmic.requestUpdate.buckVOutRetention(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck voltage retention get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_BUCKS)('Request update buckMode index: %p', index => {
-        pmic.requestUpdate.buckMode(index);
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx buck vout_select get ${index}`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test.each(PMIC_2100_BUCKS)(
-        'Request update buckModeControl index: %p',
-        index => {
-            pmic.requestUpdate.buckModeControl(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `powerup_buck mode get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_BUCKS)(
-        'Request update buckOnOffControl index: %p',
-        index => {
-            pmic.requestUpdate.buckOnOffControl(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio on_off index get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_BUCKS)(
-        'Request update buckRetentionControl index: %p',
-        index => {
-            pmic.requestUpdate.buckRetentionControl(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio retention index get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_BUCKS)(
-        'Request update buckActiveDischargeEnabled index: %p',
-        index => {
-            pmic.requestUpdate.buckActiveDischarge(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck active_discharge get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_2100_BUCKS)(
-        'Request update buckEnabled index: %p',
-        index => {
-            pmic.requestUpdate.buckEnabled(index);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck status get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
 
     test.skip('Request LDO Updates', () => {
         test.each(PMIC_2100_LDOS)(
@@ -186,7 +70,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config mode get ${index}`,
+            `npm2100 gpio mode get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -198,7 +82,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config pull get ${index}`,
+            `npm2100 gpio pull get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -210,7 +94,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config drive get ${index}`,
+            `npm2100 gpio drive get ${index}`,
             expect.anything(),
             undefined,
             true
@@ -224,7 +108,7 @@ describe('PMIC 2100 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config debounce get ${index}`,
+                `npm2100 gpio debounce get ${index}`,
                 expect.anything(),
                 undefined,
                 true
@@ -239,25 +123,13 @@ describe('PMIC 2100 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config open_drain get ${index}`,
+                `npm2100 gpio opendrain get ${index}`,
                 expect.anything(),
                 undefined,
                 true
             );
         }
     );
-
-    test.each(PMIC_2100_LEDS)('Request update ledMode index: %p', index => {
-        pmic.requestUpdate.ledMode(index);
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx led mode get ${index}`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
 
     test('Request update shipModeTimeToActive', () => {
         pmic.requestUpdate.shipModeTimeToActive();

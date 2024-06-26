@@ -7,13 +7,13 @@
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     GPIO,
-    GPIODrive,
-    GPIOMode,
-    GPIOModeValues,
-    GPIOPullMode,
-    GPIOPullValues,
+    GPIODrive as GPIODriveBase,
+    GPIOExport,
+    GPIOMode as GPIOModeBase,
+    GPIOPull as GPIOPullModeBase,
 } from '../../types';
 import { GpioGet } from './gpioGetters';
+import { GPIOMode2100, GPIOModeKeys, GPIOModeValues } from './types';
 
 export class GpioSet {
     private get: GpioGet;
@@ -30,30 +30,33 @@ export class GpioSet {
         this.get = new GpioGet(sendCommand, index);
     }
 
-    async all(gpio: GPIO) {
-        await this.mode(gpio.mode);
+    async all(gpio: GPIOExport) {
+        await this.mode(gpio.mode as GPIOMode2100);
         await this.pull(gpio.pull);
         await this.drive(gpio.drive);
         await this.openDrain(gpio.openDrain);
         await this.debounce(gpio.debounce);
     }
 
-    mode(mode: GPIOMode) {
+    mode(mode: GPIOModeBase) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
+                const valueIndex = GPIOModeValues.findIndex(v => v === mode);
+                const isInput = GPIOModeKeys[valueIndex].startsWith('Input');
+
                 this.eventEmitter.emitPartialEvent<GPIO>(
                     'onGPIOUpdate',
                     {
                         mode,
+                        driveEnabled: !isInput,
+                        openDrainEnabled: !isInput,
                     },
                     this.index
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx gpio config mode set ${
-                        this.index
-                    } ${GPIOModeValues.findIndex(m => m === mode)}`,
+                    `npm2100 gpio mode set ${this.index} ${mode}`,
                     () => resolve(),
                     () => {
                         this.get.mode();
@@ -64,7 +67,7 @@ export class GpioSet {
         });
     }
 
-    pull(pull: GPIOPullMode) {
+    pull(pull: GPIOPullModeBase) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<GPIO>(
@@ -77,9 +80,7 @@ export class GpioSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx gpio config pull set ${
-                        this.index
-                    } ${GPIOPullValues.findIndex(p => p === pull)}`,
+                    `npm2100 gpio pull set ${this.index} ${pull}`,
                     () => resolve(),
                     () => {
                         this.get.pull();
@@ -90,7 +91,7 @@ export class GpioSet {
         });
     }
 
-    drive(drive: GPIODrive) {
+    drive(drive: GPIODriveBase) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<GPIO>(
@@ -103,7 +104,7 @@ export class GpioSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx gpio config drive set ${this.index} ${drive}`,
+                    `npm2100 gpio drive set ${this.index} ${drive}`,
                     () => resolve(),
                     () => {
                         this.get.drive();
@@ -127,8 +128,8 @@ export class GpioSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx gpio config open_drain set ${this.index} ${
-                        openDrain ? '1' : '0'
+                    `npm2100 gpio opendrain set ${this.index} ${
+                        openDrain ? 'ON' : 'OFF'
                     }`,
                     () => resolve(),
                     () => {
@@ -153,8 +154,8 @@ export class GpioSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx gpio config debounce set ${this.index} ${
-                        debounce ? '1' : '0'
+                    `npm2100 gpio debounce set ${this.index} ${
+                        debounce ? 'ON' : 'OFF'
                     }`,
                     () => resolve(),
                     () => {

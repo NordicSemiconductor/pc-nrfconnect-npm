@@ -28,9 +28,10 @@ export const DocumentationTooltip = ({
     const npmDevice = useSelector(getNpmDevice);
 
     const fullDocumentation = getDocumentation(npmDevice?.getDeviceType());
-    const documentation = fullDocumentation
-        ? fullDocumentation[card][item]
-        : null;
+    const documentation =
+        fullDocumentation && fullDocumentation[card]
+            ? fullDocumentation[card][item]
+            : null;
 
     return documentation ? (
         <Overlay

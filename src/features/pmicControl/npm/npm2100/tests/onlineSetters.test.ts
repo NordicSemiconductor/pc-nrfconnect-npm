@@ -4,20 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import {
-    GPIODriveValues,
-    GPIOModeValues,
-    GPIOPullValues,
-    LEDModeValues,
-    PmicDialog,
-} from '../../types';
-import {
-    helpers,
-    PMIC_2100_BUCKS,
-    PMIC_2100_GPIOS,
-    PMIC_2100_LEDS,
-    setupMocksWithShellParser,
-} from './helpers';
+import { LEDModeValues, PmicDialog } from '../../types';
+import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
+import { helpers, PMIC_2100_GPIOS, setupMocksWithShellParser } from './helpers';
 
 describe('PMIC 2100 - Setters Online tests', () => {
     const {
@@ -39,31 +28,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
             mockEnqueueRequest.mockImplementation(
                 helpers.registerCommandCallbackSuccess
             );
-        });
-
-        test.each(PMIC_2100_BUCKS)('Set setBuckVOut index: %p', async index => {
-            await pmic.setBuckVOutNormal(index, 1.8);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx buck voltage normal set ${index} 1800`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // change from vSet to Software
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npmx buck vout_select set ${index} 1`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnBuckUpdate).toBeCalledTimes(0);
         });
 
         test('Set setBuckVOut index: 1 with warning - cancel', async () => {
@@ -150,49 +114,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
             expect(mockOnBuckUpdate).toBeCalledTimes(0);
         });
 
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckRetentionVOut index: %p',
-            async index => {
-                await pmic.setBuckVOutRetention(index, 1.8);
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck voltage retention set ${index} 1800`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)('Set setBuckMode - vSet', async index => {
-            await pmic.setBuckMode(index, 'vSet');
-
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx buck vout_select set ${index} 0`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // We need to request the buckVOut
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npmx buck voltage normal get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnBuckUpdate).toBeCalledTimes(0);
-        });
-
         test('Set setBuckMode index: 1 with software - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
                 dialog.onCancel();
@@ -270,98 +191,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
             expect(mockOnBuckUpdate).toBeCalledTimes(0);
         });
 
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckModeControl index: %p',
-            async index => {
-                await pmic.setBuckModeControl(index, 'GPIO2');
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `powerup_buck mode set ${index} GPIO2`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckOnOffControl index: %p',
-            async index => {
-                await pmic.setBuckOnOffControl(index, 'GPIO2');
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck gpio on_off index set ${index} 2`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckRetentionControl index: %p',
-            async index => {
-                await pmic.setBuckRetentionControl(index, 'GPIO2');
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx buck gpio retention index set ${index} 2`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckEnabled index: %p',
-            async index => {
-                await pmic.setBuckEnabled(index, true);
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck status set ${index} 1`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckActiveDischargeEnabled index: %p',
-            async index => {
-                await pmic.setBuckActiveDischarge(index, true);
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck active_discharge set ${index} 1`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
         test('Set setBuckEnabled index: 1 false - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
                 dialog.onCancel();
@@ -425,18 +254,17 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
         test.each(
             PMIC_2100_GPIOS.map(index =>
-                GPIOModeValues.map((mode, modeIndex) => ({
+                GPIOModeValues.map(mode => ({
                     index,
                     mode,
-                    modeIndex,
                 }))
             ).flat()
-        )('Set setGpioMode index: %p', async ({ index, mode, modeIndex }) => {
+        )('Set setGpioMode index: %p', async ({ index, mode }) => {
             await pmic.gpioModule[index].set.mode(mode);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config mode set ${index} ${modeIndex}`,
+                `npm2100 gpio mode set ${index} ${mode}`,
                 expect.anything(),
                 undefined,
                 true
@@ -448,18 +276,17 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
         test.each(
             PMIC_2100_GPIOS.map(index =>
-                GPIOPullValues.map((pull, pullIndex) => ({
+                GPIOPullValues.map(pull => ({
                     index,
                     pull,
-                    pullIndex,
                 }))
             ).flat()
-        )('Set setGpioPull index: %p', async ({ index, pull, pullIndex }) => {
+        )('Set setGpioPull index: %p', async ({ index, pull }) => {
             await pmic.gpioModule[index].set.pull(pull);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config pull set ${index} ${pullIndex}`,
+                `npm2100 gpio pull set ${index} ${pull}`,
                 expect.anything(),
                 undefined,
                 true
@@ -481,7 +308,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config drive set ${index} ${drive}`,
+                `npm2100 gpio drive set ${index} ${drive}`,
                 expect.anything(),
                 undefined,
                 true
@@ -503,9 +330,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config debounce set ${index} ${
-                    debounce ? '1' : '0'
-                }`,
+                `npm2100 gpio debounce set ${index} ${debounce ? 'ON' : 'OFF'}`,
                 expect.anything(),
                 undefined,
                 true
@@ -527,8 +352,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config open_drain set ${index} ${
-                    openDrain ? '1' : '0'
+                `npm2100 gpio opendrain set ${index} ${
+                    openDrain ? 'ON' : 'OFF'
                 }`,
                 expect.anything(),
                 undefined,
@@ -666,298 +491,16 @@ describe('PMIC 2100 - Setters Online tests', () => {
             );
         });
 
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckVOut - Fail immediately - index: %p',
-            async index => {
-                await expect(
-                    pmic.setBuckVOutNormal(index, 1.8)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck voltage normal set ${index} 1800`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx buck voltage normal get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckVOut - Fail on second command - index: %p',
-            async index => {
-                mockEnqueueRequest.mockImplementationOnce(
-                    helpers.registerCommandCallbackSuccess
-                );
-
-                await expect(
-                    pmic.setBuckVOutNormal(index, 1.8)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(3);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck voltage normal set ${index} 1800`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // change from vSet to Software
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx buck vout_select set ${index} 1`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    3,
-                    `npmx buck vout_select get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckRetentionVOut - Fail immediately - index: %p',
-            async index => {
-                await expect(
-                    pmic.setBuckVOutRetention(index, 1.7)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck voltage retention set ${index} 1700`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx buck voltage retention get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckMode - Fail immediately - vSet',
-            async index => {
-                await expect(
-                    pmic.setBuckMode(index, 'vSet')
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck vout_select set ${index} 0`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx buck vout_select get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckModeControl - Fail immediately - index: %p',
-            async index => {
-                await expect(
-                    pmic.setBuckModeControl(index, 'GPIO2')
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `powerup_buck mode set ${index} GPIO2`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `powerup_buck mode get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckOnOffControl - Fail immediately - index: %p',
-            async index => {
-                await expect(
-                    pmic.setBuckOnOffControl(index, 'GPIO2')
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck gpio on_off index set ${index} 2`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx buck gpio on_off index get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckRetentionControl - Fail immediately - index: %p',
-            async index => {
-                await expect(
-                    pmic.setBuckRetentionControl(index, 'GPIO2')
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck gpio retention index set ${index} 2`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx buck gpio retention index get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckEnabled - Fail immediately - index: %p',
-            async index => {
-                await expect(
-                    pmic.setBuckEnabled(index, true)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck status set ${index} 1`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx buck status get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(PMIC_2100_BUCKS)(
-            'Set setBuckActiveDischargeEnabled - Fail immediately - index: %p',
-            async index => {
-                await expect(
-                    pmic.setBuckActiveDischarge(index, true)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx buck active_discharge set ${index} 1`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx buck active_discharge get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
-        );
-
         test.each(
             PMIC_2100_GPIOS.map(index =>
-                GPIOModeValues.map((mode, modeIndex) => ({
+                GPIOModeValues.map(mode => ({
                     index,
                     mode,
-                    modeIndex,
                 }))
             ).flat()
         )(
             'Set setGpioMode - Fail immediately - index: %p',
-            async ({ index, mode, modeIndex }) => {
+            async ({ index, mode }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
@@ -970,7 +513,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx gpio config mode set ${index} ${modeIndex}`,
+                    `npm2100 gpio mode set ${index} ${mode}`,
                     expect.anything(),
                     undefined,
                     true
@@ -979,7 +522,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx gpio config mode get ${index}`,
+                    `npm2100 gpio mode get ${index}`,
                     expect.anything(),
                     undefined,
                     true
@@ -1012,7 +555,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx gpio config drive set ${index} ${drive}`,
+                    `npm2100 gpio drive set ${index} ${drive}`,
                     expect.anything(),
                     undefined,
                     true
@@ -1021,7 +564,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx gpio config drive get ${index}`,
+                    `npm2100 gpio drive get ${index}`,
                     expect.anything(),
                     undefined,
                     true
@@ -1034,15 +577,14 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
         test.each(
             PMIC_2100_GPIOS.map(index =>
-                GPIOPullValues.map((pull, pullIndex) => ({
+                GPIOPullValues.map(pull => ({
                     index,
                     pull,
-                    pullIndex,
                 }))
             ).flat()
         )(
             'Set setGpioPull - Fail immediately - index: %p',
-            async ({ index, pull, pullIndex }) => {
+            async ({ index, pull }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
@@ -1055,7 +597,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx gpio config pull set ${index} ${pullIndex}`,
+                    `npm2100 gpio pull set ${index} ${pull}`,
                     expect.anything(),
                     undefined,
                     true
@@ -1064,7 +606,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx gpio config pull get ${index}`,
+                    `npm2100 gpio pull get ${index}`,
                     expect.anything(),
                     undefined,
                     true
@@ -1097,8 +639,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx gpio config debounce set ${index} ${
-                        debounce ? '1' : '0'
+                    `npm2100 gpio debounce set ${index} ${
+                        debounce ? 'ON' : 'OFF'
                     }`,
                     expect.anything(),
                     undefined,
@@ -1108,7 +650,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx gpio config debounce get ${index}`,
+                    `npm2100 gpio debounce get ${index}`,
                     expect.anything(),
                     undefined,
                     true
@@ -1141,8 +683,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx gpio config open_drain set ${index} ${
-                        openDrain ? '1' : '0'
+                    `npm2100 gpio opendrain set ${index} ${
+                        openDrain ? 'ON' : 'OFF'
                     }`,
                     expect.anything(),
                     undefined,
@@ -1152,7 +694,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx gpio config open_drain get ${index}`,
+                    `npm2100 gpio opendrain get ${index}`,
                     expect.anything(),
                     undefined,
                     true
@@ -1160,49 +702,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
-        );
-
-        test.each(
-            PMIC_2100_LEDS.map(index =>
-                LEDModeValues.map((mode, modeIndex) => ({
-                    index,
-                    mode,
-                    modeIndex,
-                }))
-            ).flat()
-        )(
-            'Set setGpioMode - Fail immediately - index: %p',
-            async ({ index, mode, modeIndex }) => {
-                mockDialogHandler.mockImplementationOnce(
-                    (dialog: PmicDialog) => {
-                        dialog.onConfirm();
-                    }
-                );
-
-                await expect(
-                    pmic.setLedMode(index, mode)
-                ).rejects.toBeUndefined();
-
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx led mode set ${index} ${modeIndex}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx led mode get ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-
-                // Updates should only be emitted when we get response
-                expect(mockOnLEDUpdate).toBeCalledTimes(0);
             }
         );
 

@@ -8,6 +8,7 @@ import {
     Buck,
     Charger,
     GPIO,
+    GPIOExport,
     Ldo,
     LED,
     NpmExport,
@@ -19,6 +20,7 @@ import {
     USBPower,
 } from '../../types';
 import { toBuckExport } from '../buck';
+import { GPIOMode2100, GPIOPull2100 } from '../gpio/types';
 import { toLdoExport } from '../ldo';
 import { npm2100FWVersion } from '../pmic2100Device';
 import { setupMocksBase } from './helpers';
@@ -165,39 +167,18 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         ],
         gpios: [
             {
-                mode: 'Input',
-                pull: 'Pull down',
+                mode: GPIOMode2100.Input,
+                pull: GPIOPull2100['Pull down'],
                 drive: 6,
                 openDrain: false,
                 debounce: false,
             },
             {
-                mode: 'Input falling edge event',
-                pull: 'Pull down',
+                mode: GPIOMode2100.Output,
+                pull: GPIOPull2100['Pull down'],
                 drive: 6,
                 openDrain: true,
                 debounce: true,
-            },
-            {
-                mode: 'Input logic 0',
-                pull: 'Pull up',
-                drive: 1,
-                openDrain: false,
-                debounce: true,
-            },
-            {
-                mode: 'Output logic 0',
-                pull: 'Pull disable',
-                drive: 1,
-                openDrain: true,
-                debounce: false,
-            },
-            {
-                mode: 'Output power loss warning',
-                pull: 'Pull disable',
-                drive: 1,
-                openDrain: false,
-                debounce: false,
             },
         ],
         leds: [
@@ -235,9 +216,9 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         },
     };
 
-    const initGPIO: GPIO = {
-        mode: 'Input falling edge event',
-        pull: 'Pull down',
+    const initGPIO: GPIOExport = {
+        mode: GPIOMode2100.Output,
+        pull: GPIOPull2100['Pull down'],
         drive: 6,
         openDrain: false,
         debounce: false,
@@ -294,6 +275,11 @@ test.skip('PMIC 2100 - Apply Config ', () => {
 
         mockOnGpioUpdate.mockImplementation(
             (partialUpdate: PartialUpdate<GPIO>) => {
+                delete partialUpdate.data.pullEnabled;
+                delete partialUpdate.data.debounceEnabled;
+                delete partialUpdate.data.driveEnabled;
+                delete partialUpdate.data.openDrainEnabled;
+
                 gpios[partialUpdate.index] = {
                     ...(gpios[partialUpdate.index] ?? initGPIO),
                     ...partialUpdate.data,
