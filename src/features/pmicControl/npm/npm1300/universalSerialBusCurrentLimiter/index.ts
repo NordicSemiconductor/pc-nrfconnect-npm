@@ -9,9 +9,9 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { getRange } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { UsbCurrentLimiterModule } from '../../types';
-import usbCurrentLimiterCallbacks from './usbCurrentLimiterCallbacks';
-import { UsbCurrentLimiterGet } from './usbCurrentLimiterGetters';
-import { UsbCurrentLimiterSet } from './usbCurrentLimiterSetters';
+import callbacks from './callbacks';
+import { UsbCurrentLimiterGet } from './getter';
+import { UsbCurrentLimiterSet } from './setter';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -25,7 +25,7 @@ export default (
 ): UsbCurrentLimiterModule => ({
     get: new UsbCurrentLimiterGet(sendCommand),
     set: new UsbCurrentLimiterSet(eventEmitter, sendCommand, offlineMode),
-    callbacks: usbCurrentLimiterCallbacks(shellParser, eventEmitter),
+    callbacks: callbacks(shellParser, eventEmitter),
     defaults: {
         detectStatus: 'No USB connection',
         currentLimiter: 0.1,
