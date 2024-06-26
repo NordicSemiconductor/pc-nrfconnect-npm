@@ -43,7 +43,7 @@ import setupGpio from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
 import setupShipMode from './shipMode';
 
-export const npm2100FWVersion = '0.0.0+1346334259';
+export const npm2100FWVersion = '0.0.0+2992206765';
 
 export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new NpmEventEmitter();
