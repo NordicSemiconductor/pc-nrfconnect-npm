@@ -32,8 +32,6 @@ import {
     PmicDialog,
     PmicState,
     ProfileDownload,
-    USBDetectStatusValues,
-    USBPower,
 } from '../types';
 import getBoostModule, { numberOfBoosts } from './boost';
 import setupFuelGauge from './fuelGauge';
@@ -86,26 +84,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                     pmicState = 'pmic-pending-reboot';
                     eventEmitter.emit('onPmicStateChange', pmicState);
                 }
-                break;
-            case 'No USB connection':
-                eventEmitter.emit('onUsbPower', {
-                    detectStatus: 'No USB connection',
-                } as USBPower);
-                break;
-            case 'Default USB 100/500mA':
-                eventEmitter.emit('onUsbPower', {
-                    detectStatus: 'USB 100/500 mA',
-                } as USBPower);
-                break;
-            case '1.5A High Power':
-                eventEmitter.emit('onUsbPower', {
-                    detectStatus: '1.5A High Power',
-                } as USBPower);
-                break;
-            case '3A High Power':
-                eventEmitter.emit('onUsbPower', {
-                    detectStatus: '3A High Power',
-                } as USBPower);
                 break;
         }
     };
@@ -327,23 +305,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(...fuelGaugeCallbacks);
 
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx vbusin status cc get',
-                    false,
-                    undefined,
-                    '(0|1|2|3)'
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
-                        detectStatus: USBDetectStatusValues[parseToNumber(res)],
-                    });
-                },
-                noop
-            )
-        );
-
         releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
         releaseAll.push(...ldoCallbacks);
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
@@ -368,18 +329,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 )
             );
         }
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx vbusin current_limit', true),
-                res => {
-                    eventEmitter.emit('onUsbPower', {
-                        currentLimiter: parseToNumber(res) / 1000,
-                    });
-                },
-                noop
-            )
-        );
     }
 
     const setLedMode = (index: number, mode: LEDMode) =>
@@ -422,8 +371,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         all: () => {
             // Request all updates for nPM2100
 
-            requestUpdate.usbPowered();
-
             boostModule.forEach(boost => boost.get.all());
 
             requestUpdate.ldoVoltage();
@@ -453,8 +400,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         ...ldoGet,
         ...fuelGaugeGet,
-
-        usbPowered: () => sendCommand(`npmx vbusin status cc get`),
     };
 
     return {
