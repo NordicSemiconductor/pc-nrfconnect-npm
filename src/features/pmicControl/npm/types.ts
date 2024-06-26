@@ -795,7 +795,7 @@ export type NpmDevice = {
 
     setBatteryStatusCheckEnabled: (enabled: boolean) => void;
 
-    getBatteryProfiler: () => BatteryProfiler | undefined;
+    getBatteryProfiler?: () => BatteryProfiler | undefined;
     setAutoRebootDevice: (autoReboot: boolean) => void;
 } & BaseNpmDevice;
 

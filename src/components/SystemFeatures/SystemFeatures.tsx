@@ -11,9 +11,10 @@ import {
     PaneProps,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { SupportedErrorLogs } from '../../features/pmicControl/npm/types';
+import { SupportsErrorLogs } from '../../features/pmicControl/npm/pmicHelpers';
 import {
     getNpmDevice,
+    getPmicState,
     getPOF,
     getShip,
     getTimerConfig,
@@ -33,6 +34,7 @@ export default ({ active }: PaneProps) => {
     const ship = useSelector(getShip);
     const usbPower = useSelector(getUsbPower);
     const timerConfig = useSelector(getTimerConfig);
+    const pmicState = useSelector(getPmicState);
 
     return active ? (
         <MasonryLayout className="masonry-layout" minWidth={300}>
@@ -64,13 +66,9 @@ export default ({ active }: PaneProps) => {
                     disabled={disabled}
                 />
             )}
-            {npmDevice?.supportedErrorLogs &&
-                Object.keys(npmDevice.supportedErrorLogs).some(
-                    k =>
-                        npmDevice.supportedErrorLogs?.[
-                            k as keyof SupportedErrorLogs
-                        ]
-                ) && (
+            {pmicState !== 'ek-disconnected' &&
+                npmDevice?.supportedErrorLogs &&
+                SupportsErrorLogs(npmDevice) && (
                     <ErrorStatuses
                         disabled={disabled}
                         supportedErrorLogs={npmDevice.supportedErrorLogs}

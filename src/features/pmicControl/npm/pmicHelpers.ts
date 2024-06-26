@@ -18,8 +18,10 @@ import {
     BatteryModel,
     BatteryModelCharacterization,
     LoggingEvent,
+    NpmDevice,
     PartialUpdate,
     PmicDialog,
+    SupportedErrorLogs,
 } from './types';
 
 export const noop = () => {};
@@ -278,3 +280,9 @@ export class NpmEventEmitter extends EventEmitter {
         );
     }
 }
+
+export const SupportsErrorLogs = (npmDevice: NpmDevice): boolean =>
+    npmDevice.supportedErrorLogs !== undefined &&
+    Object.keys(npmDevice.supportedErrorLogs).some(
+        k => npmDevice.supportedErrorLogs?.[k as keyof SupportedErrorLogs]
+    );

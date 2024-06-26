@@ -94,12 +94,18 @@ export default () => {
             } else {
                 pmicStep.caption = [
                     { id: '1', caption: 'Profiling Battery' },
-                    {
-                        id: '2',
-                        caption: 'stop profiling',
-                        action: () =>
-                            npmDevice?.getBatteryProfiler()?.stopProfiling(),
-                    },
+                    ...(npmDevice?.getBatteryProfiler !== undefined
+                        ? [
+                              {
+                                  id: '2',
+                                  caption: 'stop profiling',
+                                  action: () =>
+                                      npmDevice
+                                          ?.getBatteryProfiler?.()
+                                          ?.stopProfiling(),
+                              },
+                          ]
+                        : []),
                 ];
                 pmicStep.state = 'warning';
             }
@@ -127,12 +133,12 @@ export default () => {
         } else if (ccProfilingState !== 'Off') {
             pmicStep.caption = [{ id: '1', caption: 'Profiling Battery' }];
 
-            if (!pauseFor10Ms)
+            if (!pauseFor10Ms && npmDevice?.getBatteryProfiler !== undefined)
                 pmicStep.caption.push({
                     id: '2',
                     caption: 'stop profiling',
                     action: () =>
-                        npmDevice?.getBatteryProfiler()?.stopProfiling(),
+                        npmDevice?.getBatteryProfiler?.()?.stopProfiling(),
                 });
             pmicStep.state = 'warning';
         } else if (pmicState === 'pmic-pending-reboot') {

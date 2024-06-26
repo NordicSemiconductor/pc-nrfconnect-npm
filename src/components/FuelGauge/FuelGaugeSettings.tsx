@@ -249,7 +249,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                         className="w-100"
                         onClick={() => {
                             npmDevice
-                                ?.getBatteryProfiler()
+                                ?.getBatteryProfiler?.()
                                 ?.canProfile()
                                 .then(result => {
                                     if (result) {
