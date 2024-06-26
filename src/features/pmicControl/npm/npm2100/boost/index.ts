@@ -47,7 +47,7 @@ export default (
         set: new BoostSet(eventEmitter, sendCommand, offlineMode),
         callbacks: boostCallbacks(shellParser, eventEmitter),
         ranges: {
-            voltageRange: voltageRange(),
+            voltage: voltageRange(),
         },
         defaults: boostDefaults(),
     },

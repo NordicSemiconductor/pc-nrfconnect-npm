@@ -37,7 +37,7 @@ export default ({
 }) => {
     const [summary, setSummary] = useState(defaultSummary);
 
-    const range = boostModule.ranges.voltageRange;
+    const range = boostModule.ranges.voltage;
 
     const [internalVBoost, setInternalVBoost] = useState(boost.vOut);
 
