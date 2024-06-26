@@ -666,8 +666,6 @@ export type NpmDevice = {
     startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
 
-    getBuckVoltageRange: (index: number) => RangeType;
-    getBuckRetVOutRange: (index: number) => RangeType;
     getLdoVoltageRange: (index: number) => RangeType;
     getUSBCurrentLimiterRange: () => number[];
 
