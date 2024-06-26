@@ -61,19 +61,20 @@ export const ldoSet = (
     } = ldoGet(sendCommand);
 
     // Mode
-    const setLdoMode = (index: number, mode: LdoMode) => {
-        const action = () =>
-            new Promise<void>((resolve, reject) => {
-                if (offlineMode) {
-                    eventEmitter.emitPartialEvent<Ldo>(
-                        'onLdoUpdate',
-                        {
-                            mode,
-                        },
-                        index
-                    );
-                    resolve();
-                } else {
+    const setLdoMode = (index: number, mode: LdoMode) =>
+        new Promise<void>((resolve, reject) => {
+            if (offlineMode) {
+                eventEmitter.emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        mode,
+                        enabled: false,
+                    },
+                    index
+                );
+                resolve();
+            } else {
+                setLdoEnabled(index, false).then(() => {
                     sendCommand(
                         `npm2100 ldosw mode set ${mode}`,
                         () => resolve(),
@@ -82,83 +83,9 @@ export const ldoSet = (
                             reject();
                         }
                     );
-                }
-            });
-
-        // FIXME
-        if (dialogHandler && !offlineMode && mode === 'LDO') {
-            const ldo1Message = (
-                <span>
-                    Before enabling LDO1, configure the EK as follows:
-                    <ul>
-                        <li>
-                            Connect LDO bypass capacitors by connecting the LDO1
-                            jumper on P16.
-                        </li>
-                        <li>
-                            Disconnect V<span className="subscript">OUT1</span>{' '}
-                            - LS
-                            <span className="subscript">IN1</span>.
-                        </li>
-                        <li>
-                            Disconnect HIGH - LS
-                            <span className="subscript">OUT1</span> jumpers on
-                            P15.
-                        </li>
-                        <li>
-                            Ensure IN1, on P8, is connected to a source that is
-                            between 2.6 V and 5.5 V, for example V
-                            <span className="subscript">SYS</span>.
-                        </li>
-                    </ul>
-                </span>
-            );
-            const ldo2Message = (
-                <span>
-                    Before enabling LDO2, configure the EK as follows:
-                    <ul>
-                        <li>
-                            Connect LDO bypass capacitors by connecting the LDO2
-                            jumper on P16.
-                        </li>
-                        <li>
-                            Disconnect V<span className="subscript">OUT2</span>{' '}
-                            - LS
-                            <span className="subscript">IN2</span>.
-                        </li>
-                        <li>
-                            Disconnect LOW - LS
-                            <span className="subscript">OUT2</span> jumpers on
-                            P15.
-                        </li>
-                        <li>
-                            Ensure IN2, on P8, is connected to a source that is
-                            between 2.6 V and 5.5 V, for example V
-                            <span className="subscript">SYS</span>.
-                        </li>
-                    </ul>
-                </span>
-            );
-            return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicDialog = {
-                    type: 'alert',
-                    doNotAskAgainStoreID: `pmic2100-setLdoMode-${index}`,
-                    message: index === 0 ? ldo1Message : ldo2Message,
-                    confirmLabel: 'OK',
-                    optionalLabel: "OK, don't ask again",
-                    cancelLabel: 'Cancel',
-                    title: 'Warning',
-                    onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: reject,
-                    onOptional: () => action().then(resolve).catch(reject),
-                };
-
-                dialogHandler(warningDialog);
-            });
-        }
-
-        return action();
-    };
+                });
+            }
+        });
 
     // Vout
     const setLdoVoltage = (index: number, voltage: number) =>
