@@ -43,7 +43,7 @@ import setupLdo, { ldoDefaults } from './ldo';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timerConfig';
-import setupUsbCurrentLimiter from './usbCurrentLimiterConfig';
+import setupUsbCurrentLimiter from './usbCurrentLimiter';
 
 export const npm1300FWVersion = '1.1.1+0';
 
@@ -823,5 +823,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         timerConfigModule,
         gpioModule,
         shipModeModule,
+        usbCurrentLimiterModule,
     };
 };
