@@ -7,6 +7,7 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
+import { PmicDialog } from '../../types';
 import fuelGaugeCallbacks from './fuelGaugeCallbacks';
 import { fuelGaugeGet, fuelGaugeSet } from './fuelGaugeEffects';
 import {
@@ -23,11 +24,12 @@ export default (
         onError?: (response: string, command: string) => void,
         unique?: boolean
     ) => void,
+    dialogHandler: ((dialog: PmicDialog) => void) | null,
     offlineMode: boolean
 ) => ({
     fuelGaugeGet: fuelGaugeGet(sendCommand),
     fuelGaugeSet: {
-        ...fuelGaugeSet(eventEmitter, sendCommand, offlineMode),
+        ...fuelGaugeSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
         ...profileDownloadSet(eventEmitter, sendCommand),
     },
     fuelGaugeCallbacks: [

@@ -223,16 +223,11 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 });
 
 export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
-    supportsProgrammingMode: (device: Device) => {
-        console.log('FOO');
-        console.dir(device);
-        return (
-            device.traits.mcuBoot === true &&
-            device.traits.serialPorts === true &&
-            (isNpm2100SerialRecoverMode(device) ||
-                isNpm2100SerialApplicationMode(device))
-        );
-    },
+    supportsProgrammingMode: (device: Device) =>
+        device.traits.mcuBoot === true &&
+        device.traits.serialPorts === true &&
+        (isNpm2100SerialRecoverMode(device) ||
+            isNpm2100SerialApplicationMode(device)),
     getFirmwareOptions: device => [
         {
             key: firmware.key,

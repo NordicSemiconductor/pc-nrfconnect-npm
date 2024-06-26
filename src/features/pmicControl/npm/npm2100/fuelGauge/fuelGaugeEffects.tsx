@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import React from 'react';
+
 import { NpmEventEmitter } from '../../pmicHelpers';
+import { PmicDialog } from '../../types';
 
 export const fuelGaugeGet = (
     sendCommand: (
@@ -25,6 +28,7 @@ export const fuelGaugeSet = (
         onSuccess?: (response: string, command: string) => void,
         onError?: (response: string, command: string) => void
     ) => void,
+    dialogHandler: ((dialog: PmicDialog) => void) | null,
     offlineMode: boolean
 ) => {
     const { fuelGauge, activeBatteryModel } = fuelGaugeGet(sendCommand);
@@ -46,17 +50,43 @@ export const fuelGaugeSet = (
             }
         });
 
-    const setActiveBatteryModel = (name: string) =>
-        new Promise<void>((resolve, reject) => {
-            sendCommand(
-                `fuel_gauge model set "${name}"`,
-                () => resolve(),
-                () => {
-                    activeBatteryModel();
-                    reject();
-                }
+    const setActiveBatteryModel = (name: string) => {
+        const action = () =>
+            new Promise<void>((resolve, reject) => {
+                sendCommand(
+                    `fuel_gauge model set "${name}"`,
+                    () => resolve(),
+                    () => {
+                        activeBatteryModel();
+                        reject();
+                    }
+                );
+            });
+
+        if (dialogHandler && !offlineMode) {
+            const changeActiveBatteryDialog = (
+                <span>Changing selected battery type. Are you sure?</span>
             );
-        });
+            return new Promise<void>((resolve, reject) => {
+                const warningDialog: PmicDialog = {
+                    type: 'alert',
+                    doNotAskAgainStoreID: `pmic2100-changeActiveBatteryType`,
+                    message: changeActiveBatteryDialog,
+                    confirmLabel: 'OK',
+                    optionalLabel: "OK, don't ask again",
+                    cancelLabel: 'Cancel',
+                    title: 'Warning',
+                    onConfirm: () => action().then(resolve).catch(reject),
+                    onCancel: reject,
+                    onOptional: () => action().then(resolve).catch(reject),
+                };
+
+                dialogHandler(warningDialog);
+            });
+        }
+
+        return action();
+    };
 
     const setBatteryStatusCheckEnabled = (enabled: boolean) =>
         new Promise<void>((resolve, reject) => {
