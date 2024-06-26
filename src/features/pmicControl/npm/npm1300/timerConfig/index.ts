@@ -7,8 +7,10 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import timerCallbacks from './timerCallbacks';
-import { timerGet, timerSet } from './timerEffects';
+import { TimerConfigModule } from '../../types';
+import timerCallbacks from './timerConfigCallbacks';
+import { TimerConfigGet } from './timerConfigGetter';
+import { TimerConfigSet } from './timerConfigSetter';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -19,8 +21,13 @@ export default (
         onError?: (response: string, command: string) => void
     ) => void,
     offlineMode: boolean
-) => ({
-    timerGet: timerGet(sendCommand),
-    timerSet: timerSet(eventEmitter, sendCommand, offlineMode),
-    timerCallbacks: timerCallbacks(shellParser, eventEmitter),
+): TimerConfigModule => ({
+    get: new TimerConfigGet(sendCommand),
+    set: new TimerConfigSet(eventEmitter, sendCommand, offlineMode),
+    callbacks: timerCallbacks(shellParser, eventEmitter),
+    defaults: {
+        mode: 'Boot monitor',
+        prescaler: 'Slow',
+        period: 0,
+    },
 });

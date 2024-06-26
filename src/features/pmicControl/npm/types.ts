@@ -420,6 +420,24 @@ export interface PofModule {
     };
     defaults: POF;
 }
+
+export type TimerConfigModule = {
+    get: {
+        all: () => void;
+        mode: () => void;
+        prescaler: () => void;
+        period: () => void;
+    };
+    set: {
+        all(timerConfig: TimerConfig): Promise<void>;
+        mode(mode: TimerMode): Promise<void>;
+        prescaler(prescaler: TimerPrescaler): Promise<void>;
+        period(period: number): Promise<void>;
+    };
+    callbacks: (() => void)[];
+    defaults: TimerConfig;
+};
+
 export type BaseNpmDevice = {
     kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
@@ -517,6 +535,7 @@ export type BaseNpmDevice = {
 
     boostModule: BoostModule[];
     pofModule?: PofModule;
+    timerConfigModule?: TimerConfigModule;
 };
 
 export interface INpmDevice extends IBaseNpmDevice {
@@ -607,10 +626,6 @@ export type NpmDevice = {
         gpioDebounce: (index: number) => void;
 
         ledMode: (index: number) => void;
-
-        timerConfigMode: () => void;
-        timerConfigPrescaler: () => void;
-        timerConfigCompare: () => void;
 
         shipModeTimeToActive: () => void;
         shipLongPressReset: () => void;
@@ -713,10 +728,6 @@ export type NpmDevice = {
 
     setLedMode: (index: number, mode: LEDMode) => Promise<void>;
 
-    setTimerConfigMode: (mode: TimerMode) => Promise<void>;
-    setTimerConfigPrescaler: (prescaler: TimerPrescaler) => Promise<void>;
-    setTimerConfigCompare: (period: number) => Promise<void>;
-
     setShipModeTimeToActive: (time: TimeToActive) => Promise<void>;
     setShipLongPressReset: (state: LongPressReset) => Promise<void>;
 
@@ -773,7 +784,7 @@ export interface NpmExport {
     leds: LED[];
     pof?: POF;
     ship: ShipModeConfig;
-    timerConfig: TimerConfig;
+    timerConfig?: TimerConfig;
     fuelGauge: boolean;
     firmwareVersion: string;
     deviceType: NpmModel;

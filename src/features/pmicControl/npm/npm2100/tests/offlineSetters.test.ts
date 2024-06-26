@@ -23,7 +23,6 @@ describe('PMIC 2100 - Setters Offline tests', () => {
         mockOnLdoUpdate,
         mockOnGpioUpdate,
         mockOnLEDUpdate,
-        mockOnTimerConfigUpdate,
         mockOnShipUpdate,
         mockOnUsbPower,
         pmic,
@@ -320,27 +319,6 @@ describe('PMIC 2100 - Setters Offline tests', () => {
             data: { debounce: true },
             index,
         });
-    });
-
-    test('Set set timer config mode ', async () => {
-        await pmic.setTimerConfigMode('Wakeup');
-
-        expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
-        expect(mockOnTimerConfigUpdate).toBeCalledWith({ mode: 'Wakeup' });
-    });
-
-    test('Set set timer config prescaler ', async () => {
-        await pmic.setTimerConfigPrescaler('Fast');
-
-        expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
-        expect(mockOnTimerConfigUpdate).toBeCalledWith({ prescaler: 'Fast' });
-    });
-
-    test('Set set ship config compare ', async () => {
-        await pmic.setTimerConfigCompare(1000);
-
-        expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
-        expect(mockOnTimerConfigUpdate).toBeCalledWith({ period: 1000 });
     });
 
     test('Set set timer config time ', async () => {
