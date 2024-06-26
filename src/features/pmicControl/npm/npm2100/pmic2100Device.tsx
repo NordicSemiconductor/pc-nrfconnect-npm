@@ -41,7 +41,6 @@ import setupBucks, { buckDefaults } from './buck';
 import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { ldoDefaults } from './ldo';
-import setupShipMode from './shipMode';
 
 export const npm2100FWVersion = '0.0.0+2992206765';
 
@@ -354,13 +353,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
-    const { shipModeGet, shipModeSet, shipModeCallbacks } = setupShipMode(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
     const { fuelGaugeGet, fuelGaugeSet, fuelGaugeCallbacks } = setupFuelGauge(
         shellParser,
         eventEmitter,
@@ -490,8 +482,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             );
         }
 
-        releaseAll.push(...shipModeCallbacks);
-
         releaseAll.push(
             shellParser.registerCommandCallback(
                 toRegex('npmx vbusin current_limit', true),
@@ -604,9 +594,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 requestUpdate.ledMode(i);
             }
 
-            requestUpdate.shipModeTimeToActive();
-            requestUpdate.shipLongPressReset();
-
             requestUpdate.fuelGauge();
             requestUpdate.activeBatteryModel();
             requestUpdate.storedBatteryModel();
@@ -619,7 +606,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
 
         ...ldoGet,
-        ...shipModeGet,
         ...fuelGaugeGet,
 
         usbPowered: () => sendCommand(`npmx vbusin status cc get`),
@@ -748,13 +734,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                             )
                         );
 
-                        await shipModeSet.setShipModeTimeToActive(
-                            config.ship.timeToActive
-                        );
-                        await shipModeSet.setShipLongPressReset(
-                            config.ship.longPressReset
-                        );
-
                         await fuelGaugeSet.setFuelGaugeEnabled(
                             config.fuelGauge
                         );
@@ -830,7 +809,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ...buckSet,
         ...ldoSet,
         setLedMode,
-        ...shipModeSet,
         ...fuelGaugeSet,
 
         setVBusinCurrentLimiter,

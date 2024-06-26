@@ -15,17 +15,11 @@ import { DocumentationTooltip } from '../../features/pmicControl/npm/documentati
 import {
     LongPressReset,
     LongPressResetValues,
-    NpmDevice,
     ShipModeConfig,
+    ShipModeModule,
     TimeToActive,
     TimeToActiveValues,
 } from '../../features/pmicControl/npm/types';
-
-interface GPIOProperties {
-    npmDevice: NpmDevice;
-    ship: ShipModeConfig;
-    disabled: boolean;
-}
 
 const timerShipToActiveItems = TimeToActiveValues.map(item => ({
     label: `${item} ms`,
@@ -39,7 +33,15 @@ const LongPressResetItems = LongPressResetValues.map(item => ({
 
 const card = 'resetControl';
 
-export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
+export default ({
+    shipModeModule,
+    ship,
+    disabled,
+}: {
+    shipModeModule: ShipModeModule;
+    ship: ShipModeConfig;
+    disabled: boolean;
+}) => (
     <Card
         title={
             <div className="tw-flex tw-justify-between">
@@ -55,7 +57,7 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
             }
             items={LongPressResetItems}
             onSelect={item =>
-                npmDevice.setShipLongPressReset(item.value as LongPressReset)
+                shipModeModule.set.longPressReset(item.value as LongPressReset)
             }
             selectedItem={
                 LongPressResetItems[
@@ -77,7 +79,7 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
             }
             items={timerShipToActiveItems}
             onSelect={item =>
-                npmDevice.setShipModeTimeToActive(
+                shipModeModule.set.timeToActive(
                     Number.parseInt(item.value, 10) as TimeToActive
                 )
             }
@@ -101,7 +103,7 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
                 variant="secondary"
                 className="tw-w-full"
                 onClick={() => {
-                    npmDevice.enterShipMode();
+                    shipModeModule.set.enterShipMode();
                 }}
                 disabled={disabled}
             >
@@ -113,7 +115,7 @@ export default ({ npmDevice, ship, disabled }: GPIOProperties) => (
                 variant="secondary"
                 className="tw-w-full"
                 onClick={() => {
-                    npmDevice.enterShipHibernateMode();
+                    shipModeModule.set.enterShipHibernateMode();
                 }}
                 disabled={disabled}
             >

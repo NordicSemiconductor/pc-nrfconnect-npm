@@ -522,6 +522,24 @@ export type TimerConfigModule = {
     defaults: TimerConfig;
 };
 
+export type ShipModeModule = {
+    get: {
+        all: () => void;
+        timeToActive: () => void;
+        longPressReset: () => void;
+    };
+    set: {
+        all(shipMode: ShipModeConfig): Promise<void>;
+        timeToActive(timeToActive: TimeToActive): Promise<void>;
+
+        longPressReset(longPressReset: LongPressReset): Promise<void>;
+        enterShipMode(): void;
+        enterShipHibernateMode(): void;
+    };
+    callbacks: (() => void)[];
+    defaults: ShipModeConfig;
+};
+
 export type BaseNpmDevice = {
     kernelReset: () => void;
     getKernelUptime: () => Promise<number>;
@@ -619,6 +637,7 @@ export type BaseNpmDevice = {
     gpioModule: GpioModule[];
     boostModule: BoostModule[];
     pofModule?: PofModule;
+    shipModeModule?: ShipModeModule;
     timerConfigModule?: TimerConfigModule;
 };
 
@@ -673,9 +692,6 @@ export type NpmDevice = {
         ldoOnOffControl?: (index: number) => void;
 
         ledMode: (index: number) => void;
-
-        shipModeTimeToActive: () => void;
-        shipLongPressReset: () => void;
 
         fuelGauge: () => void;
 
@@ -748,12 +764,6 @@ export type NpmDevice = {
 
     setLedMode: (index: number, mode: LEDMode) => Promise<void>;
 
-    setShipModeTimeToActive: (time: TimeToActive) => Promise<void>;
-    setShipLongPressReset: (state: LongPressReset) => Promise<void>;
-
-    enterShipMode: () => void;
-    enterShipHibernateMode: () => void;
-
     setFuelGaugeEnabled: (state: boolean) => Promise<void>;
     downloadFuelGaugeProfile: (profile: Buffer, slot?: number) => Promise<void>;
     abortDownloadFuelGaugeProfile: () => Promise<void>;
@@ -807,7 +817,7 @@ export interface NpmExport {
     gpios: GPIOExport[];
     leds: LED[];
     pof?: POF;
-    ship: ShipModeConfig;
+    ship?: ShipModeConfig;
     timerConfig?: TimerConfig;
     fuelGauge: boolean;
     firmwareVersion: string;

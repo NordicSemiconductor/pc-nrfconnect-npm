@@ -417,14 +417,14 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set timer config time ', async () => {
-        await pmic.setShipModeTimeToActive(16);
+        await pmic.shipModeModule?.set.timeToActive(16);
 
         expect(mockOnShipUpdate).toBeCalledTimes(1);
         expect(mockOnShipUpdate).toBeCalledWith({ timeToActive: 16 });
     });
 
     test('Set set timer reset longpress ', async () => {
-        await pmic.setShipLongPressReset('disabled');
+        await pmic.shipModeModule?.set.longPressReset('disabled');
 
         expect(mockOnShipUpdate).toBeCalledTimes(1);
         expect(mockOnShipUpdate).toBeCalledWith({ longPressReset: 'disabled' });

@@ -159,10 +159,13 @@ npm1300_ek_leds: leds {
 };
 `;
 
-const generateMfd = (ship: ShipModeConfig) => `
+const generateMfd = (ship?: ShipModeConfig) =>
+    ship
+        ? `
     // long-press-reset = "${ship.longPressReset}";
     // ship-to-active-time = <${ship.timeToActive}>;
-`;
+`
+        : '';
 
 export default (npmConfig: NpmExport, npmDevice: NpmDevice) => `/*
 * Copyright (C) 2023 Nordic Semiconductor ASA

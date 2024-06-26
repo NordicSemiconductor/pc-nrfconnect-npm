@@ -131,54 +131,6 @@ describe('PMIC 2100 - Request update commands', () => {
         }
     );
 
-    test('Request update shipModeTimeToActive', () => {
-        pmic.requestUpdate.shipModeTimeToActive();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship config time get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request update shipLongPressReset', () => {
-        pmic.requestUpdate.shipLongPressReset();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `powerup_ship longpress get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request enterShipMode', () => {
-        pmic.enterShipMode();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship mode ship`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request enterShipMode', () => {
-        pmic.enterShipHibernateMode();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship mode hibernate`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
     test('Request update fuelGauge', () => {
         pmic.requestUpdate.fuelGauge();
 

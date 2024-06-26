@@ -1249,7 +1249,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set ship config time %p', async () => {
-            await pmic.setShipModeTimeToActive(16);
+            await pmic.shipModeModule?.set.timeToActive(16);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1264,7 +1264,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set ship reset longpress two_button', async () => {
-            await pmic.setShipLongPressReset('two_button');
+            await pmic.shipModeModule?.set.longPressReset('two_button');
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -3211,7 +3211,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.setShipModeTimeToActive(16)
+                pmic.shipModeModule?.set.timeToActive(16)
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3241,7 +3241,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.setShipLongPressReset('one_button')
+                pmic.shipModeModule?.set.longPressReset('one_button')
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
