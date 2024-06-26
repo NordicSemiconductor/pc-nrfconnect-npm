@@ -452,6 +452,7 @@ export interface BoostModule {
 }
 
 export interface BuckModule {
+    index: number;
     get: {
         all: () => void;
         vOutNormal: () => void;

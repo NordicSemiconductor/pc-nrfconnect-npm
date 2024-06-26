@@ -73,8 +73,8 @@ export default ({ active }: PaneProps) => {
                     <BuckCard
                         buck={buck}
                         npmDevice={npmDevice}
+                        buckModule={npmDevice.buckModule[index]}
                         key={`Buck${1 + index}`}
-                        index={index}
                         disabled={disabled}
                         defaultSummary
                     />

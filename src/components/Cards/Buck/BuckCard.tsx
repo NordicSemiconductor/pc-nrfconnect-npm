@@ -20,6 +20,7 @@ import {
     BuckMode,
     BuckModeControl,
     BuckModeControlValues,
+    BuckModule,
     BuckOnOffControl,
     BuckOnOffControlValues,
     BuckRetentionControl,
@@ -29,9 +30,9 @@ import {
 } from '../../../features/pmicControl/npm/types';
 
 interface BuckCardProperties {
-    index: number;
     npmDevice: NpmDevice;
     buck: Buck;
+    buckModule: BuckModule;
     cardLabel?: string;
     defaultSummary?: boolean;
     disabled: boolean;
@@ -39,17 +40,14 @@ interface BuckCardProperties {
 
 export default ({
     npmDevice,
-    index,
     buck,
-    cardLabel = `BUCK ${index + 1}`,
+    buckModule,
+    cardLabel = `BUCK ${buckModule.index + 1}`,
     disabled,
     defaultSummary = false,
 }: BuckCardProperties) => {
-    const card = `buck${index + 1}`;
+    const card = `buck${buckModule.index + 1}`;
     const [summary, setSummary] = useState(defaultSummary);
-
-    const buckModule = npmDevice.buckModule[index];
-    if (!buckModule) return null;
 
     const onVOutChange = (value: number) => buckModule.set.vOutNormal(value);
 
@@ -81,7 +79,10 @@ export default ({
                     'Software'
                 ) : (
                     <>
-                        V<span className="subscript">{`SET${index + 1}`}</span>
+                        V
+                        <span className="subscript">{`SET${
+                            buckModule.index + 1
+                        }`}</span>
                     </>
                 );
             return {
@@ -105,7 +106,10 @@ export default ({
             key: 'Vset',
             renderItem: (
                 <>
-                    V<span className="subscript">{`SET${index + 1}`}</span>
+                    V
+                    <span className="subscript">{`SET${
+                        buckModule.index + 1
+                    }`}</span>
                 </>
             ),
         },
@@ -169,7 +173,7 @@ export default ({
                         <div>
                             <span>V</span>
                             <span className="subscript">{`OUT${
-                                index + 1
+                                buckModule.index + 1
                             }`}</span>
                         </div>
                     </DocumentationTooltip>
@@ -190,7 +194,7 @@ export default ({
                                 <div>
                                     <span>V</span>
                                     <span className="subscript">{`RET${
-                                        index + 1
+                                        buckModule.index + 1
                                     }`}</span>
                                 </div>
                             </DocumentationTooltip>

@@ -64,6 +64,7 @@ export default (
     offlineMode: boolean
 ) =>
     [...Array(numberOfBucks).keys()].map(i => ({
+        index: i,
         get: new BuckGet(sendCommand, i),
         set: new BuckSet(
             eventEmitter,
