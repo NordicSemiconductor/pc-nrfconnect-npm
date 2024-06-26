@@ -7,8 +7,8 @@
 export enum GPIOMode2100 {
     'Input' = 'INPUT',
     'Output' = 'OUTPUT',
-    'Input High' = 'INTHI',
-    'Input Low' = 'INTLO',
+    'Interrupt output, active high' = 'INTHI',
+    'Interrupt output, active low' = 'INTLO',
 }
 
 export const GPIOModeKeys = Object.keys(GPIOMode2100);
