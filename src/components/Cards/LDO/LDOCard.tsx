@@ -123,7 +123,13 @@ export default ({
                 disabled={disabled}
                 items={modeItems}
                 onSelect={i =>
-                    npmDevice.setLdoMode(index, i === 0 ? 'LDO' : 'load_switch')
+                    Promise.all([
+                        npmDevice.setLdoEnabled(index, false),
+                        npmDevice.setLdoMode(
+                            index,
+                            i === 0 ? 'LDO' : 'load_switch'
+                        ),
+                    ])
                 }
                 selectedItem={
                     ldo.mode === 'load_switch' ? modeItems[1] : modeItems[0]
