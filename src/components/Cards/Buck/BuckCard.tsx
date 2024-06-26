@@ -257,11 +257,11 @@ export default ({
                             </DocumentationTooltip>
                         }
                         items={buckOnOffControlItems}
-                        onSelect={item => {
+                        onSelect={item =>
                             buckModule.set.onOffControl(
                                 item.value as BuckOnOffControl
-                            );
-                        }}
+                            )
+                        }
                         selectedItem={
                             buckOnOffControlItems[
                                 Math.max(
