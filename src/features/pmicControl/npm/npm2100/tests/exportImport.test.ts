@@ -99,8 +99,9 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     const sampleConfig: NpmExport = {
         boosts: [
             {
-                vOut: 1,
-                mode: 'VSET',
+                vOutSoftware: 1.8,
+                vOutVSet: 1.8,
+                mode: 'Vset',
                 modeControl: 'AUTO',
                 pinSelection: 'OFF',
                 pinMode: 'HP',

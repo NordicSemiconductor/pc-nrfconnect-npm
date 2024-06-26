@@ -30,7 +30,7 @@ export class BoostSet {
     }
 
     async all(config: Boost) {
-        await this.vOut(config.vOut);
+        await this.vOut(config.vOutSoftware);
         await this.mode(config.mode);
         await this.modeControl(config.modeControl);
         await this.pinSelection(config.pinSelection);
@@ -44,14 +44,14 @@ export class BoostSet {
                 this.eventEmitter.emitPartialEvent<Boost>(
                     'onBoostUpdate',
                     {
-                        mode: 'SOFTWARE',
+                        mode: 'Software',
                     },
                     0
                 );
                 this.eventEmitter.emitPartialEvent<Boost>(
                     'onBoostUpdate',
                     {
-                        vOut: value,
+                        vOutSoftware: value,
                     },
                     0
                 );
@@ -59,13 +59,13 @@ export class BoostSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm2100 boost voutsel set SOFTWARE`,
+                    `npm2100 boost voutsel set Software`,
                     () => {
                         this.sendCommand(
-                            `npm2100 boost vout set ${value * 1000}`,
+                            `npm2100 boost vout SOFTWARE set ${value * 1000}`,
                             () => resolve(),
                             () => {
-                                this.get.vOut();
+                                this.get.vOutSoftware();
                                 reject();
                             }
                         );
@@ -94,7 +94,11 @@ export class BoostSet {
                 this.sendCommand(
                     `npm2100 boost voutsel set ${mode}`,
                     () => {
-                        this.get.vOut();
+                        if (mode === 'Software') {
+                            this.get.vOutSoftware();
+                        } else {
+                            this.get.vOutVSet();
+                        }
                         resolve();
                     },
                     () => {

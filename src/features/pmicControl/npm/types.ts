@@ -71,7 +71,7 @@ export type LdoOnOffControl =
     | (typeof LdoOnOffControlValues)[number]
     | GPIONames;
 
-export const BoostModeValues = ['VSET', 'SOFTWARE'] as const;
+export const BoostModeValues = ['Vset', 'Software'] as const;
 export type BoostMode = (typeof BoostModeValues)[number];
 export type BoostModeControl = (typeof BoostModeControlValues)[number];
 export type BoostPinMode = (typeof BoostPinModeValues)[number];
@@ -145,7 +145,8 @@ export type Charger = {
 };
 
 export type Boost = {
-    vOut: number;
+    vOutVSet: number;
+    vOutSoftware: number;
     mode: BoostMode;
     modeControl: BoostModeControl;
     pinSelection: BoostPinSelection;
@@ -428,7 +429,8 @@ export interface ChargerModule {
 export interface BoostModule {
     get: {
         all: () => void;
-        vOut: () => void;
+        vOutVSet: () => void;
+        vOutSoftware: () => void;
         mode: () => void;
         modeControl: () => void;
         pinSelection: () => void;

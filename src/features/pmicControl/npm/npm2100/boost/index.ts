@@ -16,8 +16,9 @@ import { BoostSet } from './boostSet';
 export const numberOfBoosts = 1;
 
 const boostDefaults = (): Boost => ({
-    vOut: voltageRange().min,
-    mode: 'VSET',
+    vOutSoftware: voltageRange().min,
+    vOutVSet: voltageRange().min,
+    mode: 'Vset',
     modeControl: 'AUTO',
     pinSelection: 'OFF',
     pinMode: 'HP',

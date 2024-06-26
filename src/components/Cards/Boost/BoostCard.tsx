@@ -39,7 +39,9 @@ export default ({
 
     const range = boostModule.ranges.voltage;
 
-    const [internalVBoost, setInternalVBoost] = useState(boost.vOut);
+    const [internalVBoost, setInternalVBoost] = useState(
+        boost.mode === 'Vset' ? boost.vOutVSet : boost.vOutSoftware
+    );
 
     const modeItems = [
         { key: 'Software', renderItem: <span>Software</span> },
@@ -78,7 +80,17 @@ export default ({
 
     // NumberInputSliderWithUnit do not use boost.<prop> as value as we send only at on change complete
     useEffect(() => {
-        setInternalVBoost(boost.vOut);
+        console.log(
+            'useEffect',
+            boost.mode,
+            boost.vOutVSet,
+            boost.vOutSoftware
+        );
+        if (boost.mode === 'Vset') {
+            setInternalVBoost(boost.vOutVSet);
+        } else {
+            setInternalVBoost(boost.vOutSoftware);
+        }
     }, [boost]);
 
     return boost ? (
@@ -109,10 +121,10 @@ export default ({
                 disabled={disabled}
                 items={modeItems}
                 onSelect={i =>
-                    boostModule.set.mode(i === 0 ? 'SOFTWARE' : 'VSET')
+                    boostModule.set.mode(i === 0 ? 'Software' : 'Vset')
                 }
                 selectedItem={
-                    boost.mode === 'SOFTWARE' ? modeItems[0] : modeItems[1]
+                    boost.mode === 'Software' ? modeItems[0] : modeItems[1]
                 }
             />
 
