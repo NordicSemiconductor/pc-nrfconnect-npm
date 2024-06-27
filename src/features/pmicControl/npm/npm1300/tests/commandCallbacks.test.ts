@@ -871,7 +871,7 @@ Battery models stored in database:
 
     test.each(
         PMIC_1300_LDOS.map(index => [
-            ...['LDO', 'load_switch'].map(mode =>
+            ...['LDO', 'Load_switch'].map(mode =>
                 [
                     {
                         index,
