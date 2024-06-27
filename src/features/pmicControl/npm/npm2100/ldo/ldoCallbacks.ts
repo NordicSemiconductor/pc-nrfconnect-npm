@@ -13,8 +13,9 @@ import {
     parseColonBasedAnswer,
     parseOnOff,
     parseToNumber,
+    selectFromTypeValues,
     toRegex,
-    toValueRegex,
+    toValueRegexString,
 } from '../../pmicHelpers';
 import { Ldo, LdoMode, LdoModeValues } from '../../types';
 import {
@@ -76,13 +77,16 @@ export default (
                     'npm2100 ldosw mode',
                     true,
                     undefined,
-                    toValueRegex(LdoModeValues)
+                    toValueRegexString(LdoModeValues)
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            mode: parseColonBasedAnswer(res) as LdoMode,
+                            mode: selectFromTypeValues(
+                                parseColonBasedAnswer(res),
+                                LdoModeValues
+                            ) as LdoMode,
                         },
                         0
                     );
@@ -98,7 +102,7 @@ export default (
                     'npm2100 ldosw modectrl',
                     true,
                     undefined,
-                    toValueRegex(nPM2100LdoModeControlValues)
+                    toValueRegexString(nPM2100LdoModeControlValues)
                 ),
                 res => {
                     const modeControl = parseColonBasedAnswer(
@@ -107,7 +111,10 @@ export default (
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            modeControl,
+                            modeControl: selectFromTypeValues(
+                                parseColonBasedAnswer(res),
+                                nPM2100LdoModeControlValues
+                            ) as nPM2100LdoModeControl,
                             onOffSoftwareControlEnabled: modeControl !== 'gpio',
                         },
                         0
@@ -124,14 +131,15 @@ export default (
                     'npm2100 ldosw pinsel',
                     true,
                     undefined,
-                    toValueRegex(nPM2100GPIOControlPinSelectValues)
+                    toValueRegexString(nPM2100GPIOControlPinSelectValues)
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            pinSel: parseColonBasedAnswer(
-                                res
+                            pinSel: selectFromTypeValues(
+                                parseColonBasedAnswer(res),
+                                nPM2100GPIOControlPinSelectValues
                             ) as nPM2100GPIOControlPinSelect,
                         },
                         0
@@ -148,14 +156,15 @@ export default (
                     'npm2100 ldosw softstart LDO',
                     true,
                     undefined,
-                    toValueRegex(nPM2100LDOSoftStartValues)
+                    toValueRegexString(nPM2100LDOSoftStartValues)
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            ldoSoftStart: parseColonBasedAnswer(
-                                res
+                            ldoSoftStart: selectFromTypeValues(
+                                parseColonBasedAnswer(res),
+                                nPM2100LDOSoftStartValues
                             ) as nPM2100LDOSoftStart,
                         },
                         0
@@ -172,14 +181,15 @@ export default (
                     'npm2100 ldosw softstart LOADSW',
                     true,
                     undefined,
-                    toValueRegex(nPM2100LoadSwitchSoftStartValues)
+                    toValueRegexString(nPM2100LoadSwitchSoftStartValues)
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            loadSwitchSoftStart: parseColonBasedAnswer(
-                                res
+                            loadSwitchSoftStart: selectFromTypeValues(
+                                parseColonBasedAnswer(res),
+                                nPM2100LoadSwitchSoftStartValues
                             ) as nPM2100LoadSwitchSoftStart,
                         },
                         0
@@ -195,14 +205,15 @@ export default (
                     'npm2100 ldosw pinmode',
                     true,
                     undefined,
-                    toValueRegex(nPM2100GPIOControlModeValues)
+                    toValueRegexString(nPM2100GPIOControlModeValues)
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            pinMode: parseColonBasedAnswer(
-                                res
+                            pinMode: selectFromTypeValues(
+                                parseColonBasedAnswer(res),
+                                nPM2100GPIOControlModeValues
                             ) as nPM2100GPIOControlMode,
                         },
                         0
