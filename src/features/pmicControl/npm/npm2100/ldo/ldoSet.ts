@@ -182,6 +182,7 @@ export class LdoSet {
                     'onLdoUpdate',
                     {
                         modeControl,
+                        onOffSoftwareControlEnabled: modeControl !== 'gpio',
                     },
                     0
                 );

@@ -101,12 +101,14 @@ export default (
                     toValueRegex(nPM2100LdoModeControlValues)
                 ),
                 res => {
+                    const modeControl = parseColonBasedAnswer(
+                        res
+                    ) as nPM2100LdoModeControl;
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            modeControl: parseColonBasedAnswer(
-                                res
-                            ) as nPM2100LdoModeControl,
+                            modeControl,
+                            onOffSoftwareControlEnabled: modeControl !== 'gpio',
                         },
                         0
                     );
