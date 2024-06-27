@@ -143,7 +143,10 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { modeControl },
+                data: {
+                    modeControl,
+                    onOffSoftwareControlEnabled: modeControl !== 'gpio',
+                },
                 index,
             });
         });
