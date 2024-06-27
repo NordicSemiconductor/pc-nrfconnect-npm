@@ -23,10 +23,6 @@ import {
 
 type PowerSource = 'USB' | 'Battery';
 
-interface PowerSourceProps {
-    disabled: boolean;
-}
-
 function generateBatteryTypeItems(
     batteryModels: BatteryModel[]
 ): DropdownItem[] {
@@ -36,7 +32,7 @@ function generateBatteryTypeItems(
     }));
 }
 
-export default ({ disabled }: PowerSourceProps) => {
+export default () => {
     const batteryAddonBoardId = useSelector(getBatteryAddonBoardId);
 
     const powerSourceType: PowerSource =
@@ -44,7 +40,7 @@ export default ({ disabled }: PowerSourceProps) => {
 
     const powerSourceItems = ['Battery', 'USB'];
 
-    return !disabled ? (
+    return (
         <>
             <StateSelector
                 disabled
@@ -58,7 +54,7 @@ export default ({ disabled }: PowerSourceProps) => {
             />
             <BatteryAddonBoardInfo />
         </>
-    ) : null;
+    );
 };
 
 const BatteryAddonBoardInfo = () => {
