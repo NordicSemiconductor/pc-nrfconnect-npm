@@ -10,81 +10,70 @@ import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     GPIOValues,
     Ldo,
+    LdoExport,
     LdoMode,
     LdoOnOffControl,
     LdoOnOffControlValues,
     Npm1300LoadSwitchSoftStart,
     PmicDialog,
 } from '../../types';
+import { LdoGet } from './ldoGet';
 
-export const ldoGet = (
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void
-) => ({
-    ldoVoltage: (index: number) =>
-        sendCommand(`npmx ldsw ldo_voltage get ${index}`),
-    ldoEnabled: (index: number) => sendCommand(`npmx ldsw status get ${index}`),
-    ldoMode: (index: number) => sendCommand(`npmx ldsw mode get ${index}`),
-    ldoSoftStartEnabled: (index: number) =>
-        sendCommand(`npmx ldsw soft_start enable get ${index}`),
-    ldoSoftStart: (index: number) =>
-        sendCommand(`npmx ldsw soft_start current get ${index}`),
-    ldoActiveDischarge: (index: number) =>
-        sendCommand(`npmx ldsw active_discharge get ${index}`),
-    ldoOnOffControl: (index: number) =>
-        sendCommand(`npmx ldsw gpio index get ${index}`),
-});
+export class LdoSet {
+    private get: LdoGet;
 
-export const ldoSet = (
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean
-) => {
-    const {
-        ldoVoltage,
-        ldoEnabled,
-        ldoMode,
-        ldoSoftStartEnabled,
-        ldoSoftStart,
-        ldoActiveDischarge,
-        ldoOnOffControl,
-    } = ldoGet(sendCommand);
+    constructor(
+        private eventEmitter: NpmEventEmitter,
+        private sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        private dialogHandler: ((dialog: PmicDialog) => void) | null,
+        private offlineMode: boolean,
+        private index: number
+    ) {
+        this.get = new LdoGet(sendCommand, index);
+    }
 
-    const setLdoMode = (index: number, mode: LdoMode) => {
+    async all(ldo: LdoExport) {
+        await this.voltage(ldo.voltage);
+        await this.enabled(ldo.enabled);
+        await this.softStartEnabled(ldo.softStartEnabled);
+        await this.softStart(ldo.softStart);
+        await this.activeDischarge(ldo.activeDischarge);
+        await this.onOffControl(ldo.onOffControl);
+        await this.mode(ldo.mode);
+    }
+
+    mode(mode: LdoMode) {
         const action = () =>
             new Promise<void>((resolve, reject) => {
-                if (offlineMode) {
-                    eventEmitter.emitPartialEvent<Ldo>(
+                if (this.offlineMode) {
+                    this.eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
                             mode,
                         },
-                        index
+                        this.index
                     );
                     resolve();
                 } else {
-                    sendCommand(
-                        `npmx ldsw mode set ${index} ${
+                    this.sendCommand(
+                        `npmx ldsw mode set ${this.index} ${
                             mode === 'load_switch' ? '0' : '1'
                         }`,
                         () => resolve(),
                         () => {
-                            ldoMode(index);
+                            this.get.mode();
                             reject();
                         }
                     );
                 }
             });
 
-        if (dialogHandler && !offlineMode && mode === 'LDO') {
+        const dialogHandler = this.dialogHandler;
+        if (dialogHandler && !this.offlineMode && mode === 'LDO') {
             const ldo1Message = (
                 <span>
                     Before enabling LDO1, configure the EK as follows:
@@ -140,8 +129,8 @@ export const ldoSet = (
             return new Promise<void>((resolve, reject) => {
                 const warningDialog: PmicDialog = {
                     type: 'alert',
-                    doNotAskAgainStoreID: `pmic1300-setLdoMode-${index}`,
-                    message: index === 0 ? ldo1Message : ldo2Message,
+                    doNotAskAgainStoreID: `pmic1300-setLdoMode-${this.index}`,
+                    message: this.index === 0 ? ldo1Message : ldo2Message,
                     confirmLabel: 'OK',
                     optionalLabel: "OK, don't ask again",
                     cancelLabel: 'Cancel',
@@ -156,174 +145,167 @@ export const ldoSet = (
         }
 
         return action();
-    };
+    }
 
-    const setLdoVoltage = (index: number, voltage: number) =>
-        new Promise<void>((resolve, reject) => {
-            eventEmitter.emitPartialEvent<Ldo>(
+    voltage(voltage: number) {
+        return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Ldo>(
                 'onLdoUpdate',
                 {
                     voltage,
                 },
-                index
+                this.index
             );
 
-            if (offlineMode) {
+            if (this.offlineMode) {
                 resolve();
             } else {
-                setLdoMode(index, 'LDO')
+                this.mode('LDO')
                     .then(() => {
-                        sendCommand(
-                            `npmx ldsw ldo_voltage set ${index} ${
+                        this.sendCommand(
+                            `npmx ldsw ldo_voltage set ${this.index} ${
                                 voltage * 1000
                             }`,
                             () => resolve(),
                             () => {
-                                ldoVoltage(index);
+                                this.get.voltage();
                                 reject();
                             }
                         );
                     })
                     .catch(() => {
-                        ldoVoltage(index);
+                        this.get.voltage();
                         reject();
                     });
             }
         });
+    }
 
-    const setLdoEnabled = (index: number, enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Ldo>(
+    enabled(enabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         enabled,
                     },
-                    index
+                    this.index
                 );
                 resolve();
             } else {
-                sendCommand(
-                    `npmx ldsw status set ${index} ${enabled ? '1' : '0'}`,
+                this.sendCommand(
+                    `npmx ldsw status set ${this.index} ${enabled ? '1' : '0'}`,
                     () => resolve(),
                     () => {
-                        ldoEnabled(index);
+                        this.get.enabled();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setLdoSoftStartEnabled = (index: number, enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Ldo>(
+    softStartEnabled(enabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         softStartEnabled: enabled,
                     },
-                    index
+                    this.index
                 );
                 resolve();
             } else {
-                sendCommand(
-                    `npmx ldsw soft_start enable set ${index} ${
+                this.sendCommand(
+                    `npmx ldsw soft_start enable set ${this.index} ${
                         enabled ? '1' : '0'
                     }`,
                     () => resolve(),
                     () => {
-                        ldoSoftStartEnabled(index);
+                        this.get.softStartEnabled();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setLdoSoftStart = (
-        index: number,
-        softStart: Npm1300LoadSwitchSoftStart
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Ldo>(
+    softStart(softStart: Npm1300LoadSwitchSoftStart) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         softStart,
                     },
-                    index
+                    this.index
                 );
                 resolve();
             } else {
-                sendCommand(
-                    `npmx ldsw soft_start current set ${index} ${softStart}`,
+                this.sendCommand(
+                    `npmx ldsw soft_start current set ${this.index} ${softStart}`,
                     () => resolve(),
                     () => {
-                        ldoSoftStart(index);
+                        this.get.softStart();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setLdoActiveDischarge = (index: number, activeDischarge: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Ldo>(
+    activeDischarge(activeDischarge: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         activeDischarge,
                     },
-                    index
+                    this.index
                 );
                 resolve();
             } else {
-                sendCommand(
-                    `npmx ldsw active_discharge set ${index} ${
+                this.sendCommand(
+                    `npmx ldsw active_discharge set ${this.index} ${
                         activeDischarge ? '1' : '0'
                     }`,
                     () => resolve(),
                     () => {
-                        ldoActiveDischarge(index);
+                        this.get.activeDischarge();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setLdoOnOffControl = (index: number, onOffControl: LdoOnOffControl) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emitPartialEvent<Ldo>(
+    onOffControl(onOffControl: LdoOnOffControl) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
                         onOffControl,
                         onOffSoftwareControlEnabled:
                             onOffControl === LdoOnOffControlValues[0],
                     },
-                    index
+                    this.index
                 );
                 resolve();
             } else {
-                sendCommand(
-                    `npmx ldsw gpio index set ${index} ${GPIOValues.findIndex(
-                        v => v === onOffControl
-                    )}`,
+                this.sendCommand(
+                    `npmx ldsw gpio index set ${
+                        this.index
+                    } ${GPIOValues.findIndex(v => v === onOffControl)}`,
                     () => resolve(),
                     () => {
-                        ldoOnOffControl(index);
+                        this.get.onOffControl();
                         reject();
                     }
                 );
             }
         });
-
-    return {
-        setLdoMode,
-        setLdoVoltage,
-        setLdoEnabled,
-        setLdoSoftStartEnabled,
-        setLdoSoftStart,
-        setLdoActiveDischarge,
-        setLdoOnOffControl,
-    };
-};
+    }
+}

@@ -296,34 +296,34 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
     describe('LDO Ramp', () => {
         test.each(
             PMIC_2100_LDOS.map(index => [
-                ...[true, false].map(ldoRampEnabled =>
+                ...[true, false].map(rampEnabled =>
                     [
                         {
                             index,
                             append: `get`,
-                            ldoRampEnabled,
+                            rampEnabled,
                         },
                         {
                             index,
-                            append: `set ${ldoRampEnabled ? 'ON' : 'OFF'} `,
-                            ldoRampEnabled,
+                            append: `set ${rampEnabled ? 'ON' : 'OFF'} `,
+                            rampEnabled,
                         },
                     ].flat()
                 ),
             ]).flat()
-        )('npm2100 ldosw ldoramp %p', ({ index, append, ldoRampEnabled }) => {
+        )('npm2100 ldosw ldoramp %p', ({ index, append, rampEnabled }) => {
             const command = `npm2100 ldosw ldoramp ${append}`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 
             callback?.onSuccess(
-                `Value: ${ldoRampEnabled ? 'ON' : 'OFF'}`,
+                `Value: ${rampEnabled ? 'ON' : 'OFF'}`,
                 command
             );
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { ldoRampEnabled },
+                data: { rampEnabled },
                 index,
             });
         });
@@ -333,34 +333,34 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
     describe('LDO Ramp Halt', () => {
         test.each(
             PMIC_2100_LDOS.map(index => [
-                ...[true, false].map(ldoHaltEnabled =>
+                ...[true, false].map(haltEnabled =>
                     [
                         {
                             index,
                             append: `get`,
-                            ldoHaltEnabled,
+                            haltEnabled,
                         },
                         {
                             index,
-                            append: `set ${ldoHaltEnabled ? 'ON' : 'OFF'} `,
-                            ldoHaltEnabled,
+                            append: `set ${haltEnabled ? 'ON' : 'OFF'} `,
+                            haltEnabled,
                         },
                     ].flat()
                 ),
             ]).flat()
-        )('npm2100 ldosw ldohalt %p', ({ index, append, ldoHaltEnabled }) => {
+        )('npm2100 ldosw ldohalt %p', ({ index, append, haltEnabled }) => {
             const command = `npm2100 ldosw ldohalt ${append}`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 
             callback?.onSuccess(
-                `Value: ${ldoHaltEnabled ? 'ON' : 'OFF'}`,
+                `Value: ${haltEnabled ? 'ON' : 'OFF'}`,
                 command
             );
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { ldoHaltEnabled },
+                data: { haltEnabled },
                 index,
             });
         });

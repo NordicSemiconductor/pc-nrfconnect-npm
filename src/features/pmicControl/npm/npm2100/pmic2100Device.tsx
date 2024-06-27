@@ -36,7 +36,7 @@ import {
 import getBoostModule, { numberOfBoosts } from './boost';
 import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
-import setupLdo, { ldoDefaults } from './ldo';
+import setupLdo, { numberOfLdos } from './ldo';
 
 export const npm2100FWVersion = '0.0.0+2992206765';
 
@@ -47,7 +47,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         noOfBoosts: numberOfBoosts,
         noOfBucks: 0,
         maxEnergyExtraction: true,
-        noOfLdos: 1,
+        noOfLdos: numberOfLdos,
         noOfLEDs: 0,
         noOfBatterySlots: 1,
     };
@@ -194,13 +194,11 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
     const offlineMode = !shellParser;
 
-    const { ldoGet, ldoSet, ldoCallbacks, ldoRanges } = setupLdo(
+    const ldoModule = setupLdo(
         shellParser,
         eventEmitter,
         sendCommand,
-        dialogHandler,
-        offlineMode,
-        devices.noOfLdos
+        offlineMode
     );
 
     const gpioModule = setupGpio(
@@ -306,7 +304,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         releaseAll.push(...fuelGaugeCallbacks);
 
         releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
-        releaseAll.push(...ldoCallbacks);
+        releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
 
         for (let i = 0; i < devices.noOfLEDs; i += 1) {
@@ -372,19 +370,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             // Request all updates for nPM2100
 
             boostModule.forEach(boost => boost.get.all());
-
-            requestUpdate.ldoVoltage();
-            requestUpdate.ldoEnabled();
-            requestUpdate.ldoMode();
-            requestUpdate.ldoModeCtrl();
-            requestUpdate.ldoPinSel();
-            requestUpdate.ldoSoftStartLdo();
-            requestUpdate.ldoSoftStartLoadSw();
-            requestUpdate.ldoPinMode();
-            requestUpdate.ldoOcp();
-            requestUpdate.ldoLdoRamp();
-            requestUpdate.ldoLdoHalt();
-
+            ldoModule.forEach(ldo => ldo.get.all());
             gpioModule.forEach(module => module.get.all());
 
             for (let i = 0; i < devices.noOfLEDs; i += 1) {
@@ -398,7 +384,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
 
-        ...ldoGet,
         ...fuelGaugeGet,
     };
 
@@ -418,78 +403,16 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 const action = async () => {
                     try {
                         await Promise.all(
-                            config.boosts.map((boost, index) => async () => {
-                                await boostModule[index].set.all(boost);
-                            })
+                            config.boosts.map((boost, index) =>
+                                (async () => {
+                                    await boostModule[index].set.all(boost);
+                                })()
+                            )
                         );
                         await Promise.all(
                             config.ldos.map((ldo, index) =>
                                 (async () => {
-                                    await ldoSet.setLdoVoltage(
-                                        index,
-                                        ldo.voltage
-                                    );
-                                    await ldoSet.setLdoEnabled(
-                                        index,
-                                        ldo.enabled
-                                    );
-                                    await ldoSet.setLdoMode(index, ldo.mode);
-
-                                    if (ldo.modeControl) {
-                                        await ldoSet.setLdoModeControl(
-                                            index,
-                                            ldo.modeControl
-                                        );
-                                    }
-
-                                    if (ldo.pinSel) {
-                                        await ldoSet.setLdoPinSel(
-                                            index,
-                                            ldo.pinSel
-                                        );
-                                    }
-
-                                    if (ldo.ldoSoftStart) {
-                                        await ldoSet.setLdoSoftstart(
-                                            index,
-                                            ldo.ldoSoftStart
-                                        );
-                                    }
-
-                                    if (ldo.loadSwitchSoftStart) {
-                                        await ldoSet.setLoadSwitchSoftstart(
-                                            index,
-                                            ldo.loadSwitchSoftStart
-                                        );
-                                    }
-
-                                    if (ldo.pinMode) {
-                                        await ldoSet.setLdoPinMode(
-                                            index,
-                                            ldo.pinMode
-                                        );
-                                    }
-
-                                    if (ldo.ocpEnabled) {
-                                        await ldoSet.setLdoOcpEnabled(
-                                            index,
-                                            ldo.ocpEnabled
-                                        );
-                                    }
-
-                                    if (ldo.ldoRampEnabled) {
-                                        await ldoSet.setLdoRampEnabled(
-                                            index,
-                                            ldo.ldoRampEnabled
-                                        );
-                                    }
-
-                                    if (ldo.ldoHaltEnabled) {
-                                        await ldoSet.setLdoHaltEnabled(
-                                            index,
-                                            ldo.ldoHaltEnabled
-                                        );
-                                    }
+                                    await ldoModule[index].set.all(ldo);
                                 })()
                             )
                         );
@@ -504,7 +427,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
                         await Promise.all(
                             config.leds.map((led, index) =>
-                                setLedMode(index, led.mode)
+                                (async () => {
+                                    await setLedMode(index, led.mode);
+                                })()
                             )
                         );
 
@@ -560,8 +485,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         startAdcSample,
         stopAdcSample,
 
-        ...ldoRanges,
-
         getUSBCurrentLimiterRange: () => [
             0.1,
             ...getRange([
@@ -575,7 +498,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         requestUpdate,
 
-        ...ldoSet,
         setLedMode,
         ...fuelGaugeSet,
 
@@ -626,11 +548,11 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         },
 
         // Default settings
-        ldoDefaults: () => ldoDefaults(devices.noOfLdos),
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
 
         boostModule,
         gpioModule,
+        ldoModule,
 
         getBatteryConnectedVoltageThreshold: () => 0, // 0V
     };

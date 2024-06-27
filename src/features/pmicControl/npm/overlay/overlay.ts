@@ -6,9 +6,11 @@
 
 import {
     BuckExport,
+    BuckModule,
     Charger,
     GPIOValues,
     LdoExport,
+    LdoModule,
     LED,
     LEDMode,
     NpmDevice,
@@ -67,18 +69,10 @@ npm1300_ek_charger: charger {
 };`
         : '';
 
-const generateBuck = (
-    buck: BuckExport,
-    index: number,
-    npmDevice: NpmDevice
-) => `
-npm1300_ek_buck${index + 1}: BUCK${index + 1} {
-    regulator-min-microvolt = <${toMicro(
-        npmDevice.buckModule[index].ranges.voltage.min
-    )}>;
-    regulator-max-microvolt = <${toMicro(
-        npmDevice.buckModule[index].ranges.voltage.max
-    )}>;
+const generateBuck = (buck: BuckExport, buckModule: BuckModule) => `
+npm1300_ek_buck${buckModule.index + 1}: BUCK${buckModule.index + 1} {
+    regulator-min-microvolt = <${toMicro(buckModule.ranges.voltage.min)}>;
+    regulator-max-microvolt = <${toMicro(buckModule.ranges.voltage.max)}>;
     ${
         buck.mode !== 'vSet'
             ? `regulator-init-microvolt =  <${toMicro(buck.vOutNormal)}>;`
@@ -120,14 +114,10 @@ npm1300_ek_buck${index + 1}: BUCK${index + 1} {
 `;
 
 // TODO: Reinstate // soft-start-microamp = <${toMilli(ldo.softStart)}>;
-const generateLDO = (ldo: LdoExport, index: number, npmDevice: NpmDevice) => `
-npm1300_ek_ldo${index + 1}: LDO${index + 1} {
-    regulator-min-microvolt = <${toMicro(
-        npmDevice.getLdoVoltageRange(index).min
-    )}>;
-    regulator-max-microvolt = <${toMicro(
-        npmDevice.getLdoVoltageRange(index).max
-    )}>;
+const generateLDO = (ldo: LdoExport, ldoModule: LdoModule) => `
+npm1300_ek_ldo${ldoModule.index + 1}: LDO${ldoModule.index + 1} {
+    regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;
+    regulator-max-microvolt = <${toMicro(ldoModule.ranges.voltage.max)}>;
     ${
         ldo.mode === 'LDO'
             ? `regulator-init-microvolt = <${toMicro(ldo.voltage)}>;`
@@ -193,11 +183,15 @@ export default (npmConfig: NpmExport, npmDevice: NpmDevice) => `/*
            compatible = "nordic,npm1300-regulator";
 
            ${npmConfig.bucks
-               .map((buck, index) => generateBuck(buck, index, npmDevice))
+               .map((buck, index) =>
+                   generateBuck(buck, npmDevice.buckModule[index])
+               )
                .join('\n\n')}
 
             ${npmConfig.ldos
-                .map((ldos, index) => generateLDO(ldos, index, npmDevice))
+                .map((ldos, index) =>
+                    generateLDO(ldos, npmDevice.ldoModule[index])
+                )
                 .join('\n\n')}
        };
 

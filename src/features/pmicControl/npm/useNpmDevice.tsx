@@ -490,7 +490,9 @@ export default () => {
                 setBoosts(npmDevice.boostModule.map(boost => boost.defaults))
             );
             dispatch(setBucks(npmDevice.buckModule.map(buck => buck.defaults)));
-            dispatch(setLdos(npmDevice.ldoDefaults()));
+            dispatch(
+                setLdos(npmDevice.ldoModule.map(module => module.defaults))
+            );
             dispatch(
                 setGPIOs(npmDevice.gpioModule.map(module => module.defaults))
             );
@@ -650,15 +652,15 @@ export default () => {
                     setPaneHidden({
                         name: 'Regulators',
                         hidden:
-                            npmDevice.boostModule === undefined &&
-                            npmDevice.buckModule === undefined &&
-                            npmDevice.getNumberOfLdos() <= 0, // TODO change to use ldoModule
+                            npmDevice.boostModule.length <= 0 &&
+                            npmDevice.buckModule.length <= 0 &&
+                            npmDevice.ldoModule.length <= 0, // TODO change to use ldoModule
                     })
                 );
                 dispatch(
                     setPaneHidden({
                         name: 'GPIOs',
-                        hidden: npmDevice.gpioModule === undefined,
+                        hidden: npmDevice.gpioModule.length <= 0,
                     })
                 );
                 dispatch(

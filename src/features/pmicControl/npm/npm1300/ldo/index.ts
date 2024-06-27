@@ -10,24 +10,21 @@ import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Ldo, LdoExport, PmicDialog } from '../../types';
 import ldoCallbacks from './ldoCallbacks';
-import { ldoGet, ldoSet } from './ldoEffects';
+import { LdoGet } from './ldoGet';
+import { LdoSet } from './ldoSet';
 
-export const ldoDefaults = (noOfLdos: number): Ldo[] => {
-    const defaultLDOs: Ldo[] = [];
-    for (let i = 0; i < noOfLdos; i += 1) {
-        defaultLDOs.push({
-            voltage: getLdoVoltageRange(i).min,
-            mode: 'load_switch',
-            enabled: false,
-            softStartEnabled: true,
-            softStart: 20,
-            activeDischarge: false,
-            onOffControl: 'SW',
-            onOffSoftwareControlEnabled: true,
-        });
-    }
-    return defaultLDOs;
-};
+export const numberOfLdos = 2;
+
+const ldoDefaults = (): Ldo => ({
+    voltage: getLdoVoltageRange().min,
+    mode: 'load_switch',
+    enabled: false,
+    softStartEnabled: true,
+    softStart: 20,
+    activeDischarge: false,
+    onOffControl: 'SW',
+    onOffSoftwareControlEnabled: true,
+});
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
     voltage: ldo.voltage,
@@ -39,8 +36,7 @@ export const toLdoExport = (ldo: Ldo): LdoExport => ({
     onOffControl: ldo.onOffControl,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getLdoVoltageRange = (i: number) =>
+const getLdoVoltageRange = () =>
     ({
         min: 1,
         max: 3.3,
@@ -57,13 +53,21 @@ export default (
         onError?: (response: string, command: string) => void
     ) => void,
     dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean,
-    noOfBucks: number
-) => ({
-    ldoGet: ldoGet(sendCommand),
-    ldoSet: ldoSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
-    ldoCallbacks: ldoCallbacks(shellParser, eventEmitter, noOfBucks),
-    ldoRanges: {
-        getLdoVoltageRange,
-    },
-});
+    offlineMode: boolean
+) =>
+    [...Array(numberOfLdos).keys()].map(index => ({
+        index,
+        get: new LdoGet(sendCommand, index),
+        set: new LdoSet(
+            eventEmitter,
+            sendCommand,
+            dialogHandler,
+            offlineMode,
+            index
+        ),
+        callbacks: ldoCallbacks(shellParser, eventEmitter, index),
+        ranges: {
+            voltage: getLdoVoltageRange(),
+        },
+        defaults: ldoDefaults(),
+    }));

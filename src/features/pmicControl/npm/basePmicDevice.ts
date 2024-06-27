@@ -226,9 +226,6 @@ export const baseNpmDevice: IBaseNpmDevice = (
 
         hasCharger: () => !!devices.charger,
         hasMaxEnergyExtraction: () => !!devices.maxEnergyExtraction,
-        getNumberOfBoosts: () => devices.noOfBoosts ?? 0,
-        getNumberOfBucks: () => devices.noOfBucks ?? 0,
-        getNumberOfLdos: () => devices.noOfLdos ?? 0,
         getNumberOfLEDs: () => devices.noOfLEDs ?? 0,
         getNumberOfBatteryModelSlots: () => devices.noOfBatterySlots ?? 0,
 
@@ -306,6 +303,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         boostModule: [],
         gpioModule: [],
         buckModule: [],
+        ldoModule: [],
 
         supportedErrorLogs: {
             reset: false,
