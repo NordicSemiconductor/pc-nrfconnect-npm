@@ -645,10 +645,6 @@ export default () => {
     useEffect(() => {
         if (npmDevice) {
             setTimeout(() => {
-                console.log({
-                    name: 'Profiles',
-                    hidden: npmDevice.getBatteryProfiler === undefined,
-                });
                 dispatch(
                     setPaneHidden({
                         name: 'Charger',

@@ -80,7 +80,6 @@ const initialState: pmicControlState = {
     },
     pmicState: 'ek-disconnected',
     batteryConnected: false,
-    batteryAddonBoardId: 0,
     fuelGauge: false,
     hardcodedBatterModels: [],
     dialog: [],
@@ -334,14 +333,25 @@ export const getTimerConfig = (state: RootState) =>
     state.app.pmicControl.timerConfig;
 export const isBatteryConnected = (state: RootState) => {
     const { pmicState, batteryConnected } = state.app.pmicControl;
+    const supportsBatteryModules = getSupportsBatteryModules(state);
+    const batteryModuleConnected = isBatteryModuleConnected(state);
+
     return parseConnectedState(
         pmicState,
-        batteryConnected,
+        (supportsBatteryModules &&
+            batteryModuleConnected &&
+            batteryConnected) ||
+            (batteryConnected && !supportsBatteryModules),
         initialState.batteryConnected
     );
 };
 export const getBatteryAddonBoardId = (state: RootState) =>
     state.app.pmicControl.batteryAddonBoardId || 0;
+export const getSupportsBatteryModules = (state: RootState) =>
+    state.app.pmicControl.batteryAddonBoardId !== undefined;
+export const isBatteryModuleConnected = (state: RootState) =>
+    state.app.pmicControl.batteryAddonBoardId !== undefined &&
+    state.app.pmicControl.batteryAddonBoardId !== 0;
 export const getFuelGauge = (state: RootState) =>
     state.app.pmicControl.fuelGauge;
 export const getActiveBatterModel = (state: RootState) =>

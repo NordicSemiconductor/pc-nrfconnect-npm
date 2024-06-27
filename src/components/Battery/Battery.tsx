@@ -15,6 +15,7 @@ import {
 import {
     getFuelGauge,
     getLatestAdcSample,
+    getNpmDevice,
     getPmicChargingState,
     isBatteryConnected,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -80,6 +81,7 @@ const SideText = ({
     fuelGauge,
 }: BatterySideTextProperties) => {
     const card = 'battery';
+    const npmDevice = useSelector(getNpmDevice);
 
     return (
         <div className="battery-side-panel">
@@ -103,12 +105,14 @@ const SideText = ({
                         </h2>
                     </DocumentationTooltip>
 
-                    {latestAdcSample && !Number.isNaN(latestAdcSample.ttf) ? (
-                        <div className="line-wrapper">
+                    {latestAdcSample &&
+                    !!npmDevice?.chargerModule &&
+                    !Number.isNaN(latestAdcSample.ttf) ? (
+                        <div className="tw-flex tw-flex-col">
                             <DocumentationTooltip card={card} item="TimeToFull">
-                                <span className="line-title">Time to full</span>
+                                <span>Time to full</span>
                             </DocumentationTooltip>
-                            <span className="line-data">
+                            <span>
                                 {latestAdcSample.ttf &&
                                 !Number.isNaN(latestAdcSample.ttf)
                                     ? `${formatSecondsToString(
@@ -118,16 +122,14 @@ const SideText = ({
                             </span>
                         </div>
                     ) : (
-                        <div className="line-wrapper">
+                        <div className="tw-flex tw-flex-col">
                             <DocumentationTooltip
                                 card={card}
                                 item="TimeToEmpty"
                             >
-                                <span className="line-title">
-                                    Time to empty
-                                </span>
+                                <span>Time to empty</span>
                             </DocumentationTooltip>
-                            <span className="line-data">
+                            <span>
                                 {latestAdcSample?.tte &&
                                 !Number.isNaN(latestAdcSample.tte)
                                     ? `${formatSecondsToString(
