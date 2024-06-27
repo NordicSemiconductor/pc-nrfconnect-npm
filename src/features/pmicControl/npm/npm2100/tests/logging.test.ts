@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { USBDetectStatusValues } from '../../types';
 import { setupMocksWithShellParser } from './helpers';
 
 jest.useFakeTimers();
@@ -65,13 +64,8 @@ describe('PMIC 2100 - Logging', () => {
     });
 
     describe('Specific logging events', () => {
-        let {
-            eventHandlers,
-            mockOnAdcSample,
-            mockOnBeforeReboot,
-            mockOnUsbPower,
-            pmic,
-        } = setupMocksWithShellParser();
+        let { eventHandlers, mockOnAdcSample, mockOnBeforeReboot, pmic } =
+            setupMocksWithShellParser();
 
         beforeEach(() => {
             const setupMock = setupMocksWithShellParser();
@@ -79,7 +73,6 @@ describe('PMIC 2100 - Logging', () => {
             eventHandlers = setupMock.eventHandlers;
             mockOnAdcSample = setupMock.mockOnAdcSample;
             mockOnBeforeReboot = setupMock.mockOnBeforeReboot;
-            mockOnUsbPower = setupMock.mockOnUsbPower;
             pmic = setupMock.pmic;
         });
 
