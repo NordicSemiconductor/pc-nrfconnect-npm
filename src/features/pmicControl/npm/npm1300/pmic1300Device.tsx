@@ -39,7 +39,7 @@ import setupBucks, { numberOfBucks } from './buck';
 import { ChargerModule } from './charger';
 import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
-import setupLdo, { ldoDefaults } from './ldo';
+import setupLdo, { numberOfLdos } from './ldo';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timerConfig';
@@ -52,7 +52,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
     const devices = {
         noOfBucks: numberOfBucks,
-        noOfLdos: 2,
+        noOfLdos: numberOfLdos,
         noOfLEDs: 3,
         noOfBatterySlots: 3,
     };
@@ -356,13 +356,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
-    const { ldoGet, ldoSet, ldoCallbacks, ldoRanges } = setupLdo(
+    const ldoModule = setupLdo(
         shellParser,
         eventEmitter,
         sendCommand,
         dialogHandler,
-        offlineMode,
-        devices.noOfLdos
+        offlineMode
     );
 
     const gpioModule = setupGpio(
@@ -505,7 +504,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         );
 
         releaseAll.push(...buckModule.map(buck => buck.callbacks).flat());
-        releaseAll.push(...ldoCallbacks);
+        releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
 
         for (let i = 0; i < devices.noOfLEDs; i += 1) {
@@ -579,17 +578,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             chargerModule.get.all();
 
             buckModule.forEach(buck => buck.get.all());
-
-            for (let i = 0; i < devices.noOfLdos; i += 1) {
-                requestUpdate.ldoVoltage(i);
-                requestUpdate.ldoMode(i);
-                requestUpdate.ldoEnabled(i);
-                requestUpdate.ldoSoftStartEnabled(i);
-                requestUpdate.ldoSoftStart(i);
-                requestUpdate.ldoActiveDischarge(i);
-                requestUpdate.ldoOnOffControl(i);
-            }
-
+            ldoModule.forEach(ldo => ldo.get.all());
             gpioModule.forEach(module => module.get.all());
 
             for (let i = 0; i < devices.noOfLEDs; i += 1) {
@@ -607,7 +596,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
 
-        ...ldoGet,
         ...fuelGaugeGet,
     };
 
@@ -643,31 +631,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                         await Promise.all(
                             config.ldos.map((ldo, index) =>
                                 (async () => {
-                                    await ldoSet.setLdoVoltage(
-                                        index,
-                                        ldo.voltage
-                                    );
-                                    await ldoSet.setLdoEnabled(
-                                        index,
-                                        ldo.enabled
-                                    );
-                                    await ldoSet.setLdoSoftStartEnabled(
-                                        index,
-                                        ldo.softStartEnabled
-                                    );
-                                    await ldoSet.setLdoSoftStart(
-                                        index,
-                                        ldo.softStart
-                                    );
-                                    await ldoSet.setLdoActiveDischarge(
-                                        index,
-                                        ldo.activeDischarge
-                                    );
-                                    await ldoSet.setLdoOnOffControl(
-                                        index,
-                                        ldo.onOffControl
-                                    );
-                                    await ldoSet.setLdoMode(index, ldo.mode);
+                                    await ldoModule[index].set.all(ldo);
                                 })()
                             )
                         );
@@ -755,14 +719,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         getConnectionState: () => pmicState,
         startAdcSample,
         stopAdcSample,
-
-        ...ldoRanges,
-
         requestUpdate,
-
-        buckModule,
-
-        ...ldoSet,
         setLedMode,
         ...fuelGaugeSet,
 
@@ -813,7 +770,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         },
 
         // Default settings
-        ldoDefaults: () => ldoDefaults(devices.noOfLdos),
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
 
         getBatteryConnectedVoltageThreshold: () => 1, // 1V
@@ -830,5 +786,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         gpioModule,
         shipModeModule,
         usbCurrentLimiterModule,
+        ldoModule,
+        buckModule,
     };
 };

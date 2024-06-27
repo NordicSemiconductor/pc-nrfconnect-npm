@@ -8,26 +8,22 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Ldo, LdoExport, PmicDialog } from '../../types';
+import { Ldo, LdoExport } from '../../types';
 import ldoCallbacks from './ldoCallbacks';
-import { ldoGet, ldoSet } from './ldoEffects';
+import { LdoGet } from './ldoGet';
+import { LdoSet } from './ldoSet';
 
-export const ldoDefaults = (noOfLdos: number): Ldo[] => {
-    const defaultLDOs: Ldo[] = [];
-    for (let i = 0; i < noOfLdos; i += 1) {
-        defaultLDOs.push({
-            voltage: getLdoVoltageRange(i).min,
-            mode: 'load_switch',
-            enabled: false,
-            softStartEnabled: true,
-            softStart: 20,
-            activeDischarge: false,
-            onOffControl: 'SW',
-            onOffSoftwareControlEnabled: true,
-        });
-    }
-    return defaultLDOs;
-};
+export const numberOfLdos = 1;
+const ldoDefaults = (): Ldo => ({
+    voltage: getLdoVoltageRange().min,
+    mode: 'load_switch',
+    enabled: false,
+    softStartEnabled: true,
+    softStart: 20,
+    activeDischarge: false,
+    onOffControl: 'SW',
+    onOffSoftwareControlEnabled: true,
+});
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
     voltage: ldo.voltage,
@@ -39,8 +35,7 @@ export const toLdoExport = (ldo: Ldo): LdoExport => ({
     onOffControl: ldo.onOffControl,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getLdoVoltageRange = (i: number) =>
+const getLdoVoltageRange = () =>
     ({
         min: 0.8,
         max: 3,
@@ -56,14 +51,16 @@ export default (
         onSuccess?: (response: string, command: string) => void,
         onError?: (response: string, command: string) => void
     ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean,
-    noOfBucks: number
-) => ({
-    ldoGet: ldoGet(sendCommand),
-    ldoSet: ldoSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
-    ldoCallbacks: ldoCallbacks(shellParser, eventEmitter, noOfBucks),
-    ldoRanges: {
-        getLdoVoltageRange,
+    offlineMode: boolean
+) => [
+    {
+        index: 0,
+        get: new LdoGet(sendCommand),
+        set: new LdoSet(eventEmitter, sendCommand, offlineMode),
+        callbacks: ldoCallbacks(shellParser, eventEmitter),
+        ranges: {
+            voltage: getLdoVoltageRange(),
+        },
+        defaults: ldoDefaults(),
     },
-});
+];

@@ -18,7 +18,7 @@ describe('PMIC 1300 - Static getters', () => {
 
     test('Number of Bucks', () => expect(pmic.buckModule.length).toBe(2));
 
-    test('Number of LDOs', () => expect(pmic.getNumberOfLdos()).toBe(2));
+    test('Number of LDOs', () => expect(pmic.ldoModule.length).toBe(2));
 
     test('Number of GPIOs', () => expect(pmic.gpioModule.length).toBe(5));
 
@@ -88,7 +88,7 @@ describe('PMIC 1300 - Static getters', () => {
     );
 
     test.each(PMIC_1300_LDOS)('LDO Voltage Range index: %p', index =>
-        expect(pmic.getLdoVoltageRange(index)).toStrictEqual({
+        expect(pmic.ldoModule[index].ranges.voltage).toStrictEqual({
             min: 1,
             max: 3.3,
             decimals: 1,
