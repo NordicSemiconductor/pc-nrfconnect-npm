@@ -7,12 +7,13 @@
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Boost,
-    BoostMode,
+    BoostExport,
     BoostModeControl,
     BoostPinMode,
     BoostPinSelection,
+    BoostVOutSel,
 } from '../../types';
-import { BoostGet } from './boostGet';
+import { BoostGet } from './getters';
 
 export class BoostSet {
     private get: BoostGet;
@@ -29,9 +30,9 @@ export class BoostSet {
         this.get = new BoostGet(sendCommand);
     }
 
-    async all(config: Boost) {
+    async all(config: BoostExport) {
         await this.vOut(config.vOutSoftware);
-        await this.mode(config.mode);
+        await this.vOutSel(config.vOutSelect);
         await this.modeControl(config.modeControl);
         await this.pinSelection(config.pinSelection);
         await this.pinMode(config.pinMode);
@@ -44,13 +45,7 @@ export class BoostSet {
                 this.eventEmitter.emitPartialEvent<Boost>(
                     'onBoostUpdate',
                     {
-                        mode: 'Software',
-                    },
-                    0
-                );
-                this.eventEmitter.emitPartialEvent<Boost>(
-                    'onBoostUpdate',
-                    {
+                        vOutSelect: 'Software',
                         vOutSoftware: value,
                     },
                     0
@@ -71,7 +66,7 @@ export class BoostSet {
                         );
                     },
                     () => {
-                        this.get.mode();
+                        this.get.vOutSel();
                         reject();
                     }
                 );
@@ -79,13 +74,13 @@ export class BoostSet {
         });
     }
 
-    mode(mode: BoostMode) {
+    vOutSel(mode: BoostVOutSel) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Boost>(
                     'onBoostUpdate',
                     {
-                        mode,
+                        vOutSelect: mode,
                     },
                     0
                 );
@@ -102,7 +97,7 @@ export class BoostSet {
                         resolve();
                     },
                     () => {
-                        this.get.mode();
+                        this.get.vOutSel();
                         reject();
                     }
                 );
