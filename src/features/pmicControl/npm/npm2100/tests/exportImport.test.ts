@@ -112,7 +112,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         ldos: [
             {
                 voltage: 1,
-                mode: 'load_switch',
+                mode: 'Load_switch',
                 enabled: false,
                 softStartEnabled: false,
                 softStart: 50,
@@ -121,7 +121,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             },
             {
                 voltage: 2,
-                mode: 'load_switch',
+                mode: 'Load_switch',
                 enabled: false,
                 softStartEnabled: false,
                 softStart: 50,

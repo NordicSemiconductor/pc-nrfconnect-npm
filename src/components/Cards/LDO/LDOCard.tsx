@@ -112,10 +112,10 @@ export default ({
                 disabled={disabled}
                 items={modeItems}
                 onSelect={i =>
-                    ldoModule.set.mode(i === 0 ? 'LDO' : 'load_switch')
+                    ldoModule.set.mode(i === 0 ? 'LDO' : 'Load_switch')
                 }
                 selectedItem={
-                    ldo.mode === 'load_switch' ? modeItems[1] : modeItems[0]
+                    ldo.mode === 'Load_switch' ? modeItems[1] : modeItems[0]
                 }
             />
 

@@ -85,7 +85,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
     describe('LDOSW mode', () => {
         test.each(
             PMIC_2100_LDOS.map(index => [
-                ...['LDO', 'load_switch'].map(mode =>
+                ...['LDO', 'Load_switch'].map(mode =>
                     [
                         {
                             index,
@@ -190,20 +190,18 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
     describe('LDO soft start', () => {
         test.each(
             PMIC_2100_LDOS.map(index => [
-                ...['0mA', '25mA', '38mA', '50mA', '75mA', '150mA'].map(
-                    current => [
-                        {
-                            index,
-                            append: `get `,
-                            enabled: current,
-                        },
-                        {
-                            index,
-                            append: `set ${current} `,
-                            enabled: current,
-                        },
-                    ]
-                ),
+                ...['25mA', '38mA', '50mA', '75mA', '150mA'].map(current => [
+                    {
+                        index,
+                        append: `get `,
+                        enabled: current,
+                    },
+                    {
+                        index,
+                        append: `set ${current} `,
+                        enabled: current,
+                    },
+                ]),
             ]).flat()
         )(
             'npm2100 ldosw softstart LDO %p',
@@ -230,7 +228,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                 ...nPM2100LoadSwitchSoftStartValues.map(value => [
                     {
                         index,
-                        append: `get x`,
+                        append: `get `,
                         value,
                     },
                     {

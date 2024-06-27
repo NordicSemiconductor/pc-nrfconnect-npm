@@ -47,7 +47,7 @@ export default (
                         {
                             mode:
                                 parseToNumber(res) === 0
-                                    ? 'load_switch'
+                                    ? 'Load_switch'
                                     : 'LDO',
                         },
                         index

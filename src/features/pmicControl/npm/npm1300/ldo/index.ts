@@ -17,7 +17,7 @@ export const numberOfLdos = 2;
 
 const ldoDefaults = (): Ldo => ({
     voltage: getLdoVoltageRange().min,
-    mode: 'load_switch',
+    mode: 'Load_switch',
     enabled: false,
     softStartEnabled: true,
     softStart: 20,
