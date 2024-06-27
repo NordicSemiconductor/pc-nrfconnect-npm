@@ -10,6 +10,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
+    Boost,
     Buck,
     Charger,
     ErrorLogs,
@@ -25,6 +26,7 @@ import {
 } from '../../types';
 import { getNPM2100 } from '../pmic2100Device';
 
+export const PMIC_2100_BOOST = [0];
 export const PMIC_2100_LDOS = [0];
 export const PMIC_2100_GPIOS = [0, 1];
 
@@ -77,6 +79,11 @@ export const setupMocksBase = (
         (_partialUpdate: Partial<ShipModeConfig>) => {}
     );
 
+    const mockOnBoostUpdate = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: PartialUpdate<Boost>) => {}
+    );
+
     const mockOnUsbPower = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_partialUpdate: Partial<USBPower>) => {}
@@ -96,6 +103,7 @@ export const setupMocksBase = (
     pmic.onAdcSample(mockOnAdcSample);
     pmic.onBeforeReboot(mockOnBeforeReboot);
     pmic.onBuckUpdate(mockOnBuckUpdate);
+    pmic.onBoostUpdate(mockOnBoostUpdate);
     pmic.onChargerUpdate(mockOnChargerUpdate);
     pmic.onGPIOUpdate(mockOnGpioUpdate);
     pmic.onLEDUpdate(mockOnLEDUpdate);
@@ -118,6 +126,7 @@ export const setupMocksBase = (
         mockOnAdcSample,
         mockOnBeforeReboot,
         mockOnBuckUpdate,
+        mockOnBoostUpdate,
         mockOnChargerUpdate,
         mockOnChargingStatusUpdate,
         mockOnFuelGaugeUpdate,

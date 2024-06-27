@@ -17,7 +17,7 @@ export class BoostGet {
     all() {
         this.vOutVSet();
         this.vOutSoftware();
-        this.mode();
+        this.vOutSel();
         this.modeControl();
         this.pinSelection();
         this.pinMode();
@@ -32,12 +32,12 @@ export class BoostGet {
         this.sendCommand(`npm2100 boost vout SOFTWARE get`);
     }
 
-    mode() {
-        this.sendCommand(`npm2100 boost mode get`);
+    vOutSel() {
+        this.sendCommand(`npm2100 boost voutsel get`);
     }
 
     modeControl() {
-        this.sendCommand(`npm2100 boost voutsel get`);
+        this.sendCommand(`npm2100 boost mode get`);
     }
 
     pinSelection() {

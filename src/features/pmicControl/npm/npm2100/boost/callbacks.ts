@@ -11,20 +11,21 @@ import {
     NpmEventEmitter,
     onOffRegex,
     parseColonBasedAnswer,
+    parseOnOff,
     parseToNumber,
     toRegex,
     toValueRegex,
 } from '../../pmicHelpers';
 import {
     Boost,
-    BoostMode,
     BoostModeControl,
     BoostModeControlValues,
-    BoostModeValues,
     BoostPinMode,
     BoostPinModeValues,
     BoostPinSelection,
     BoostPinSelectionValues,
+    BoostVOutSel,
+    BoostVOutSelValues,
 } from '../../types';
 
 export default (
@@ -37,7 +38,6 @@ export default (
             shellParser.registerCommandCallback(
                 toRegex('npm2100 boost vout VSET get'),
                 res => {
-                    console.log('vset', res);
                     const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
@@ -55,7 +55,6 @@ export default (
             shellParser.registerCommandCallback(
                 toRegex('npm2100 boost vout SOFTWARE', true),
                 res => {
-                    console.log('soft', res);
                     const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
@@ -75,14 +74,15 @@ export default (
                     'npm2100 boost voutsel',
                     true,
                     undefined,
-                    toValueRegex(BoostModeValues)
+                    toValueRegex(BoostVOutSelValues)
                 ),
                 res => {
-                    console.log('mode', res);
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
                         {
-                            mode: parseColonBasedAnswer(res) as BoostMode,
+                            vOutSelect: parseColonBasedAnswer(
+                                res
+                            ) as BoostVOutSel,
                         },
                         0
                     );
@@ -123,16 +123,15 @@ export default (
                     toValueRegex(BoostPinSelectionValues)
                 ),
                 res => {
+                    const pinSelection = parseColonBasedAnswer(
+                        res
+                    ) as BoostPinSelection;
+                    const pinModeEnabled = pinSelection !== 'OFF';
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
                         {
-                            pinSelection: parseColonBasedAnswer(
-                                res
-                            ) as BoostPinSelection,
-                            pinModeEnabled:
-                                (parseColonBasedAnswer(
-                                    res
-                                ) as BoostPinSelection) !== 'OFF',
+                            pinSelection,
+                            pinModeEnabled,
                         },
                         0
                     );
@@ -169,8 +168,7 @@ export default (
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
                         {
-                            overCurrentProtection:
-                                parseColonBasedAnswer(res) === 'ON',
+                            overCurrentProtection: parseOnOff(res),
                         },
                         0
                     );

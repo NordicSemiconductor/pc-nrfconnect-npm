@@ -100,12 +100,10 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         boosts: [
             {
                 vOutSoftware: 1.8,
-                vOutVSet: 1.8,
-                mode: 'Vset',
+                vOutSelect: 'Vset',
                 modeControl: 'AUTO',
                 pinSelection: 'OFF',
                 pinMode: 'HP',
-                pinModeEnabled: false,
                 overCurrentProtection: false,
             },
         ],
