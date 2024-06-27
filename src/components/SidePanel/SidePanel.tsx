@@ -142,17 +142,16 @@ export default () => {
                     />
                 </Group>
             )}
-            {npmDevice?.getDeviceType() === 'npm2100' && (
-                <Group
-                    collapsible
-                    defaultCollapsed={false}
-                    heading="Power Source"
-                >
-                    <PowerSource
-                        disabled={pmicConnection === 'ek-disconnected'}
-                    />
-                </Group>
-            )}
+            {npmDevice?.getDeviceType() === 'npm2100' &&
+                pmicConnection !== 'ek-disconnected' && (
+                    <Group
+                        collapsible
+                        defaultCollapsed={false}
+                        heading="Power Source"
+                    >
+                        <PowerSource />
+                    </Group>
+                )}
             <Group collapsible defaultCollapsed={false} heading="Settings">
                 <NumberInput
                     showSlider
