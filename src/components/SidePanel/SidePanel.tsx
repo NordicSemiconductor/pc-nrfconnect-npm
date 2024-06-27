@@ -149,9 +149,7 @@ export default () => {
                     heading="Power Source"
                 >
                     <PowerSource
-                        disabled={
-                            pmicConnection === 'ek-disconnected' || uiDisabled
-                        }
+                        disabled={pmicConnection === 'ek-disconnected'}
                     />
                 </Group>
             )}
