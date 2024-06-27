@@ -181,6 +181,9 @@ export const baseNpmDevice: IBaseNpmDevice = (
         onChargerUpdate: setupHandler<Partial<Charger>, true>(
             'onChargerUpdate'
         ),
+        onBatteryAddonBoardIdUpdate: setupHandler<number, true>(
+            'onBatteryAddonBoardIdUpdate'
+        ),
         onBoostUpdate: setupHandler<PartialUpdate<Boost>, true>(
             'onBoostUpdate'
         ),

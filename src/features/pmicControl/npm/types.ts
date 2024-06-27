@@ -654,6 +654,9 @@ export type BaseNpmDevice = {
     onChargerUpdate: (
         handler: (payload: Partial<Charger>, error?: string) => void
     ) => () => void;
+    onBatteryAddonBoardIdUpdate: (
+        handler: (batteryAddonBoardId: number, error?: string) => void
+    ) => () => void;
     onBoostUpdate: (
         handler: (payload: PartialUpdate<Boost>, error?: string) => void
     ) => () => void;
