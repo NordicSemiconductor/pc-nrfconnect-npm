@@ -15,7 +15,7 @@ describe('PMIC 2100 - Static getters', () => {
 
     test('Has of Charger', () => expect(pmic.chargerModule).toBeUndefined());
 
-    test('Number of LDOs', () => expect(pmic.getNumberOfLdos()).toBe(1));
+    test('Number of LDOs', () => expect(pmic.ldoModule.length).toBe(1));
 
     test('Number of GPIOs', () => expect(pmic.gpioModule.length).toBe(2));
 
@@ -24,7 +24,7 @@ describe('PMIC 2100 - Static getters', () => {
     test('Device Type', () => expect(pmic.getDeviceType()).toBe('npm2100'));
 
     test.each(PMIC_2100_LDOS)('LDO Voltage Range index: %p', index =>
-        expect(pmic.getLdoVoltageRange(index)).toStrictEqual({
+        expect(pmic.ldoModule[index].ranges.voltage).toStrictEqual({
             min: 0.8,
             max: 3,
             decimals: 1,

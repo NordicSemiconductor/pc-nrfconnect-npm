@@ -57,9 +57,9 @@ export default ({ active }: PaneProps) => {
                 ldos.map((ldo, index) => (
                     <LDOCard
                         ldo={ldo}
-                        npmDevice={npmDevice}
+                        ldoModule={npmDevice.ldoModule[index]}
+                        deviceType={npmDevice.getDeviceType()}
                         key={`Buck${1 + index}`}
-                        index={index}
                         disabled={disabled}
                     />
                 ))}

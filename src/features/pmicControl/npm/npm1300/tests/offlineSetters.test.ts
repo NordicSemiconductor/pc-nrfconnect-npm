@@ -265,7 +265,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
             dialog.onConfirm();
         });
 
-        await pmic.setLdoVoltage(index, 1.2);
+        await pmic.ldoModule[index].set.voltage(1.2);
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
@@ -275,7 +275,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test.each(PMIC_1300_LDOS)('Set setLdoEnabled index: %p', async index => {
-        await pmic.setLdoEnabled(index, false);
+        await pmic.ldoModule[index].set.enabled(false);
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
@@ -287,7 +287,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     test.each(PMIC_1300_LDOS)(
         'Set setLdoSoftStartEnabled index: %p',
         async index => {
-            await pmic.setLdoSoftStartEnabled?.(index, true);
+            await pmic.ldoModule[index].set.softStartEnabled?.(true);
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
@@ -298,7 +298,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     );
 
     test.each(PMIC_1300_LDOS)('Set setLdoSoftStart index: %p', async index => {
-        await pmic.setLdoSoftStart?.(index, 20);
+        await pmic.ldoModule[index].set.softStart?.(20);
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
@@ -310,7 +310,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     test.each(PMIC_1300_LDOS)(
         'Set setLdoActiveDischarge index: %p',
         async index => {
-            await pmic.setLdoActiveDischarge?.(index, true);
+            await pmic.ldoModule[index].set.activeDischarge?.(true);
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
@@ -323,7 +323,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     test.each(PMIC_1300_LDOS)(
         'Set setLdoOnOffControl index: %p',
         async index => {
-            await pmic.setLdoOnOffControl?.(index, 'SW');
+            await pmic.ldoModule[index].set.onOffControl?.('SW');
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({

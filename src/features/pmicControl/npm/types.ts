@@ -22,9 +22,7 @@ import {
     nPM2100GPIOControlMode,
     nPM2100GPIOControlPinSelect,
     nPM2100LdoModeControl,
-    nPM2100LDOSoftStart as Npm2100LDOSoftStart,
     nPM2100LDOSoftStart,
-    nPM2100LoadSwitchSoftStart as Npm2100LoadSwitchSoftStart,
     nPM2100LoadSwitchSoftStart,
 } from './npm2100/types';
 
@@ -175,12 +173,12 @@ export type Ldo = {
     pinSel?: nPM2100GPIOControlPinSelect;
     pinMode?: nPM2100GPIOControlMode;
     ocpEnabled?: boolean;
-    ldoRampEnabled?: boolean;
-    ldoHaltEnabled?: boolean;
+    rampEnabled?: boolean;
+    haltEnabled?: boolean;
     softStartEnabled: boolean;
     softStart?: Npm1300LoadSwitchSoftStart;
-    loadSwitchSoftStart?: Npm2100LoadSwitchSoftStart;
-    ldoSoftStart?: Npm2100LDOSoftStart;
+    loadSwitchSoftStart?: nPM2100LoadSwitchSoftStart;
+    ldoSoftStart?: nPM2100LDOSoftStart;
     activeDischarge: boolean;
     onOffControl: LdoOnOffControl;
     onOffSoftwareControlEnabled: boolean;
@@ -493,6 +491,52 @@ export interface BuckModule {
     defaults: Buck;
 }
 
+export interface LdoModule {
+    index: number;
+    get: {
+        all: () => void;
+        voltage: () => void;
+        enabled: () => void;
+        mode: () => void;
+        softStartEnabled?: () => void;
+        softStart?: () => void;
+        activeDischarge?: () => void;
+        onOffControl?: () => void;
+        modeCtrl?: () => void;
+        pinSel?: () => void;
+        softStartLdo?: () => void;
+        softStartLoadSw?: () => void;
+        pinMode?: () => void;
+        ocp?: () => void;
+        ramp?: () => void;
+        halt?: () => void;
+    };
+    set: {
+        all: (config: LdoExport) => Promise<void>;
+        voltage: (value: number) => Promise<void>;
+        enabled: (enabled: boolean) => Promise<void>;
+        mode: (mode: LdoMode) => Promise<void>;
+        softStartEnabled?: (enabled: boolean) => Promise<void>;
+        softStart?: (softStart: Npm1300LoadSwitchSoftStart) => Promise<void>;
+        activeDischarge?: (activeDischarge: boolean) => Promise<void>;
+        onOffControl?: (onOffControl: LdoOnOffControl) => Promise<void>;
+        modeControl?: (modeCtrl: nPM2100LdoModeControl) => Promise<void>;
+        pinSel?: (pinSel: nPM2100GPIOControlPinSelect) => Promise<void>;
+        ldoSoftstart?: (softStartLdo: nPM2100LDOSoftStart) => Promise<void>;
+        loadSwitchSoftstart?: (
+            softStartLoadSw: nPM2100LoadSwitchSoftStart
+        ) => Promise<void>;
+        pinMode?: (pinMode: nPM2100GPIOControlMode) => Promise<void>;
+        ocpEnabled?: (ocp: boolean) => Promise<void>;
+        rampEnabled?: (ramp: boolean) => Promise<void>;
+        haltEnabled?: (halt: boolean) => Promise<void>;
+    };
+    callbacks: (() => void)[];
+    ranges: {
+        voltage: RangeType;
+    };
+    defaults: Ldo;
+}
 export type GpioModule = {
     index: number;
     get: {
@@ -672,7 +716,6 @@ export type BaseNpmDevice = {
     ) => () => void;
 
     hasMaxEnergyExtraction: () => boolean;
-    getNumberOfLdos: () => number;
     getNumberOfLEDs: () => number;
     getNumberOfBatteryModelSlots: () => number;
 
@@ -693,6 +736,7 @@ export type BaseNpmDevice = {
     timerConfigModule?: TimerConfigModule;
     buckModule: BuckModule[];
     usbCurrentLimiterModule?: UsbCurrentLimiterModule;
+    ldoModule: LdoModule[];
 };
 
 export interface INpmDevice extends IBaseNpmDevice {
@@ -714,23 +758,12 @@ export type NpmDevice = {
     startAdcSample: (intervalMs: number, samplingRate: number) => void;
     stopAdcSample: () => void;
 
-    getLdoVoltageRange: (index: number) => RangeType;
-
-    ldoDefaults: () => Ldo[];
     ledDefaults: () => LED[];
 
     getBatteryConnectedVoltageThreshold: () => number;
 
     requestUpdate: {
         all: () => void;
-
-        ldoVoltage: (index: number) => void;
-        ldoEnabled: (index: number) => void;
-        ldoMode: (index: number) => void;
-        ldoSoftStartEnabled?: (index: number) => void;
-        ldoSoftStart?: (index: number) => void;
-        ldoActiveDischarge?: (index: number) => void;
-        ldoOnOffControl?: (index: number) => void;
 
         ledMode: (index: number) => void;
 
@@ -739,50 +772,6 @@ export type NpmDevice = {
         activeBatteryModel: () => void;
         storedBatteryModel: () => void;
     };
-
-    setLdoVoltage: (index: number, value: number) => Promise<void>;
-    setLdoEnabled: (index: number, state: boolean) => Promise<void>;
-    setLdoMode: (index: number, mode: LdoMode) => Promise<void>;
-    setLdoSoftStartEnabled?: (index: number, enabled: boolean) => Promise<void>;
-
-    // TODO: This is to be renamed as loadswitch softstart (1300 has no ldo soft start)
-    setLdoSoftStart?: (
-        index: number,
-        softStart: Npm1300LoadSwitchSoftStart
-    ) => Promise<void>;
-    setLdoActiveDischarge?: (index: number, state: boolean) => Promise<void>;
-    setLdoOnOffControl?: (
-        index: number,
-        mode: LdoOnOffControl
-    ) => Promise<void>;
-
-    setLdoModeControl?: (
-        index: number,
-        modeControl: nPM2100LdoModeControl
-    ) => Promise<void>;
-    setLdoPinSel?: (
-        index: number,
-        pinSel: nPM2100GPIOControlPinSelect
-    ) => Promise<void>;
-
-    // TODO: This should be kept after renaming the old ldoSoftStart -> loadSwitchSoftstart
-    setLdoSoftstart?: (
-        index: number,
-        ldoSoftStart: nPM2100LDOSoftStart
-    ) => Promise<void>;
-
-    // TODO: This is the same as nPM1300 ldoSoftStart
-    setLoadSwitchSoftstart?: (
-        index: number,
-        loadSwitchSoftStart: nPM2100LoadSwitchSoftStart
-    ) => Promise<void>;
-    setLdoPinMode?: (
-        index: number,
-        pinMode: nPM2100GPIOControlMode
-    ) => Promise<void>;
-    setLdoOcpEnabled?: (index: number, ocpEnabled: boolean) => Promise<void>;
-    setLdoRampEnabled?: (index: number, rampEnabled: boolean) => Promise<void>;
-    setLdoHaltEnabled?: (index: number, haltEnabled: boolean) => Promise<void>;
 
     setLedMode: (index: number, mode: LEDMode) => Promise<void>;
 
