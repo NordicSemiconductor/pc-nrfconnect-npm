@@ -66,6 +66,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ? 'pmic-connected'
         : 'ek-disconnected';
 
+    // init as not connected
+    eventEmitter.emit('onBatteryAddonBoardIdUpdate', 0);
+
     const processModulePmic = ({ message }: LoggingEvent) => {
         switch (message) {
             case 'No response from PMIC.':
@@ -160,6 +163,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         if (match && match.length === 2) {
             const holderId = parseInt(match[1], 10);
+            console.log(holderId);
             eventEmitter.emit('onBatteryAddonBoardIdUpdate', holderId);
         }
     };
