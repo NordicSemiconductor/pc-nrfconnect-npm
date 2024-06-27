@@ -31,6 +31,7 @@ import {
     getPmicState,
     isSupportedVersion,
     setActiveBatterModel,
+    setBatteryAddonBoardId,
     setBatteryConnected,
     setBoosts,
     setBucks,
@@ -272,6 +273,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onStoredBatteryModelUpdate(payload => {
                     dispatch(setStoredBatterModel(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onBatteryAddonBoardIdUpdate(payload => {
+                    dispatch(setBatteryAddonBoardId(payload));
                 })
             );
 
