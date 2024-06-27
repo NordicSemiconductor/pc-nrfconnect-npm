@@ -71,8 +71,8 @@ export type LdoOnOffControl =
     | (typeof LdoOnOffControlValues)[number]
     | GPIONames;
 
-export const BoostModeValues = ['Vset', 'Software'] as const;
-export type BoostMode = (typeof BoostModeValues)[number];
+export const BoostVOutSelValues = ['Vset', 'Software'] as const;
+export type BoostVOutSel = (typeof BoostVOutSelValues)[number];
 export type BoostModeControl = (typeof BoostModeControlValues)[number];
 export type BoostPinMode = (typeof BoostPinModeValues)[number];
 export type BoostPinSelection = (typeof BoostPinSelectionValues)[number];
@@ -147,7 +147,7 @@ export type Charger = {
 export type Boost = {
     vOutVSet: number;
     vOutSoftware: number;
-    mode: BoostMode;
+    vOutSelect: BoostVOutSel;
     modeControl: BoostModeControl;
     pinSelection: BoostPinSelection;
     pinMode: BoostPinMode;
@@ -437,16 +437,16 @@ export interface BoostModule {
         all: () => void;
         vOutVSet: () => void;
         vOutSoftware: () => void;
-        mode: () => void;
+        vOutSel: () => void;
         modeControl: () => void;
         pinSelection: () => void;
         pinMode: () => void;
         overCurrent: () => void;
     };
     set: {
-        all: (config: Boost) => Promise<void>;
+        all: (config: BoostExport) => Promise<void>;
         vOut: (value: number) => Promise<void>;
-        mode: (mode: BoostMode) => Promise<void>;
+        vOutSel: (mode: BoostVOutSel) => Promise<void>;
         modeControl: (modeControl: BoostModeControl) => Promise<void>;
         pinSelection: (pinSelection: BoostPinSelection) => Promise<void>;
         pinMode: (pinMode: BoostPinMode) => Promise<void>;
@@ -822,6 +822,7 @@ export interface PmicDialog {
 
 export type NpmModel = 'npm1300' | 'npm2100';
 
+export type BoostExport = Omit<Boost, 'pinModeEnabled' | 'vOutVSet'>;
 export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
 export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
 export type GPIOExport = Omit<
@@ -831,7 +832,7 @@ export type GPIOExport = Omit<
 export type USBPowerExport = Omit<USBPower, 'detectStatus'>;
 
 export interface NpmExport {
-    boosts: Boost[];
+    boosts: BoostExport[];
     charger?: Charger;
     bucks: BuckExport[];
     ldos: LdoExport[];

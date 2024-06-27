@@ -8,17 +8,17 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Boost } from '../../types';
-import boostCallbacks from './boostCallback';
-import { BoostGet } from './boostGet';
-import { BoostSet } from './boostSet';
+import { Boost, BoostModule } from '../../types';
+import boostCallbacks from './callbacks';
+import { BoostGet } from './getters';
+import { BoostSet } from './setters';
 
 export const numberOfBoosts = 1;
 
 const boostDefaults = (): Boost => ({
     vOutSoftware: voltageRange().min,
     vOutVSet: voltageRange().min,
-    mode: 'Vset',
+    vOutSelect: 'Vset',
     modeControl: 'AUTO',
     pinSelection: 'OFF',
     pinMode: 'HP',
@@ -42,7 +42,7 @@ export default (
         onError?: (response: string, command: string) => void
     ) => void,
     offlineMode: boolean
-) => [
+): BoostModule[] => [
     {
         get: new BoostGet(sendCommand),
         set: new BoostSet(eventEmitter, sendCommand, offlineMode),
