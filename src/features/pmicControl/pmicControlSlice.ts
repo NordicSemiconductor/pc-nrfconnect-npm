@@ -43,6 +43,7 @@ interface pmicControlState {
     pmicState: PmicState;
     pmicChargingState: PmicChargingState;
     batteryConnected: boolean;
+    batteryAddonBoardId?: number;
     fuelGauge: boolean;
     supportedVersion?: boolean;
     dialog: PmicDialog[];
@@ -79,6 +80,7 @@ const initialState: pmicControlState = {
     },
     pmicState: 'ek-disconnected',
     batteryConnected: false,
+    batteryAddonBoardId: 0,
     fuelGauge: false,
     hardcodedBatterModels: [],
     dialog: [],
@@ -124,6 +126,9 @@ const pmicControlSlice = createSlice({
             action: PayloadAction<AdcSample | undefined>
         ) {
             state.latestAdcSample = action.payload;
+        },
+        setBatteryAddonBoardId(state, action: PayloadAction<number>) {
+            state.batteryAddonBoardId = action.payload;
         },
         setBoosts(state, action: PayloadAction<Boost[]>) {
             state.boosts = action.payload;
@@ -335,6 +340,8 @@ export const isBatteryConnected = (state: RootState) => {
         initialState.batteryConnected
     );
 };
+export const getBatteryAddonBoardId = (state: RootState) =>
+    state.app.pmicControl.batteryAddonBoardId || 0;
 export const getFuelGauge = (state: RootState) =>
     state.app.pmicControl.fuelGauge;
 export const getActiveBatterModel = (state: RootState) =>
@@ -393,6 +400,7 @@ export const {
     setShipModeConfig,
     updateShipModeConfig,
     setBatteryConnected,
+    setBatteryAddonBoardId,
     setFuelGauge,
     setActiveBatterModel,
     setHardcodedBatterModels,

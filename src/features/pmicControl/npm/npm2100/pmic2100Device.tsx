@@ -33,6 +33,7 @@ import {
     PmicState,
     ProfileDownload,
 } from '../types';
+import getBatteryModule from './battery';
 import getBoostModule, { numberOfBoosts } from './boost';
 import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
@@ -150,6 +151,19 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         });
     };
 
+    const processBattInputDetect = ({ message }: LoggingEvent) => {
+        // Example: module_batt_input_detect: Battery board id: 0
+
+        const boardIdPattern = /Battery board id: ([0-9]+)/;
+
+        const match = boardIdPattern.exec(message);
+
+        if (match && match.length === 2) {
+            const holderId = parseInt(match[1], 10);
+            eventEmitter.emit('onBatteryAddonBoardIdUpdate', holderId);
+        }
+    };
+
     const startAdcSample = (intervalMs: number, samplingRate: number) => {
         sendCommand(`npm_adc sample ${samplingRate} ${intervalMs}`);
     };
@@ -217,6 +231,12 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
+    const batteryModule = getBatteryModule(
+        shellParser,
+        eventEmitter,
+        sendCommand
+    );
+
     const boostModule = getBoostModule(
         shellParser,
         eventEmitter,
@@ -239,6 +259,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                             break;
                         case 'module_pmic_irq':
                             processModulePmicIrq(loggingEvent);
+                            break;
+                        case 'module_batt_input_detect':
+                            processBattInputDetect(loggingEvent);
                             break;
                         case 'module_pmic_charger':
                             // Handled in charger callbacks
@@ -302,7 +325,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         );
 
         releaseAll.push(...fuelGaugeCallbacks);
-
+        releaseAll.push(...batteryModule.callbacks);
         releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
         releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
@@ -369,6 +392,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         all: () => {
             // Request all updates for nPM2100
 
+            batteryModule.get.all();
             boostModule.forEach(boost => boost.get.all());
             ldoModule.forEach(ldo => ldo.get.all());
             gpioModule.forEach(module => module.get.all());
