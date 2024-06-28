@@ -465,7 +465,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                             config.fuelGauge
                         );
                     } catch (error) {
-                        logger.error('Invalid File.');
+                        // TODO
+                        // console.log(error);
+                        // logger.error('Invalid File.');
                     }
                 };
 
