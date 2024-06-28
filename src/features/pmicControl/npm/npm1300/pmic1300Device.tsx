@@ -40,6 +40,7 @@ import { ChargerModule } from './charger';
 import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { numberOfLdos } from './ldo';
+import overlay from './overlay';
 import setupPof from './pof';
 import setupShipMode from './shipMode';
 import setupTimer from './timerConfig';
@@ -773,6 +774,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
 
         getBatteryConnectedVoltageThreshold: () => 1, // 1V
+
+        generateOverlay(npmExport) {
+            return overlay(npmExport, this);
+        },
 
         supportedErrorLogs: {
             reset: true,

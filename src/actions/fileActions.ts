@@ -17,8 +17,8 @@ import path from 'path';
 import { RootState } from '../appReducer';
 import { toBuckExport } from '../features/pmicControl/npm/npm1300/buck';
 import { toLdoExport } from '../features/pmicControl/npm/npm1300/ldo';
-import overlay from '../features/pmicControl/npm/overlay/overlay';
 import { NpmExport } from '../features/pmicControl/npm/types';
+import { getNpmDevice } from '../features/pmicControl/pmicControlSlice';
 
 const saveSettings =
     (filePath: string): AppThunk<RootState> =>
@@ -51,10 +51,15 @@ const saveSettings =
             config: out,
         });
 
+        const npmDevice = getNpmDevice(getState());
+
         if (filePath.endsWith('.json')) {
             fs.writeFileSync(filePath, JSON.stringify(out, null, 2));
-        } else if (filePath.endsWith('.overlay')) {
-            fs.writeFileSync(filePath, overlay(out, currentState.npmDevice));
+        } else if (
+            filePath.endsWith('.overlay') &&
+            npmDevice?.generateOverlay !== undefined
+        ) {
+            fs.writeFileSync(filePath, npmDevice.generateOverlay(out));
         }
     };
 
@@ -156,15 +161,22 @@ export const selectDirectoryDialog = () =>
             .catch(reject);
     });
 
-export const saveFileDialog = (): AppThunk => dispatch => {
+export const saveFileDialog = (): AppThunk => (dispatch, getState) => {
+    const isOverlaySupported =
+        getNpmDevice(getState())?.generateOverlay !== undefined;
+
     showSaveDialog({
         title: 'Save Device Settings',
-        defaultPath: 'config.overlay',
+        defaultPath: isOverlaySupported ? 'config.overlay' : 'config.json',
         filters: [
-            {
-                name: 'Overlay',
-                extensions: ['overlay'],
-            },
+            ...(isOverlaySupported
+                ? [
+                      {
+                          name: 'Overlay',
+                          extensions: ['overlay'],
+                      },
+                  ]
+                : []),
             {
                 name: 'JSON',
                 extensions: ['json'],
