@@ -92,7 +92,13 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
-    const processModulePmicAdc = ({ timestamp, message }: LoggingEvent) => {
+    const processModulePmicAdc = ({
+        timestamp,
+        message,
+        logLevel,
+    }: LoggingEvent) => {
+        if (logLevel !== 'inf') return;
+
         const messageParts = message.split(',');
         const adcSample: AdcSample = {
             timestamp,
