@@ -156,7 +156,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         ldos: [
             {
                 voltage: 1,
-                mode: 'load_switch',
+                mode: 'Load_switch',
                 enabled: false,
                 softStartEnabled: false,
                 softStart: 50,
@@ -165,7 +165,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             },
             {
                 voltage: 2,
-                mode: 'load_switch',
+                mode: 'Load_switch',
                 enabled: false,
                 softStartEnabled: false,
                 softStart: 50,

@@ -847,7 +847,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
             await pmic.ldoModule[index].set.mode(
-                mode === 0 ? 'load_switch' : 'LDO'
+                mode === 0 ? 'Load_switch' : 'LDO'
             );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -2577,7 +2577,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
                 await expect(
                     pmic.ldoModule[index].set.mode(
-                        mode === 0 ? 'load_switch' : 'LDO'
+                        mode === 0 ? 'Load_switch' : 'LDO'
                     )
                 ).rejects.toBeUndefined();
 

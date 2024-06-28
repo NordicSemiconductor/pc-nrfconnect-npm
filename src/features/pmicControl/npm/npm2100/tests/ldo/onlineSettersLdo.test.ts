@@ -93,7 +93,7 @@ test.skip('PMIC 2100 - Setters Online tests - LDO', () => {
                 );
 
             await pmic.ldoModule[index].set.mode(
-                mode === 0 ? 'load_switch' : 'LDO'
+                mode === 0 ? 'Load_switch' : 'LDO'
             );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -329,7 +329,7 @@ test.skip('PMIC 2100 - Setters Online tests - LDO', () => {
 
                 await expect(
                     pmic.ldoModule[index].set.mode(
-                        mode === 0 ? 'load_switch' : 'LDO'
+                        mode === 0 ? 'Load_switch' : 'LDO'
                     )
                 ).rejects.toBeUndefined();
 

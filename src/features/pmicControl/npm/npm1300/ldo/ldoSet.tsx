@@ -61,7 +61,7 @@ export class LdoSet {
                 } else {
                     this.sendCommand(
                         `npmx ldsw mode set ${this.index} ${
-                            mode === 'load_switch' ? '0' : '1'
+                            mode === 'Load_switch' ? '0' : '1'
                         }`,
                         () => resolve(),
                         () => {

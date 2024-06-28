@@ -61,7 +61,7 @@ export const BuckRetentionControlValues = ['Off'] as const;
 
 type GPIONames = (typeof GPIOValues)[number];
 export type RebootMode = 'cold' | 'warm';
-export const LdoModeValues = ['load_switch', 'LDO'] as const;
+export const LdoModeValues = ['Load_switch', 'LDO'] as const;
 export type LdoMode = (typeof LdoModeValues)[number];
 export const SoftStartValues = [10, 20, 35, 50, undefined] as const;
 export type Npm1300LoadSwitchSoftStart = (typeof SoftStartValues)[number];

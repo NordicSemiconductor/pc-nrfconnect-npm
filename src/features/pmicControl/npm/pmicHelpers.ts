@@ -85,6 +85,18 @@ export const parseToBoolean = (message: string) =>
 export const parseOnOff = (message: string): boolean =>
     parseColonBasedAnswer(message).toLowerCase() === 'on';
 
+// Select the type value from a type value array, ignoring case
+// (search for 'ldo' in ['LDO','Load_switch] and find 'LDO')
+export const selectFromTypeValues = (
+    value: string,
+    typeValues: readonly string[]
+): string | undefined => {
+    const lowerCaseValue = value.toLowerCase();
+    return typeValues.find(
+        typeValue => typeValue.toLowerCase() === lowerCaseValue
+    );
+};
+
 export const parseBatteryModel = (message: string) => {
     const slot = message.split(':')[1];
     let slotIndex: number | undefined;
@@ -171,6 +183,16 @@ export const toRegex = (
 // Generate a regex to match a set of numbers [1,2,3] => '(1|2|3)'
 export const toValueRegex = (values: readonly unknown[]) =>
     `(${values.join('|')})`;
+
+// Generate a regex to match a set of strings
+export const toValueRegexString = (values: readonly string[]) =>
+    `(${values.map(str => caseIgnorantRegexString(str)).join('|')})`;
+
+// Create a case ignorant regex string: 'yes' => '[yY][eE][sS]'
+export const caseIgnorantRegexString = (str: string): string =>
+    Array.from(str)
+        .map(chr => `[${chr.toLowerCase()}${chr.toUpperCase()}]`)
+        .join('');
 
 export const onOffRegex = '([Oo][Nn]|[Oo][Ff][Ff])';
 
