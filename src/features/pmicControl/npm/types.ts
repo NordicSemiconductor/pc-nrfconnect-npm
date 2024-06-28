@@ -731,6 +731,8 @@ export type BaseNpmDevice = {
     setUptimeOverflowCounter: (value: number) => void;
     release: () => void;
 
+    generateOverlay?: (npmExport: NpmExport) => string;
+
     chargerModule?: ChargerModule;
     gpioModule: GpioModule[];
     boostModule: BoostModule[];
