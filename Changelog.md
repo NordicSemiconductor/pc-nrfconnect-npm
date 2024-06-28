@@ -1,8 +1,8 @@
-## 2.0.0 - Unreleased
+## 2.0.0-alpha1 - 2024-06-28
 
 ### Added
 
--   Support for nPM2100
+-   Experimental support for nPM2100.
 
 ## 1.3.0 - 2024-05-10
 
