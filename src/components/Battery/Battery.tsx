@@ -15,13 +15,14 @@ import {
 import {
     getFuelGauge,
     getLatestAdcSample,
-    getNpmDevice,
     getPmicChargingState,
     isBatteryConnected,
 } from '../../features/pmicControl/pmicControlSlice';
 
 import './battery.scss';
 import styles from './Battery.module.scss';
+
+const card = 'battery';
 
 interface BatteryIconProperties {
     pmicChargingState: PmicChargingState;
@@ -75,84 +76,68 @@ interface BatterySideTextProperties {
     fuelGauge: boolean;
 }
 
+const TimeToFullTimeToEmpty = (latestAdcSample: AdcSample) =>
+    latestAdcSample?.ttf !== undefined &&
+    !Number.isNaN(latestAdcSample?.ttf) ? (
+        <div className="tw-flex tw-flex-col">
+            <DocumentationTooltip card={card} item="TimeToFull">
+                <span>Time to full</span>
+            </DocumentationTooltip>
+            <span>
+                {!Number.isNaN(latestAdcSample?.ttf)
+                    ? `${formatSecondsToString(latestAdcSample?.ttf)}`
+                    : 'N/A'}
+            </span>
+        </div>
+    ) : (
+        <div className="tw-flex tw-flex-col">
+            <DocumentationTooltip card={card} item="TimeToEmpty">
+                <span>Time to empty</span>
+            </DocumentationTooltip>
+            <span>
+                {latestAdcSample?.tte && !Number.isNaN(latestAdcSample?.tte)
+                    ? `${formatSecondsToString(latestAdcSample?.tte)}`
+                    : 'N/A'}
+            </span>
+        </div>
+    );
+
 const SideText = ({
     batteryConnected,
     latestAdcSample,
     fuelGauge,
-}: BatterySideTextProperties) => {
-    const card = 'battery';
-    const npmDevice = useSelector(getNpmDevice);
+}: BatterySideTextProperties) => (
+    <div className="battery-side-panel">
+        {!batteryConnected && (
+            <h2>
+                Battery not
+                <br />
+                detected
+            </h2>
+        )}
 
-    return (
-        <div className="battery-side-panel">
-            {!batteryConnected && (
-                <h2>
-                    Battery not
-                    <br />
-                    detected
-                </h2>
-            )}
+        {batteryConnected && (
+            <>
+                <DocumentationTooltip card={card} item="StateOfCharge">
+                    <h2>
+                        {fuelGauge &&
+                        latestAdcSample &&
+                        !Number.isNaN(latestAdcSample.soc)
+                            ? `${latestAdcSample.soc ?? 0}%`
+                            : 'N/A %'}
+                    </h2>
+                </DocumentationTooltip>
 
-            {batteryConnected && (
-                <>
-                    <DocumentationTooltip card={card} item="StateOfCharge">
-                        <h2>
-                            {fuelGauge &&
-                            latestAdcSample &&
-                            !Number.isNaN(latestAdcSample.soc)
-                                ? `${latestAdcSample.soc ?? 0}%`
-                                : 'N/A %'}
-                        </h2>
-                    </DocumentationTooltip>
-                    {npmDevice?.getDeviceType() === 'npm2100' ? (
-                        <div className="tw-flex tw-flex-col" />
-                    ) : (
-                        <>
-                            {latestAdcSample &&
-                            !!npmDevice?.chargerModule &&
-                            !Number.isNaN(latestAdcSample.ttf) ? (
-                                <div className="tw-flex tw-flex-col">
-                                    <DocumentationTooltip
-                                        card={card}
-                                        item="TimeToFull"
-                                    >
-                                        <span>Time to full</span>
-                                    </DocumentationTooltip>
-                                    <span>
-                                        {latestAdcSample.ttf &&
-                                        !Number.isNaN(latestAdcSample.ttf)
-                                            ? `${formatSecondsToString(
-                                                  latestAdcSample.ttf
-                                              )}`
-                                            : 'N/A'}
-                                    </span>
-                                </div>
-                            ) : (
-                                <div className="tw-flex tw-flex-col">
-                                    <DocumentationTooltip
-                                        card={card}
-                                        item="TimeToEmpty"
-                                    >
-                                        <span>Time to empty</span>
-                                    </DocumentationTooltip>
-                                    <span>
-                                        {latestAdcSample?.tte &&
-                                        !Number.isNaN(latestAdcSample.tte)
-                                            ? `${formatSecondsToString(
-                                                  latestAdcSample.tte
-                                              )}`
-                                            : 'N/A'}
-                                    </span>
-                                </div>
-                            )}
-                            )
-                        </>
-                    )}
-                </>
-            )}
-        </div>
-    );
-};
+                {latestAdcSample?.ttf !== undefined ||
+                latestAdcSample?.tte !== undefined ? (
+                    TimeToFullTimeToEmpty(latestAdcSample)
+                ) : (
+                    <div className="tw-flex tw-flex-col" />
+                )}
+            </>
+        )}
+    </div>
+);
 
 export interface BatteryProperties {
     disabled: boolean;
