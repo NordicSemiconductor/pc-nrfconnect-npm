@@ -104,40 +104,49 @@ const SideText = ({
                                 : 'N/A %'}
                         </h2>
                     </DocumentationTooltip>
-
-                    {latestAdcSample &&
-                    !!npmDevice?.chargerModule &&
-                    !Number.isNaN(latestAdcSample.ttf) ? (
-                        <div className="tw-flex tw-flex-col">
-                            <DocumentationTooltip card={card} item="TimeToFull">
-                                <span>Time to full</span>
-                            </DocumentationTooltip>
-                            <span>
-                                {latestAdcSample.ttf &&
-                                !Number.isNaN(latestAdcSample.ttf)
-                                    ? `${formatSecondsToString(
-                                          latestAdcSample.ttf
-                                      )}`
-                                    : 'N/A'}
-                            </span>
-                        </div>
+                    {npmDevice?.getDeviceType() === 'npm2100' ? (
+                        <div className="tw-flex tw-flex-col" />
                     ) : (
-                        <div className="tw-flex tw-flex-col">
-                            <DocumentationTooltip
-                                card={card}
-                                item="TimeToEmpty"
-                            >
-                                <span>Time to empty</span>
-                            </DocumentationTooltip>
-                            <span>
-                                {latestAdcSample?.tte &&
-                                !Number.isNaN(latestAdcSample.tte)
-                                    ? `${formatSecondsToString(
-                                          latestAdcSample.tte
-                                      )}`
-                                    : 'N/A'}
-                            </span>
-                        </div>
+                        <>
+                            {latestAdcSample &&
+                            !!npmDevice?.chargerModule &&
+                            !Number.isNaN(latestAdcSample.ttf) ? (
+                                <div className="tw-flex tw-flex-col">
+                                    <DocumentationTooltip
+                                        card={card}
+                                        item="TimeToFull"
+                                    >
+                                        <span>Time to full</span>
+                                    </DocumentationTooltip>
+                                    <span>
+                                        {latestAdcSample.ttf &&
+                                        !Number.isNaN(latestAdcSample.ttf)
+                                            ? `${formatSecondsToString(
+                                                  latestAdcSample.ttf
+                                              )}`
+                                            : 'N/A'}
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="tw-flex tw-flex-col">
+                                    <DocumentationTooltip
+                                        card={card}
+                                        item="TimeToEmpty"
+                                    >
+                                        <span>Time to empty</span>
+                                    </DocumentationTooltip>
+                                    <span>
+                                        {latestAdcSample?.tte &&
+                                        !Number.isNaN(latestAdcSample.tte)
+                                            ? `${formatSecondsToString(
+                                                  latestAdcSample.tte
+                                              )}`
+                                            : 'N/A'}
+                                    </span>
+                                </div>
+                            )}
+                            )
+                        </>
                     )}
                 </>
             )}
