@@ -1120,10 +1120,11 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Select the battery model you want to use for Fuel Gauge
-                        in nPM PowerUP. To add new battery models, use the Add
-                        New Active Battery Model selection below. You can use
-                        the default battery model for initial evaluation, but
-                        this will not give the best state-of-charge accuracy.
+                        in nPM PowerUP. To add new battery models, use the{' '}
+                        <b>Add New Active Battery Model</b> drop-down menu
+                        below. You can use the default battery model for initial
+                        evaluation, but this will not give the best
+                        state-of-charge accuracy.
                     </p>,
                 ],
             },
@@ -1133,14 +1134,16 @@ export const documentation: Documentation = {
                 title: 'Add New Active Battery Model',
                 content: [
                     <p key="p1">
-                        Nordic has profiled batteries from selected vendors.
-                        Choose a model from the drop-down menus below to add it
-                        to the Active Battery Model selection.
+                        Nordic Semiconductor has profiled batteries from
+                        selected vendors. Choose a model from the drop-down
+                        menus below to add it to the <b>Active Battery Model</b>{' '}
+                        selection.
                     </p>,
                     <p key="p2">
                         You can also add your own custom battery model. If your
-                        battery is not listed, click Profile Battery to create a
-                        new battery model.
+                        battery is not listed, click <b>Profile Battery</b> to
+                        create a new battery model and then add it using this
+                        menu.
                     </p>,
                     <p key="p3">
                         For quick evaluation, you can also use one of the
@@ -1160,20 +1163,21 @@ export const documentation: Documentation = {
                         estimation across voltage, current, and temperature
                         range for the specific battery used. The result of the
                         battery profiling is a battery model. To evaluate the
-                        battery model in nPM PowerUP, use the 'Write Battery
-                        Model' option to upload the battery model .json file. To
+                        custom battery model in nPM PowerUP, select the battery
+                        model in <p>Add New Active Battery Model</p> and write
+                        its JSON file to the selected battery model slot. To
                         continue development and implementation on your own
-                        design, use the battery model .inc file. See the NCS
-                        documentation for more details: `}
+                        design, use the battery model INC file. See the
+                        following page for more details: `}
                         <ExternalLink
-                            label=" nPM1300: Fuel gauge — nRF Connect SDK 2.4.99 documentation"
-                            href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/samples/pmic/native/npm1300_fuel_gauge/README.html#npm1300-fuel-gauge"
+                            label="nPM1300: Fuel gauge in the nRF Connect SDK documentation"
+                            href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/pmic/native/npm1300_fuel_gauge/README.html"
                         />
                     </p>,
                     <p key="p2">
-                        An additional board, nPM-FG, is required to perform
-                        battery profiling. This must be connected to EK before
-                        battery profiling is started.
+                        An additional board, nPM Fuel Gauge, is required to
+                        perform the battery profiling. This board must be
+                        connected to EK before battery profiling is started.
                     </p>,
                 ],
             },
@@ -1184,17 +1188,17 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Exports the nPM1300 configuration based on the nPM
-                        PowerUP settings. Choose .overlay to export to a nRF
-                        Connect SDK project, or .json to save the nPM PowerUP
-                        configuration for later use in nPM PowerUP using the
-                        &quot;Load Configuration&quot; option.
+                        PowerUP settings. Choose the overlay format to export to
+                        a project in the nRF Connect SDK, or JSON to save the
+                        configuration for later use in nPM PowerUP (&quot;Load
+                        Configuration&quot; option).
                     </p>,
                     <p key="p2">
-                        For more details on how to import the overlay file to
-                        the nRF Connect SDK, see{' '}
+                        For more details about importing to the nRF Connect SDK,
+                        see{' '}
                         <ExternalLink
                             label="Importing an overlay from nPM PowerUP"
-                            href="https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/device_guides/working_with_pmic/npm1300/developing.html"
+                            href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/pmic/npm1300.html#importing_an_overlay_from_npm_powerup"
                         />
                     </p>,
                 ],
@@ -1205,8 +1209,8 @@ export const documentation: Documentation = {
                 title: 'Load Configuration',
                 content: [
                     <p key="p1">
-                        Loads a saved nPM PowerUP configuration and updates all
-                        device configurations accordingly.
+                        Loads a saved nPM PowerUP configuration from a JSON file
+                        and updates all device configurations accordingly.
                     </p>,
                 ],
             },
@@ -1227,7 +1231,7 @@ export const documentation: Documentation = {
                 title: 'Record Events',
                 content: [
                     <p key="p1">
-                        Records all terminal log events in CSV files, including
+                        Saves all terminal log events to CSV files, including
                         commands executed, battery voltage, current temperature,
                         voltage, state-of-charge, time to empty, and time to
                         full.
@@ -1265,14 +1269,14 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         The battery profiling temperatures. Supported
-                        remperatures range from 0°C to 60°C, in steps of 1°C.
+                        temperatures range from 0°C to 60°C, in steps of 1°C.
                     </p>,
                     <p key="p2">
                         {' '}
-                        We recommend profiling at three temperatures for best
+                        Profile at three different temperatures for best
                         state-of-charge accuracy. For example, if your
-                        application temperature range is 5°C to 45°C, we
-                        recommend profiling at 5°C, 25°C, and 45°C.
+                        application temperature range is 5°C to 45°C, set
+                        profiling at 5°C, 25°C, and 45°C.
                     </p>,
                 ],
             },
