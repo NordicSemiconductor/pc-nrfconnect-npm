@@ -22,6 +22,11 @@ Dropdown to list the PMIC devices attached to the computer.
 !!! note "Note"
       Read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use the nPM1300 EK with nPM PowerUP.
 
+### Offline mode actions
+
+You can set the desired PMIC configuration without selecting a device.
+The **Export Configuration** button let you then save this configuration to a file, while the **Load Configuration** allows you to import such a configuration from a file.
+
 ## After selection
 
 When you select a device, the application checks the firmware programmed on the nPM Controller. If needed, it asks you to program the required firmware.
@@ -35,8 +40,8 @@ This side panel area contains the following buttons:
 
 |          Button          | Description |
 | ------------------------ | ----------- |
-| **Export Configuration** | Export the PMIC configuration based on the nPM PowerUP application settings. You can save the configuration to an `.overlay` file for [use in the nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/pmic/npm1300.html#importing_an_overlay_from_npm_powerup) or to a JSON file for later use in nPM PowerUP.</br></br>You can also set the configuration before you select a device and export it to a file. |
-| **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device.  |
+| **Export Configuration** | Export the PMIC configuration based on the nPM PowerUP application settings. You can save the configuration to an `.overlay` file for [use in the nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/pmic/npm1300.html#importing_an_overlay_from_npm_powerup) or to a JSON file for later use in nPM PowerUP.</br></br>You can also set the configuration before you select a device and export it to a file ([offline mode](#offline-mode-actions)). |
+| **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device ([offline mode](#offline-mode-actions)).  |
 | **Open Serial Terminal** | Open the [nRF Connect Serial Terminal](https://docs.nordicsemi.com/bundle/nrf-connect-serial-terminal/page/index.html) application in a separate window. Make sure to first [install the application](). |
 | **Reset Device**         | Reset the PMIC device and the nPM Controller. The PMIC default device configuration is restored.  |
 | **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory. |
@@ -53,7 +58,7 @@ This side panel area lets you select the following options:
 
 ### Settings
 
-This side panel area lets you configure the reporting rate.
+This side panel area lets you configure the reporting rate. This can affect the frequency of the data in the [**Graph** tab](#graph-tab) and on the **Battery Status** tile in the **Dashboard** and **Charger** tabs.
 
 ### Connection Status
 
