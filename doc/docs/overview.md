@@ -80,7 +80,7 @@ You can use the options in the **Charger** tab to control and monitor the chargi
 !!! info "Tip"
       Check the battery datasheet for the termination voltage and current limit values that you can set for your battery.
 
-Using the built-in battery models, you can get an estimated time-to-full and time-to-empty when charging or discharging a battery connected to the EK.
+Using the built-in battery models, you can get an estimated time-to-full and time-to-empty when charging or discharging a battery connected to the EK. The application also provides the State of Charge (SOC) percentage value.
 
 ## Regulators tab
 
@@ -123,7 +123,7 @@ The following drop-down menu options are available for the project and profile s
 | ------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | **Process Included Data**| Project  | If your project includes multiple temperature profiles, you can include a selection of them with the **Include** toggle. Using this option processes only the included temperature profiles. |
 | **Save Battery Model**   | Project  | Save the battery model for the entire project to a JSON or an INC file. This only saves the temperature profiles you have selected with the **Include** toggle. |
-| **Write Battery Model**  | Project  | Write the battery model for the entire project to the nPM Controller. This only writes the temperature profiles you have selected with the **Include** toggle. |
+| **Write Battery Model**  | Project  | Write the battery model for the entire project to the nPM Controller on the EK. This only writes the temperature profiles you have selected with the **Include** toggle. |
 | **Add Profile**          | Project  | Add a new battery profile with a specific temperature and a CSV data file. Data files are generated when you use the [**Profile Battery** option](#fuel-gauge). |
 | **Open Folder**          | Project  | Open the project directory in the **File Explorer**. |
 | **Edit Project**         | Project  | Edit the project settings.  |
@@ -131,7 +131,7 @@ The following drop-down menu options are available for the project and profile s
 | **Include** toggle       | Profile  | Select the temperatures to be included for processing with **Process Included Data** button for the entire project. |
 | **Process Data**         | Profile  | Process the data for the given temperature profile only. |
 | **Save Battery Model**   | Profile  | Save the battery model to a JSON or an INC file. |
-| **Write Battery Model**  | Profile  | Write the battery model to the nPM Controller. |
+| **Write Battery Model**  | Profile  | Write the battery model to the nPM Controller on the EK. |
 | **Edit Profile**         | Profile  | Edit the battery profile. |
 | **Remove Profile**       | Profile  | Remove the battery profile.|
 
@@ -139,14 +139,14 @@ The following drop-down menu options are available for the project and profile s
 
 Here you write and save battery models from selected vendors that has been profiled by Nordic Semiconductor.
 
-When writing, you are going to write new firmware on the nPM Controller to one of its available battery model slots.
+When writing, you are going to write new battery model on the nPM Controller to one of its available battery model slots.
 This can overwrite the [**Active Battery Model**](#fuel-gauge).
 
-When saving, the battery model is saved in the INC file format in the selected directory. This file format is meant for integrating the battery model into your final application with a Nordic System on Chip (SoC).
+When saving, the battery model is saved in the selected directory either to a JSON file that can be downloaded to the nPM Controller or to an INC file. The INC file format is meant for integrating the battery model into your final application with a Nordic System on Chip (SoC).
 
 ## Graph tab
 
-After generating the battery model, you can use the **Graph** tab to evaluate the battery state-of-charge predictions in real time. Make sure the battery Fuel Gauge in the **Dashboard** tab or **Fuel Gauge** tab is enabled.
+Here you can monitor the state of the PMIC, including the current voltage temperature and State of Charge (SOC). For SOC, make sure the battery Fuel Gauge in the **Dashboard** tab or **Fuel Gauge** tab is enabled.
 
 ![nPM PowerUP graph example](./screenshots/npm_graph_example.png "nPM PowerUP graph example")
 
