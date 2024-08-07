@@ -483,7 +483,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         releaseAll.push(
             shellParser.registerCommandCallback(
                 toRegex(
-                    'npmx vbusin status cc get',
+                    'powerup_vbusin status get',
                     false,
                     undefined,
                     '(0|1|2|3)'
@@ -682,7 +682,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         ...shipModeGet,
         ...fuelGaugeGet,
 
-        usbPowered: () => sendCommand(`npmx vbusin status cc get`),
+        usbPowered: () => sendCommand(`powerup_vbusin status get`),
 
         vbusinCurrentLimiter: () =>
             sendCommand(`npmx vbusin current_limit get`),

@@ -537,9 +537,9 @@ Battery models stored in database:
     });
 
     test.each(USBDetectStatusValues.map((state, index) => ({ state, index })))(
-        'npmx vbusin status cc get %p',
+        'powerup_vbusin status get %p',
         ({ state, index }) => {
-            const command = `npmx vbusin status cc get`;
+            const command = `powerup_vbusin status get`;
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 
