@@ -24,7 +24,7 @@ Complete the following steps to profile a battery and use the generated battery 
 
     The measurement data is automatically processed in the Nordic battery modeling software to make a single battery model file for each test temperature.
 
-1. After the temperature profiling at a given temperature is complete, follow the instructions in the application to charge the battery at room temperature before profiling at the next test temperature. When all the individual temperature models have been completed, they will be merged to generate the final battery model file. The final battery model is automatically saved as a JSON file.
+1. After the temperature profiling at a given temperature is complete, follow the instructions in the application to charge the battery at room temperature before profiling at the next test temperature. When all the individual temperature models have been completed, they will be merged to generate the final battery model file. The final battery model is automatically saved as both a JSON file and an INC file.
 1. Select [**Add New Battery Model**](./overview.md#fuel-gauge) in the side panel.</br>
    A drop-down menu appears.
 1. Select **Custom Model** to load the generated JSON battery model file to the host System on Chip (SoC) of nPM1300 EK.
