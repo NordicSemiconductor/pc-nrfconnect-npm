@@ -39,7 +39,7 @@ import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { numberOfLdos } from './ldo';
 
-export const npm2100FWVersion = '0.0.0+404524177';
+export const npm2100FWVersion = '0.2.0+0';
 
 export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new NpmEventEmitter();
