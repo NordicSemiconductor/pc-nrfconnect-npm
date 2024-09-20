@@ -3,7 +3,7 @@
 ### Added
 
 -   Experimental support for nPM2100.
--   Updated nPM2100 firmware to v0.2.0+0.
+-   Updated nPM2100 firmware to v0.2.1+0.
 
 ## 1.3.0 - 2024-05-10
 
