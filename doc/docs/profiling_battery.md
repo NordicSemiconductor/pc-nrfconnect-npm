@@ -12,7 +12,7 @@ Complete the following steps to profile a battery and use the generated battery 
 1. Connect the nPM Fuel Gauge Board to the nPM1300 Evaluation Kit (EK) at the edge connectors **P20** and **P21** (denoted as **EXT BOARD** on the EK).
 1. Follow the instructions in [Connect nPM1300 EK to nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) to connect the nPM1300 EK and download the software.
 1. Click the [**Profile Battery**](overview.md#actions) button in the side panel.
-1. Enter the battery data and temperatures for the profiling test. Provide the generic information about the selected battery. Refer to the battery datasheet for information. For further information on profiling, see [Guidelines for battery profiling](./profiling_guidelines.md).
+1. Enter the battery data and temperatures for the profiling test. Provide the generic information about the selected battery. Refer to the battery datasheet for information. For further information on profiling, see [Guidelines for battery profiling](https://docs.nordicsemi.com/bundle/nan_045/page/APP/nan_045/guidelines.html).
 
     ![Profile Battery test configuration](./screenshots/battery_profiling.PNG "Profile Battery test configuration")
 
