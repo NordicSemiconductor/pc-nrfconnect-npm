@@ -40,8 +40,8 @@ This side panel area contains the following buttons:
 
 |          Button          | Description |
 | ------------------------ | ----------- |
-| **Export Configuration** | Export the PMIC configuration based on the nPM PowerUP application settings. You can save the configuration to an `.overlay` file for [use in the nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/pmic/npm1300.html#importing_an_overlay_from_npm_powerup) or to a JSON file for later use in nPM PowerUP.</br></br>You can also set the configuration before you select a device and export it to a file ([offline mode](#offline-mode-actions)). |
-| **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device ([offline mode](#offline-mode-actions)).  |
+| **Export Configuration** | Export the PMIC configuration based on the nPM PowerUP application settings. You can save the configuration to an `.overlay` file for [use in the nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/pmic/npm1300.html#importing_an_overlay_from_npm_powerup) or to a JSON file for later use in nPM PowerUP.</br></br>You can also set the configuration before you select a device and export it to a file ([Offline Mode](#offline-mode-actions)). |
+| **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device ([Offline Mode](#offline-mode-actions)).  |
 | **Open Serial Terminal** | Open the [nRF Connect Serial Terminal](https://docs.nordicsemi.com/bundle/nrf-connect-serial-terminal/page/index.html) application in a separate window. Make sure to first [install the application](). |
 | **Reset Device**         | Reset the PMIC device and the nPM Controller. The PMIC default device configuration is restored.  |
 | **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory. |
@@ -53,16 +53,18 @@ This side panel area lets you select the following options:
 |               Menu               | Description |
 | -------------------------------- | ----------- |
 | **Active Battery Model**         | Select the battery model you want to use for Fuel Gauge in nPM PowerUP.        |
-| **Add New Active Battery Model** | Select a battery from selected vendors that has been profiled by Nordic Semiconductor or your own custom battery model, added with the **Profile Battery** feature and saved in the [**Profiles** tab](#profiles-tab).        |
-| **Profile Battery**              | Create your own, custom battery profile, and collect the data. These are then saved in the [**Profiles** tab](#profiles-tab) and added to the **Add New Active Battery Model** drop-down menu.</br></br>An additional board, nPM Fuel Gauge, is required to perform the battery profiling.        |
+| **Add New Active Battery Model** | Select a battery from selected vendors that has been profiled by Nordic Semiconductor or your own custom battery model, added with the **Profile Battery** feature and saved in the [**Profiles**](#profiles-tab) tab.        |
+| **Profile Battery**              | Create your own, custom battery profile, and collect the data. These are then saved in the [**Profiles**](#profiles-tab) tab and added to the **Add New Active Battery Model** drop-down menu.</br></br>An additional board, nPM Fuel Gauge, is required to perform the battery profiling. See [Profiling a battery with nPM PowerUP](profiling_battery.md) for more information.        |
 
 ### Settings
 
-This side panel area lets you configure the reporting rate. This can affect the frequency of the data in the [**Graph** tab](#graph-tab) and on the **Battery Status** tile in the **Dashboard** and **Charger** tabs.
+This side panel area lets you configure the reporting rate. This can affect the frequency of the data in the [**Graph**](#graph-tab) tab and on the **Battery Status** tile in the **Dashboard** and **Charger** tabs.
 
 ### Connection Status
 
 You can check the connection status to the [device you selected](#select-device).
+
+If no device is connected, the application works in the [Offline Mode](#offline-mode-actions).
 
 ![Example of Connection Status after selecting a device](./screenshots/npm_connection_status.PNG "Example of Connection Status after selecting a device")
 
@@ -147,6 +149,8 @@ When saving, the battery model is saved in the selected directory either to a JS
 ## Graph tab
 
 Here you can monitor the state of the PMIC, including the current voltage temperature and State of Charge (SOC). For SOC, make sure the battery Fuel Gauge in the **Dashboard** tab or **Fuel Gauge** tab is enabled.
+
+The monitoring can happen in real time after [generating a battery model](profiling_battery.md#generating-a-battery-model). You can use the **Live** toggle to enable or disable real time monitoring.
 
 ![nPM PowerUP graph example](./screenshots/npm_graph_example.png "nPM PowerUP graph example")
 
