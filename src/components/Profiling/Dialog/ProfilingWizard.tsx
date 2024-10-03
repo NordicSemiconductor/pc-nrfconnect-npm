@@ -404,8 +404,9 @@ export default () => {
             {profilingStage === 'MissingSyncBoard' && (
                 <PreConfigurationDialog />
             )}
-            {profilingStage === 'Configuration' && (
+            {npmDevice && profilingStage === 'Configuration' && (
                 <ConfigurationDialog
+                    npmDevice={npmDevice}
                     isVisible={!abortAction && !confirmCloseDialogOpen}
                 />
             )}

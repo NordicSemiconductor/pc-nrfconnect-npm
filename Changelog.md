@@ -5,15 +5,25 @@
 -   Experimental support for nPM2100.
 -   Updated nPM2100 firmware to v0.2.2+0.
 
-## 1.3.0 - 2024-05-10
+## 1.3.0 - 2024-06-10
 
 ### Added
 
--   Charger Battery Limit (BatLim) configuration.
+-   Added IBat Lim high and low configuration options.
+-   Profiling now supports additional VTerm values: 3.50 V, 3.55 V, 3.60 V, and
+    3.65 V.
 
 ### Changed
 
--   Updated firmware to v1.1.1+0.
+-   Updated firmware to v1.2.3+0.
+
+## 1.2.2 - 2024-03-10
+
+### Changed
+
+-   Updated firmware to v1.2.0+0.
+-   iBat current < 15 mA will it not rendered on the graph or the Battery status
+    card.
 -   During profiling, when a battery is considered disconnected (vBat < 1 V), a
     warning is now issued instead of a terminating error.
 -   Moved feedback tab to a dialog which can be opened by going to the about tab
@@ -81,7 +91,7 @@
 
 ### Changed
 
--   nPM PowerUp now uses nrfutil device v2.0.3
+-   nPM PowerUp now uses nrfutil device v2.0.3.
 -   Soft Start Current range is now at 10mA 20mA 35mA 50mA.
 -   Tooltip text has been improved.
 -   `Export configuration` file save dialog now has default filename.
@@ -92,23 +102,23 @@
 
 ### Removed
 
--   LDO Soft Start Enabled toggle
+-   LDO Soft Start Enabled toggle.
 
 ## 1.0.1 - 2023-11-02
 
 ### Fixed
 
--   Wrong conversion of value in overlay for charger current-microamp
+-   Wrong conversion of value in overlay for charger current-microamp.
 -   Removed overlay properties for thermistor-cold-millidegrees,
     thermistor-cool-millidegrees, thermistor-warm-millidegrees,
     thermistor-hot-millidegrees as conversion from millidegrees to register
-    values is incorrect, resulting in charging being disabled incorrectly
+    values is incorrect, resulting in charging being disabled incorrectly.
 
 ## 1.0.0 - 2023-10-25
 
 ### Added
 
--   Support for NTC thermistor `ntc_z` option
+-   Support for NTC thermistor `ntc_z` option.
 -   Support for Chip Thermal Regulation
     -   Read and Write Tchgresume
     -   Read and Write Tchgstop
@@ -144,14 +154,14 @@
 ### Changed
 
 -   Battery profiling can now support a minimum Discharge cut-off voltage of
-    2.65v
--   Improved Battery profiling load profile
+    2.65v.
+-   Improved Battery profiling load profile.
 -   nPM PowerUP now uses nrfutil device for all device operations.
 
 ### Fixed
 
--   Buck 2 vOut warning is triggered at 1.6V
--   App crashed if an invalid `Profile Project` project json is loaded
+-   Buck 2 vOut warning is triggered at 1.6V.
+-   App crashed if an invalid `Profile Project` project json is loaded.
 
 ## 0.9.1 - 2023-07-17
 

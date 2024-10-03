@@ -100,7 +100,7 @@ describe('PMIC 1300 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            'npmx charger discharging_current get',
+            'npm_adc fullscale get',
             expect.anything(),
             undefined,
             true

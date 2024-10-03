@@ -19,6 +19,7 @@ import { selectDirectoryDialog } from '../../../actions/fileActions';
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     CCProfile,
+    NpmDevice,
     NTCThermistor,
     NTCValues,
     Profile,
@@ -37,7 +38,13 @@ import { ProfilingProject } from '../types';
 
 import '../profiling.scss';
 
-export default ({ isVisible }: { isVisible: boolean }) => {
+export default ({
+    isVisible,
+    npmDevice,
+}: {
+    isVisible: boolean;
+    npmDevice: NpmDevice;
+}) => {
     const [vLowerCutOff, setLowerVCutOff] = useState(3);
     const [vUpperCutOff, setUpperVCutOff] = useState(4.2);
     const [validName, setValidName] = useState(false);

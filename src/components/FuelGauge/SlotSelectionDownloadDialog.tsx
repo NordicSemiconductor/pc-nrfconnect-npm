@@ -82,12 +82,12 @@ export default () => {
         >
             <div className="tw-flex tw-flex-col tw-gap-2">
                 <p>
-                    {`This will write a new battery model to the nPM Controller which
+                    {`You are about to write a new battery model to the nPM Controller that
                 is running the Fuel Gauge algorithm in nPM PowerUP, and make it
-                available in the "Active Battery Model" dropdown.`}
+                available in the Active Battery Model drop-down menu.`}
                 </p>
                 <p>
-                    There are 3 available battery model slots in the nPM
+                    Select one of the available battery model slots in the nPM
                     Controller.
                 </p>
                 <Dropdown

@@ -146,7 +146,7 @@ describe('PMIC 1300 - Command callbacks', () => {
     });
 
     test.each(['get', 'set 1340'])('npmx charger iBatLim %p', append => {
-        const command = `npmx charger discharging_current ${append}`;
+        const command = `npm_adc fullscale ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -157,17 +157,17 @@ describe('PMIC 1300 - Command callbacks', () => {
     });
 
     test('npmx charger iBatLim apx result', () => {
-        const command = `npmx charger discharging_current set 271`;
+        const command = `npm_adc fullscale set 270`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
         callback?.onSuccess(
-            'Info: Requested value was 271 but reading will return 300 due to approximations.',
+            'Info: Requested value was 270 but reading will return 300 due to approximations.',
             command
         );
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).nthCalledWith(1, { iBatLim: 271 });
+        expect(mockOnChargerUpdate).nthCalledWith(1, { iBatLim: 270 });
     });
 
     test.each(['get', 'set 100'])('npmx charger die_temp resume %p', append => {

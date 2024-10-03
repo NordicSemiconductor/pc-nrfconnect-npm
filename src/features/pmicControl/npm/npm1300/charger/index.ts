@@ -103,13 +103,13 @@ export class ChargerModule implements ChargerModuleBase {
 
     static iBatRange(): FixedListRange {
         const result: number[] & { toLabel?: (v: number) => string } = [
-            1340, 271,
+            1340, 270,
         ];
         result.toLabel = (v: number) => {
             switch (v) {
                 case 1340:
                     return 'High';
-                case 271:
+                case 270:
                     return 'Low';
                 default:
                     return `Manual (${v} mA)`;
