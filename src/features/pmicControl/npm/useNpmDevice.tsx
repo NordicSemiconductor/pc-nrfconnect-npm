@@ -100,16 +100,18 @@ export default () => {
     const preventSleepId = useRef<number | null>();
 
     useEffect(() => {
-        getNpmDevice(shellParser, pmicDialog =>
-            dispatch(dialogHandler(pmicDialog))
-        ).then(dev => {
-            dispatch(setNpmDevice(dev));
+        if (shellParser) {
+            getNpmDevice(shellParser, pmicDialog =>
+                dispatch(dialogHandler(pmicDialog))
+            ).then(dev => {
+                dispatch(setNpmDevice(dev));
 
-            dev.isSupportedVersion().then(result => {
-                dispatch(setSupportedVersion(result.supported));
+                dev.isSupportedVersion().then(result => {
+                    dispatch(setSupportedVersion(result.supported));
+                });
+                dev.isPMICPowered().then(setPMICPowered);
             });
-            dev.isPMICPowered().then(setPMICPowered);
-        });
+        }
     }, [dispatch, shellParser]);
 
     useEffect(() => {
