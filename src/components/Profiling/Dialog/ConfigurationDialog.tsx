@@ -204,7 +204,12 @@ export default ({
                     }
                     unit="V"
                     value={vUpperCutOff}
-                    range={npmDevice.getChargerVoltageRange()}
+                    range={{
+                        min: 4,
+                        max: 4.4,
+                        step: 0.05,
+                        decimals: 2,
+                    }}
                     onChange={setUpperVCutOff}
                 />
 
