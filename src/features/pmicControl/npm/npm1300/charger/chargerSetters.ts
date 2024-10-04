@@ -194,7 +194,7 @@ export class ChargerSet {
                 this.enabled(false)
                     .then(() => {
                         this.sendCommand(
-                            `npmx charger discharging_current set ${iBatLim}`,
+                            `npm_adc fullscale set ${iBatLim}`,
                             () => resolve(),
                             () => {
                                 this.get.batLim();

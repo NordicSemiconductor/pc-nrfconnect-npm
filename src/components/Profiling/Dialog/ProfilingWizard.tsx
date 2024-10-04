@@ -406,7 +406,6 @@ export default () => {
             )}
             {npmDevice && profilingStage === 'Configuration' && (
                 <ConfigurationDialog
-                    npmDevice={npmDevice}
                     isVisible={!abortAction && !confirmCloseDialogOpen}
                 />
             )}

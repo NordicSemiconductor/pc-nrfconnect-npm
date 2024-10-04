@@ -55,7 +55,7 @@ export class ChargerGet {
         this.sendCommand('npmx charger termination_current get');
     }
     batLim() {
-        this.sendCommand('npmx charger discharging_current get');
+        this.sendCommand('npm_adc fullscale get');
     }
     enabledRecharging() {
         this.sendCommand('npmx charger module recharge get');
