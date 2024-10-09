@@ -39,9 +39,12 @@ export default ({ active }: PaneProps) => {
             className="masonry-layout min-height-cards"
             minWidth={300}
         >
-            <BatteryCard disabled={disabled} />
-            <BatteryStatusCard disabled={disabled} />
-
+            {npmDevice && (
+                <>
+                    <BatteryCard disabled={disabled} />
+                    <BatteryStatusCard disabled={disabled} />
+                </>
+            )}
             {npmDevice &&
                 boosts.map((boost, index) => (
                     <BoostCard

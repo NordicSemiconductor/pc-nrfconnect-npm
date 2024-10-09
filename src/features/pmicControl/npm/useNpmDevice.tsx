@@ -673,55 +673,72 @@ export default () => {
     }, [dispatch, pmicState]);
 
     useEffect(() => {
-        if (npmDevice) {
-            setTimeout(() => {
-                dispatch(
-                    setPaneHidden({
-                        name: 'Charger',
-                        hidden: npmDevice.chargerModule === undefined,
-                    })
-                );
-                dispatch(
-                    setPaneHidden({
-                        name: 'Regulators',
-                        hidden:
-                            npmDevice.boostModule.length <= 0 &&
-                            npmDevice.buckModule.length <= 0 &&
-                            npmDevice.ldoModule.length <= 0, // TODO change to use ldoModule
-                    })
-                );
-                dispatch(
-                    setPaneHidden({
-                        name: 'GPIOs',
-                        hidden: npmDevice.gpioModule.length <= 0,
-                    })
-                );
-                dispatch(
-                    setPaneHidden({
-                        name: 'System Features',
-                        hidden:
-                            npmDevice.lowPowerModule === undefined &&
-                            npmDevice.resetModule === undefined &&
-                            npmDevice.timerConfigModule === undefined &&
-                            npmDevice.pofModule === undefined &&
-                            npmDevice.usbCurrentLimiterModule === undefined &&
-                            !SupportsErrorLogs(npmDevice),
-                    })
-                );
-                dispatch(
-                    setPaneHidden({
-                        name: 'MEE',
-                        hidden: !npmDevice.hasMaxEnergyExtraction(),
-                    })
-                );
-                dispatch(
-                    setPaneHidden({
-                        name: 'Profiles',
-                        hidden: npmDevice.getBatteryProfiler === undefined,
-                    })
-                );
-            });
-        }
+        // Need to be debounced... for reasons
+        setTimeout(() => {
+            dispatch(
+                setPaneHidden({
+                    name: 'Dashboard',
+                    hidden:
+                        !npmDevice?.chargerModule &&
+                        !npmDevice?.boostModule?.length &&
+                        !npmDevice?.buckModule?.length &&
+                        !npmDevice?.ldoModule?.length &&
+                        !npmDevice?.hasMaxEnergyExtraction?.(),
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'Graph',
+                    hidden: !npmDevice,
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'Charger',
+                    hidden: !npmDevice?.chargerModule,
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'Regulators',
+                    hidden:
+                        !npmDevice?.boostModule?.length &&
+                        !npmDevice?.buckModule?.length &&
+                        !npmDevice?.ldoModule?.length, // TODO change to use ldoModule
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'GPIOs',
+                    hidden: !npmDevice?.gpioModule?.length,
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'System Features',
+                    hidden:
+                        !npmDevice?.lowPowerModule &&
+                        !npmDevice?.resetModule &&
+                        !npmDevice?.timerConfigModule &&
+                        !npmDevice?.pofModule &&
+                        !npmDevice?.usbCurrentLimiterModule &&
+                        (!npmDevice ||
+                            (npmDevice && !SupportsErrorLogs(npmDevice))),
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'MEE',
+                    hidden: !npmDevice?.hasMaxEnergyExtraction?.(),
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'Profiles',
+                    hidden: !npmDevice?.getBatteryProfiler,
+                })
+            );
+        });
     }, [dispatch, npmDevice, pmicState]);
 
     useEffect(() => {
