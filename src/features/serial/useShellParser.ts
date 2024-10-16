@@ -10,7 +10,7 @@ import {
     shellParser as ShellParser,
     xTerminalShellParserWrapper,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { Terminal } from 'xterm-headless';
+import { Terminal } from '@xterm/headless';
 
 import { noop } from '../pmicControl/npm/pmicHelpers';
 import useNpmDevice from '../pmicControl/npm/useNpmDevice';
