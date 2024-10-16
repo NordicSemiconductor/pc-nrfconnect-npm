@@ -1,3 +1,10 @@
+## 1.3.1 - 2024-08-12
+
+### Changed
+
+-   Updated firmware to v1.2.4.
+-   USB is now detected when VBUSIN power is applied without CC lines present.
+
 ## 1.3.0 - 2024-06-10
 
 ### Added
