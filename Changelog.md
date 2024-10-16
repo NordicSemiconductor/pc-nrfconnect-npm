@@ -3,6 +3,8 @@
 ### Changed
 
 -   Updated `nrfutil device` to v2.6.4.
+-   Updated firmware to v1.2.4.
+-   USB is now detected when VBUSIN power is applied without CC lines present.
 
 ## 1.3.0 - 2024-06-10
 
