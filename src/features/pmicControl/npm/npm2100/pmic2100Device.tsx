@@ -143,6 +143,11 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     };
 
     const processModulePmicIrq = ({ message }: LoggingEvent) => {
+        // Handle timer expiry interrupt and emit event
+        if (message === 'SYS_TIMER_EXPIRY') {
+            eventEmitter.emit('onTimerExpiryInterrupt', message);
+            return;
+        }
         const messageParts = message.split(',');
         const event: IrqEvent = {
             type: '',
@@ -158,6 +163,8 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                     event.event = pair[1];
                     break;
             }
+
+            // handle event!!
         });
     };
 

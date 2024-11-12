@@ -284,6 +284,13 @@ export default () => {
             );
 
             releaseAll.push(
+                npmDevice.onTimerExpiryInterrupt(payload => {
+                    console.log(`Got onTimerExpiryINterrupt with ${payload}`);
+                    dispatch(updateTimerConfig({ enabled: false }));
+                })
+            );
+
+            releaseAll.push(
                 npmDevice.onUsbPower(payload => {
                     dispatch(updateUsbPower(payload));
                 })

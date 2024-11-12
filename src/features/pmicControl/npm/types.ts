@@ -667,6 +667,9 @@ export type BaseNpmDevice = {
     onBatteryAddonBoardIdUpdate: (
         handler: (batteryAddonBoardId: number, error?: string) => void
     ) => () => void;
+    onTimerExpiryInterrupt: (
+        handler: (payload: string, error?: string) => void
+    ) => () => void;
     onBoostUpdate: (
         handler: (payload: PartialUpdate<Boost>, error?: string) => void
     ) => () => void;
