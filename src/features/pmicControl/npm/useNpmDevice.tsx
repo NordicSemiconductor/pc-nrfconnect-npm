@@ -53,6 +53,7 @@ import {
     setShipModeConfig,
     setStoredBatterModel,
     setSupportedVersion,
+    setTimerConfig,
     setUsbPower,
     updateBoost,
     updateBuck,
@@ -507,6 +508,7 @@ export default () => {
             dispatch(setPOFs(npmDevice.pofModule?.defaults));
             dispatch(setShipModeConfig(npmDevice.shipModeModule?.defaults));
             dispatch(setUsbPower(npmDevice.usbCurrentLimiterModule?.defaults));
+            dispatch(setTimerConfig(npmDevice.timerConfigModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());

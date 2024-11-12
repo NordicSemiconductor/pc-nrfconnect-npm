@@ -48,3 +48,10 @@ export const nPM2100LoadSwitchSoftStartValues = [
 ] as const; // Default 75
 export type nPM2100LoadSwitchSoftStart =
     (typeof nPM2100LoadSwitchSoftStartValues)[number];
+
+export enum npm2100TimerMode {
+    'General Purpose' = 'GENERAL_PURPOSE',
+    'Watchdog reset' = 'WATCHDOG_RESET',
+    'Watchdog power cycle' = 'WATCHDOG_POWER_CYCLE',
+    'Wake up' = 'WAKE-UP',
+}

@@ -25,6 +25,7 @@ import {
     POF,
     ShipModeConfig,
     TimerConfig,
+    TimerMode,
     USBPower,
 } from './npm/types';
 
@@ -65,7 +66,7 @@ const initialState: pmicControlState = {
     gpios: [],
     leds: [],
     timerConfig: {
-        mode: 'Boot monitor',
+        mode: 'Boot monitor' as TimerMode,
         prescaler: 'Slow',
         period: 0,
     },

@@ -575,7 +575,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update timerConfigPrescaler', () => {
-        pmic.timerConfigModule?.get.prescaler();
+        pmic.timerConfigModule?.get.prescaler!();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

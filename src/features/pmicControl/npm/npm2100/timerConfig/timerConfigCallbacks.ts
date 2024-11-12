@@ -10,15 +10,13 @@ import {
     noop,
     NpmEventEmitter,
     parseColonBasedAnswer,
-    parseToNumber,
+    parseToFloat,
+    selectFromTypeValues,
     toRegex,
+    toValueRegexString,
 } from '../../pmicHelpers';
-import {
-    npm1300TimerMode,
-    TimerConfig,
-    TimerMode,
-    TimerPrescalerValues,
-} from '../../types';
+import { TimerConfig } from '../../types';
+import { npm2100TimerMode } from '../types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -26,41 +24,31 @@ export default (
 ) => {
     const cleanupCallbacks = [];
 
+    // Mode
     if (shellParser) {
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx timer config mode', true, undefined, '[0-4]'),
-                res => {
-                    const enumKey = Object.keys(npm1300TimerMode)[
-                        Object.values(npm1300TimerMode).findIndex(
-                            v => v === parseColonBasedAnswer(res)
-                        )
-                    ] as keyof typeof npm1300TimerMode;
-
-                    eventEmitter.emitPartialEvent<TimerConfig>(
-                        'onTimerConfigUpdate',
-                        {
-                            mode: enumKey as TimerMode,
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
                 toRegex(
-                    'npmx timer config prescaler',
+                    'npm2100 timer mode',
                     true,
                     undefined,
-                    '[0-1]'
+                    toValueRegexString(
+                        Object.keys(npm2100TimerMode).map(
+                            key =>
+                                npm2100TimerMode[
+                                    key as keyof typeof npm2100TimerMode
+                                ]
+                        )
+                    )
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<TimerConfig>(
                         'onTimerConfigUpdate',
                         {
-                            prescaler: TimerPrescalerValues[parseToNumber(res)],
+                            mode: selectFromTypeValues(
+                                parseColonBasedAnswer(res),
+                                Object.values(npm2100TimerMode)
+                            ) as npm2100TimerMode,
                         }
                     );
                 },
@@ -68,14 +56,40 @@ export default (
             )
         );
 
+        // State (enabled)
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx timer config compare', true),
+                toRegex(
+                    'npm2100 timer state',
+                    true,
+                    undefined,
+                    toValueRegexString(['ENABLE', 'DISABLE', 'BUSY', 'IDLE'])
+                ),
                 res => {
                     eventEmitter.emitPartialEvent<TimerConfig>(
                         'onTimerConfigUpdate',
                         {
-                            period: parseToNumber(res),
+                            enabled:
+                                parseColonBasedAnswer(res).toUpperCase() ===
+                                    'ENABLE' ||
+                                parseColonBasedAnswer(res).toUpperCase() ===
+                                    'BUSY',
+                        }
+                    );
+                },
+                noop
+            )
+        );
+
+        // Period
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm2100 timer period', true),
+                res => {
+                    eventEmitter.emitPartialEvent<TimerConfig>(
+                        'onTimerConfigUpdate',
+                        {
+                            period: parseToFloat(res) * 1000,
                         }
                     );
                 },

@@ -49,6 +49,7 @@ export default ({ active }: PaneProps) => {
                 <Timer
                     timerConfigModule={npmDevice.timerConfigModule}
                     timerConfig={timerConfig}
+                    deviceType={npmDevice.getDeviceType()}
                     disabled={disabled}
                 />
             )}

@@ -79,6 +79,9 @@ export const parseColonBasedAnswer = (message: string) => {
 export const parseToNumber = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10);
 
+export const parseToFloat = (message: string) =>
+    Number.parseFloat(parseColonBasedAnswer(message));
+
 export const parseToBoolean = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10) === 1;
 

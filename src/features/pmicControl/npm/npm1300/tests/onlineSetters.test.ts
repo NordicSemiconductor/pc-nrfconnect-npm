@@ -6,11 +6,11 @@
 
 import {
     LEDModeValues,
+    npm1300TimerMode,
     NTCThermistor,
     PmicDialog,
     POFPolarityValues,
     SoftStartValues,
-    TimerModeValues,
     TimerPrescalerValues,
 } from '../../types';
 import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
@@ -1199,23 +1199,27 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnPOFUpdate).toBeCalledTimes(0);
         });
 
-        test.each(TimerModeValues.map((mode, index) => ({ mode, index })))(
-            'Set timer config mode %p',
-            async ({ mode, index }) => {
-                await pmic.timerConfigModule?.set.mode(mode);
+        test.each(
+            Object.keys(npm1300TimerMode).map((modeKey, index) => ({
+                modeKey,
+                index,
+            }))
+        )('Set timer config mode %p', async ({ modeKey, index }) => {
+            const mode =
+                npm1300TimerMode[modeKey as keyof typeof npm1300TimerMode];
+            await pmic.timerConfigModule?.set.mode(mode);
 
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx timer config mode set ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx timer config mode set ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
 
-                // Updates should only be emitted when we get response
-                expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-            }
-        );
+            // Updates should only be emitted when we get response
+            expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
+        });
 
         test.each(
             TimerPrescalerValues.map((prescaler, index) => ({
@@ -1223,7 +1227,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 index,
             }))
         )('Set timer config mode %p', async ({ prescaler, index }) => {
-            await pmic.timerConfigModule?.set.prescaler(prescaler);
+            await pmic.timerConfigModule?.set.prescaler!(prescaler);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -3106,15 +3110,22 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnPOFUpdate).toBeCalledTimes(0);
         });
 
-        test.each(TimerModeValues.map((mode, index) => ({ mode, index })))(
+        test.each(
+            Object.keys(npm1300TimerMode).map((modeKey, index) => ({
+                modeKey,
+                index,
+            }))
+        )(
             'Set setTimerConfigMode - Fail immediately - index: %p',
-            async ({ mode, index }) => {
+            async ({ modeKey, index }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
                     }
                 );
 
+                const mode =
+                    npm1300TimerMode[modeKey as keyof typeof npm1300TimerMode];
                 await expect(
                     pmic.timerConfigModule?.set.mode(mode)
                 ).rejects.toBeUndefined();
@@ -3156,7 +3167,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.timerConfigModule?.set.prescaler(prescaler)
+                    pmic.timerConfigModule?.set.prescaler!(prescaler)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
