@@ -42,7 +42,7 @@ This side panel area contains the following buttons:
 | ------------------------ | ----------- |
 | **Export Configuration** | Export the PMIC configuration based on the nPM PowerUP application settings. You can save the configuration to an `.overlay` file for [use in the nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/pmic/npm1300.html#importing_an_overlay_from_npm_powerup) or to a JSON file for later use in nPM PowerUP.</br></br>You can also set the configuration before you select a device and export it to a file ([Offline Mode](#offline-mode-actions)). |
 | **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device ([Offline Mode](#offline-mode-actions)).  |
-| **Open Serial Terminal** | Open the [nRF Connect Serial Terminal](https://docs.nordicsemi.com/bundle/nrf-connect-serial-terminal/page/index.html) application in a separate window. Make sure to first [install the application](). |
+| **Open Serial Terminal** | Open the [Serial Terminal app](https://docs.nordicsemi.com/bundle/nrf-connect-serial-terminal/page/index.html) application in a separate window. Make sure to first [install the application](). |
 | **Reset Device**         | Reset the PMIC device and the nPM Controller. The PMIC default device configuration is restored.  |
 | **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory. |
 
