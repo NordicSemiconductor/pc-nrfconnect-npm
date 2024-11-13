@@ -816,7 +816,7 @@ export type NpmDevice = {
         handler: (success: ProfileDownload, error?: string) => void
     ) => () => void;
 
-    startAdcSample: (intervalMs: number, samplingRate: number) => void;
+    startAdcSample: (intervalMs: number, samplingRate: number) => Promise<void>;
     stopAdcSample: () => void;
 
     ledDefaults: () => LED[];

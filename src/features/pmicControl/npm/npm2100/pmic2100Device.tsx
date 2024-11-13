@@ -182,9 +182,14 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
-    const startAdcSample = (intervalMs: number, samplingRate: number) => {
-        sendCommand(`npm_adc sample ${samplingRate} ${intervalMs}`);
-    };
+    const startAdcSample = (intervalMs: number, samplingRate: number) =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `npm_adc sample ${samplingRate} ${intervalMs}`,
+                () => resolve(),
+                () => reject()
+            );
+        });
 
     const stopAdcSample = () => {
         sendCommand(`npm_adc sample 0`);
@@ -224,25 +229,23 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
-    const initializeFuelGauge = async () => {
-        if (offlineMode) return;
-
-        await boostModule[0].set.modeControl('HP');
-        const t = setTimeout(() => {
-            // clean up release callback
-            const index = releaseAll.findIndex(fn => fn === clearAction);
-            if (index) releaseAll.splice(index);
-
-            fuelGaugeModule.actions.reset();
-            boostModule[0].set.modeControl('AUTO');
-        }, 500);
-
-        const clearAction = () => {
-            clearTimeout(t);
-        };
-
-        // add release callback to cancel event if object is released
-        releaseAll.push(clearAction);
+    const initializeFuelGauge = () => {
+        if (offlineMode) return Promise.resolve();
+        return new Promise<void>(resolve => {
+            startAdcSample(1000, 500).then(async () => {
+                await boostModule[0].set.modeControl('HP');
+                const waiterA = baseDevice.onAdcSample(async () => {
+                    waiterA();
+                    await fuelGaugeModule.actions.reset();
+                    const waiterB = baseDevice.onAdcSample(() => {
+                        waiterB();
+                        boostModule[0].set.modeControl('AUTO');
+                        startAdcSample(2000, 500);
+                        resolve();
+                    });
+                });
+            });
+        });
     };
 
     const offlineMode = !shellParser;
