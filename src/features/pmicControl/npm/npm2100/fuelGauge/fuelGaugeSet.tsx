@@ -22,6 +22,7 @@ export class FuelGaugeSet {
             unique?: boolean
         ) => void,
         private offlineMode: boolean,
+        private initializeFuelGauge: () => Promise<void>,
         private dialogHandler?: ((dialog: PmicDialog) => void) | null
     ) {
         this.get = new FuelGaugeGet(sendCommand);
@@ -39,7 +40,12 @@ export class FuelGaugeSet {
             } else {
                 this.sendCommand(
                     `fuel_gauge set ${enabled ? '1' : '0'}`,
-                    () => resolve(),
+                    () => {
+                        resolve();
+                        if (enabled) {
+                            this.initializeFuelGauge();
+                        }
+                    },
                     () => {
                         this.get.enabled();
                         reject();

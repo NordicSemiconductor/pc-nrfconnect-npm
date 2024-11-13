@@ -8,6 +8,12 @@ import { LEDModeValues, PmicDialog } from '../../types';
 import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
 import { helpers, PMIC_2100_GPIOS, setupMocksWithShellParser } from './helpers';
 
+jest.useFakeTimers();
+jest.spyOn(global, 'setTimeout');
+jest.spyOn(global, 'clearTimeout');
+const systemTime = new Date('2020-01-01');
+jest.setSystemTime(systemTime);
+
 describe('PMIC 2100 - Setters Online tests', () => {
     const {
         mockDialogHandler,
@@ -22,6 +28,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
         beforeEach(() => {
             jest.clearAllMocks();
 
+            jest.setSystemTime(systemTime);
             mockEnqueueRequest.mockImplementation(
                 helpers.registerCommandCallbackSuccess
             );
@@ -170,23 +177,62 @@ describe('PMIC 2100 - Setters Online tests', () => {
             expect(mockOnLEDUpdate).toBeCalledTimes(0);
         });
 
-        test.each([true, false])(
-            'Set setFuelGaugeEnabled enabled: %p',
-            async enabled => {
-                await pmic.fuelGaugeModule.set.enabled(enabled);
+        test('Set setFuelGaugeEnabled enabled: false', async () => {
+            await pmic.fuelGaugeModule.set.enabled(false);
 
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `fuel_gauge set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `fuel_gauge set 0`,
+                expect.anything(),
+                undefined,
+                true
+            );
 
-                // Updates should only be emitted when we get response
-                expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
-        );
+            // Updates should only be emitted when we get response
+            expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
+        });
+
+        test('Set setFuelGaugeEnabled enabled: true', async () => {
+            await pmic.fuelGaugeModule.set.enabled(true);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(2);
+            expect(mockEnqueueRequest).nthCalledWith(
+                1,
+                `fuel_gauge set 1`,
+                expect.anything(),
+                undefined,
+                true
+            );
+            // init fuel gauge with some load NCD-1074
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npm2100 boost mode set HP`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            jest.runAllTimers();
+
+            expect(mockEnqueueRequest).toBeCalledTimes(4);
+            expect(mockEnqueueRequest).nthCalledWith(
+                3,
+                `fuel_gauge reset`,
+                expect.anything(),
+                undefined,
+                true
+            );
+            expect(mockEnqueueRequest).nthCalledWith(
+                4,
+                `npm2100 boost mode set AUTO`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
+        });
 
         test.skip('Set setActiveBatteryModel', async () => {
             await pmic.fuelGaugeModule.set.activeBatteryModel(

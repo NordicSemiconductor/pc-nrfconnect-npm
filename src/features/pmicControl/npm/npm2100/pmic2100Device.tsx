@@ -224,6 +224,27 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
+    const initializeFuelGauge = async () => {
+        if (offlineMode) return;
+
+        await boostModule[0].set.modeControl('HP');
+        const t = setTimeout(() => {
+            // clean up release callback
+            const index = releaseAll.findIndex(fn => fn === clearAction);
+            if (index) releaseAll.splice(index);
+
+            fuelGaugeModule.actions.reset();
+            boostModule[0].set.modeControl('AUTO');
+        }, 500);
+
+        const clearAction = () => {
+            clearTimeout(t);
+        };
+
+        // add release callback to cancel event if object is released
+        releaseAll.push(clearAction);
+    };
+
     const offlineMode = !shellParser;
 
     const ldoModule = setupLdo(
@@ -246,7 +267,8 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         eventEmitter,
         sendCommand,
         dialogHandler,
-        offlineMode
+        offlineMode,
+        initializeFuelGauge
     );
 
     const batteryModule = getBatteryModule(
@@ -436,6 +458,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
     return {
         ...baseDevice,
+        initialize: async () => {
+            await initializeFuelGauge();
+        },
         release: () => {
             baseDevice.release();
             releaseAll.forEach(release => release());

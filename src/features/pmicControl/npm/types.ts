@@ -772,6 +772,8 @@ export type BaseNpmDevice = {
         handler: (payload: PartialUpdate<Ldo>, error?: string) => void
     ) => () => void;
 
+    initialize: () => Promise<void>;
+
     hasMaxEnergyExtraction: () => boolean;
     getNumberOfLEDs: () => number;
     getNumberOfBatteryModelSlots: () => number;
