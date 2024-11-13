@@ -105,7 +105,7 @@ describe('PMIC 2100 - Setters Offline tests', () => {
     );
 
     test('Set setFuelGaugeEnabled', async () => {
-        await pmic.setFuelGaugeEnabled(false);
+        await pmic.fuelGaugeModule.set.enabled(false);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
         expect(mockOnFuelGaugeUpdate).toBeCalledWith(false);

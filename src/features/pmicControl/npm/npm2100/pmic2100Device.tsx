@@ -35,7 +35,7 @@ import {
 } from '../types';
 import getBatteryModule from './battery';
 import getBoostModule, { numberOfBoosts } from './boost';
-import setupFuelGauge from './fuelGauge';
+import { FuelGaugeModule } from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { numberOfLdos } from './ldo';
 import setupTimer from './timerConfig';
@@ -241,7 +241,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
-    const { fuelGaugeGet, fuelGaugeSet, fuelGaugeCallbacks } = setupFuelGauge(
+    const fuelGaugeModule = new FuelGaugeModule(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -349,7 +349,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             )
         );
 
-        releaseAll.push(...fuelGaugeCallbacks);
+        releaseAll.push(...fuelGaugeModule.callbacks);
         releaseAll.push(...batteryModule.callbacks);
         releaseAll.push(...timerConfigModule.callbacks);
         releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
@@ -428,14 +428,10 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 requestUpdate.ledMode(i);
             }
 
-            requestUpdate.fuelGauge();
-            requestUpdate.activeBatteryModel();
-            requestUpdate.storedBatteryModel();
+            fuelGaugeModule.get.all();
         },
 
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
-
-        ...fuelGaugeGet,
     };
 
     return {
@@ -487,8 +483,8 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                         if (config.timerConfig)
                             await timerConfigModule.set.all(config.timerConfig);
 
-                        await fuelGaugeSet.setFuelGaugeEnabled(
-                            config.fuelGauge
+                        await fuelGaugeModule.set.enabled(
+                            config.fuelGaugeSettings.enabled
                         );
                     } catch (error) {
                         // TODO
@@ -555,7 +551,6 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         requestUpdate,
 
         setLedMode,
-        ...fuelGaugeSet,
 
         getHardcodedBatteryModels: () =>
             new Promise<BatteryModel[]>((resolve, reject) => {
@@ -606,6 +601,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         // Default settings
         ledDefaults: () => ledDefaults(devices.noOfLEDs),
 
+        fuelGaugeModule,
         boostModule,
         gpioModule,
         ldoModule,

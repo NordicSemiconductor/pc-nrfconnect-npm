@@ -132,7 +132,7 @@ describe('PMIC 2100 - Request update commands', () => {
     );
 
     test('Request update fuelGauge', () => {
-        pmic.requestUpdate.fuelGauge();
+        pmic.fuelGaugeModule.get.enabled();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -144,7 +144,7 @@ describe('PMIC 2100 - Request update commands', () => {
     });
 
     test('Request update activeBatteryModel', () => {
-        pmic.requestUpdate.activeBatteryModel();
+        pmic.fuelGaugeModule.get.activeBatteryModel();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -156,7 +156,7 @@ describe('PMIC 2100 - Request update commands', () => {
     });
 
     test('Request update storedBatteryModel', () => {
-        pmic.requestUpdate.storedBatteryModel();
+        pmic.fuelGaugeModule.get.storedBatteryModel();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

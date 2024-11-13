@@ -155,7 +155,9 @@ export default ({ disabled }: { disabled: boolean }) => {
                 }
                 items={batteryModelItems}
                 onSelect={(item: DropdownItem) => {
-                    npmDevice?.setActiveBatteryModel(item.value);
+                    npmDevice?.fuelGaugeModule.set.activeBatteryModel(
+                        item.value
+                    );
                 }}
                 selectedItem={selectedActiveItemBatteryMode}
                 disabled={disabled || batteryModelItems.length === 0}

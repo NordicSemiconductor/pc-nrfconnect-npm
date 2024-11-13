@@ -14,7 +14,7 @@ import {
     LED,
     LEDMode,
     NpmDevice,
-    NpmExport,
+    NpmExportLatest,
     NTCThermistor,
     ShipModeConfig,
 } from '../types';
@@ -157,7 +157,7 @@ const generateMfd = (ship?: ShipModeConfig) =>
 `
         : '';
 
-export default (npmConfig: NpmExport, npmDevice: NpmDevice) => `/*
+export default (npmConfig: NpmExportLatest, npmDevice: NpmDevice) => `/*
 * Copyright (C) 2023 Nordic Semiconductor ASA
 * SPDX-License-Identifier: Apache-2.0
 */

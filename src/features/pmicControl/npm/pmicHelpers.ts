@@ -254,7 +254,7 @@ export const dialogHandler =
         dispatch(requestDialog(pmicDialog));
     };
 
-export const updateAdcTimings =
+export const updateNpm1300AdcTimings =
     ({
         samplingRate,
         chargingSamplingRate,
@@ -265,14 +265,18 @@ export const updateAdcTimings =
         reportInterval?: number;
     }): AppThunk<RootState> =>
     (_, getState) => {
+        const stateNotChargingSamplingRate =
+            getState().app.pmicControl.fuelGaugeSettings
+                .notChargingSamplingRate;
+        const stateChargingSamplingRate =
+            getState().app.pmicControl.fuelGaugeSettings.chargingSamplingRate ??
+            stateNotChargingSamplingRate;
         getState().app.pmicControl.npmDevice?.startAdcSample(
-            reportInterval ?? getState().app.pmicControl.fuelGaugeReportingRate,
+            reportInterval ??
+                getState().app.pmicControl.fuelGaugeSettings.reportingRate,
             getState().app.pmicControl.charger?.enabled
-                ? chargingSamplingRate ??
-                      getState().app.pmicControl.fuelGaugeChargingSamplingRate
-                : samplingRate ??
-                      getState().app.pmicControl
-                          .fuelGaugeNotChargingSamplingRate
+                ? chargingSamplingRate ?? stateChargingSamplingRate
+                : samplingRate ?? stateNotChargingSamplingRate
         );
     };
 

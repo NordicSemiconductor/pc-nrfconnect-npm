@@ -11,7 +11,7 @@ import {
     Ldo,
     LED,
     npm2100TimerConfig,
-    NpmExport,
+    NpmExportLatest,
     PartialUpdate,
     PmicDialog,
     POF,
@@ -98,7 +98,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         currentLimiter: 100,
     };
 
-    const sampleConfig: NpmExport = {
+    const sampleConfig: NpmExportLatest = {
         boosts: [
             {
                 vOutSoftware: 1.8,
@@ -173,13 +173,15 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             invPolarity: true,
             longPressReset: 'one_button',
         },
-        fuelGauge: true,
+        fuelGaugeSettings: {
+            enabled: true,
+        },
         firmwareVersion: npm2100FWVersion,
         deviceType: 'npm2100',
-        fuelGaugeChargingSamplingRate: 1000,
         usbPower: {
             currentLimiter: 500,
         },
+        fileFormatVersion: 2,
     };
 
     const initGPIO: GPIOExport = {

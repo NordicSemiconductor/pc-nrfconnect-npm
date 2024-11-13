@@ -13,7 +13,7 @@ import {
     PmicChargingState,
 } from '../../features/pmicControl/npm/types';
 import {
-    getFuelGauge,
+    getFuelGaugeEnabled,
     getLatestAdcSample,
     getPmicChargingState,
     isBatteryConnected,
@@ -146,7 +146,7 @@ export default ({ disabled }: BatteryProperties) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
 
-    const fuelGauge = useSelector(getFuelGauge);
+    const fuelGauge = useSelector(getFuelGaugeEnabled);
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const batteryConnected = useSelector(isBatteryConnected);

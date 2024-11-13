@@ -13,7 +13,7 @@ import {
     LED,
     npm1300TimerConfig,
     npm1300TimerMode,
-    NpmExport,
+    NpmExportLatest,
     PartialUpdate,
     PmicDialog,
     POF,
@@ -112,7 +112,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         currentLimiter: 100,
     };
 
-    const sampleConfig: NpmExport = {
+    const sampleConfig: NpmExportLatest = {
         boosts: [],
         charger: {
             vTerm: 3.5,
@@ -238,13 +238,16 @@ describe('PMIC 1300 - Apply Config ', () => {
             invPolarity: true,
             longPressReset: 'one_button',
         },
-        fuelGauge: true,
+        fuelGaugeSettings: {
+            enabled: true,
+            chargingSamplingRate: 1000,
+        },
         firmwareVersion: npm1300FWVersion,
         deviceType: 'npm1300',
-        fuelGaugeChargingSamplingRate: 1000,
         usbPower: {
             currentLimiter: 500,
         },
+        fileFormatVersion: 2,
     };
 
     const initGPIO: GPIOExport = {

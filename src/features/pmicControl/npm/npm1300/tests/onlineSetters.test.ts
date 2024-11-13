@@ -1289,7 +1289,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'Set setFuelGaugeEnabled enabled: %p',
             async enabled => {
-                await pmic.setFuelGaugeEnabled(enabled);
+                await pmic.fuelGaugeModule.set.enabled(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -1305,7 +1305,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setActiveBatteryModel', async () => {
-            await pmic.setActiveBatteryModel('someProfileName');
+            await pmic.fuelGaugeModule.set.activeBatteryModel(
+                'someProfileName'
+            );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1322,7 +1324,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'startBatteryStatusCheck enabled: %p',
             async enabled => {
-                await pmic.setBatteryStatusCheckEnabled(enabled);
+                await pmic.fuelGaugeModule.set.batteryStatusCheckEnabled(
+                    enabled
+                );
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -3286,7 +3290,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setFuelGaugeEnabled(enabled)
+                    pmic.fuelGaugeModule.set.enabled(enabled)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3313,7 +3317,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setActiveBatteryModel - Fail immediately', async () => {
             await expect(
-                pmic.setActiveBatteryModel('someProfileName')
+                pmic.fuelGaugeModule.set.activeBatteryModel('someProfileName')
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

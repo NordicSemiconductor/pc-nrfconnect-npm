@@ -20,7 +20,7 @@ import {
     selectDirectoryDialog,
 } from '../../actions/fileActions';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
-import { updateAdcTimings } from '../../features/pmicControl/npm/pmicHelpers';
+import { updateNpm1300AdcTimings as updateNpmAdcTimings } from '../../features/pmicControl/npm/pmicHelpers';
 import {
     getEventRecordingPath,
     getFuelGaugeReportingRate,
@@ -162,7 +162,7 @@ export default () => {
                     onChange={value => setFuelGaugeReportingRateInternal(value)}
                     onChangeComplete={() =>
                         dispatch(
-                            updateAdcTimings({
+                            updateNpmAdcTimings({
                                 reportInterval: fuelGaugeReportingRateInternal,
                             })
                         )
