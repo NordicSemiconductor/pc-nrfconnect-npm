@@ -38,6 +38,7 @@ import getBoostModule, { numberOfBoosts } from './boost';
 import setupFuelGauge from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { numberOfLdos } from './ldo';
+import setupTimer from './timerConfig';
 
 export const npm2100FWVersion = '0.2.2+0';
 
@@ -142,6 +143,11 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     };
 
     const processModulePmicIrq = ({ message }: LoggingEvent) => {
+        // Handle timer expiry interrupt and emit event
+        if (message === 'SYS_TIMER_EXPIRY') {
+            eventEmitter.emit('onTimerExpiryInterrupt', message);
+            return;
+        }
         const messageParts = message.split(',');
         const event: IrqEvent = {
             type: '',
@@ -157,6 +163,8 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                     event.event = pair[1];
                     break;
             }
+
+            // handle event!!
         });
     };
 
@@ -254,6 +262,13 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
+    const timerConfigModule = setupTimer(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
     const releaseAll: (() => void)[] = [];
 
     if (shellParser) {
@@ -336,6 +351,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(...fuelGaugeCallbacks);
         releaseAll.push(...batteryModule.callbacks);
+        releaseAll.push(...timerConfigModule.callbacks);
         releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
         releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
@@ -403,6 +419,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             // Request all updates for nPM2100
 
             batteryModule.get.all();
+            timerConfigModule.get.all();
             boostModule.forEach(boost => boost.get.all());
             ldoModule.forEach(ldo => ldo.get.all());
             gpioModule.forEach(module => module.get.all());
@@ -466,6 +483,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                                 })()
                             )
                         );
+
+                        if (config.timerConfig)
+                            await timerConfigModule.set.all(config.timerConfig);
 
                         await fuelGaugeSet.setFuelGaugeEnabled(
                             config.fuelGauge
@@ -589,6 +609,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         boostModule,
         gpioModule,
         ldoModule,
+        timerConfigModule,
 
         getBatteryConnectedVoltageThreshold: () => 0, // 0V
     };

@@ -11,11 +11,11 @@ import {
     LdoOnOffControlValues,
     LEDModeValues,
     LongPressResetValues,
+    npm1300TimerMode,
     NTCThermistor,
     PmicChargingState,
     POFPolarityValues,
     SoftStartValues,
-    TimerModeValues,
     TimerPrescalerValues,
     TimeToActiveValues,
     USBDetectStatusValues,
@@ -1282,18 +1282,20 @@ Battery models stored in database:
     });
 
     test.each(
-        TimerModeValues.map((mode, modeIndex) => [
-            {
-                append: `get`,
-                mode,
-                modeIndex,
-            },
-            {
-                append: `set ${modeIndex}`,
-                mode,
-                modeIndex,
-            },
-        ]).flat()
+        Object.keys(npm1300TimerMode)
+            .map((mode, modeIndex) => [
+                {
+                    append: `get`,
+                    mode,
+                    modeIndex,
+                },
+                {
+                    append: `set ${modeIndex}`,
+                    mode,
+                    modeIndex,
+                },
+            ])
+            .flat()
     )('npmx timer config mode %p', ({ append, mode, modeIndex }) => {
         const command = `npmx timer config mode ${append}`;
         const callback =

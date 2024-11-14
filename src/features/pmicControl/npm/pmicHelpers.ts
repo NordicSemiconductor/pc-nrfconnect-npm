@@ -79,6 +79,9 @@ export const parseColonBasedAnswer = (message: string) => {
 export const parseToNumber = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10);
 
+export const parseToFloat = (message: string) =>
+    Number.parseFloat(parseColonBasedAnswer(message));
+
 export const parseToBoolean = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10) === 1;
 
@@ -191,7 +194,11 @@ export const toValueRegexString = (values: readonly string[]) =>
 // Create a case ignorant regex string: 'yes' => '[yY][eE][sS]'
 export const caseIgnorantRegexString = (str: string): string =>
     Array.from(str)
-        .map(chr => `[${chr.toLowerCase()}${chr.toUpperCase()}]`)
+        .map(chr =>
+            chr.match(/[a-zA-Z]/)
+                ? `[${chr.toLowerCase()}${chr.toUpperCase()}]`
+                : chr
+        )
         .join('');
 
 export const onOffRegex = '([Oo][Nn]|[Oo][Ff][Ff])';

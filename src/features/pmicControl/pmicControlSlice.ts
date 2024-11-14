@@ -64,11 +64,6 @@ const initialState: pmicControlState = {
     ldos: [],
     gpios: [],
     leds: [],
-    timerConfig: {
-        mode: 'Boot monitor',
-        prescaler: 'Slow',
-        period: 0,
-    },
     pmicChargingState: {
         batteryFull: false,
         trickleCharge: false,
@@ -204,7 +199,7 @@ const pmicControlSlice = createSlice({
                 state.timerConfig = {
                     ...state.npmDevice.timerConfigModule.defaults,
                     ...state.timerConfig,
-                    ...action.payload,
+                    ...(action.payload as TimerConfig),
                 };
             }
         },

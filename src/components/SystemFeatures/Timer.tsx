@@ -9,6 +9,7 @@ import {
     Card,
     Dropdown,
     NumberInput,
+    Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
@@ -16,7 +17,6 @@ import {
     TimerConfig,
     TimerConfigModule,
     TimerMode,
-    TimerModeValues,
     TimerPrescaler,
     TimerPrescalerValues,
 } from '../../features/pmicControl/npm/types';
@@ -27,11 +27,6 @@ interface TimerConfigProperties {
     timerConfig: TimerConfig;
     disabled: boolean;
 }
-
-const timerModeValuesItems = TimerModeValues.map(item => ({
-    label: `${item}`,
-    value: `${item}`,
-}));
 
 const timerPrescalerItems = TimerPrescalerValues.map(item => ({
     label: `${item}`,
@@ -47,10 +42,8 @@ export default ({
         timerConfig.period
     );
 
-    const prescalerMultiplier = useMemo(
-        () => (timerConfig.prescaler === 'Fast' ? 2 : 16),
-        [timerConfig]
-    );
+    const prescalerMultiplier =
+        timerConfigModule.getPrescalerMultiplier?.(timerConfig) ?? 1;
 
     const timeString = useMemo(() => {
         const split = splitMS(internalTimerPeriod);
@@ -81,6 +74,9 @@ export default ({
 
     const card = 'timer';
 
+    const periodRange =
+        timerConfigModule.ranges.periodRange(prescalerMultiplier);
+
     return (
         <Card
             title={
@@ -91,53 +87,64 @@ export default ({
                 </div>
             }
         >
+            {'enabled' in timerConfig && timerConfigModule.set.enabled && (
+                <Toggle
+                    label={
+                        <DocumentationTooltip card={card} item="TimeState">
+                            Enable
+                        </DocumentationTooltip>
+                    }
+                    isToggled={timerConfig.enabled === true}
+                    onToggle={value => timerConfigModule.set.enabled?.(value)}
+                    disabled={disabled}
+                />
+            )}
+
             <Dropdown
                 label={
                     <DocumentationTooltip card={card} item="TimeMode">
-                        Time Mode
+                        Timer Mode
                     </DocumentationTooltip>
                 }
-                items={timerModeValuesItems}
+                items={timerConfigModule.values.mode}
                 onSelect={item =>
                     timerConfigModule.set.mode(item.value as TimerMode)
                 }
                 selectedItem={
-                    timerModeValuesItems[
-                        Math.max(
-                            0,
-                            timerModeValuesItems.findIndex(
-                                item => item.value === timerConfig.mode
-                            )
-                        ) ?? 0
-                    ]
+                    timerConfigModule.values.mode.find(
+                        item => item.value === timerConfig.mode
+                    ) ?? timerConfigModule.values.mode[0]
                 }
                 disabled={disabled}
             />
 
-            <Dropdown
-                label={
-                    <DocumentationTooltip card={card} item="TimePrescaler">
-                        Timer Prescaler
-                    </DocumentationTooltip>
-                }
-                items={timerPrescalerItems}
-                onSelect={item =>
-                    timerConfigModule.set.prescaler(
-                        item.value as TimerPrescaler
-                    )
-                }
-                selectedItem={
-                    timerPrescalerItems[
-                        Math.max(
-                            0,
-                            timerPrescalerItems.findIndex(
-                                item => item.value === timerConfig.prescaler
-                            )
-                        ) ?? 0
-                    ]
-                }
-                disabled={disabled}
-            />
+            {'prescaler' in timerConfig && timerConfigModule.set.prescaler && (
+                <Dropdown
+                    label={
+                        <DocumentationTooltip card={card} item="TimePrescaler">
+                            Timer Prescaler
+                        </DocumentationTooltip>
+                    }
+                    items={timerPrescalerItems}
+                    onSelect={item =>
+                        timerConfigModule.set.prescaler?.(
+                            item.value as TimerPrescaler
+                        )
+                    }
+                    selectedItem={
+                        timerPrescalerItems[
+                            Math.max(
+                                0,
+                                timerPrescalerItems.findIndex(
+                                    item => item.value === timerConfig.prescaler
+                                )
+                            ) ?? 0
+                        ]
+                    }
+                    disabled={disabled}
+                />
+            )}
+
             <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="TimePeriod">
@@ -148,12 +155,7 @@ export default ({
                     <span>{`ms${timeString ? ` (${timeString})` : ''}`} </span>
                 }
                 disabled={disabled}
-                range={{
-                    min: 0,
-                    max: 16777215 * prescalerMultiplier,
-                    decimals: 0,
-                    step: 1 * prescalerMultiplier,
-                }}
+                range={periodRange}
                 value={internalTimerPeriod}
                 onChange={setInternalTimerPeriod}
                 onChangeComplete={v =>

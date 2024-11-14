@@ -53,6 +53,7 @@ import {
     setShipModeConfig,
     setStoredBatterModel,
     setSupportedVersion,
+    setTimerConfig,
     setUsbPower,
     updateBoost,
     updateBuck,
@@ -283,6 +284,13 @@ export default () => {
             );
 
             releaseAll.push(
+                npmDevice.onTimerExpiryInterrupt(payload => {
+                    console.log(`Got onTimerExpiryINterrupt with ${payload}`);
+                    dispatch(updateTimerConfig({ enabled: false }));
+                })
+            );
+
+            releaseAll.push(
                 npmDevice.onUsbPower(payload => {
                     dispatch(updateUsbPower(payload));
                 })
@@ -507,6 +515,7 @@ export default () => {
             dispatch(setPOFs(npmDevice.pofModule?.defaults));
             dispatch(setShipModeConfig(npmDevice.shipModeModule?.defaults));
             dispatch(setUsbPower(npmDevice.usbCurrentLimiterModule?.defaults));
+            dispatch(setTimerConfig(npmDevice.timerConfigModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());

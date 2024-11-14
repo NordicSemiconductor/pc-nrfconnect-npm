@@ -5,13 +5,8 @@
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import {
-    npm1300TimerConfig,
-    TimerConfig,
-    TimerMode,
-    TimerPrescaler,
-    TimerPrescalerValues,
-} from '../../types';
+import { npm2100TimerConfig, TimerConfig } from '../../types';
+import { npm2100TimerMode } from '../types';
 import { TimerConfigGet } from './timerConfigGetter';
 
 export class TimerConfigSet {
@@ -29,13 +24,13 @@ export class TimerConfigSet {
         this.get = new TimerConfigGet(sendCommand);
     }
 
-    async all(timerConfig: npm1300TimerConfig) {
-        await this.mode(timerConfig.mode);
-        await this.prescaler(timerConfig.prescaler);
+    async all(timerConfig: npm2100TimerConfig) {
+        await this.mode(timerConfig.mode as npm2100TimerMode);
+        await this.enabled(timerConfig.enabled);
         await this.period(timerConfig.period);
     }
 
-    mode(mode: TimerMode) {
+    mode(mode: npm2100TimerMode) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<TimerConfig>(
@@ -47,7 +42,7 @@ export class TimerConfigSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx timer config mode set ${mode}`,
+                    `npm2100 timer mode set ${mode}`,
                     () => resolve(),
                     () => {
                         this.get.mode();
@@ -58,24 +53,22 @@ export class TimerConfigSet {
         });
     }
 
-    prescaler(prescaler: TimerPrescaler) {
+    enabled(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<TimerConfig>(
                     'onTimerConfigUpdate',
                     {
-                        prescaler,
+                        enabled,
                     }
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx timer config prescaler set ${TimerPrescalerValues.findIndex(
-                        p => p === prescaler
-                    )}`,
+                    `npm2100 timer state set ${enabled ? 'ENABLE' : 'DISABLE'}`,
                     () => resolve(),
                     () => {
-                        this.get.prescaler();
+                        this.get.state();
                         reject();
                     }
                 );
@@ -89,13 +82,13 @@ export class TimerConfigSet {
                 this.eventEmitter.emitPartialEvent<TimerConfig>(
                     'onTimerConfigUpdate',
                     {
-                        period,
+                        period: period / 1000,
                     }
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx timer config compare set ${period}`,
+                    `npm2100 timer period set ${period / 1000}`,
                     () => resolve(),
                     () => {
                         this.get.period();

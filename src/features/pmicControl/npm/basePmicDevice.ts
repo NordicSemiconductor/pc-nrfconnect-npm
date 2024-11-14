@@ -184,6 +184,9 @@ export const baseNpmDevice: IBaseNpmDevice = (
         onBatteryAddonBoardIdUpdate: setupHandler<number, true>(
             'onBatteryAddonBoardIdUpdate'
         ),
+        onTimerExpiryInterrupt: setupHandler<string, true>(
+            'onTimerExpiryInterrupt'
+        ),
         onBoostUpdate: setupHandler<PartialUpdate<Boost>, true>(
             'onBoostUpdate'
         ),

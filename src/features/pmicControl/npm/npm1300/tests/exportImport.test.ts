@@ -11,6 +11,8 @@ import {
     GPIOExport,
     Ldo,
     LED,
+    npm1300TimerConfig,
+    npm1300TimerMode,
     NpmExport,
     PartialUpdate,
     PmicDialog,
@@ -95,7 +97,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     };
 
     const initTimerConfig: TimerConfig = {
-        mode: 'Boot monitor',
+        mode: npm1300TimerMode['Boot monitor'],
         prescaler: 'Slow',
         period: 0,
     };
@@ -227,7 +229,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             polarity: 'Active low',
         },
         timerConfig: {
-            mode: 'General purpose',
+            mode: npm1300TimerMode['General purpose'],
             prescaler: 'Fast',
             period: 10,
         },
@@ -346,7 +348,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 timerConfig = {
                     ...timerConfig,
                     ...partialUpdate,
-                };
+                } as npm1300TimerConfig;
             }
         );
 

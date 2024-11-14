@@ -7,7 +7,8 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { npm1300TimerMode, TimerConfig, TimerConfigModule } from '../../types';
+import { TimerConfigModule } from '../../types';
+import { npm2100TimerMode } from '../types';
 import timerCallbacks from './timerConfigCallbacks';
 import { TimerConfigGet } from './timerConfigGetter';
 import { TimerConfigSet } from './timerConfigSetter';
@@ -25,36 +26,26 @@ export default (
     get: new TimerConfigGet(sendCommand),
     set: new TimerConfigSet(eventEmitter, sendCommand, offlineMode),
     values: {
-        mode: Object.keys(npm1300TimerMode).map(key => ({
+        mode: Object.keys(npm2100TimerMode).map(key => ({
             label: `${key}`,
-            value: npm1300TimerMode[key as keyof typeof npm1300TimerMode],
+            value: npm2100TimerMode[key as keyof typeof npm2100TimerMode],
         })),
     },
     callbacks: timerCallbacks(shellParser, eventEmitter),
     ranges: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         periodRange: prescalerMultiplier => ({
             min: 0,
-            max: 16777215 * prescalerMultiplier,
-            decimals: 0,
-            step: 1 * prescalerMultiplier,
+            // max: 16777215 * prescalerMultiplier,
+            max: 262143 * 1000,
+            decimals: 3,
+            // step: 1 * prescalerMultiplier,
+            step: 1,
         }),
     },
     defaults: {
-        mode: npm1300TimerMode['Boot monitor'], // Boot monitor is default
-        prescaler: 'Slow',
+        enabled: false,
+        mode: npm2100TimerMode['General Purpose'],
         period: 0,
-    },
-
-    getPrescalerMultiplier: (timerConfig: TimerConfig) => {
-        if ('prescaler' in timerConfig) {
-            switch (timerConfig.prescaler) {
-                case 'Slow':
-                    return 16;
-                case 'Fast':
-                    return 2;
-            }
-        } else {
-            return 16;
-        }
     },
 });

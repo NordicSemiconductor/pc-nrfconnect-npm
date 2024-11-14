@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { PmicDialog } from '../../types';
+import { npm1300TimerMode, PmicDialog } from '../../types';
 import { GPIOMode1300, GPIOPull1300 } from '../gpio/types';
 import {
     PMIC_1300_BUCKS,
@@ -396,14 +396,16 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set timer config mode ', async () => {
-        await pmic.timerConfigModule?.set.mode('Wakeup');
+        await pmic.timerConfigModule?.set.mode(npm1300TimerMode.Wakeup);
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
-        expect(mockOnTimerConfigUpdate).toBeCalledWith({ mode: 'Wakeup' });
+        expect(mockOnTimerConfigUpdate).toBeCalledWith({
+            mode: npm1300TimerMode.Wakeup,
+        });
     });
 
     test('Set set timer config prescaler ', async () => {
-        await pmic.timerConfigModule?.set.prescaler('Fast');
+        await pmic.timerConfigModule?.set.prescaler!('Fast');
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ prescaler: 'Fast' });

@@ -24,6 +24,7 @@ import {
     nPM2100LdoModeControl,
     nPM2100LDOSoftStart,
     nPM2100LoadSwitchSoftStart,
+    npm2100TimerMode,
 } from './npm2100/types';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
@@ -221,21 +222,28 @@ export type POF = {
     threshold: number;
 };
 
-export const TimerModeValues = [
-    'Boot monitor',
-    'Watchdog warning',
-    'Watchdog reset',
-    'General purpose',
-    'Wakeup',
-] as const;
-export type TimerMode = (typeof TimerModeValues)[number];
+export enum npm1300TimerMode {
+    'Boot monitor' = '0',
+    'Watchdog warning' = '1',
+    'Watchdog reset' = '2',
+    'General purpose' = '3',
+    'Wakeup' = '4',
+}
+export type TimerMode = npm1300TimerMode | npm2100TimerMode;
 
 export const TimerPrescalerValues = ['Slow', 'Fast'] as const;
 export type TimerPrescaler = (typeof TimerPrescalerValues)[number];
 
-export type TimerConfig = {
-    mode: TimerMode;
+export type TimerConfig = npm1300TimerConfig | npm2100TimerConfig;
+
+export type npm1300TimerConfig = {
+    mode: npm1300TimerMode;
     prescaler: TimerPrescaler;
+    period: number;
+};
+export type npm2100TimerConfig = {
+    mode: npm2100TimerMode;
+    enabled: boolean;
     period: number;
 };
 
@@ -588,17 +596,26 @@ export type TimerConfigModule = {
     get: {
         all: () => void;
         mode: () => void;
-        prescaler: () => void;
+        prescaler?: () => void;
+        enabled?: () => void;
         period: () => void;
     };
     set: {
         all(timerConfig: TimerConfig): Promise<void>;
         mode(mode: TimerMode): Promise<void>;
-        prescaler(prescaler: TimerPrescaler): Promise<void>;
+        prescaler?(prescaler: TimerPrescaler): Promise<void>;
+        enabled?(enabled: boolean): Promise<void>;
         period(period: number): Promise<void>;
     };
+    values: {
+        mode: { label: string; value: TimerMode }[];
+    };
     callbacks: (() => void)[];
+    ranges: {
+        periodRange: (prescalerMultiplier: number) => RangeType;
+    };
     defaults: TimerConfig;
+    getPrescalerMultiplier?: (timerConfig: TimerConfig) => number;
 };
 
 export type ShipModeModule = {
@@ -656,6 +673,9 @@ export type BaseNpmDevice = {
     ) => () => void;
     onBatteryAddonBoardIdUpdate: (
         handler: (batteryAddonBoardId: number, error?: string) => void
+    ) => () => void;
+    onTimerExpiryInterrupt: (
+        handler: (payload: string, error?: string) => void
     ) => () => void;
     onBoostUpdate: (
         handler: (payload: PartialUpdate<Boost>, error?: string) => void
