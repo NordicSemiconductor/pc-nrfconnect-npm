@@ -145,7 +145,6 @@ export default ({
                 />
             )}
 
-            <p>Prescaler {prescalerMultiplier}</p>
             <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="TimePeriod">
