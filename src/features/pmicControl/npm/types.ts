@@ -237,12 +237,12 @@ export type TimerPrescaler = (typeof TimerPrescalerValues)[number];
 export type TimerConfig = npm1300TimerConfig | npm2100TimerConfig;
 
 export type npm1300TimerConfig = {
-    mode: TimerMode;
+    mode: npm1300TimerMode;
     prescaler: TimerPrescaler;
     period: number;
 };
 export type npm2100TimerConfig = {
-    mode: TimerMode;
+    mode: npm2100TimerMode;
     enabled: boolean;
     period: number;
 };

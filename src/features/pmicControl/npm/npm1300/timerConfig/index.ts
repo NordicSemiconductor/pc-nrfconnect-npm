@@ -7,12 +7,7 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import {
-    npm1300TimerMode,
-    TimerConfig,
-    TimerConfigModule,
-    TimerMode,
-} from '../../types';
+import { npm1300TimerMode, TimerConfig, TimerConfigModule } from '../../types';
 import timerCallbacks from './timerConfigCallbacks';
 import { TimerConfigGet } from './timerConfigGetter';
 import { TimerConfigSet } from './timerConfigSetter';
@@ -45,7 +40,7 @@ export default (
         }),
     },
     defaults: {
-        mode: npm1300TimerMode['Boot monitor'] as TimerMode, // Boot monitor is default
+        mode: npm1300TimerMode['Boot monitor'], // Boot monitor is default
         prescaler: 'Slow',
         period: 0,
     },

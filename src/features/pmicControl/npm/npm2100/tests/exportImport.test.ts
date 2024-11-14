@@ -10,7 +10,6 @@ import {
     GPIOExport,
     Ldo,
     LED,
-    npm1300TimerMode,
     npm2100TimerConfig,
     NpmExport,
     PartialUpdate,
@@ -85,7 +84,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
 
     const initTimerConfig: TimerConfig = {
         enabled: false,
-        mode: npm1300TimerMode['Boot monitor'],
+        mode: npm2100TimerMode['Wake up'],
         period: 0,
     };
 
