@@ -1,3 +1,9 @@
+## 2.0.0-alpha2 - 2024-11-14
+
+### Changed
+
+-   Updated `nrfutil device` to v2.7.3.
+
 ## 2.0.0-alpha1 - 2024-09-25
 
 ### Added

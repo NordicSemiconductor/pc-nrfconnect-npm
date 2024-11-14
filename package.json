@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-npm",
-    "version": "2.0.0-alpha1",
+    "version": "2.0.0-alpha2",
     "description": "Evaluate and implement Nordic's PMICs",
     "displayName": "nPM PowerUP",
     "homepage": "https://github.com/NordicPlayground/pc-nrfconnect-npm",
@@ -11,13 +11,13 @@
     "author": "Nordic Semiconductor ASA",
     "license": "SEE LICENSE IN LICENSE",
     "engines": {
-        "nrfconnect": ">=4.4.1"
+        "nrfconnect": ">=5.0.1"
     },
     "main": "dist/bundle.js",
     "nrfConnectForDesktop": {
         "nrfutil": {
             "device": [
-                "2.3.5"
+                "2.7.3"
             ],
             "npm": [
                 "0.3.0"
@@ -49,7 +49,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^179.0.0",
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^188.0.0",
         "chart.js": "^4.0.1",
         "chartjs-adapter-date-fns": "^2.0.1",
         "react-chartjs-2": "^5.0.1",
