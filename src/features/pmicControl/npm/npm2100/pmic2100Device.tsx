@@ -231,20 +231,32 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
     const initializeFuelGauge = () => {
         if (offlineMode) return Promise.resolve();
-        return new Promise<void>(resolve => {
-            startAdcSample(1000, 500).then(async () => {
-                await boostModule[0].set.modeControl('HP');
-                const waiterA = baseDevice.onAdcSample(async () => {
-                    waiterA();
-                    await fuelGaugeModule.actions.reset();
-                    const waiterB = baseDevice.onAdcSample(() => {
-                        waiterB();
-                        boostModule[0].set.modeControl('AUTO');
-                        startAdcSample(2000, 500);
-                        resolve();
-                    });
-                });
-            });
+        return new Promise<void>((resolve, reject) => {
+            startAdcSample(1000, 500)
+                .then(async () => {
+                    try {
+                        await boostModule[0].set.modeControl('HP');
+                        const waiterA = baseDevice.onAdcSample(async () => {
+                            waiterA();
+                            try {
+                                await fuelGaugeModule.actions.reset();
+                                const waiterB = baseDevice.onAdcSample(() => {
+                                    waiterB();
+                                    boostModule[0].set
+                                        .modeControl('AUTO')
+                                        .catch(reject);
+                                    startAdcSample(2000, 500);
+                                    resolve();
+                                });
+                            } catch (e) {
+                                reject(e);
+                            }
+                        });
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
+                .catch(reject);
         });
     };
 
