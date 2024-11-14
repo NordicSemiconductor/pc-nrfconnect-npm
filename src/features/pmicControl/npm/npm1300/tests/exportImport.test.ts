@@ -11,6 +11,7 @@ import {
     GPIOExport,
     Ldo,
     LED,
+    npm1300TimerConfig,
     npm1300TimerMode,
     NpmExport,
     PartialUpdate,
@@ -347,7 +348,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 timerConfig = {
                     ...timerConfig,
                     ...partialUpdate,
-                };
+                } as npm1300TimerConfig;
             }
         );
 

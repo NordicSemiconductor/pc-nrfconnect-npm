@@ -14,7 +14,6 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    NpmModel,
     TimerConfig,
     TimerConfigModule,
     TimerMode,
@@ -26,7 +25,6 @@ import { splitMS } from '../Profiling/TimeComponent';
 interface TimerConfigProperties {
     timerConfigModule: TimerConfigModule;
     timerConfig: TimerConfig;
-    deviceType: NpmModel;
     disabled: boolean;
 }
 
@@ -38,24 +36,14 @@ const timerPrescalerItems = TimerPrescalerValues.map(item => ({
 export default ({
     timerConfigModule,
     timerConfig,
-    deviceType,
     disabled,
 }: TimerConfigProperties) => {
     const [internalTimerPeriod, setInternalTimerPeriod] = useState(
         timerConfig.period
     );
 
-    const prescalerMultiplier = useMemo(() => {
-        switch (timerConfig.prescaler) {
-            case 'Fast':
-                return 2;
-            case 'Slow':
-                return 16;
-        }
-
-        // No prescaler set
-        return 1;
-    }, [timerConfig]);
+    const prescalerMultiplier =
+        timerConfigModule.getPrescalerMultiplier?.(timerConfig) ?? 1;
 
     const timeString = useMemo(() => {
         const split = splitMS(internalTimerPeriod);
@@ -99,7 +87,7 @@ export default ({
                 </div>
             }
         >
-            {deviceType === 'npm2100' && (
+            {'enabled' in timerConfig && timerConfigModule.set.enabled && (
                 <Toggle
                     label={
                         <DocumentationTooltip card={card} item="TimeState">
@@ -130,7 +118,7 @@ export default ({
                 disabled={disabled}
             />
 
-            {deviceType === 'npm1300' && (
+            {'prescaler' in timerConfig && timerConfigModule.set.prescaler && (
                 <Dropdown
                     label={
                         <DocumentationTooltip card={card} item="TimePrescaler">

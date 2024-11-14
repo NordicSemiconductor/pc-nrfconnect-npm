@@ -234,10 +234,16 @@ export type TimerMode = npm1300TimerMode | npm2100TimerMode;
 export const TimerPrescalerValues = ['Slow', 'Fast'] as const;
 export type TimerPrescaler = (typeof TimerPrescalerValues)[number];
 
-export type TimerConfig = {
+export type TimerConfig = npm1300TimerConfig | npm2100TimerConfig;
+
+export type npm1300TimerConfig = {
     mode: TimerMode;
-    enabled?: boolean;
-    prescaler?: TimerPrescaler;
+    prescaler: TimerPrescaler;
+    period: number;
+};
+export type npm2100TimerConfig = {
+    mode: TimerMode;
+    enabled: boolean;
     period: number;
 };
 
@@ -609,6 +615,7 @@ export type TimerConfigModule = {
         periodRange: (prescalerMultiplier: number) => RangeType;
     };
     defaults: TimerConfig;
+    getPrescalerMultiplier?: (timerConfig: TimerConfig) => number;
 };
 
 export type ShipModeModule = {

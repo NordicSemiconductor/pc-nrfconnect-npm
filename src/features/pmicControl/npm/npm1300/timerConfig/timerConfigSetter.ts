@@ -6,6 +6,7 @@
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
+    npm1300TimerConfig,
     TimerConfig,
     TimerMode,
     TimerPrescaler,
@@ -28,9 +29,9 @@ export class TimerConfigSet {
         this.get = new TimerConfigGet(sendCommand);
     }
 
-    async all(timerConfig: TimerConfig) {
-        if (timerConfig.mode) await this.mode(timerConfig.mode);
-        if (timerConfig.prescaler) await this.prescaler(timerConfig.prescaler);
+    async all(timerConfig: npm1300TimerConfig) {
+        await this.mode(timerConfig.mode);
+        await this.prescaler(timerConfig.prescaler);
         await this.period(timerConfig.period);
     }
 

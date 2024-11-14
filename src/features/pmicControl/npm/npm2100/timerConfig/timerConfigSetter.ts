@@ -5,7 +5,7 @@
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { TimerConfig } from '../../types';
+import { npm2100TimerConfig, TimerConfig } from '../../types';
 import { npm2100TimerMode } from '../types';
 import { TimerConfigGet } from './timerConfigGetter';
 
@@ -24,11 +24,9 @@ export class TimerConfigSet {
         this.get = new TimerConfigGet(sendCommand);
     }
 
-    async all(timerConfig: TimerConfig) {
+    async all(timerConfig: npm2100TimerConfig) {
         await this.mode(timerConfig.mode as npm2100TimerMode);
-        if (timerConfig.enabled) {
-            await this.enabled(timerConfig.enabled);
-        }
+        await this.enabled(timerConfig.enabled);
         await this.period(timerConfig.period);
     }
 

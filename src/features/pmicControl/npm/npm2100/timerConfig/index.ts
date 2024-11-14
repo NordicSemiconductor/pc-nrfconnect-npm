@@ -45,7 +45,6 @@ export default (
     },
     defaults: {
         enabled: false,
-        prescaler: undefined,
         mode: npm2100TimerMode['General Purpose'],
         period: 0,
     },

@@ -11,6 +11,7 @@ import {
     Ldo,
     LED,
     npm1300TimerMode,
+    npm2100TimerConfig,
     NpmExport,
     PartialUpdate,
     PmicDialog,
@@ -22,6 +23,7 @@ import {
 import { GPIOMode2100, GPIOPull2100 } from '../gpio/types';
 import { toLdoExport } from '../ldo';
 import { npm2100FWVersion } from '../pmic2100Device';
+import { npm2100TimerMode } from '../types';
 import { setupMocksBase } from './helpers';
 
 test.skip('PMIC 2100 - Apply Config ', () => {
@@ -82,8 +84,8 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     };
 
     const initTimerConfig: TimerConfig = {
+        enabled: false,
         mode: npm1300TimerMode['Boot monitor'],
-        prescaler: 'Slow',
         period: 0,
     };
 
@@ -163,8 +165,8 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             polarity: 'Active low',
         },
         timerConfig: {
-            mode: npm1300TimerMode['General purpose'],
-            prescaler: 'Fast',
+            enabled: false,
+            mode: npm2100TimerMode['General Purpose'],
             period: 10,
         },
         ship: {
@@ -271,7 +273,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 timerConfig = {
                     ...timerConfig,
                     ...partialUpdate,
-                };
+                } as npm2100TimerConfig;
             }
         );
 
