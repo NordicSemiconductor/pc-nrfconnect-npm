@@ -236,22 +236,25 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
                 .then(async () => {
                     try {
                         await boostModule[0].set.modeControl('HP');
-                        const waiterA = baseDevice.onAdcSample(async () => {
-                            waiterA();
-                            try {
-                                await fuelGaugeModule.actions.reset();
-                                const waiterB = baseDevice.onAdcSample(() => {
-                                    waiterB();
-                                    boostModule[0].set
-                                        .modeControl('AUTO')
-                                        .catch(reject);
-                                    startAdcSample(2000, 500);
-                                    resolve();
-                                });
-                            } catch (e) {
-                                reject(e);
+                        const listenerADtor = baseDevice.onAdcSample(
+                            async () => {
+                                listenerADtor();
+                                try {
+                                    await fuelGaugeModule.actions.reset();
+                                    const listenerBDtor =
+                                        baseDevice.onAdcSample(() => {
+                                            listenerBDtor();
+                                            boostModule[0].set
+                                                .modeControl('AUTO')
+                                                .catch(reject);
+                                            startAdcSample(2000, 500);
+                                            resolve();
+                                        });
+                                } catch (e) {
+                                    reject(e);
+                                }
                             }
-                        });
+                        );
                     } catch (e) {
                         reject(e);
                     }
