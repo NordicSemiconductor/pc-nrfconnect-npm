@@ -37,7 +37,7 @@ import {
 } from '../types';
 import setupBucks, { numberOfBucks } from './buck';
 import { ChargerModule } from './charger';
-import setupFuelGauge from './fuelGauge';
+import { FuelGaugeModule } from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { numberOfLdos } from './ldo';
 import overlay from './overlay';
@@ -393,7 +393,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
-    const { fuelGaugeGet, fuelGaugeSet, fuelGaugeCallbacks } = setupFuelGauge(
+    const fuelGaugeModule = new FuelGaugeModule(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -485,7 +485,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         );
 
         releaseAll.push(...chargerModule.callbacks);
-        releaseAll.push(...fuelGaugeCallbacks);
+        releaseAll.push(...fuelGaugeModule.callbacks);
 
         releaseAll.push(
             shellParser.registerCommandCallback(
@@ -589,15 +589,10 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             pofModule.get.all();
             timerConfigModule.get.all();
             shipModeModule.get.all();
-
-            requestUpdate.fuelGauge();
-            requestUpdate.activeBatteryModel();
-            requestUpdate.storedBatteryModel();
+            fuelGaugeModule.get.all();
         },
 
         ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
-
-        ...fuelGaugeGet,
     };
 
     return {
@@ -663,8 +658,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             await shipModeModule.set.all(config.ship);
                         }
 
-                        await fuelGaugeSet.setFuelGaugeEnabled(
-                            config.fuelGauge
+                        await fuelGaugeModule.set.enabled(
+                            config.fuelGaugeSettings.enabled
                         );
 
                         if (config.usbPower) {
@@ -722,7 +717,6 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         stopAdcSample,
         requestUpdate,
         setLedMode,
-        ...fuelGaugeSet,
 
         getHardcodedBatteryModels: () =>
             new Promise<BatteryModel[]>((resolve, reject) => {
@@ -785,6 +779,7 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             sensor: true,
         },
 
+        fuelGaugeModule,
         chargerModule,
         pofModule,
         timerConfigModule,

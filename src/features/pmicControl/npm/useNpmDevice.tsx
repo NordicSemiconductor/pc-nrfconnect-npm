@@ -21,6 +21,7 @@ import { appendFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
+import { RootState } from '../../../appReducer';
 import { PROFILE_FOLDER_PREFIX } from '../../../components/Profiling/helpers';
 import { getShellParser } from '../../serial/serialSlice';
 import {
@@ -123,7 +124,7 @@ export default () => {
             });
 
             npmDevice.getBatteryProfiler?.()?.isProfiling();
-            npmDevice.setBatteryStatusCheckEnabled(true);
+            npmDevice.fuelGaugeModule.set.batteryStatusCheckEnabled(true);
         }
     }, [dispatch, isPMICPowered, npmDevice, pmicState, supportedVersion]);
 
@@ -171,33 +172,41 @@ export default () => {
             );
 
             if (!npmDevice.chargerModule) {
-                dispatch((_, getState) => {
+                dispatch((_, getState: () => RootState) => {
                     const samplingRate =
-                        getState().app.pmicControl
-                            .fuelGaugeChargingSamplingRate;
+                        getState().app.pmicControl.fuelGaugeSettings
+                            .chargingSamplingRate ??
+                        getState().app.pmicControl.fuelGaugeSettings
+                            .notChargingSamplingRate;
                     const reportingRate =
-                        getState().app.pmicControl.fuelGaugeReportingRate;
+                        getState().app.pmicControl.fuelGaugeSettings
+                            .reportingRate;
 
                     npmDevice.startAdcSample(reportingRate, samplingRate);
                 });
             } else {
                 releaseAll.push(
                     npmDevice.onChargerUpdate(payload => {
-                        dispatch((_, getState) => {
+                        dispatch((_, getState: () => RootState) => {
                             dispatch(updateCharger(payload));
                             if (
                                 payload.enabled != null &&
                                 getState().app.profiling.ccProfilingState !==
                                     'Running'
                             ) {
+                                const notChargingSamplingRate =
+                                    getState().app.pmicControl.fuelGaugeSettings
+                                        .notChargingSamplingRate;
+                                const chargingSamplingRate =
+                                    getState().app.pmicControl.fuelGaugeSettings
+                                        .chargingSamplingRate;
                                 npmDevice.startAdcSample(
-                                    getState().app.pmicControl
-                                        .fuelGaugeReportingRate,
+                                    getState().app.pmicControl.fuelGaugeSettings
+                                        .reportingRate,
                                     payload.enabled
-                                        ? getState().app.pmicControl
-                                              .fuelGaugeChargingSamplingRate
-                                        : getState().app.pmicControl
-                                              .fuelGaugeNotChargingSamplingRate
+                                        ? chargingSamplingRate ??
+                                              notChargingSamplingRate
+                                        : notChargingSamplingRate
                                 );
                             }
                         });
@@ -322,7 +331,7 @@ export default () => {
                                 payload.completeChunks &&
                                 payload.completeChunks === payload.totalChunks
                             ) {
-                                npmDevice.applyDownloadFuelGaugeProfile(
+                                npmDevice.fuelGaugeModule.actions.applyDownloadFuelGaugeProfile(
                                     payload.slot
                                 );
                             }
@@ -332,7 +341,7 @@ export default () => {
                                     cancelLabel: 'Abort',
                                     cancelClosesDialog: false,
                                     onCancel: () => {
-                                        npmDevice.abortDownloadFuelGaugeProfile();
+                                        npmDevice.fuelGaugeModule.actions.abortDownloadFuelGaugeProfile();
                                     },
                                     message: (
                                         <>

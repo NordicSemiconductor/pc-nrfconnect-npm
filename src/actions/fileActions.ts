@@ -17,7 +17,12 @@ import path from 'path';
 import { RootState } from '../appReducer';
 import { toBuckExport } from '../features/pmicControl/npm/npm1300/buck';
 import { toLdoExport } from '../features/pmicControl/npm/npm1300/ldo';
-import { NpmExport } from '../features/pmicControl/npm/types';
+import {
+    AnyNpmExport,
+    FuelGaugeExport,
+    NpmExportLatest,
+    NpmExportV1,
+} from '../features/pmicControl/npm/types';
 import { getNpmDevice } from '../features/pmicControl/pmicControlSlice';
 
 const saveSettings =
@@ -27,7 +32,7 @@ const saveSettings =
 
         if (!currentState.npmDevice) return;
 
-        const out: NpmExport = {
+        const out: NpmExportLatest = {
             boosts: [...currentState.boosts],
             charger: currentState.charger,
             bucks: [...currentState.bucks.map(toBuckExport)],
@@ -37,14 +42,17 @@ const saveSettings =
             pof: currentState.pof,
             ship: currentState.ship,
             timerConfig: currentState.timerConfig,
-            fuelGauge: currentState.fuelGauge,
+            fuelGaugeSettings: {
+                enabled: currentState.fuelGaugeSettings.enabled,
+                chargingSamplingRate:
+                    currentState.fuelGaugeSettings.chargingSamplingRate,
+            },
             firmwareVersion: currentState.npmDevice.getSupportedVersion(),
             deviceType: currentState.npmDevice.getDeviceType(),
-            fuelGaugeChargingSamplingRate:
-                currentState.fuelGaugeChargingSamplingRate,
             usbPower: currentState.usbPower
                 ? { currentLimiter: currentState.usbPower.currentLimiter }
                 : undefined,
+            fileFormatVersion: 2,
         };
 
         telemetry.sendEvent('Export Configuration', {
@@ -64,7 +72,7 @@ const saveSettings =
     };
 
 const parseFile =
-    (filePath: string): AppThunk =>
+    (filePath: string): AppThunk<RootState> =>
     (_dispatch, getState) => {
         const currentState = getState().app.pmicControl;
 
@@ -72,10 +80,30 @@ const parseFile =
         if (pathObject.ext === '.json') {
             const config = JSON.parse(
                 fs.readFileSync(filePath).toString()
-            ) as unknown as NpmExport;
-            currentState.npmDevice?.applyConfig(config);
+            ) as unknown as AnyNpmExport;
+
+            currentState.npmDevice?.applyConfig(upgradeToLatest(config));
         }
     };
+
+const upgradeToLatest = (exportJson: AnyNpmExport): NpmExportLatest => {
+    if (isNpmExportV1(exportJson)) {
+        const fuelGaugeSettings: FuelGaugeExport = {
+            enabled: exportJson.fuelGauge,
+            chargingSamplingRate: exportJson.fuelGaugeChargingSamplingRate,
+        };
+        return {
+            ...exportJson,
+            ...fuelGaugeSettings,
+            fileFormatVersion: 2,
+        };
+    }
+
+    return exportJson;
+};
+
+const isNpmExportV1 = (exportJson: AnyNpmExport): exportJson is NpmExportV1 =>
+    (exportJson as NpmExportV1).fuelGauge === undefined;
 
 export const showOpenDialog = (options: OpenDialogOptions) =>
     dialog.showOpenDialog(getCurrentWindow(), options);

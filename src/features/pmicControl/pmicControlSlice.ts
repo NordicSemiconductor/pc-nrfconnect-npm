@@ -14,6 +14,7 @@ import {
     Buck,
     Charger,
     ErrorLogs,
+    FuelGauge,
     GPIO,
     Ldo,
     LED,
@@ -44,17 +45,13 @@ interface pmicControlState {
     pmicChargingState: PmicChargingState;
     batteryConnected: boolean;
     batteryAddonBoardId?: number;
-    fuelGauge: boolean;
+    fuelGaugeSettings: FuelGauge;
     supportedVersion?: boolean;
     dialog: PmicDialog[];
     eventRecordingPath?: string;
-    activeBatterModel?: BatteryModel;
     hardcodedBatterModels: BatteryModel[];
     storedBatterModel?: BatteryModel[];
     usbPower?: USBPower;
-    fuelGaugeChargingSamplingRate: number;
-    fuelGaugeNotChargingSamplingRate: number;
-    fuelGaugeReportingRate: number;
     errorLogs?: ErrorLogs;
 }
 
@@ -75,12 +72,14 @@ const initialState: pmicControlState = {
     },
     pmicState: 'ek-disconnected',
     batteryConnected: false,
-    fuelGauge: false,
+    fuelGaugeSettings: {
+        enabled: false,
+        chargingSamplingRate: 500,
+        notChargingSamplingRate: 1000,
+        reportingRate: 2000,
+    },
     hardcodedBatterModels: [],
     dialog: [],
-    fuelGaugeChargingSamplingRate: 500,
-    fuelGaugeNotChargingSamplingRate: 1000,
-    fuelGaugeReportingRate: 2000,
 };
 
 const pmicControlSlice = createSlice({
@@ -225,10 +224,10 @@ const pmicControlSlice = createSlice({
             state.batteryConnected = action.payload;
         },
         setFuelGauge(state, action: PayloadAction<boolean>) {
-            state.fuelGauge = action.payload;
+            state.fuelGaugeSettings.enabled = action.payload;
         },
         setActiveBatterModel(state, action: PayloadAction<BatteryModel>) {
-            state.activeBatterModel = action.payload;
+            state.fuelGaugeSettings.activeBatterModel = action.payload;
         },
         setHardcodedBatterModels(state, action: PayloadAction<BatteryModel[]>) {
             state.hardcodedBatterModels = action.payload;
@@ -272,16 +271,16 @@ const pmicControlSlice = createSlice({
             }
         },
         setFuelGaugeChargingSamplingRate(state, action: PayloadAction<number>) {
-            state.fuelGaugeChargingSamplingRate = action.payload;
+            state.fuelGaugeSettings.chargingSamplingRate = action.payload;
         },
         setFuelGaugeNotChargingSamplingRate(
             state,
             action: PayloadAction<number>
         ) {
-            state.fuelGaugeNotChargingSamplingRate = action.payload;
+            state.fuelGaugeSettings.notChargingSamplingRate = action.payload;
         },
         setFuelGaugeReportingRate(state, action: PayloadAction<number>) {
-            state.fuelGaugeReportingRate = action.payload;
+            state.fuelGaugeSettings.reportingRate = action.payload;
         },
         setErrorLogs(state, action: PayloadAction<Partial<ErrorLogs>>) {
             state.errorLogs = { ...state.errorLogs, ...action.payload };
@@ -347,10 +346,10 @@ export const getSupportsBatteryModules = (state: RootState) =>
 export const isBatteryModuleConnected = (state: RootState) =>
     state.app.pmicControl.batteryAddonBoardId !== undefined &&
     state.app.pmicControl.batteryAddonBoardId !== 0;
-export const getFuelGauge = (state: RootState) =>
-    state.app.pmicControl.fuelGauge;
+export const getFuelGaugeEnabled = (state: RootState) =>
+    state.app.pmicControl.fuelGaugeSettings.enabled;
 export const getActiveBatterModel = (state: RootState) =>
-    state.app.pmicControl.activeBatterModel;
+    state.app.pmicControl.fuelGaugeSettings.activeBatterModel;
 export const getHardcodedBatterModels = (state: RootState) =>
     state.app.pmicControl.hardcodedBatterModels;
 export const getStoredBatterModels = (state: RootState) =>
@@ -373,11 +372,11 @@ export const getEventRecording = (state: RootState) =>
 export const getEventRecordingPath = (state: RootState) =>
     state.app.pmicControl.eventRecordingPath;
 export const getFuelGaugeChargingSamplingRate = (state: RootState) =>
-    state.app.pmicControl.fuelGaugeChargingSamplingRate;
+    state.app.pmicControl.fuelGaugeSettings.chargingSamplingRate;
 export const getFuelGaugeNotChargingSamplingRate = (state: RootState) =>
-    state.app.pmicControl.fuelGaugeNotChargingSamplingRate;
+    state.app.pmicControl.fuelGaugeSettings.notChargingSamplingRate;
 export const getFuelGaugeReportingRate = (state: RootState) =>
-    state.app.pmicControl.fuelGaugeReportingRate;
+    state.app.pmicControl.fuelGaugeSettings.reportingRate;
 export const getErrorLogs = (state: RootState) =>
     state.app.pmicControl.errorLogs;
 

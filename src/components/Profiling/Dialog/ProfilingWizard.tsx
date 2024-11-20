@@ -25,7 +25,7 @@ import { closeDevice, openDevice } from '../../../actions/deviceActions';
 import { Profile } from '../../../features/pmicControl/npm/types';
 import {
     getBucks,
-    getFuelGauge,
+    getFuelGaugeEnabled,
     getLdos,
     getNpmDevice,
     getPmicState,
@@ -89,7 +89,7 @@ export default () => {
         usbPower && usbPower.detectStatus !== 'No USB connection';
     const ldos = useSelector(getLdos);
     const bucks = useSelector(getBucks);
-    const fuelGauge = useSelector(getFuelGauge);
+    const fuelGauge = useSelector(getFuelGaugeEnabled);
     const index = useSelector(getProfileIndex);
     const ccProfilingState = useSelector(getCcProfilingState);
     const abortAction = useSelector(getAbort);

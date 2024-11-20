@@ -10,7 +10,7 @@ import { Card, Toggle } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    getFuelGauge,
+    getFuelGaugeEnabled,
     getNpmDevice,
 } from '../../../features/pmicControl/pmicControlSlice';
 import Battery, {
@@ -19,7 +19,7 @@ import Battery, {
 
 export default ({ disabled }: BatteryCardProperties) => {
     const npmDevice = useSelector(getNpmDevice);
-    const fuelGauge = useSelector(getFuelGauge);
+    const fuelGauge = useSelector(getFuelGaugeEnabled);
 
     return (
         <Card
@@ -31,7 +31,9 @@ export default ({ disabled }: BatteryCardProperties) => {
                     <Toggle
                         label="Enable"
                         isToggled={fuelGauge}
-                        onToggle={npmDevice?.setFuelGaugeEnabled}
+                        onToggle={enabled =>
+                            npmDevice?.fuelGaugeModule.set.enabled(enabled)
+                        }
                         disabled={disabled}
                     />
                 </div>

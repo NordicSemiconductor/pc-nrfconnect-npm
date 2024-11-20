@@ -123,6 +123,14 @@ export type IrqEvent = {
     event: string;
 };
 
+export type FuelGauge = {
+    enabled: boolean;
+    notChargingSamplingRate: number;
+    reportingRate: number;
+    chargingSamplingRate?: number;
+    activeBatterModel?: BatteryModel;
+};
+
 export type Charger = {
     vTerm: number;
     vTrickleFast: VTrickleFast;
@@ -379,6 +387,32 @@ export const isFixedListRangeWithLabel = (
 
 export const isRangeType = (range: RangeOrFixedListRange): range is RangeType =>
     !Array.isArray(range);
+
+export interface FuelGaugeModule {
+    get: {
+        all: () => void;
+        enabled: () => void;
+        activeBatteryModel: () => void;
+        storedBatteryModel: () => void;
+    };
+    set: {
+        all: (config: FuelGaugeExport) => Promise<void>;
+        enabled: (enabled: boolean) => Promise<void>;
+        activeBatteryModel: (name: string) => Promise<void>;
+        batteryStatusCheckEnabled: (enabled: boolean) => Promise<void>;
+    };
+    actions: {
+        abortDownloadFuelGaugeProfile: () => Promise<void>;
+        applyDownloadFuelGaugeProfile: (slot?: number) => Promise<void>;
+        downloadFuelGaugeProfile: (
+            profile: Buffer,
+            slot?: number
+        ) => Promise<void>;
+        reset: () => Promise<void>;
+    };
+    callbacks: (() => void)[];
+    defaults: FuelGauge;
+}
 
 export interface ChargerModule {
     get: {
@@ -751,7 +785,7 @@ export type BaseNpmDevice = {
     setUptimeOverflowCounter: (value: number) => void;
     release: () => void;
 
-    generateOverlay?: (npmExport: NpmExport) => string;
+    generateOverlay?: (npmExport: NpmExportLatest) => string;
 
     chargerModule?: ChargerModule;
     gpioModule: GpioModule[];
@@ -772,7 +806,7 @@ export interface INpmDevice extends IBaseNpmDevice {
 }
 
 export type NpmDevice = {
-    applyConfig: (config: NpmExport) => void;
+    applyConfig: (config: NpmExportLatest) => void;
     getDeviceType: () => NpmModel;
     getConnectionState: () => PmicState;
 
@@ -789,25 +823,14 @@ export type NpmDevice = {
 
     requestUpdate: {
         all: () => void;
-
         ledMode: (index: number) => void;
-
-        fuelGauge: () => void;
-
-        activeBatteryModel: () => void;
-        storedBatteryModel: () => void;
     };
 
     setLedMode: (index: number, mode: LEDMode) => Promise<void>;
 
-    setFuelGaugeEnabled: (state: boolean) => Promise<void>;
-    downloadFuelGaugeProfile: (profile: Buffer, slot?: number) => Promise<void>;
-    abortDownloadFuelGaugeProfile: () => Promise<void>;
-    applyDownloadFuelGaugeProfile: (slot?: number) => Promise<void>;
+    fuelGaugeModule: FuelGaugeModule;
+    // TODO
     getHardcodedBatteryModels: () => Promise<BatteryModel[]>;
-    setActiveBatteryModel: (name: string) => Promise<void>;
-
-    setBatteryStatusCheckEnabled: (enabled: boolean) => void;
 
     getBatteryProfiler?: () => BatteryProfiler | undefined;
     setAutoRebootDevice: (autoReboot: boolean) => void;
@@ -836,6 +859,10 @@ export interface PmicDialog {
 
 export type NpmModel = 'npm1300' | 'npm2100';
 
+export type FuelGaugeExport = Omit<
+    FuelGauge,
+    'notChargingSamplingRate' | 'reportingRate' | 'activeBatterModel'
+>;
 export type BoostExport = Omit<Boost, 'pinModeEnabled' | 'vOutVSet'>;
 export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
 export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
@@ -845,7 +872,7 @@ export type GPIOExport = Omit<
 >;
 export type USBPowerExport = Omit<USBPower, 'detectStatus'>;
 
-export interface NpmExport {
+export interface NpmExportV1 {
     boosts: BoostExport[];
     charger?: Charger;
     bucks: BuckExport[];
@@ -855,12 +882,34 @@ export interface NpmExport {
     pof?: POF;
     ship?: ShipModeConfig;
     timerConfig?: TimerConfig;
-    fuelGauge: boolean;
+    fuelGaugeSettings: FuelGaugeExport;
     firmwareVersion: string;
     deviceType: NpmModel;
-    fuelGaugeChargingSamplingRate: number;
     usbPower?: USBPowerExport;
+    fuelGauge: boolean; // legacy setting deprecated in v2.0.0
+    fuelGaugeChargingSamplingRate: number; // legacy setting deprecated in v2.0.0
 }
+
+export interface NpmExportV2 {
+    boosts: BoostExport[];
+    charger?: Charger;
+    bucks: BuckExport[];
+    ldos: LdoExport[];
+    gpios: GPIOExport[];
+    leds: LED[];
+    pof?: POF;
+    ship?: ShipModeConfig;
+    timerConfig?: TimerConfig;
+    fuelGaugeSettings: FuelGaugeExport;
+    firmwareVersion: string;
+    deviceType: NpmModel;
+    usbPower?: USBPowerExport;
+    fileFormatVersion: 2;
+}
+
+export type NpmExportLatest = NpmExportV2;
+
+export type AnyNpmExport = NpmExportV1 | NpmExportV2 | NpmExportLatest;
 
 export interface LoggingEvent {
     timestamp: number;

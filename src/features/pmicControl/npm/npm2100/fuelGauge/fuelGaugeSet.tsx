@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
@@ -7,63 +7,63 @@
 import React from 'react';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { PmicDialog } from '../../types';
+import { FuelGaugeExport, PmicDialog } from '../../types';
+import { FuelGaugeGet } from './fuelGaugeGet';
 
-export const fuelGaugeGet = (
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void
-) => ({
-    fuelGauge: () => sendCommand('fuel_gauge get'),
-    activeBatteryModel: () => sendCommand(`fuel_gauge model get`),
-    storedBatteryModel: () => sendCommand(`fuel_gauge model list`),
-});
+export class FuelGaugeSet {
+    private get: FuelGaugeGet;
 
-export const fuelGaugeSet = (
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean
-) => {
-    const { fuelGauge, activeBatteryModel } = fuelGaugeGet(sendCommand);
+    constructor(
+        private eventEmitter: NpmEventEmitter,
+        private sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void,
+            unique?: boolean
+        ) => void,
+        private offlineMode: boolean,
+        private dialogHandler?: ((dialog: PmicDialog) => void) | null
+    ) {
+        this.get = new FuelGaugeGet(sendCommand);
+    }
 
-    const setFuelGaugeEnabled = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            if (offlineMode) {
-                eventEmitter.emit('onFuelGauge', enabled);
+    async all(fuelGauge: FuelGaugeExport) {
+        await this.enabled(fuelGauge.enabled);
+    }
+
+    enabled(enabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emit('onFuelGauge', enabled);
                 resolve();
             } else {
-                sendCommand(
+                this.sendCommand(
                     `fuel_gauge set ${enabled ? '1' : '0'}`,
                     () => resolve(),
                     () => {
-                        fuelGauge();
+                        this.get.enabled();
                         reject();
                     }
                 );
             }
         });
+    }
 
-    const setActiveBatteryModel = (name: string) => {
+    activeBatteryModel(name: string) {
         const action = () =>
             new Promise<void>((resolve, reject) => {
-                sendCommand(
+                this.sendCommand(
                     `fuel_gauge model set "${name}"`,
                     () => resolve(),
                     () => {
-                        activeBatteryModel();
+                        this.get.activeBatteryModel();
                         reject();
                     }
                 );
             });
 
-        if (dialogHandler && !offlineMode) {
+        const dialogHandler = this.dialogHandler;
+        if (dialogHandler && !this.offlineMode) {
             const changeActiveBatteryDialog = (
                 <span>Changing selected battery type. Are you sure?</span>
             );
@@ -86,20 +86,15 @@ export const fuelGaugeSet = (
         }
 
         return action();
-    };
+    }
 
-    const setBatteryStatusCheckEnabled = (enabled: boolean) =>
-        new Promise<void>((resolve, reject) => {
-            sendCommand(
+    batteryStatusCheckEnabled(enabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            this.sendCommand(
                 `npm_chg_status_check set ${enabled ? '1' : '0'}`,
                 () => resolve(),
                 () => reject()
             );
         });
-
-    return {
-        setFuelGaugeEnabled,
-        setActiveBatteryModel,
-        setBatteryStatusCheckEnabled,
-    };
-};
+    }
+}
