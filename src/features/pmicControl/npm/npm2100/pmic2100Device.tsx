@@ -182,9 +182,14 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
-    const startAdcSample = (intervalMs: number, samplingRate: number) => {
-        sendCommand(`npm_adc sample ${samplingRate} ${intervalMs}`);
-    };
+    const startAdcSample = (intervalMs: number, samplingRate: number) =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `npm_adc sample ${samplingRate} ${intervalMs}`,
+                () => resolve(),
+                () => reject()
+            );
+        });
 
     const stopAdcSample = () => {
         sendCommand(`npm_adc sample 0`);
@@ -224,6 +229,40 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
+    const initializeFuelGauge = () => {
+        if (offlineMode) return Promise.resolve();
+        return new Promise<void>((resolve, reject) => {
+            startAdcSample(1000, 500)
+                .then(async () => {
+                    try {
+                        await boostModule[0].set.modeControl('HP');
+                        const listenerADtor = baseDevice.onAdcSample(
+                            async () => {
+                                listenerADtor();
+                                try {
+                                    await fuelGaugeModule.actions.reset();
+                                    const listenerBDtor =
+                                        baseDevice.onAdcSample(() => {
+                                            listenerBDtor();
+                                            boostModule[0].set
+                                                .modeControl('AUTO')
+                                                .catch(reject);
+                                            startAdcSample(2000, 500);
+                                            resolve();
+                                        });
+                                } catch (e) {
+                                    reject(e);
+                                }
+                            }
+                        );
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
+                .catch(reject);
+        });
+    };
+
     const offlineMode = !shellParser;
 
     const ldoModule = setupLdo(
@@ -246,7 +285,8 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         eventEmitter,
         sendCommand,
         dialogHandler,
-        offlineMode
+        offlineMode,
+        initializeFuelGauge
     );
 
     const batteryModule = getBatteryModule(
@@ -436,6 +476,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
     return {
         ...baseDevice,
+        initialize: async () => {
+            await initializeFuelGauge();
+        },
         release: () => {
             baseDevice.release();
             releaseAll.forEach(release => release());

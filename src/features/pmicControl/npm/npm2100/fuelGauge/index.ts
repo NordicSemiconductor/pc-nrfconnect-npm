@@ -36,13 +36,15 @@ export class FuelGaugeModule implements FuelGaugeModuleBase {
             unique?: boolean
         ) => void,
         dialogHandler: ((dialog: PmicDialog) => void) | null,
-        offlineMode: boolean
+        offlineMode: boolean,
+        initializeFuelGauge: () => Promise<void>
     ) {
         this._get = new FuelGaugeGet(sendCommand);
         this._set = new FuelGaugeSet(
             eventEmitter,
             sendCommand,
             offlineMode,
+            initializeFuelGauge,
             dialogHandler
         );
         this._actions = new FuelGaugeActions(eventEmitter, sendCommand, this);

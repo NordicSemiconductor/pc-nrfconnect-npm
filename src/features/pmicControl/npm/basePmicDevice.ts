@@ -305,7 +305,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         release: () => {
             releaseAll.forEach(release => release());
         },
-
+        initialize: () => Promise.resolve(),
         boostModule: [],
         gpioModule: [],
         buckModule: [],

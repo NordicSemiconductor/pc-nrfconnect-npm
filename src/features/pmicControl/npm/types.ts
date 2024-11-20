@@ -772,6 +772,8 @@ export type BaseNpmDevice = {
         handler: (payload: PartialUpdate<Ldo>, error?: string) => void
     ) => () => void;
 
+    initialize: () => Promise<void>;
+
     hasMaxEnergyExtraction: () => boolean;
     getNumberOfLEDs: () => number;
     getNumberOfBatteryModelSlots: () => number;
@@ -814,7 +816,7 @@ export type NpmDevice = {
         handler: (success: ProfileDownload, error?: string) => void
     ) => () => void;
 
-    startAdcSample: (intervalMs: number, samplingRate: number) => void;
+    startAdcSample: (intervalMs: number, samplingRate: number) => Promise<void>;
     stopAdcSample: () => void;
 
     ledDefaults: () => LED[];

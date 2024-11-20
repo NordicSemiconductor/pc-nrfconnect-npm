@@ -298,9 +298,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         }
     };
 
-    const startAdcSample = (intervalMs: number, samplingRate: number) => {
-        sendCommand(`npm_adc sample ${samplingRate} ${intervalMs}`);
-    };
+    const startAdcSample = (intervalMs: number, samplingRate: number) =>
+        new Promise<void>((resolve, reject) => {
+            sendCommand(
+                `npm_adc sample ${samplingRate} ${intervalMs}`,
+                () => resolve(),
+                () => reject()
+            );
+        });
 
     const stopAdcSample = () => {
         sendCommand(`npm_adc sample 0`);

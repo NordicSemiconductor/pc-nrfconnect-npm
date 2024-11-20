@@ -10,6 +10,7 @@ import { helpers, PMIC_2100_GPIOS, setupMocksWithShellParser } from './helpers';
 
 describe('PMIC 2100 - Setters Online tests', () => {
     const {
+        eventHandlers,
         mockDialogHandler,
         mockOnActiveBatteryModelUpdate,
         mockOnFuelGaugeUpdate,
@@ -170,23 +171,139 @@ describe('PMIC 2100 - Setters Online tests', () => {
             expect(mockOnLEDUpdate).toBeCalledTimes(0);
         });
 
-        test.each([true, false])(
-            'Set setFuelGaugeEnabled enabled: %p',
-            async enabled => {
-                await pmic.fuelGaugeModule.set.enabled(enabled);
+        test('Set setFuelGaugeEnabled enabled: false', async () => {
+            await pmic.fuelGaugeModule.set.enabled(false);
 
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `fuel_gauge set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `fuel_gauge set 0`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
+        });
+
+        test('Set setFuelGaugeEnabled enabled: true', async () => {
+            pmic.fuelGaugeModule.set.enabled(true);
+            await new Promise<void>(resolve => {
+                mockEnqueueRequest.mockImplementationOnce(
+                    (command, callbacks, timeout, unique) => {
+                        expect(mockEnqueueRequest).toBeCalledTimes(3);
+                        expect(mockEnqueueRequest).nthCalledWith(
+                            1,
+                            `fuel_gauge set 1`,
+                            expect.anything(),
+                            undefined,
+                            true
+                        );
+                        // init fuel gauge with some load NCD-1074
+                        expect(mockEnqueueRequest).nthCalledWith(
+                            2,
+                            `npm_adc sample 500 1000`,
+                            expect.anything(),
+                            undefined,
+                            true
+                        );
+                        expect(mockEnqueueRequest).nthCalledWith(
+                            3,
+                            `npm2100 boost mode set HP`,
+                            expect.anything(),
+                            undefined,
+                            true
+                        );
+
+                        resolve();
+                        return helpers
+                            .registerCommandCallbackSuccess(
+                                command,
+                                callbacks,
+                                timeout,
+                                unique
+                            )
+                            .then(() => {
+                                process.nextTick(() => {
+                                    eventHandlers.mockOnShellLoggingEventHandler(
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                    );
+                                });
+                            });
+                    }
                 );
+            });
 
-                // Updates should only be emitted when we get response
-                expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
-        );
+            await new Promise<void>(resolve => {
+                mockEnqueueRequest.mockImplementationOnce(
+                    (command, callbacks, timeout, unique) => {
+                        expect(mockEnqueueRequest).nthCalledWith(
+                            4,
+                            `fuel_gauge reset`,
+                            expect.anything(),
+                            undefined,
+                            true
+                        );
+
+                        resolve();
+                        return helpers
+                            .registerCommandCallbackSuccess(
+                                command,
+                                callbacks,
+                                timeout,
+                                unique
+                            )
+                            .then(() => {
+                                process.nextTick(() => {
+                                    eventHandlers.mockOnShellLoggingEventHandler(
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                    );
+                                });
+                            });
+                    }
+                );
+            });
+
+            await new Promise<void>(resolve => {
+                mockEnqueueRequest.mockImplementationOnce(
+                    (command, callbacks, timeout, unique) => {
+                        expect(mockEnqueueRequest).nthCalledWith(
+                            5,
+                            `npm2100 boost mode set AUTO`,
+                            expect.anything(),
+                            undefined,
+                            true
+                        );
+                        return helpers
+                            .registerCommandCallbackSuccess(
+                                command,
+                                callbacks,
+                                timeout,
+                                unique
+                            )
+                            .then(() => {
+                                process.nextTick(() => {
+                                    eventHandlers.mockOnShellLoggingEventHandler(
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                    );
+                                });
+                                resolve();
+                            });
+                    }
+                );
+            });
+
+            expect(mockEnqueueRequest).nthCalledWith(
+                6,
+                `npm_adc sample 500 2000`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
+        });
 
         test.skip('Set setActiveBatteryModel', async () => {
             await pmic.fuelGaugeModule.set.activeBatteryModel(
