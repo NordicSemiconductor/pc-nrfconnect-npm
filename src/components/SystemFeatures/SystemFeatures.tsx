@@ -16,12 +16,14 @@ import {
     getNpmDevice,
     getPmicState,
     getPOF,
+    getReset,
     getShip,
     getTimerConfig,
     getUsbPower,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import ErrorStatuses from './ErrorStatuses';
+import LowPower from './LowPower';
 import PowerFailure from './PowerFailure';
 import ResetControl from './ResetControl';
 import Timer from './Timer';
@@ -32,15 +34,23 @@ export default ({ active }: PaneProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const pof = useSelector(getPOF);
     const ship = useSelector(getShip);
+    const reset = useSelector(getReset);
     const usbPower = useSelector(getUsbPower);
     const timerConfig = useSelector(getTimerConfig);
     const pmicState = useSelector(getPmicState);
 
     return active ? (
         <MasonryLayout className="masonry-layout" minWidth={300}>
-            {npmDevice?.shipModeModule && ship && (
+            {npmDevice?.resetModule && reset && (
                 <ResetControl
-                    shipModeModule={npmDevice?.shipModeModule}
+                    resetModule={npmDevice?.resetModule}
+                    reset={reset}
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice?.lowPowerModule && ship && (
+                <LowPower
+                    lowPowerModule={npmDevice?.lowPowerModule}
                     ship={ship}
                     disabled={disabled}
                 />

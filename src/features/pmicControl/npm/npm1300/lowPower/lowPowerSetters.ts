@@ -5,11 +5,11 @@
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { LongPressReset, ShipModeConfig, TimeToActive } from '../../types';
-import { ShipModeGet } from './shipModeGetters';
+import { LowPowerConfig, TimeToActive } from '../../types';
+import { LowPowerGet } from './lowPowerGetters';
 
-export class ShipModeSet {
-    private get: ShipModeGet;
+export class LowPowerSet {
+    private get: LowPowerGet;
 
     constructor(
         private eventEmitter: NpmEventEmitter,
@@ -20,19 +20,18 @@ export class ShipModeSet {
         ) => void,
         private offlineMode: boolean
     ) {
-        this.get = new ShipModeGet(sendCommand);
+        this.get = new LowPowerGet(sendCommand);
     }
 
-    async all(shipMode: ShipModeConfig) {
+    async all(shipMode: LowPowerConfig) {
         await this.timeToActive(shipMode.timeToActive);
-        await this.longPressReset(shipMode.longPressReset);
     }
 
     timeToActive(timeToActive: TimeToActive) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<ShipModeConfig>(
-                    'onShipUpdate',
+                this.eventEmitter.emitPartialEvent<LowPowerConfig>(
+                    'onLowPowerUpdate',
                     {
                         timeToActive,
                     }
@@ -51,28 +50,6 @@ export class ShipModeSet {
         });
     }
 
-    longPressReset(longPressReset: LongPressReset) {
-        return new Promise<void>((resolve, reject) => {
-            if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<ShipModeConfig>(
-                    'onShipUpdate',
-                    {
-                        longPressReset,
-                    }
-                );
-                resolve();
-            } else {
-                this.sendCommand(
-                    `powerup_ship longpress set ${longPressReset}`,
-                    () => resolve(),
-                    () => {
-                        this.get.longPressReset();
-                        reject();
-                    }
-                );
-            }
-        });
-    }
     enterShipMode() {
         this.sendCommand(`npmx ship mode ship`);
     }

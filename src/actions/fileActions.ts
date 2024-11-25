@@ -40,7 +40,7 @@ const saveSettings =
             gpios: [...currentState.gpios],
             leds: [...currentState.leds],
             pof: currentState.pof,
-            ship: currentState.ship,
+            lowPower: currentState.lowPower,
             timerConfig: currentState.timerConfig,
             fuelGaugeSettings: {
                 enabled: currentState.fuelGaugeSettings.enabled,

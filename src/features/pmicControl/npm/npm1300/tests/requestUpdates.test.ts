@@ -599,7 +599,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update shipModeTimeToActive', () => {
-        pmic.shipModeModule?.get.timeToActive();
+        pmic.lowPowerModule?.get.timeToActive();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -611,7 +611,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update shipLongPressReset', () => {
-        pmic.shipModeModule?.get.longPressReset();
+        pmic.resetModule?.get.longPressReset();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -623,7 +623,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request enterShipMode', () => {
-        pmic.shipModeModule?.set.enterShipMode();
+        pmic.lowPowerModule?.set.enterShipMode();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -635,7 +635,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request enterShipMode', () => {
-        pmic.shipModeModule?.set.enterShipHibernateMode();
+        pmic.lowPowerModule?.set.enterShipHibernateMode();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

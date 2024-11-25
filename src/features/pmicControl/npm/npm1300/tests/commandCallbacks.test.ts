@@ -50,7 +50,8 @@ describe('PMIC 1300 - Command callbacks', () => {
         mockOnPOFUpdate,
         mockOnLEDUpdate,
         mockOnTimerConfigUpdate,
-        mockOnShipUpdate,
+        mockOnLowPowerUpdate,
+        mockOnResetUpdate,
         mockOnReboot,
     } = setupMocksWithShellParser();
 
@@ -1363,8 +1364,8 @@ Battery models stored in database:
 
         callback?.onSuccess(`Value: ${value}ms.`, command);
 
-        expect(mockOnShipUpdate).toBeCalledTimes(1);
-        expect(mockOnShipUpdate).toBeCalledWith({
+        expect(mockOnLowPowerUpdate).toBeCalledTimes(1);
+        expect(mockOnLowPowerUpdate).toBeCalledWith({
             timeToActive: value,
         });
     });
@@ -1381,8 +1382,8 @@ Battery models stored in database:
 
         callback?.onSuccess(`Value: ${value}`, command);
 
-        expect(mockOnShipUpdate).toBeCalledTimes(1);
-        expect(mockOnShipUpdate).toBeCalledWith({
+        expect(mockOnResetUpdate).toBeCalledTimes(1);
+        expect(mockOnResetUpdate).toBeCalledWith({
             longPressReset: value,
         });
     });

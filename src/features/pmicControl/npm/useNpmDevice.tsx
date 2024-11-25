@@ -47,11 +47,11 @@ import {
     setLatestAdcSample,
     setLdos,
     setLEDs,
+    setLowPowerConfig,
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
     setPOFs,
-    setShipModeConfig,
     setStoredBatterModel,
     setSupportedVersion,
     setTimerConfig,
@@ -62,8 +62,9 @@ import {
     updateGPIOs,
     updateLdo,
     updateLEDs,
+    updateLowPowerConfig,
     updatePOFs,
-    updateShipModeConfig,
+    updateResetConfig,
     updateTimerConfig,
     updateUsbPower,
 } from '../pmicControlSlice';
@@ -270,8 +271,14 @@ export default () => {
             );
 
             releaseAll.push(
-                npmDevice.onShipUpdate(payload => {
-                    dispatch(updateShipModeConfig(payload));
+                npmDevice.onLowPowerUpdate(payload => {
+                    dispatch(updateLowPowerConfig(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onResetUpdate(payload => {
+                    dispatch(updateResetConfig(payload));
                 })
             );
 
@@ -523,7 +530,7 @@ export default () => {
             );
             dispatch(setLEDs(npmDevice.ledDefaults()));
             dispatch(setPOFs(npmDevice.pofModule?.defaults));
-            dispatch(setShipModeConfig(npmDevice.shipModeModule?.defaults));
+            dispatch(setLowPowerConfig(npmDevice.lowPowerModule?.defaults));
             dispatch(setUsbPower(npmDevice.usbCurrentLimiterModule?.defaults));
             dispatch(setTimerConfig(npmDevice.timerConfigModule?.defaults));
 
@@ -689,7 +696,7 @@ export default () => {
                     setPaneHidden({
                         name: 'System Features',
                         hidden:
-                            npmDevice.shipModeModule === undefined &&
+                            npmDevice.lowPowerModule === undefined &&
                             npmDevice.timerConfigModule === undefined &&
                             npmDevice.pofModule === undefined &&
                             npmDevice.usbCurrentLimiterModule === undefined &&

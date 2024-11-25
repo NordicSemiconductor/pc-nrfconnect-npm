@@ -35,7 +35,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
-        mockOnShipUpdate,
+        mockOnLowPowerUpdate: mockonLowPowerUpdate,
         mockEnqueueRequest,
         mockOnUsbPower,
         pmic,
@@ -1257,7 +1257,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set ship config time %p', async () => {
-            await pmic.shipModeModule?.set.timeToActive(16);
+            await pmic.lowPowerModule?.set.timeToActive(16);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1268,11 +1268,11 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnShipUpdate).toBeCalledTimes(0);
+            expect(mockonLowPowerUpdate).toBeCalledTimes(0);
         });
 
         test('Set ship reset longpress two_button', async () => {
-            await pmic.shipModeModule?.set.longPressReset('two_button');
+            await pmic.resetModule?.set.longPressReset('two_button');
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1283,7 +1283,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnShipUpdate).toBeCalledTimes(0);
+            expect(mockonLowPowerUpdate).toBeCalledTimes(0);
         });
 
         test.each([true, false])(
@@ -3232,7 +3232,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.shipModeModule?.set.timeToActive(16)
+                pmic.lowPowerModule?.set.timeToActive(16)
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3253,7 +3253,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnShipUpdate).toBeCalledTimes(0);
+            expect(mockonLowPowerUpdate).toBeCalledTimes(0);
         });
 
         test('Set setShipLongPressReset - Fail immediately - index: %p', async () => {
@@ -3262,7 +3262,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.shipModeModule?.set.longPressReset('one_button')
+                pmic.resetModule?.set.longPressReset('one_button')
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3283,7 +3283,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnShipUpdate).toBeCalledTimes(0);
+            expect(mockonLowPowerUpdate).toBeCalledTimes(0);
         });
 
         test.each([true, false])(

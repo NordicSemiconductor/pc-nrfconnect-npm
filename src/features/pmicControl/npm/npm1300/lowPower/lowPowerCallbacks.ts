@@ -9,11 +9,10 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     noop,
     NpmEventEmitter,
-    parseColonBasedAnswer,
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { LongPressReset, ShipModeConfig, TimeToActive } from '../../types';
+import { LowPowerConfig, TimeToActive } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -31,26 +30,10 @@ export default (
                     '(16|32|64|96|304|608|1008|3008)'
                 ),
                 res => {
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
+                    eventEmitter.emitPartialEvent<LowPowerConfig>(
+                        'onLowPowerUpdate',
                         {
                             timeToActive: parseToNumber(res) as TimeToActive,
-                        }
-                    );
-                },
-                noop
-            )
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('powerup_ship longpress', true, undefined, '(\\w+)'),
-                res => {
-                    const result = parseColonBasedAnswer(res);
-                    eventEmitter.emitPartialEvent<ShipModeConfig>(
-                        'onShipUpdate',
-                        {
-                            longPressReset: result as LongPressReset,
                         }
                     );
                 },

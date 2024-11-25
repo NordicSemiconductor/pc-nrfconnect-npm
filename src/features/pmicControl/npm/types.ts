@@ -267,9 +267,12 @@ export const LongPressResetValues = [
 ] as const;
 export type LongPressReset = (typeof LongPressResetValues)[number];
 
-export type ShipModeConfig = {
+export type LowPowerConfig = {
     timeToActive: TimeToActive;
     invPolarity: boolean;
+};
+
+export type ResetConfig = {
     longPressReset: LongPressReset;
 };
 
@@ -652,22 +655,34 @@ export type TimerConfigModule = {
     getPrescalerMultiplier?: (timerConfig: TimerConfig) => number;
 };
 
-export type ShipModeModule = {
+export type LowPowerModule = {
     get: {
         all: () => void;
         timeToActive: () => void;
-        longPressReset: () => void;
     };
     set: {
-        all(shipMode: ShipModeConfig): Promise<void>;
+        all(lowPower: LowPowerConfig): Promise<void>;
         timeToActive(timeToActive: TimeToActive): Promise<void>;
 
-        longPressReset(longPressReset: LongPressReset): Promise<void>;
         enterShipMode(): void;
         enterShipHibernateMode(): void;
     };
     callbacks: (() => void)[];
-    defaults: ShipModeConfig;
+    defaults: LowPowerConfig;
+};
+
+export type ResetModule = {
+    get: {
+        all: () => void;
+        longPressReset: () => void;
+    };
+    set: {
+        all(reset: ResetConfig): Promise<void>;
+
+        longPressReset(longPressReset: LongPressReset): Promise<void>;
+    };
+    callbacks: (() => void)[];
+    defaults: ResetConfig;
 };
 
 export type UsbCurrentLimiterModule = {
@@ -729,8 +744,11 @@ export type BaseNpmDevice = {
     onTimerConfigUpdate: (
         handler: (payload: Partial<TimerConfig>, error?: string) => void
     ) => () => void;
-    onShipUpdate: (
-        handler: (payload: Partial<ShipModeConfig>, error?: string) => void
+    onLowPowerUpdate: (
+        handler: (payload: Partial<LowPowerConfig>, error?: string) => void
+    ) => () => void;
+    onResetUpdate: (
+        handler: (payload: Partial<ResetConfig>, error?: string) => void
     ) => () => void;
     onBeforeReboot: (
         handler: (payload: number, error?: string) => void
@@ -793,7 +811,8 @@ export type BaseNpmDevice = {
     gpioModule: GpioModule[];
     boostModule: BoostModule[];
     pofModule?: PofModule;
-    shipModeModule?: ShipModeModule;
+    lowPowerModule?: LowPowerModule;
+    resetModule?: ResetModule;
     timerConfigModule?: TimerConfigModule;
     buckModule: BuckModule[];
     usbCurrentLimiterModule?: UsbCurrentLimiterModule;
@@ -882,7 +901,8 @@ export interface NpmExportV1 {
     gpios: GPIOExport[];
     leds: LED[];
     pof?: POF;
-    ship?: ShipModeConfig;
+    lowPower?: LowPowerConfig;
+    reset?: ResetConfig;
     timerConfig?: TimerConfig;
     fuelGaugeSettings: FuelGaugeExport;
     firmwareVersion: string;
@@ -900,7 +920,8 @@ export interface NpmExportV2 {
     gpios: GPIOExport[];
     leds: LED[];
     pof?: POF;
-    ship?: ShipModeConfig;
+    lowPower?: LowPowerConfig;
+    reset?: ResetConfig;
     timerConfig?: TimerConfig;
     fuelGaugeSettings: FuelGaugeExport;
     firmwareVersion: string;
