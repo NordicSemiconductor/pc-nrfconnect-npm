@@ -55,3 +55,17 @@ export enum npm2100TimerMode {
     'Watchdog power cycle' = 'WATCHDOG_POWER_CYCLE',
     'Wake up' = 'WAKE-UP',
 }
+
+export const npm2100LongPressResetDebounceValues = [
+    '5s',
+    '10s',
+    '20s',
+    '30s',
+] as const;
+export type npm2100LongPressResetDebounce =
+    (typeof npm2100LongPressResetDebounceValues)[number];
+
+export enum npm2100ResetPinSelection {
+    'PG/RESET' = 'PGRESET',
+    'SHPHLD' = 'SHPHLD',
+}

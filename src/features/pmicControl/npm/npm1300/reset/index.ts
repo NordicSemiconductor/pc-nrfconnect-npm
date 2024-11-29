@@ -24,6 +24,9 @@ export default (
 ): ResetModule => ({
     get: new ResetGet(sendCommand),
     set: new ResetSet(eventEmitter, sendCommand, offlineMode),
+    values: {
+        pinSelection: [],
+    },
     callbacks: resetCallbacks(shellParser, eventEmitter),
     defaults: {
         longPressReset: 'one_button',

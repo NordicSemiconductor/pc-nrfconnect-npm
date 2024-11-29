@@ -1272,7 +1272,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set ship reset longpress two_button', async () => {
-            await pmic.resetModule?.set.longPressReset('two_button');
+            await pmic.resetModule?.set.longPressReset?.('two_button');
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -3262,7 +3262,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.resetModule?.set.longPressReset('one_button')
+                pmic.resetModule?.set.longPressReset?.('one_button')
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

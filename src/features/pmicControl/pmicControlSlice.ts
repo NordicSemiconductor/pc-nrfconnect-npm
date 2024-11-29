@@ -230,7 +230,7 @@ const pmicControlSlice = createSlice({
                 state.reset = {
                     ...state.npmDevice?.resetModule.defaults,
                     ...state.reset,
-                    ...action.payload,
+                    ...(action.payload as ResetConfig),
                 };
             }
         },

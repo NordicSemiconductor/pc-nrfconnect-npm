@@ -426,7 +426,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set timer reset longpress ', async () => {
-        await pmic.resetModule?.set.longPressReset('disabled');
+        await pmic.resetModule?.set.longPressReset?.('disabled');
 
         expect(mockonLowPowerUpdate).toBeCalledTimes(1);
         expect(mockonLowPowerUpdate).toBeCalledWith({

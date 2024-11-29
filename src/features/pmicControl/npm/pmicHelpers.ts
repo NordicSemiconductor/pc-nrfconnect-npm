@@ -85,6 +85,12 @@ export const parseToFloat = (message: string) =>
 export const parseToBoolean = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10) === 1;
 
+export const parseEnabled = (message: string): boolean => {
+    const res = parseColonBasedAnswer(message).toLocaleLowerCase();
+
+    return res === 'enable' || res === 'enabled';
+};
+
 export const parseOnOff = (message: string): boolean =>
     parseColonBasedAnswer(message).toLowerCase() === 'on';
 
@@ -172,7 +178,7 @@ export const toRegex = (
     command: string,
     getSet?: boolean,
     index?: number,
-    valueRegex = '[0-9]+'
+    valueRegex: string | RegExp = '[0-9]+'
 ) => {
     const indexRegex = index !== undefined ? ` ${index}` : '';
     if (getSet)
