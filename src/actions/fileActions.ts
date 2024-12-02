@@ -41,6 +41,7 @@ const saveSettings =
             leds: [...currentState.leds],
             pof: currentState.pof,
             lowPower: currentState.lowPower,
+            reset: currentState.reset,
             timerConfig: currentState.timerConfig,
             fuelGaugeSettings: {
                 enabled: currentState.fuelGaugeSettings.enabled,
