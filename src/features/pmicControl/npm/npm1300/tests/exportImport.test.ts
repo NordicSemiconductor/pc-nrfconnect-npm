@@ -11,13 +11,14 @@ import {
     GPIOExport,
     Ldo,
     LED,
+    LowPowerConfig,
     npm1300TimerConfig,
     npm1300TimerMode,
     NpmExportLatest,
     PartialUpdate,
     PmicDialog,
     POF,
-    ShipModeConfig,
+    ResetConfig,
     TimerConfig,
     USBPower,
 } from '../../types';
@@ -35,7 +36,8 @@ describe('PMIC 1300 - Apply Config ', () => {
         mockOnGpioUpdate,
         mockOnLEDUpdate,
         mockOnPOFUpdate,
-        mockOnShipUpdate,
+        mockOnLowPowerUpdate,
+        mockOnResetUpdate,
         mockOnTimerConfigUpdate,
         mockOnFuelGaugeUpdate,
         mockDialogHandler,
@@ -102,9 +104,11 @@ describe('PMIC 1300 - Apply Config ', () => {
         period: 0,
     };
 
-    const initShip: ShipModeConfig = {
+    const initShip: LowPowerConfig = {
         timeToActive: 96,
         invPolarity: false,
+    };
+    const initReset: ResetConfig = {
         longPressReset: 'two_button',
     };
 
@@ -233,9 +237,11 @@ describe('PMIC 1300 - Apply Config ', () => {
             prescaler: 'Fast',
             period: 10,
         },
-        ship: {
+        lowPower: {
             timeToActive: 16,
             invPolarity: true,
+        },
+        reset: {
             longPressReset: 'one_button',
         },
         fuelGaugeSettings: {
@@ -264,7 +270,8 @@ describe('PMIC 1300 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
-    let ship: ShipModeConfig = { ...initShip };
+    let ship: LowPowerConfig = { ...initShip };
+    let reset: ResetConfig = { ...initReset };
     let timerConfig = { ...initTimerConfig };
     let usbPower = { ...initUSBPower };
 
@@ -278,6 +285,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         leds = [];
         pof = { ...initPOF };
         ship = { ...initShip };
+        reset = { ...initReset };
         timerConfig = { ...initTimerConfig };
 
         mockOnChargerUpdate.mockImplementation(
@@ -337,10 +345,19 @@ describe('PMIC 1300 - Apply Config ', () => {
             };
         });
 
-        mockOnShipUpdate.mockImplementation(
-            (partialUpdate: Partial<ShipModeConfig>) => {
+        mockOnLowPowerUpdate.mockImplementation(
+            (partialUpdate: Partial<LowPowerConfig>) => {
                 ship = {
                     ...ship,
+                    ...partialUpdate,
+                };
+            }
+        );
+
+        mockOnResetUpdate.mockImplementation(
+            (partialUpdate: Partial<ResetConfig>) => {
+                reset = {
+                    ...reset,
                     ...partialUpdate,
                 };
             }
@@ -380,7 +397,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);
-        expect(mockOnShipUpdate).toBeCalledTimes(2);
+        expect(mockOnLowPowerUpdate).toBeCalledTimes(2);
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);

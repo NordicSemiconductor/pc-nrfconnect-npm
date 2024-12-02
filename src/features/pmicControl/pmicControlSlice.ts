@@ -18,13 +18,14 @@ import {
     GPIO,
     Ldo,
     LED,
+    LowPowerConfig,
     NpmDevice,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
     PmicState,
     POF,
-    ShipModeConfig,
+    ResetConfig,
     TimerConfig,
     USBPower,
 } from './npm/types';
@@ -38,7 +39,8 @@ interface pmicControlState {
     gpios: GPIO[];
     leds: LED[];
     pof?: POF;
-    ship?: ShipModeConfig;
+    lowPower?: LowPowerConfig;
+    reset?: ResetConfig;
     timerConfig?: TimerConfig;
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
@@ -202,20 +204,32 @@ const pmicControlSlice = createSlice({
                 };
             }
         },
-        setShipModeConfig(
+        setLowPowerConfig(
             state,
-            action: PayloadAction<ShipModeConfig | undefined>
+            action: PayloadAction<LowPowerConfig | undefined>
         ) {
-            state.ship = action.payload;
+            state.lowPower = action.payload;
         },
-        updateShipModeConfig(
+        updateLowPowerConfig(
             state,
-            action: PayloadAction<Partial<ShipModeConfig | undefined>>
+            action: PayloadAction<Partial<LowPowerConfig | undefined>>
         ) {
-            if (state.npmDevice?.shipModeModule) {
-                state.ship = {
-                    ...state.npmDevice?.shipModeModule.defaults,
-                    ...state.ship,
+            if (state.npmDevice?.lowPowerModule) {
+                state.lowPower = {
+                    ...state.npmDevice?.lowPowerModule.defaults,
+                    ...state.lowPower,
+                    ...action.payload,
+                };
+            }
+        },
+        updateResetConfig(
+            state,
+            action: PayloadAction<Partial<ResetConfig | undefined>>
+        ) {
+            if (state.npmDevice?.resetModule) {
+                state.reset = {
+                    ...state.npmDevice?.resetModule.defaults,
+                    ...state.reset,
                     ...action.payload,
                 };
             }
@@ -322,7 +336,8 @@ export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
 export const getGPIOs = (state: RootState) => state.app.pmicControl.gpios;
 export const getLEDs = (state: RootState) => state.app.pmicControl.leds;
 export const getPOF = (state: RootState) => state.app.pmicControl.pof;
-export const getShip = (state: RootState) => state.app.pmicControl.ship;
+export const getShip = (state: RootState) => state.app.pmicControl.lowPower;
+export const getReset = (state: RootState) => state.app.pmicControl.reset;
 export const getTimerConfig = (state: RootState) =>
     state.app.pmicControl.timerConfig;
 export const isBatteryConnected = (state: RootState) => {
@@ -401,8 +416,9 @@ export const {
     updatePOFs,
     setTimerConfig,
     updateTimerConfig,
-    setShipModeConfig,
-    updateShipModeConfig,
+    setLowPowerConfig,
+    updateLowPowerConfig,
+    updateResetConfig,
     setBatteryConnected,
     setBatteryAddonBoardId,
     setFuelGauge,

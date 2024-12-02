@@ -40,9 +40,10 @@ import { ChargerModule } from './charger';
 import { FuelGaugeModule } from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { numberOfLdos } from './ldo';
+import setupLowPower from './lowPower';
 import overlay from './overlay';
 import setupPof from './pof';
-import setupShipMode from './shipMode';
+import setupReset from './reset';
 import setupTimer from './timerConfig';
 import setupUsbCurrentLimiter from './universalSerialBusCurrentLimiter';
 
@@ -384,7 +385,14 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
-    const shipModeModule = setupShipMode(
+    const lowPowerModule = setupLowPower(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
+    const resetModule = setupReset(
         shellParser,
         eventEmitter,
         sendCommand,
@@ -536,7 +544,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
         releaseAll.push(...pofModule.callbacks);
         releaseAll.push(...timerConfigModule.callbacks);
-        releaseAll.push(...shipModeModule.callbacks);
+        releaseAll.push(...lowPowerModule.callbacks);
+        releaseAll.push(...resetModule.callbacks);
         releaseAll.push(...usbCurrentLimiterModule.callbacks);
     }
 
@@ -593,7 +602,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
 
             pofModule.get.all();
             timerConfigModule.get.all();
-            shipModeModule.get.all();
+            lowPowerModule.get.all();
+            resetModule.get.all();
             fuelGaugeModule.get.all();
         },
 
@@ -659,8 +669,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                             await timerConfigModule.set.all(config.timerConfig);
                         }
 
-                        if (config.ship) {
-                            await shipModeModule.set.all(config.ship);
+                        if (config.lowPower) {
+                            await lowPowerModule.set.all(config.lowPower);
+                        }
+
+                        if (config.reset) {
+                            await resetModule.set.all(config.reset);
                         }
 
                         await fuelGaugeModule.set.enabled(
@@ -789,7 +803,8 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
         pofModule,
         timerConfigModule,
         gpioModule,
-        shipModeModule,
+        lowPowerModule,
+        resetModule,
         usbCurrentLimiterModule,
         ldoModule,
         buckModule,

@@ -13,10 +13,11 @@ import {
     LdoModule,
     LED,
     LEDMode,
+    LowPowerConfig,
     NpmDevice,
     NpmExportLatest,
     NTCThermistor,
-    ShipModeConfig,
+    ResetConfig,
 } from '../types';
 
 const toMicro = (value: number) => value * 1000000;
@@ -149,11 +150,17 @@ npm1300_ek_leds: leds {
 };
 `;
 
-const generateMfd = (ship?: ShipModeConfig) =>
-    ship
+const generateLowPower = (lowPower?: LowPowerConfig) =>
+    lowPower
         ? `
-    // long-press-reset = "${ship.longPressReset}";
-    // ship-to-active-time = <${ship.timeToActive}>;
+    // ship-to-active-time = <${lowPower.timeToActive}>;
+`
+        : '';
+
+const generateReset = (reset?: ResetConfig) =>
+    reset
+        ? `
+    // long-press-reset = "${reset.longPressReset}";
 `
         : '';
 
@@ -170,7 +177,8 @@ export default (npmConfig: NpmExportLatest, npmDevice: NpmDevice) => `/*
        compatible = "nordic,npm1300";
        reg = <0x6b>;
 
-       ${generateMfd(npmConfig.ship)}
+       ${generateLowPower(npmConfig.lowPower)}
+       ${generateReset(npmConfig.reset)}
 
        npm1300_ek_gpio: gpio-controller {
            compatible = "nordic,npm1300-gpio";

@@ -7,10 +7,10 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { ShipModeModule } from '../../types';
-import shipModeCallbacks from './shipModeCallbacks';
-import { ShipModeGet } from './shipModeGetters';
-import { ShipModeSet } from './shipModeSetters';
+import { LowPowerModule } from '../../types';
+import shipModeCallbacks from './lowPowerCallbacks';
+import { LowPowerGet } from './lowPowerGetters';
+import { LowPowerSet } from './lowPowerSetters';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -21,13 +21,12 @@ export default (
         onError?: (response: string, command: string) => void
     ) => void,
     offlineMode: boolean
-): ShipModeModule => ({
-    get: new ShipModeGet(sendCommand),
-    set: new ShipModeSet(eventEmitter, sendCommand, offlineMode),
+): LowPowerModule => ({
+    get: new LowPowerGet(sendCommand),
+    set: new LowPowerSet(eventEmitter, sendCommand, offlineMode),
     callbacks: shipModeCallbacks(shellParser, eventEmitter),
     defaults: {
         timeToActive: 96,
         invPolarity: true,
-        longPressReset: 'one_button',
     },
 });

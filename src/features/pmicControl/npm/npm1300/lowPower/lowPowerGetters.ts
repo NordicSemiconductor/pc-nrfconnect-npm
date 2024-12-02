@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-export class ShipModeGet {
+export class LowPowerGet {
     // eslint-disable-next-line no-useless-constructor
     constructor(
         private sendCommand: (

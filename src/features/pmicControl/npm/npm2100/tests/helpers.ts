@@ -17,10 +17,11 @@ import {
     GPIO,
     Ldo,
     LED,
+    LowPowerConfig,
     PartialUpdate,
     PmicDialog,
     POF,
-    ShipModeConfig,
+    ResetConfig,
     TimerConfig,
     USBPower,
 } from '../../types';
@@ -74,9 +75,14 @@ export const setupMocksBase = (
         (_partialUpdate: Partial<TimerConfig>) => {}
     );
 
-    const mockOnShipUpdate = jest.fn(
+    const mockOnLowPowerUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<ShipModeConfig>) => {}
+        (_partialUpdate: Partial<LowPowerConfig>) => {}
+    );
+
+    const mockOnResetUpdate = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: Partial<ResetConfig>) => {}
     );
 
     const mockOnBoostUpdate = jest.fn(
@@ -109,7 +115,7 @@ export const setupMocksBase = (
     pmic.onLEDUpdate(mockOnLEDUpdate);
     pmic.onPOFUpdate(mockOnPOFUpdate);
     pmic.onTimerConfigUpdate(mockOnTimerConfigUpdate);
-    pmic.onShipUpdate(mockOnShipUpdate);
+    pmic.onLowPowerUpdate(mockOnLowPowerUpdate);
     pmic.onChargingStatusUpdate(mockOnChargingStatusUpdate);
     pmic.onFuelGaugeUpdate(mockOnFuelGaugeUpdate);
     pmic.onLdoUpdate(mockOnLdoUpdate);
@@ -135,7 +141,8 @@ export const setupMocksBase = (
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
-        mockOnShipUpdate,
+        mockOnLowPowerUpdate,
+        mockOnResetUpdate,
         mockOnLoggingEvent,
         mockOnPmicStateChange,
         mockOnReboot,

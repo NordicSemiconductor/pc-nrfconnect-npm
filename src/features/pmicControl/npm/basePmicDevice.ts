@@ -21,12 +21,13 @@ import {
     Ldo,
     LED,
     LoggingEvent,
+    LowPowerConfig,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
     PmicState,
     POF,
-    ShipModeConfig,
+    ResetConfig,
     TimerConfig,
     USBPower,
 } from './types';
@@ -199,8 +200,11 @@ export const baseNpmDevice: IBaseNpmDevice = (
         onTimerConfigUpdate: setupHandler<Partial<TimerConfig>, true>(
             'onTimerConfigUpdate'
         ),
-        onShipUpdate: setupHandler<Partial<ShipModeConfig>, true>(
-            'onShipUpdate'
+        onLowPowerUpdate: setupHandler<Partial<LowPowerConfig>, true>(
+            'onLowPowerUpdate'
+        ),
+        onResetUpdate: setupHandler<Partial<ResetConfig>, true>(
+            'onResetUpdate'
         ),
         onLoggingEvent: setupHandler<{
             loggingEvent: LoggingEvent;
