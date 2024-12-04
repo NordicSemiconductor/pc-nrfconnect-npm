@@ -31,7 +31,7 @@ export class ResetSet {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<ResetConfig>(
-                    'onLowPowerUpdate',
+                    'onResetUpdate',
                     {
                         longPressReset,
                     }
