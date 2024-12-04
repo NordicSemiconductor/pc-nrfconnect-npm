@@ -1,6 +1,6 @@
 # Overview and user interface
 
-After starting nPM PowerUP, the main application window is displayed.
+After starting the {{app_name}}, the main application window is displayed.
 
 ![nPM PowerUP application window](./screenshots/npm_overview.png "nPM PowerUP application window")
 
@@ -20,7 +20,7 @@ Before a device is selected, the side panel contains the following buttons:
 Dropdown to list the PMIC devices attached to the computer.
 
 !!! note "Note"
-      Read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use the nPM1300 EK with nPM PowerUP.
+      If you are using the nPM1300 EK, read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use this device with the {{app_name}}.
 
 ### Offline mode actions
 
@@ -48,6 +48,9 @@ This side panel area contains the following buttons:
 
 ### Fuel Gauge
 
+!!! note "Note"
+     This feature is available for the nPM1300 EK.
+
 This side panel area lets you select the following options:
 
 |               Menu               | Description |
@@ -55,6 +58,20 @@ This side panel area lets you select the following options:
 | **Active Battery Model**         | Select the battery model you want to use for Fuel Gauge in nPM PowerUP.        |
 | **Add New Active Battery Model** | Select a battery from selected vendors that has been profiled by Nordic Semiconductor or your own custom battery model, added with the **Profile Battery** feature and saved in the [**Profiles**](#profiles-tab) tab.        |
 | **Profile Battery**              | Create your own, custom battery profile, and collect the data. These are then saved in the [**Profiles**](#profiles-tab) tab and added to the **Add New Active Battery Model** drop-down menu.</br></br>An additional board, nPM Fuel Gauge, is required to perform the battery profiling. See [Profiling a battery with nPM PowerUP](profiling_battery.md) for more information.        |
+
+### Power Source
+
+!!! note "Note"
+     This feature is available for the nPM2100 EK.
+
+TBD
+
+### Maximum Energy Extraction
+
+!!! note "Note"
+     This feature is available for the nPM2100 EK.
+
+TBD
 
 ### Settings
 
@@ -76,6 +93,9 @@ The **Dashboard** tab provides a quick look overview of the major PMIC settings 
       Use the expand button in the top-right corner of some of the tiles to see all the options of the given setting.
 
 ## Charger tab
+
+!!! note "Note"
+     This feature is available for the nPM1300 EK.
 
 You can use the options in the **Charger** tab to control and monitor the charging settings and status of the PMIC device.
 
@@ -99,6 +119,9 @@ You can use the options in the **GPIOs** tab to configure the GPIO pins availabl
 You can use the options in the **System Features** tab to configure the **Reset and Low Power control**, **Timer**, **Power Failure**, **Vbus input current limiter**, and **Reset & Error Logs**.
 
 ## Profiles tab
+
+!!! note "Note"
+     This feature is available for the nPM1300 EK.
 
 The **Profiles** tab provides an overview of all battery profiles that you can select using the [Fuel Gauge drop-down menus](#fuel-gauge).
 
@@ -145,6 +168,13 @@ When writing, you are going to write new battery model on the nPM Controller to 
 This can overwrite the [**Active Battery Model**](#fuel-gauge).
 
 When saving, the battery model is saved in the selected directory either to a JSON file that can be downloaded to the nPM Controller or to an INC file. The INC file format is meant for integrating the battery model into your final application with a Nordic System on Chip (SoC).
+
+## MEE tab
+
+!!! note "Note"
+     This feature is available for the nPM2100 EK.
+
+TBD
 
 ## Graph tab
 
