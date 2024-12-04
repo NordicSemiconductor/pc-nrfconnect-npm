@@ -59,4 +59,5 @@ nav:
   - Home: index.md
   - Installing the nPM PowerUP app: installing.md
   - Overview and user interface: overview.md
-  - Profiling a battery with nPM PowerUP: profiling_battery.md
+  - Profiling a battery: profiling_battery.md
+  - Evaluating a battery: evaluating_battery.md
