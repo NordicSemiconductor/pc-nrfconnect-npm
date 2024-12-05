@@ -18,8 +18,10 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import { Terminal } from '@xterm/headless';
+import semver from 'semver';
 
 import { RootState } from '../../../appReducer';
+import { minimumHWVersion as minimumHWVersionNpm2100 } from './npm2100/pmic2100Device';
 import { getNpmDevice } from './npmFactory';
 import {
     dialogHandler,
@@ -335,6 +337,8 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
                 const version = await npmDevice.getPmicVersion();
 
+                const hwVersion = await npmDevice.getHwVersion();
+
                 shellParserO.unregister();
                 await port.close();
 
@@ -369,6 +373,33 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                     });
 
                     return p;
+                }
+
+                if (
+                    !hwVersion.version ||
+                    semver.gt(minimumHWVersionNpm2100, hwVersion.version)
+                ) {
+                    const p = new Promise<{
+                        device: Device;
+                        validFirmware: boolean;
+                    }>((resolve, reject) => {
+                        const information: PmicDialog = {
+                            type: 'alert',
+                            message:
+                                'Your device hardware version is too old and not compatible with this firmware',
+                            confirmLabel: 'OK',
+                            optionalLabel: "OK, don't mention it again",
+                            title: 'Important notice!',
+                            onConfirm: () => {
+                                reject(new Error('Device setup cancelled'));
+                            },
+                            onOptional: () => {
+                                reject(new Error('Device setup cancelled'));
+                            },
+                        };
+
+                        dispatch(dialogHandler(information));
+                    });
                 }
 
                 return action();
