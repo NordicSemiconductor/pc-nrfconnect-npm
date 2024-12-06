@@ -159,7 +159,7 @@ test.skip('PMIC 2100 - Setters Online tests - LDO', () => {
             async index => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
-                        dialog.onCancel();
+                        dialog.onCancel?.();
                     }
                 );
                 await expect(

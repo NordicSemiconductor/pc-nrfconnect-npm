@@ -418,7 +418,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setBuckVOut index: 1 with warning - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onCancel();
+                dialog.onCancel?.();
             });
 
             await expect(
@@ -545,7 +545,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setBuckMode index: 1 with software - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onCancel();
+                dialog.onCancel?.();
             });
 
             await expect(
@@ -714,7 +714,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setBuckEnabled index: 1 false - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onCancel();
+                dialog.onCancel?.();
             });
 
             await expect(
@@ -915,7 +915,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             async index => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
-                        dialog.onCancel();
+                        dialog.onCancel?.();
                     }
                 );
                 await expect(
