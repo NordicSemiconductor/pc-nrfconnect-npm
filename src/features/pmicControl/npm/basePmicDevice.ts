@@ -21,7 +21,7 @@ import {
     Ldo,
     LED,
     LoggingEvent,
-    LowPowerConfig,
+    npm1300LowPowerConfig,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
@@ -200,7 +200,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
         onTimerConfigUpdate: setupHandler<Partial<TimerConfig>, true>(
             'onTimerConfigUpdate'
         ),
-        onLowPowerUpdate: setupHandler<Partial<LowPowerConfig>, true>(
+        onLowPowerUpdate: setupHandler<Partial<npm1300LowPowerConfig>, true>(
             'onLowPowerUpdate'
         ),
         onResetUpdate: setupHandler<Partial<ResetConfig>, true>(

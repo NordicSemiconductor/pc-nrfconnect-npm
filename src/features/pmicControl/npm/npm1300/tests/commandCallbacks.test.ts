@@ -12,12 +12,12 @@ import {
     LEDModeValues,
     LongPressResetValues,
     npm1300TimerMode,
+    npm1300TimeToActive,
     NTCThermistor,
     PmicChargingState,
     POFPolarityValues,
     SoftStartValues,
     TimerPrescalerValues,
-    TimeToActiveValues,
     USBDetectStatusValues,
 } from '../../types';
 import {
@@ -1353,20 +1353,28 @@ Battery models stored in database:
     });
 
     test.each(
-        TimeToActiveValues.map(value => [
-            { append: `get`, value },
-            { append: `set ${value}`, value },
-        ])
-    )('npmx ship config time %p', ({ append, value }) => {
+        Object.keys(npm1300TimeToActive)
+            .map(key => {
+                const value =
+                    npm1300TimeToActive[
+                        key as keyof typeof npm1300TimeToActive
+                    ];
+                return [
+                    { append: `get`, expected: key },
+                    { append: `set ${value}`, expected: key },
+                ];
+            })
+            .flat()
+    )('npmx ship config time %p', ({ append, expected }) => {
         const command = `npmx ship config time ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${value}ms.`, command);
+        callback?.onSuccess(`Value: ${expected}.`, command);
 
         expect(mockOnLowPowerUpdate).toBeCalledTimes(1);
         expect(mockOnLowPowerUpdate).toBeCalledWith({
-            timeToActive: value,
+            timeToActive: expected,
         });
     });
 

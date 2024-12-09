@@ -9,16 +9,21 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     noop,
     NpmEventEmitter,
-    parseToNumber,
+    parseColonBasedAnswer,
     toRegex,
+    toValueRegex,
 } from '../../pmicHelpers';
-import { LowPowerConfig, TimeToActive } from '../../types';
+import { npm1300LowPowerConfig, npm1300TimeToActive } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter
 ) => {
     const cleanupCallbacks = [];
+
+    const npm1300TimeToActiveValues = Object.keys(npm1300TimeToActive).map(
+        key => npm1300TimeToActive[key as keyof typeof npm1300TimeToActive]
+    );
 
     if (shellParser) {
         cleanupCallbacks.push(
@@ -27,13 +32,15 @@ export default (
                     'npmx ship config time',
                     true,
                     undefined,
-                    '(16|32|64|96|304|608|1008|3008)'
+                    toValueRegex(npm1300TimeToActiveValues)
                 ),
                 res => {
-                    eventEmitter.emitPartialEvent<LowPowerConfig>(
+                    eventEmitter.emitPartialEvent<npm1300LowPowerConfig>(
                         'onLowPowerUpdate',
                         {
-                            timeToActive: parseToNumber(res) as TimeToActive,
+                            timeToActive: parseColonBasedAnswer(
+                                res
+                            ) as npm1300TimeToActive,
                         }
                     );
                 },

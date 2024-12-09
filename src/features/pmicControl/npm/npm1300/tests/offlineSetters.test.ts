@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { npm1300TimerMode, PmicDialog } from '../../types';
+import { npm1300TimerMode, npm1300TimeToActive, PmicDialog } from '../../types';
 import { GPIOMode1300, GPIOPull1300 } from '../gpio/types';
 import {
     PMIC_1300_BUCKS,
@@ -420,10 +420,12 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set timer config time ', async () => {
-        await pmic.lowPowerModule?.set.timeToActive(16);
+        await pmic.lowPowerModule?.set.timeToActive(
+            npm1300TimeToActive['16ms']
+        );
 
         expect(mockOnLowPowerUpdate).toBeCalledTimes(1);
-        expect(mockOnLowPowerUpdate).toBeCalledWith({ timeToActive: 16 });
+        expect(mockOnLowPowerUpdate).toBeCalledWith({ timeToActive: '16' });
     });
 
     test('Set set timer reset longpress ', async () => {

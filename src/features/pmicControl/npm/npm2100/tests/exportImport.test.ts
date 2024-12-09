@@ -11,7 +11,9 @@ import {
     Ldo,
     LED,
     LowPowerConfig,
+    npm2100LowPowerConfig,
     npm2100TimerConfig,
+    npm2100TimeToActive,
     NpmExportLatest,
     PartialUpdate,
     PmicDialog,
@@ -90,9 +92,9 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         period: 0,
     };
 
-    const initLowPower: LowPowerConfig = {
-        timeToActive: 96,
-        invPolarity: false,
+    const initLowPower: npm2100LowPowerConfig = {
+        timeToActive: npm2100TimeToActive['100ms'],
+        powerButtonEnable: true,
     };
 
     const initReset: ResetConfig = {
@@ -174,8 +176,8 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             period: 10,
         },
         lowPower: {
-            timeToActive: 16,
-            invPolarity: true,
+            timeToActive: npm2100TimeToActive['30ms'],
+            powerButtonEnable: true,
         },
         reset: {
             longPressReset: 'one_button',
@@ -204,7 +206,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
-    let ship: LowPowerConfig = { ...initLowPower };
+    let ship: npm2100LowPowerConfig = { ...initLowPower };
     let reset: ResetConfig = { ...initReset };
     let timerConfig = { ...initTimerConfig };
     let usbPower = { ...initUSBPower };
@@ -274,7 +276,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 ship = {
                     ...ship,
                     ...partialUpdate,
-                };
+                } as npm2100LowPowerConfig;
             }
         );
 

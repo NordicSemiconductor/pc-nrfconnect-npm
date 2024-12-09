@@ -7,7 +7,7 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { LowPowerModule, npm1300TimeToActive } from '../../types';
+import { LowPowerModule, npm2100TimeToActive } from '../../types';
 import shipModeCallbacks from './lowPowerCallbacks';
 import { LowPowerGet } from './lowPowerGetters';
 import { LowPowerSet } from './lowPowerSetters';
@@ -26,13 +26,13 @@ export default (
     set: new LowPowerSet(eventEmitter, sendCommand, offlineMode),
     callbacks: shipModeCallbacks(shellParser, eventEmitter),
     defaults: {
-        timeToActive: npm1300TimeToActive['96ms'],
-        invPolarity: true,
+        timeToActive: npm2100TimeToActive['100ms'],
+        powerButtonEnable: true,
     },
     values: {
-        timeToActive: Object.keys(npm1300TimeToActive).map(key => ({
+        timeToActive: Object.keys(npm2100TimeToActive).map(key => ({
             label: `${key}`,
-            value: npm1300TimeToActive[key as keyof typeof npm1300TimeToActive],
+            value: npm2100TimeToActive[key as keyof typeof npm2100TimeToActive],
         })),
     },
 });

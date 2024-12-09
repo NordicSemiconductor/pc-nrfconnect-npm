@@ -16,7 +16,7 @@ import {
     GPIO,
     Ldo,
     LED,
-    LowPowerConfig,
+    npm1300LowPowerConfig,
     PartialUpdate,
     PmicDialog,
     POF,
@@ -77,7 +77,7 @@ export const setupMocksBase = (
 
     const mockOnLowPowerUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<LowPowerConfig>) => {}
+        (_partialUpdate: Partial<npm1300LowPowerConfig>) => {}
     );
 
     const mockOnResetUpdate = jest.fn(

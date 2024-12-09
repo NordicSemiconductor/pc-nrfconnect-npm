@@ -11,9 +11,10 @@ import {
     GPIOExport,
     Ldo,
     LED,
-    LowPowerConfig,
+    npm1300LowPowerConfig,
     npm1300TimerConfig,
     npm1300TimerMode,
+    npm1300TimeToActive,
     NpmExportLatest,
     PartialUpdate,
     PmicDialog,
@@ -104,8 +105,8 @@ describe('PMIC 1300 - Apply Config ', () => {
         period: 0,
     };
 
-    const initShip: LowPowerConfig = {
-        timeToActive: 96,
+    const initShip: npm1300LowPowerConfig = {
+        timeToActive: npm1300TimeToActive['96ms'],
         invPolarity: false,
     };
     const initReset: ResetConfig = {
@@ -238,7 +239,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             period: 10,
         },
         lowPower: {
-            timeToActive: 16,
+            timeToActive: npm1300TimeToActive['16ms'],
             invPolarity: true,
         },
         reset: {
@@ -270,7 +271,7 @@ describe('PMIC 1300 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
-    let ship: LowPowerConfig = { ...initShip };
+    let ship: npm1300LowPowerConfig = { ...initShip };
     let reset: ResetConfig = { ...initReset };
     let timerConfig = { ...initTimerConfig };
     let usbPower = { ...initUSBPower };
@@ -346,7 +347,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         });
 
         mockOnLowPowerUpdate.mockImplementation(
-            (partialUpdate: Partial<LowPowerConfig>) => {
+            (partialUpdate: Partial<npm1300LowPowerConfig>) => {
                 ship = {
                     ...ship,
                     ...partialUpdate,

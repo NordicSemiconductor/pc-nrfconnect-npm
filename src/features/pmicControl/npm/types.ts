@@ -260,10 +260,30 @@ export type npm2100TimerConfig = {
     period: number;
 };
 
-export const TimeToActiveValues = [
-    16, 32, 64, 96, 304, 608, 1008, 3008,
-] as const;
-export type TimeToActive = (typeof TimeToActiveValues)[number];
+export enum npm1300TimeToActive {
+    '16ms' = '16',
+    '32ms' = '32',
+    '64ms' = '64',
+    '96ms' = '96',
+    '304ms' = '304',
+    '608ms' = '608',
+    '1008ms' = '1008',
+    '3008ms' = '3008',
+}
+
+export enum npm2100TimeToActive {
+    'DISABLE' = 'OFF',
+    '10ms' = '10',
+    '30ms' = '30',
+    '60ms' = '60',
+    '100ms' = '100',
+    '300ms' = '300',
+    '600ms' = '600',
+    '1s' = '1000',
+    '3s' = '3000',
+}
+
+export type TimeToActive = npm1300TimeToActive | npm2100TimeToActive;
 
 export const LongPressResetValues = [
     'one_button',
@@ -272,9 +292,16 @@ export const LongPressResetValues = [
 ] as const;
 export type LongPressReset = (typeof LongPressResetValues)[number];
 
-export type LowPowerConfig = {
-    timeToActive: TimeToActive;
+export type LowPowerConfig = npm1300LowPowerConfig | npm2100LowPowerConfig;
+
+export type npm1300LowPowerConfig = {
+    timeToActive: npm1300TimeToActive;
     invPolarity: boolean;
+};
+
+export type npm2100LowPowerConfig = {
+    timeToActive: npm2100TimeToActive;
+    powerButtonEnable: boolean;
 };
 
 export type ResetConfig = npm1300ResetConfig | npm2100ResetConfig;
@@ -282,12 +309,6 @@ export type ResetConfig = npm1300ResetConfig | npm2100ResetConfig;
 export type npm1300ResetConfig = {
     longPressReset: LongPressReset;
 };
-
-/*
-export const npm2100ResetPinSelectionValues = ['PG/RESET', 'SHPHLD'] as const;
-export type npm2100ResetPinSelection =
-    (typeof npm2100ResetPinSelectionValues)[number];
-*/
 
 export type npm2100ResetReason = {
     reason?: string;
@@ -691,9 +712,14 @@ export type LowPowerModule = {
     set: {
         all(lowPower: LowPowerConfig): Promise<void>;
         timeToActive(timeToActive: TimeToActive): Promise<void>;
+        powerButtonEnable?(powerButtonEnable: boolean): Promise<void>;
 
         enterShipMode(): void;
         enterShipHibernateMode(): void;
+        enterHibernatePtMode?(): void;
+    };
+    values: {
+        timeToActive: { label: string; value: TimeToActive }[];
     };
     callbacks: (() => void)[];
     defaults: LowPowerConfig;
@@ -789,7 +815,10 @@ export type BaseNpmDevice = {
         handler: (payload: Partial<TimerConfig>, error?: string) => void
     ) => () => void;
     onLowPowerUpdate: (
-        handler: (payload: Partial<LowPowerConfig>, error?: string) => void
+        handler: (
+            payload: Partial<npm1300LowPowerConfig>,
+            error?: string
+        ) => void
     ) => () => void;
     onResetUpdate: (
         handler: (payload: Partial<ResetConfig>, error?: string) => void

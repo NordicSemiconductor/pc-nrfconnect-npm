@@ -7,6 +7,7 @@
 import {
     LEDModeValues,
     npm1300TimerMode,
+    npm1300TimeToActive,
     NTCThermistor,
     PmicDialog,
     POFPolarityValues,
@@ -1258,7 +1259,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set ship config time %p', async () => {
-            await pmic.lowPowerModule?.set.timeToActive(16);
+            await pmic.lowPowerModule?.set.timeToActive(
+                npm1300TimeToActive['16ms']
+            );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -3233,7 +3236,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.lowPowerModule?.set.timeToActive(16)
+                pmic.lowPowerModule?.set.timeToActive(
+                    npm1300TimeToActive['16ms']
+                )
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
