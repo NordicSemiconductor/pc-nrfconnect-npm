@@ -1,11 +1,12 @@
 # Profiling a battery with nPM PowerUP
 
+!!! note "Note"
+     This feature is available for the nPM1300 EK.
+
 Use the nPM PowerUP together with the [nPM1300 Evaluation Kit (EK)](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/intro.html) and the [nPM Fuel Gauge Board](https://docs.nordicsemi.com/bundle/ug_npm_fuel_gauge/page/UG/nPM_fuel_gauge/intro.html) to profile your battery and generate a battery model.
 
 The EK and the nPM Fuel Gauge Board are used to profile and generate the model. Once the battery model is extracted, you only need nPM1300 and the SoC (or SiP) in your application to do fuel gauging.
 For the complete overview of the whole process, read the [Using the nPM1300 Fuel Gauge](https://docs.nordicsemi.com/bundle/nan_045/page/APP/nan_045/intro.html) application note.
-
-## Generating a battery model
 
 Complete the following steps to profile a battery and use the generated battery model to initialize and run the nPM1300 fuel gauge in the nPM PowerUP app:
 
@@ -29,19 +30,4 @@ Complete the following steps to profile a battery and use the generated battery 
    A drop-down menu appears.
 1. Select **Custom Model** to load the generated JSON battery model file to the host System on Chip (SoC) of nPM1300 EK.
 
-## Evaluating a battery model
-
-To start fuel gauge evaluations using a battery model, complete the following steps:
-
-1. Make sure the following conditions are met:
-
-    - You have a battery connected to the EK.
-    - You have an active battery model selected in the [**Fuel Gauge**](./overview.md#fuel-gauge) side panel, either using the **Active Battery Model** for a preloaded battery model or the **Add New Battery Model** > **Custom Model** for your own custom battery model from a JSON file.
-    - You have the **Fuel Gauge** setting enabled on the [**Dashboard**](./overview.md#dashboard-tab) tab.
-
-1. Open the [**Graph**](./overview.md#graph-tab) tab.
-1. Make sure the **Live** toggle is enabled.</br>
-   The graph will display the live State of Charge over time.
-
-    ![nPM PowerUP graph during real time evaluation](./screenshots/battery_evaluation.png "nPM PowerUP graph during real time evaluation")
-
+To start fuel gauge evaluations using a battery model, see [Evaluating a battery model with nPM PowerUP](evaluating_battery.md).
