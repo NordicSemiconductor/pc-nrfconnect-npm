@@ -26,7 +26,8 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
-        mockOnLowPowerUpdate: mockonLowPowerUpdate,
+        mockOnLowPowerUpdate,
+        mockOnResetUpdate,
         mockOnUsbPower,
         pmic,
     } = setupMocksBase();
@@ -421,15 +422,15 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     test('Set set timer config time ', async () => {
         await pmic.lowPowerModule?.set.timeToActive(16);
 
-        expect(mockonLowPowerUpdate).toBeCalledTimes(1);
-        expect(mockonLowPowerUpdate).toBeCalledWith({ timeToActive: 16 });
+        expect(mockOnLowPowerUpdate).toBeCalledTimes(1);
+        expect(mockOnLowPowerUpdate).toBeCalledWith({ timeToActive: 16 });
     });
 
     test('Set set timer reset longpress ', async () => {
         await pmic.resetModule?.set.longPressReset?.('disabled');
 
-        expect(mockonLowPowerUpdate).toBeCalledTimes(1);
-        expect(mockonLowPowerUpdate).toBeCalledWith({
+        expect(mockOnResetUpdate).toBeCalledTimes(1);
+        expect(mockOnResetUpdate).toBeCalledWith({
             longPressReset: 'disabled',
         });
     });

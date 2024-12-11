@@ -18,7 +18,6 @@ import {
     NpmDevice,
     NpmExportLatest,
     NTCThermistor,
-    ResetConfig,
 } from '../types';
 
 const toMicro = (value: number) => value * 1000000;
