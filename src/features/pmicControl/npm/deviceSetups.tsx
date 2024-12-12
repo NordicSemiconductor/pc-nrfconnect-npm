@@ -344,10 +344,10 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                     !hwVersion.version ||
                     semver.gte(minimumHWVersionNpm2100, hwVersion.version)
                 ) {
-                    const p = new Promise<{
+                    return new Promise<{
                         device: Device;
                         validFirmware: boolean;
-                    }>((resolve, reject) => {
+                    }>((_, reject) => {
                         const information: PmicDialog = {
                             type: 'alert',
                             message:
