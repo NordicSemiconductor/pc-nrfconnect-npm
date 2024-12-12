@@ -342,7 +342,7 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
                 if (
                     !hwVersion.version ||
-                    semver.gt(minimumHWVersionNpm2100, hwVersion.version)
+                    semver.gte(minimumHWVersionNpm2100, hwVersion.version)
                 ) {
                     const p = new Promise<{
                         device: Device;
