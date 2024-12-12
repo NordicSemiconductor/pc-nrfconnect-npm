@@ -335,45 +335,10 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                     validFirmware: result.supported,
                 });
 
-                const version = await npmDevice.getPmicVersion();
-
                 const hwVersion = await npmDevice.getHwVersion();
 
                 shellParserO.unregister();
                 await port.close();
-
-                if (
-                    version === 2.0 ||
-                    (Number.isNaN(version) && result.version === '0.7.0+0')
-                ) {
-                    const p = new Promise<{
-                        device: Device;
-                        validFirmware: boolean;
-                    }>((resolve, reject) => {
-                        const information: PmicDialog = {
-                            type: 'alert',
-                            doNotAskAgainStoreID: 'pmic1300-fp2-reset-issue',
-                            message: npm1300EngineeringCMessage,
-                            confirmLabel: 'Yes',
-                            cancelLabel: 'No',
-                            optionalLabel: "Yes, don't ask again",
-                            title: 'Important notice!',
-                            onConfirm: () => {
-                                resolve(action());
-                            },
-                            onCancel: () => {
-                                reject(new Error('Device setup cancelled'));
-                            },
-                            onOptional: () => {
-                                action();
-                            },
-                        };
-
-                        dispatch(dialogHandler(information));
-                    });
-
-                    return p;
-                }
 
                 if (
                     !hwVersion.version ||
