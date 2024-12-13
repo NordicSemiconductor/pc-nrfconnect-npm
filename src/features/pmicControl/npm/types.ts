@@ -716,6 +716,8 @@ export type ResetModule = {
             longPressResetDebounce: npm2100LongPressResetDebounce
         ) => Promise<void>;
         selectResetPin?: (resetPin: npm2100ResetPinSelection) => Promise<void>;
+    };
+    actions: {
         powerCycle?: () => Promise<void>;
     };
     values: {

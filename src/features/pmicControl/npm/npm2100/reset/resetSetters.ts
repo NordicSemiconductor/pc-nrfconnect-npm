@@ -103,18 +103,4 @@ export class ResetSet {
             }
         });
     }
-
-    powerCycle() {
-        return new Promise<void>((resolve, reject) => {
-            if (this.offlineMode) {
-                // No action if offline
-            } else {
-                this.sendCommand(
-                    `npm2100 reset_ctrl power_cycle set ENABLE`,
-                    () => resolve(),
-                    () => reject()
-                );
-            }
-        });
-    }
 }

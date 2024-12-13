@@ -24,6 +24,7 @@ export default (
 ): ResetModule => ({
     get: new ResetGet(sendCommand),
     set: new ResetSet(eventEmitter, sendCommand, offlineMode),
+    actions: {},
     values: {
         longPressReset: LongPressResetValues.map(item => ({
             label: `${item}`.replaceAll('_', ' '),

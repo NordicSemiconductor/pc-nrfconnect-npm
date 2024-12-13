@@ -128,13 +128,13 @@ export default ({
                 />
             )}
 
-        {resetModule.set.powerCycle && (
+        {resetModule.actions.powerCycle && (
             <DocumentationTooltip card={card} item="PowerCycle">
                 <Button
                     variant="secondary"
                     className="tw-w-full"
                     onClick={() => {
-                        resetModule.set.powerCycle?.();
+                        resetModule.actions.powerCycle?.();
                     }}
                     disabled={disabled}
                 >

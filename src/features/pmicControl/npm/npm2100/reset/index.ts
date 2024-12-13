@@ -12,6 +12,7 @@ import {
     npm2100LongPressResetDebounceValues,
     npm2100ResetPinSelection,
 } from '../types';
+import { ResetActions } from './resetActions';
 import resetCallbacks from './resetCallbacks';
 import { ResetGet } from './resetGetters';
 import { ResetSet } from './resetSetters';
@@ -28,6 +29,7 @@ export default (
 ): ResetModule => ({
     get: new ResetGet(sendCommand),
     set: new ResetSet(eventEmitter, sendCommand, offlineMode),
+    actions: new ResetActions(eventEmitter, sendCommand, offlineMode),
     values: {
         pinSelection: Object.keys(npm2100ResetPinSelection).map(key => ({
             label: `${key}`,
