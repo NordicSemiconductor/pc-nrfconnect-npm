@@ -7,7 +7,7 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { ResetModule } from '../../types';
+import { LongPressResetValues, ResetModule } from '../../types';
 import resetCallbacks from './resetCallbacks';
 import { ResetGet } from './resetGetters';
 import { ResetSet } from './resetSetters';
@@ -25,7 +25,12 @@ export default (
     get: new ResetGet(sendCommand),
     set: new ResetSet(eventEmitter, sendCommand, offlineMode),
     values: {
+        longPressReset: LongPressResetValues.map(item => ({
+            label: `${item}`.replaceAll('_', ' '),
+            value: `${item}`,
+        })),
         pinSelection: [],
+        longPressResetDebounce: [],
     },
     callbacks: resetCallbacks(shellParser, eventEmitter),
     defaults: {

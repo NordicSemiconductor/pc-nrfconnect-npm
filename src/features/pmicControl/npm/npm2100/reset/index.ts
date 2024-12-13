@@ -8,7 +8,10 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { ResetModule } from '../../types';
-import { npm2100ResetPinSelection } from '../types';
+import {
+    npm2100LongPressResetDebounceValues,
+    npm2100ResetPinSelection,
+} from '../types';
 import resetCallbacks from './resetCallbacks';
 import { ResetGet } from './resetGetters';
 import { ResetSet } from './resetSetters';
@@ -32,6 +35,13 @@ export default (
                 key as keyof typeof npm2100ResetPinSelection
             ],
         })),
+        longPressResetDebounce: npm2100LongPressResetDebounceValues.map(
+            item => ({
+                label: `${item}`,
+                value: `${item}`,
+            })
+        ),
+        longPressReset: [],
     },
     callbacks: resetCallbacks(shellParser, eventEmitter),
     defaults: {

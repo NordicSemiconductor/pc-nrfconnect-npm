@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    DropdownItem,
+    ShellParser,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
 
 import { RangeType } from '../../../utils/helpers';
@@ -290,6 +293,9 @@ export type npm2100ResetReason = {
     reason?: string;
     bor?: string;
 };
+
+export type LongPressResetDebounce = npm2100LongPressResetDebounce;
+export type ResetPinSelection = npm2100ResetPinSelection;
 
 export type npm2100ResetConfig = {
     longPressResetEnable: boolean;
@@ -713,7 +719,9 @@ export type ResetModule = {
         powerCycle?: () => Promise<void>;
     };
     values: {
-        pinSelection: { label: string; value: npm2100ResetPinSelection }[];
+        pinSelection: DropdownItem<ResetPinSelection>[];
+        longPressReset: DropdownItem<LongPressReset>[];
+        longPressResetDebounce: DropdownItem<LongPressResetDebounce>[];
     };
     callbacks: (() => void)[];
     defaults: ResetConfig;

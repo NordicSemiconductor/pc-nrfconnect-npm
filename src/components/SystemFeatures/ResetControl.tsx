@@ -15,28 +15,12 @@ import {
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { ResetReasons } from '../../features/pmicControl/npm/npm2100/reset';
 import {
-    npm2100LongPressResetDebounce,
-    npm2100LongPressResetDebounceValues,
-    npm2100ResetPinSelection,
-} from '../../features/pmicControl/npm/npm2100/types';
-import {
     LongPressReset,
-    LongPressResetValues,
+    LongPressResetDebounce,
     ResetConfig,
     ResetModule,
+    ResetPinSelection,
 } from '../../features/pmicControl/npm/types';
-
-const LongPressResetItems = LongPressResetValues.map(item => ({
-    label: `${item}`.replaceAll('_', ' '),
-    value: `${item}`,
-}));
-
-const LongPressResetDebounceItems = npm2100LongPressResetDebounceValues.map(
-    item => ({
-        label: `${item}`,
-        value: `${item}`,
-    })
-);
 
 const card = 'resetControl';
 
@@ -59,21 +43,16 @@ export default ({
                         Long Press Reset
                     </DocumentationTooltip>
                 }
-                items={LongPressResetItems}
+                items={resetModule.values.longPressReset}
                 onSelect={item =>
                     resetModule.set.longPressReset?.(
                         item.value as LongPressReset
                     )
                 }
                 selectedItem={
-                    LongPressResetItems[
-                        Math.max(
-                            0,
-                            LongPressResetItems.findIndex(
-                                item => item.value === reset.longPressReset
-                            )
-                        ) ?? 0
-                    ]
+                    resetModule.values.longPressReset.find(
+                        item => item.value === reset.longPressReset
+                    ) ?? resetModule.values.longPressReset[0]
                 }
                 disabled={disabled}
             />
@@ -92,7 +71,7 @@ export default ({
                 items={resetModule.values.pinSelection}
                 onSelect={item =>
                     resetModule.set.selectResetPin?.(
-                        item.value as npm2100ResetPinSelection
+                        item.value as ResetPinSelection
                     )
                 }
                 selectedItem={
@@ -134,23 +113,16 @@ export default ({
                             Long Press Reset Debounce
                         </DocumentationTooltip>
                     }
-                    items={LongPressResetDebounceItems}
+                    items={resetModule.values.longPressResetDebounce}
                     onSelect={item =>
                         resetModule.set.longPressResetDebounce?.(
-                            item.value as npm2100LongPressResetDebounce
+                            item.value as LongPressResetDebounce
                         )
                     }
                     selectedItem={
-                        LongPressResetDebounceItems[
-                            Math.max(
-                                0,
-                                LongPressResetDebounceItems.findIndex(
-                                    item =>
-                                        item.value ===
-                                        reset.longPressResetDebounce
-                                )
-                            ) ?? 0
-                        ]
+                        resetModule.values.longPressResetDebounce.find(
+                            item => item.value === reset.longPressResetDebounce
+                        ) ?? resetModule.values.longPressResetDebounce[0]
                     }
                     disabled={disabled}
                 />
