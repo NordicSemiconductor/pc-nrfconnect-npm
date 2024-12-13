@@ -403,7 +403,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         releaseAll.push(...fuelGaugeModule.callbacks);
         releaseAll.push(...batteryModule.callbacks);
         releaseAll.push(...timerConfigModule.callbacks);
-        // releaseAll.push(...resetModule.callbacks);
+        releaseAll.push(...resetModule.callbacks);
         releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
         releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
