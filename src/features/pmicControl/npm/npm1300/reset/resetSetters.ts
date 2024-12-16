@@ -5,7 +5,7 @@
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { LongPressReset, ResetConfig } from '../../types';
+import { LongPressReset, npm1300ResetConfig, ResetConfig } from '../../types';
 import { ResetGet } from './resetGetters';
 
 export class ResetSet {
@@ -23,7 +23,7 @@ export class ResetSet {
         this.get = new ResetGet(sendCommand);
     }
 
-    async all(shipMode: ResetConfig) {
+    async all(shipMode: npm1300ResetConfig) {
         await this.longPressReset(shipMode.longPressReset);
     }
 
@@ -31,7 +31,7 @@ export class ResetSet {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<ResetConfig>(
-                    'onLowPowerUpdate',
+                    'onResetUpdate',
                     {
                         longPressReset,
                     }

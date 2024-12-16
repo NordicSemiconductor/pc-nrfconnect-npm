@@ -14,10 +14,10 @@ import {
     LED,
     LEDMode,
     LowPowerConfig,
+    npm1300ResetConfig,
     NpmDevice,
     NpmExportLatest,
     NTCThermistor,
-    ResetConfig,
 } from '../types';
 
 const toMicro = (value: number) => value * 1000000;
@@ -157,7 +157,7 @@ const generateLowPower = (lowPower?: LowPowerConfig) =>
 `
         : '';
 
-const generateReset = (reset?: ResetConfig) =>
+const generateReset = (reset?: npm1300ResetConfig) =>
     reset
         ? `
     // long-press-reset = "${reset.longPressReset}";
@@ -178,7 +178,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: NpmDevice) => `/*
        reg = <0x6b>;
 
        ${generateLowPower(npmConfig.lowPower)}
-       ${generateReset(npmConfig.reset)}
+       ${generateReset(npmConfig.reset as npm1300ResetConfig)}
 
        npm1300_ek_gpio: gpio-controller {
            compatible = "nordic,npm1300-gpio";

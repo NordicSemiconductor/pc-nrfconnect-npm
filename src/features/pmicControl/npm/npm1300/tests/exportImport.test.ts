@@ -397,7 +397,8 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);
-        expect(mockOnLowPowerUpdate).toBeCalledTimes(2);
+        expect(mockOnLowPowerUpdate).toBeCalledTimes(1);
+        expect(mockOnResetUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);

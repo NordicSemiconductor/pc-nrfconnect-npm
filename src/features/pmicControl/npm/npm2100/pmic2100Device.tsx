@@ -38,6 +38,7 @@ import getBoostModule, { numberOfBoosts } from './boost';
 import { FuelGaugeModule } from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { numberOfLdos } from './ldo';
+import setupReset from './reset';
 import setupTimer from './timerConfig';
 
 export const npm2100FWVersion = '0.2.2+0';
@@ -302,6 +303,16 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         offlineMode
     );
 
+    // Setup lowpower
+
+    // Setup reset
+    const resetModule = setupReset(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
+
     const timerConfigModule = setupTimer(
         shellParser,
         eventEmitter,
@@ -392,6 +403,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         releaseAll.push(...fuelGaugeModule.callbacks);
         releaseAll.push(...batteryModule.callbacks);
         releaseAll.push(...timerConfigModule.callbacks);
+        releaseAll.push(...resetModule.callbacks);
         releaseAll.push(...boostModule.map(boost => boost.callbacks).flat());
         releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
@@ -460,6 +472,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
             batteryModule.get.all();
             timerConfigModule.get.all();
+            resetModule.get.all();
             boostModule.forEach(boost => boost.get.all());
             ldoModule.forEach(ldo => ldo.get.all());
             gpioModule.forEach(module => module.get.all());
@@ -525,6 +538,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
                         if (config.timerConfig)
                             await timerConfigModule.set.all(config.timerConfig);
+
+                        if (config.reset)
+                            await resetModule.set.all(config.reset);
 
                         await fuelGaugeModule.set.enabled(
                             config.fuelGaugeSettings.enabled
@@ -649,6 +665,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         gpioModule,
         ldoModule,
         timerConfigModule,
+        resetModule,
 
         getBatteryConnectedVoltageThreshold: () => 0, // 0V
     };

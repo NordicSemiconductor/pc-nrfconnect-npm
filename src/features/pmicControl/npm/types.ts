@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    DropdownItem,
+    ShellParser,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
 
 import { RangeType } from '../../../utils/helpers';
@@ -24,6 +27,8 @@ import {
     nPM2100LdoModeControl,
     nPM2100LDOSoftStart,
     nPM2100LoadSwitchSoftStart,
+    npm2100LongPressResetDebounce,
+    npm2100ResetPinSelection,
     npm2100TimerMode,
 } from './npm2100/types';
 
@@ -272,8 +277,31 @@ export type LowPowerConfig = {
     invPolarity: boolean;
 };
 
-export type ResetConfig = {
+export type ResetConfig = npm1300ResetConfig | npm2100ResetConfig;
+
+export type npm1300ResetConfig = {
     longPressReset: LongPressReset;
+};
+
+/*
+export const npm2100ResetPinSelectionValues = ['PG/RESET', 'SHPHLD'] as const;
+export type npm2100ResetPinSelection =
+    (typeof npm2100ResetPinSelectionValues)[number];
+*/
+
+export type npm2100ResetReason = {
+    reason?: string;
+    bor?: string;
+};
+
+export type LongPressResetDebounce = npm2100LongPressResetDebounce;
+export type ResetPinSelection = npm2100ResetPinSelection;
+
+export type npm2100ResetConfig = {
+    longPressResetEnable: boolean;
+    longPressResetDebounce: npm2100LongPressResetDebounce;
+    resetPinSelection: npm2100ResetPinSelection;
+    resetReason?: npm2100ResetReason;
 };
 
 export type AdcSample = {
@@ -679,7 +707,23 @@ export type ResetModule = {
     set: {
         all(reset: ResetConfig): Promise<void>;
 
-        longPressReset(longPressReset: LongPressReset): Promise<void>;
+        // npm1300
+        longPressReset?: (longPressReset: LongPressReset) => Promise<void>;
+
+        // npm2100
+        longPressResetEnable?: (longPressResetEnable: boolean) => Promise<void>;
+        longPressResetDebounce?: (
+            longPressResetDebounce: npm2100LongPressResetDebounce
+        ) => Promise<void>;
+        selectResetPin?: (resetPin: npm2100ResetPinSelection) => Promise<void>;
+    };
+    actions: {
+        powerCycle?: () => Promise<void>;
+    };
+    values: {
+        pinSelection: DropdownItem<ResetPinSelection>[];
+        longPressReset: DropdownItem<LongPressReset>[];
+        longPressResetDebounce: DropdownItem<LongPressResetDebounce>[];
     };
     callbacks: (() => void)[];
     defaults: ResetConfig;
