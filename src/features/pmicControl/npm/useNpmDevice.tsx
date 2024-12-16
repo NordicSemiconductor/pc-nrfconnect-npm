@@ -697,6 +697,7 @@ export default () => {
                         name: 'System Features',
                         hidden:
                             npmDevice.lowPowerModule === undefined &&
+                            npmDevice.resetModule === undefined &&
                             npmDevice.timerConfigModule === undefined &&
                             npmDevice.pofModule === undefined &&
                             npmDevice.usbCurrentLimiterModule === undefined &&
