@@ -31,7 +31,9 @@ export default ({
 }) => (
     <Card
         title={
-            <div className="tw-flex tw-justify-between">Low Power control</div>
+            <div className="tw-flex tw-justify-between tw-gap-1">
+                Low Power control
+            </div>
         }
     >
         {'powerButtonEnable' in lowPower &&
@@ -72,45 +74,49 @@ export default ({
             }
             disabled={disabled}
         />
-
-        <DocumentationTooltip card={card} item="EnterShipMode">
-            <Button
-                variant="secondary"
-                className="tw-my-1 tw-w-full"
-                onClick={() => {
-                    lowPowerModule.set.enterShipMode();
-                }}
-                disabled={disabled}
-            >
-                Enter Ship Mode
-            </Button>
-        </DocumentationTooltip>
-        <DocumentationTooltip card={card} item="EnterHibernateMode">
-            <Button
-                variant="secondary"
-                className="tw-my-1 tw-w-full"
-                onClick={() => {
-                    lowPowerModule.set.enterShipHibernateMode();
-                }}
-                disabled={disabled}
-            >
-                Enter Hibernate Mode
-            </Button>
-        </DocumentationTooltip>
-
-        {lowPowerModule.set.enterHibernatePtMode && (
-            <DocumentationTooltip card={card} item="EnterHibernateMode">
-                <Button
-                    variant="secondary"
-                    className="tw-my-1 tw-w-full"
-                    onClick={() => {
-                        lowPowerModule.set.enterHibernatePtMode?.();
-                    }}
-                    disabled={disabled}
-                >
-                    Enter Hibernate PT Mode
-                </Button>
-            </DocumentationTooltip>
-        )}
+        <div className="tw-flex tw-flex-col tw-gap-1">
+            {lowPowerModule.actions.enterShipMode && (
+                <DocumentationTooltip card={card} item="EnterShipMode">
+                    <Button
+                        variant="secondary"
+                        className="tw-w-full"
+                        onClick={() => {
+                            lowPowerModule.actions.enterShipMode?.();
+                        }}
+                        disabled={disabled}
+                    >
+                        Enter Ship Mode
+                    </Button>
+                </DocumentationTooltip>
+            )}
+            {lowPowerModule.actions.enterShipHibernateMode && (
+                <DocumentationTooltip card={card} item="EnterHibernateMode">
+                    <Button
+                        variant="secondary"
+                        className="tw-w-full"
+                        onClick={() => {
+                            lowPowerModule.actions.enterShipHibernateMode?.();
+                        }}
+                        disabled={disabled}
+                    >
+                        Enter Hibernate Mode
+                    </Button>
+                </DocumentationTooltip>
+            )}
+            {lowPowerModule.actions.enterHibernatePtMode && (
+                <DocumentationTooltip card={card} item="EnterHibernateMode">
+                    <Button
+                        variant="secondary"
+                        className="tw-w-full"
+                        onClick={() => {
+                            lowPowerModule.actions.enterHibernatePtMode?.();
+                        }}
+                        disabled={disabled}
+                    >
+                        Enter Hibernate PT Mode
+                    </Button>
+                </DocumentationTooltip>
+            )}
+        </div>
     </Card>
 );

@@ -75,17 +75,4 @@ export class LowPowerSet {
             }
         });
     }
-
-    enterShipMode() {
-        this.sendCommand(`npm2100 low_power_control ship_mode set ENABLE`);
-    }
-    enterShipHibernateMode() {
-        this.sendCommand(`npm2100 low_power_control hibernate_mode set ENABLE`);
-    }
-
-    enterHibernatePtMode() {
-        this.sendCommand(
-            `npm2100 low_power_control hibernate_pt_mode set ENABLE`
-        );
-    }
 }

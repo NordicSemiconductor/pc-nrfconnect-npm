@@ -713,9 +713,10 @@ export type LowPowerModule = {
         all(lowPower: LowPowerConfig): Promise<void>;
         timeToActive(timeToActive: TimeToActive): Promise<void>;
         powerButtonEnable?(powerButtonEnable: boolean): Promise<void>;
-
-        enterShipMode(): void;
-        enterShipHibernateMode(): void;
+    };
+    actions: {
+        enterShipMode?(): void;
+        enterShipHibernateMode?(): void;
         enterHibernatePtMode?(): void;
     };
     values: {

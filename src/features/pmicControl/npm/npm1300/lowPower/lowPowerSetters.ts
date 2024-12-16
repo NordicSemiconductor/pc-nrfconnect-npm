@@ -49,11 +49,4 @@ export class LowPowerSet {
             }
         });
     }
-
-    enterShipMode() {
-        this.sendCommand(`npmx ship mode ship`);
-    }
-    enterShipHibernateMode() {
-        this.sendCommand(`npmx ship mode hibernate`);
-    }
 }
