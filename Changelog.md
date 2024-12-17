@@ -1,3 +1,9 @@
+## 2.0.0-alpha3 - 2024-12-17
+
+### Added
+
+-   Added cards for nPM2100 controls
+
 ## 2.0.0-alpha2 - 2024-11-14
 
 ### Changed
