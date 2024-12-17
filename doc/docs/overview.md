@@ -69,24 +69,7 @@ This side panel area lets you select the power source for nPM2100:
 |               Menu               | Description |
 | -------------------------------- | ----------- |
 | **Battery**                      | The default setting. With this power source selected, the application automatically detects the battery type connected to the PMIC. You can also select the battery type from the drop-down menu.        |
-| **USB**                          | Select if you are powering the PMIC from the USB. With this power source selected, the application disables the [**Maximum Energy Extraction**](#maximum-energy-extraction) panel, the **Fuel Gauge** and the **Maximum Energy Extraction** tiles on the [**Dashboard**](#dashboard-tab) tab, and the [**MEE**](#mee-tab) tab, as no battery evaluation is available.        |
-
-
-### Maximum Energy Extraction
-
-!!! note "Note"
-     This feature is available for the nPM2100 EK.
-
-This side panel area lets you select which power profile to use for the Maximum Energy Extraction (MEE) configuration:
-
-|               Menu               | Description |
-| -------------------------------- | ----------- |
-| **Active Power Profile**         | Select a power profile from a list of predefined profiles provided with the application.        |
-| **Add New Active Power Profile** | Add new power profile to the **Active Power Profile** drop-down menu. |
-| **Create & Tune Power Profile**  | Open the [**MEE**](#mee-tab) tab, where you can configure the MEE options. |
-
-!!! note "Note"
-     If you set [**Power Source**](#power-source) to **USB**, this area, the **Fuel Gauge** and the **Maximum Energy Extraction** tiles on the [**Dashboard**](#dashboard-tab) tab, and the [**MEE**](#mee-tab) tab will be unavailable.
+| **USB**                          | Select if you are powering the PMIC from the USB. With this power source selected, the application disables the **Fuel Gauge** tile on the [**Dashboard**](#dashboard-tab) tab, as no battery evaluation is available.        |
 
 ### Settings
 
@@ -183,13 +166,6 @@ When writing, you are going to write new battery model on the nPM Controller to 
 This can overwrite the [**Active Battery Model**](#fuel-gauge).
 
 When saving, the battery model is saved in the selected directory either to a JSON file that can be downloaded to the nPM Controller or to an INC file. The INC file format is meant for integrating the battery model into your final application with a Nordic System on Chip (SoC).
-
-## MEE tab
-
-!!! note "Note"
-     This feature is available for the nPM2100 EK.
-
-Here you can configure Maximum Energy Extraction options, grouped in **Power Profile** and **Operating Conditions**.
 
 ## Graph tab
 
