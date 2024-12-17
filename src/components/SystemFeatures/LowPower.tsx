@@ -9,87 +9,114 @@ import {
     Button,
     Card,
     Dropdown,
+    Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     LowPowerConfig,
     LowPowerModule,
-    TimeToActive,
-    TimeToActiveValues,
 } from '../../features/pmicControl/npm/types';
-
-const timerShipToActiveItems = TimeToActiveValues.map(item => ({
-    label: `${item} ms`,
-    value: `${item}`,
-}));
 
 const card = 'lowPowerControl';
 
 export default ({
     lowPowerModule,
-    ship,
+    lowPower,
     disabled,
 }: {
     lowPowerModule: LowPowerModule;
-    ship: LowPowerConfig;
+    lowPower: LowPowerConfig;
     disabled: boolean;
 }) => (
     <Card
         title={
-            <div className="tw-flex tw-justify-between">Low Power control</div>
+            <div className="tw-flex tw-justify-between tw-gap-1">
+                Low Power control
+            </div>
         }
     >
+        {'powerButtonEnable' in lowPower &&
+            lowPowerModule.set.powerButtonEnable && (
+                <Toggle
+                    label={
+                        <DocumentationTooltip
+                            card={card}
+                            item="LongPressResetEnable"
+                        >
+                            Enable
+                        </DocumentationTooltip>
+                    }
+                    isToggled={lowPower.powerButtonEnable === true}
+                    onToggle={value =>
+                        lowPowerModule.set.powerButtonEnable?.(value)
+                    }
+                    disabled={disabled}
+                />
+            )}
         <Dropdown
             label={
                 <>
                     T<span className="subscript">ShipToActive</span>
                 </>
             }
-            items={timerShipToActiveItems}
-            onSelect={item =>
-                lowPowerModule.set.timeToActive(
-                    Number.parseInt(item.value, 10) as TimeToActive
-                )
-            }
+            items={lowPowerModule.values.timeToActive}
+            onSelect={item => lowPowerModule.set.timeToActive(item.value)}
             selectedItem={
-                timerShipToActiveItems[
+                lowPowerModule.values.timeToActive[
                     Math.max(
                         0,
-                        timerShipToActiveItems.findIndex(
-                            item =>
-                                Number.parseInt(item.value, 10) ===
-                                ship.timeToActive
+                        lowPowerModule.values.timeToActive.findIndex(
+                            item => item.value === lowPower.timeToActive
                         )
                     ) ?? 0
                 ]
             }
             disabled={disabled}
         />
-
-        <DocumentationTooltip card={card} item="EnterShipMode">
-            <Button
-                variant="secondary"
-                className="tw-w-full"
-                onClick={() => {
-                    lowPowerModule.set.enterShipMode();
-                }}
-                disabled={disabled}
-            >
-                Enter Ship Mode
-            </Button>
-        </DocumentationTooltip>
-        <DocumentationTooltip card={card} item="EnterHibernateMode">
-            <Button
-                variant="secondary"
-                className="tw-w-full"
-                onClick={() => {
-                    lowPowerModule.set.enterShipHibernateMode();
-                }}
-                disabled={disabled}
-            >
-                Enter Hibernate Mode
-            </Button>
-        </DocumentationTooltip>
+        <div className="tw-flex tw-flex-col tw-gap-1">
+            {lowPowerModule.actions.enterShipMode && (
+                <DocumentationTooltip card={card} item="EnterShipMode">
+                    <Button
+                        variant="secondary"
+                        className="tw-w-full"
+                        onClick={() => {
+                            lowPowerModule.actions.enterShipMode?.();
+                        }}
+                        disabled={disabled}
+                    >
+                        Enter Ship Mode
+                    </Button>
+                </DocumentationTooltip>
+            )}
+            {lowPowerModule.actions.enterShipHibernateMode && (
+                <DocumentationTooltip card={card} item="EnterHibernateMode">
+                    <Button
+                        variant="secondary"
+                        className="tw-w-full"
+                        onClick={() => {
+                            lowPowerModule.actions.enterShipHibernateMode?.();
+                        }}
+                        disabled={disabled}
+                    >
+                        Enter Hibernate Mode
+                    </Button>
+                </DocumentationTooltip>
+            )}
+            {lowPowerModule.actions.enterHibernatePtMode && (
+                <DocumentationTooltip card={card} item="EnterHibernateMode">
+                    <Button
+                        variant="secondary"
+                        className="tw-w-full"
+                        onClick={() => {
+                            lowPowerModule.actions.enterHibernatePtMode?.();
+                        }}
+                        disabled={disabled}
+                    >
+                        Enter Hibernate PT Mode
+                    </Button>
+                </DocumentationTooltip>
+            )}
+        </div>
     </Card>
 );

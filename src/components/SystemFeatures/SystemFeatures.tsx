@@ -51,7 +51,7 @@ export default ({ active }: PaneProps) => {
             {npmDevice?.lowPowerModule && ship && (
                 <LowPower
                     lowPowerModule={npmDevice?.lowPowerModule}
-                    ship={ship}
+                    lowPower={ship}
                     disabled={disabled}
                 />
             )}

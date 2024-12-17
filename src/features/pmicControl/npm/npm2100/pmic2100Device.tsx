@@ -38,6 +38,7 @@ import getBoostModule, { numberOfBoosts } from './boost';
 import { FuelGaugeModule } from './fuelGauge';
 import setupGpio from './gpio';
 import setupLdo, { numberOfLdos } from './ldo';
+import setupLowPower from './lowPower';
 import setupReset from './reset';
 import setupTimer from './timerConfig';
 
@@ -304,6 +305,12 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     );
 
     // Setup lowpower
+    const lowPowerModule = setupLowPower(
+        shellParser,
+        eventEmitter,
+        sendCommand,
+        offlineMode
+    );
 
     // Setup reset
     const resetModule = setupReset(
@@ -473,6 +480,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
             batteryModule.get.all();
             timerConfigModule.get.all();
             resetModule.get.all();
+            lowPowerModule.get.all();
             boostModule.forEach(boost => boost.get.all());
             ldoModule.forEach(ldo => ldo.get.all());
             gpioModule.forEach(module => module.get.all());
@@ -541,6 +549,9 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
 
                         if (config.reset)
                             await resetModule.set.all(config.reset);
+
+                        if (config.lowPower)
+                            await lowPowerModule.set.all(config.lowPower);
 
                         await fuelGaugeModule.set.enabled(
                             config.fuelGaugeSettings.enabled
@@ -666,6 +677,7 @@ export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
         ldoModule,
         timerConfigModule,
         resetModule,
+        lowPowerModule,
 
         getBatteryConnectedVoltageThreshold: () => 0, // 0V
     };

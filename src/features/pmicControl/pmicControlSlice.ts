@@ -218,7 +218,7 @@ const pmicControlSlice = createSlice({
                 state.lowPower = {
                     ...state.npmDevice?.lowPowerModule.defaults,
                     ...state.lowPower,
-                    ...action.payload,
+                    ...(action.payload as LowPowerConfig),
                 };
             }
         },
