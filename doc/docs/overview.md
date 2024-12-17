@@ -1,6 +1,6 @@
 # Overview and user interface
 
-After starting nPM PowerUP, the main application window is displayed.
+After starting the {{app_name}}, the main application window is displayed.
 
 ![nPM PowerUP application window](./screenshots/npm_overview.png "nPM PowerUP application window")
 
@@ -20,7 +20,7 @@ Before a device is selected, the side panel contains the following buttons:
 Dropdown to list the PMIC devices attached to the computer.
 
 !!! note "Note"
-      Read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use the nPM1300 EK with nPM PowerUP.
+      If you are using the nPM1300 EK, read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use this device with the {{app_name}}.
 
 ### Offline mode actions
 
@@ -48,6 +48,9 @@ This side panel area contains the following buttons:
 
 ### Fuel Gauge
 
+!!! note "Note"
+     This feature is available for the nPM1300 EK.
+
 This side panel area lets you select the following options:
 
 |               Menu               | Description |
@@ -55,6 +58,18 @@ This side panel area lets you select the following options:
 | **Active Battery Model**         | Select the battery model you want to use for Fuel Gauge in nPM PowerUP.        |
 | **Add New Active Battery Model** | Select a battery from selected vendors that has been profiled by Nordic Semiconductor or your own custom battery model, added with the **Profile Battery** feature and saved in the [**Profiles**](#profiles-tab) tab.        |
 | **Profile Battery**              | Create your own, custom battery profile, and collect the data. These are then saved in the [**Profiles**](#profiles-tab) tab and added to the **Add New Active Battery Model** drop-down menu.</br></br>An additional board, nPM Fuel Gauge, is required to perform the battery profiling. See [Profiling a battery with nPM PowerUP](profiling_battery.md) for more information.        |
+
+### Power Source
+
+!!! note "Note"
+     This feature is available for the nPM2100 EK.
+
+This side panel area lets you select the power source for nPM2100:
+
+|               Menu               | Description |
+| -------------------------------- | ----------- |
+| **Battery**                      | The default setting. With this power source selected, the application automatically detects the battery type connected to the PMIC. You can also select the battery type from the drop-down menu.        |
+| **USB**                          | Select if you are powering the PMIC from the USB. With this power source selected, the application disables the **Fuel Gauge** tile on the [**Dashboard**](#dashboard-tab) tab, as no battery evaluation is available.        |
 
 ### Settings
 
@@ -77,6 +92,9 @@ The **Dashboard** tab provides a quick look overview of the major PMIC settings 
 
 ## Charger tab
 
+!!! note "Note"
+     This feature is available for the nPM1300 EK.
+
 You can use the options in the **Charger** tab to control and monitor the charging settings and status of the PMIC device.
 
 !!! info "Tip"
@@ -96,9 +114,12 @@ You can use the options in the **GPIOs** tab to configure the GPIO pins availabl
 
 ## System Features tab
 
-You can use the options in the **System Features** tab to configure the **Reset and Low Power control**, **Timer**, **Power Failure**, **Vbus input current limiter**, and **Reset & Error Logs**.
+You can use the options in the **System Features** tab to configure **Reset control**, **Low Power control**, **Timer**, **Power Failure**, **Vbus input current limiter**, and **Reset & Error Logs**.
 
 ## Profiles tab
+
+!!! note "Note"
+     This feature is available for the nPM1300 EK.
 
 The **Profiles** tab provides an overview of all battery profiles that you can select using the [Fuel Gauge drop-down menus](#fuel-gauge).
 
@@ -148,7 +169,7 @@ When saving, the battery model is saved in the selected directory either to a JS
 
 ## Graph tab
 
-Here you can monitor the state of the PMIC, including the current voltage temperature and State of Charge (SOC). For SOC, make sure the battery Fuel Gauge in the **Dashboard** tab or **Fuel Gauge** tab is enabled.
+Here you can monitor the state of the PMIC, including voltage, current, system temperature, internal resistance, and State of Charge (SOC). For SOC, make sure the battery Fuel Gauge in the **Dashboard** tab or **Fuel Gauge** side panel is enabled.
 
 The monitoring can happen in real time after [generating a battery model](profiling_battery.md#generating-a-battery-model). You can use the **Live** toggle to enable or disable real time monitoring.
 
