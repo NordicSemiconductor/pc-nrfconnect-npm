@@ -91,7 +91,7 @@ export default ({
                 <Toggle
                     label={
                         <DocumentationTooltip card={card} item="TimeState">
-                            Enable
+                            Start Timer
                         </DocumentationTooltip>
                     }
                     isToggled={timerConfig.enabled === true}

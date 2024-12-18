@@ -44,7 +44,7 @@ export default ({
                             card={card}
                             item="LongPressResetEnable"
                         >
-                            Enable
+                            Power OFF Button Enable
                         </DocumentationTooltip>
                     }
                     isToggled={lowPower.powerButtonEnable === true}
