@@ -24,7 +24,6 @@ import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
-import MaximumEnergyExtraction from '../Cards/MEE/MaximumEnergyExtractionCard';
 import PowerCard from '../Cards/Power/PowerCard';
 
 export default ({ active }: PaneProps) => {
@@ -42,12 +41,6 @@ export default ({ active }: PaneProps) => {
         >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
-            {npmDevice && npmDevice.hasMaxEnergyExtraction() && (
-                <MaximumEnergyExtraction
-                    npmDevice={npmDevice}
-                    disabled={disabled}
-                />
-            )}
 
             {npmDevice &&
                 boosts.map((boost, index) => (
