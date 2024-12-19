@@ -1,3 +1,9 @@
+## 2.0.0-alpha4 - 2024-12-19
+
+### Changed
+
+-   Removed MEE tab and MEE card from Dashboard.
+
 ## 2.0.0-alpha3 - 2024-12-17
 
 ### Added
