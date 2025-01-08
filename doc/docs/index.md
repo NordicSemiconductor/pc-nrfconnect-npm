@@ -18,3 +18,8 @@ The {{app_name}} supports the following Power Management IC devices from Nordic 
       Some features of the {{app_name}} are only available for specific devices.
       In the documentation, such features are marked with notes that specify the supported device.
       When no note is present, the feature is available on all supported devices.
+
+## Application source code
+
+The code of the application is open source and [available on GitHub](https://github.com/NordicSemiconductor/pc-nrfconnect-npm).
+Feel free to fork the repository and clone it for secondary development or feature contributions.
