@@ -222,6 +222,9 @@ const pmicControlSlice = createSlice({
                 };
             }
         },
+        setResetConfig(state, action: PayloadAction<ResetConfig | undefined>) {
+            state.reset = action.payload;
+        },
         updateResetConfig(
             state,
             action: PayloadAction<Partial<ResetConfig | undefined>>
@@ -418,6 +421,7 @@ export const {
     updateTimerConfig,
     setLowPowerConfig,
     updateLowPowerConfig,
+    setResetConfig,
     updateResetConfig,
     setBatteryConnected,
     setBatteryAddonBoardId,
