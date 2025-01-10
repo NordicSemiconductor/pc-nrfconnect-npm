@@ -52,6 +52,7 @@ import {
     setPmicChargingState,
     setPmicState,
     setPOFs,
+    setResetConfig,
     setStoredBatterModel,
     setSupportedVersion,
     setTimerConfig,
@@ -533,6 +534,7 @@ export default () => {
             dispatch(setLowPowerConfig(npmDevice.lowPowerModule?.defaults));
             dispatch(setUsbPower(npmDevice.usbCurrentLimiterModule?.defaults));
             dispatch(setTimerConfig(npmDevice.timerConfigModule?.defaults));
+            dispatch(setResetConfig(npmDevice.resetModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());
