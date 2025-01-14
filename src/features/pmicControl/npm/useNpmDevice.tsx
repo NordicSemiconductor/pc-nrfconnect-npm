@@ -111,6 +111,8 @@ export default () => {
                 });
                 dev.isPMICPowered().then(setPMICPowered);
             });
+        } else {
+            dispatch(setNpmDevice(undefined));
         }
     }, [dispatch, shellParser]);
 
