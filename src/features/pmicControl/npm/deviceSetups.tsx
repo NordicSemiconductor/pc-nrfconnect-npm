@@ -354,7 +354,7 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                             message:
                                 'Your device hardware version is too old and not compatible with this firmware',
                             confirmLabel: 'OK',
-                            optionalLabel: "OK, don't mention it again",
+                            optionalLabel: "Don't show again",
                             title: 'Important notice!',
                             onConfirm: () => {
                                 reject(new Error('Device setup cancelled'));
