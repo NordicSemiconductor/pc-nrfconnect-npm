@@ -15,19 +15,26 @@ export const getNpmDevice = (
     dialogHandler: ((pmicDialog: PmicDialog) => void) | null
 ): Promise<NpmDevice> =>
     new Promise<NpmDevice>((resolve, reject) => {
-        shellParser.enqueueRequest('hw_version', {
-            onSuccess: response => {
-                switch (response) {
-                    case 'hw_version=npm1300ek_nrf5340_cpuapp':
-                        resolve(getNPM1300(shellParser, dialogHandler));
-                        break;
-                    case 'hw_version=npm2100ek_nrf5340_cpuapp':
-                        resolve(getNPM2100(shellParser, dialogHandler));
-                        break;
-                    default:
-                        reject(new Error('Unknown hardware'));
-                }
-            },
-            onError: reject,
-        });
+        if (shellParser) {
+            shellParser.enqueueRequest('hw_version', {
+                onSuccess: response => {
+                    const hwVersion = response
+                        .split(',')
+                        .find(s => s.startsWith('hw_version'));
+                    switch (hwVersion) {
+                        case 'hw_version=npm1300ek_nrf5340_cpuapp':
+                            resolve(getNPM1300(shellParser, dialogHandler));
+                            break;
+                        case 'hw_version=npm2100ek_nrf5340_cpuapp':
+                            resolve(getNPM2100(shellParser, dialogHandler));
+                            break;
+                        default:
+                            reject(new Error('Unknown hardware'));
+                    }
+                },
+                onError: reject,
+            });
+        } else {
+            resolve(getNPM2100(undefined, dialogHandler));
+        }
     });
