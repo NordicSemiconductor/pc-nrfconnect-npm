@@ -341,8 +341,9 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 await port.close();
 
                 if (
-                    !hwVersion.version ||
-                    semver.gte(minimumHWVersionNpm2100, hwVersion.version)
+                    (!hwVersion.version && result.version !== '0.2.4+0') ||
+                    (hwVersion.version &&
+                        semver.lt(hwVersion.version, minimumHWVersionNpm2100))
                 ) {
                     return new Promise<{
                         device: Device;
