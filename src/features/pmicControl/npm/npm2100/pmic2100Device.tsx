@@ -42,8 +42,8 @@ import setupLowPower from './lowPower';
 import setupReset from './reset';
 import setupTimer from './timerConfig';
 
-export const npm2100FWVersion = '0.2.2+0';
-export const minimumHWVersion = '0.7.0'; // TODO test with new kits once we have one!!
+export const npm2100FWVersion = '0.3.0+0';
+export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
 export const getNPM2100: INpmDevice = (shellParser, dialogHandler) => {
     const eventEmitter = new NpmEventEmitter();
