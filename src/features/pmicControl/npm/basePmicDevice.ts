@@ -277,7 +277,7 @@ export const baseNpmDevice: IBaseNpmDevice = (
                                 const checkAndReplace = (label: string) =>
                                     splitResult
                                         .find(item => item.startsWith(label))
-                                        ?.replace(label, '');
+                                        ?.replace(`${label}=`, '');
 
                                 const labels = ['hw_version', 'version', 'pca'];
                                 resolve(
