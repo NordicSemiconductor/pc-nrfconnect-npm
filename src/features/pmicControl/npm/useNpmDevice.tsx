@@ -12,6 +12,7 @@ import {
     clearWaitForDevice,
     describeError,
     logger,
+    setCurrentPane,
     setPaneDisabled,
     setPaneHidden,
     setWaitForDevice,
@@ -664,6 +665,7 @@ export default () => {
     ]);
 
     useEffect(() => {
+        // Need to be debounced... for reasons
         setTimeout(() => {
             dispatch(
                 setPaneDisabled({
@@ -671,12 +673,7 @@ export default () => {
                     disabled: pmicState === 'ek-disconnected',
                 })
             );
-        });
-    }, [dispatch, pmicState]);
 
-    useEffect(() => {
-        // Need to be debounced... for reasons
-        setTimeout(() => {
             dispatch(
                 setPaneHidden({
                     name: 'Dashboard',
@@ -740,6 +737,16 @@ export default () => {
                     hidden: !npmDevice?.getBatteryProfiler,
                 })
             );
+
+            dispatch(
+                setPaneHidden({
+                    name: 'Welcome',
+                    hidden: !!npmDevice,
+                })
+            );
+            if (!npmDevice) {
+                dispatch(setCurrentPane('Welcome'));
+            }
         });
     }, [dispatch, npmDevice, pmicState]);
 

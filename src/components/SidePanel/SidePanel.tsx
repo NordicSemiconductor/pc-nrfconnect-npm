@@ -33,6 +33,7 @@ import { getShellParser } from '../../features/serial/serialSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import FuelGaugeSettings from '../FuelGauge/FuelGaugeSettings';
 import PowerSource from '../PowerSource/PowerSource';
+import { WelcomeSidePanel } from '../Welcome';
 import ConnectionStatus from './ConnectionStatus';
 import OpenSerialTerminal from './OpenSerialTerminal';
 
@@ -53,6 +54,10 @@ export default () => {
     }, [fuelGaugeReportingRate]);
 
     const card = 'sidePanel';
+
+    if (!npmDevice) {
+        return <WelcomeSidePanel />;
+    }
 
     return (
         <SidePanel className="side-panel">
