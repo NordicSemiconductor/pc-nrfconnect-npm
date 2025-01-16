@@ -346,9 +346,13 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
                 await dispose();
 
+                const deviceFW = result.version.split('+', 1)[0];
+                if (!hwVersion.version && semver.lt(deviceFW, '0.3.0')) {
+                    return action();
+                }
 
                 if (
-                    (!hwVersion.version && result.version !== '0.2.4+0') ||
+                    (!hwVersion.version && semver.gte(deviceFW, '0.3.0')) ||
                     (hwVersion.version &&
                         semver.lt(hwVersion.version, minimumHWVersionNpm2100))
                 ) {
