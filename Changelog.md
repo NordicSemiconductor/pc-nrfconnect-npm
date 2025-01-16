@@ -1,3 +1,9 @@
+## 2.0.0-alpha5 - 2025-01-17
+
+### Changed
+
+-   Error handeling from 0.7 EKs
+
 ## 2.0.0-alpha4 - 2024-12-19
 
 ### Changed
