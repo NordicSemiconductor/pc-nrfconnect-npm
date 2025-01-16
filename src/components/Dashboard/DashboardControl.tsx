@@ -39,12 +39,14 @@ export default ({ active }: PaneProps) => {
             className="masonry-layout min-height-cards"
             minWidth={300}
         >
-            {npmDevice && (
-                <>
-                    <BatteryCard disabled={disabled} />
-                    <BatteryStatusCard disabled={disabled} />
-                </>
-            )}
+            {npmDevice && [
+                <BatteryCard key="BatteryCard" disabled={disabled} />,
+                <BatteryStatusCard
+                    key="BatteryStatusCard"
+                    disabled={disabled}
+                />,
+            ]}
+
             {npmDevice &&
                 boosts.map((boost, index) => (
                     <BoostCard
@@ -55,6 +57,7 @@ export default ({ active }: PaneProps) => {
                         defaultSummary
                     />
                 ))}
+
             {npmDevice?.chargerModule && charger && (
                 <PowerCard
                     chargerModule={npmDevice.chargerModule}
