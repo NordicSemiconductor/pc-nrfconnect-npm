@@ -280,7 +280,54 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                     programmedDevice
                                 ),
                             once: true,
-                            onSuccess: dev => {
+                            onSuccess: async dev => {
+                                if (
+                                    !(
+                                        dev.serialPorts &&
+                                        dev.serialPorts[0].comName
+                                    )
+                                ) {
+                                    throw new Error(
+                                        'device does not have a serial port'
+                                    );
+                                }
+
+                                const { npmDevice, dispose } =
+                                    await getNpmDeviceObject(
+                                        dev.serialPorts[0].comName
+                                    );
+
+                                const hwVersion =
+                                    await npmDevice.getHwVersion();
+
+                                await dispose();
+
+                                if (
+                                    !hwVersion.version ||
+                                    (hwVersion.version &&
+                                        semver.lt(
+                                            hwVersion.version,
+                                            minimumHWVersionNpm2100
+                                        ))
+                                ) {
+                                    await new Promise<void>(r => {
+                                        dispatch(
+                                            dialogHandler(
+                                                npm2100TooOldMessage(() => {
+                                                    r();
+                                                    reject(
+                                                        new Error(
+                                                            'Hardware is too old.'
+                                                        )
+                                                    );
+                                                })
+                                            )
+                                        );
+                                    });
+
+                                    return;
+                                }
+
                                 success = true;
                                 resolve(dev);
                             },
