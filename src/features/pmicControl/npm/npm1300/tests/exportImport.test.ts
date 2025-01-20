@@ -439,7 +439,7 @@ describe('PMIC 1300 - Apply Config ', () => {
 
     test('Apply wrong firmware version -- Cancel', async () => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-            dialog.onCancel();
+            dialog.onCancel?.();
         });
 
         await pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });

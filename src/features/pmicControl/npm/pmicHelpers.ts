@@ -227,7 +227,7 @@ export const dialogHandler =
         if (pmicDialog.cancelClosesDialog !== false) {
             const onCancel = pmicDialog.onCancel;
             pmicDialog.onCancel = () => {
-                onCancel();
+                onCancel?.();
                 dispatch(dequeueDialog());
             };
         }

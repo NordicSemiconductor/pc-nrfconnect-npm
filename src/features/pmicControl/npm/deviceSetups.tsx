@@ -18,8 +18,10 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import { Terminal } from '@xterm/headless';
+import semver from 'semver';
 
 import { RootState } from '../../../appReducer';
+import { minimumHWVersion as minimumHWVersionNpm2100 } from './npm2100/pmic2100Device';
 import { getNpmDevice } from './npmFactory';
 import {
     dialogHandler,
@@ -59,6 +61,63 @@ const npm1300EngineeringCMessage = (
         </p>
     </>
 );
+
+const npm2100TooOldMessage = (reject: (error: Error) => void): PmicDialog => ({
+    type: 'alert',
+    message:
+        'Your device hardware version is too old and not compatible with this version of the application',
+    confirmLabel: 'OK',
+    optionalLabel: "Don't show again",
+    title: 'Important notice!',
+    onConfirm: () => {
+        reject(new Error('Device setup cancelled'));
+    },
+    onOptional: () => {
+        reject(new Error('Device setup cancelled'));
+    },
+});
+
+const getNpmDeviceObject = async (comName: string) => {
+    const port = await createSerialPort(
+        {
+            path: comName,
+            baudRate: 115200,
+        },
+        { overwrite: true, settingsLocked: true }
+    );
+
+    const shellParserO = await shellParser(
+        port,
+        xTerminalShellParserWrapper(
+            new Terminal({
+                allowProposedApi: true,
+                cols: 999,
+            })
+        ),
+        {
+            shellPromptUart: 'shell:~$ ',
+            logRegex:
+                /[[][0-9]{2,}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
+            errorRegex: /Error: /,
+            timeout: 5000,
+            columnWidth: 80,
+        }
+    );
+
+    try {
+        return {
+            npmDevice: await getNpmDevice(shellParserO, null),
+            dispose: async () => {
+                shellParserO.unregister();
+                await port.close();
+            },
+        };
+    } catch (e) {
+        shellParserO.unregister();
+        await port.close();
+        throw e;
+    }
+};
 
 export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
     supportsProgrammingMode: (device: Device) =>
@@ -135,35 +194,11 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 };
             }
 
-            const port = await createSerialPort(
-                {
-                    path: device.serialPorts[0].comName,
-                    baudRate: 115200,
-                },
-                { overwrite: true, settingsLocked: true }
-            );
-
-            const shellParserO = await shellParser(
-                port,
-                xTerminalShellParserWrapper(
-                    new Terminal({
-                        allowProposedApi: true,
-                        cols: 999,
-                    })
-                ),
-                {
-                    shellPromptUart: 'shell:~$ ',
-                    logRegex:
-                        /[[][0-9]{2,}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
-                    errorRegex: /Error: /,
-                    timeout: 5000,
-                    columnWidth: 80,
-                }
+            const { npmDevice, dispose } = await getNpmDeviceObject(
+                device.serialPorts[0].comName
             );
 
             try {
-                const npmDevice = await getNpmDevice(shellParserO, null);
-
                 const result = await npmDevice.isSupportedVersion();
 
                 const action = () => ({
@@ -173,8 +208,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
                 const version = await npmDevice.getPmicVersion();
 
-                shellParserO.unregister();
-                await port.close();
+                await dispose();
 
                 if (
                     version === 2.0 ||
@@ -211,8 +245,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
                 return action();
             } catch (e) {
-                shellParserO.unregister();
-                await port.close();
+                await dispose();
                 throw e;
             }
         },
@@ -247,7 +280,54 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                     programmedDevice
                                 ),
                             once: true,
-                            onSuccess: dev => {
+                            onSuccess: async dev => {
+                                if (
+                                    !(
+                                        dev.serialPorts &&
+                                        dev.serialPorts[0].comName
+                                    )
+                                ) {
+                                    throw new Error(
+                                        'device does not have a serial port'
+                                    );
+                                }
+
+                                const { npmDevice, dispose } =
+                                    await getNpmDeviceObject(
+                                        dev.serialPorts[0].comName
+                                    );
+
+                                const hwVersion =
+                                    await npmDevice.getHwVersion();
+
+                                await dispose();
+
+                                if (
+                                    !hwVersion.version ||
+                                    (hwVersion.version &&
+                                        semver.lt(
+                                            hwVersion.version,
+                                            minimumHWVersionNpm2100
+                                        ))
+                                ) {
+                                    await new Promise<void>(r => {
+                                        dispatch(
+                                            dialogHandler(
+                                                npm2100TooOldMessage(() => {
+                                                    r();
+                                                    reject(
+                                                        new Error(
+                                                            'Hardware is too old.'
+                                                        )
+                                                    );
+                                                })
+                                            )
+                                        );
+                                    });
+
+                                    return;
+                                }
+
                                 success = true;
                                 resolve(dev);
                             },
@@ -297,35 +377,11 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 };
             }
 
-            const port = await createSerialPort(
-                {
-                    path: device.serialPorts[0].comName,
-                    baudRate: 115200,
-                },
-                { overwrite: true, settingsLocked: true }
-            );
-
-            const shellParserO = await shellParser(
-                port,
-                xTerminalShellParserWrapper(
-                    new Terminal({
-                        allowProposedApi: true,
-                        cols: 999,
-                    })
-                ),
-                {
-                    shellPromptUart: 'shell:~$ ',
-                    logRegex:
-                        /[[][0-9]{2,}:[0-9]{2}:[0-9]{2}.[0-9]{3},[0-9]{3}] <([^<^>]+)> ([^:]+): .*(\r\n|\r|\n)$/,
-                    errorRegex: /Error: /,
-                    timeout: 5000,
-                    columnWidth: 80,
-                }
+            const { npmDevice, dispose } = await getNpmDeviceObject(
+                device.serialPorts[0].comName
             );
 
             try {
-                const npmDevice = await getNpmDevice(shellParserO, null);
-
                 const result = await npmDevice.isSupportedVersion();
 
                 const action = () => ({
@@ -333,48 +389,31 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                     validFirmware: result.supported,
                 });
 
-                const version = await npmDevice.getPmicVersion();
+                const hwVersion = await npmDevice.getHwVersion();
 
-                shellParserO.unregister();
-                await port.close();
+                await dispose();
+
+                const deviceFW = result.version.split('+', 1)[0];
+                if (!hwVersion.version && semver.lt(deviceFW, '0.3.0')) {
+                    return action();
+                }
 
                 if (
-                    version === 2.0 ||
-                    (Number.isNaN(version) && result.version === '0.7.0+0')
+                    (!hwVersion.version && semver.gte(deviceFW, '0.3.0')) ||
+                    (hwVersion.version &&
+                        semver.lt(hwVersion.version, minimumHWVersionNpm2100))
                 ) {
-                    const p = new Promise<{
+                    return new Promise<{
                         device: Device;
                         validFirmware: boolean;
-                    }>((resolve, reject) => {
-                        const information: PmicDialog = {
-                            type: 'alert',
-                            doNotAskAgainStoreID: 'pmic1300-fp2-reset-issue',
-                            message: npm1300EngineeringCMessage,
-                            confirmLabel: 'Yes',
-                            cancelLabel: 'No',
-                            optionalLabel: "Yes, don't ask again",
-                            title: 'Important notice!',
-                            onConfirm: () => {
-                                resolve(action());
-                            },
-                            onCancel: () => {
-                                reject(new Error('Device setup cancelled'));
-                            },
-                            onOptional: () => {
-                                action();
-                            },
-                        };
-
-                        dispatch(dialogHandler(information));
+                    }>((_, reject) => {
+                        dispatch(dialogHandler(npm2100TooOldMessage(reject)));
                     });
-
-                    return p;
                 }
 
                 return action();
             } catch (e) {
-                shellParserO.unregister();
-                await port.close();
+                await dispose();
                 throw e;
             }
         },

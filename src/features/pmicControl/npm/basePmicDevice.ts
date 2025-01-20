@@ -265,6 +265,46 @@ export const baseNpmDevice: IBaseNpmDevice = (
             ),
         getSupportedVersion: () => supportsVersion,
 
+        getHwVersion: () =>
+            new Promise<{ hw_version: string; pca?: string; version?: string }>(
+                (resolve, reject) => {
+                    shellParser?.enqueueRequest(
+                        'hw_version',
+                        {
+                            onSuccess: result => {
+                                const splitResult = result.split(',');
+
+                                const checkAndReplace = (label: string) =>
+                                    splitResult
+                                        .find(item => item.startsWith(label))
+                                        ?.replace(`${label}=`, '');
+
+                                const labels = ['hw_version', 'version', 'pca'];
+                                resolve(
+                                    labels.reduce(
+                                        (res, label) => ({
+                                            ...res,
+                                            [label]: checkAndReplace(label),
+                                        }),
+                                        {}
+                                    ) as {
+                                        hw_version: string;
+                                        pca?: string;
+                                        version?: string;
+                                    }
+                                );
+                            },
+                            onError: reject,
+                            onTimeout: error => {
+                                reject(error);
+                                console.warn(error);
+                            },
+                        },
+                        undefined,
+                        true
+                    );
+                }
+            ),
         getPmicVersion: () =>
             new Promise<number>((resolve, reject) => {
                 shellParser?.enqueueRequest(

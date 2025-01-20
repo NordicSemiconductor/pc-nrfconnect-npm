@@ -872,6 +872,11 @@ export type BaseNpmDevice = {
 
     isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
     getSupportedVersion: () => string;
+    getHwVersion: () => Promise<{
+        hw_version: string;
+        pca?: string;
+        version?: string;
+    }>;
     getPmicVersion: () => Promise<number>;
     isPMICPowered: () => Promise<boolean>;
 
@@ -941,12 +946,12 @@ export interface PmicDialog {
     confirmLabel: string;
     confirmDisabled?: boolean;
     confirmClosesDialog?: boolean;
-    cancelLabel: string;
+    cancelLabel?: string;
     cancelDisabled?: boolean;
     cancelClosesDialog?: boolean;
     title: string;
     onConfirm: () => void | Promise<void>;
-    onCancel: () => void | Promise<void>;
+    onCancel?: () => void | Promise<void>;
     onOptional?: () => void | Promise<void>;
     doNotAskAgainStoreID?: string;
     progress?: number;
