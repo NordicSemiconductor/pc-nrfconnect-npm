@@ -22,10 +22,9 @@ Dropdown to list the PMIC devices attached to the computer.
 !!! note "Note"
       If you are using the nPM1300 EK, read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use this device with the {{app_name}}.
 
-### Offline mode actions
+### Instructions
 
-You can set the desired PMIC configuration without selecting a device.
-The **Export Configuration** button let you then save this configuration to a file, while the **Load Configuration** allows you to import such a configuration from a file.
+Section with links to the [Nordic Semiconductor PMIC product page](https://www.nordicsemi.com/Products/Power-Management) and the [index of distributors who sell the PMIC devices from Nordic Semiconductor](https://www.nordicsemi.com/About-us/BuyOnline).
 
 ## After selection
 
