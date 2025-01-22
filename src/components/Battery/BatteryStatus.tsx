@@ -13,6 +13,7 @@ import {
     getLatestAdcSample,
     getNpmDevice,
     getPmicChargingState,
+    isBatteryConnected,
 } from '../../features/pmicControl/pmicControlSlice';
 
 import './battery.scss';
@@ -39,8 +40,7 @@ export default ({ disabled }: { disabled: boolean }) => {
 
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
-    const batteryConnected =
-        latestAdcSample !== undefined && latestAdcSample?.vBat > 1;
+    const batteryConnected = useSelector(isBatteryConnected);
 
     let mode = 'N/A';
     if (batteryConnected && pmicChargingState.constantCurrentCharging) {
