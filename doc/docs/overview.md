@@ -114,7 +114,8 @@ You can use the options in the **GPIOs** tab to configure the GPIO pins availabl
 
 ## System Features tab
 
-You can use the options in the **System Features** tab to configure **Reset control**, **Low Power control**, **Timer**, **Power Failure**, **Vbus input current limiter**, and **Reset & Error Logs**.
+You can use the options in the **System Features** tab to configure **Low Power control** and **Timer**.
+Some devices also allow you to configure **Reset control**, **Power Failure**, **Vbus input current limiter**, and **Reset & Error Logs**.
 
 ## Profiles tab
 
