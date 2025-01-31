@@ -134,7 +134,7 @@ export default () => {
                     />
                 </DocumentationTooltip>
             </Group>
-            {npmDevice?.getDeviceType() === 'npm1300' && (
+            {npmDevice?.deviceType === 'npm1300' && (
                 <Group
                     collapsible
                     defaultCollapsed={false}
@@ -147,7 +147,7 @@ export default () => {
                     />
                 </Group>
             )}
-            {npmDevice?.getDeviceType() === 'npm2100' &&
+            {npmDevice?.deviceType === 'npm2100' &&
                 pmicConnection !== 'ek-disconnected' && (
                     <Group
                         collapsible

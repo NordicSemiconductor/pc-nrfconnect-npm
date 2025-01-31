@@ -19,12 +19,10 @@ import {
     npm1300DeviceSetup,
     npm2100DeviceSetup,
 } from '../features/pmicControl/npm/deviceSetups';
-import {
-    getNPM1300,
+import Npm1300, {
     npm1300FWVersion,
 } from '../features/pmicControl/npm/npm1300/pmic1300Device';
-import {
-    getNPM2100,
+import Npm2100, {
     npm2100FWVersion,
 } from '../features/pmicControl/npm/npm2100/pmic2100Device';
 import {
@@ -115,7 +113,7 @@ export default () => {
                 if (device === 'nPM1300') {
                     dispatch(
                         setNpmDevice(
-                            getNPM1300(undefined, pmicDialog =>
+                            new Npm1300(undefined, pmicDialog =>
                                 dispatch(dialogHandler(pmicDialog))
                             )
                         )
@@ -123,7 +121,7 @@ export default () => {
                 } else if (device === 'nPM2100') {
                     dispatch(
                         setNpmDevice(
-                            getNPM2100(undefined, pmicDialog =>
+                            new Npm2100(undefined, pmicDialog =>
                                 dispatch(dialogHandler(pmicDialog))
                             )
                         )

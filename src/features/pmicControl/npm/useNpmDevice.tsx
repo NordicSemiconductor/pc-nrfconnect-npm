@@ -127,14 +127,14 @@ export default () => {
             supportedVersion
         ) {
             npmDevice.initialize();
-            npmDevice.requestUpdate.all();
+            npmDevice.requestUpdate();
 
             npmDevice.getHardcodedBatteryModels().then(models => {
                 dispatch(setHardcodedBatterModels(models));
             });
 
-            npmDevice.getBatteryProfiler?.()?.isProfiling();
-            npmDevice.fuelGaugeModule.set.batteryStatusCheckEnabled(true);
+            npmDevice.batteryProfiler?.isProfiling();
+            npmDevice.fuelGaugeModule?.set.batteryStatusCheckEnabled(true);
         }
     }, [dispatch, isPMICPowered, npmDevice, pmicState, supportedVersion]);
 
@@ -153,7 +153,7 @@ export default () => {
                     dispatch(
                         setBatteryConnected(
                             sample.vBat >
-                                npmDevice.getBatteryConnectedVoltageThreshold()
+                                npmDevice.batteryConnectedVoltageThreshold
                         )
                     );
                     dispatch(setLatestAdcSample(sample));
@@ -347,7 +347,7 @@ export default () => {
                                 payload.completeChunks &&
                                 payload.completeChunks === payload.totalChunks
                             ) {
-                                npmDevice.fuelGaugeModule.actions.applyDownloadFuelGaugeProfile(
+                                npmDevice.fuelGaugeModule?.actions.applyDownloadFuelGaugeProfile(
                                     payload.slot
                                 );
                             }
@@ -357,7 +357,7 @@ export default () => {
                                     cancelLabel: 'Abort',
                                     cancelClosesDialog: false,
                                     onCancel: () => {
-                                        npmDevice.fuelGaugeModule.actions.abortDownloadFuelGaugeProfile();
+                                        npmDevice.fuelGaugeModule?.actions.abortDownloadFuelGaugeProfile();
                                     },
                                     message: (
                                         <>
@@ -516,14 +516,12 @@ export default () => {
             );
 
             releaseAll.push(
-                npmDevice
-                    .getBatteryProfiler?.()
-                    ?.onProfilingStateChange(profiling => {
-                        dispatch(setCcProfiling(profiling));
-                    }) ?? noop
+                npmDevice.batteryProfiler?.onProfilingStateChange(profiling => {
+                    dispatch(setCcProfiling(profiling));
+                }) ?? noop
             );
 
-            dispatch(setPmicState(npmDevice.getConnectionState()));
+            dispatch(setPmicState(npmDevice.pmicState));
             dispatch(setCharger(npmDevice.chargerModule?.defaults));
 
             dispatch(
@@ -550,10 +548,7 @@ export default () => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        if (
-            !npmDevice ||
-            npmDevice.getConnectionState() === 'ek-disconnected'
-        ) {
+        if (!npmDevice || npmDevice.pmicState === 'ek-disconnected') {
             return;
         }
 
@@ -736,7 +731,7 @@ export default () => {
             dispatch(
                 setPaneHidden({
                     name: 'Profiles',
-                    hidden: !npmDevice?.getBatteryProfiler,
+                    hidden: !npmDevice?.batteryProfiler,
                 })
             );
 

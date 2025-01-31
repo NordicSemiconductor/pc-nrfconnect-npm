@@ -8,12 +8,13 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Buck, BuckExport, PmicDialog } from '../../types';
+import { Buck, BuckExport, BuckModule, PmicDialog } from '../../types';
 import buckCallbacks from './buckCallbacks';
 import { BuckGet } from './buckGet';
 import { BuckSet } from './buckSet';
 
-export const numberOfBucks = 2;
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-underscore-dangle */
 
 const buckDefaults = (): Buck => ({
     vOutNormal: buckVoltageRange().min,
@@ -52,31 +53,54 @@ const buckRetVOutRange = () =>
         decimals: 1,
     } as RangeType);
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean
-) =>
-    [...Array(numberOfBucks).keys()].map(i => ({
-        index: i,
-        get: new BuckGet(sendCommand, i),
-        set: new BuckSet(
+export default class Module implements BuckModule {
+    private _get: BuckGet;
+    private _set: BuckSet;
+    private _callbacks: (() => void)[];
+    constructor(
+        readonly index: number,
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+        offlineMode: boolean
+    ) {
+        this._get = new BuckGet(sendCommand, index);
+        this._set = new BuckSet(
             eventEmitter,
             sendCommand,
             dialogHandler,
             offlineMode,
-            i
-        ),
-        callbacks: buckCallbacks(shellParser, eventEmitter, i),
-        ranges: {
+            index
+        );
+        this._callbacks = buckCallbacks(shellParser, eventEmitter, index);
+    }
+    get get() {
+        return this._get;
+    }
+
+    get set() {
+        return this._set;
+    }
+
+    get callbacks() {
+        return this._callbacks;
+    }
+
+    get ranges(): {
+        voltage: RangeType;
+        retVOut: RangeType;
+    } {
+        return {
             voltage: buckVoltageRange(),
             retVOut: buckRetVOutRange(),
-        },
-        defaults: buckDefaults(),
-    }));
+        };
+    }
+    get defaults(): Buck {
+        return buckDefaults();
+    }
+}

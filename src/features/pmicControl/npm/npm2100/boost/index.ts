@@ -13,7 +13,8 @@ import boostCallbacks from './callbacks';
 import { BoostGet } from './getters';
 import { BoostSet } from './setters';
 
-export const numberOfBoosts = 1;
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable class-methods-use-this */
 
 const boostDefaults = (): Boost => ({
     vOutSoftware: voltageRange().min,
@@ -33,23 +34,41 @@ const voltageRange = () =>
         decimals: 1,
     } as RangeType);
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    offlineMode: boolean
-): BoostModule[] => [
-    {
-        get: new BoostGet(sendCommand),
-        set: new BoostSet(eventEmitter, sendCommand, offlineMode),
-        callbacks: boostCallbacks(shellParser, eventEmitter),
-        ranges: {
+export default class Module implements BoostModule {
+    private _get: BoostGet;
+    private _set: BoostSet;
+    private _callbacks: (() => void)[];
+    constructor(
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        offlineMode: boolean
+    ) {
+        this._get = new BoostGet(sendCommand);
+        this._set = new BoostSet(eventEmitter, sendCommand, offlineMode);
+        this._callbacks = boostCallbacks(shellParser, eventEmitter);
+    }
+    get get() {
+        return this._get;
+    }
+    get set() {
+        return this._set;
+    }
+    get callbacks() {
+        return this._callbacks;
+    }
+    get ranges(): {
+        voltage: RangeType;
+    } {
+        return {
             voltage: voltageRange(),
-        },
-        defaults: boostDefaults(),
-    },
-];
+        };
+    }
+    get defaults(): Boost {
+        return boostDefaults();
+    }
+}

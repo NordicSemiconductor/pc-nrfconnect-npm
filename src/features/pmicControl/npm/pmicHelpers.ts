@@ -12,13 +12,13 @@ import {
 import EventEmitter from 'events';
 import { v4 as uuid } from 'uuid';
 
-import { RootState } from '../../../appReducer';
+import type { RootState } from '../../../appReducer';
 import { dequeueDialog, requestDialog } from '../pmicControlSlice';
-import {
+import type BaseNpmDevice from './basePmicDevice';
+import type {
     BatteryModel,
     BatteryModelCharacterization,
     LoggingEvent,
-    NpmDevice,
     PartialUpdate,
     PmicDialog,
     SupportedErrorLogs,
@@ -320,7 +320,7 @@ export class NpmEventEmitter extends EventEmitter {
     }
 }
 
-export const SupportsErrorLogs = (npmDevice: NpmDevice): boolean =>
+export const SupportsErrorLogs = (npmDevice: BaseNpmDevice): boolean =>
     npmDevice.supportedErrorLogs !== undefined &&
     Object.keys(npmDevice.supportedErrorLogs).some(
         k => npmDevice.supportedErrorLogs?.[k as keyof SupportedErrorLogs]

@@ -48,8 +48,8 @@ const saveSettings =
                 chargingSamplingRate:
                     currentState.fuelGaugeSettings.chargingSamplingRate,
             },
-            firmwareVersion: currentState.npmDevice.getSupportedVersion(),
-            deviceType: currentState.npmDevice.getDeviceType(),
+            firmwareVersion: currentState.npmDevice.supportedVersion,
+            deviceType: currentState.npmDevice.deviceType,
             usbPower: currentState.usbPower
                 ? { currentLimiter: currentState.usbPower.currentLimiter }
                 : undefined,

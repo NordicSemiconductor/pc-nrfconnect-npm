@@ -85,7 +85,7 @@ export default ({ disabled }: { disabled: boolean }) => {
     );
 
     const bundledBatteries = useMemo(
-        () => getBundledBatteries(npmDevice?.getDeviceType() ?? 'npm1300'),
+        () => getBundledBatteries(npmDevice?.deviceType ?? 'npm1300'),
         [npmDevice]
     );
 
@@ -155,7 +155,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 }
                 items={batteryModelItems}
                 onSelect={(item: DropdownItem) => {
-                    npmDevice?.fuelGaugeModule.set.activeBatteryModel(
+                    npmDevice?.fuelGaugeModule?.set.activeBatteryModel(
                         item.value
                     );
                 }}
@@ -250,8 +250,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                         variant="secondary"
                         className="w-100"
                         onClick={() => {
-                            npmDevice
-                                ?.getBatteryProfiler?.()
+                            npmDevice?.batteryProfiler
                                 ?.canProfile()
                                 .then(result => {
                                     if (result) {

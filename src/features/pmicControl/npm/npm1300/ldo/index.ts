@@ -8,12 +8,10 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Ldo, LdoExport, PmicDialog } from '../../types';
+import { Ldo, LdoExport, LdoModule, PmicDialog } from '../../types';
 import ldoCallbacks from './ldoCallbacks';
 import { LdoGet } from './ldoGet';
 import { LdoSet } from './ldoSet';
-
-export const numberOfLdos = 2;
 
 const ldoDefaults = (): Ldo => ({
     voltage: getLdoVoltageRange().min,
@@ -44,30 +42,54 @@ const getLdoVoltageRange = () =>
         step: 0.1,
     } as RangeType);
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean
-) =>
-    [...Array(numberOfLdos).keys()].map(index => ({
-        index,
-        get: new LdoGet(sendCommand, index),
-        set: new LdoSet(
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable class-methods-use-this */
+
+export default class Module implements LdoModule {
+    private _get: LdoGet;
+    private _set: LdoSet;
+    private _callbacks: (() => void)[];
+    constructor(
+        readonly index: number,
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+        offlineMode: boolean
+    ) {
+        this._get = new LdoGet(sendCommand, index);
+        this._set = new LdoSet(
             eventEmitter,
             sendCommand,
             dialogHandler,
             offlineMode,
             index
-        ),
-        callbacks: ldoCallbacks(shellParser, eventEmitter, index),
-        ranges: {
+        );
+        this._callbacks = ldoCallbacks(shellParser, eventEmitter, index);
+    }
+
+    get get() {
+        return this._get;
+    }
+
+    get set() {
+        return this._set;
+    }
+
+    get callbacks() {
+        return this._callbacks;
+    }
+
+    get ranges(): { voltage: RangeType } {
+        return {
             voltage: getLdoVoltageRange(),
-        },
-        defaults: ldoDefaults(),
-    }));
+        };
+    }
+    get defaults(): Ldo {
+        return ldoDefaults();
+    }
+}

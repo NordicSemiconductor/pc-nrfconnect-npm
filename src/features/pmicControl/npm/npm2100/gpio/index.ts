@@ -7,7 +7,14 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { GpioModule, PmicDialog } from '../../types';
+import {
+    GPIO,
+    GPIODrive,
+    GPIOMode,
+    type GpioModule,
+    GPIOPull,
+    PmicDialog,
+} from '../../types';
 import gpioCallbacks from './gpioCallbacks';
 import { GpioGet } from './gpioGetters';
 import { GpioSet } from './gpioSetters';
@@ -20,31 +27,51 @@ import {
     GPIOPullKeys,
 } from './types';
 
-export const numberOfGPIOs = 2;
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable class-methods-use-this */
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean
-): GpioModule[] =>
-    [...Array(numberOfGPIOs).keys()].map(index => ({
-        index,
-        get: new GpioGet(sendCommand, index),
-        set: new GpioSet(
+export default class Module implements GpioModule {
+    private _get: GpioGet;
+    private _set: GpioSet;
+    private _callbacks: (() => void)[];
+    constructor(
+        readonly index: number,
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+        offlineMode: boolean
+    ) {
+        this._get = new GpioGet(sendCommand, index);
+        this._set = new GpioSet(
             eventEmitter,
             sendCommand,
             offlineMode,
             dialogHandler,
             index
-        ),
-        callbacks: gpioCallbacks(shellParser, eventEmitter, numberOfGPIOs),
-        values: {
+        );
+        this._callbacks = gpioCallbacks(shellParser, eventEmitter, index);
+    }
+
+    get get() {
+        return this._get;
+    }
+    get set() {
+        return this._set;
+    }
+    get callbacks() {
+        return this._callbacks;
+    }
+    get values(): {
+        mode: { label: string; value: GPIOMode }[];
+        pull: { label: string; value: GPIOPull }[];
+        drive: { label: string; value: GPIODrive }[];
+    } {
+        return {
             mode: [...GPIOModeKeys].map(item => ({
                 label: `${item}`,
                 value: GPIOMode2100[item as keyof typeof GPIOMode2100],
@@ -57,8 +84,11 @@ export default (
                 label: `${item}`,
                 value: GPIODrive2100[item as keyof typeof GPIODrive2100],
             })),
-        },
-        defaults: {
+        };
+    }
+
+    get defaults(): GPIO {
+        return {
             mode: GPIOMode2100.Input,
             pull: GPIOPull2100['Pull up'],
             pullEnabled: true,
@@ -68,5 +98,6 @@ export default (
             openDrainEnabled: false,
             debounce: false,
             debounceEnabled: true,
-        },
-    }));
+        };
+    }
+}

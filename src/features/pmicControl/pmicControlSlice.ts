@@ -7,7 +7,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../appReducer';
-import {
+import type BaseNpmDevice from './npm/basePmicDevice';
+import type {
     AdcSample,
     BatteryModel,
     Boost,
@@ -19,7 +20,6 @@ import {
     Ldo,
     LED,
     LowPowerConfig,
-    NpmDevice,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
@@ -31,7 +31,7 @@ import {
 } from './npm/types';
 
 interface pmicControlState {
-    npmDevice?: NpmDevice;
+    npmDevice?: BaseNpmDevice;
     charger?: Charger;
     boosts: Boost[];
     bucks: Buck[];
@@ -88,7 +88,7 @@ const pmicControlSlice = createSlice({
     name: 'pmicControl',
     initialState,
     reducers: {
-        setNpmDevice(state, action: PayloadAction<NpmDevice | undefined>) {
+        setNpmDevice(state, action: PayloadAction<BaseNpmDevice | undefined>) {
             if (state.npmDevice) {
                 state.npmDevice.release();
             }
@@ -374,7 +374,7 @@ export const getStoredBatterModels = (state: RootState) =>
     state.app.pmicControl.storedBatterModel;
 export const getUsbPower = (state: RootState) => state.app.pmicControl.usbPower;
 export const canProfile = (state: RootState) =>
-    state.app.pmicControl.npmDevice?.getBatteryProfiler?.() !== undefined;
+    state.app.pmicControl.npmDevice?.batteryProfiler !== undefined;
 export const isSupportedVersion = (state: RootState) =>
     state.app.pmicControl.pmicState !== 'ek-disconnected'
         ? state.app.pmicControl.supportedVersion

@@ -84,7 +84,7 @@ export default ({ active }: PaneProps) => {
                         ldo={ldo}
                         ldoModule={npmDevice.ldoModule[index]}
                         key={`Ldo${1 + index}`}
-                        deviceType={npmDevice.getDeviceType()}
+                        deviceType={npmDevice.deviceType}
                         disabled={disabled}
                         defaultSummary
                     />

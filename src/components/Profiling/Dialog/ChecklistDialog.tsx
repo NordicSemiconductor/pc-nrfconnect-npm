@@ -69,7 +69,9 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             await npmDevice?.ldoModule[1]?.set.enabled(false);
                             await npmDevice?.buckModule[0]?.set.enabled(false);
 
-                            await npmDevice?.fuelGaugeModule.set.enabled(false);
+                            await npmDevice?.fuelGaugeModule?.set.enabled(
+                                false
+                            );
                             await npmDevice?.chargerModule?.set.nTCThermistor(
                                 profile.ntcThermistor
                             );

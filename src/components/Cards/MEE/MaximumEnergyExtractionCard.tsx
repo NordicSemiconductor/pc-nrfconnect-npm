@@ -7,10 +7,10 @@
 import React from 'react';
 import { Card, Toggle } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { NpmDevice } from '../../../features/pmicControl/npm/types';
+import BaseNpmDevice from '../../../features/pmicControl/npm/basePmicDevice';
 
 interface BuckCardProperties {
-    npmDevice: NpmDevice;
+    npmDevice: BaseNpmDevice;
     cardLabel?: string;
     disabled: boolean;
 }

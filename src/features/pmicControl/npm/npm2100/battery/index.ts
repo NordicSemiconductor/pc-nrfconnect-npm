@@ -7,18 +7,32 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
+import { BatteryModule } from '../../types';
 import batteryCallbacks from './batteryCallbacks';
 import { BatteryGet } from './BatteryGet';
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void
-) => ({
-    get: new BatteryGet(sendCommand),
-    callbacks: batteryCallbacks(shellParser, eventEmitter),
-});
+/* eslint-disable no-underscore-dangle */
+
+export default class Module implements BatteryModule {
+    private _get: BatteryGet;
+    private _callbacks: (() => void)[];
+    constructor(
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void
+    ) {
+        this._get = new BatteryGet(sendCommand);
+        this._callbacks = batteryCallbacks(shellParser, eventEmitter);
+    }
+
+    get get() {
+        return this._get;
+    }
+    get callbacks() {
+        return this._callbacks;
+    }
+}

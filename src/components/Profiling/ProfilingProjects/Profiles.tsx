@@ -190,7 +190,7 @@ export default () => {
     useProfilingProjects();
 
     const bundledBatteries = useMemo(
-        () => getBundledBatteries(npmDevice?.getDeviceType() ?? 'npm1300'),
+        () => getBundledBatteries(npmDevice?.deviceType ?? 'npm1300'),
         [npmDevice]
     );
 

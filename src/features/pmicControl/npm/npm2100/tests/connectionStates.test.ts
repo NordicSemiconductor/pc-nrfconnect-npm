@@ -13,7 +13,7 @@ describe('PMIC 2100 - Pmic State Change tests', () => {
     test('Initial State', () => {
         const { pmic } = setupMocksWithShellParser();
 
-        expect(pmic.getConnectionState()).toBe('pmic-connected');
+        expect(pmic.pmicState).toBe('pmic-connected');
     });
 
     test("Goes from 'pmic-connected' to 'pmic-disconnected' if 'No response from PMIC.' is received", () => {

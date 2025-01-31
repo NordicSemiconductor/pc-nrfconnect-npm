@@ -21,7 +21,7 @@ describe('PMIC 2100 - Static getters', () => {
 
     test('Number of LEDs', () => expect(pmic.getNumberOfLEDs()).toBe(0));
 
-    test('Device Type', () => expect(pmic.getDeviceType()).toBe('npm2100'));
+    test('Device Type', () => expect(pmic.deviceType).toBe('npm2100'));
 
     test.each(PMIC_2100_LDOS)('LDO Voltage Range index: %p', index =>
         expect(pmic.ldoModule[index].ranges.voltage).toStrictEqual({

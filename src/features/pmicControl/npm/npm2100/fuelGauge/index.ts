@@ -18,7 +18,7 @@ import fuelGaugeCallbacks from './fuelGaugeCallbacks';
 import { FuelGaugeGet } from './fuelGaugeGet';
 import { FuelGaugeSet } from './fuelGaugeSet';
 
-export class FuelGaugeModule implements FuelGaugeModuleBase {
+export default class Module implements FuelGaugeModuleBase {
     profileDownloadInProgress = false;
     profileDownloadAborting = false;
     private _get: FuelGaugeGet;

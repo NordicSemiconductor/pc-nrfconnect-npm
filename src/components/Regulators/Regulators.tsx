@@ -58,7 +58,7 @@ export default ({ active }: PaneProps) => {
                     <LDOCard
                         ldo={ldo}
                         ldoModule={npmDevice.ldoModule[index]}
-                        deviceType={npmDevice.getDeviceType()}
+                        deviceType={npmDevice.deviceType}
                         key={`Buck${1 + index}`}
                         disabled={disabled}
                     />

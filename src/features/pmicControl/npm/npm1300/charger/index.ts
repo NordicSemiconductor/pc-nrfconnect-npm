@@ -18,10 +18,10 @@ import chargerCallbacks from './chargerCallbacks';
 import { ChargerGet } from './chargerGetters';
 import { ChargerSet } from './chargerSetters';
 
-export class ChargerModule implements ChargerModuleBase {
+export default class Module implements ChargerModuleBase {
     private _get: ChargerGet;
     private _set: ChargerSet;
-    private _callbacks: ReturnType<typeof chargerCallbacks>;
+    private _callbacks: (() => void)[];
 
     constructor(
         shellParser: ShellParser | undefined,
@@ -75,8 +75,8 @@ export class ChargerModule implements ChargerModuleBase {
     // eslint-disable-next-line class-methods-use-this
     get ranges() {
         return {
-            voltage: ChargerModule.voltageRange,
-            vTermR: ChargerModule.voltageRange,
+            voltage: Module.voltageRange,
+            vTermR: Module.voltageRange,
             jeita: {
                 min: -20,
                 max: 60,
@@ -97,7 +97,7 @@ export class ChargerModule implements ChargerModuleBase {
                 decimals: 0,
                 step: 1,
             },
-            iBatLim: ChargerModule.iBatRange(),
+            iBatLim: Module.iBatRange(),
         };
     }
 

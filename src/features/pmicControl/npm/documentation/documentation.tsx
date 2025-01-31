@@ -27,7 +27,7 @@ export const DocumentationTooltip = ({
 }) => {
     const npmDevice = useSelector(getNpmDevice);
 
-    const fullDocumentation = getDocumentation(npmDevice?.getDeviceType());
+    const fullDocumentation = getDocumentation(npmDevice?.deviceType);
     const documentation =
         fullDocumentation && fullDocumentation[card]
             ? fullDocumentation[card][item]
