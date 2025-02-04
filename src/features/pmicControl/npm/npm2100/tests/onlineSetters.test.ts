@@ -305,7 +305,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
         });
 
-        test.skip('Set setActiveBatteryModel', async () => {
+        test('Set setActiveBatteryModel', async () => {
             await pmic.fuelGaugeModule.set.activeBatteryModel(
                 'someProfileName'
             );

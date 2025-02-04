@@ -57,16 +57,20 @@ export class LdoSet {
                 );
                 resolve();
             } else {
-                this.enabled(false).then(() => {
-                    this.sendCommand(
-                        `npm2100 ldosw mode set ${mode}`,
-                        () => resolve(),
-                        () => {
-                            this.get.mode();
-                            reject();
-                        }
-                    );
-                });
+                this.enabled(false)
+                    .then(() => {
+                        this.sendCommand(
+                            `npm2100 ldosw mode set ${mode}`,
+                            () => resolve(),
+                            () => {
+                                this.get.mode();
+                                reject();
+                            }
+                        );
+                    })
+                    .catch(() => {
+                        reject();
+                    });
             }
         });
     }
@@ -96,7 +100,6 @@ export class LdoSet {
                         );
                     })
                     .catch(() => {
-                        this.get.mode();
                         reject();
                     });
             }
