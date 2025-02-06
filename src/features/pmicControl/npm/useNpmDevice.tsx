@@ -12,6 +12,7 @@ import {
     clearWaitForDevice,
     describeError,
     logger,
+    selectedVirtualDevice,
     setCurrentPane,
     setPaneDisabled,
     setPaneHidden,
@@ -87,6 +88,7 @@ import { PmicDialog } from './types';
 
 export default () => {
     const [isPMICPowered, setPMICPowered] = useState(false);
+    const virtualDeviceSelected = useSelector(selectedVirtualDevice);
     const shellParser = useSelector(getShellParser);
     const npmDevice = useSelector(getNpmDeviceSlice);
     const dispatch = useDispatch<AppDispatch>();
@@ -112,10 +114,10 @@ export default () => {
                 });
                 dev.isPMICPowered().then(setPMICPowered);
             });
-        } else {
+        } else if (!virtualDeviceSelected) {
             dispatch(setNpmDevice(undefined));
         }
-    }, [dispatch, shellParser]);
+    }, [dispatch, shellParser, virtualDeviceSelected]);
 
     useEffect(() => {
         if (
