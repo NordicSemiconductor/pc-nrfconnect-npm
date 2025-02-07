@@ -13,7 +13,6 @@ import {
     getLatestAdcSample,
     getNpmDevice,
     getPmicChargingState,
-    isBatteryConnected,
     isReceivingBatteryVoltageAboveThreshold,
 } from '../../features/pmicControl/pmicControlSlice';
 

@@ -126,7 +126,12 @@ export default () => {
     useEffect(
         () =>
             npmDevice?.batteryProfiler?.onProfilingEvent(event => {
-                dispatch(setBatteryConnected(event.data.vLoad > 1));
+                dispatch(
+                    setBatteryConnected(
+                        event.data.vLoad >
+                            npmDevice.batteryConnectedVoltageThreshold
+                    )
+                );
                 dispatch(
                     setLatestTBat(Number.parseFloat(event.data.tBat.toFixed(2)))
                 );
