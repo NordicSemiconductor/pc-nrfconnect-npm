@@ -14,6 +14,7 @@ import {
     getNpmDevice,
     getPmicChargingState,
     isBatteryConnected,
+    isReceivingBatteryVoltageAboveThreshold,
 } from '../../features/pmicControl/pmicControlSlice';
 
 import './battery.scss';
@@ -40,7 +41,9 @@ export default ({ disabled }: { disabled: boolean }) => {
 
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
-    const batteryConnected = useSelector(isBatteryConnected);
+    const batteryConnected = useSelector(
+        isReceivingBatteryVoltageAboveThreshold
+    );
 
     let mode = 'N/A';
     if (batteryConnected && pmicChargingState.constantCurrentCharging) {

@@ -343,6 +343,8 @@ export const getShip = (state: RootState) => state.app.pmicControl.lowPower;
 export const getReset = (state: RootState) => state.app.pmicControl.reset;
 export const getTimerConfig = (state: RootState) =>
     state.app.pmicControl.timerConfig;
+export const isReceivingBatteryVoltageAboveThreshold = (state: RootState) =>
+    state.app.pmicControl.batteryConnected;
 export const isBatteryConnected = (state: RootState) => {
     const { pmicState, batteryConnected } = state.app.pmicControl;
     const supportsBatteryModules = getSupportsBatteryModules(state);
