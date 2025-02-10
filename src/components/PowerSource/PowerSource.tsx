@@ -103,7 +103,7 @@ const BatteryModelDropdown = ({ disabled }: BatteryModelDropdownAttr) => {
                 );
 
                 if (selectedBatteryModel) {
-                    npmDevice?.fuelGaugeModule.set.activeBatteryModel(
+                    npmDevice?.fuelGaugeModule?.set.activeBatteryModel(
                         item.value
                     );
                 }

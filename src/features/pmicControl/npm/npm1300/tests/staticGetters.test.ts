@@ -24,7 +24,7 @@ describe('PMIC 1300 - Static getters', () => {
 
     test('Number of LEDs', () => expect(pmic.getNumberOfLEDs()).toBe(3));
 
-    test('Device Type', () => expect(pmic.getDeviceType()).toBe('npm1300'));
+    test('Device Type', () => expect(pmic.deviceType).toBe('npm1300'));
 
     test('Charger Voltage Range', () =>
         expect(pmic.chargerModule?.ranges.voltage).toStrictEqual([

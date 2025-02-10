@@ -24,7 +24,7 @@ import {
     TimerConfig,
     USBPower,
 } from '../../types';
-import { getNPM1300 } from '../pmic1300Device';
+import Npm1300 from '../pmic1300Device';
 
 export const PMIC_1300_BUCKS = [0, 1];
 export const PMIC_1300_LDOS = [0, 1];
@@ -39,7 +39,7 @@ export const setupMocksBase = (
         (_pmicDialog: PmicDialog) => {}
     );
 
-    const pmic = getNPM1300(shellParser, mockDialogHandler);
+    const pmic = new Npm1300(shellParser, mockDialogHandler);
 
     const mockOnActiveBatteryModelUpdate = jest.fn(() => {});
     const mockOnAdcSample = jest.fn(() => {});

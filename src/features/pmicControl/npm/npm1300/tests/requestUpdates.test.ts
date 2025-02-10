@@ -515,7 +515,7 @@ describe('PMIC 1300 - Request update commands', () => {
     );
 
     test.each(PMIC_1300_LEDS)('Request update ledMode index: %p', index => {
-        pmic.requestUpdate.ledMode(index);
+        pmic.getLedMode(index);
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -647,7 +647,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update fuelGauge', () => {
-        pmic.fuelGaugeModule.get.enabled();
+        pmic.fuelGaugeModule?.get.enabled();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -659,7 +659,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update activeBatteryModel', () => {
-        pmic.fuelGaugeModule.get.activeBatteryModel();
+        pmic.fuelGaugeModule?.get.activeBatteryModel();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -671,7 +671,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update storedBatteryModel', () => {
-        pmic.fuelGaugeModule.get.storedBatteryModel();
+        pmic.fuelGaugeModule?.get.storedBatteryModel();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

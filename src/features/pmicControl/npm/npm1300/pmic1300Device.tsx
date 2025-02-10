@@ -4,124 +4,279 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { baseNpmDevice } from '../basePmicDevice';
+import BaseNpmDevice from '../basePmicDevice';
 import { BatteryProfiler } from '../batteryProfiler';
 import {
     isModuleDataPair,
     MAX_TIMESTAMP,
     noop,
     NpmEventEmitter,
-    parseBatteryModel,
-    parseColonBasedAnswer,
     parseLogData,
     parseToNumber,
     toRegex,
 } from '../pmicHelpers';
 import {
     AdcSample,
-    AdcSampleSettings,
-    BatteryModel,
-    INpmDevice,
     IrqEvent,
-    LED,
-    LEDMode,
-    LEDModeValues,
     LoggingEvent,
+    NpmExportV2,
     PmicDialog,
-    PmicState,
-    ProfileDownload,
     USBDetectStatusValues,
     USBPower,
 } from '../types';
-import setupBucks, { numberOfBucks } from './buck';
-import { ChargerModule } from './charger';
-import { FuelGaugeModule } from './fuelGauge';
-import setupGpio from './gpio';
-import setupLdo, { numberOfLdos } from './ldo';
-import setupLowPower from './lowPower';
+import BuckModule from './buck';
+import ChargerModule from './charger';
+import FuelGaugeModule from './fuelGauge';
+import GpioModule from './gpio';
+import LdoModule from './ldo';
+import LowPowerModule from './lowPower';
 import overlay from './overlay';
-import setupPof from './pof';
-import setupReset from './reset';
-import setupTimer from './timerConfig';
-import setupUsbCurrentLimiter from './universalSerialBusCurrentLimiter';
+import PofModule from './pof';
+import ResetModule from './reset';
+import TimerModule from './timerConfig';
+import UsbCurrentLimiterModule from './universalSerialBusCurrentLimiter';
 
 export const npm1300FWVersion = '1.2.3+0';
 
-export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
-    const eventEmitter = new NpmEventEmitter();
+/* eslint-disable no-underscore-dangle */
 
-    const devices = {
-        noOfBucks: numberOfBucks,
-        noOfLdos: numberOfLdos,
-        noOfLEDs: 3,
-        noOfBatterySlots: 3,
-    };
-    const baseDevice = baseNpmDevice(
-        shellParser,
-        dialogHandler,
-        eventEmitter,
-        devices,
-        npm1300FWVersion
-    );
-    const batteryProfiler = shellParser
-        ? BatteryProfiler(shellParser, eventEmitter)
-        : undefined;
-    let lastUptime = 0;
-    let autoReboot = true;
+export default class Npm1300 extends BaseNpmDevice {
+    constructor(
+        shellParser: ShellParser | undefined,
+        dialogHandler: ((dialog: PmicDialog) => void) | null
+    ) {
+        super(
+            'npm1300',
+            npm1300FWVersion,
+            shellParser,
+            dialogHandler,
+            new NpmEventEmitter(),
+            {
+                charger: true,
+                noOfBoosts: 0,
+                noOfBucks: 2,
+                noOfLdos: 2,
+                noOfLEDs: 3,
+                noOfGPIOs: 5,
+                noOfBatterySlots: 3,
+                maxEnergyExtraction: false,
+            },
+            1,
+            {
+                reset: true,
+                charger: true,
+                sensor: true,
+            }
+        );
 
-    let pmicState: PmicState = shellParser
-        ? 'pmic-connected'
-        : 'ek-disconnected';
+        this._batteryProfiler = shellParser
+            ? BatteryProfiler(shellParser, this.eventEmitter)
+            : undefined;
 
-    const processModulePmic = ({ message }: LoggingEvent) => {
+        this._chargerModule = new ChargerModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+
+        this._buckModule = [...Array(this.devices.noOfBucks).keys()].map(
+            index =>
+                new BuckModule(
+                    index,
+                    this.shellParser,
+                    this.eventEmitter,
+                    this.sendCommand.bind(this),
+                    this.dialogHandler,
+                    this.offlineMode
+                )
+        );
+
+        this._ldoModule = [...Array(this.devices.noOfLdos).keys()].map(
+            index =>
+                new LdoModule(
+                    index,
+                    this.shellParser,
+                    this.eventEmitter,
+                    this.sendCommand.bind(this),
+                    this.dialogHandler,
+                    this.offlineMode
+                )
+        );
+
+        this._gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
+            index =>
+                new GpioModule(
+                    index,
+                    this.shellParser,
+                    this.eventEmitter,
+                    this.sendCommand.bind(this),
+                    this.offlineMode
+                )
+        );
+
+        this._pofModule = new PofModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+
+        this._lowPowerModule = new LowPowerModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+
+        this._resetModule = new ResetModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+
+        this._timerConfigModule = new TimerModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+
+        this._fuelGaugeModule = new FuelGaugeModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+
+        this._usbCurrentLimiterModule = new UsbCurrentLimiterModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+
+        if (shellParser) {
+            this.releaseAll.push(
+                shellParser.onShellLoggingEvent(logEvent => {
+                    parseLogData(logEvent, loggingEvent => {
+                        switch (loggingEvent.module) {
+                            case 'module_pmic':
+                                this.processModulePmic(loggingEvent);
+                                break;
+                            case 'module_pmic_adc':
+                                this.processModulePmicAdc(loggingEvent);
+                                break;
+                            case 'module_pmic_irq':
+                                this.processModulePmicIrq(loggingEvent);
+                                break;
+                            case 'module_pmic_charger':
+                                // Handled in charger callbacks
+                                break;
+                            case 'module_fg':
+                                // Handled in fuelGauge callbacks
+                                break;
+                        }
+
+                        this.eventEmitter.emit('onLoggingEvent', {
+                            loggingEvent,
+                            dataPair: isModuleDataPair(loggingEvent.module),
+                        });
+                    });
+                })
+            );
+
+            this.releaseAll.push(...this._chargerModule.callbacks);
+            this.releaseAll.push(...this._fuelGaugeModule.callbacks);
+            this.releaseAll.push(
+                shellParser.registerCommandCallback(
+                    toRegex(
+                        'npmx vbusin status cc get',
+                        false,
+                        undefined,
+                        '(0|1|2|3)'
+                    ),
+                    res => {
+                        this.eventEmitter.emitPartialEvent<USBPower>(
+                            'onUsbPower',
+                            {
+                                detectStatus:
+                                    USBDetectStatusValues[parseToNumber(res)],
+                            }
+                        );
+                    },
+                    noop
+                )
+            );
+
+            this.releaseAll.push(
+                ...this._buckModule.map(buck => buck.callbacks).flat()
+            );
+            this.releaseAll.push(
+                ...this._ldoModule.map(ldo => ldo.callbacks).flat()
+            );
+            this.releaseAll.push(
+                ...this._gpioModule.map(module => module.callbacks).flat()
+            );
+
+            this.releaseAll.push(...this._pofModule.callbacks);
+            this.releaseAll.push(...this._timerConfigModule.callbacks);
+            this.releaseAll.push(...this._lowPowerModule.callbacks);
+            this.releaseAll.push(...this._resetModule.callbacks);
+            this.releaseAll.push(...this._usbCurrentLimiterModule.callbacks);
+        }
+    }
+
+    private processModulePmic({ message }: LoggingEvent) {
         switch (message) {
             case 'Power Failure Warning':
-                batteryProfiler?.pofError();
+                this.batteryProfiler?.pofError();
                 break;
             case 'No response from PMIC.':
-                if (pmicState !== 'pmic-disconnected') {
-                    pmicState = 'pmic-disconnected';
-                    eventEmitter.emit('onPmicStateChange', pmicState);
+                if (this.pmicState !== 'pmic-disconnected') {
+                    this.pmicState = 'pmic-disconnected';
+                    this.eventEmitter.emit('onPmicStateChange', this.pmicState);
                 }
                 break;
             case 'PMIC available. Application can be restarted.':
-                if (pmicState === 'pmic-pending-rebooting') return;
+                if (this.pmicState === 'pmic-pending-rebooting') return;
 
-                if (autoReboot) {
-                    baseDevice.kernelReset();
-                    pmicState = 'pmic-pending-rebooting';
-                    eventEmitter.emit('onPmicStateChange', pmicState);
-                } else if (pmicState !== 'pmic-pending-reboot') {
-                    pmicState = 'pmic-pending-reboot';
-                    eventEmitter.emit('onPmicStateChange', pmicState);
+                if (this.autoReboot) {
+                    this.kernelReset();
+                    this.pmicState = 'pmic-pending-rebooting';
+                    this.eventEmitter.emit('onPmicStateChange', this.pmicState);
+                } else if (this.pmicState !== 'pmic-pending-reboot') {
+                    this.pmicState = 'pmic-pending-reboot';
+                    this.eventEmitter.emit('onPmicStateChange', this.pmicState);
                 }
                 break;
             case 'No USB connection':
-                eventEmitter.emit('onUsbPower', {
+                this.eventEmitter.emit('onUsbPower', {
                     detectStatus: 'No USB connection',
                 } as USBPower);
                 break;
             case 'Default USB 100/500mA':
-                eventEmitter.emit('onUsbPower', {
+                this.eventEmitter.emit('onUsbPower', {
                     detectStatus: 'USB 100/500 mA',
                 } as USBPower);
                 break;
             case '1.5A High Power':
-                eventEmitter.emit('onUsbPower', {
+                this.eventEmitter.emit('onUsbPower', {
                     detectStatus: '1.5A High Power',
                 } as USBPower);
                 break;
             case '3A High Power':
-                eventEmitter.emit('onUsbPower', {
+                this.eventEmitter.emit('onUsbPower', {
                     detectStatus: '3A High Power',
                 } as USBPower);
                 break;
         }
-    };
+    }
 
-    const processModulePmicAdc = ({ timestamp, message }: LoggingEvent) => {
+    private processModulePmicAdc({ timestamp, message }: LoggingEvent) {
         const messageParts = message.split(',');
         const adcSample: AdcSample = {
             timestamp,
@@ -163,20 +318,17 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
-        if (adcSample.timestamp < lastUptime) {
-            baseDevice.setUptimeOverflowCounter(
-                baseDevice.getUptimeOverflowCounter() + 1
-            );
-            adcSample.timestamp +=
-                MAX_TIMESTAMP * baseDevice.getUptimeOverflowCounter();
+        if (adcSample.timestamp < this.lastUptime) {
+            this.uptimeOverflowCounter += 1;
+            adcSample.timestamp += MAX_TIMESTAMP * this.uptimeOverflowCounter;
         }
 
-        lastUptime = adcSample.timestamp;
+        this.lastUptime = adcSample.timestamp;
 
-        eventEmitter.emit('onAdcSample', adcSample);
-    };
+        this.eventEmitter.emit('onAdcSample', adcSample);
+    }
 
-    const processModulePmicIrq = ({ message }: LoggingEvent) => {
+    processModulePmicIrq = ({ message }: LoggingEvent) => {
         const messageParts = message.split(',');
         const event: IrqEvent = {
             type: '',
@@ -194,22 +346,22 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
             }
         });
 
-        doActionOnEvent(event);
+        this.doActionOnEvent(event);
     };
 
-    const doActionOnEvent = (irqEvent: IrqEvent) => {
+    private doActionOnEvent(irqEvent: IrqEvent) {
         switch (irqEvent.type) {
             case 'EVENTSVBUSIN0SET':
-                processEventVBus0Set(irqEvent);
+                this.processEventVBus0Set(irqEvent);
                 break;
             case 'EVENTSBCHARGER1SET':
                 if (irqEvent.event === 'EVENTCHGERROR') {
-                    eventEmitter.emit('onErrorLogs', {
+                    this.eventEmitter.emit('onErrorLogs', {
                         chargerError: [],
                         sensorError: [],
                     });
 
-                    shellParser?.enqueueRequest(
+                    this.shellParser?.enqueueRequest(
                         'npmx errlog get',
                         {
                             onSuccess: res => {
@@ -219,9 +371,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                 const emit = () => {
                                     switch (currentState) {
                                         case 'RSTCAUSE:':
-                                            eventEmitter.emit('onErrorLogs', {
-                                                resetCause: errors,
-                                            });
+                                            this.eventEmitter.emit(
+                                                'onErrorLogs',
+                                                {
+                                                    resetCause: errors,
+                                                }
+                                            );
                                             logger.warn(
                                                 `Reset cause: ${errors.join(
                                                     ', '
@@ -229,9 +384,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                             );
                                             break;
                                         case 'CHARGER_ERROR:':
-                                            eventEmitter.emit('onErrorLogs', {
-                                                chargerError: errors,
-                                            });
+                                            this.eventEmitter.emit(
+                                                'onErrorLogs',
+                                                {
+                                                    chargerError: errors,
+                                                }
+                                            );
                                             logger.error(
                                                 `Charger Errors: ${errors.join(
                                                     ', '
@@ -239,9 +397,12 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                                             );
                                             break;
                                         case 'SENSOR_ERROR:':
-                                            eventEmitter.emit('onErrorLogs', {
-                                                sensorError: errors,
-                                            });
+                                            this.eventEmitter.emit(
+                                                'onErrorLogs',
+                                                {
+                                                    sensorError: errors,
+                                                }
+                                            );
                                             logger.error(
                                                 `Sensor Errors: ${errors.join(
                                                     ', '
@@ -280,533 +441,32 @@ export const getNPM1300: INpmDevice = (shellParser, dialogHandler) => {
                 }
                 break;
             case 'RSTCAUSE':
-                eventEmitter.emit('onErrorLogs', {
+                this.eventEmitter.emit('onErrorLogs', {
                     resetCause: [irqEvent.event],
                 });
                 logger.warn(`Reset cause: ${irqEvent.event}`);
                 break;
         }
-    };
-
-    const processEventVBus0Set = (irqEvent: IrqEvent) => {
-        switch (irqEvent.event) {
-            case 'EVENTVBUSREMOVED':
-                eventEmitter.emit('onUsbPowered', false);
-                break;
-            case 'EVENTVBUSDETECTED':
-                eventEmitter.emit('onUsbPowered', true);
-                break;
-        }
-    };
-
-    const startAdcSample = (intervalMs: number, samplingRate: number) =>
-        new Promise<void>((resolve, reject) => {
-            sendCommand(
-                `npm_adc sample ${samplingRate} ${intervalMs}`,
-                () => resolve(),
-                () => reject()
-            );
-        });
-
-    const stopAdcSample = () => {
-        sendCommand(`npm_adc sample 0`);
-    };
-
-    const sendCommand = (
-        command: string,
-        onSuccess: (response: string, command: string) => void = noop,
-        onError: (response: string, command: string) => void = noop,
-        unique = true
-    ) => {
-        if (pmicState !== 'ek-disconnected') {
-            shellParser?.enqueueRequest(
-                command,
-                {
-                    onSuccess,
-                    onError: (error, cmd) => {
-                        if (
-                            error.includes('IO error') &&
-                            pmicState === 'pmic-connected'
-                        ) {
-                            pmicState = 'pmic-disconnected';
-                            eventEmitter.emit('onPmicStateChange', pmicState);
-                        }
-                        onError(error, cmd);
-                    },
-                    onTimeout: error => {
-                        if (onError) onError(error, command);
-                        console.warn(error);
-                    },
-                },
-                undefined,
-                unique
-            );
-        } else {
-            onError('No Shell connection', command);
-        }
-    };
-
-    const offlineMode = !shellParser;
-
-    const chargerModule = new ChargerModule(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
-    const buckModule = setupBucks(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        dialogHandler,
-        offlineMode
-    );
-
-    const ldoModule = setupLdo(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        dialogHandler,
-        offlineMode
-    );
-
-    const gpioModule = setupGpio(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
-    const pofModule = setupPof(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
-    const lowPowerModule = setupLowPower(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
-    const resetModule = setupReset(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
-    const timerConfigModule = setupTimer(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
-    const fuelGaugeModule = new FuelGaugeModule(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
-    const usbCurrentLimiterModule = setupUsbCurrentLimiter(
-        shellParser,
-        eventEmitter,
-        sendCommand,
-        offlineMode
-    );
-
-    const releaseAll: (() => void)[] = [];
-
-    if (shellParser) {
-        releaseAll.push(
-            shellParser.onShellLoggingEvent(logEvent => {
-                parseLogData(logEvent, loggingEvent => {
-                    switch (loggingEvent.module) {
-                        case 'module_pmic':
-                            processModulePmic(loggingEvent);
-                            break;
-                        case 'module_pmic_adc':
-                            processModulePmicAdc(loggingEvent);
-                            break;
-                        case 'module_pmic_irq':
-                            processModulePmicIrq(loggingEvent);
-                            break;
-                        case 'module_pmic_charger':
-                            // Handled in charger callbacks
-                            break;
-                        case 'module_fg':
-                            // Handled in fuelGauge callbacks
-                            break;
-                    }
-
-                    eventEmitter.emit('onLoggingEvent', {
-                        loggingEvent,
-                        dataPair: isModuleDataPair(loggingEvent.module),
-                    });
-                });
-            })
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('npm_adc sample', false, undefined, '[0-9]+ [0-9]+'),
-                res => {
-                    const results = parseColonBasedAnswer(res).split(',');
-                    const settings: AdcSampleSettings = {
-                        samplingRate: 1000,
-                        reportRate: 2000,
-                    };
-                    results.forEach(result => {
-                        const pair = result.trim().split('=');
-                        if (pair.length === 2) {
-                            switch (pair[0]) {
-                                case 'sample interval':
-                                    settings.samplingRate = Number.parseInt(
-                                        pair[1],
-                                        10
-                                    );
-                                    break;
-                                case 'report interval':
-                                    settings.reportRate = Number.parseInt(
-                                        pair[1],
-                                        10
-                                    );
-                                    break;
-                            }
-                        }
-                    });
-                    eventEmitter.emit('onAdcSettingsChange', settings);
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex('delayed_reboot', false, undefined, '[0-9]+'),
-                () => {
-                    pmicState = 'pmic-pending-rebooting';
-                    eventEmitter.emit('onPmicStateChange', pmicState);
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(...chargerModule.callbacks);
-        releaseAll.push(...fuelGaugeModule.callbacks);
-
-        releaseAll.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx vbusin status cc get',
-                    false,
-                    undefined,
-                    '(0|1|2|3)'
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
-                        detectStatus: USBDetectStatusValues[parseToNumber(res)],
-                    });
-                },
-                noop
-            )
-        );
-
-        releaseAll.push(...buckModule.map(buck => buck.callbacks).flat());
-        releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
-        releaseAll.push(...gpioModule.map(module => module.callbacks).flat());
-
-        for (let i = 0; i < devices.noOfLEDs; i += 1) {
-            releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex('npmx led mode', true, i, '[0-3]'),
-                    res => {
-                        const mode = LEDModeValues[parseToNumber(res)];
-                        if (mode) {
-                            eventEmitter.emitPartialEvent<LED>(
-                                'onLEDUpdate',
-                                {
-                                    mode,
-                                },
-                                i
-                            );
-                        }
-                    },
-                    noop
-                )
-            );
-        }
-
-        releaseAll.push(...pofModule.callbacks);
-        releaseAll.push(...timerConfigModule.callbacks);
-        releaseAll.push(...lowPowerModule.callbacks);
-        releaseAll.push(...resetModule.callbacks);
-        releaseAll.push(...usbCurrentLimiterModule.callbacks);
     }
 
-    const setLedMode = (index: number, mode: LEDMode) =>
-        new Promise<void>((resolve, reject) => {
-            if (pmicState === 'ek-disconnected') {
-                eventEmitter.emitPartialEvent<LED>(
-                    'onLEDUpdate',
-                    {
-                        mode,
-                    },
-                    index
-                );
-                resolve();
-            } else {
-                sendCommand(
-                    `npmx led mode set ${index} ${LEDModeValues.findIndex(
-                        m => m === mode
-                    )}`,
-                    () => resolve(),
-                    () => {
-                        requestUpdate.ledMode(index);
-                        reject();
-                    }
-                );
-            }
-        });
-
-    // Return a set of default LED settings
-    const ledDefaults = (noOfLeds: number): LED[] => {
-        const defaultLEDs: LED[] = [];
-        for (let i = 0; i < noOfLeds; i += 1) {
-            defaultLEDs.push({
-                mode: LEDModeValues[i],
-            });
+    private processEventVBus0Set(irqEvent: IrqEvent) {
+        switch (irqEvent.event) {
+            case 'EVENTVBUSREMOVED':
+                this.eventEmitter.emit('onUsbPowered', false);
+                break;
+            case 'EVENTVBUSDETECTED':
+                this.eventEmitter.emit('onUsbPowered', true);
+                break;
         }
-        return defaultLEDs;
-    };
+    }
 
-    const requestUpdate = {
-        all: () => {
-            // Request all updates for nPM1300
+    release() {
+        super.release();
+        this.batteryProfiler?.release();
+        this.releaseAll.forEach(release => release());
+    }
 
-            usbCurrentLimiterModule.get.all();
-            chargerModule.get.all();
-
-            buckModule.forEach(buck => buck.get.all());
-            ldoModule.forEach(ldo => ldo.get.all());
-            gpioModule.forEach(module => module.get.all());
-
-            for (let i = 0; i < devices.noOfLEDs; i += 1) {
-                requestUpdate.ledMode(i);
-            }
-
-            pofModule.get.all();
-            timerConfigModule.get.all();
-            lowPowerModule.get.all();
-            resetModule.get.all();
-            fuelGaugeModule.get.all();
-        },
-
-        ledMode: (index: number) => sendCommand(`npmx led mode get ${index}`),
-    };
-
-    return {
-        ...baseDevice,
-        release: () => {
-            baseDevice.release();
-            batteryProfiler?.release();
-            releaseAll.forEach(release => release());
-        },
-        applyConfig: config =>
-            new Promise<void>(resolve => {
-                if (config.deviceType !== 'npm1300') {
-                    resolve();
-                    return;
-                }
-
-                const action = async () => {
-                    try {
-                        if (config.charger) {
-                            const charger = config.charger;
-                            await chargerModule.set.all(charger);
-                        }
-
-                        await Promise.all(
-                            config.bucks.map((buck, index) =>
-                                (async () => {
-                                    await buckModule[index].set.all(buck);
-                                })()
-                            )
-                        );
-
-                        await Promise.all(
-                            config.ldos.map((ldo, index) =>
-                                (async () => {
-                                    await ldoModule[index].set.all(ldo);
-                                })()
-                            )
-                        );
-
-                        await Promise.all(
-                            config.gpios.map((gpio, index) =>
-                                (async () => {
-                                    await gpioModule[index].set.all(gpio);
-                                })()
-                            )
-                        );
-
-                        await Promise.all(
-                            config.leds.map((led, index) =>
-                                setLedMode(index, led.mode)
-                            )
-                        );
-
-                        if (config.pof) {
-                            await pofModule.set.all(config.pof);
-                        }
-
-                        if (config.timerConfig) {
-                            await timerConfigModule.set.all(config.timerConfig);
-                        }
-
-                        if (config.lowPower) {
-                            await lowPowerModule.set.all(config.lowPower);
-                        }
-
-                        if (config.reset) {
-                            await resetModule.set.all(config.reset);
-                        }
-
-                        await fuelGaugeModule.set.enabled(
-                            config.fuelGaugeSettings.enabled
-                        );
-
-                        if (config.usbPower) {
-                            await usbCurrentLimiterModule.set.all(
-                                config.usbPower
-                            );
-                        }
-                    } catch (error) {
-                        logger.error('Invalid File.');
-                    }
-                };
-
-                if (config.firmwareVersion == null) {
-                    logger.error('Invalid File.');
-                    resolve();
-                    return;
-                }
-
-                if (
-                    dialogHandler &&
-                    config.firmwareVersion !== baseDevice.getSupportedVersion()
-                ) {
-                    const warningDialog: PmicDialog = {
-                        doNotAskAgainStoreID: 'pmic1300-load-config-mismatch',
-                        message: `The configuration was intended for firmware version ${
-                            config.firmwareVersion
-                        }. Device is running a different version.
-                    ${baseDevice.getSupportedVersion()}. Do you still want to apply this configuration?`,
-                        confirmLabel: 'Yes',
-                        optionalLabel: "Yes, don't ask again",
-                        cancelLabel: 'No',
-                        title: 'Warning',
-                        onConfirm: async () => {
-                            await action();
-                            resolve();
-                        },
-                        onCancel: () => {
-                            resolve();
-                        },
-                        onOptional: async () => {
-                            await action();
-                            resolve();
-                        },
-                    };
-
-                    dialogHandler(warningDialog);
-                } else {
-                    action().finally(resolve);
-                }
-            }),
-
-        getDeviceType: () => 'npm1300',
-        getConnectionState: () => pmicState,
-        startAdcSample,
-        stopAdcSample,
-        requestUpdate,
-        setLedMode,
-
-        getHardcodedBatteryModels: () =>
-            new Promise<BatteryModel[]>((resolve, reject) => {
-                shellParser?.enqueueRequest(
-                    'fuel_gauge model list',
-                    {
-                        onSuccess: result => {
-                            const models = result.split(':');
-                            if (models.length < 3) reject();
-                            const stringModels = models[2].trim().split('\n');
-                            const list = stringModels.map(parseBatteryModel);
-                            resolve(
-                                list.filter(
-                                    item => item !== null
-                                ) as BatteryModel[]
-                            );
-                        },
-                        onError: reject,
-                        onTimeout: error => {
-                            reject();
-                            console.warn(error);
-                        },
-                    },
-                    undefined,
-                    true
-                );
-            }),
-
-        onProfileDownloadUpdate: (
-            handler: (payload: ProfileDownload, error?: string) => void
-        ) => {
-            eventEmitter.on('onProfileDownloadUpdate', handler);
-            return () => {
-                eventEmitter.removeListener('onProfileDownloadUpdate', handler);
-            };
-        },
-
-        getBatteryProfiler: () => batteryProfiler,
-        setAutoRebootDevice: v => {
-            if (v && v !== autoReboot && pmicState === 'pmic-pending-reboot') {
-                baseDevice.kernelReset();
-                pmicState = 'pmic-pending-rebooting';
-                eventEmitter.emit('onPmicStateChange', pmicState);
-            }
-            autoReboot = v;
-        },
-
-        // Default settings
-        ledDefaults: () => ledDefaults(devices.noOfLEDs),
-
-        getBatteryConnectedVoltageThreshold: () => 1, // 1V
-
-        generateOverlay(npmExport) {
-            return overlay(npmExport, this);
-        },
-
-        supportedErrorLogs: {
-            reset: true,
-            charger: true,
-            sensor: true,
-        },
-
-        fuelGaugeModule,
-        chargerModule,
-        pofModule,
-        timerConfigModule,
-        gpioModule,
-        lowPowerModule,
-        resetModule,
-        usbCurrentLimiterModule,
-        ldoModule,
-        buckModule,
-    };
-};
+    generateOverlay(npmExport: NpmExportV2) {
+        return overlay(npmExport, this);
+    }
+}

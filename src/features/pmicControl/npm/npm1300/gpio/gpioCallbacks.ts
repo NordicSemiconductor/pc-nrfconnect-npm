@@ -24,136 +24,121 @@ import {
     GPIOPullValues,
 } from './types';
 
-const setupSingleGpio = (
-    shellParser: ShellParser,
-    eventEmitter: NpmEventEmitter,
-    i: number
-) => {
-    const cleanupCallbacks = [];
-
-    cleanupCallbacks.push(
-        shellParser.registerCommandCallback(
-            toRegex(
-                'npmx gpio config mode',
-                true,
-                i,
-                toValueRegex(GPIOModeValues)
-            ),
-            res => {
-                const mode: GPIOMode1300 = parseToNumber(res);
-                if (mode >= 0 && mode < GPIOModeValues.length) {
-                    const isInput = GPIOMode1300[mode].startsWith('Input');
-                    eventEmitter.emitPartialEvent<GPIO>(
-                        'onGPIOUpdate',
-                        {
-                            mode,
-                            pullEnabled: isInput,
-                            driveEnabled: !isInput,
-                            debounceEnabled: isInput,
-                        },
-                        i
-                    );
-                }
-            },
-            noop
-        )
-    );
-
-    cleanupCallbacks.push(
-        shellParser.registerCommandCallback(
-            toRegex(
-                'npmx gpio config pull',
-                true,
-                i,
-                toValueRegex(GPIOPullValues)
-            ),
-            res => {
-                const pull: GPIOPull1300 = parseToNumber(res);
-                if (pull >= 0 && pull < GPIOPullValues.length) {
-                    eventEmitter.emitPartialEvent<GPIO>(
-                        'onGPIOUpdate',
-                        {
-                            pull,
-                        },
-                        i
-                    );
-                }
-            },
-            noop
-        )
-    );
-
-    cleanupCallbacks.push(
-        shellParser.registerCommandCallback(
-            toRegex(
-                'npmx gpio config drive',
-                true,
-                i,
-                toValueRegex(GPIODriveValues)
-            ),
-            res => {
-                const drive: GPIODrive1300 = parseToNumber(res);
-                if (GPIODriveValues.findIndex(v => v === drive) !== -1) {
-                    eventEmitter.emitPartialEvent<GPIO>(
-                        'onGPIOUpdate',
-                        {
-                            drive: parseToNumber(res),
-                        },
-                        i
-                    );
-                }
-            },
-            noop
-        )
-    );
-
-    cleanupCallbacks.push(
-        shellParser.registerCommandCallback(
-            toRegex('npmx gpio config open_drain', true, i, '(0|1)'),
-            res => {
-                eventEmitter.emitPartialEvent<GPIO>(
-                    'onGPIOUpdate',
-                    {
-                        openDrain: parseToBoolean(res),
-                    },
-                    i
-                );
-            },
-            noop
-        )
-    );
-
-    cleanupCallbacks.push(
-        shellParser.registerCommandCallback(
-            toRegex('npmx gpio config debounce', true, i, '(0|1)'),
-            res => {
-                eventEmitter.emitPartialEvent<GPIO>(
-                    'onGPIOUpdate',
-                    {
-                        debounce: parseToBoolean(res),
-                    },
-                    i
-                );
-            },
-            noop
-        )
-    );
-
-    return cleanupCallbacks;
-};
-
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    noOfGpios: number
+    index: number
 ) => {
     const cleanupCallbacks = [];
+
     if (shellParser) {
-        for (let i = 0; i < noOfGpios; i += 1) {
-            cleanupCallbacks.push(
-                ...setupSingleGpio(shellParser, eventEmitter, i)
-            );
-        }
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx gpio config mode',
+                    true,
+                    index,
+                    toValueRegex(GPIOModeValues)
+                ),
+                res => {
+                    const mode: GPIOMode1300 = parseToNumber(res);
+                    if (mode >= 0 && mode < GPIOModeValues.length) {
+                        const isInput = GPIOMode1300[mode].startsWith('Input');
+                        eventEmitter.emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                mode,
+                                pullEnabled: isInput,
+                                driveEnabled: !isInput,
+                                debounceEnabled: isInput,
+                            },
+                            index
+                        );
+                    }
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx gpio config pull',
+                    true,
+                    index,
+                    toValueRegex(GPIOPullValues)
+                ),
+                res => {
+                    const pull: GPIOPull1300 = parseToNumber(res);
+                    if (pull >= 0 && pull < GPIOPullValues.length) {
+                        eventEmitter.emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                pull,
+                            },
+                            index
+                        );
+                    }
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npmx gpio config drive',
+                    true,
+                    index,
+                    toValueRegex(GPIODriveValues)
+                ),
+                res => {
+                    const drive: GPIODrive1300 = parseToNumber(res);
+                    if (GPIODriveValues.findIndex(v => v === drive) !== -1) {
+                        eventEmitter.emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                drive: parseToNumber(res),
+                            },
+                            index
+                        );
+                    }
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx gpio config open_drain', true, index, '(0|1)'),
+                res => {
+                    eventEmitter.emitPartialEvent<GPIO>(
+                        'onGPIOUpdate',
+                        {
+                            openDrain: parseToBoolean(res),
+                        },
+                        index
+                    );
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx gpio config debounce', true, index, '(0|1)'),
+                res => {
+                    eventEmitter.emitPartialEvent<GPIO>(
+                        'onGPIOUpdate',
+                        {
+                            debounce: parseToBoolean(res),
+                        },
+                        index
+                    );
+                },
+                noop
+            )
+        );
     }
 
     return cleanupCallbacks;

@@ -128,20 +128,16 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 await npmDevice?.chargerModule?.set.enabled(
                                     false
                                 );
-                                await npmDevice
-                                    ?.getBatteryProfiler?.()
-                                    ?.setProfile(
-                                        REPORTING_RATE, // iBat
-                                        REPORTING_RATE * 8, // tBat
-                                        profile.vLowerCutOff,
-                                        [
-                                            ...profile.restingProfiles,
-                                            ...profile.profilingProfiles,
-                                        ]
-                                    );
-                                await npmDevice
-                                    ?.getBatteryProfiler?.()
-                                    ?.startProfiling();
+                                await npmDevice?.batteryProfiler?.setProfile(
+                                    REPORTING_RATE, // iBat
+                                    REPORTING_RATE * 8, // tBat
+                                    profile.vLowerCutOff,
+                                    [
+                                        ...profile.restingProfiles,
+                                        ...profile.profilingProfiles,
+                                    ]
+                                );
+                                await npmDevice?.batteryProfiler?.startProfiling();
                             } catch (e) {
                                 dispatch(
                                     setCompleteStep({

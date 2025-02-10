@@ -398,20 +398,6 @@ export type PmicChargingState = {
     supplementModeActive: boolean;
 };
 
-export interface IBaseNpmDevice {
-    (
-        shellParser: ShellParser | undefined,
-        dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
-        eventEmitter: EventEmitter,
-        devices: {
-            noOfBucks?: number;
-            noOfLdos?: number;
-            noOfLEDs?: number;
-        },
-        supportsVersion: string
-    ): BaseNpmDevice;
-}
-
 export interface ProfileDownload {
     state: 'downloading' | 'aborted' | 'aborting' | 'applied' | 'failed';
     completeChunks?: number;
@@ -704,6 +690,14 @@ export type TimerConfigModule = {
     getPrescalerMultiplier?: (timerConfig: TimerConfig) => number;
 };
 
+export type BatteryModule = {
+    get: {
+        all: () => void;
+        batteryInput: () => void;
+    };
+    callbacks: (() => void)[];
+};
+
 export type LowPowerModule = {
     get: {
         all: () => void;
@@ -772,169 +766,6 @@ export type UsbCurrentLimiterModule = {
         vBusInLimiter: number[];
     };
 };
-
-export type BaseNpmDevice = {
-    kernelReset: () => void;
-    getKernelUptime: () => Promise<number>;
-    onPmicStateChange: (
-        handler: (state: PmicState, error?: string) => void
-    ) => () => void;
-    onAdcSample: (
-        handler: (sample: AdcSample, error?: string) => void
-    ) => () => void;
-    onAdcSettingsChange: (
-        handler: (payload: AdcSampleSettings) => void
-    ) => () => void;
-    onChargingStatusUpdate: (
-        handler: (payload: PmicChargingState, error?: string) => void
-    ) => () => void;
-    onChargerUpdate: (
-        handler: (payload: Partial<Charger>, error?: string) => void
-    ) => () => void;
-    onBatteryAddonBoardIdUpdate: (
-        handler: (batteryAddonBoardId: number, error?: string) => void
-    ) => () => void;
-    onTimerExpiryInterrupt: (
-        handler: (payload: string, error?: string) => void
-    ) => () => void;
-    onBoostUpdate: (
-        handler: (payload: PartialUpdate<Boost>, error?: string) => void
-    ) => () => void;
-    onBuckUpdate: (
-        handler: (payload: PartialUpdate<Buck>, error?: string) => void
-    ) => () => void;
-    onGPIOUpdate: (
-        handler: (payload: PartialUpdate<GPIO>, error?: string) => void
-    ) => () => void;
-    onLEDUpdate: (
-        handler: (payload: PartialUpdate<LED>, error?: string) => void
-    ) => () => void;
-    onPOFUpdate: (
-        handler: (payload: Partial<POF>, error?: string) => void
-    ) => () => void;
-    onTimerConfigUpdate: (
-        handler: (payload: Partial<TimerConfig>, error?: string) => void
-    ) => () => void;
-    onLowPowerUpdate: (
-        handler: (
-            payload: Partial<npm1300LowPowerConfig>,
-            error?: string
-        ) => void
-    ) => () => void;
-    onResetUpdate: (
-        handler: (payload: Partial<ResetConfig>, error?: string) => void
-    ) => () => void;
-    onBeforeReboot: (
-        handler: (payload: number, error?: string) => void
-    ) => () => void;
-    onReboot: (
-        handler: (success: boolean, error?: string) => void
-    ) => () => void;
-
-    onUsbPower: (
-        handler: (payload: Partial<USBPower>, error?: string) => void
-    ) => () => void;
-
-    onErrorLogs: (
-        handler: (payload: Partial<ErrorLogs>, error?: string) => void
-    ) => () => void;
-
-    clearErrorLogs?: (errorOnly?: boolean) => void;
-
-    onFuelGaugeUpdate: (handler: (payload: boolean) => void) => () => void;
-
-    supportedErrorLogs?: SupportedErrorLogs;
-
-    onActiveBatteryModelUpdate: (
-        handler: (payload: BatteryModel) => void
-    ) => () => void;
-
-    onStoredBatteryModelUpdate: (
-        handler: (payload: BatteryModel[]) => void
-    ) => () => void;
-
-    onLoggingEvent: (
-        handler: (payload: {
-            loggingEvent: LoggingEvent;
-            dataPair: boolean;
-        }) => void
-    ) => () => void;
-
-    onLdoUpdate: (
-        handler: (payload: PartialUpdate<Ldo>, error?: string) => void
-    ) => () => void;
-
-    initialize: () => Promise<void>;
-
-    hasMaxEnergyExtraction: () => boolean;
-    getNumberOfLEDs: () => number;
-    getNumberOfBatteryModelSlots: () => number;
-
-    isSupportedVersion: () => Promise<{ supported: boolean; version: string }>;
-    getSupportedVersion: () => string;
-    getHwVersion: () => Promise<{
-        hw_version: string;
-        pca?: string;
-        version?: string;
-    }>;
-    getPmicVersion: () => Promise<number>;
-    isPMICPowered: () => Promise<boolean>;
-
-    getUptimeOverflowCounter: () => number;
-    setUptimeOverflowCounter: (value: number) => void;
-    release: () => void;
-
-    generateOverlay?: (npmExport: NpmExportLatest) => string;
-
-    chargerModule?: ChargerModule;
-    gpioModule: GpioModule[];
-    boostModule: BoostModule[];
-    pofModule?: PofModule;
-    lowPowerModule?: LowPowerModule;
-    resetModule?: ResetModule;
-    timerConfigModule?: TimerConfigModule;
-    buckModule: BuckModule[];
-    usbCurrentLimiterModule?: UsbCurrentLimiterModule;
-    ldoModule: LdoModule[];
-};
-
-export interface INpmDevice extends IBaseNpmDevice {
-    (
-        shellParser: ShellParser | undefined,
-        dialogHandler: ((pmicDialog: PmicDialog) => void) | null
-    ): NpmDevice;
-}
-
-export type NpmDevice = {
-    applyConfig: (config: NpmExportLatest) => void;
-    getDeviceType: () => NpmModel;
-    getConnectionState: () => PmicState;
-
-    onProfileDownloadUpdate: (
-        handler: (success: ProfileDownload, error?: string) => void
-    ) => () => void;
-
-    startAdcSample: (intervalMs: number, samplingRate: number) => Promise<void>;
-    stopAdcSample: () => void;
-
-    ledDefaults: () => LED[];
-
-    getBatteryConnectedVoltageThreshold: () => number;
-
-    requestUpdate: {
-        all: () => void;
-        ledMode: (index: number) => void;
-    };
-
-    setLedMode: (index: number, mode: LEDMode) => Promise<void>;
-
-    fuelGaugeModule: FuelGaugeModule;
-    // TODO
-    getHardcodedBatteryModels: () => Promise<BatteryModel[]>;
-
-    getBatteryProfiler?: () => BatteryProfiler | undefined;
-    setAutoRebootDevice: (autoReboot: boolean) => void;
-} & BaseNpmDevice;
 
 export interface PmicDialog {
     uuid?: string;

@@ -125,7 +125,7 @@ export default () => {
 
     useEffect(
         () =>
-            npmDevice?.getBatteryProfiler?.()?.onProfilingEvent(event => {
+            npmDevice?.batteryProfiler?.onProfilingEvent(event => {
                 dispatch(setBatteryConnected(event.data.vLoad > 1));
                 dispatch(
                     setLatestTBat(Number.parseFloat(event.data.tBat.toFixed(2)))
@@ -231,7 +231,7 @@ export default () => {
         ) {
             if (usbPowered) {
                 npmDevice?.setAutoRebootDevice(true);
-                npmDevice?.getBatteryProfiler?.()?.stopProfiling();
+                npmDevice?.batteryProfiler?.stopProfiling();
                 dispatch(
                     setCompleteStep({
                         level: 'danger',
@@ -240,7 +240,7 @@ export default () => {
                 );
             } else if (fuelGauge) {
                 npmDevice?.setAutoRebootDevice(true);
-                npmDevice?.getBatteryProfiler?.()?.stopProfiling();
+                npmDevice?.batteryProfiler?.stopProfiling();
                 dispatch(
                     setCompleteStep({
                         level: 'danger',
@@ -249,7 +249,7 @@ export default () => {
                 );
             } else if (!batteryConnected) {
                 npmDevice?.setAutoRebootDevice(true);
-                npmDevice?.getBatteryProfiler?.()?.stopProfiling();
+                npmDevice?.batteryProfiler?.stopProfiling();
                 dispatch(
                     setCompleteStep({
                         level:
@@ -259,7 +259,7 @@ export default () => {
                 );
             } else if (ldos.filter(ldo => ldo.enabled).length > 0) {
                 npmDevice?.setAutoRebootDevice(true);
-                npmDevice?.getBatteryProfiler?.()?.stopProfiling();
+                npmDevice?.batteryProfiler?.stopProfiling();
                 dispatch(
                     setCompleteStep({
                         level: 'danger',
@@ -268,7 +268,7 @@ export default () => {
                 );
             } else if (bucks.length && bucks[0].enabled) {
                 npmDevice?.setAutoRebootDevice(true);
-                npmDevice?.getBatteryProfiler?.()?.stopProfiling();
+                npmDevice?.batteryProfiler?.stopProfiling();
                 dispatch(
                     setCompleteStep({
                         level: 'danger',

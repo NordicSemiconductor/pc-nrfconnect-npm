@@ -8,12 +8,14 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Ldo, LdoExport } from '../../types';
+import { Ldo, LdoExport, LdoModule } from '../../types';
 import ldoCallbacks from './ldoCallbacks';
 import { LdoGet } from './ldoGet';
 import { LdoSet } from './ldoSet';
 
-export const numberOfLdos = 1;
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-underscore-dangle */
+
 const ldoDefaults = (): Ldo => ({
     voltage: getLdoVoltageRange().min,
     mode: 'Load_switch',
@@ -43,24 +45,41 @@ const getLdoVoltageRange = () =>
         step: 0.1,
     } as RangeType);
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    offlineMode: boolean
-) => [
-    {
-        index: 0,
-        get: new LdoGet(sendCommand),
-        set: new LdoSet(eventEmitter, sendCommand, offlineMode),
-        callbacks: ldoCallbacks(shellParser, eventEmitter),
-        ranges: {
+export default class Module implements LdoModule {
+    private _get: LdoGet;
+    private _set: LdoSet;
+    private _callbacks: (() => void)[];
+    constructor(
+        public readonly index: number,
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        offlineMode: boolean
+    ) {
+        this._get = new LdoGet(sendCommand);
+        this._set = new LdoSet(eventEmitter, sendCommand, offlineMode);
+        this._callbacks = ldoCallbacks(shellParser, eventEmitter);
+    }
+
+    get get(): LdoGet {
+        return this._get;
+    }
+    get set(): LdoSet {
+        return this._set;
+    }
+    get callbacks(): (() => void)[] {
+        return this._callbacks;
+    }
+    get ranges(): { voltage: RangeType } {
+        return {
             voltage: getLdoVoltageRange(),
-        },
-        defaults: ldoDefaults(),
-    },
-];
+        };
+    }
+    get defaults(): Ldo {
+        return ldoDefaults();
+    }
+}

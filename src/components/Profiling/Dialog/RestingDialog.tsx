@@ -70,9 +70,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         onClick={() => {
                             dispatch(
                                 setAbortAction(() => {
-                                    npmDevice
-                                        ?.getBatteryProfiler?.()
-                                        ?.stopProfiling();
+                                    npmDevice?.batteryProfiler?.stopProfiling();
                                     npmDevice?.setAutoRebootDevice(true);
                                     dispatch(closeProfiling());
                                     dispatch(clearWaitForDevice());

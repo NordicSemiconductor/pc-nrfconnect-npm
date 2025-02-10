@@ -32,7 +32,7 @@ export default ({ disabled }: BatteryCardProperties) => {
                         label="Enable"
                         isToggled={fuelGauge}
                         onToggle={enabled =>
-                            npmDevice?.fuelGaugeModule.set.enabled(enabled)
+                            npmDevice?.fuelGaugeModule?.set.enabled(enabled)
                         }
                         disabled={disabled}
                     />

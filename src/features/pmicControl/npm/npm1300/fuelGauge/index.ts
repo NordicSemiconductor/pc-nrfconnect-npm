@@ -14,13 +14,13 @@ import fuelGaugeCallbacks from './fuelGaugeCallbacks';
 import { FuelGaugeGet } from './fuelGaugeGet';
 import { FuelGaugeSet } from './fuelGaugeSet';
 
-export class FuelGaugeModule implements FuelGaugeModuleBase {
+export default class Module implements FuelGaugeModuleBase {
     profileDownloadInProgress = false;
     profileDownloadAborting = false;
     private _get: FuelGaugeGet;
     private _set: FuelGaugeSet;
     private _actions: FuelGaugeActions;
-    private _callbacks: ReturnType<typeof fuelGaugeCallbacks>;
+    private _callbacks: (() => void)[];
 
     constructor(
         shellParser: ShellParser | undefined,

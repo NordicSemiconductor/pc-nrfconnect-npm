@@ -4,10 +4,19 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    DropdownItem,
+    ShellParser,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { ResetModule } from '../../types';
+import {
+    LongPressReset,
+    LongPressResetDebounce,
+    ResetConfig,
+    ResetModule,
+    ResetPinSelection,
+} from '../../types';
 import {
     npm2100LongPressResetDebounceValues,
     npm2100ResetPinSelection,
@@ -17,41 +26,74 @@ import resetCallbacks from './resetCallbacks';
 import { ResetGet } from './resetGetters';
 import { ResetSet } from './resetSetters';
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    offlineMode: boolean
-): ResetModule => ({
-    get: new ResetGet(sendCommand),
-    set: new ResetSet(eventEmitter, sendCommand, offlineMode),
-    actions: new ResetActions(eventEmitter, sendCommand, offlineMode),
-    values: {
-        pinSelection: Object.keys(npm2100ResetPinSelection).map(key => ({
-            label: `${key}`,
-            value: npm2100ResetPinSelection[
-                key as keyof typeof npm2100ResetPinSelection
-            ],
-        })),
-        longPressResetDebounce: npm2100LongPressResetDebounceValues.map(
-            item => ({
-                label: `${item}`,
-                value: `${item}`,
-            })
-        ),
-        longPressReset: [],
-    },
-    callbacks: resetCallbacks(shellParser, eventEmitter),
-    defaults: {
-        longPressResetEnable: false,
-        longPressResetDebounce: '5s',
-        resetPinSelection: npm2100ResetPinSelection['PG/RESET'],
-    },
-});
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-underscore-dangle */
+
+export default class Module implements ResetModule {
+    private _get: ResetGet;
+    private _set: ResetSet;
+    private _actions: ResetActions;
+    private _callbacks: (() => void)[];
+    constructor(
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        offlineMode: boolean
+    ) {
+        this._get = new ResetGet(sendCommand);
+        this._set = new ResetSet(eventEmitter, sendCommand, offlineMode);
+        this._actions = new ResetActions(
+            eventEmitter,
+            sendCommand,
+            offlineMode
+        );
+        this._callbacks = resetCallbacks(shellParser, eventEmitter);
+    }
+    get get() {
+        return this._get;
+    }
+    get set() {
+        return this._set;
+    }
+    get actions() {
+        return this._actions;
+    }
+    get callbacks() {
+        return this._callbacks;
+    }
+    get values(): {
+        pinSelection: DropdownItem<ResetPinSelection>[];
+        longPressReset: DropdownItem<LongPressReset>[];
+        longPressResetDebounce: DropdownItem<LongPressResetDebounce>[];
+    } {
+        return {
+            pinSelection: Object.keys(npm2100ResetPinSelection).map(key => ({
+                label: `${key}`,
+                value: npm2100ResetPinSelection[
+                    key as keyof typeof npm2100ResetPinSelection
+                ],
+            })),
+            longPressResetDebounce: npm2100LongPressResetDebounceValues.map(
+                item => ({
+                    label: `${item}`,
+                    value: `${item}`,
+                })
+            ),
+            longPressReset: [],
+        };
+    }
+    get defaults(): ResetConfig {
+        return {
+            longPressResetEnable: false,
+            longPressResetDebounce: '5s',
+            resetPinSelection: npm2100ResetPinSelection['PG/RESET'],
+        };
+    }
+}
 
 // Mapping from reset reason code to description
 export const ResetReasons = new Map<string, string>([

@@ -15,10 +15,10 @@ import {
     LEDMode,
     LowPowerConfig,
     npm1300ResetConfig,
-    NpmDevice,
     NpmExportLatest,
     NTCThermistor,
 } from '../types';
+import type Npm1300 from './pmic1300Device';
 
 const toMicro = (value: number) => value * 1000000;
 // const toMilli = (value: number) => value * 1000;
@@ -164,7 +164,7 @@ const generateReset = (reset?: npm1300ResetConfig) =>
 `
         : '';
 
-export default (npmConfig: NpmExportLatest, npmDevice: NpmDevice) => `/*
+export default (npmConfig: NpmExportLatest, npmDevice: Npm1300) => `/*
 * Copyright (C) 2023 Nordic Semiconductor ASA
 * SPDX-License-Identifier: Apache-2.0
 */

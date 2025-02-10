@@ -172,7 +172,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
         });
 
         test('Set setFuelGaugeEnabled enabled: false', async () => {
-            await pmic.fuelGaugeModule.set.enabled(false);
+            await pmic.fuelGaugeModule?.set.enabled(false);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -187,7 +187,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
         });
 
         test('Set setFuelGaugeEnabled enabled: true', async () => {
-            pmic.fuelGaugeModule.set.enabled(true);
+            pmic.fuelGaugeModule?.set.enabled(true);
             await new Promise<void>(resolve => {
                 mockEnqueueRequest.mockImplementationOnce(
                     (command, callbacks, timeout, unique) => {
@@ -306,7 +306,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
         });
 
         test('Set setActiveBatteryModel', async () => {
-            await pmic.fuelGaugeModule.set.activeBatteryModel(
+            await pmic.fuelGaugeModule?.set.activeBatteryModel(
                 'someProfileName'
             );
 
@@ -325,7 +325,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
         test.each([true, false])(
             'startBatteryStatusCheck enabled: %p',
             async enabled => {
-                await pmic.fuelGaugeModule.set.batteryStatusCheckEnabled(
+                await pmic.fuelGaugeModule?.set.batteryStatusCheckEnabled(
                     enabled
                 );
 
@@ -543,7 +543,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.fuelGaugeModule.set.enabled(enabled)
+                    pmic.fuelGaugeModule?.set.enabled(enabled)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -570,7 +570,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
         test('Set setActiveBatteryModel - Fail immediately', async () => {
             await expect(
-                pmic.fuelGaugeModule.set.activeBatteryModel('someProfileName')
+                pmic.fuelGaugeModule?.set.activeBatteryModel('someProfileName')
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

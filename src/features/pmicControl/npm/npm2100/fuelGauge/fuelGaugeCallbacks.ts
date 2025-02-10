@@ -20,7 +20,7 @@ import {
     BatteryModelCharacterization,
     ProfileDownload,
 } from '../../types';
-import { type FuelGaugeModule } from '.';
+import type FuelGaugeModule from '.';
 import { FuelGaugeGet } from './fuelGaugeGet';
 
 export default (
