@@ -182,7 +182,7 @@ export default class Npm2100 extends BaseNpmDevice {
         switch (message) {
             case 'No response from PMIC.':
                 if (this.pmicState !== 'pmic-disconnected') {
-                    this._pmicState = 'pmic-disconnected';
+                    this.pmicState = 'pmic-disconnected';
                     this.eventEmitter.emit('onPmicStateChange', this.pmicState);
                 }
                 break;
@@ -194,7 +194,7 @@ export default class Npm2100 extends BaseNpmDevice {
                     this.pmicState = 'pmic-pending-rebooting';
                     this.eventEmitter.emit('onPmicStateChange', this.pmicState);
                 } else if (this.pmicState !== 'pmic-pending-reboot') {
-                    this._pmicState = 'pmic-pending-reboot';
+                    this.pmicState = 'pmic-pending-reboot';
                     this.eventEmitter.emit('onPmicStateChange', this.pmicState);
                 }
                 break;
