@@ -264,7 +264,7 @@ export default abstract class BaseNpmDevice {
                 shellParser.registerCommandCallback(
                     toRegex('delayed_reboot', false, undefined, '[0-9]+'),
                     () => {
-                        this._pmicState = 'pmic-pending-rebooting';
+                        this.pmicState = 'pmic-pending-rebooting';
                         this.eventEmitter.emit(
                             'onPmicStateChange',
                             this.pmicState
