@@ -30,6 +30,7 @@ export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have
 
 export default class Npm2100 extends BaseNpmDevice {
     private waitingForReset = false;
+    private recentReset = false;
     constructor(
         shellParser: ShellParser | undefined,
         dialogHandler: ((pmicDialog: PmicDialog) => void) | null
@@ -211,7 +212,24 @@ export default class Npm2100 extends BaseNpmDevice {
 
             this.waitingForReset = true;
         } else if (logLevel === 'inf' && this.waitingForReset) {
+            if (this.recentReset) {
+                this.dialogHandler?.({
+                    uuid: 'bootMonitorEnabled',
+                    type: 'information',
+                    title: 'Boot monitor is enabled',
+                    message:
+                        'The boot monitor on TIMER is enabled and will cause a periodic reset. Do you want to disable it?',
+                    confirmLabel: 'Yes, disable it',
+                    onConfirm: () =>
+                        this.timerConfigModule?.set.enabled?.(false),
+                    cancelLabel: 'No, keep enabled',
+                });
+            }
             this.waitingForReset = false;
+            this.recentReset = true;
+            setTimeout(() => {
+                this.recentReset = false;
+            }, 15000);
             this.requestUpdate();
         }
     }
