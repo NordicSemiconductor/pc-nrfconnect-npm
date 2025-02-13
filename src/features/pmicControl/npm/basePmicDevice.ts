@@ -347,11 +347,14 @@ export default abstract class BaseNpmDevice {
         this.buckModule.forEach(buck => buck.get.all());
         this.ldoModule.forEach(ldo => ldo.get.all());
         this.gpioModule.forEach(module => module.get.all());
+        this.boostModule.forEach(boost => boost.get.all());
 
         for (let i = 0; i < this.devices.noOfLEDs; i += 1) {
             this.getLedMode(i);
         }
 
+        this.batteryModule?.get.all();
+        this.usbCurrentLimiterModule?.get.all();
         this.pofModule?.get.all();
         this.timerConfigModule?.get.all();
         this.lowPowerModule?.get.all();
