@@ -29,6 +29,7 @@ export const npm2100FWVersion = '0.4.1+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
 export default class Npm2100 extends BaseNpmDevice {
+    private waitingForReset = false;
     constructor(
         shellParser: ShellParser | undefined,
         dialogHandler: ((pmicDialog: PmicDialog) => void) | null
@@ -201,11 +202,27 @@ export default class Npm2100 extends BaseNpmDevice {
         }
     }
 
+    private handleReset(logLevel: string, message: string) {
+        if (
+            logLevel === 'err' &&
+            message.startsWith('Error: ADC reading failed')
+        ) {
+            if (this.waitingForReset) return;
+
+            this.waitingForReset = true;
+        } else if (logLevel === 'inf' && this.waitingForReset) {
+            this.waitingForReset = false;
+            this.requestUpdate();
+        }
+    }
+
     private processModulePmicAdc({
         timestamp,
         message,
         logLevel,
     }: LoggingEvent) {
+        this.handleReset(logLevel, message);
+
         if (logLevel !== 'inf') return;
 
         const messageParts = message.split(',');
