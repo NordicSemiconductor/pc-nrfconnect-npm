@@ -723,6 +723,9 @@ export type LowPowerModule = {
         enterShipMode?(): void;
         enterShipHibernateMode?(): void;
         enterHibernatePtMode?(): void;
+        exitBreakToWake?(): void;
+        enterBreakToWakeStep1?(): void;
+        enterBreakToWakeStep2?(): void;
     };
     values: {
         timeToActive: { label: string; value: TimeToActive }[];
