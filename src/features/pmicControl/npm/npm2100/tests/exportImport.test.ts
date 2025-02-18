@@ -22,7 +22,7 @@ import {
     TimerConfig,
     USBPower,
 } from '../../types';
-import { GPIOMode2100, GPIOPull2100 } from '../gpio/types';
+import { GPIOMode2100, GPIOPull2100, GPIOState2100 } from '../gpio/types';
 import { toLdoExport } from '../ldo';
 import { npm2100FWVersion } from '../pmic2100Device';
 import { npm2100TimerMode } from '../types';
@@ -141,6 +141,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         gpios: [
             {
                 mode: GPIOMode2100.Input,
+                state: GPIOState2100.Low,
                 pull: GPIOPull2100['Pull down'],
                 drive: 6,
                 openDrain: false,
@@ -148,6 +149,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             },
             {
                 mode: GPIOMode2100.Output,
+                state: GPIOState2100.High,
                 pull: GPIOPull2100['Pull down'],
                 drive: 6,
                 openDrain: true,
@@ -195,6 +197,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
 
     const initGPIO: GPIOExport = {
         mode: GPIOMode2100.Output,
+        state: GPIOState2100.High,
         pull: GPIOPull2100['Pull down'],
         drive: 6,
         openDrain: false,

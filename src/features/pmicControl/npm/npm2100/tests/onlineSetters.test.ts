@@ -42,13 +42,25 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
             await pmic.gpioModule[index].set.mode(mode);
 
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
+            expect(mockEnqueueRequest).toBeCalledTimes(
+                mode === 'OUTPUT' ? 2 : 1
+            );
+            expect(mockEnqueueRequest).nthCalledWith(
+                1,
                 `npm2100 gpio mode set ${index} ${mode}`,
                 expect.anything(),
                 undefined,
                 true
             );
+            if (mode === 'OUTPUT') {
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npm2100 gpio state get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+            }
 
             // Updates should only be emitted when we get response
             expect(mockOnGpioUpdate).toBeCalledTimes(0);

@@ -8,10 +8,11 @@ import React from 'react';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     GPIO,
-    GPIODrive as GPIODriveBase,
+    GPIODrive,
     GPIOExport,
-    GPIOMode as GPIOModeBase,
-    GPIOPull as GPIOPullModeBase,
+    GPIOMode,
+    GPIOPull,
+    GPIOState,
     PmicDialog,
 } from '../../types';
 import { GpioGet } from './gpioGetters';
@@ -44,7 +45,7 @@ export class GpioSet {
         await this.mode(gpio.mode as GPIOMode2100);
     }
 
-    mode(mode: GPIOModeBase) {
+    mode(mode: GPIOMode) {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (this.offlineMode) {
@@ -68,7 +69,10 @@ export class GpioSet {
                 } else {
                     this.sendCommand(
                         `npm2100 gpio mode set ${this.index} ${mode}`,
-                        () => resolve(),
+                        () => {
+                            if (mode === GPIOMode2100.Output) this.get.state();
+                            resolve();
+                        },
                         () => {
                             this.get.mode();
                             reject();
@@ -108,7 +112,31 @@ export class GpioSet {
         return action();
     }
 
-    pull(pull: GPIOPullModeBase) {
+    state(state: GPIOState) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<GPIO>(
+                    'onGPIOUpdate',
+                    {
+                        state,
+                    },
+                    this.index
+                );
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm2100 gpio state set ${this.index} ${state}`,
+                    () => resolve(),
+                    () => {
+                        this.get.state();
+                        reject();
+                    }
+                );
+            }
+        });
+    }
+
+    pull(pull: GPIOPull) {
         const action = () =>
             new Promise<void>((resolve, reject) => {
                 if (this.offlineMode) {
@@ -163,7 +191,7 @@ export class GpioSet {
         return action();
     }
 
-    drive(drive: GPIODriveBase) {
+    drive(drive: GPIODrive) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<GPIO>(

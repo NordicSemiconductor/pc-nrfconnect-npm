@@ -13,6 +13,7 @@ import {
     GPIOMode,
     type GpioModule,
     GPIOPull,
+    GPIOState,
     PmicDialog,
 } from '../../types';
 import gpioCallbacks from './gpioCallbacks';
@@ -25,6 +26,8 @@ import {
     GPIOModeKeys,
     GPIOPull2100,
     GPIOPullKeys,
+    GPIOState2100,
+    GPIOStateKeys,
 } from './types';
 
 /* eslint-disable no-underscore-dangle */
@@ -68,6 +71,7 @@ export default class Module implements GpioModule {
     }
     get values(): {
         mode: { label: string; value: GPIOMode }[];
+        state: { label: string; value: GPIOState }[];
         pull: { label: string; value: GPIOPull }[];
         drive: { label: string; value: GPIODrive }[];
     } {
@@ -75,6 +79,10 @@ export default class Module implements GpioModule {
             mode: [...GPIOModeKeys].map(item => ({
                 label: `${item}`,
                 value: GPIOMode2100[item as keyof typeof GPIOMode2100],
+            })),
+            state: [...GPIOStateKeys].map(item => ({
+                label: `${item}`,
+                value: GPIOState2100[item as keyof typeof GPIOState2100],
             })),
             pull: [...GPIOPullKeys].map(item => ({
                 label: `${item}`,
@@ -90,6 +98,7 @@ export default class Module implements GpioModule {
     get defaults(): GPIO {
         return {
             mode: GPIOMode2100.Input,
+            state: GPIOState2100.Low,
             pull: GPIOPull2100['Pull up'],
             pullEnabled: true,
             drive: GPIODrive2100.High,
