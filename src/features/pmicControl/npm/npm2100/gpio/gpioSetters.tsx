@@ -60,7 +60,7 @@ export class GpioSet {
                             mode,
                             driveEnabled: !isInterrupt,
                             openDrainEnabled: isOutput,
-                            pullEnabled: !isInterrupt,
+                            pullEnabled: !isInterrupt && !isOutput,
                         },
                         this.index
                     );
