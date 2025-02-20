@@ -6,6 +6,7 @@
 
 import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { RootState } from '../../../../appReducer';
 import BaseNpmDevice from '../basePmicDevice';
 import { BatteryProfiler } from '../batteryProfiler';
 import {
@@ -26,11 +27,11 @@ import {
     USBDetectStatusValues,
     USBPower,
 } from '../types';
-import BuckModule from './buck';
+import BuckModule, { toBuckExport } from './buck';
 import ChargerModule from './charger';
 import FuelGaugeModule from './fuelGauge';
 import GpioModule from './gpio';
-import LdoModule from './ldo';
+import LdoModule, { toLdoExport } from './ldo';
 import LowPowerModule from './lowPower';
 import overlay from './overlay';
 import PofModule from './pof';
@@ -464,6 +465,39 @@ export default class Npm1300 extends BaseNpmDevice {
         super.release();
         this.batteryProfiler?.release();
         this.releaseAll.forEach(release => release());
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    generateExport(
+        getState: () => RootState & {
+            app: { pmicControl: { npmDevice: BaseNpmDevice } };
+        }
+    ) {
+        const currentState = getState().app.pmicControl;
+
+        return {
+            boosts: [...currentState.boosts],
+            charger: currentState.charger,
+            bucks: [...currentState.bucks.map(toBuckExport)],
+            ldos: [...currentState.ldos.map(toLdoExport)],
+            gpios: [...currentState.gpios],
+            leds: [...currentState.leds],
+            pof: currentState.pof,
+            lowPower: currentState.lowPower,
+            reset: currentState.reset,
+            timerConfig: currentState.timerConfig,
+            fuelGaugeSettings: {
+                enabled: currentState.fuelGaugeSettings.enabled,
+                chargingSamplingRate:
+                    currentState.fuelGaugeSettings.chargingSamplingRate,
+            },
+            firmwareVersion: currentState.npmDevice.supportedVersion,
+            deviceType: currentState.npmDevice.deviceType,
+            usbPower: currentState.usbPower
+                ? { currentLimiter: currentState.usbPower.currentLimiter }
+                : undefined,
+            fileFormatVersion: 2 as const,
+        };
     }
 
     generateOverlay(npmExport: NpmExportV2) {

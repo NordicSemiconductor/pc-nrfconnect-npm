@@ -6,6 +6,7 @@
 
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { RootState } from '../../../../appReducer';
 import BaseNpmDevice from '../basePmicDevice';
 import {
     isModuleDataPair,
@@ -13,12 +14,18 @@ import {
     NpmEventEmitter,
     parseLogData,
 } from '../pmicHelpers';
-import { AdcSample, IrqEvent, LoggingEvent, PmicDialog } from '../types';
+import {
+    AdcSample,
+    IrqEvent,
+    LoggingEvent,
+    NpmExportLatest,
+    PmicDialog,
+} from '../types';
 import BatteryModule from './battery';
 import BoostModule from './boost';
 import FuelGaugeModule from './fuelGauge';
 import GpioModule from './gpio';
-import LdoModule from './ldo';
+import LdoModule, { toLdoExport } from './ldo';
 import LowPowerModule from './lowPower';
 import ResetModule from './reset';
 import TimerModule from './timerConfig';
@@ -356,5 +363,35 @@ export default class Npm2100 extends BaseNpmDevice {
     release() {
         super.release();
         this.releaseAll.forEach(release => release());
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    generateExport(
+        getState: () => RootState & {
+            app: { pmicControl: { npmDevice: BaseNpmDevice } };
+        }
+    ) {
+        const currentState = getState().app.pmicControl;
+
+        return {
+            boosts: [...currentState.boosts],
+            ldos: [...currentState.ldos.map(toLdoExport)],
+            gpios: [...currentState.gpios],
+            leds: [...currentState.leds],
+            lowPower: currentState.lowPower,
+            reset: currentState.reset,
+            timerConfig: currentState.timerConfig,
+            fuelGaugeSettings: {
+                enabled: currentState.fuelGaugeSettings.enabled,
+                chargingSamplingRate:
+                    currentState.fuelGaugeSettings.chargingSamplingRate,
+            },
+            firmwareVersion: currentState.npmDevice.supportedVersion,
+            deviceType: currentState.npmDevice.deviceType,
+            usbPower: currentState.usbPower
+                ? { currentLimiter: currentState.usbPower.currentLimiter }
+                : undefined,
+            fileFormatVersion: 2 as const,
+        } as NpmExportLatest;
     }
 }
