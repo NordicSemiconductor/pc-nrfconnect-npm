@@ -19,6 +19,7 @@ import {
     IrqEvent,
     LoggingEvent,
     NpmExportLatest,
+    NpmExportV2,
     PmicDialog,
 } from '../types';
 import BatteryModule from './battery';
@@ -27,6 +28,7 @@ import FuelGaugeModule from './fuelGauge';
 import GpioModule from './gpio';
 import LdoModule, { toLdoExport } from './ldo';
 import LowPowerModule from './lowPower';
+import overlay from './overlay';
 import ResetModule from './reset';
 import TimerModule from './timerConfig';
 
@@ -393,5 +395,9 @@ export default class Npm2100 extends BaseNpmDevice {
                 : undefined,
             fileFormatVersion: 2 as const,
         } as NpmExportLatest;
+    }
+
+    generateOverlay(npmExport: NpmExportV2) {
+        return overlay(npmExport, this);
     }
 }
