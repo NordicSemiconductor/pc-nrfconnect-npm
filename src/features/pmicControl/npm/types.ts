@@ -511,6 +511,7 @@ export interface ChargerModule {
 }
 
 export interface BoostModule {
+    index: number;
     get: {
         all: () => void;
         vOutVSet: () => void;
@@ -825,7 +826,7 @@ export interface NpmExportV1 {
 export interface NpmExportV2 {
     boosts: BoostExport[];
     charger?: Charger;
-    bucks: BuckExport[];
+    bucks?: BuckExport[];
     ldos: LdoExport[];
     gpios: GPIOExport[];
     leds: LED[];

@@ -15,8 +15,6 @@ import fs from 'fs';
 import path from 'path';
 
 import { RootState } from '../appReducer';
-import { toBuckExport } from '../features/pmicControl/npm/npm1300/buck';
-import { toLdoExport } from '../features/pmicControl/npm/npm1300/ldo';
 import {
     AnyNpmExport,
     FuelGaugeExport,
@@ -28,39 +26,14 @@ import { getNpmDevice } from '../features/pmicControl/pmicControlSlice';
 const saveSettings =
     (filePath: string): AppThunk<RootState> =>
     (_dispatch, getState) => {
-        const currentState = getState().app.pmicControl;
+        const npmDevice = getNpmDevice(getState());
 
-        if (!currentState.npmDevice) return;
-
-        const out: NpmExportLatest = {
-            boosts: [...currentState.boosts],
-            charger: currentState.charger,
-            bucks: [...currentState.bucks.map(toBuckExport)],
-            ldos: [...currentState.ldos.map(toLdoExport)],
-            gpios: [...currentState.gpios],
-            leds: [...currentState.leds],
-            pof: currentState.pof,
-            lowPower: currentState.lowPower,
-            reset: currentState.reset,
-            timerConfig: currentState.timerConfig,
-            fuelGaugeSettings: {
-                enabled: currentState.fuelGaugeSettings.enabled,
-                chargingSamplingRate:
-                    currentState.fuelGaugeSettings.chargingSamplingRate,
-            },
-            firmwareVersion: currentState.npmDevice.supportedVersion,
-            deviceType: currentState.npmDevice.deviceType,
-            usbPower: currentState.usbPower
-                ? { currentLimiter: currentState.usbPower.currentLimiter }
-                : undefined,
-            fileFormatVersion: 2,
-        };
+        const out = npmDevice?.generateExport?.(getState);
+        if (!out) return;
 
         telemetry.sendEvent('Export Configuration', {
             config: out,
         });
-
-        const npmDevice = getNpmDevice(getState());
 
         if (filePath.endsWith('.json')) {
             fs.writeFileSync(filePath, JSON.stringify(out, null, 2));

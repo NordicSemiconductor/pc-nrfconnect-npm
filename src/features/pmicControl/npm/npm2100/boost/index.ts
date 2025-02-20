@@ -46,7 +46,8 @@ export default class Module implements BoostModule {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
         ) => void,
-        offlineMode: boolean
+        offlineMode: boolean,
+        readonly index = 0
     ) {
         this._get = new BoostGet(sendCommand);
         this._set = new BoostSet(eventEmitter, sendCommand, offlineMode);

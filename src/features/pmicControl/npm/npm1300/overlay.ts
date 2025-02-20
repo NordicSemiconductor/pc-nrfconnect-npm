@@ -190,11 +190,14 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300) => `/*
        npm1300_ek_regulators: regulators {
            compatible = "nordic,npm1300-regulator";
 
-           ${npmConfig.bucks
-               .map((buck, index) =>
-                   generateBuck(buck, npmDevice.buckModule[index])
-               )
-               .join('\n\n')}
+           ${
+               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+               npmConfig
+                   .bucks!.map((buck, index) =>
+                       generateBuck(buck, npmDevice.buckModule[index])
+                   )
+                   .join('\n\n')
+           }
 
             ${npmConfig.ldos
                 .map((ldos, index) =>

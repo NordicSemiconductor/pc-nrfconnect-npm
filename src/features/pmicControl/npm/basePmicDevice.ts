@@ -6,6 +6,7 @@
 
 import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { RootState } from '../../../appReducer';
 import {
     MAX_TIMESTAMP,
     noop,
@@ -69,6 +70,13 @@ export default abstract class BaseNpmDevice {
     protected uptimeOverflowCounter = 0;
     protected releaseAll: (() => void)[] = [];
     generateOverlay?(npmExport: NpmExportV2): string;
+    generateExport?(
+        getState: () =>
+            | RootState
+            | {
+                  app: { pmicControl: { npmDevice: BaseNpmDevice } };
+              }
+    ): NpmExportLatest;
 
     get deviceType() {
         return this._deviceType;
@@ -756,13 +764,15 @@ export default abstract class BaseNpmDevice {
                         )
                     );
 
-                    await Promise.all(
-                        config.bucks.map((buck, index) =>
-                            (async () => {
-                                await this.buckModule[index].set.all(buck);
-                            })()
-                        )
-                    );
+                    if (config.bucks) {
+                        await Promise.all(
+                            config.bucks.map((buck, index) =>
+                                (async () => {
+                                    await this.buckModule[index].set.all(buck);
+                                })()
+                            )
+                        );
+                    }
 
                     await Promise.all(
                         config.ldos.map((ldo, index) =>
