@@ -19,9 +19,5 @@ export const batteryAddonBoards = new Map<number, string>([
 ]);
 
 export function getBatteryAddonBoard(addonBoardId: number): string {
-    return (
-        batteryAddonBoards.get(addonBoardId) ??
-        batteryAddonBoards.get(0) ??
-        'UNKNOWN'
-    );
+    return batteryAddonBoards.get(addonBoardId) ?? 'UNKNOWN';
 }

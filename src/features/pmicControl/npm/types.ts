@@ -16,6 +16,7 @@ import type {
     GPIOMode1300,
     GPIOPull1300,
 } from './npm1300/gpio/types';
+import type { PowerID2100 } from './npm2100/battery';
 import type {
     GPIODrive2100,
     GPIOMode2100,
@@ -128,6 +129,8 @@ export type IrqEvent = {
     type: string;
     event: string;
 };
+
+export type PowerID = PowerID2100;
 
 export type FuelGauge = {
     enabled: boolean;
@@ -701,6 +704,7 @@ export type BatteryModule = {
     get: {
         all: () => void;
         batteryInput: () => void;
+        powerid: () => void;
     };
     callbacks: (() => void)[];
 };

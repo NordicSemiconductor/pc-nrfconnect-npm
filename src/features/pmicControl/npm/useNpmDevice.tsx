@@ -54,6 +54,7 @@ import {
     setPmicChargingState,
     setPmicState,
     setPOFs,
+    setPowerId,
     setResetConfig,
     setStoredBatterModel,
     setSupportedVersion,
@@ -299,6 +300,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onStoredBatteryModelUpdate(payload => {
                     dispatch(setStoredBatterModel(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onPowerIdUpdate(payload => {
+                    dispatch(setPowerId(payload));
                 })
             );
 

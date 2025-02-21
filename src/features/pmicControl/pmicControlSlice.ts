@@ -25,6 +25,7 @@ import type {
     PmicDialog,
     PmicState,
     POF,
+    PowerID,
     ResetConfig,
     TimerConfig,
     USBPower,
@@ -47,6 +48,7 @@ interface pmicControlState {
     pmicChargingState: PmicChargingState;
     batteryConnected: boolean;
     batteryAddonBoardId?: number;
+    powerid?: PowerID;
     fuelGaugeSettings: FuelGauge;
     supportedVersion?: boolean;
     dialog: PmicDialog[];
@@ -121,6 +123,9 @@ const pmicControlSlice = createSlice({
             action: PayloadAction<AdcSample | undefined>
         ) {
             state.latestAdcSample = action.payload;
+        },
+        setPowerId(state, action: PayloadAction<PowerID>) {
+            state.powerid = action.payload;
         },
         setBatteryAddonBoardId(state, action: PayloadAction<number>) {
             state.batteryAddonBoardId = action.payload;
@@ -359,6 +364,7 @@ export const isBatteryConnected = (state: RootState) => {
         initialState.batteryConnected
     );
 };
+export const getPowerId = (state: RootState) => state.app.pmicControl.powerid;
 export const getBatteryAddonBoardId = (state: RootState) =>
     state.app.pmicControl.batteryAddonBoardId || 0;
 export const getSupportsBatteryModules = (state: RootState) =>
@@ -427,6 +433,7 @@ export const {
     updateResetConfig,
     setBatteryConnected,
     setBatteryAddonBoardId,
+    setPowerId,
     setFuelGauge,
     setActiveBatterModel,
     setHardcodedBatterModels,
