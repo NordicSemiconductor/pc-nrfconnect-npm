@@ -30,7 +30,7 @@ export const DocumentationTooltip = ({
     const fullDocumentation = getDocumentation(npmDevice?.deviceType);
     const documentation =
         fullDocumentation && fullDocumentation[card]
-            ? fullDocumentation[card][item]
+            ? fullDocumentation[card]?.[item]
             : null;
 
     return documentation ? (
