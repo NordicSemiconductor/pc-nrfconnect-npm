@@ -152,7 +152,14 @@ export default () => {
                     <Group
                         collapsible
                         defaultCollapsed={false}
-                        heading="Power Source"
+                        heading={
+                            <DocumentationTooltip
+                                card={card}
+                                item="PowerSource"
+                            >
+                                Power Source
+                            </DocumentationTooltip>
+                        }
                     >
                         <PowerSource />
                     </Group>
