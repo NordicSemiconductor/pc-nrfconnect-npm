@@ -22,7 +22,7 @@ import {
     NpmExportV2,
     PmicDialog,
 } from '../types';
-import BatteryModule from './battery';
+import BatteryModule, { PowerID2100 } from './battery';
 import BoostModule from './boost';
 import FuelGaugeModule from './fuelGauge';
 import GpioModule from './gpio';
@@ -34,7 +34,7 @@ import TimerModule from './timerConfig';
 
 /* eslint-disable no-underscore-dangle */
 
-export const npm2100FWVersion = '0.4.1+0';
+export const npm2100FWVersion = '0.5.0+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
 export default class Npm2100 extends BaseNpmDevice {
@@ -209,6 +209,13 @@ export default class Npm2100 extends BaseNpmDevice {
                     this.eventEmitter.emit('onPmicStateChange', this.pmicState);
                 }
                 break;
+            default:
+                if (message.startsWith('powerid=')) {
+                    this.eventEmitter.emit(
+                        'onPowerIdUpdate',
+                        message.split('=')[1] as PowerID2100
+                    );
+                }
         }
     }
 

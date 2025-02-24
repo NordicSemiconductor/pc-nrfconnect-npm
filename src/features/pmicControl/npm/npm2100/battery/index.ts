@@ -13,6 +13,8 @@ import { BatteryGet } from './BatteryGet';
 
 /* eslint-disable no-underscore-dangle */
 
+export type PowerID2100 = 'VEXT' | 'VBAT';
+
 export default class Module implements BatteryModule {
     private _get: BatteryGet;
     private _callbacks: (() => void)[];

@@ -49,6 +49,7 @@ import {
     PmicState,
     POF,
     PofModule,
+    PowerID,
     ProfileDownload,
     ResetConfig,
     ResetModule,
@@ -503,6 +504,9 @@ export default abstract class BaseNpmDevice {
         return this.setupHandler<number, true>('onBatteryAddonBoardIdUpdate')(
             handler
         );
+    }
+    onPowerIdUpdate(handler: (payload: PowerID, error: string) => void) {
+        return this.setupHandler<PowerID, true>('onPowerIdUpdate')(handler);
     }
     onTimerExpiryInterrupt(handler: (payload: string, error: string) => void) {
         return this.setupHandler<string, true>('onTimerExpiryInterrupt')(

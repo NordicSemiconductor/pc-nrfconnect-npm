@@ -33,6 +33,16 @@ export default (
                 noop
             )
         );
+
+        batteryCommandCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('powerid', false, undefined),
+                res => {
+                    eventEmitter.emit('onPowerIdUpdate', res.split('=')[1]);
+                },
+                noop
+            )
+        );
     }
 
     return batteryCommandCallbacks;

@@ -16,9 +16,14 @@ export class BatteryGet {
 
     all() {
         this.batteryInput();
+        this.powerid();
     }
 
     batteryInput() {
         this.sendCommand(`batt_input_detect get`);
+    }
+
+    powerid() {
+        this.sendCommand(`powerid`);
     }
 }

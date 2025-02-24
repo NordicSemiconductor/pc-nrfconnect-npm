@@ -19,6 +19,7 @@ import {
     getBatteryAddonBoardId,
     getHardcodedBatterModels,
     getNpmDevice,
+    getPowerId,
 } from '../../features/pmicControl/pmicControlSlice';
 
 type PowerSource = 'USB' | 'Battery';
@@ -33,12 +34,12 @@ function generateBatteryTypeItems(
 }
 
 export default () => {
-    const batteryAddonBoardId = useSelector(getBatteryAddonBoardId);
+    // const batteryAddonBoardId = useSelector(getBatteryAddonBoardId);
+    const powerid = useSelector(getPowerId);
 
+    const powerSourceItems = ['Battery', 'USB'] as PowerSource[];
     const powerSourceType: PowerSource =
-        batteryAddonBoardId !== 0 ? 'Battery' : 'USB';
-
-    const powerSourceItems = ['Battery', 'USB'];
+        powerid === 'VEXT' ? powerSourceItems[1] : powerSourceItems[0];
 
     return (
         <>
@@ -46,36 +47,34 @@ export default () => {
                 disabled
                 items={powerSourceItems}
                 onSelect={() => {}}
-                selectedItem={
-                    powerSourceType === 'Battery'
-                        ? powerSourceItems[0]
-                        : powerSourceItems[1]
-                }
+                selectedItem={powerSourceType}
             />
-            <BatteryAddonBoardInfo />
+            <div className="tw-mb-6 tw-w-full tw-border tw-border-solid tw-border-gray-200 tw-p-2">
+                <BatteryAddonBoardInfo
+                    vextEnabled={powerSourceType === 'USB'}
+                />
+            </div>
         </>
     );
 };
 
-const BatteryAddonBoardInfo = () => {
+const BatteryAddonBoardInfo = ({ vextEnabled }: { vextEnabled: boolean }) => {
     const batteryAddonBoardId = useSelector(getBatteryAddonBoardId);
 
     const batteryCellType = getBatteryAddonBoard(batteryAddonBoardId);
 
-    if (batteryAddonBoardId === 0) {
-        return (
-            <div className="x tw-mb-6 tw-w-full tw-border tw-border-solid tw-border-gray-200 tw-p-2">
-                No battery add-on board detected.
-            </div>
-        );
+    if (vextEnabled) {
+        return <>VEXT used as power source.</>;
     }
 
-    return (
-        <div className="x tw-mb-6 tw-w-full tw-border tw-border-solid tw-border-gray-200 tw-p-2">
+    return batteryAddonBoardId === 0 ? (
+        <>No battery add-on board detected.</>
+    ) : (
+        <>
             Battery add-on board for
             <br />
             {batteryCellType}-batteries connected.
-        </div>
+        </>
     );
 };
 
