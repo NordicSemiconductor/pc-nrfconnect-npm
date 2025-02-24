@@ -11,7 +11,7 @@ on:
                     - npm2100-rev1 (internal)
                     - npm2100 (internal)
                     - release-test (internal)
-                    - experimental (internal)
+                    - test (internal)
                     - official (external)
             ref:
                 description:
