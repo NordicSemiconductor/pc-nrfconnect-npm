@@ -26,6 +26,9 @@ import {
     GPIOPull2100,
     GPIOPullKeys,
     GPIOPullValues,
+    GPIOState2100,
+    GPIOStateKeys,
+    GPIOStateValues,
 } from './types';
 
 export default (
@@ -70,6 +73,39 @@ export default (
                                 driveEnabled: !isInterrupt,
                                 openDrainEnabled: isOutput,
                                 pullEnabled: !isInterrupt,
+                            },
+                            i
+                        );
+                    }
+                },
+                noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npm2100 gpio state',
+                    true,
+                    i,
+                    toValueRegex(GPIOStateValues)
+                ),
+                res => {
+                    const valueIndex = GPIOStateValues.findIndex(
+                        v => v === parseColonBasedAnswer(res)
+                    );
+
+                    if (valueIndex !== -1) {
+                        const state: GPIOState2100 =
+                            GPIOState2100[
+                                GPIOStateKeys[
+                                    valueIndex
+                                ] as keyof typeof GPIOState2100
+                            ];
+                        eventEmitter.emitPartialEvent<GPIO>(
+                            'onGPIOUpdate',
+                            {
+                                state,
                             },
                             i
                         );

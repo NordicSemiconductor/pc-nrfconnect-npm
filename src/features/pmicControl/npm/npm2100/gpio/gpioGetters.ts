@@ -17,6 +17,7 @@ export class GpioGet {
 
     all() {
         this.mode();
+        this.state();
         this.pull();
         this.drive();
         this.openDrain();
@@ -25,6 +26,9 @@ export class GpioGet {
 
     mode() {
         this.sendCommand(`npm2100 gpio mode get ${this.index}`);
+    }
+    state() {
+        this.sendCommand(`npm2100 gpio state get ${this.index}`);
     }
     pull() {
         this.sendCommand(`npm2100 gpio pull get ${this.index}`);

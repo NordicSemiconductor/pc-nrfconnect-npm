@@ -8,15 +8,19 @@ import React from 'react';
 import {
     Card,
     Dropdown,
+    StateSelector,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
+import { GPIOMode2100 } from '../../features/pmicControl/npm/npm2100/gpio/types';
 import {
     GPIO,
     GPIOMode,
     GpioModule,
     GPIOPull,
+    GPIOState,
+    NpmModel,
 } from '../../features/pmicControl/npm/types';
 
 interface GPIOProperties {
@@ -24,6 +28,7 @@ interface GPIOProperties {
     gpio: GPIO;
     cardLabel?: string;
     disabled: boolean;
+    deviceType: NpmModel;
 }
 
 const card = 'gpio';
@@ -33,6 +38,7 @@ export default ({
     gpio,
     cardLabel = `GPIO${gpioModule.index}`,
     disabled,
+    deviceType,
 }: GPIOProperties) => {
     const toStringMode = (mode: GPIOMode) =>
         gpioModule.values.mode.find(m => m.value === mode)?.label;
@@ -71,6 +77,30 @@ export default ({
                 }
                 disabled={disabled}
             />
+            {deviceType === 'npm2100' &&
+                gpio.mode === GPIOMode2100.Output &&
+                gpioModule.values.state !== undefined && (
+                    <div>
+                        <p className="tw-mb-1 tw-text-xs">State</p>
+                        <StateSelector
+                            disabled={disabled}
+                            items={gpioModule.values.state.map(
+                                item => item.label
+                            )}
+                            onSelect={i =>
+                                gpioModule.set.state?.(
+                                    gpioModule.values.state?.[i]
+                                        .value as GPIOState
+                                )
+                            }
+                            selectedItem={
+                                gpioModule.values.state.find(
+                                    item => item.value === gpio.state
+                                )?.label ?? gpioModule.values.state[0].label
+                            }
+                        />
+                    </div>
+                )}
             <Dropdown
                 label={
                     <DocumentationTooltip

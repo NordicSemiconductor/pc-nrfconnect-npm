@@ -10,16 +10,21 @@ export enum GPIOMode2100 {
     'Interrupt output, active high' = 'INTHI',
     'Interrupt output, active low' = 'INTLO',
 }
-
 export const GPIOModeKeys = Object.keys(GPIOMode2100);
 export const GPIOModeValues = Object.values(GPIOMode2100);
+
+export enum GPIOState2100 {
+    'Low' = 'LOW',
+    'High' = 'HIGH',
+}
+export const GPIOStateKeys = Object.keys(GPIOState2100);
+export const GPIOStateValues = Object.values(GPIOState2100);
 
 export enum GPIOPull2100 {
     'Pull down' = 'PULLDOWN',
     'Pull up' = 'PULLUP',
     'Pull disable' = 'NOPULL',
 }
-
 export const GPIOPullKeys = Object.keys(GPIOPull2100);
 export const GPIOPullValues = Object.values(GPIOPull2100);
 

@@ -20,6 +20,7 @@ import type {
     GPIODrive2100,
     GPIOMode2100,
     GPIOPull2100,
+    GPIOState2100,
 } from './npm2100/gpio/types';
 import {
     nPM2100GPIOControlMode,
@@ -198,12 +199,14 @@ export type Ldo = {
     onOffSoftwareControlEnabled: boolean;
 };
 
+export type GPIOState = GPIOState2100;
 export type GPIOMode = GPIOMode1300 | GPIOMode2100;
 export type GPIOPull = GPIOPull1300 | GPIOPull2100;
 export type GPIODrive = GPIODrive1300 | GPIODrive2100;
 
 export type GPIO = {
     mode: GPIOMode;
+    state?: GPIOState;
     pull: GPIOPull;
     pullEnabled: boolean;
     drive: GPIODrive;
@@ -623,6 +626,7 @@ export type GpioModule = {
     get: {
         all: () => void;
         mode: () => void;
+        state?: () => void;
         pull: () => void;
         drive: () => void;
         openDrain: () => void;
@@ -631,6 +635,7 @@ export type GpioModule = {
     set: {
         all: (gpio: GPIOExport) => Promise<void>;
         mode: (mode: GPIOMode) => Promise<void>;
+        state?: (state: GPIOState) => Promise<void>;
         pull: (pull: GPIOPull) => Promise<void>;
         drive: (drive: GPIODrive) => Promise<void>;
         openDrain: (openDrain: boolean) => Promise<void>;
@@ -638,6 +643,7 @@ export type GpioModule = {
     };
     values: {
         mode: { label: string; value: GPIOMode }[];
+        state?: { label: string; value: GPIOState }[];
         pull: { label: string; value: GPIOPull }[];
         drive: { label: string; value: GPIODrive }[];
     };
