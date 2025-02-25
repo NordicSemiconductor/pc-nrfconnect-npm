@@ -181,7 +181,7 @@ export default ({
                                         card={card}
                                         item="OcpEnabled"
                                     >
-                                        Over Current Protection enabled
+                                        Overcurrent Protection
                                     </DocumentationTooltip>
                                 }
                                 isToggled={ldo.ocpEnabled === true}
@@ -196,7 +196,7 @@ export default ({
                                         card={card}
                                         item="LdoRampEnabled"
                                     >
-                                        LDO Ramp enabled
+                                        LDO Ramp
                                     </DocumentationTooltip>
                                 }
                                 isToggled={ldo.rampEnabled === true}
@@ -211,7 +211,7 @@ export default ({
                                         card={card}
                                         item="HaltEnabled"
                                     >
-                                        LDO Halt Enabled
+                                        LDO Halt
                                     </DocumentationTooltip>
                                 }
                                 isToggled={ldo.haltEnabled === true}

@@ -111,5 +111,5 @@ export const ResetReasons = new Map<string, string>([
     ['HiberPtTimer', 'Timer exit from HIBERNATE_PT mode'],
     ['PowerOffButton', 'PowerOffButton'],
     ['ShipExit', 'Exit from SHIP mode'],
-    ['OCP', 'Over-current protection (OCP)'],
+    ['OCP', 'Overcurrent protection (OCP)'],
 ]);
