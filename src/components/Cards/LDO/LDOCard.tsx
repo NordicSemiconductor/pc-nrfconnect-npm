@@ -181,7 +181,7 @@ export default ({
                                         card={card}
                                         item="OcpEnabled"
                                     >
-                                        Over-Current Protection
+                                        Overcurrent Protection
                                     </DocumentationTooltip>
                                 }
                                 isToggled={ldo.ocpEnabled === true}

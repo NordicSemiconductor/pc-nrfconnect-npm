@@ -186,7 +186,7 @@ export default ({
                         disabled={disabled || !boost.pinModeEnabled}
                     />
                     <Toggle
-                        label={<div>Over-Current Protection</div>}
+                        label={<div>Overcurrent Protection</div>}
                         isToggled={boost.overCurrentProtection}
                         onToggle={value => boostModule.set.overCurrent(value)}
                         disabled={disabled}
