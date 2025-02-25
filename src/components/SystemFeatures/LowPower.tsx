@@ -57,7 +57,7 @@ export default ({
         <Dropdown
             label={
                 <>
-                    T<span className="subscript">ShipToActive</span>
+                    t<span className="subscript">SHPHLD_DEB_HIB</span>
                 </>
             }
             items={lowPowerModule.values.timeToActive}
