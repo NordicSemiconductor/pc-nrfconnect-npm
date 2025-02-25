@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { ShellParserCallbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import {
     BoostModeControlValues,
     BoostPinModeValues,
@@ -13,7 +15,7 @@ import {
 import { helpers, setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 2100 - Boost Setters Online tests', () => {
-    const { mockOnBoostUpdate, mockEnqueueRequest, pmic } =
+    const { eventHandlers, mockOnBoostUpdate, mockEnqueueRequest, pmic } =
         setupMocksWithShellParser();
     describe('Setters and effects state - success', () => {
         beforeEach(() => {
@@ -182,13 +184,21 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
             expect(mockOnBoostUpdate).toBeCalledTimes(0);
         });
 
-        test('Set vOut - Fail on 2nd Call', async () => {
-            mockEnqueueRequest.mockImplementationOnce(
-                helpers.registerCommandCallbackSuccess
-            );
+        test.only('Set vOut - Fail on 2nd Call', async () => {
+            const value = 2.7;
+            const command = `npm2100 boost vout SOFTWARE set ${value * 1000}`;
+
+            mockEnqueueRequest
+                .mockImplementationOnce(helpers.registerCommandCallbackSuccess)
+                .mockImplementationOnce(
+                    (_command: string, callback?: ShellParserCallbacks) => {
+                        callback?.onError('Error: Error case', command);
+                        return Promise.resolve();
+                    }
+                );
 
             await expect(
-                pmic.boostModule[0].set.vOut(2.7)
+                pmic.boostModule[0].set.vOut(value)
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);
