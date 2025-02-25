@@ -73,7 +73,6 @@ export class BoostSet {
                                     optionalLabel: "OK, don't ask again",
                                     title: 'Error',
                                     onConfirm: () => {},
-                                    onOptional: () => {},
                                 });
 
                                 reject();

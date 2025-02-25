@@ -106,7 +106,6 @@ export class LdoSet {
                                     optionalLabel: "OK, don't ask again",
                                     title: 'Error',
                                     onConfirm: () => {},
-                                    onOptional: () => {},
                                 });
 
                                 reject();
