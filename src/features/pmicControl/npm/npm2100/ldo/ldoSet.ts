@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { Ldo, LdoExport, LdoMode } from '../../types';
+import { NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
+import { Ldo, LdoExport, LdoMode, PmicDialog } from '../../types';
 import {
     nPM2100GPIOControlMode,
     nPM2100GPIOControlPinSelect,
@@ -24,6 +24,7 @@ export class LdoSet {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
         ) => void,
+        private dialogHandler: ((dialog: PmicDialog) => void) | null,
         private offlineMode: boolean
     ) {
         this.get = new LdoGet(sendCommand);
@@ -93,8 +94,21 @@ export class LdoSet {
                         this.sendCommand(
                             `npm2100 ldosw vout set ${voltage * 1000}`,
                             () => resolve(),
-                            () => {
+                            response => {
                                 this.get.voltage();
+                                this.dialogHandler?.({
+                                    type: 'alert',
+                                    doNotAskAgainStoreID: `pmic2100-setLDOVoltage`,
+                                    message: `${parseColonBasedAnswer(
+                                        response
+                                    )}.`,
+                                    confirmLabel: 'OK',
+                                    optionalLabel: "OK, don't ask again",
+                                    title: 'Error',
+                                    onConfirm: () => {},
+                                    onOptional: () => {},
+                                });
+
                                 reject();
                             }
                         );

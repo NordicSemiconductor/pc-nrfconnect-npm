@@ -74,6 +74,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 this.shellParser,
                 this.eventEmitter,
                 this.sendCommand.bind(this),
+                this.dialogHandler,
                 this.offlineMode
             ),
         ];
@@ -110,6 +111,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 this.shellParser,
                 this.eventEmitter,
                 this.sendCommand.bind(this),
+                this.dialogHandler,
                 this.offlineMode
             ),
         ];
