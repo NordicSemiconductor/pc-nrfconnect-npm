@@ -14,6 +14,7 @@ import {
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Boost,
     BoostModeControl,
@@ -25,7 +26,7 @@ import {
 export default ({
     boost,
     boostModule,
-    cardLabel = `BOOST`,
+    cardLabel = 'Boost',
     defaultSummary = false,
     disabled,
 }: {
@@ -38,6 +39,7 @@ export default ({
     const [summary, setSummary] = useState(defaultSummary);
 
     const range = boostModule.ranges.voltage;
+    const card = `Boost${boostModule.index}`;
 
     const [internalVBoost, setInternalVBoost] = useState(
         boost.vOutSelect === 'Vset' ? boost.vOutVSet : boost.vOutSoftware
@@ -91,7 +93,9 @@ export default ({
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
-                    <span>{cardLabel}</span>
+                    <DocumentationTooltip card={card} item="Boost">
+                        <span>{cardLabel}</span>
+                    </DocumentationTooltip>
 
                     <div className="d-flex">
                         <span
@@ -126,10 +130,12 @@ export default ({
 
             <NumberInput
                 label={
-                    <div>
-                        <span>V</span>
-                        <span className="subscript">OUT</span>
-                    </div>
+                    <DocumentationTooltip card={card} item="VOUT">
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">OUT</span>
+                        </div>
+                    </DocumentationTooltip>
                 }
                 unit="V"
                 disabled={disabled}
