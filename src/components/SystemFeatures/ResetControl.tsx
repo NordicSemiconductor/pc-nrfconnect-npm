@@ -145,7 +145,9 @@ export default ({
 
         {'resetReason' in reset && reset.resetReason?.reason && (
             <div className="tw-flex tw-flex-row tw-justify-between tw-border-0 tw-border-b tw-border-solid">
-                <span>Reset Cause</span>
+                <DocumentationTooltip card={card} item="ResetCause">
+                    <span>Reset Cause</span>
+                </DocumentationTooltip>
                 <span>
                     {ResetReasons.get(reset.resetReason?.reason || 'Unknown') ||
                         reset.resetReason?.reason}

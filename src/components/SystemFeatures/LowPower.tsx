@@ -46,7 +46,7 @@ export default ({
                         label={
                             <DocumentationTooltip
                                 card={card}
-                                item="LongPressResetEnable"
+                                item="PowerButtonEnable"
                             >
                                 Power Off Button
                             </DocumentationTooltip>
@@ -60,9 +60,11 @@ export default ({
                 )}
             <Dropdown
                 label={
-                    <>
-                        t<span className="subscript">SHPHLD_DEB_HIB</span>
-                    </>
+                    <DocumentationTooltip card={card} item="TimeToActive">
+                        <>
+                            t<span className="subscript">SHPHLD_DEB_HIB</span>
+                        </>
+                    </DocumentationTooltip>
                 }
                 items={lowPowerModule.values.timeToActive}
                 onSelect={item => lowPowerModule.set.timeToActive(item.value)}
@@ -108,7 +110,10 @@ export default ({
                     </DocumentationTooltip>
                 )}
                 {lowPowerModule.actions.enterHibernatePtMode && (
-                    <DocumentationTooltip card={card} item="EnterHibernateMode">
+                    <DocumentationTooltip
+                        card={card}
+                        item="EnterHibernatePTMode"
+                    >
                         <Button
                             variant="secondary"
                             className="tw-w-full"

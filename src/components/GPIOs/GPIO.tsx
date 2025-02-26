@@ -31,8 +31,6 @@ interface GPIOProperties {
     deviceType: NpmModel;
 }
 
-const card = 'gpio';
-
 export default ({
     gpioModule,
     gpio,
@@ -43,6 +41,7 @@ export default ({
     const toStringMode = (mode: GPIOMode) =>
         gpioModule.values.mode.find(m => m.value === mode)?.label;
 
+    const card = `gpio${gpioModule.index}`;
     return (
         <Card
             title={
@@ -61,10 +60,7 @@ export default ({
         >
             <Dropdown
                 label={
-                    <DocumentationTooltip
-                        card={`${card}${gpioModule.index}`}
-                        item="Mode"
-                    >
+                    <DocumentationTooltip card={card} item="Mode">
                         <span>Mode</span>
                     </DocumentationTooltip>
                 }
@@ -103,10 +99,7 @@ export default ({
                 )}
             <Dropdown
                 label={
-                    <DocumentationTooltip
-                        card={`${card}${gpioModule.index}`}
-                        item="Pull"
-                    >
+                    <DocumentationTooltip card={card} item="Pull">
                         <span>Pull</span>
                     </DocumentationTooltip>
                 }
@@ -121,10 +114,7 @@ export default ({
             />
             <Dropdown
                 label={
-                    <DocumentationTooltip
-                        card={`${card}${gpioModule.index}`}
-                        item="Drive"
-                    >
+                    <DocumentationTooltip card={card} item="Drive">
                         <span>Drive</span>
                     </DocumentationTooltip>
                 }
@@ -139,10 +129,7 @@ export default ({
             />
             <Toggle
                 label={
-                    <DocumentationTooltip
-                        card={`${card}${gpioModule.index}`}
-                        item="OpenDrain"
-                    >
+                    <DocumentationTooltip card={card} item="OpenDrain">
                         <span>Open Drain</span>
                     </DocumentationTooltip>
                 }
@@ -152,10 +139,7 @@ export default ({
             />
             <Toggle
                 label={
-                    <DocumentationTooltip
-                        card={`${card}${gpioModule.index}`}
-                        item="Debounce"
-                    >
+                    <DocumentationTooltip card={card} item="Debounce">
                         <span>Debounce</span>
                     </DocumentationTooltip>
                 }
