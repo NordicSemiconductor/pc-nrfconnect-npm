@@ -34,7 +34,7 @@ import TimerModule from './timerConfig';
 
 /* eslint-disable no-underscore-dangle */
 
-export const npm2100FWVersion = '0.5.0+0';
+export const npm2100FWVersion = '0.5.1+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
 export default class Npm2100 extends BaseNpmDevice {
@@ -74,6 +74,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 this.shellParser,
                 this.eventEmitter,
                 this.sendCommand.bind(this),
+                this.dialogHandler,
                 this.offlineMode
             ),
         ];
@@ -110,6 +111,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 this.shellParser,
                 this.eventEmitter,
                 this.sendCommand.bind(this),
+                this.dialogHandler,
                 this.offlineMode
             ),
         ];

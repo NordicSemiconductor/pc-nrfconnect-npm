@@ -8,7 +8,7 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Ldo, LdoExport, LdoModule } from '../../types';
+import { Ldo, LdoExport, LdoModule, PmicDialog } from '../../types';
 import ldoCallbacks from './ldoCallbacks';
 import { LdoGet } from './ldoGet';
 import { LdoSet } from './ldoSet';
@@ -64,10 +64,16 @@ export default class Module implements LdoModule {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
         ) => void,
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
         offlineMode: boolean
     ) {
         this._get = new LdoGet(sendCommand);
-        this._set = new LdoSet(eventEmitter, sendCommand, offlineMode);
+        this._set = new LdoSet(
+            eventEmitter,
+            sendCommand,
+            dialogHandler,
+            offlineMode
+        );
         this._callbacks = ldoCallbacks(shellParser, eventEmitter);
     }
 

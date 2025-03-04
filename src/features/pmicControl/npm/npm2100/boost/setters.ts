@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
+import { NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
 import {
     Boost,
     BoostExport,
@@ -12,6 +12,7 @@ import {
     BoostPinMode,
     BoostPinSelection,
     BoostVOutSel,
+    PmicDialog,
 } from '../../types';
 import { BoostGet } from './getters';
 
@@ -25,6 +26,7 @@ export class BoostSet {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
         ) => void,
+        private dialogHandler: ((dialog: PmicDialog) => void) | null,
         private offlineMode: boolean
     ) {
         this.get = new BoostGet(sendCommand);
@@ -59,8 +61,20 @@ export class BoostSet {
                         this.sendCommand(
                             `npm2100 boost vout SOFTWARE set ${value * 1000}`,
                             () => resolve(),
-                            () => {
+                            response => {
                                 this.get.vOutSoftware();
+                                this.dialogHandler?.({
+                                    type: 'alert',
+                                    doNotAskAgainStoreID: `pmic2100-setBoostVOut`,
+                                    message: `${parseColonBasedAnswer(
+                                        response
+                                    )}.`,
+                                    confirmLabel: 'OK',
+                                    optionalLabel: "OK, don't ask again",
+                                    title: 'Error',
+                                    onConfirm: () => {},
+                                });
+
                                 reject();
                             }
                         );

@@ -233,12 +233,12 @@ export const dialogHandler =
         }
 
         if (
-            pmicDialog.doNotAskAgainStoreID !== undefined &&
+            pmicDialog.doNotAskAgainStoreID !== undefined ||
             pmicDialog.onOptional
         ) {
             const onOptional = pmicDialog.onOptional;
             pmicDialog.onOptional = () => {
-                onOptional();
+                onOptional?.();
                 if (pmicDialog.optionalClosesDialog !== false) {
                     dispatch(dequeueDialog());
                 }

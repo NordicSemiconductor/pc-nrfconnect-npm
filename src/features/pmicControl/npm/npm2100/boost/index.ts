@@ -8,7 +8,7 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Boost, BoostModule } from '../../types';
+import { Boost, BoostModule, PmicDialog } from '../../types';
 import boostCallbacks from './callbacks';
 import { BoostGet } from './getters';
 import { BoostSet } from './setters';
@@ -46,11 +46,17 @@ export default class Module implements BoostModule {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
         ) => void,
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
         offlineMode: boolean,
         readonly index = 0
     ) {
         this._get = new BoostGet(sendCommand);
-        this._set = new BoostSet(eventEmitter, sendCommand, offlineMode);
+        this._set = new BoostSet(
+            eventEmitter,
+            sendCommand,
+            dialogHandler,
+            offlineMode
+        );
         this._callbacks = boostCallbacks(shellParser, eventEmitter);
     }
     get get() {
