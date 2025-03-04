@@ -30,4 +30,25 @@ export class LowPowerActions {
             `npm2100 low_power_control hibernate_pt_mode set ENABLE`
         );
     }
+
+    exitBreakToWake() {
+        this.sendCommand('npm2100 low_power_control pwr_btn set ON');
+    }
+
+    enterBreakToWakeStep1() {
+        this.sendCommand('npm2100 low_power_control pwr_btn set OFF');
+    }
+
+    enterBreakToWakeStep2() {
+        this.sendCommand(
+            'npm2100 low_power_control ship_mode_configure resistor set NONE'
+        );
+        this.sendCommand(
+            'npm2100 low_power_control wakeup_configure edge_polarity set RISING'
+        );
+        this.sendCommand(
+            'npm2100 low_power_control ship_mode_configure current set WEAK/LOW/MODERATE/HIGH'
+        );
+        this.sendCommand('npm2100 low_power_control ship_mode set ENABLE');
+    }
 }

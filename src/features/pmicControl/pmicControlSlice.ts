@@ -57,6 +57,7 @@ interface pmicControlState {
     storedBatterModel?: BatteryModel[];
     usbPower?: USBPower;
     errorLogs?: ErrorLogs;
+    breakToWakeDialogVisible: boolean;
 }
 
 const initialState: pmicControlState = {
@@ -84,6 +85,7 @@ const initialState: pmicControlState = {
     },
     hardcodedBatterModels: [],
     dialog: [],
+    breakToWakeDialogVisible: false,
 };
 
 const pmicControlSlice = createSlice({
@@ -307,6 +309,9 @@ const pmicControlSlice = createSlice({
         setErrorLogs(state, action: PayloadAction<Partial<ErrorLogs>>) {
             state.errorLogs = { ...state.errorLogs, ...action.payload };
         },
+        setBreakToWakeDialogVisible(state, action: PayloadAction<boolean>) {
+            state.breakToWakeDialogVisible = action.payload;
+        },
     },
 });
 
@@ -405,6 +410,8 @@ export const getFuelGaugeReportingRate = (state: RootState) =>
     state.app.pmicControl.fuelGaugeSettings.reportingRate;
 export const getErrorLogs = (state: RootState) =>
     state.app.pmicControl.errorLogs;
+export const getBreakToWakeDialogVisible = (state: RootState) =>
+    state.app.pmicControl.breakToWakeDialogVisible;
 
 export const {
     setNpmDevice,
@@ -449,5 +456,6 @@ export const {
     setFuelGaugeNotChargingSamplingRate,
     setFuelGaugeReportingRate,
     setErrorLogs,
+    setBreakToWakeDialogVisible,
 } = pmicControlSlice.actions;
 export default pmicControlSlice.reducer;
