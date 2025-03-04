@@ -149,7 +149,14 @@ export default ({
             {!summary && (
                 <>
                     <Dropdown
-                        label={<div>Mode Control</div>}
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="ModeControl"
+                            >
+                                Mode Control
+                            </DocumentationTooltip>
+                        }
                         items={modeControlItems}
                         onSelect={item =>
                             boostModule.set.modeControl(
@@ -164,7 +171,14 @@ export default ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="GPIO Control - Pin Selection"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="PinSelection"
+                            >
+                                GPIO Control - Pin Selection
+                            </DocumentationTooltip>
+                        }
                         items={pinSelectionItems}
                         onSelect={item =>
                             boostModule.set.pinSelection(
@@ -179,7 +193,14 @@ export default ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="GPIO Control - Mode Selection"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="ModeSelection"
+                            >
+                                GPIO Control - Mode Selection
+                            </DocumentationTooltip>
+                        }
                         items={pinModeItems}
                         onSelect={item =>
                             boostModule.set.pinMode(item.value as BoostPinMode)
@@ -192,7 +213,14 @@ export default ({
                         disabled={disabled || !boost.pinModeEnabled}
                     />
                     <Toggle
-                        label={<div>Overcurrent Protection</div>}
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="OvercurrentProtection"
+                            >
+                                Overcurrent Protection
+                            </DocumentationTooltip>
+                        }
                         isToggled={boost.overCurrentProtection}
                         onToggle={value => boostModule.set.overCurrent(value)}
                         disabled={disabled}

@@ -171,6 +171,7 @@ export default ({
                         ldoModule={ldoModule}
                         disabled={disabled}
                         ldo={ldo}
+                        card={card}
                     />
 
                     {deviceType === 'npm2100' && (
@@ -359,12 +360,14 @@ interface OnOffControlAttrs {
     ldoModule: LdoModule;
     disabled: boolean;
     ldo: Ldo;
+    card: string;
 }
 const OnOffControl = ({
     deviceType,
     ldoModule,
     disabled,
     ldo,
+    card,
 }: OnOffControlAttrs) => {
     switch (deviceType) {
         case 'npm1300': {
@@ -426,7 +429,14 @@ const OnOffControl = ({
             return (
                 <>
                     <Dropdown
-                        label="Mode Control"
+                        label={
+                            <DocumentationTooltip
+                                card={card}
+                                item="ModeControl"
+                            >
+                                Mode Control
+                            </DocumentationTooltip>
+                        }
                         items={ldoModeControllItems}
                         onSelect={item =>
                             ldoModule.set.modeControl?.(
@@ -437,7 +447,11 @@ const OnOffControl = ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="Pin Mode"
+                        label={
+                            <DocumentationTooltip card={card} item="PinMode">
+                                Pin Mode
+                            </DocumentationTooltip>
+                        }
                         items={ldoModePinModeItems}
                         onSelect={item =>
                             ldoModule.set.pinMode?.(
@@ -448,7 +462,11 @@ const OnOffControl = ({
                         disabled={disabled}
                     />
                     <Dropdown
-                        label="Pin Select"
+                        label={
+                            <DocumentationTooltip card={card} item="PinSelect">
+                                Pin Select
+                            </DocumentationTooltip>
+                        }
                         items={ldoModePinSelectItems}
                         onSelect={item =>
                             ldoModule.set.pinSel?.(
