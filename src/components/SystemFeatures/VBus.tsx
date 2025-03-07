@@ -12,15 +12,22 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
-import { NpmDevice, USBPower } from '../../features/pmicControl/npm/types';
+import {
+    UsbCurrentLimiterModule,
+    USBPower,
+} from '../../features/pmicControl/npm/types';
 
 interface VBusProperties {
-    npmDevice: NpmDevice;
+    usbCurrentLimiterModule: UsbCurrentLimiterModule;
     usbPower: USBPower;
     disabled: boolean;
 }
 
-export default ({ npmDevice, usbPower, disabled }: VBusProperties) => {
+export default ({
+    usbCurrentLimiterModule,
+    usbPower,
+    disabled,
+}: VBusProperties) => {
     const [internalCurrentLimiter, setInternalCurrentLimiter] = useState(
         usbPower.currentLimiter
     );
@@ -71,10 +78,12 @@ export default ({ npmDevice, usbPower, disabled }: VBusProperties) => {
                     </DocumentationTooltip>
                 }
                 disabled={disabled}
-                range={npmDevice.getUSBCurrentLimiterRange()}
+                range={usbCurrentLimiterModule.ranges.vBusInLimiter}
                 value={internalCurrentLimiter}
                 onChange={setInternalCurrentLimiter}
-                onChangeComplete={npmDevice.setVBusinCurrentLimiter}
+                onChangeComplete={v =>
+                    usbCurrentLimiterModule.set.vBusInCurrentLimiter(v)
+                }
                 unit="A"
             />
         </Card>

@@ -12,6 +12,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
+    getBoosts,
     getBucks,
     getCharger,
     getLdos,
@@ -20,6 +21,7 @@ import {
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import BatteryCard from '../Cards/Battery/BatteryCard';
 import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
+import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
 import PowerCard from '../Cards/Power/PowerCard';
@@ -29,6 +31,7 @@ export default ({ active }: PaneProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const charger = useSelector(getCharger);
     const bucks = useSelector(getBucks);
+    const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
 
     return active ? (
@@ -36,11 +39,28 @@ export default ({ active }: PaneProps) => {
             className="masonry-layout min-height-cards"
             minWidth={300}
         >
-            <BatteryCard disabled={disabled} />
-            <BatteryStatusCard disabled={disabled} />
-            {npmDevice && charger && (
+            {npmDevice && [
+                <BatteryCard key="BatteryCard" disabled={disabled} />,
+                <BatteryStatusCard
+                    key="BatteryStatusCard"
+                    disabled={disabled}
+                />,
+            ]}
+
+            {npmDevice &&
+                boosts.map((boost, index) => (
+                    <BoostCard
+                        boost={boost}
+                        boostModule={npmDevice.boostModule[index]}
+                        key={`Boost${1 + index}`}
+                        disabled={disabled}
+                        defaultSummary
+                    />
+                ))}
+
+            {npmDevice?.chargerModule && charger && (
                 <PowerCard
-                    npmDevice={npmDevice}
+                    chargerModule={npmDevice.chargerModule}
                     charger={charger}
                     cardLabel="Charger"
                     disabled={disabled}
@@ -51,20 +71,23 @@ export default ({ active }: PaneProps) => {
                 bucks.map((buck, index) => (
                     <BuckCard
                         buck={buck}
-                        npmDevice={npmDevice}
+                        buckModule={npmDevice.buckModule[index]}
                         key={`Buck${1 + index}`}
-                        index={index}
                         disabled={disabled}
                         defaultSummary
+                        numberOfGPIOs={npmDevice.gpioModule.length}
                     />
                 ))}
             {npmDevice &&
                 ldos.map((ldo, index) => (
                     <LDOCard
                         ldo={ldo}
-                        npmDevice={npmDevice}
-                        key={`Buck${1 + index}`}
-                        index={index}
+                        ldoModule={npmDevice.ldoModule[index]}
+                        cardLabel={
+                            ldos.length === 1 ? `Load Switch/LDO` : undefined
+                        }
+                        key={`Ldo${1 + index}`}
+                        deviceType={npmDevice.deviceType}
                         disabled={disabled}
                         defaultSummary
                     />

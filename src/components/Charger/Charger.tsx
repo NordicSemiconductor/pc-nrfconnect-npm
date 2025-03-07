@@ -27,7 +27,7 @@ export default ({ active }: PaneProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const charger = useSelector(getCharger);
 
-    return active && npmDevice && charger ? (
+    return active && npmDevice?.chargerModule && charger ? (
         <MasonryLayout
             className="masonry-layout min-height-cards"
             minWidth={422}
@@ -36,7 +36,7 @@ export default ({ active }: PaneProps) => {
             <BatteryStatusCard disabled={disabled} />
             {npmDevice && charger && (
                 <PowerCard
-                    npmDevice={npmDevice}
+                    chargerModule={npmDevice.chargerModule}
                     charger={charger}
                     cardLabel="Charger"
                     disabled={disabled}
@@ -44,14 +44,14 @@ export default ({ active }: PaneProps) => {
             )}
             {npmDevice && charger && (
                 <Jeita
-                    npmDevice={npmDevice}
+                    chargerModule={npmDevice.chargerModule}
                     charger={charger}
                     disabled={disabled}
                 />
             )}
             {npmDevice && charger && (
                 <ThermalRegulation
-                    npmDevice={npmDevice}
+                    chargerModule={npmDevice.chargerModule}
                     charger={charger}
                     disabled={disabled}
                 />

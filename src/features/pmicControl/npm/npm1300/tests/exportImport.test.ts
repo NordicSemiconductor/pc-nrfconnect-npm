@@ -8,17 +8,23 @@ import {
     Buck,
     Charger,
     GPIO,
+    GPIOExport,
     Ldo,
     LED,
-    NpmExport,
+    npm1300LowPowerConfig,
+    npm1300TimerConfig,
+    npm1300TimerMode,
+    npm1300TimeToActive,
+    NpmExportLatest,
     PartialUpdate,
     PmicDialog,
     POF,
-    ShipModeConfig,
+    ResetConfig,
     TimerConfig,
     USBPower,
 } from '../../types';
 import { toBuckExport } from '../buck';
+import { GPIOMode1300, GPIOPull1300 } from '../gpio/types';
 import { toLdoExport } from '../ldo';
 import { npm1300FWVersion } from '../pmic1300Device';
 import { setupMocksBase } from './helpers';
@@ -31,7 +37,8 @@ describe('PMIC 1300 - Apply Config ', () => {
         mockOnGpioUpdate,
         mockOnLEDUpdate,
         mockOnPOFUpdate,
-        mockOnShipUpdate,
+        mockOnLowPowerUpdate,
+        mockOnResetUpdate,
         mockOnTimerConfigUpdate,
         mockOnFuelGaugeUpdate,
         mockDialogHandler,
@@ -93,14 +100,16 @@ describe('PMIC 1300 - Apply Config ', () => {
     };
 
     const initTimerConfig: TimerConfig = {
-        mode: 'Boot monitor',
+        mode: npm1300TimerMode['Boot monitor'],
         prescaler: 'Slow',
         period: 0,
     };
 
-    const initShip: ShipModeConfig = {
-        timeToActive: 96,
+    const initShip: npm1300LowPowerConfig = {
+        timeToActive: npm1300TimeToActive['96ms'],
         invPolarity: false,
+    };
+    const initReset: ResetConfig = {
         longPressReset: 'two_button',
     };
 
@@ -108,7 +117,8 @@ describe('PMIC 1300 - Apply Config ', () => {
         currentLimiter: 100,
     };
 
-    const sampleConfig: NpmExport = {
+    const sampleConfig: NpmExportLatest = {
+        boosts: [],
         charger: {
             vTerm: 3.5,
             vTrickleFast: 2.5,
@@ -153,7 +163,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         ldos: [
             {
                 voltage: 1,
-                mode: 'ldoSwitch',
+                mode: 'Load_switch',
                 enabled: false,
                 softStartEnabled: false,
                 softStart: 50,
@@ -162,7 +172,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             },
             {
                 voltage: 2,
-                mode: 'ldoSwitch',
+                mode: 'Load_switch',
                 enabled: false,
                 softStartEnabled: false,
                 softStart: 50,
@@ -172,36 +182,36 @@ describe('PMIC 1300 - Apply Config ', () => {
         ],
         gpios: [
             {
-                mode: 'Input',
-                pull: 'Pull down',
+                mode: GPIOMode1300.Input,
+                pull: GPIOPull1300['Pull down'],
                 drive: 6,
                 openDrain: false,
                 debounce: false,
             },
             {
-                mode: 'Input falling edge event',
-                pull: 'Pull down',
+                mode: GPIOMode1300['Input falling edge event'],
+                pull: GPIOPull1300['Pull down'],
                 drive: 6,
                 openDrain: true,
                 debounce: true,
             },
             {
-                mode: 'Input logic 0',
-                pull: 'Pull up',
+                mode: GPIOMode1300['Input logic 0'],
+                pull: GPIOPull1300['Pull down'],
                 drive: 1,
                 openDrain: false,
                 debounce: true,
             },
             {
-                mode: 'Output logic 0',
-                pull: 'Pull disable',
+                mode: GPIOMode1300['Output logic 0'],
+                pull: GPIOPull1300['Pull down'],
                 drive: 1,
                 openDrain: true,
                 debounce: false,
             },
             {
-                mode: 'Output power loss warning',
-                pull: 'Pull disable',
+                mode: GPIOMode1300['Output power loss warning'],
+                pull: GPIOPull1300['Pull down'],
                 drive: 1,
                 openDrain: false,
                 debounce: false,
@@ -224,27 +234,32 @@ describe('PMIC 1300 - Apply Config ', () => {
             polarity: 'Active low',
         },
         timerConfig: {
-            mode: 'General purpose',
+            mode: npm1300TimerMode['General purpose'],
             prescaler: 'Fast',
             period: 10,
         },
-        ship: {
-            timeToActive: 16,
+        lowPower: {
+            timeToActive: npm1300TimeToActive['16ms'],
             invPolarity: true,
+        },
+        reset: {
             longPressReset: 'one_button',
         },
-        fuelGauge: true,
+        fuelGaugeSettings: {
+            enabled: true,
+            chargingSamplingRate: 1000,
+        },
         firmwareVersion: npm1300FWVersion,
         deviceType: 'npm1300',
-        fuelGaugeChargingSamplingRate: 1000,
         usbPower: {
             currentLimiter: 500,
         },
+        fileFormatVersion: 2,
     };
 
-    const initGPIO: GPIO = {
-        mode: 'Input falling edge event',
-        pull: 'Pull down',
+    const initGPIO: GPIOExport = {
+        mode: GPIOMode1300['Input falling edge event'],
+        pull: GPIOPull1300['Pull down'],
         drive: 6,
         openDrain: false,
         debounce: false,
@@ -256,7 +271,8 @@ describe('PMIC 1300 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
-    let ship: ShipModeConfig = { ...initShip };
+    let ship: npm1300LowPowerConfig = { ...initShip };
+    let reset: ResetConfig = { ...initReset };
     let timerConfig = { ...initTimerConfig };
     let usbPower = { ...initUSBPower };
 
@@ -270,6 +286,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         leds = [];
         pof = { ...initPOF };
         ship = { ...initShip };
+        reset = { ...initReset };
         timerConfig = { ...initTimerConfig };
 
         mockOnChargerUpdate.mockImplementation(
@@ -301,6 +318,11 @@ describe('PMIC 1300 - Apply Config ', () => {
 
         mockOnGpioUpdate.mockImplementation(
             (partialUpdate: PartialUpdate<GPIO>) => {
+                delete partialUpdate.data.pullEnabled;
+                delete partialUpdate.data.debounceEnabled;
+                delete partialUpdate.data.driveEnabled;
+                delete partialUpdate.data.openDrainEnabled;
+
                 gpios[partialUpdate.index] = {
                     ...(gpios[partialUpdate.index] ?? initGPIO),
                     ...partialUpdate.data,
@@ -324,10 +346,19 @@ describe('PMIC 1300 - Apply Config ', () => {
             };
         });
 
-        mockOnShipUpdate.mockImplementation(
-            (partialUpdate: Partial<ShipModeConfig>) => {
+        mockOnLowPowerUpdate.mockImplementation(
+            (partialUpdate: Partial<npm1300LowPowerConfig>) => {
                 ship = {
                     ...ship,
+                    ...partialUpdate,
+                };
+            }
+        );
+
+        mockOnResetUpdate.mockImplementation(
+            (partialUpdate: Partial<ResetConfig>) => {
+                reset = {
+                    ...reset,
                     ...partialUpdate,
                 };
             }
@@ -338,7 +369,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                 timerConfig = {
                     ...timerConfig,
                     ...partialUpdate,
-                };
+                } as npm1300TimerConfig;
             }
         );
 
@@ -367,7 +398,8 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnGpioUpdate).toBeCalledTimes(25);
         expect(mockOnLEDUpdate).toBeCalledTimes(3);
         expect(mockOnPOFUpdate).toBeCalledTimes(3);
-        expect(mockOnShipUpdate).toBeCalledTimes(2);
+        expect(mockOnLowPowerUpdate).toBeCalledTimes(1);
+        expect(mockOnResetUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
@@ -407,7 +439,7 @@ describe('PMIC 1300 - Apply Config ', () => {
 
     test('Apply wrong firmware version -- Cancel', async () => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-            dialog.onCancel();
+            dialog.onCancel?.();
         });
 
         await pmic.applyConfig({ ...sampleConfig, firmwareVersion: '0.0.0+9' });

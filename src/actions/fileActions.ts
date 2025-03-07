@@ -15,36 +15,21 @@ import fs from 'fs';
 import path from 'path';
 
 import { RootState } from '../appReducer';
-import { toBuckExport } from '../features/pmicControl/npm/npm1300/buck';
-import { toLdoExport } from '../features/pmicControl/npm/npm1300/ldo';
-import overlay from '../features/pmicControl/npm/overlay/overlay';
-import { NpmExport } from '../features/pmicControl/npm/types';
+import {
+    AnyNpmExport,
+    FuelGaugeExport,
+    NpmExportLatest,
+    NpmExportV1,
+} from '../features/pmicControl/npm/types';
+import { getNpmDevice } from '../features/pmicControl/pmicControlSlice';
 
 const saveSettings =
     (filePath: string): AppThunk<RootState> =>
     (_dispatch, getState) => {
-        const currentState = getState().app.pmicControl;
+        const npmDevice = getNpmDevice(getState());
 
-        if (!currentState.npmDevice) return;
-
-        const out: NpmExport = {
-            charger: currentState.charger
-                ? { ...currentState.charger }
-                : undefined,
-            bucks: [...currentState.bucks.map(toBuckExport)],
-            ldos: [...currentState.ldos.map(toLdoExport)],
-            gpios: [...currentState.gpios],
-            leds: [...currentState.leds],
-            pof: currentState.pof,
-            ship: currentState.ship,
-            timerConfig: currentState.timerConfig,
-            fuelGauge: currentState.fuelGauge,
-            firmwareVersion: currentState.npmDevice.getSupportedVersion(),
-            deviceType: currentState.npmDevice.getDeviceType(),
-            fuelGaugeChargingSamplingRate:
-                currentState.fuelGaugeChargingSamplingRate,
-            usbPower: { currentLimiter: currentState.usbPower.currentLimiter },
-        };
+        const out = npmDevice?.generateExport?.(getState);
+        if (!out) return;
 
         telemetry.sendEvent('Export Configuration', {
             config: out,
@@ -52,13 +37,16 @@ const saveSettings =
 
         if (filePath.endsWith('.json')) {
             fs.writeFileSync(filePath, JSON.stringify(out, null, 2));
-        } else if (filePath.endsWith('.overlay')) {
-            fs.writeFileSync(filePath, overlay(out, currentState.npmDevice));
+        } else if (
+            filePath.endsWith('.overlay') &&
+            npmDevice?.generateOverlay !== undefined
+        ) {
+            fs.writeFileSync(filePath, npmDevice.generateOverlay(out));
         }
     };
 
 const parseFile =
-    (filePath: string): AppThunk =>
+    (filePath: string): AppThunk<RootState> =>
     (_dispatch, getState) => {
         const currentState = getState().app.pmicControl;
 
@@ -66,10 +54,30 @@ const parseFile =
         if (pathObject.ext === '.json') {
             const config = JSON.parse(
                 fs.readFileSync(filePath).toString()
-            ) as unknown as NpmExport;
-            currentState.npmDevice?.applyConfig(config);
+            ) as unknown as AnyNpmExport;
+
+            currentState.npmDevice?.applyConfig(upgradeToLatest(config));
         }
     };
+
+const upgradeToLatest = (exportJson: AnyNpmExport): NpmExportLatest => {
+    if (isNpmExportV1(exportJson)) {
+        const fuelGaugeSettings: FuelGaugeExport = {
+            enabled: exportJson.fuelGauge,
+            chargingSamplingRate: exportJson.fuelGaugeChargingSamplingRate,
+        };
+        return {
+            ...exportJson,
+            ...fuelGaugeSettings,
+            fileFormatVersion: 2,
+        };
+    }
+
+    return exportJson;
+};
+
+const isNpmExportV1 = (exportJson: AnyNpmExport): exportJson is NpmExportV1 =>
+    (exportJson as NpmExportV1).fuelGauge === undefined;
 
 export const showOpenDialog = (options: OpenDialogOptions) =>
     dialog.showOpenDialog(getCurrentWindow(), options);
@@ -155,15 +163,22 @@ export const selectDirectoryDialog = () =>
             .catch(reject);
     });
 
-export const saveFileDialog = (): AppThunk => dispatch => {
+export const saveFileDialog = (): AppThunk => (dispatch, getState) => {
+    const isOverlaySupported =
+        getNpmDevice(getState())?.generateOverlay !== undefined;
+
     showSaveDialog({
         title: 'Save Device Settings',
-        defaultPath: 'config.overlay',
+        defaultPath: isOverlaySupported ? 'config.overlay' : 'config.json',
         filters: [
-            {
-                name: 'Overlay',
-                extensions: ['overlay'],
-            },
+            ...(isOverlaySupported
+                ? [
+                      {
+                          name: 'Overlay',
+                          extensions: ['overlay'],
+                      },
+                  ]
+                : []),
             {
                 name: 'JSON',
                 extensions: ['json'],

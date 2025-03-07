@@ -11,23 +11,20 @@ import {
     NpmEventEmitter,
     parseBatteryModel,
     parseColonBasedAnswer,
+    parseLogData,
     parseToBoolean,
     toRegex,
 } from '../../pmicHelpers';
-import { fuelGaugeGet } from './fuelGaugeEffects';
+import { ProfileDownload } from '../../types';
+import type FuelGaugeModule from '.';
+import { FuelGaugeGet } from './fuelGaugeGet';
 
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void
+    get: FuelGaugeGet,
+    fuelGaugeModule: FuelGaugeModule
 ) => {
-    const { storedBatteryModel, activeBatteryModel } =
-        fuelGaugeGet(sendCommand);
-
     const cleanupCallbacks = [];
 
     if (shellParser) {
@@ -72,8 +69,8 @@ export default (
             shellParser.registerCommandCallback(
                 toRegex('fuel_gauge model store'),
                 () => {
-                    storedBatteryModel();
-                    activeBatteryModel();
+                    get.storedBatteryModel();
+                    get.activeBatteryModel();
                 },
                 noop
             )
@@ -98,6 +95,103 @@ export default (
                     );
                 },
                 noop
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.onShellLoggingEvent(logEvent => {
+                parseLogData(logEvent, loggingEvent => {
+                    if (loggingEvent.module === 'module_fg') {
+                        if (loggingEvent.message === 'Battery model timeout') {
+                            shellParser?.setShellEchos(true);
+
+                            fuelGaugeModule.profileDownloadAborting = true;
+                            if (fuelGaugeModule.profileDownloadInProgress) {
+                                fuelGaugeModule.profileDownloadInProgress =
+                                    false;
+                                const payload: ProfileDownload = {
+                                    state: 'aborted',
+                                    alertMessage: loggingEvent.message,
+                                };
+
+                                eventEmitter.emit(
+                                    'onProfileDownloadUpdate',
+                                    payload
+                                );
+                            }
+                        }
+                    }
+                });
+            })
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('fuel_gauge model download apply'),
+                res => {
+                    if (fuelGaugeModule.profileDownloadInProgress) {
+                        fuelGaugeModule.profileDownloadInProgress = false;
+                        const profileDownload: ProfileDownload = {
+                            state: 'applied',
+                            alertMessage: parseColonBasedAnswer(res),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+                    }
+                    shellParser?.setShellEchos(true);
+                },
+                res => {
+                    if (fuelGaugeModule.profileDownloadInProgress) {
+                        fuelGaugeModule.profileDownloadInProgress = false;
+                        const profileDownload: ProfileDownload = {
+                            state: 'failed',
+                            alertMessage: parseColonBasedAnswer(res),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+                    }
+                    shellParser?.setShellEchos(true);
+                }
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('fuel_gauge model download abort'),
+                res => {
+                    if (fuelGaugeModule.profileDownloadInProgress) {
+                        fuelGaugeModule.profileDownloadInProgress = false;
+                        const profileDownload: ProfileDownload = {
+                            state: 'aborted',
+                            alertMessage: parseColonBasedAnswer(res),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+                    }
+
+                    shellParser?.setShellEchos(true);
+                },
+                res => {
+                    if (fuelGaugeModule.profileDownloadInProgress) {
+                        fuelGaugeModule.profileDownloadInProgress = false;
+                        const profileDownload: ProfileDownload = {
+                            state: 'failed',
+                            alertMessage: parseColonBasedAnswer(res),
+                        };
+                        eventEmitter.emit(
+                            'onProfileDownloadUpdate',
+                            profileDownload
+                        );
+                    }
+
+                    shellParser?.setShellEchos(true);
+                }
             )
         );
     }

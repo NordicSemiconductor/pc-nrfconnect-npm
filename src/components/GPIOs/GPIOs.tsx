@@ -32,13 +32,13 @@ export default ({ active }: PaneProps) => {
                 gpios.map((gpio, index) => (
                     <GPIO
                         gpio={gpio}
-                        npmDevice={npmDevice}
+                        gpioModule={npmDevice.gpioModule[index]}
                         key={`GPIO${1 + index}`}
-                        index={index}
                         disabled={disabled}
+                        deviceType={npmDevice.deviceType}
                     />
                 ))}
-            {npmDevice && (
+            {npmDevice && !!npmDevice.getNumberOfLEDs() && (
                 <LEDs npmDevice={npmDevice} leds={leds} disabled={disabled} />
             )}
         </MasonryLayout>

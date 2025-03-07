@@ -16,10 +16,10 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { selectDirectoryDialog } from '../../../actions/fileActions';
+import BaseNpmDevice from '../../../features/pmicControl/npm/basePmicDevice';
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     CCProfile,
-    NpmDevice,
     NTCThermistor,
     NTCValues,
     Profile,
@@ -43,7 +43,7 @@ export default ({
     npmDevice,
 }: {
     isVisible: boolean;
-    npmDevice: NpmDevice;
+    npmDevice: BaseNpmDevice;
 }) => {
     const [vLowerCutOff, setLowerVCutOff] = useState(3);
     const [vUpperCutOff, setUpperVCutOff] = useState(4.2);
@@ -204,7 +204,8 @@ export default ({
                     }
                     unit="V"
                     value={vUpperCutOff}
-                    range={npmDevice.getChargerVoltageRange()}
+                    // Only nPM1300 which has the chargerModule will get access to this dialog
+                    range={npmDevice.chargerModule?.ranges.voltage || [0, 1]}
                     onChange={setUpperVCutOff}
                 />
 

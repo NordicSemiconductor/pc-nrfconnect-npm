@@ -11,15 +11,20 @@ import {
     PaneProps,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { SupportsErrorLogs } from '../../features/pmicControl/npm/pmicHelpers';
 import {
     getNpmDevice,
+    getPmicState,
     getPOF,
+    getReset,
     getShip,
     getTimerConfig,
     getUsbPower,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
+import EnterBreakToWakeDialog from './EnterBreakToWakeDialog';
 import ErrorStatuses from './ErrorStatuses';
+import LowPower from './LowPower';
 import PowerFailure from './PowerFailure';
 import ResetControl from './ResetControl';
 import Timer from './Timer';
@@ -30,40 +35,57 @@ export default ({ active }: PaneProps) => {
     const npmDevice = useSelector(getNpmDevice);
     const pof = useSelector(getPOF);
     const ship = useSelector(getShip);
+    const reset = useSelector(getReset);
     const usbPower = useSelector(getUsbPower);
     const timerConfig = useSelector(getTimerConfig);
+    const pmicState = useSelector(getPmicState);
 
     return active ? (
         <MasonryLayout className="masonry-layout" minWidth={300}>
-            {npmDevice && (
+            {npmDevice?.resetModule && reset && (
                 <ResetControl
-                    npmDevice={npmDevice}
-                    ship={ship}
+                    resetModule={npmDevice?.resetModule}
+                    reset={reset}
                     disabled={disabled}
                 />
             )}
-            {npmDevice && (
+            {npmDevice?.lowPowerModule && ship && (
+                <LowPower
+                    lowPowerModule={npmDevice?.lowPowerModule}
+                    lowPower={ship}
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice?.timerConfigModule && timerConfig && (
                 <Timer
-                    npmDevice={npmDevice}
+                    timerConfigModule={npmDevice.timerConfigModule}
                     timerConfig={timerConfig}
                     disabled={disabled}
                 />
             )}
-            {npmDevice && (
+            {npmDevice?.pofModule && pof && (
                 <PowerFailure
-                    npmDevice={npmDevice}
+                    pofModule={npmDevice.pofModule}
                     pof={pof}
                     disabled={disabled}
                 />
             )}
-            {npmDevice && (
+            {npmDevice?.usbCurrentLimiterModule && usbPower && (
                 <VBus
-                    npmDevice={npmDevice}
+                    usbCurrentLimiterModule={npmDevice?.usbCurrentLimiterModule}
                     usbPower={usbPower}
                     disabled={disabled}
                 />
             )}
-            {npmDevice && <ErrorStatuses disabled={disabled} />}
+            {pmicState !== 'ek-disconnected' &&
+                npmDevice?.supportedErrorLogs &&
+                SupportsErrorLogs(npmDevice) && (
+                    <ErrorStatuses
+                        disabled={disabled}
+                        supportedErrorLogs={npmDevice.supportedErrorLogs}
+                    />
+                )}
+            <EnterBreakToWakeDialog />
         </MasonryLayout>
     ) : null;
 };

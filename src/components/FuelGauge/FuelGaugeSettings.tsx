@@ -51,8 +51,8 @@ export default ({ disabled }: { disabled: boolean }) => {
         temperature: number
     ) =>
         batteryModel?.characterizations.reduce((prev, curr) =>
-            Math.abs(curr.temperature - temperature) <
-            Math.abs(prev.temperature - temperature)
+            Math.abs(curr.temperature ?? 0 - temperature) <
+            Math.abs(prev.temperature ?? 0 - temperature)
                 ? curr
                 : prev
         ) ?? undefined;
@@ -85,7 +85,7 @@ export default ({ disabled }: { disabled: boolean }) => {
     );
 
     const bundledBatteries = useMemo(
-        () => getBundledBatteries(npmDevice?.getDeviceType() ?? 'npm1300'),
+        () => getBundledBatteries(npmDevice?.deviceType ?? 'npm1300'),
         [npmDevice]
     );
 
@@ -155,7 +155,9 @@ export default ({ disabled }: { disabled: boolean }) => {
                 }
                 items={batteryModelItems}
                 onSelect={(item: DropdownItem) => {
-                    npmDevice?.setActiveBatteryModel(item.value);
+                    npmDevice?.fuelGaugeModule?.set.activeBatteryModel(
+                        item.value
+                    );
                 }}
                 selectedItem={selectedActiveItemBatteryMode}
                 disabled={disabled || batteryModelItems.length === 0}
@@ -248,8 +250,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                         variant="secondary"
                         className="w-100"
                         onClick={() => {
-                            npmDevice
-                                ?.getBatteryProfiler()
+                            npmDevice?.batteryProfiler
                                 ?.canProfile()
                                 .then(result => {
                                     if (result) {
