@@ -16,16 +16,16 @@ import {
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     Charger,
+    ChargerModule,
     isFixedListRangeWithLabel,
     ITerm,
     ITermValues,
-    NpmDevice,
     VTrickleFast,
     VTrickleFastValues,
 } from '../../../features/pmicControl/npm/types';
 
 interface PowerCardProperties {
-    npmDevice: NpmDevice;
+    chargerModule: ChargerModule;
     charger: Charger;
     cardLabel?: string;
     disabled: boolean;
@@ -43,7 +43,7 @@ const iTermItems = [...ITermValues].map(item => ({
 }));
 
 export default ({
-    npmDevice,
+    chargerModule,
     charger,
     cardLabel = `Charger`,
     disabled,
@@ -51,8 +51,6 @@ export default ({
 }: PowerCardProperties) => {
     const card = 'charger';
     const [summary, setSummary] = useState(defaultSummary);
-    const currentRange = npmDevice.getChargerCurrentRange();
-    const currentVoltageRange = npmDevice.getChargerVoltageRange();
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
@@ -65,7 +63,7 @@ export default ({
         setInternalBatLim(charger.iBatLim);
     }, [charger]);
 
-    const chargerIBatLimRange = npmDevice.getChargerIBatLimRange();
+    const chargerIBatLimRange = chargerModule.ranges.iBatLim;
 
     return (
         <Card
@@ -79,7 +77,7 @@ export default ({
                         <Toggle
                             label="Enable"
                             isToggled={charger.enabled}
-                            onToggle={v => npmDevice.setChargerEnabled(v)}
+                            onToggle={v => chargerModule.set.enabled(v)}
                             disabled={disabled}
                         />
                         <span
@@ -110,10 +108,10 @@ export default ({
                 }
                 unit="V"
                 disabled={disabled}
-                range={currentVoltageRange}
+                range={chargerModule.ranges.voltage}
                 value={internalVTerm}
                 onChange={setInternalVTerm}
-                onChangeComplete={v => npmDevice.setChargerVTerm(v)}
+                onChangeComplete={v => chargerModule.set.vTerm(v)}
                 showSlider
             />
             <NumberInput
@@ -127,10 +125,10 @@ export default ({
                 }
                 unit="mA"
                 disabled={disabled}
-                range={currentRange}
+                range={chargerModule.ranges.current}
                 value={internalIChg}
                 onChange={setInternalIChg}
-                onChangeComplete={v => npmDevice.setChargerIChg(v)}
+                onChangeComplete={v => chargerModule.set.iChg(v)}
                 showSlider
             />
 
@@ -169,7 +167,7 @@ export default ({
                                 </DocumentationTooltip>
                             }
                             disabled={disabled}
-                            onSelect={v => npmDevice.setChargerBatLim(v.value)}
+                            onSelect={v => chargerModule.set.batLim(v.value)}
                             selectedItem={{
                                 value: charger.iBatLim,
                                 label: chargerIBatLimRange.toLabel(
@@ -195,9 +193,7 @@ export default ({
                             range={chargerIBatLimRange}
                             value={internalBatLim}
                             onChange={setInternalBatLim}
-                            onChangeComplete={v =>
-                                npmDevice.setChargerBatLim(v)
-                            }
+                            onChangeComplete={v => chargerModule.set.batLim(v)}
                             showSlider
                         />
                     )}
@@ -213,7 +209,7 @@ export default ({
                         }
                         isToggled={charger.enableRecharging}
                         onToggle={value =>
-                            npmDevice.setChargerEnabledRecharging(value)
+                            chargerModule.set.enabledRecharging(value)
                         }
                         disabled={disabled}
                     />
@@ -231,7 +227,7 @@ export default ({
                         }
                         isToggled={charger.enableVBatLow}
                         onToggle={value =>
-                            npmDevice.setChargerEnabledVBatLow(value)
+                            chargerModule.set.enabledVBatLow(value)
                         }
                         disabled={disabled}
                     />
@@ -246,7 +242,7 @@ export default ({
                         }
                         items={iTermItems}
                         onSelect={item =>
-                            npmDevice.setChargerITerm(item.value as ITerm)
+                            chargerModule.set.iTerm(item.value as ITerm)
                         }
                         selectedItem={
                             iTermItems[
@@ -276,7 +272,7 @@ export default ({
                         }
                         items={vTrickleFastItems}
                         onSelect={item =>
-                            npmDevice.setChargerVTrickleFast(
+                            chargerModule.set.vTrickleFast(
                                 Number.parseFloat(item.value) as VTrickleFast
                             )
                         }

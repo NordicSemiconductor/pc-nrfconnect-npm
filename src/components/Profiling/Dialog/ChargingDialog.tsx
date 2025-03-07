@@ -43,7 +43,8 @@ import StepperProgress from './StepperProgress';
 export default ({ isVisible }: { isVisible: boolean }) => {
     const npmDevice = useSelector(getNpmDevice);
     const usbPower = useSelector(getUsbPower);
-    const usbPowered = usbPower.detectStatus !== 'No USB connection';
+    const usbPowered =
+        usbPower && usbPower.detectStatus !== 'No USB connection';
     const charger = useSelector(getCharger);
     const pmicChargingState = useSelector(getPmicChargingState);
     const batteryConnected = useSelector(isBatteryConnected);
@@ -122,23 +123,21 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         onClick={async () => {
                             dispatch(setProfilingStage('Resting'));
                             try {
-                                await npmDevice?.setPOFThreshold(2.6);
+                                await npmDevice?.pofModule?.set.threshold(2.6);
                                 npmDevice?.setAutoRebootDevice(false);
-                                await npmDevice?.setChargerEnabled(false);
-                                await npmDevice
-                                    ?.getBatteryProfiler()
-                                    ?.setProfile(
-                                        REPORTING_RATE, // iBat
-                                        REPORTING_RATE * 8, // tBat
-                                        profile.vLowerCutOff,
-                                        [
-                                            ...profile.restingProfiles,
-                                            ...profile.profilingProfiles,
-                                        ]
-                                    );
-                                await npmDevice
-                                    ?.getBatteryProfiler()
-                                    ?.startProfiling();
+                                await npmDevice?.chargerModule?.set.enabled(
+                                    false
+                                );
+                                await npmDevice?.batteryProfiler?.setProfile(
+                                    REPORTING_RATE, // iBat
+                                    REPORTING_RATE * 8, // tBat
+                                    profile.vLowerCutOff,
+                                    [
+                                        ...profile.restingProfiles,
+                                        ...profile.profilingProfiles,
+                                    ]
+                                );
+                                await npmDevice?.batteryProfiler?.startProfiling();
                             } catch (e) {
                                 dispatch(
                                     setCompleteStep({
@@ -204,7 +203,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    npmDevice?.setChargerEnabled(true);
+                                    npmDevice?.chargerModule?.set.enabled(true);
                                 }}
                             >
                                 Turn on

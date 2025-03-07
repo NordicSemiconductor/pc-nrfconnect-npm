@@ -13,6 +13,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
+import { SupportedErrorLogs } from '../../features/pmicControl/npm/types';
 import {
     getErrorLogs,
     getNpmDevice,
@@ -40,7 +41,13 @@ export const LineData = ({
     </div>
 );
 
-export default ({ disabled }: { disabled: boolean }) => {
+export default ({
+    disabled,
+    supportedErrorLogs,
+}: {
+    disabled: boolean;
+    supportedErrorLogs: SupportedErrorLogs;
+}) => {
     const errorLogs = useSelector(getErrorLogs);
     const npmDevice = useSelector(getNpmDevice);
     const pmicState = useSelector(getPmicState);
@@ -52,7 +59,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                     <div>Reset & Error Logs</div>
                     <Button
                         variant="secondary"
-                        onClick={() => npmDevice?.clearErrorLogs()}
+                        onClick={() => npmDevice?.clearErrorLogs?.()}
                         disabled={pmicState !== 'pmic-connected'}
                     >
                         Clear logs
@@ -65,29 +72,41 @@ export default ({ disabled }: { disabled: boolean }) => {
                     disabled && 'tw-text-gray-300'
                 )}`}
             >
-                <DocumentationTooltip card="ResetErrorLogs" item="ResetCause">
-                    <LineData
-                        title="Reset Cause"
-                        value={errorLogs?.resetCause}
-                    />
-                </DocumentationTooltip>
+                {supportedErrorLogs.reset && (
+                    <DocumentationTooltip
+                        card="ResetErrorLogs"
+                        item="ResetCause"
+                    >
+                        <LineData
+                            title="Reset Cause"
+                            value={errorLogs?.resetCause}
+                        />
+                    </DocumentationTooltip>
+                )}
 
-                <DocumentationTooltip
-                    card="ResetErrorLogs"
-                    item="ChargerErrors"
-                >
-                    <LineData
-                        title="Charger Errors"
-                        value={errorLogs?.chargerError}
-                    />
-                </DocumentationTooltip>
+                {supportedErrorLogs.charger && (
+                    <DocumentationTooltip
+                        card="ResetErrorLogs"
+                        item="ChargerErrors"
+                    >
+                        <LineData
+                            title="Charger Errors"
+                            value={errorLogs?.chargerError}
+                        />
+                    </DocumentationTooltip>
+                )}
 
-                <DocumentationTooltip card="ResetErrorLogs" item="SensorErrors">
-                    <LineData
-                        title="Sensor Errors"
-                        value={errorLogs?.sensorError}
-                    />
-                </DocumentationTooltip>
+                {supportedErrorLogs.sensor && (
+                    <DocumentationTooltip
+                        card="ResetErrorLogs"
+                        item="SensorErrors"
+                    >
+                        <LineData
+                            title="Sensor Errors"
+                            value={errorLogs?.sensorError}
+                        />
+                    </DocumentationTooltip>
+                )}
             </div>
         </Card>
     );

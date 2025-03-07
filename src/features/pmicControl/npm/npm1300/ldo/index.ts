@@ -8,26 +8,21 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Ldo, LdoExport, PmicDialog } from '../../types';
+import { Ldo, LdoExport, LdoModule, PmicDialog } from '../../types';
 import ldoCallbacks from './ldoCallbacks';
-import { ldoGet, ldoSet } from './ldoEffects';
+import { LdoGet } from './ldoGet';
+import { LdoSet } from './ldoSet';
 
-export const ldoDefaults = (noOfLdos: number): Ldo[] => {
-    const defaultLDOs: Ldo[] = [];
-    for (let i = 0; i < noOfLdos; i += 1) {
-        defaultLDOs.push({
-            voltage: getLdoVoltageRange(i).min,
-            mode: 'ldoSwitch',
-            enabled: false,
-            softStartEnabled: true,
-            softStart: 20,
-            activeDischarge: false,
-            onOffControl: 'SW',
-            onOffSoftwareControlEnabled: true,
-        });
-    }
-    return defaultLDOs;
-};
+const ldoDefaults = (): Ldo => ({
+    voltage: getLdoVoltageRange().min,
+    mode: 'Load_switch',
+    enabled: false,
+    softStartEnabled: true,
+    softStart: 20,
+    activeDischarge: false,
+    onOffControl: 'SW',
+    onOffSoftwareControlEnabled: true,
+});
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
     voltage: ldo.voltage,
@@ -39,8 +34,7 @@ export const toLdoExport = (ldo: Ldo): LdoExport => ({
     onOffControl: ldo.onOffControl,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getLdoVoltageRange = (i: number) =>
+const getLdoVoltageRange = () =>
     ({
         min: 1,
         max: 3.3,
@@ -48,22 +42,54 @@ const getLdoVoltageRange = (i: number) =>
         step: 0.1,
     } as RangeType);
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean,
-    noOfBucks: number
-) => ({
-    ldoGet: ldoGet(sendCommand),
-    ldoSet: ldoSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
-    ldoCallbacks: ldoCallbacks(shellParser, eventEmitter, noOfBucks),
-    ldoRanges: {
-        getLdoVoltageRange,
-    },
-});
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable class-methods-use-this */
+
+export default class Module implements LdoModule {
+    private _get: LdoGet;
+    private _set: LdoSet;
+    private _callbacks: (() => void)[];
+    constructor(
+        readonly index: number,
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+        offlineMode: boolean
+    ) {
+        this._get = new LdoGet(sendCommand, index);
+        this._set = new LdoSet(
+            eventEmitter,
+            sendCommand,
+            dialogHandler,
+            offlineMode,
+            index
+        );
+        this._callbacks = ldoCallbacks(shellParser, eventEmitter, index);
+    }
+
+    get get() {
+        return this._get;
+    }
+
+    get set() {
+        return this._set;
+    }
+
+    get callbacks() {
+        return this._callbacks;
+    }
+
+    get ranges(): { voltage: RangeType } {
+        return {
+            voltage: getLdoVoltageRange(),
+        };
+    }
+    get defaults(): Ldo {
+        return ldoDefaults();
+    }
+}

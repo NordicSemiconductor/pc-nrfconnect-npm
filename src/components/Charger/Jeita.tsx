@@ -19,7 +19,7 @@ import {
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     Charger,
-    NpmDevice,
+    ChargerModule,
     NTCThermistor,
     NTCValues,
 } from '../../features/pmicControl/npm/types';
@@ -34,11 +34,11 @@ const ntcThermistorItems = [...NTCValues].map(item => ({
 const card = 'JEITA';
 
 export default ({
-    npmDevice,
+    chargerModule,
     charger,
     disabled,
 }: {
-    npmDevice: NpmDevice;
+    chargerModule: ChargerModule;
     charger: Charger;
     disabled: boolean;
 }) => {
@@ -57,13 +57,13 @@ export default ({
 
     const updateNpmDeviceJeitaTemps = () => {
         if (internalJeitaTemps[0] !== charger.tCold)
-            npmDevice.setChargerTCold(internalJeitaTemps[0]);
+            chargerModule.set.tCold(internalJeitaTemps[0]);
         if (internalJeitaTemps[1] !== charger.tCool)
-            npmDevice.setChargerTCool(internalJeitaTemps[1]);
+            chargerModule.set.tCool(internalJeitaTemps[1]);
         if (internalJeitaTemps[2] !== charger.tWarm)
-            npmDevice.setChargerTWarm(internalJeitaTemps[2]);
+            chargerModule.set.tWarm(internalJeitaTemps[2]);
         if (internalJeitaTemps[3] !== charger.tHot)
-            npmDevice.setChargerTHot(internalJeitaTemps[3]);
+            chargerModule.set.tHot(internalJeitaTemps[3]);
     };
 
     //  NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
@@ -134,8 +134,8 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat < internalJeitaTemps[0] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat < internalJeitaTemps[0] &&
                                 'tw-bg-indigo-100'
                         )}`}
                     >
@@ -150,7 +150,7 @@ export default ({
                             type="COLD"
                             temperature={internalJeitaTemps[0]}
                             range={{
-                                min: npmDevice.getChargerJeitaRange().min,
+                                min: chargerModule.ranges.jeita.min,
                                 max: internalJeitaTemps[1],
                             }}
                             onChange={v => updateInternal(0, v)}
@@ -159,10 +159,9 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat >=
-                                    internalJeitaTemps[0] &&
-                                latestAdcSample?.tBat < internalJeitaTemps[1] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat >= internalJeitaTemps[0] &&
+                                latestAdcSample.tBat < internalJeitaTemps[1] &&
                                 'tw-bg-lightBlue-100'
                         )}`}
                     >
@@ -190,9 +189,8 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat >=
-                                    internalJeitaTemps[1] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat >= internalJeitaTemps[1] &&
                                 latestAdcSample?.tBat < internalJeitaTemps[2] &&
                                 'tw-bg-green-100'
                         )}`}
@@ -221,10 +219,9 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat >=
-                                    internalJeitaTemps[2] &&
-                                latestAdcSample?.tBat < internalJeitaTemps[3] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat >= internalJeitaTemps[2] &&
+                                latestAdcSample.tBat < internalJeitaTemps[3] &&
                                 'tw-bg-orange-100'
                         )}`}
                     >
@@ -244,7 +241,7 @@ export default ({
                             temperature={internalJeitaTemps[3]}
                             range={{
                                 min: internalJeitaTemps[2],
-                                max: npmDevice.getChargerJeitaRange().max,
+                                max: chargerModule.ranges.jeita.max,
                             }}
                             onChange={v => updateInternal(3, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
@@ -252,9 +249,8 @@ export default ({
                     </div>
                     <div
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
-                            latestAdcSample &&
-                                latestAdcSample?.tBat >=
-                                    internalJeitaTemps[3] &&
+                            latestAdcSample?.tBat &&
+                                latestAdcSample.tBat >= internalJeitaTemps[3] &&
                                 'tw-bg-red-100'
                         )}`}
                     >
@@ -267,11 +263,11 @@ export default ({
                 </div>
 
                 <div className="tw-flex tw-flex-row tw-justify-between tw-gap-2 tw-text-xs">
-                    <span>{npmDevice.getChargerJeitaRange().min}°C</span>
+                    <span>{chargerModule.ranges.jeita.min}°C</span>
                     <div className="tw-w-full">
                         <Slider
                             values={internalJeitaTemps}
-                            range={npmDevice.getChargerJeitaRange()}
+                            range={chargerModule.ranges.jeita}
                             onChange={[0, 1, 2, 3].map(
                                 i => v => updateInternal(i, v)
                             )}
@@ -279,7 +275,7 @@ export default ({
                             disabled={disabled}
                         />
                     </div>
-                    <span>{npmDevice.getChargerJeitaRange().max}°C</span>
+                    <span>{chargerModule.ranges.jeita.max}°C</span>
                 </div>
             </div>
             <NumberInput
@@ -293,9 +289,9 @@ export default ({
                 }
                 unit="V"
                 value={internalVTermr}
-                range={npmDevice.getChargerVTermRRange()}
+                range={chargerModule.ranges.vTermR}
                 onChange={value => setInternalVTermr(value)}
-                onChangeComplete={npmDevice.setChargerVTermR}
+                onChangeComplete={v => chargerModule.set.vTermR(v)}
                 disabled={disabled}
                 showSlider
             />
@@ -307,7 +303,7 @@ export default ({
                 }
                 items={ntcThermistorItems}
                 onSelect={item =>
-                    npmDevice.setChargerNTCThermistor(
+                    chargerModule.set.nTCThermistor(
                         item.value as NTCThermistor,
                         autoNTCBeta
                     )
@@ -329,7 +325,7 @@ export default ({
                 onToggle={v => {
                     setAutoNTCBeta(v);
                     if (!v) return;
-                    npmDevice.setChargerNTCThermistor(
+                    chargerModule.set.nTCThermistor(
                         charger.ntcThermistor,
                         true
                     );
@@ -347,10 +343,10 @@ export default ({
                     </DocumentationTooltip>
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
-                            range={npmDevice.getChargerNTCBetaRange()}
+                            range={chargerModule.ranges.nTCBeta}
                             value={internalNTCBeta}
                             onChange={setInternalNTCBeta}
-                            onChangeComplete={npmDevice.setChargerNTCBeta}
+                            onChangeComplete={v => chargerModule.set.nTCBeta(v)}
                         />
                     </div>
                 </div>

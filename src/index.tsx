@@ -23,6 +23,7 @@ import Profiles from './components/Profiling/ProfilingProjects/Profiles';
 import Regulators from './components/Regulators/Regulators';
 import SidePanel from './components/SidePanel/SidePanel';
 import SystemFeatures from './components/SystemFeatures/SystemFeatures';
+import Welcome from './components/Welcome';
 import NpmGenericDialog from './features/pmicControl/npm/NpmGenericDialog';
 
 import './index.scss';
@@ -43,6 +44,10 @@ render(
             </>
         }
         panes={[
+            {
+                name: 'Welcome',
+                Main: Welcome,
+            },
             {
                 name: 'Dashboard',
                 Main: DashboardControl,
