@@ -20,7 +20,6 @@ import {
     GpioModule,
     GPIOPull,
     GPIOState,
-    NpmModel,
 } from '../../features/pmicControl/npm/types';
 
 interface GPIOProperties {
@@ -28,7 +27,6 @@ interface GPIOProperties {
     gpio: GPIO;
     cardLabel?: string;
     disabled: boolean;
-    deviceType: NpmModel;
 }
 
 export default ({
@@ -36,7 +34,6 @@ export default ({
     gpio,
     cardLabel = `GPIO${gpioModule.index}`,
     disabled,
-    deviceType,
 }: GPIOProperties) => {
     const toStringMode = (mode: GPIOMode) =>
         gpioModule.values.mode.find(m => m.value === mode)?.label;
@@ -73,9 +70,9 @@ export default ({
                 }
                 disabled={disabled}
             />
-            {deviceType === 'npm2100' &&
-                gpio.mode === GPIOMode2100.Output &&
-                gpioModule.values.state !== undefined && (
+            {gpio.mode === GPIOMode2100.Output &&
+                gpioModule.set.state &&
+                gpioModule.values.state && (
                     <div>
                         <p className="tw-mb-1 tw-text-xs">State</p>
                         <StateSelector

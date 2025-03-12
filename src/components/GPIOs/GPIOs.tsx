@@ -35,7 +35,6 @@ export default ({ active }: PaneProps) => {
                         gpioModule={npmDevice.gpioModule[index]}
                         key={`GPIO${1 + index}`}
                         disabled={disabled}
-                        deviceType={npmDevice.deviceType}
                     />
                 ))}
             {npmDevice && !!npmDevice.getNumberOfLEDs() && (

@@ -87,7 +87,6 @@ export default ({ active }: PaneProps) => {
                             ldos.length === 1 ? `Load Switch/LDO` : undefined
                         }
                         key={`Ldo${1 + index}`}
-                        deviceType={npmDevice.deviceType}
                         disabled={disabled}
                         defaultSummary
                     />
