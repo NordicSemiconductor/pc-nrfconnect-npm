@@ -17,8 +17,10 @@ import {
     getErrorLogs,
     getNpmDevice,
     getPmicState,
+    getSupportsBatteryModules,
     getUsbPower,
     isBatteryConnected,
+    isBatteryModuleConnected,
     isSupportedVersion,
 } from '../../features/pmicControl/pmicControlSlice';
 import { getCcProfilingState } from '../../features/pmicControl/profilingSlice';
@@ -31,14 +33,18 @@ import {
 export default () => {
     const shellParser = useSelector(getShellParser);
     const pmicState = useSelector(getPmicState);
+    const npmDevice = useSelector(getNpmDevice);
     const supportedVersion = useSelector(isSupportedVersion);
     const usbPower = useSelector(getUsbPower);
-    const usbPowered = usbPower.detectStatus !== 'No USB connection';
+    const usbPowered =
+        usbPower && usbPower.detectStatus !== 'No USB connection';
+    const hasCharger = !!npmDevice?.chargerModule;
     const paused = useSelector(isPaused);
     const ccProfilingState = useSelector(getCcProfilingState);
-    const npmDevice = useSelector(getNpmDevice);
     const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
     const batteryConnected = useSelector(isBatteryConnected);
+    const supportsBatteryModules = useSelector(getSupportsBatteryModules);
+    const batteryModuleConnected = useSelector(isBatteryModuleConnected);
     const errorLogs = useSelector(getErrorLogs);
     const dispatch = useDispatch();
 
@@ -90,14 +96,14 @@ export default () => {
             if (ccProfilingState !== 'Running') {
                 pmicStep.caption = 'Waiting on shell';
                 pmicStep.state = 'active';
-            } else {
+            } else if (npmDevice?.batteryProfiler) {
                 pmicStep.caption = [
                     { id: '1', caption: 'Profiling Battery' },
                     {
                         id: '2',
                         caption: 'stop profiling',
                         action: () =>
-                            npmDevice?.getBatteryProfiler()?.stopProfiling(),
+                            npmDevice?.batteryProfiler?.stopProfiling(),
                     },
                 ];
                 pmicStep.state = 'warning';
@@ -126,12 +132,11 @@ export default () => {
         } else if (ccProfilingState !== 'Off') {
             pmicStep.caption = [{ id: '1', caption: 'Profiling Battery' }];
 
-            if (!pauseFor10Ms)
+            if (!pauseFor10Ms && npmDevice?.batteryProfiler !== undefined)
                 pmicStep.caption.push({
                     id: '2',
                     caption: 'stop profiling',
-                    action: () =>
-                        npmDevice?.getBatteryProfiler()?.stopProfiling(),
+                    action: () => npmDevice?.batteryProfiler?.stopProfiling(),
                 });
             pmicStep.state = 'warning';
         } else if (pmicState === 'pmic-pending-reboot') {
@@ -155,17 +160,28 @@ export default () => {
                     caption:
                         "Errors detected. Check 'System Features' tab for more information",
                 },
-                {
-                    id: '2',
-                    caption: 'clear error log',
-                    action: () => npmDevice?.clearErrorLogs(true),
-                },
+                ...(npmDevice?.clearErrorLogs !== undefined
+                    ? [
+                          {
+                              id: '2',
+                              caption: 'clear error log',
+                              action: () => npmDevice.clearErrorLogs?.(true),
+                          },
+                      ]
+                    : []),
             ];
             pmicStep.state = 'failure';
-        } else if (!usbPowered) {
+        } else if (!usbPowered && hasCharger) {
             pmicStep.caption =
                 'Not powered by USB PMIC. Charging is not possible';
             pmicStep.state = 'warning';
+        } else if (supportsBatteryModules && !batteryModuleConnected) {
+            // PMIC must be powered as this is checked above
+            // Given that pmic is powered and we support battery modules then the
+            // fact that !batteryModuleConnected (batteryModuleId === 0) means
+            // PMIC is USB powered
+            pmicStep.state = 'success';
+            pmicStep.caption = 'In sync';
         } else if (!batteryConnected) {
             pmicStep.caption = 'Battery not detected';
             pmicStep.state = 'warning';

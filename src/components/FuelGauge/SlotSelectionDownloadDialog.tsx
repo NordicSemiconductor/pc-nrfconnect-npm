@@ -58,7 +58,7 @@ export default () => {
                         onClick={() => {
                             dispatch(closeDialog());
                             if (npmDevice && buffer) {
-                                npmDevice.downloadFuelGaugeProfile(
+                                npmDevice.fuelGaugeModule?.actions.downloadFuelGaugeProfile(
                                     buffer,
                                     slot
                                 );

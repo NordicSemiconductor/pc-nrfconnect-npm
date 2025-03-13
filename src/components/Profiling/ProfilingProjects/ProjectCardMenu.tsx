@@ -49,7 +49,7 @@ export default ({
     const [generatingBatterModel, setGeneratingBatterModel] = useState(false);
     const uiDisabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
-    const pmicConnection = npmDevice?.getConnectionState();
+    const pmicConnection = npmDevice?.pmicState;
     const allProgress = useSelector(getProjectProfileProgress).filter(
         progress => progress.path === projectSettingsPath
     );

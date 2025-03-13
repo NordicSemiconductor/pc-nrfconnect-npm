@@ -9,6 +9,7 @@ import lodashRange from 'lodash.range';
 export interface RangeType {
     min: number;
     max: number;
+    decimals?: number;
     step?: number;
 }
 

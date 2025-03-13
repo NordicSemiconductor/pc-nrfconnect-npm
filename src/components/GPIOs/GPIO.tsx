@@ -8,153 +8,142 @@ import React from 'react';
 import {
     Card,
     Dropdown,
+    StateSelector,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
+import { GPIOMode2100 } from '../../features/pmicControl/npm/npm2100/gpio/types';
 import {
     GPIO,
-    GPIODrive,
-    GPIODriveValues,
     GPIOMode,
-    GPIOModeValues,
-    GPIOPullMode,
-    GPIOPullValues,
-    NpmDevice,
+    GpioModule,
+    GPIOPull,
+    GPIOState,
 } from '../../features/pmicControl/npm/types';
 
 interface GPIOProperties {
-    npmDevice: NpmDevice;
-    index: number;
+    gpioModule: GpioModule;
     gpio: GPIO;
     cardLabel?: string;
     disabled: boolean;
 }
 
-const gpioModeValuesItems = [...GPIOModeValues].map(item => ({
-    label: `${item}`,
-    value: `${item}`,
-}));
-
-const gpioDriveValuesItems = [...GPIODriveValues].map(item => ({
-    label: `${item} mA`,
-    value: `${item}`,
-}));
-
-const gpioPullValues = [...GPIOPullValues].map(item => ({
-    label: `${item}`,
-    value: `${item}`,
-}));
-
-const card = 'gpio';
-
 export default ({
-    npmDevice,
-    index,
+    gpioModule,
     gpio,
-    cardLabel = `GPIO${index}`,
+    cardLabel = `GPIO${gpioModule.index}`,
     disabled,
-}: GPIOProperties) => (
-    <Card
-        title={
-            <div className="tw-flex tw-justify-between">
-                <span>{cardLabel}</span>
+}: GPIOProperties) => {
+    const toStringMode = (mode: GPIOMode) =>
+        gpioModule.values.mode.find(m => m.value === mode)?.label;
 
-                <div className="d-flex">
-                    {`${gpio.mode.startsWith('Input') ? 'Input' : 'Output'}`}
+    const card = `gpio${gpioModule.index}`;
+    return (
+        <Card
+            title={
+                <div className="tw-flex tw-justify-between">
+                    <span>{cardLabel}</span>
+
+                    <div className="d-flex">
+                        {`${
+                            toStringMode(gpio.mode)?.startsWith('Input')
+                                ? 'Input'
+                                : 'Output'
+                        }`}
+                    </div>
                 </div>
-            </div>
-        }
-    >
-        <Dropdown
-            label={
-                <DocumentationTooltip card={`${card}${index}`} item="Mode">
-                    <span>Mode</span>
-                </DocumentationTooltip>
             }
-            items={gpioModeValuesItems}
-            onSelect={item =>
-                npmDevice.setGpioMode(index, item.value as GPIOMode)
-            }
-            selectedItem={
-                gpioModeValuesItems[
-                    Math.max(
-                        0,
-                        gpioModeValuesItems.findIndex(
-                            item => item.value === gpio.mode
-                        )
-                    ) ?? 0
-                ]
-            }
-            disabled={disabled}
-        />
-        <Dropdown
-            label={
-                <DocumentationTooltip card={`${card}${index}`} item="Pull">
-                    <span>Pull</span>
-                </DocumentationTooltip>
-            }
-            items={gpioPullValues}
-            onSelect={item =>
-                npmDevice.setGpioPull(index, item.value as GPIOPullMode)
-            }
-            selectedItem={
-                gpioPullValues[
-                    Math.max(
-                        0,
-                        gpioPullValues.findIndex(
-                            item => item.value === gpio.pull
-                        )
-                    ) ?? 0
-                ]
-            }
-            disabled={disabled || gpio.mode.startsWith('Output')}
-        />
-        <Dropdown
-            label={
-                <DocumentationTooltip card={`${card}${index}`} item="Drive">
-                    <span>Drive</span>
-                </DocumentationTooltip>
-            }
-            items={gpioDriveValuesItems}
-            onSelect={item =>
-                npmDevice.setGpioDrive(
-                    index,
-                    Number.parseInt(item.value, 10) as GPIODrive
-                )
-            }
-            selectedItem={
-                gpioDriveValuesItems[
-                    Math.max(
-                        0,
-                        gpioDriveValuesItems.findIndex(
-                            item =>
-                                Number.parseInt(item.value, 10) === gpio.drive
-                        )
-                    ) ?? 0
-                ]
-            }
-            disabled={disabled || gpio.mode.startsWith('Input')}
-        />
-        <Toggle
-            label={
-                <DocumentationTooltip card={`${card}${index}`} item="OpenDrain">
-                    <span>Open Drain</span>
-                </DocumentationTooltip>
-            }
-            isToggled={gpio.openDrain}
-            onToggle={value => npmDevice.setGpioOpenDrain(index, value)}
-            disabled={disabled}
-        />
-        <Toggle
-            label={
-                <DocumentationTooltip card={`${card}${index}`} item="Debounce">
-                    <span>Debounce</span>
-                </DocumentationTooltip>
-            }
-            isToggled={gpio.debounce}
-            onToggle={value => npmDevice.setGpioDebounce(index, value)}
-            disabled={disabled || gpio.mode.startsWith('Output')}
-        />
-    </Card>
-);
+        >
+            <Dropdown
+                label={
+                    <DocumentationTooltip card={card} item="Mode">
+                        <span>Mode</span>
+                    </DocumentationTooltip>
+                }
+                items={gpioModule.values.mode}
+                onSelect={item => gpioModule.set.mode(item.value as GPIOMode)}
+                selectedItem={
+                    gpioModule.values.mode.find(
+                        item => item.value === gpio.mode
+                    ) ?? gpioModule.values.mode[0]
+                }
+                disabled={disabled}
+            />
+            {gpio.mode === GPIOMode2100.Output &&
+                gpioModule.set.state &&
+                gpioModule.values.state && (
+                    <div>
+                        <p className="tw-mb-1 tw-text-xs">State</p>
+                        <StateSelector
+                            disabled={disabled}
+                            items={gpioModule.values.state.map(
+                                item => item.label
+                            )}
+                            onSelect={i =>
+                                gpioModule.set.state?.(
+                                    gpioModule.values.state?.[i]
+                                        .value as GPIOState
+                                )
+                            }
+                            selectedItem={
+                                gpioModule.values.state.find(
+                                    item => item.value === gpio.state
+                                )?.label ?? gpioModule.values.state[0].label
+                            }
+                        />
+                    </div>
+                )}
+            <Dropdown
+                label={
+                    <DocumentationTooltip card={card} item="Pull">
+                        <span>Pull</span>
+                    </DocumentationTooltip>
+                }
+                items={gpioModule.values.pull}
+                onSelect={item => gpioModule.set.pull(item.value as GPIOPull)}
+                selectedItem={
+                    gpioModule.values.pull.find(
+                        item => item.value === gpio.pull
+                    ) ?? gpioModule.values.pull[0]
+                }
+                disabled={disabled || !gpio.pullEnabled}
+            />
+            <Dropdown
+                label={
+                    <DocumentationTooltip card={card} item="Drive">
+                        <span>Drive</span>
+                    </DocumentationTooltip>
+                }
+                items={gpioModule.values.drive}
+                onSelect={item => gpioModule.set.drive(item.value)}
+                selectedItem={
+                    gpioModule.values.drive.find(
+                        item => item.value === gpio.drive
+                    ) ?? gpioModule.values.drive[0]
+                }
+                disabled={disabled || !gpio.driveEnabled}
+            />
+            <Toggle
+                label={
+                    <DocumentationTooltip card={card} item="OpenDrain">
+                        <span>Open Drain</span>
+                    </DocumentationTooltip>
+                }
+                isToggled={gpio.openDrain}
+                onToggle={value => gpioModule.set.openDrain(value)}
+                disabled={disabled || !gpio.openDrainEnabled}
+            />
+            <Toggle
+                label={
+                    <DocumentationTooltip card={card} item="Debounce">
+                        <span>Debounce</span>
+                    </DocumentationTooltip>
+                }
+                isToggled={gpio.debounce}
+                onToggle={value => gpioModule.set.debounce(value)}
+                disabled={disabled || !gpio.pullEnabled}
+            />
+        </Card>
+    );
+};

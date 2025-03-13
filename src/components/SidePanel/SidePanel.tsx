@@ -20,7 +20,7 @@ import {
     selectDirectoryDialog,
 } from '../../actions/fileActions';
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
-import { updateAdcTimings } from '../../features/pmicControl/npm/pmicHelpers';
+import { updateNpm1300AdcTimings as updateNpmAdcTimings } from '../../features/pmicControl/npm/pmicHelpers';
 import {
     getEventRecordingPath,
     getFuelGaugeReportingRate,
@@ -32,6 +32,8 @@ import {
 import { getShellParser } from '../../features/serial/serialSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import FuelGaugeSettings from '../FuelGauge/FuelGaugeSettings';
+import PowerSource from '../PowerSource/PowerSource';
+import { WelcomeSidePanel } from '../Welcome';
 import ConnectionStatus from './ConnectionStatus';
 import OpenSerialTerminal from './OpenSerialTerminal';
 
@@ -52,6 +54,10 @@ export default () => {
     }, [fuelGaugeReportingRate]);
 
     const card = 'sidePanel';
+
+    if (!npmDevice) {
+        return <WelcomeSidePanel />;
+    }
 
     return (
         <SidePanel className="side-panel">
@@ -128,13 +134,36 @@ export default () => {
                     />
                 </DocumentationTooltip>
             </Group>
-            <Group collapsible defaultCollapsed={false} heading="Fuel Gauge">
-                <FuelGaugeSettings
-                    disabled={
-                        pmicConnection === 'ek-disconnected' || uiDisabled
-                    }
-                />
-            </Group>
+            {npmDevice?.deviceType === 'npm1300' && (
+                <Group
+                    collapsible
+                    defaultCollapsed={false}
+                    heading="Fuel Gauge"
+                >
+                    <FuelGaugeSettings
+                        disabled={
+                            pmicConnection === 'ek-disconnected' || uiDisabled
+                        }
+                    />
+                </Group>
+            )}
+            {npmDevice?.deviceType === 'npm2100' &&
+                pmicConnection !== 'ek-disconnected' && (
+                    <Group
+                        collapsible
+                        defaultCollapsed={false}
+                        heading={
+                            <DocumentationTooltip
+                                card={card}
+                                item="PowerSource"
+                            >
+                                Power Source
+                            </DocumentationTooltip>
+                        }
+                    >
+                        <PowerSource />
+                    </Group>
+                )}
             <Group collapsible defaultCollapsed={false} heading="Settings">
                 <NumberInput
                     showSlider
@@ -145,7 +174,7 @@ export default () => {
                     onChange={value => setFuelGaugeReportingRateInternal(value)}
                     onChangeComplete={() =>
                         dispatch(
-                            updateAdcTimings({
+                            updateNpmAdcTimings({
                                 reportInterval: fuelGaugeReportingRateInternal,
                             })
                         )

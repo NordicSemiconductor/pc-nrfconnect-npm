@@ -34,6 +34,10 @@ export const getBundledBatteries = (npmModel: NpmModel) => {
         npmModel
     );
 
+    if (!fs.existsSync(modelsPath)) {
+        return [];
+    }
+
     const brands = fs.readdirSync(modelsPath);
 
     return brands.map(brandFolder => {

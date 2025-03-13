@@ -24,7 +24,9 @@ export default () => {
 
     useEffect(() => {
         if (!device && currentPmicDialog) {
-            currentPmicDialog?.onCancel();
+            currentPmicDialog?.onCancel
+                ? currentPmicDialog?.onCancel()
+                : currentPmicDialog?.onConfirm();
         }
     }, [currentPmicDialog, device]);
 
@@ -46,12 +48,14 @@ export default () => {
                     >
                         {currentPmicDialog?.confirmLabel}
                     </DialogButton>
-                    <DialogButton
-                        disabled={currentPmicDialog?.cancelDisabled}
-                        onClick={currentPmicDialog?.onCancel ?? noop}
-                    >
-                        {currentPmicDialog?.cancelLabel}
-                    </DialogButton>
+                    {currentPmicDialog?.cancelLabel && (
+                        <DialogButton
+                            disabled={currentPmicDialog?.cancelDisabled}
+                            onClick={currentPmicDialog?.onCancel ?? noop}
+                        >
+                            {currentPmicDialog?.cancelLabel}
+                        </DialogButton>
+                    )}
                     {currentPmicDialog?.optionalLabel && (
                         <DialogButton
                             disabled={currentPmicDialog?.optionalDisabled}

@@ -35,7 +35,7 @@ export default ({
     const dispatch = useDispatch();
     const uiDisabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
-    const pmicConnection = npmDevice?.getConnectionState();
+    const pmicConnection = npmDevice?.pmicState;
     const profile = project.profiles[index];
     const allProgress = useSelector(getProjectProfileProgress);
     const progress = useMemo(

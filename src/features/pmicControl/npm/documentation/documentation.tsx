@@ -10,6 +10,7 @@ import { Overlay } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getNpmDevice } from '../../pmicControlSlice';
 import { documentation as pmic1300Documentation } from '../npm1300/documentationPmic1300';
+import { documentation as pmic2100Documentation } from '../npm2100/documentationPmic2100';
 import { NpmModel } from '../types';
 
 export const DocumentationTooltip = ({
@@ -27,10 +28,11 @@ export const DocumentationTooltip = ({
 }) => {
     const npmDevice = useSelector(getNpmDevice);
 
-    const fullDocumentation = getDocumentation(npmDevice?.getDeviceType());
-    const documentation = fullDocumentation
-        ? fullDocumentation[card][item]
-        : null;
+    const fullDocumentation = getDocumentation(npmDevice?.deviceType);
+    const documentation =
+        fullDocumentation && fullDocumentation[card]
+            ? fullDocumentation[card]?.[item]
+            : null;
 
     return documentation ? (
         <Overlay
@@ -58,7 +60,7 @@ export const DocumentationTooltip = ({
             {children}
         </Overlay>
     ) : (
-        <span className="line-title">{children}</span>
+        <span>{children}</span>
     );
 };
 
@@ -66,7 +68,8 @@ export const getDocumentation = (model: NpmModel | undefined) => {
     switch (model) {
         case 'npm1300':
             return pmic1300Documentation;
+        case 'npm2100':
+            return pmic2100Documentation;
     }
-
     return null;
 };

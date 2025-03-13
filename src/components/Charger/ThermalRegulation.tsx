@@ -14,17 +14,17 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
-import { Charger, NpmDevice } from '../../features/pmicControl/npm/types';
+import { Charger, ChargerModule } from '../../features/pmicControl/npm/types';
 import { getPmicChargingState } from '../../features/pmicControl/pmicControlSlice';
 
 const card = 'chipThermalRegulation';
 
 export default ({
-    npmDevice,
+    chargerModule,
     charger,
     disabled,
 }: {
-    npmDevice: NpmDevice;
+    chargerModule: ChargerModule;
     charger: Charger;
     disabled: boolean;
 }) => {
@@ -78,9 +78,11 @@ export default ({
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
                             value={internalChipThermal[0]}
-                            range={npmDevice.getChargerChipThermalRange()}
+                            range={chargerModule.ranges.chipThermal}
                             onChange={v => updateInternal(0, v)}
-                            onChangeComplete={npmDevice.setChargerTChgResume}
+                            onChangeComplete={v =>
+                                chargerModule.set.tChgResume(v)
+                            }
                             disabled={disabled}
                         />
                         °C
@@ -96,9 +98,11 @@ export default ({
                     <div className="tw-flex tw-flex-row">
                         <NumberInlineInput
                             value={internalChipThermal[1]}
-                            range={npmDevice.getChargerChipThermalRange()}
+                            range={chargerModule.ranges.chipThermal}
                             onChange={v => updateInternal(1, v)}
-                            onChangeComplete={npmDevice.setChargerTChgStop}
+                            onChangeComplete={v =>
+                                chargerModule.set.tChgStop(v)
+                            }
                             disabled={disabled}
                         />
                         °C
@@ -106,15 +110,13 @@ export default ({
                 </div>
                 <Slider
                     values={internalChipThermal}
-                    range={npmDevice.getChargerChipThermalRange()}
+                    range={chargerModule.ranges.chipThermal}
                     onChange={[0, 1].map(i => v => updateInternal(i, v))}
                     onChangeComplete={() => {
                         if (internalChipThermal[1] !== charger.tChgStop)
-                            npmDevice.setChargerTChgStop(
-                                internalChipThermal[1]
-                            );
+                            chargerModule.set.tChgStop(internalChipThermal[1]);
                         if (internalChipThermal[0] !== charger.tChgResume)
-                            npmDevice.setChargerTChgResume(
+                            chargerModule.set.tChgResume(
                                 internalChipThermal[0]
                             );
                     }}

@@ -9,6 +9,7 @@ import {
     Card,
     classNames,
     Dropdown,
+    DropdownItem,
     NumberInput,
     StateSelector,
     Toggle,
@@ -16,55 +17,63 @@ import {
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    GPIOValues,
+    nPM2100GPIOControlMode,
+    nPM2100GPIOControlModeValues,
+    nPM2100GPIOControlPinSelect,
+    nPM2100GPIOControlPinSelectValues,
+    nPM2100LdoModeControl,
+    nPM2100LdoModeControlValues,
+    nPM2100LDOSoftStart,
+    nPM2100LDOSoftStartValues,
+    nPM2100LoadSwitchSoftStart,
+    nPM2100LoadSwitchSoftStartValues,
+} from '../../../features/pmicControl/npm/npm2100/types';
+import {
     Ldo,
+    LdoModule,
     LdoOnOffControl,
     LdoOnOffControlValues,
-    NpmDevice,
-    SoftStart,
+    Npm1300LoadSwitchSoftStart,
     SoftStartValues,
 } from '../../../features/pmicControl/npm/types';
 
 interface LdoCardProperties {
-    index: number;
-    npmDevice: NpmDevice;
     ldo: Ldo;
+    ldoModule: LdoModule;
     cardLabel?: string;
     disabled: boolean;
     defaultSummary?: boolean;
 }
 
-const softStartItems = SoftStartValues.map(item => ({
-    label: `${item} mA`,
-    value: `${item}`,
-}));
+const genDropdownItems = <V,>(values: V[]) =>
+    values.map(value => ({
+        value,
+        label: value,
+    }));
+
+const findSelectedIndex = <T,>(items: DropdownItem<T>[], value: T) =>
+    items[
+        Math.max(
+            0,
+            items.findIndex(item => item.value === value)
+        ) ?? 0
+    ];
 
 export default ({
-    index,
-    npmDevice,
     ldo,
-    cardLabel = `Load Switch/LDO ${index + 1}`,
+    ldoModule,
+    cardLabel = `Load Switch/LDO ${ldoModule.index + 1}`,
     defaultSummary = false,
     disabled,
 }: LdoCardProperties) => {
     const [summary, setSummary] = useState(defaultSummary);
 
-    const card = `ldo${index + 1}`;
-    const range = npmDevice.getLdoVoltageRange(index);
+    const card = `ldo${ldoModule.index + 1}`;
+    const range = ldoModule.ranges.voltage;
 
     const [internalVLdo, setInternalVLdo] = useState(ldo.voltage);
 
     const modeItems = ['LDO', 'Load Switch'];
-
-    const numberOfGPIOs = npmDevice.getNumberOfGPIOs() ?? 0;
-    const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
-
-    const LdoOnOffControlItems = [...LdoOnOffControlValues, ...gpioNames].map(
-        item => ({
-            label: item,
-            value: item,
-        })
-    );
 
     // NumberInputSliderWithUnit do not use ldo.<prop> as value as we send only at on change complete
     useEffect(() => {
@@ -83,9 +92,7 @@ export default ({
                         <Toggle
                             label="Enable"
                             isToggled={ldo.enabled}
-                            onToggle={value =>
-                                npmDevice.setLdoEnabled(index, value)
-                            }
+                            onToggle={value => ldoModule.set.enabled(value)}
                             disabled={
                                 disabled || !ldo.onOffSoftwareControlEnabled
                             }
@@ -111,10 +118,10 @@ export default ({
                 disabled={disabled}
                 items={modeItems}
                 onSelect={i =>
-                    npmDevice.setLdoMode(index, i === 0 ? 'LDO' : 'ldoSwitch')
+                    ldoModule.set.mode(i === 0 ? 'LDO' : 'Load_switch')
                 }
                 selectedItem={
-                    ldo.mode === 'ldoSwitch' ? modeItems[1] : modeItems[0]
+                    ldo.mode === 'Load_switch' ? modeItems[1] : modeItems[0]
                 }
             />
 
@@ -124,7 +131,7 @@ export default ({
                         <div>
                             <span>V</span>
                             <span className="subscript">{`OUTLDO${
-                                index + 1
+                                ldoModule.index + 1
                             }`}</span>
                         </div>
                     </DocumentationTooltip>
@@ -134,82 +141,307 @@ export default ({
                 range={range}
                 value={internalVLdo}
                 onChange={setInternalVLdo}
-                onChangeComplete={value =>
-                    npmDevice.setLdoVoltage(index, value)
-                }
+                onChangeComplete={value => ldoModule.set.voltage(value)}
                 showSlider
             />
 
             {!summary && (
                 <>
+                    <LdoSoftstart
+                        ldoModule={ldoModule}
+                        disabled={disabled}
+                        ldo={ldo}
+                        card={card}
+                    />
+                    {ldoModule.set.activeDischarge && (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="ActiveDischarge"
+                                >
+                                    Active Discharge
+                                </DocumentationTooltip>
+                            }
+                            isToggled={ldo.activeDischarge}
+                            onToggle={value => {
+                                ldoModule.set.activeDischarge?.(value);
+                            }}
+                            disabled={disabled}
+                        />
+                    )}
+
+                    <OnOffControl
+                        ldoModule={ldoModule}
+                        disabled={disabled}
+                        ldo={ldo}
+                        card={card}
+                    />
+
+                    {ldoModule.set.ocpEnabled ?? (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="OcpEnabled"
+                                >
+                                    Overcurrent Protection
+                                </DocumentationTooltip>
+                            }
+                            isToggled={ldo.ocpEnabled === true}
+                            onToggle={value =>
+                                ldoModule.set.ocpEnabled?.(value)
+                            }
+                            disabled={disabled}
+                        />
+                    )}
+                    {ldoModule.set.rampEnabled && (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="LdoRampEnabled"
+                                >
+                                    LDO Ramp
+                                </DocumentationTooltip>
+                            }
+                            isToggled={ldo.rampEnabled === true}
+                            onToggle={value =>
+                                ldoModule.set.rampEnabled?.(value)
+                            }
+                            disabled={disabled}
+                        />
+                    )}
+                    {ldoModule.set.haltEnabled && (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="HaltEnabled"
+                                >
+                                    LDO Halt
+                                </DocumentationTooltip>
+                            }
+                            isToggled={ldo.haltEnabled === true}
+                            onToggle={value =>
+                                ldoModule.set.haltEnabled?.(value)
+                            }
+                            disabled={disabled}
+                        />
+                    )}
+                </>
+            )}
+        </Card>
+    ) : null;
+};
+
+export interface LdoSoftstartAttr {
+    ldoModule: LdoModule;
+    disabled: boolean;
+    ldo: Ldo;
+    card: string;
+}
+const LdoSoftstart = ({ disabled, ldoModule, ldo, card }: LdoSoftstartAttr) => {
+    const softStartItems = SoftStartValues.map(item => ({
+        label: `${item} mA`,
+        value: `${item}`,
+    }));
+
+    const ldoSoftStartItems = genDropdownItems([...nPM2100LDOSoftStartValues]);
+
+    const loadSwitchSoftStartItems = genDropdownItems([
+        ...nPM2100LoadSwitchSoftStartValues,
+    ]);
+
+    return (
+        <>
+            {ldoModule.set.softStart ?? (
+                <Dropdown
+                    label={
+                        <DocumentationTooltip
+                            card={card}
+                            item="SoftStartCurrent"
+                        >
+                            Soft Start Current
+                        </DocumentationTooltip>
+                    }
+                    items={softStartItems}
+                    onSelect={item =>
+                        ldoModule.set.softStart?.(
+                            item.value
+                                ? (Number.parseInt(
+                                      item.value,
+                                      10
+                                  ) as Npm1300LoadSwitchSoftStart)
+                                : undefined
+                        )
+                    }
+                    selectedItem={findSelectedIndex(
+                        softStartItems,
+                        ldo.softStart?.toString()
+                    )}
+                    disabled={disabled || ldo.mode === 'LDO'}
+                />
+            )}
+
+            {(ldoModule.set.ldoSoftstart && ldo.mode === 'LDO') ?? (
+                <Dropdown
+                    label={
+                        <DocumentationTooltip
+                            card={card}
+                            item="SoftStartCurrent"
+                        >
+                            LDO Soft Start Current
+                        </DocumentationTooltip>
+                    }
+                    items={ldoSoftStartItems}
+                    onSelect={item =>
+                        ldoModule.set.ldoSoftstart?.(
+                            item.value as nPM2100LDOSoftStart
+                        )
+                    }
+                    // TODO: Get default from npm device implementation
+                    selectedItem={findSelectedIndex(
+                        ldoSoftStartItems,
+                        ldo.ldoSoftStart
+                    )}
+                    disabled={disabled}
+                />
+            )}
+
+            {ldoModule.set.loadSwitchSoftstart &&
+                ldo.mode === 'Load_switch' && (
                     <Dropdown
                         label={
                             <DocumentationTooltip
                                 card={card}
                                 item="SoftStartCurrent"
                             >
-                                Soft Start Current
+                                Load Switch Soft Start Current
                             </DocumentationTooltip>
                         }
-                        items={softStartItems}
+                        items={loadSwitchSoftStartItems}
                         onSelect={item =>
-                            npmDevice.setLdoSoftStart(
-                                index,
-                                Number.parseInt(item.value, 10) as SoftStart
+                            ldoModule.set.loadSwitchSoftstart?.(
+                                item.value as nPM2100LoadSwitchSoftStart
                             )
                         }
-                        selectedItem={
-                            softStartItems[
-                                Math.max(
-                                    0,
-                                    softStartItems.findIndex(
-                                        item =>
-                                            item.value ===
-                                            ldo.softStart.toString()
-                                    )
-                                ) ?? 0
-                            ]
-                        }
-                        disabled={disabled || ldo.mode === 'LDO'}
-                    />
-                    <Toggle
-                        label={
-                            <DocumentationTooltip
-                                card={card}
-                                item="ActiveDischarge"
-                            >
-                                Active Discharge
-                            </DocumentationTooltip>
-                        }
-                        isToggled={ldo.activeDischarge}
-                        onToggle={value =>
-                            npmDevice.setLdoActiveDischarge(index, value)
-                        }
+                        selectedItem={findSelectedIndex(
+                            loadSwitchSoftStartItems,
+                            ldo.loadSwitchSoftStart
+                        )}
                         disabled={disabled}
                     />
-                    <Dropdown
-                        label="On/Off Control"
-                        items={LdoOnOffControlItems}
-                        onSelect={item => {
-                            npmDevice.setLdoOnOffControl(
-                                index,
-                                item.value as LdoOnOffControl
-                            );
-                        }}
-                        selectedItem={
-                            LdoOnOffControlItems[
-                                Math.max(
-                                    0,
-                                    LdoOnOffControlItems.findIndex(
-                                        item => item.value === ldo.onOffControl
-                                    )
-                                ) ?? 0
-                            ]
-                        }
-                        disabled={disabled}
-                    />
-                </>
+                )}
+        </>
+    );
+};
+
+interface OnOffControlAttrs {
+    ldoModule: LdoModule;
+    disabled: boolean;
+    ldo: Ldo;
+    card: string;
+}
+const OnOffControl = ({
+    ldoModule,
+    disabled,
+    ldo,
+    card,
+}: OnOffControlAttrs) => {
+    const ldoOnOffControlItems = genDropdownItems([...LdoOnOffControlValues]);
+
+    const ldoModeControllItems = genDropdownItems([
+        ...nPM2100LdoModeControlValues,
+    ]);
+
+    const ldoModePinModeItems = genDropdownItems([
+        ...nPM2100GPIOControlModeValues,
+    ]);
+
+    const ldoModePinSelectItems = genDropdownItems([
+        ...nPM2100GPIOControlPinSelectValues,
+    ]);
+
+    return (
+        <>
+            {ldoModule.set.onOffControl ?? (
+                <Dropdown
+                    label="On/Off Control"
+                    items={ldoOnOffControlItems}
+                    onSelect={item => {
+                        ldoModule.set.onOffControl?.(
+                            item.value as LdoOnOffControl
+                        );
+                    }}
+                    selectedItem={findSelectedIndex(
+                        ldoOnOffControlItems,
+                        ldo.onOffControl
+                    )}
+                    disabled={disabled}
+                />
             )}
-        </Card>
-    ) : null;
+
+            {ldoModule.set.modeControl && (
+                <Dropdown
+                    label={
+                        <DocumentationTooltip card={card} item="ModeControl">
+                            Mode Control
+                        </DocumentationTooltip>
+                    }
+                    items={ldoModeControllItems}
+                    onSelect={item =>
+                        ldoModule.set.modeControl?.(
+                            item.value as nPM2100LdoModeControl
+                        )
+                    }
+                    selectedItem={findSelectedIndex(
+                        ldoModeControllItems,
+                        ldo.modeControl
+                    )}
+                    disabled={disabled}
+                />
+            )}
+            {ldoModule.set.pinMode && (
+                <Dropdown
+                    label={
+                        <DocumentationTooltip card={card} item="PinMode">
+                            Pin Mode
+                        </DocumentationTooltip>
+                    }
+                    items={ldoModePinModeItems}
+                    onSelect={item =>
+                        ldoModule.set.pinMode?.(
+                            item.value as nPM2100GPIOControlMode
+                        )
+                    }
+                    selectedItem={findSelectedIndex(
+                        ldoModePinModeItems,
+                        ldo.pinMode
+                    )}
+                    disabled={disabled}
+                />
+            )}
+            {ldoModule.set.pinSel && (
+                <Dropdown
+                    label={
+                        <DocumentationTooltip card={card} item="PinSelect">
+                            Pin Select
+                        </DocumentationTooltip>
+                    }
+                    items={ldoModePinSelectItems}
+                    onSelect={item =>
+                        ldoModule.set.pinSel?.(
+                            item.value as nPM2100GPIOControlPinSelect
+                        )
+                    }
+                    selectedItem={findSelectedIndex(
+                        ldoModePinSelectItems,
+                        ldo.pinSel
+                    )}
+                    disabled={disabled}
+                />
+            )}
+        </>
+    );
 };

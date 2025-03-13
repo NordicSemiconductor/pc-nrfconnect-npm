@@ -5,17 +5,16 @@
  */
 
 import {
-    GPIODriveValues,
-    GPIOModeValues,
-    GPIOPullValues,
     LEDModeValues,
+    npm1300TimerMode,
+    npm1300TimeToActive,
     NTCThermistor,
     PmicDialog,
     POFPolarityValues,
     SoftStartValues,
-    TimerModeValues,
     TimerPrescalerValues,
 } from '../../types';
+import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
 import {
     helpers,
     PMIC_1300_BUCKS,
@@ -37,7 +36,8 @@ describe('PMIC 1300 - Setters Online tests', () => {
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
-        mockOnShipUpdate,
+        mockOnLowPowerUpdate,
+        mockOnResetUpdate,
         mockEnqueueRequest,
         mockOnUsbPower,
         pmic,
@@ -51,7 +51,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
         test('Set setChargerVTerm', async () => {
-            await pmic.setChargerVTerm(3.2);
+            await pmic.chargerModule?.set.vTerm(3.2);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
@@ -75,7 +75,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerIChg', async () => {
-            await pmic.setChargerIChg(32);
+            await pmic.chargerModule?.set.iChg(32);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
@@ -99,7 +99,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerBatLim', async () => {
-            await pmic.setChargerBatLim(1000);
+            await pmic.chargerModule?.set.batLim(1000);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
@@ -123,7 +123,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerVTrickleFast', async () => {
-            await pmic.setChargerVTrickleFast(2.5);
+            await pmic.chargerModule?.set.vTrickleFast(2.5);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger trickle_voltage set 2500`,
@@ -134,7 +134,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerITerm', async () => {
-            await pmic.setChargerITerm('10%');
+            await pmic.chargerModule?.set.iTerm('10%');
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger termination_current set 10`,
@@ -147,7 +147,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'Set setChargerEnabledRecharging enabled: %p',
             async enabled => {
-                await pmic.setChargerEnabledRecharging(enabled);
+                await pmic.chargerModule?.set.enabledRecharging(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -165,7 +165,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'Set setChargerEnabledVBatLow enabled: %p',
             async enabled => {
-                await pmic.setChargerEnabledVBatLow(enabled);
+                await pmic.chargerModule?.set.enabledVBatLow(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -183,7 +183,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'Set setChargerEnabled enabled: %p',
             async enabled => {
-                await pmic.setChargerEnabled(enabled);
+                await pmic.chargerModule?.set.enabled(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -217,7 +217,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         ] as { mode: NTCThermistor; cliMode: number; beta: number }[])(
             'Set setChargerNTCThermistor - auto beta - %p',
             async ({ mode, cliMode, beta }) => {
-                await pmic.setChargerNTCThermistor(mode, true);
+                await pmic.chargerModule?.set.nTCThermistor(mode, true);
 
                 // turn off charging
                 expect(mockEnqueueRequest).toBeCalledTimes(4);
@@ -272,7 +272,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         ] as { mode: NTCThermistor; cliMode: number; beta: number }[])(
             'Set setChargerNTCThermistor - manual beta %p',
             async ({ mode, cliMode }) => {
-                await pmic.setChargerNTCThermistor(mode, false);
+                await pmic.chargerModule?.set.nTCThermistor(mode, false);
 
                 // turn off charging
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -294,7 +294,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setChargerNTCBeta', async () => {
-            await pmic.setChargerNTCBeta(3380);
+            await pmic.chargerModule?.set.nTCBeta(3380);
 
             // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -315,7 +315,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTChgResume', async () => {
-            await pmic.setChargerTChgResume(90);
+            await pmic.chargerModule?.set.tChgResume(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger die_temp resume set 90`,
@@ -326,7 +326,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTChgStop', async () => {
-            await pmic.setChargerTChgStop(90);
+            await pmic.chargerModule?.set.tChgStop(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger die_temp stop set 90`,
@@ -337,7 +337,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCold', async () => {
-            await pmic.setChargerTCold(90);
+            await pmic.chargerModule?.set.tCold(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger ntc_temperature cold set 90`,
@@ -348,7 +348,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCool', async () => {
-            await pmic.setChargerTCool(90);
+            await pmic.chargerModule?.set.tCool(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger ntc_temperature cool set 90`,
@@ -359,7 +359,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTWarm', async () => {
-            await pmic.setChargerTWarm(90);
+            await pmic.chargerModule?.set.tWarm(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger ntc_temperature warm set 90`,
@@ -370,7 +370,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTHot', async () => {
-            await pmic.setChargerTHot(90);
+            await pmic.chargerModule?.set.tHot(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger ntc_temperature hot set 90`,
@@ -381,7 +381,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set chargerVTermR', async () => {
-            await pmic.setChargerVTermR(3.55);
+            await pmic.chargerModule?.set.vTermR(3.55);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger termination_voltage warm set 3550`,
@@ -392,7 +392,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test.each(PMIC_1300_BUCKS)('Set setBuckVOut index: %p', async index => {
-            await pmic.setBuckVOutNormal(index, 1.8);
+            await pmic.buckModule[index].set.vOutNormal(1.8);
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -418,11 +418,11 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setBuckVOut index: 1 with warning - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onCancel();
+                dialog.onCancel?.();
             });
 
             await expect(
-                pmic.setBuckVOutNormal(1, 1.6)
+                pmic.buckModule[1].set.vOutNormal(1.6)
             ).rejects.toBeUndefined();
 
             expect(mockDialogHandler).toBeCalledTimes(1);
@@ -445,7 +445,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 dialog.onConfirm();
             });
 
-            await pmic.setBuckVOutNormal(1, 1.6);
+            await pmic.buckModule[1].set.vOutNormal(1.6);
             expect(mockDialogHandler).toBeCalledTimes(1);
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -475,7 +475,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 if (dialog?.onOptional) dialog.onOptional();
             });
 
-            await pmic.setBuckVOutNormal(1, 1.6);
+            await pmic.buckModule[1].set.vOutNormal(1.6);
             expect(mockDialogHandler).toBeCalledTimes(1);
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -503,7 +503,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckRetentionVOut index: %p',
             async index => {
-                await pmic.setBuckVOutRetention(index, 1.8);
+                await pmic.buckModule[index].set.vOutRetention(1.8);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -519,7 +519,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test.each(PMIC_1300_BUCKS)('Set setBuckMode - vSet', async index => {
-            await pmic.setBuckMode(index, 'vSet');
+            await pmic.buckModule[index].set.mode('vSet');
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -545,11 +545,11 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setBuckMode index: 1 with software - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onCancel();
+                dialog.onCancel?.();
             });
 
             await expect(
-                pmic.setBuckMode(1, 'software')
+                pmic.buckModule[1].set.mode('software')
             ).rejects.toBeUndefined();
 
             expect(mockDialogHandler).toBeCalledTimes(1);
@@ -563,7 +563,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 dialog.onConfirm();
             });
 
-            await pmic.setBuckMode(1, 'software');
+            await pmic.buckModule[1].set.mode('software');
             expect(mockDialogHandler).toBeCalledTimes(1);
 
             // on cancel we should update ui
@@ -594,7 +594,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 if (dialog.onOptional) dialog.onOptional();
             });
 
-            await pmic.setBuckMode(1, 'software');
+            await pmic.buckModule[1].set.mode('software');
             expect(mockDialogHandler).toBeCalledTimes(1);
 
             // on cancel we should update ui
@@ -623,7 +623,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckModeControl index: %p',
             async index => {
-                await pmic.setBuckModeControl(index, 'GPIO2');
+                await pmic.buckModule[index].set.modeControl('GPIO2');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -641,7 +641,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckOnOffControl index: %p',
             async index => {
-                await pmic.setBuckOnOffControl(index, 'GPIO2');
+                await pmic.buckModule[index].set.onOffControl('GPIO2');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -659,7 +659,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckRetentionControl index: %p',
             async index => {
-                await pmic.setBuckRetentionControl(index, 'GPIO2');
+                await pmic.buckModule[index].set.retentionControl('GPIO2');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -677,7 +677,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckEnabled index: %p',
             async index => {
-                await pmic.setBuckEnabled(index, true);
+                await pmic.buckModule[index].set.enabled(true);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -696,7 +696,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckActiveDischargeEnabled index: %p',
             async index => {
-                await pmic.setBuckActiveDischarge(index, true);
+                await pmic.buckModule[index].set.activeDischarge(true);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -714,10 +714,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setBuckEnabled index: 1 false - cancel', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onCancel();
+                dialog.onCancel?.();
             });
 
-            await expect(pmic.setBuckEnabled(1, false)).rejects.toBeUndefined();
+            await expect(
+                pmic.buckModule[1].set.enabled(false)
+            ).rejects.toBeUndefined();
             expect(mockDialogHandler).toBeCalledTimes(1);
 
             // No need to request UI update
@@ -734,7 +736,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 dialog.onConfirm();
             });
 
-            await pmic.setBuckEnabled(1, false);
+            await pmic.buckModule[1].set.enabled(false);
             expect(mockDialogHandler).toBeCalledTimes(1);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -757,7 +759,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 if (dialog.onOptional) dialog.onOptional();
             });
 
-            await pmic.setBuckEnabled(1, false);
+            await pmic.buckModule[1].set.enabled(false);
             expect(mockDialogHandler).toBeCalledTimes(1);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -782,7 +784,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     }
                 );
 
-                await pmic.setLdoVoltage(index, 1);
+                await pmic.ldoModule[index].set.voltage(1);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -813,7 +815,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setLdoEnabled %p', async ({ index, enabled }) => {
-            await pmic.setLdoEnabled(index, enabled);
+            await pmic.ldoModule[index].set.enabled(enabled);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -846,7 +848,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     }
                 );
 
-            await pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO');
+            await pmic.ldoModule[index].set.mode(
+                mode === 0 ? 'Load_switch' : 'LDO'
+            );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -868,7 +872,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                         dialog.onConfirm();
                     }
                 );
-                await pmic.setLdoMode(index, 'LDO');
+                await pmic.ldoModule[index].set.mode('LDO');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -891,7 +895,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                         if (dialog.onOptional) dialog.onOptional();
                     }
                 );
-                await pmic.setLdoMode(index, 'LDO');
+                await pmic.ldoModule[index].set.mode('LDO');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -911,11 +915,11 @@ describe('PMIC 1300 - Setters Online tests', () => {
             async index => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
-                        dialog.onCancel();
+                        dialog.onCancel?.();
                     }
                 );
                 await expect(
-                    pmic.setLdoMode(index, 'LDO')
+                    pmic.ldoModule[index].set.mode('LDO')
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(0);
@@ -931,7 +935,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setLdoSoftStart %p', async ({ index, enabled }) => {
-            await pmic.setLdoSoftStartEnabled(index, enabled);
+            await pmic.ldoModule[index].set.softStartEnabled?.(enabled);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -955,7 +959,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setLdoSoftStart %p', async ({ index, softStart }) => {
-            await pmic.setLdoSoftStart(index, softStart);
+            await pmic.ldoModule[index].set.softStart?.(softStart);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -977,7 +981,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setLdoEnabled %p', async ({ index, enabled }) => {
-            await pmic.setLdoActiveDischarge(index, enabled);
+            await pmic.ldoModule[index].set.activeDischarge?.(enabled);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -996,7 +1000,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_LDOS)(
             'Set setLdoOnOffControl index: %p',
             async index => {
-                await pmic.setLdoOnOffControl(index, 'GPIO2');
+                await pmic.ldoModule[index].set.onOffControl?.('GPIO2');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -1020,7 +1024,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioMode index: %p', async ({ index, mode, modeIndex }) => {
-            await pmic.setGpioMode(index, mode);
+            await pmic.gpioModule[index].set.mode(mode);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1043,7 +1047,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioPull index: %p', async ({ index, pull, pullIndex }) => {
-            await pmic.setGpioPull(index, pull);
+            await pmic.gpioModule[index].set.pull(pull);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1065,7 +1069,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioDrive index: %p', async ({ index, drive }) => {
-            await pmic.setGpioDrive(index, drive);
+            await pmic.gpioModule[index].set.drive(drive);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1087,7 +1091,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioDebounce index: %p', async ({ index, debounce }) => {
-            await pmic.setGpioDebounce(index, debounce);
+            await pmic.gpioModule[index].set.debounce(debounce);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1111,7 +1115,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )('Set setGpioOpenDrain index: %p', async ({ index, openDrain }) => {
-            await pmic.setGpioOpenDrain(index, openDrain);
+            await pmic.gpioModule[index].set.openDrain(openDrain);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1151,7 +1155,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test.each([true, false])('Set pof enable %p', async enable => {
-            await pmic.setPOFEnabled(enable);
+            await pmic.pofModule?.set.enabled(enable);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1166,7 +1170,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set pof threshold', async () => {
-            await pmic.setPOFThreshold(3);
+            await pmic.pofModule?.set.threshold(3);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1183,7 +1187,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(
             POFPolarityValues.map((polarity, index) => ({ polarity, index }))
         )('Set pof polarity %p', async ({ polarity, index }) => {
-            await pmic.setPOFPolarity(polarity);
+            await pmic.pofModule?.set.polarity(polarity);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1197,23 +1201,27 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnPOFUpdate).toBeCalledTimes(0);
         });
 
-        test.each(TimerModeValues.map((mode, index) => ({ mode, index })))(
-            'Set timer config mode %p',
-            async ({ mode, index }) => {
-                await pmic.setTimerConfigMode(mode);
+        test.each(
+            Object.keys(npm1300TimerMode).map((modeKey, index) => ({
+                modeKey,
+                index,
+            }))
+        )('Set timer config mode %p', async ({ modeKey, index }) => {
+            const mode =
+                npm1300TimerMode[modeKey as keyof typeof npm1300TimerMode];
+            await pmic.timerConfigModule?.set.mode(mode);
 
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx timer config mode set ${index}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npmx timer config mode set ${index}`,
+                expect.anything(),
+                undefined,
+                true
+            );
 
-                // Updates should only be emitted when we get response
-                expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-            }
-        );
+            // Updates should only be emitted when we get response
+            expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
+        });
 
         test.each(
             TimerPrescalerValues.map((prescaler, index) => ({
@@ -1221,7 +1229,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 index,
             }))
         )('Set timer config mode %p', async ({ prescaler, index }) => {
-            await pmic.setTimerConfigPrescaler(prescaler);
+            await pmic.timerConfigModule?.set.prescaler!(prescaler);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1236,7 +1244,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set timer config compare %p', async () => {
-            await pmic.setTimerConfigCompare(1000);
+            await pmic.timerConfigModule?.set.period(1000);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1251,7 +1259,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set ship config time %p', async () => {
-            await pmic.setShipModeTimeToActive(16);
+            await pmic.lowPowerModule?.set.timeToActive(
+                npm1300TimeToActive['16ms']
+            );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1262,11 +1272,11 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnShipUpdate).toBeCalledTimes(0);
+            expect(mockOnLowPowerUpdate).toBeCalledTimes(0);
         });
 
         test('Set ship reset longpress two_button', async () => {
-            await pmic.setShipLongPressReset('two_button');
+            await pmic.resetModule?.set.longPressReset?.('two_button');
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1277,13 +1287,13 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnShipUpdate).toBeCalledTimes(0);
+            expect(mockOnResetUpdate).toBeCalledTimes(0);
         });
 
         test.each([true, false])(
             'Set setFuelGaugeEnabled enabled: %p',
             async enabled => {
-                await pmic.setFuelGaugeEnabled(enabled);
+                await pmic.fuelGaugeModule?.set.enabled(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -1299,7 +1309,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setActiveBatteryModel', async () => {
-            await pmic.setActiveBatteryModel('someProfileName');
+            await pmic.fuelGaugeModule?.set.activeBatteryModel(
+                'someProfileName'
+            );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -1316,7 +1328,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'startBatteryStatusCheck enabled: %p',
             async enabled => {
-                await pmic.setBatteryStatusCheckEnabled(enabled);
+                await pmic.fuelGaugeModule?.set.batteryStatusCheckEnabled(
+                    enabled
+                );
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -1329,7 +1343,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set vBusinCurrentLimiter', async () => {
-            await pmic.setVBusinCurrentLimiter(5);
+            await pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(5);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1354,7 +1368,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
         test('Set setChargerVTerm onError case 1 - Fail immediately', async () => {
-            await expect(pmic.setChargerVTerm(3.2)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.vTerm(3.2)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
@@ -1390,7 +1406,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerVTerm(3.2)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.vTerm(3.2)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
@@ -1423,7 +1441,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerIChg onError case 1 - Fail immediately', async () => {
-            await expect(pmic.setChargerIChg(32)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.iChg(32)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
@@ -1459,7 +1479,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerIChg(32)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.iChg(32)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
@@ -1492,7 +1514,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerBatLim onError case 1 - Fail immediately', async () => {
-            await expect(pmic.setChargerBatLim(1000)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.batLim(1000)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
@@ -1528,7 +1552,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerBatLim(1000)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.batLim(1000)
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
@@ -1562,7 +1588,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setChargerVTrickleFast onError case 1 - Fail immediately', async () => {
             await expect(
-                pmic.setChargerVTrickleFast(2.5)
+                pmic.chargerModule?.set.vTrickleFast(2.5)
             ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
@@ -1601,7 +1627,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             await expect(
-                pmic.setChargerVTrickleFast(2.5)
+                pmic.chargerModule?.set.vTrickleFast(2.5)
             ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
@@ -1637,7 +1663,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerITerm  onError case 1 - Fail immediately', async () => {
-            await expect(pmic.setChargerITerm('10%')).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.iTerm('10%')
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: '10%' });
@@ -1672,7 +1700,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerITerm('10%')).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.iTerm('10%')
+            ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: '10%' });
@@ -1708,7 +1738,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerEnabledRecharging - Fail immediately -  enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setChargerEnabledRecharging(enabled)
+                    pmic.chargerModule?.set.enabledRecharging(enabled)
                 ).rejects.toBeUndefined();
 
                 // turn off recharge
@@ -1736,7 +1766,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerEnableVBatLow - Fail immediately -  enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setChargerEnabledVBatLow(enabled)
+                    pmic.chargerModule?.set.enabledVBatLow(enabled)
                 ).rejects.toBeUndefined();
 
                 // turn off vbatlow
@@ -1785,7 +1815,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setChargerNTCThermistor(mode)
+                    pmic.chargerModule?.set.nTCThermistor(mode)
                 ).rejects.toBeUndefined();
 
                 // turn chance ntc thermistor
@@ -1820,7 +1850,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerNTCThermistor - Fail immediately - mode: %p',
             async mode => {
                 await expect(
-                    pmic.setChargerNTCThermistor(mode)
+                    pmic.chargerModule?.set.nTCThermistor(mode)
                 ).rejects.toBeUndefined();
 
                 // turn chance ntc thermistor
@@ -1853,7 +1883,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setChargerNTCBeta - Fail immediately : %p', async () => {
-            await expect(pmic.setChargerNTCBeta(3380)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.nTCBeta(3380)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1879,7 +1911,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess
             );
 
-            await expect(pmic.setChargerNTCBeta(3380)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.nTCBeta(3380)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1912,7 +1946,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerEnabled - Fail immediately - enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setChargerEnabled(enabled)
+                    pmic.chargerModule?.set.enabled(enabled)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -1939,7 +1973,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setChargerTChgResume - Fail immediately', async () => {
-            await expect(pmic.setChargerTChgResume(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tChgResume(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1964,7 +2000,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTChgStop - Fail immediately', async () => {
-            await expect(pmic.setChargerTChgStop(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tChgStop(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -1989,7 +2027,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCold - Fail immediately', async () => {
-            await expect(pmic.setChargerTCold(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tCold(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2014,7 +2054,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCool - Fail immediately', async () => {
-            await expect(pmic.setChargerTCool(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tCool(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2039,7 +2081,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTWarm - Fail immediately', async () => {
-            await expect(pmic.setChargerTWarm(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tWarm(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2064,7 +2108,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTHot - Fail immediately', async () => {
-            await expect(pmic.setChargerTHot(90)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.tHot(90)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2089,7 +2135,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerVTermR - Fail immediately', async () => {
-            await expect(pmic.setChargerVTermR(3.55)).rejects.toBeUndefined();
+            await expect(
+                pmic.chargerModule?.set.vTermR(3.55)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
@@ -2117,7 +2165,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckVOut - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setBuckVOutNormal(index, 1.8)
+                    pmic.buckModule[index].set.vOutNormal(1.8)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2151,7 +2199,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setBuckVOutNormal(index, 1.8)
+                    pmic.buckModule[index].set.vOutNormal(1.8)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(3);
@@ -2190,7 +2238,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckRetentionVOut - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setBuckVOutRetention(index, 1.7)
+                    pmic.buckModule[index].set.vOutRetention(1.7)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2220,7 +2268,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckMode - Fail immediately - vSet',
             async index => {
                 await expect(
-                    pmic.setBuckMode(index, 'vSet')
+                    pmic.buckModule[index].set.mode('vSet')
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2250,7 +2298,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckModeControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setBuckModeControl(index, 'GPIO2')
+                    pmic.buckModule[index].set.modeControl('GPIO2')
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2280,7 +2328,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckOnOffControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setBuckOnOffControl(index, 'GPIO2')
+                    pmic.buckModule[index].set.onOffControl('GPIO2')
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2310,7 +2358,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckRetentionControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setBuckRetentionControl(index, 'GPIO2')
+                    pmic.buckModule[index].set.retentionControl('GPIO2')
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2340,7 +2388,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckEnabled - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setBuckEnabled(index, true)
+                    pmic.buckModule[index].set.enabled(true)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2369,7 +2417,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckActiveDischargeEnabled - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setBuckActiveDischarge(index, true)
+                    pmic.buckModule[index].set.activeDischarge(true)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2404,7 +2452,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setLdoVoltage(index, 3)
+                    pmic.ldoModule[index].set.voltage(3)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(3);
@@ -2450,7 +2498,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setLdoVoltage(index, 3)
+                    pmic.ldoModule[index].set.voltage(3)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(3);
@@ -2494,7 +2542,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoEnabled - Fail immediately - %p',
             async ({ index, enabled }) => {
                 await expect(
-                    pmic.setLdoEnabled(index, enabled)
+                    pmic.ldoModule[index].set.enabled(enabled)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2540,7 +2588,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setLdoMode(index, mode === 0 ? 'ldoSwitch' : 'LDO')
+                    pmic.ldoModule[index].set.mode(
+                        mode === 0 ? 'Load_switch' : 'LDO'
+                    )
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2576,7 +2626,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoSoftStartEnabled - Fail immediately - %p',
             async ({ index, enabled }) => {
                 await expect(
-                    pmic.setLdoSoftStartEnabled(index, enabled)
+                    pmic.ldoModule[index].set.softStartEnabled?.(enabled)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2614,7 +2664,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoEnabled - Fail immediately - %p',
             async ({ index, softStart }) => {
                 await expect(
-                    pmic.setLdoSoftStart(index, softStart)
+                    pmic.ldoModule[index].set.softStart?.(softStart)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2650,7 +2700,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoEnabled - Fail immediately - %p',
             async ({ index, activeDischarge }) => {
                 await expect(
-                    pmic.setLdoActiveDischarge(index, activeDischarge)
+                    pmic.ldoModule[index].set.activeDischarge?.(activeDischarge)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2681,7 +2731,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setLdoOnOffControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.setLdoOnOffControl(index, 'GPIO2')
+                    pmic.ldoModule[index].set.onOffControl?.('GPIO2')
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2725,7 +2775,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioMode(index, mode)
+                    pmic.gpioModule[index].set.mode(mode)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2767,7 +2817,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioDrive(index, drive)
+                    pmic.gpioModule[index].set.drive(drive)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2810,7 +2860,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioPull(index, pull)
+                    pmic.gpioModule[index].set.pull(pull)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2852,7 +2902,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioDebounce(index, debounce)
+                    pmic.gpioModule[index].set.debounce(debounce)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2896,7 +2946,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setGpioOpenDrain(index, openDrain)
+                    pmic.gpioModule[index].set.openDrain(openDrain)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -2976,7 +3026,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setPOFEnabled(enable)
+                    pmic.pofModule?.set.enabled(enable)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3013,7 +3063,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setPOFPolarity(polarity)
+                    pmic.pofModule?.set.polarity(polarity)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3043,7 +3093,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 dialog.onConfirm();
             });
 
-            await expect(pmic.setPOFThreshold(2.7)).rejects.toBeUndefined();
+            await expect(
+                pmic.pofModule?.set.threshold(2.7)
+            ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -3066,17 +3118,24 @@ describe('PMIC 1300 - Setters Online tests', () => {
             expect(mockOnPOFUpdate).toBeCalledTimes(0);
         });
 
-        test.each(TimerModeValues.map((mode, index) => ({ mode, index })))(
+        test.each(
+            Object.keys(npm1300TimerMode).map((modeKey, index) => ({
+                modeKey,
+                index,
+            }))
+        )(
             'Set setTimerConfigMode - Fail immediately - index: %p',
-            async ({ mode, index }) => {
+            async ({ modeKey, index }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
                     }
                 );
 
+                const mode =
+                    npm1300TimerMode[modeKey as keyof typeof npm1300TimerMode];
                 await expect(
-                    pmic.setTimerConfigMode(mode)
+                    pmic.timerConfigModule?.set.mode(mode)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3116,7 +3175,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.setTimerConfigPrescaler(prescaler)
+                    pmic.timerConfigModule?.set.prescaler!(prescaler)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3147,7 +3206,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.setTimerConfigCompare(1000)
+                pmic.timerConfigModule?.set.period(1000)
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3177,7 +3236,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.setShipModeTimeToActive(16)
+                pmic.lowPowerModule?.set.timeToActive(
+                    npm1300TimeToActive['16ms']
+                )
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3198,7 +3259,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnShipUpdate).toBeCalledTimes(0);
+            expect(mockOnLowPowerUpdate).toBeCalledTimes(0);
         });
 
         test('Set setShipLongPressReset - Fail immediately - index: %p', async () => {
@@ -3207,7 +3268,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.setShipLongPressReset('one_button')
+                pmic.resetModule?.set.longPressReset?.('one_button')
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3228,14 +3289,14 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnShipUpdate).toBeCalledTimes(0);
+            expect(mockOnLowPowerUpdate).toBeCalledTimes(0);
         });
 
         test.each([true, false])(
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.setFuelGaugeEnabled(enabled)
+                    pmic.fuelGaugeModule?.set.enabled(enabled)
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3262,7 +3323,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setActiveBatteryModel - Fail immediately', async () => {
             await expect(
-                pmic.setActiveBatteryModel('someProfileName')
+                pmic.fuelGaugeModule?.set.activeBatteryModel('someProfileName')
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -3288,7 +3349,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set vBusinCurrentLimiter - Fail immediately', async () => {
             await expect(
-                pmic.setVBusinCurrentLimiter(5)
+                pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(5)
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

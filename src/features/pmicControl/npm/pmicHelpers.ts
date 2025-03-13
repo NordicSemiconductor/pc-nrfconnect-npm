@@ -12,14 +12,16 @@ import {
 import EventEmitter from 'events';
 import { v4 as uuid } from 'uuid';
 
-import { RootState } from '../../../appReducer';
+import type { RootState } from '../../../appReducer';
 import { dequeueDialog, requestDialog } from '../pmicControlSlice';
-import {
+import type BaseNpmDevice from './basePmicDevice';
+import type {
     BatteryModel,
     BatteryModelCharacterization,
     LoggingEvent,
     PartialUpdate,
     PmicDialog,
+    SupportedErrorLogs,
 } from './types';
 
 export const noop = () => {};
@@ -65,14 +67,44 @@ export const parseLogData = (
 };
 
 // parse strings like value is: XXX mV
-export const parseColonBasedAnswer = (message: string) =>
-    message.split(':')[1]?.trim();
+export const parseColonBasedAnswer = (message: string) => {
+    const parsed = message.split(':')[1]?.trim();
+    if (parsed.endsWith('.')) {
+        return parsed.substring(0, parsed.length - 1);
+    }
+
+    return parsed;
+};
 
 export const parseToNumber = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10);
 
+export const parseToFloat = (message: string) =>
+    Number.parseFloat(parseColonBasedAnswer(message));
+
 export const parseToBoolean = (message: string) =>
     Number.parseInt(parseColonBasedAnswer(message), 10) === 1;
+
+export const parseEnabled = (message: string): boolean => {
+    const res = parseColonBasedAnswer(message).toLocaleLowerCase();
+
+    return res === 'enable' || res === 'enabled';
+};
+
+export const parseOnOff = (message: string): boolean =>
+    parseColonBasedAnswer(message).toLowerCase() === 'on';
+
+// Select the type value from a type value array, ignoring case
+// (search for 'ldo' in ['LDO','Load_switch] and find 'LDO')
+export const selectFromTypeValues = (
+    value: string,
+    typeValues: readonly string[]
+): string | undefined => {
+    const lowerCaseValue = value.toLowerCase();
+    return typeValues.find(
+        typeValue => typeValue.toLowerCase() === lowerCaseValue
+    );
+};
 
 export const parseBatteryModel = (message: string) => {
     const slot = message.split(':')[1];
@@ -96,7 +128,7 @@ export const parseBatteryModel = (message: string) => {
     let capacity: number[] = [];
     let name = '';
 
-    if (valuePairs.length !== 3) return null;
+    if (valuePairs.length <= 1) return null;
 
     valuePairs.forEach(value => {
         const pair = value.split('=');
@@ -118,14 +150,20 @@ export const parseBatteryModel = (message: string) => {
                 break;
         }
 
-        while (temperature.length > 0 && capacity.length > 0) {
-            const t = temperature.pop();
-            const q = capacity.pop();
-            if (t !== undefined && q !== undefined)
-                characterizations.push({
-                    temperature: t,
-                    capacity: q,
-                });
+        if (temperature.length > 0 && capacity.length > 0) {
+            while (temperature.length > 0 && capacity.length > 0) {
+                const t = temperature.pop();
+                const q = capacity.pop();
+                if (t !== undefined && q !== undefined)
+                    characterizations.push({
+                        temperature: t,
+                        capacity: q,
+                    });
+            }
+        } else if (capacity.length === 1) {
+            characterizations.push({
+                capacity: capacity[0],
+            });
         }
     });
 
@@ -140,7 +178,7 @@ export const toRegex = (
     command: string,
     getSet?: boolean,
     index?: number,
-    valueRegex = '[0-9]+'
+    valueRegex: string | RegExp = '[0-9]+'
 ) => {
     const indexRegex = index !== undefined ? ` ${index}` : '';
     if (getSet)
@@ -150,6 +188,26 @@ export const toRegex = (
     command = command.replaceAll(' ', '([^\\S\\r\\n])+');
     return `${command}`;
 };
+
+// Generate a regex to match a set of numbers [1,2,3] => '(1|2|3)'
+export const toValueRegex = (values: readonly unknown[]) =>
+    `(${values.join('|')})`;
+
+// Generate a regex to match a set of strings
+export const toValueRegexString = (values: readonly string[]) =>
+    `(${values.map(str => caseIgnorantRegexString(str)).join('|')})`;
+
+// Create a case ignorant regex string: 'yes' => '[yY][eE][sS]'
+export const caseIgnorantRegexString = (str: string): string =>
+    Array.from(str)
+        .map(chr =>
+            chr.match(/[a-zA-Z]/)
+                ? `[${chr.toLowerCase()}${chr.toUpperCase()}]`
+                : chr
+        )
+        .join('');
+
+export const onOffRegex = '([Oo][Nn]|[Oo][Ff][Ff])';
 
 export const dialogHandler =
     (pmicDialog: PmicDialog): AppThunk =>
@@ -169,18 +227,18 @@ export const dialogHandler =
         if (pmicDialog.cancelClosesDialog !== false) {
             const onCancel = pmicDialog.onCancel;
             pmicDialog.onCancel = () => {
-                onCancel();
+                onCancel?.();
                 dispatch(dequeueDialog());
             };
         }
 
         if (
-            pmicDialog.doNotAskAgainStoreID !== undefined &&
+            pmicDialog.doNotAskAgainStoreID !== undefined ||
             pmicDialog.onOptional
         ) {
             const onOptional = pmicDialog.onOptional;
             pmicDialog.onOptional = () => {
-                onOptional();
+                onOptional?.();
                 if (pmicDialog.optionalClosesDialog !== false) {
                     dispatch(dequeueDialog());
                 }
@@ -202,7 +260,7 @@ export const dialogHandler =
         dispatch(requestDialog(pmicDialog));
     };
 
-export const updateAdcTimings =
+export const updateNpm1300AdcTimings =
     ({
         samplingRate,
         chargingSamplingRate,
@@ -213,14 +271,18 @@ export const updateAdcTimings =
         reportInterval?: number;
     }): AppThunk<RootState> =>
     (_, getState) => {
+        const stateNotChargingSamplingRate =
+            getState().app.pmicControl.fuelGaugeSettings
+                .notChargingSamplingRate;
+        const stateChargingSamplingRate =
+            getState().app.pmicControl.fuelGaugeSettings.chargingSamplingRate ??
+            stateNotChargingSamplingRate;
         getState().app.pmicControl.npmDevice?.startAdcSample(
-            reportInterval ?? getState().app.pmicControl.fuelGaugeReportingRate,
+            reportInterval ??
+                getState().app.pmicControl.fuelGaugeSettings.reportingRate,
             getState().app.pmicControl.charger?.enabled
-                ? chargingSamplingRate ??
-                      getState().app.pmicControl.fuelGaugeChargingSamplingRate
-                : samplingRate ??
-                      getState().app.pmicControl
-                          .fuelGaugeNotChargingSamplingRate
+                ? chargingSamplingRate ?? stateChargingSamplingRate
+                : samplingRate ?? stateNotChargingSamplingRate
         );
     };
 
@@ -230,6 +292,14 @@ export const isNpm1300SerialApplicationMode = (device: Device) =>
 
 export const isNpm1300SerialRecoverMode = (device: Device) =>
     device.usb?.device.descriptor.idProduct === 0x53ac &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
+export const isNpm2100SerialApplicationMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ad &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
+export const isNpm2100SerialRecoverMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ae &&
     device.usb?.device.descriptor.idVendor === 0x1915;
 
 export const MAX_TIMESTAMP = 2 ** 32 - 1; //  2^32
@@ -249,3 +319,9 @@ export class NpmEventEmitter extends EventEmitter {
         );
     }
 }
+
+export const SupportsErrorLogs = (npmDevice: BaseNpmDevice): boolean =>
+    npmDevice.supportedErrorLogs !== undefined &&
+    Object.keys(npmDevice.supportedErrorLogs).some(
+        k => npmDevice.supportedErrorLogs?.[k as keyof SupportedErrorLogs]
+    );
