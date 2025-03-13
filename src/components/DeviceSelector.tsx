@@ -54,7 +54,7 @@ const deviceSetupConfig: DeviceSetupConfig = {
             key: 'nPM1300',
             description: '',
             hex: getAppFile(
-                path.join('fw', `app_signed_${npm1300FWVersion}.hex`)
+                path.join('fw', `app_signed_nPM1300_${npm1300FWVersion}.hex`)
             ),
         }),
         npm2100DeviceSetup({
