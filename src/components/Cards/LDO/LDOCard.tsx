@@ -268,10 +268,12 @@ const LdoSoftstart = ({ disabled, ldoModule, ldo, card }: LdoSoftstartAttr) => {
                     items={softStartItems}
                     onSelect={item =>
                         ldoModule.set.softStart?.(
-                            Number.parseInt(
-                                item.value as string,
-                                10
-                            ) as Npm1300LoadSwitchSoftStart
+                            item.value
+                                ? (Number.parseInt(
+                                      item.value,
+                                      10
+                                  ) as Npm1300LoadSwitchSoftStart)
+                                : undefined
                         )
                     }
                     selectedItem={findSelectedIndex(
