@@ -96,19 +96,15 @@ export default () => {
             if (ccProfilingState !== 'Running') {
                 pmicStep.caption = 'Waiting on shell';
                 pmicStep.state = 'active';
-            } else {
+            } else if (npmDevice?.batteryProfiler) {
                 pmicStep.caption = [
                     { id: '1', caption: 'Profiling Battery' },
-                    ...(npmDevice?.batteryProfiler !== undefined
-                        ? [
-                              {
-                                  id: '2',
-                                  caption: 'stop profiling',
-                                  action: () =>
-                                      npmDevice?.batteryProfiler?.stopProfiling(),
-                              },
-                          ]
-                        : []),
+                    {
+                        id: '2',
+                        caption: 'stop profiling',
+                        action: () =>
+                            npmDevice?.batteryProfiler?.stopProfiling(),
+                    },
                 ];
                 pmicStep.state = 'warning';
             }
