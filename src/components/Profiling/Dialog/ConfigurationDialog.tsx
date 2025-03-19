@@ -153,7 +153,11 @@ export default ({
             closeOnEsc={false}
             footer={
                 <>
-                    <DialogButton variant="primary" onClick={onSelectFolder}>
+                    <DialogButton
+                        variant="primary"
+                        onClick={onSelectFolder}
+                        disabled={showValidationError}
+                    >
                         Select folder
                     </DialogButton>
 
