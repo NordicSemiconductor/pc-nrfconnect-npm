@@ -14,8 +14,8 @@ import {
     LdoMode,
     LdoOnOffControl,
     LdoOnOffControlValues,
-    Npm1300LoadSwitchSoftStart,
     PmicDialog,
+    SoftStart,
 } from '../../types';
 import { LdoGet } from './ldoGet';
 
@@ -231,7 +231,7 @@ export class LdoSet {
         });
     }
 
-    softStart(softStart: Npm1300LoadSwitchSoftStart) {
+    softStart(softStart: SoftStart) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(

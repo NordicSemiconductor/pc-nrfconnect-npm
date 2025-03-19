@@ -23,18 +23,12 @@ import {
     nPM2100GPIOControlPinSelectValues,
     nPM2100LdoModeControl,
     nPM2100LdoModeControlValues,
-    nPM2100LDOSoftStart,
-    nPM2100LDOSoftStartValues,
-    nPM2100LoadSwitchSoftStart,
-    nPM2100LoadSwitchSoftStartValues,
 } from '../../../features/pmicControl/npm/npm2100/types';
 import {
     Ldo,
     LdoModule,
     LdoOnOffControl,
     LdoOnOffControlValues,
-    Npm1300LoadSwitchSoftStart,
-    SoftStartValues,
 } from '../../../features/pmicControl/npm/types';
 
 interface LdoCardProperties {
@@ -241,101 +235,51 @@ export interface LdoSoftstartAttr {
     ldo: Ldo;
     card: string;
 }
-const LdoSoftstart = ({ disabled, ldoModule, ldo, card }: LdoSoftstartAttr) => {
-    const softStartItems = SoftStartValues.map(item => ({
-        label: `${item} mA`,
-        value: `${item}`,
-    }));
 
-    const ldoSoftStartItems = genDropdownItems([...nPM2100LDOSoftStartValues]);
-
-    const loadSwitchSoftStartItems = genDropdownItems([
-        ...nPM2100LoadSwitchSoftStartValues,
-    ]);
-
-    return (
-        <>
-            {ldoModule.set.softStart ?? (
-                <Dropdown
-                    label={
-                        <DocumentationTooltip
-                            card={card}
-                            item="SoftStartCurrent"
-                        >
+const LdoSoftstart = ({ disabled, ldoModule, ldo, card }: LdoSoftstartAttr) => (
+    <>
+        {ldoModule.values.ldoSoftstart && ldo.mode === 'LDO' && (
+            <Dropdown
+                label={
+                    <DocumentationTooltip card={card} item="SoftStartCurrent">
+                        LDO Soft Start Current
+                    </DocumentationTooltip>
+                }
+                items={ldoModule.values.ldoSoftstart}
+                onSelect={item => ldoModule.set.ldoSoftstart?.(item.value)}
+                selectedItem={
+                    ldoModule.values.ldoSoftstart?.find(
+                        item => item.value === ldo.ldoSoftStart
+                    ) ?? ldoModule.values.ldoSoftstart[0]
+                }
+                disabled={disabled}
+            />
+        )}
+        {ldoModule.set.softStart && (
+            <Dropdown
+                label={
+                    <DocumentationTooltip card={card} item="SoftStartCurrent">
+                        <>
+                            {ldoModule.set.ldoSoftstart ? 'Load Switch' : ''}{' '}
                             Soft Start Current
-                        </DocumentationTooltip>
-                    }
-                    items={softStartItems}
-                    onSelect={item =>
-                        ldoModule.set.softStart?.(
-                            item.value
-                                ? (Number.parseInt(
-                                      item.value,
-                                      10
-                                  ) as Npm1300LoadSwitchSoftStart)
-                                : undefined
-                        )
-                    }
-                    selectedItem={findSelectedIndex(
-                        softStartItems,
-                        ldo.softStart?.toString()
-                    )}
-                    disabled={disabled || ldo.mode === 'LDO'}
-                />
-            )}
-
-            {(ldoModule.set.ldoSoftstart && ldo.mode === 'LDO') ?? (
-                <Dropdown
-                    label={
-                        <DocumentationTooltip
-                            card={card}
-                            item="SoftStartCurrent"
-                        >
-                            LDO Soft Start Current
-                        </DocumentationTooltip>
-                    }
-                    items={ldoSoftStartItems}
-                    onSelect={item =>
-                        ldoModule.set.ldoSoftstart?.(
-                            item.value as nPM2100LDOSoftStart
-                        )
-                    }
-                    // TODO: Get default from npm device implementation
-                    selectedItem={findSelectedIndex(
-                        ldoSoftStartItems,
-                        ldo.ldoSoftStart
-                    )}
-                    disabled={disabled}
-                />
-            )}
-
-            {ldoModule.set.loadSwitchSoftstart &&
-                ldo.mode === 'Load_switch' && (
-                    <Dropdown
-                        label={
-                            <DocumentationTooltip
-                                card={card}
-                                item="SoftStartCurrent"
-                            >
-                                Load Switch Soft Start Current
-                            </DocumentationTooltip>
-                        }
-                        items={loadSwitchSoftStartItems}
-                        onSelect={item =>
-                            ldoModule.set.loadSwitchSoftstart?.(
-                                item.value as nPM2100LoadSwitchSoftStart
-                            )
-                        }
-                        selectedItem={findSelectedIndex(
-                            loadSwitchSoftStartItems,
-                            ldo.loadSwitchSoftStart
-                        )}
-                        disabled={disabled}
-                    />
-                )}
-        </>
-    );
-};
+                        </>
+                    </DocumentationTooltip>
+                }
+                items={ldoModule.values.softstart}
+                onSelect={item => ldoModule.set.softStart(item.value)}
+                selectedItem={
+                    ldoModule.values.softstart.find(
+                        item => item.value === ldo.softStart
+                    ) ?? ldoModule.values.softstart[0]
+                }
+                disabled={
+                    disabled ||
+                    (ldo.mode === 'LDO' && !ldoModule.set.ldoSoftstart)
+                }
+            />
+        )}
+    </>
+);
 
 interface OnOffControlAttrs {
     ldoModule: LdoModule;

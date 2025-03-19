@@ -7,7 +7,7 @@
 import {
     nPM2100GPIOControlPinSelectValues,
     nPM2100LdoModeControlValues,
-    nPM2100LoadSwitchSoftStartValues,
+    nPM2100SoftStartValues,
 } from '../../types';
 import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../helpers';
 
@@ -225,7 +225,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
     describe('Load Switch soft start', () => {
         test.each(
             PMIC_2100_LDOS.map(index => [
-                ...nPM2100LoadSwitchSoftStartValues.map(value => [
+                ...nPM2100SoftStartValues.map(value => [
                     {
                         index,
                         append: `get `,
@@ -247,7 +247,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { loadSwitchSoftStart: value },
+                data: { softStart: value },
                 index,
             });
         });

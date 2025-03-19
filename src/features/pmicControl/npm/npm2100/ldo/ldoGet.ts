@@ -21,7 +21,7 @@ export class LdoGet {
         this.modeCtrl();
         this.pinSel();
         this.softStartLdo();
-        this.softStartLoadSw();
+        this.softStart();
         this.pinMode();
         this.ocp();
         this.ramp();
@@ -52,7 +52,7 @@ export class LdoGet {
         this.sendCommand(`npm2100 ldosw softstart LDO get`);
     }
 
-    softStartLoadSw() {
+    softStart() {
         this.sendCommand(`npm2100 ldosw softstart LOADSW get`);
     }
 

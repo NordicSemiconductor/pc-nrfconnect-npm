@@ -11,10 +11,10 @@ import {
     NTCThermistor,
     PmicDialog,
     POFPolarityValues,
-    SoftStartValues,
     TimerPrescalerValues,
 } from '../../types';
 import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
+import { SoftStartValues } from '../ldo/types';
 import {
     helpers,
     PMIC_1300_BUCKS,

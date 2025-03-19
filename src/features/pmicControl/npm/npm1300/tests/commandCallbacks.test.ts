@@ -16,7 +16,6 @@ import {
     NTCThermistor,
     PmicChargingState,
     POFPolarityValues,
-    SoftStartValues,
     TimerPrescalerValues,
     USBDetectStatusValues,
 } from '../../types';
@@ -26,6 +25,7 @@ import {
     GPIOModeValues,
     GPIOPullValues,
 } from '../gpio/types';
+import { SoftStartValues } from '../ldo/types';
 import {
     PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,

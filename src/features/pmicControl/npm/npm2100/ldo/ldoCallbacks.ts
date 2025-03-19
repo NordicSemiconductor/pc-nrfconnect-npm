@@ -27,8 +27,8 @@ import {
     nPM2100LdoModeControlValues,
     nPM2100LDOSoftStart,
     nPM2100LDOSoftStartValues,
-    nPM2100LoadSwitchSoftStart,
-    nPM2100LoadSwitchSoftStartValues,
+    nPM2100SoftStart,
+    nPM2100SoftStartValues,
 } from '../types';
 
 export default (
@@ -181,16 +181,16 @@ export default (
                     'npm2100 ldosw softstart LOADSW',
                     true,
                     undefined,
-                    toValueRegexString(nPM2100LoadSwitchSoftStartValues)
+                    toValueRegexString(nPM2100SoftStartValues)
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            loadSwitchSoftStart: selectFromTypeValues(
+                            softStart: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                nPM2100LoadSwitchSoftStartValues
-                            ) as nPM2100LoadSwitchSoftStart,
+                                nPM2100SoftStartValues
+                            ) as nPM2100SoftStart,
                         },
                         0
                     );

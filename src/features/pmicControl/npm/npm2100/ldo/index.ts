@@ -9,6 +9,14 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Ldo, LdoExport, LdoModule, PmicDialog } from '../../types';
+import {
+    nPM2100LDOSoftStart,
+    nPM2100LDOSoftStartKeys,
+    nPM2100LDOSoftStartValues,
+    nPM2100SoftStart,
+    nPM2100SoftStartKeys,
+    nPM2100SoftStartValues,
+} from '../types';
 import ldoCallbacks from './ldoCallbacks';
 import { LdoGet } from './ldoGet';
 import { LdoSet } from './ldoSet';
@@ -89,6 +97,21 @@ export default class Module implements LdoModule {
     get ranges(): { voltage: RangeType } {
         return {
             voltage: getLdoVoltageRange(),
+        };
+    }
+    get values(): {
+        softstart: { label: string; value: nPM2100SoftStart }[];
+        ldoSoftstart: { label: string; value: nPM2100LDOSoftStart }[];
+    } {
+        return {
+            softstart: [...nPM2100SoftStartValues].map((item, i) => ({
+                label: `${nPM2100SoftStartKeys[i]}`,
+                value: item,
+            })),
+            ldoSoftstart: [...nPM2100LDOSoftStartValues].map((item, i) => ({
+                label: `${nPM2100LDOSoftStartKeys[i]}`,
+                value: item,
+            })),
         };
     }
     get defaults(): Ldo {
