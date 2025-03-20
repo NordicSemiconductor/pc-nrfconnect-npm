@@ -8,10 +8,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
-    AppThunk,
+    AppDispatch,
     clearWaitForDevice,
     describeError,
     logger,
+    selectedVirtualDevice,
+    setCurrentPane,
+    setPaneDisabled,
+    setPaneHidden,
     setWaitForDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { ipcRenderer } from 'electron';
@@ -30,7 +34,9 @@ import {
     getPmicState,
     isSupportedVersion,
     setActiveBatterModel,
+    setBatteryAddonBoardId,
     setBatteryConnected,
+    setBoosts,
     setBucks,
     setCharger,
     setErrorLogs,
@@ -43,18 +49,26 @@ import {
     setLatestAdcSample,
     setLdos,
     setLEDs,
+    setLowPowerConfig,
     setNpmDevice,
     setPmicChargingState,
     setPmicState,
+    setPOFs,
+    setPowerId,
+    setResetConfig,
     setStoredBatterModel,
     setSupportedVersion,
+    setTimerConfig,
+    setUsbPower,
+    updateBoost,
     updateBuck,
     updateCharger,
     updateGPIOs,
     updateLdo,
     updateLEDs,
+    updateLowPowerConfig,
     updatePOFs,
-    updateShipModeConfig,
+    updateResetConfig,
     updateTimerConfig,
     updateUsbPower,
 } from '../pmicControlSlice';
@@ -69,14 +83,16 @@ import {
     dialogHandler,
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
     noop,
+    SupportsErrorLogs,
 } from './pmicHelpers';
 import { PmicDialog } from './types';
 
 export default () => {
     const [isPMICPowered, setPMICPowered] = useState(false);
+    const virtualDeviceSelected = useSelector(selectedVirtualDevice);
     const shellParser = useSelector(getShellParser);
     const npmDevice = useSelector(getNpmDeviceSlice);
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const supportedVersion = useSelector(isSupportedVersion);
     const pmicState = useSelector(getPmicState);
     const recordEvents = useSelector(getEventRecording);
@@ -88,19 +104,21 @@ export default () => {
     const preventSleepId = useRef<number | null>();
 
     useEffect(() => {
-        getNpmDevice(shellParser, pmicDialog =>
-            dispatch(dialogHandler(pmicDialog))
-        ).then(dev => dispatch(setNpmDevice(dev)));
-    }, [dispatch, shellParser]);
+        if (shellParser) {
+            getNpmDevice(shellParser, pmicDialog =>
+                dispatch(dialogHandler(pmicDialog))
+            ).then(dev => {
+                dispatch(setNpmDevice(dev));
 
-    useEffect(() => {
-        if (npmDevice) {
-            npmDevice.isSupportedVersion().then(result => {
-                dispatch(setSupportedVersion(result.supported));
+                dev.isSupportedVersion().then(result => {
+                    dispatch(setSupportedVersion(result.supported));
+                });
+                dev.isPMICPowered().then(setPMICPowered);
             });
-            npmDevice.isPMICPowered().then(setPMICPowered);
+        } else if (!virtualDeviceSelected) {
+            dispatch(setNpmDevice(undefined));
         }
-    }, [dispatch, npmDevice]);
+    }, [dispatch, shellParser, virtualDeviceSelected]);
 
     useEffect(() => {
         if (
@@ -109,32 +127,20 @@ export default () => {
             pmicState === 'pmic-connected' &&
             supportedVersion
         ) {
-            npmDevice.requestUpdate.all();
+            npmDevice.initialize();
+            npmDevice.requestUpdate();
 
             npmDevice.getHardcodedBatteryModels().then(models => {
                 dispatch(setHardcodedBatterModels(models));
             });
 
-            npmDevice.getBatteryProfiler()?.isProfiling();
-            npmDevice.setBatteryStatusCheckEnabled(true);
+            npmDevice.batteryProfiler?.isProfiling();
+            npmDevice.fuelGaugeModule?.set.batteryStatusCheckEnabled(true);
         }
     }, [dispatch, isPMICPowered, npmDevice, pmicState, supportedVersion]);
 
     useEffect(() => {
         if (npmDevice) {
-            const initComponents = () => {
-                if (!npmDevice) return;
-
-                if (npmDevice.hasCharger()) {
-                    dispatch(setCharger(npmDevice.chargerDefault()));
-                }
-
-                dispatch(setBucks(npmDevice.buckDefaults()));
-                dispatch(setLdos(npmDevice.ldoDefaults()));
-                dispatch(setGPIOs(npmDevice.gpioDefaults()));
-                dispatch(setLEDs(npmDevice.ledDefaults()));
-            };
-
             const releaseAll: (() => void)[] = [];
 
             releaseAll.push(
@@ -145,7 +151,12 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onAdcSample(sample => {
-                    dispatch(setBatteryConnected(sample.vBat > 1));
+                    dispatch(
+                        setBatteryConnected(
+                            sample.vBat >
+                                npmDevice.batteryConnectedVoltageThreshold
+                        )
+                    );
                     dispatch(setLatestAdcSample(sample));
                 })
             );
@@ -153,7 +164,7 @@ export default () => {
             releaseAll.push(
                 npmDevice.onAdcSettingsChange(settings => {
                     dispatch(setFuelGaugeReportingRate(settings.reportRate));
-                    dispatch<AppThunk<RootState>>((_, getState) => {
+                    dispatch((_, getState) => {
                         if (getState().app.pmicControl.charger?.enabled) {
                             dispatch(
                                 setFuelGaugeChargingSamplingRate(
@@ -171,28 +182,48 @@ export default () => {
                 })
             );
 
-            releaseAll.push(
-                npmDevice.onChargerUpdate(payload => {
-                    dispatch<AppThunk<RootState>>((_, getState) => {
-                        dispatch(updateCharger(payload));
-                        if (
-                            payload.enabled != null &&
-                            getState().app.profiling.ccProfilingState !==
-                                'Running'
-                        ) {
-                            npmDevice.startAdcSample(
-                                getState().app.pmicControl
-                                    .fuelGaugeReportingRate,
-                                payload.enabled
-                                    ? getState().app.pmicControl
-                                          .fuelGaugeChargingSamplingRate
-                                    : getState().app.pmicControl
-                                          .fuelGaugeNotChargingSamplingRate
-                            );
-                        }
-                    });
-                })
-            );
+            if (!npmDevice.chargerModule) {
+                dispatch((_, getState: () => RootState) => {
+                    const samplingRate =
+                        getState().app.pmicControl.fuelGaugeSettings
+                            .chargingSamplingRate ??
+                        getState().app.pmicControl.fuelGaugeSettings
+                            .notChargingSamplingRate;
+                    const reportingRate =
+                        getState().app.pmicControl.fuelGaugeSettings
+                            .reportingRate;
+
+                    npmDevice.startAdcSample(reportingRate, samplingRate);
+                });
+            } else {
+                releaseAll.push(
+                    npmDevice.onChargerUpdate(payload => {
+                        dispatch((_, getState: () => RootState) => {
+                            dispatch(updateCharger(payload));
+                            if (
+                                payload.enabled != null &&
+                                getState().app.profiling.ccProfilingState !==
+                                    'Running'
+                            ) {
+                                const notChargingSamplingRate =
+                                    getState().app.pmicControl.fuelGaugeSettings
+                                        .notChargingSamplingRate;
+                                const chargingSamplingRate =
+                                    getState().app.pmicControl.fuelGaugeSettings
+                                        .chargingSamplingRate;
+                                npmDevice.startAdcSample(
+                                    getState().app.pmicControl.fuelGaugeSettings
+                                        .reportingRate,
+                                    payload.enabled
+                                        ? chargingSamplingRate ??
+                                              notChargingSamplingRate
+                                        : notChargingSamplingRate
+                                );
+                            }
+                        });
+                    })
+                );
+            }
 
             releaseAll.push(
                 npmDevice.onFuelGaugeUpdate(payload => {
@@ -209,6 +240,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onBuckUpdate(payload => {
                     dispatch(updateBuck(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onBoostUpdate(payload => {
+                    dispatch(updateBoost(payload));
                 })
             );
 
@@ -243,8 +280,14 @@ export default () => {
             );
 
             releaseAll.push(
-                npmDevice.onShipUpdate(payload => {
-                    dispatch(updateShipModeConfig(payload));
+                npmDevice.onLowPowerUpdate(payload => {
+                    dispatch(updateLowPowerConfig(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onResetUpdate(payload => {
+                    dispatch(updateResetConfig(payload));
                 })
             );
 
@@ -257,6 +300,25 @@ export default () => {
             releaseAll.push(
                 npmDevice.onStoredBatteryModelUpdate(payload => {
                     dispatch(setStoredBatterModel(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onPowerIdUpdate(payload => {
+                    dispatch(setPowerId(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onBatteryAddonBoardIdUpdate(payload => {
+                    dispatch(setBatteryAddonBoardId(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onTimerExpiryInterrupt(payload => {
+                    console.log(`Got onTimerExpiryINterrupt with ${payload}`);
+                    dispatch(updateTimerConfig({ enabled: false }));
                 })
             );
 
@@ -292,7 +354,7 @@ export default () => {
                                 payload.completeChunks &&
                                 payload.completeChunks === payload.totalChunks
                             ) {
-                                npmDevice.applyDownloadFuelGaugeProfile(
+                                npmDevice.fuelGaugeModule?.actions.applyDownloadFuelGaugeProfile(
                                     payload.slot
                                 );
                             }
@@ -302,7 +364,7 @@ export default () => {
                                     cancelLabel: 'Abort',
                                     cancelClosesDialog: false,
                                     onCancel: () => {
-                                        npmDevice.abortDownloadFuelGaugeProfile();
+                                        npmDevice.fuelGaugeModule?.actions.abortDownloadFuelGaugeProfile();
                                     },
                                     message: (
                                         <>
@@ -402,7 +464,7 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onBeforeReboot(() => {
-                    dispatch<AppThunk>((dis, getState) => {
+                    dispatch((dis, getState) => {
                         const previousWaitForDevice =
                             getState().deviceAutoSelect.waitForDevice;
                         dis(
@@ -433,7 +495,7 @@ export default () => {
                         dispatch(clearWaitForDevice());
                     } else {
                         setPMICPowered(false);
-                        dispatch<AppThunk>((dis, getState) => {
+                        dispatch((dis, getState) => {
                             const previousWaitForDevice =
                                 getState().deviceAutoSelect.waitForDevice;
 
@@ -461,16 +523,30 @@ export default () => {
             );
 
             releaseAll.push(
-                npmDevice
-                    .getBatteryProfiler()
-                    ?.onProfilingStateChange(profiling => {
-                        dispatch(setCcProfiling(profiling));
-                    }) ?? noop
+                npmDevice.batteryProfiler?.onProfilingStateChange(profiling => {
+                    dispatch(setCcProfiling(profiling));
+                }) ?? noop
             );
 
-            dispatch(setPmicState(npmDevice.getConnectionState()));
+            dispatch(setPmicState(npmDevice.pmicState));
+            dispatch(setCharger(npmDevice.chargerModule?.defaults));
 
-            initComponents();
+            dispatch(
+                setBoosts(npmDevice.boostModule.map(boost => boost.defaults))
+            );
+            dispatch(setBucks(npmDevice.buckModule.map(buck => buck.defaults)));
+            dispatch(
+                setLdos(npmDevice.ldoModule.map(module => module.defaults))
+            );
+            dispatch(
+                setGPIOs(npmDevice.gpioModule.map(module => module.defaults))
+            );
+            dispatch(setLEDs(npmDevice.ledDefaults()));
+            dispatch(setPOFs(npmDevice.pofModule?.defaults));
+            dispatch(setLowPowerConfig(npmDevice.lowPowerModule?.defaults));
+            dispatch(setUsbPower(npmDevice.usbCurrentLimiterModule?.defaults));
+            dispatch(setTimerConfig(npmDevice.timerConfigModule?.defaults));
+            dispatch(setResetConfig(npmDevice.resetModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());
@@ -479,10 +555,7 @@ export default () => {
     }, [dispatch, npmDevice]);
 
     useEffect(() => {
-        if (
-            !npmDevice ||
-            npmDevice.getConnectionState() === 'ek-disconnected'
-        ) {
+        if (!npmDevice || npmDevice.pmicState === 'ek-disconnected') {
             return;
         }
 
@@ -596,11 +669,97 @@ export default () => {
     ]);
 
     useEffect(() => {
+        // Need to be debounced... for reasons
+        setTimeout(() => {
+            dispatch(
+                setPaneDisabled({
+                    name: 'Graph',
+                    disabled: pmicState === 'ek-disconnected',
+                })
+            );
+
+            dispatch(
+                setPaneHidden({
+                    name: 'Dashboard',
+                    hidden:
+                        !npmDevice?.chargerModule &&
+                        !npmDevice?.boostModule?.length &&
+                        !npmDevice?.buckModule?.length &&
+                        !npmDevice?.ldoModule?.length &&
+                        !npmDevice?.hasMaxEnergyExtraction?.(),
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'Graph',
+                    hidden: !npmDevice,
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'Charger',
+                    hidden: !npmDevice?.chargerModule,
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'Regulators',
+                    hidden:
+                        !npmDevice?.boostModule?.length &&
+                        !npmDevice?.buckModule?.length &&
+                        !npmDevice?.ldoModule?.length, // TODO change to use ldoModule
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'GPIOs',
+                    hidden: !npmDevice?.gpioModule?.length,
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'System Features',
+                    hidden:
+                        !npmDevice?.lowPowerModule &&
+                        !npmDevice?.resetModule &&
+                        !npmDevice?.timerConfigModule &&
+                        !npmDevice?.pofModule &&
+                        !npmDevice?.usbCurrentLimiterModule &&
+                        (!npmDevice ||
+                            (npmDevice && !SupportsErrorLogs(npmDevice))),
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'MEE',
+                    hidden: !npmDevice?.hasMaxEnergyExtraction?.(),
+                })
+            );
+            dispatch(
+                setPaneHidden({
+                    name: 'Profiles',
+                    hidden: !npmDevice?.batteryProfiler,
+                })
+            );
+
+            dispatch(
+                setPaneHidden({
+                    name: 'Welcome',
+                    hidden: !!npmDevice,
+                })
+            );
+            if (!npmDevice) {
+                dispatch(setCurrentPane('Welcome'));
+            }
+        });
+    }, [dispatch, npmDevice, pmicState]);
+
+    useEffect(() => {
         if (npmDevice) {
             const t = setInterval(() => {
-                for (let i = 0; i < npmDevice.getNumberOfBucks(); i += 1) {
+                for (let i = 0; i < npmDevice.buckModule.length; i += 1) {
                     if (bucks[i].onOffControl !== 'Off') {
-                        npmDevice.requestUpdate.buckEnabled(i);
+                        npmDevice.buckModule[i].get.enabled();
                     }
                 }
             }, 1000);

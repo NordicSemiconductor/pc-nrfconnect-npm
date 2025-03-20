@@ -13,20 +13,22 @@ import {
 import type { AutoDetectTypes } from '@serialport/bindings-cpp';
 import type { SerialPortOpenOptions } from 'serialport';
 
+import { RootState } from '../appReducer';
 import { setSerialPort } from '../features/serial/serialSlice';
 
-export const closeDevice = (): AppThunk => async (dispatch, getState) => {
-    try {
-        await getState().app.serial.serialPort?.close();
-    } catch (e) {
-        console.error(describeError(e));
-    }
+export const closeDevice =
+    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
+        try {
+            await getState().app.serial.serialPort?.close();
+        } catch (e) {
+            console.error(describeError(e));
+        }
 
-    dispatch(setSerialPort(undefined));
-};
+        dispatch(setSerialPort(undefined));
+    };
 
 export const openDevice =
-    (device: Device): AppThunk =>
+    (device: Device): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
         // Reset serial port settings
         const ports = device.serialPorts;
@@ -34,7 +36,7 @@ export const openDevice =
         if (ports) {
             const comPort = ports[0].comName; // We want to connect to vComIndex 0
             if (comPort) {
-                await dispatch(
+                dispatch(
                     setSerialPort(
                         await createSerialPort(
                             {

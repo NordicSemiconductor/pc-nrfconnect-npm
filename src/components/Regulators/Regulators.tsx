@@ -12,11 +12,13 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
+    getBoosts,
     getBucks,
     getLdos,
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
+import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
 
@@ -24,6 +26,7 @@ export default ({ active }: PaneProps) => {
     const disabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
     const bucks = useSelector(getBucks);
+    const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
 
     return active ? (
@@ -35,9 +38,18 @@ export default ({ active }: PaneProps) => {
                 bucks.map((buck, index) => (
                     <BuckCard
                         buck={buck}
-                        npmDevice={npmDevice}
+                        buckModule={npmDevice.buckModule[index]}
                         key={`Buck${1 + index}`}
-                        index={index}
+                        disabled={disabled}
+                        numberOfGPIOs={npmDevice.gpioModule.length}
+                    />
+                ))}
+            {npmDevice &&
+                boosts.map((boost, index) => (
+                    <BoostCard
+                        boost={boost}
+                        boostModule={npmDevice.boostModule[index]}
+                        key={`Boost${1 + index}`}
                         disabled={disabled}
                     />
                 ))}
@@ -45,9 +57,11 @@ export default ({ active }: PaneProps) => {
                 ldos.map((ldo, index) => (
                     <LDOCard
                         ldo={ldo}
-                        npmDevice={npmDevice}
+                        ldoModule={npmDevice.ldoModule[index]}
+                        cardLabel={
+                            ldos.length === 1 ? `Load Switch/LDO` : undefined
+                        }
                         key={`Buck${1 + index}`}
-                        index={index}
                         disabled={disabled}
                     />
                 ))}

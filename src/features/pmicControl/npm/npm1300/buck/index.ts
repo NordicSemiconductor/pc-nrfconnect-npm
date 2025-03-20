@@ -8,28 +8,25 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Buck, BuckExport, PmicDialog } from '../../types';
+import { Buck, BuckExport, BuckModule, PmicDialog } from '../../types';
 import buckCallbacks from './buckCallbacks';
-import { buckGet, buckSet } from './buckEffects';
+import { BuckGet } from './buckGet';
+import { BuckSet } from './buckSet';
 
-export const buckDefaults = (noOfBucks: number): Buck[] => {
-    const defaultBucks: Buck[] = [];
-    for (let i = 0; i < noOfBucks; i += 1) {
-        defaultBucks.push({
-            vOutNormal: getBuckVoltageRange(i).min,
-            vOutRetention: 1,
-            mode: 'vSet',
-            enabled: true,
-            modeControl: 'Auto',
-            onOffControl: 'Off',
-            onOffSoftwareControlEnabled: true,
-            retentionControl: 'Off',
-            activeDischarge: false,
-        });
-    }
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-underscore-dangle */
 
-    return defaultBucks;
-};
+const buckDefaults = (): Buck => ({
+    vOutNormal: buckVoltageRange().min,
+    vOutRetention: 1,
+    mode: 'vSet',
+    enabled: true,
+    modeControl: 'Auto',
+    onOffControl: 'Off',
+    onOffSoftwareControlEnabled: true,
+    retentionControl: 'Off',
+    activeDischarge: false,
+});
 
 export const toBuckExport = (buck: Buck): BuckExport => ({
     vOutNormal: buck.vOutNormal,
@@ -42,39 +39,68 @@ export const toBuckExport = (buck: Buck): BuckExport => ({
     activeDischarge: buck.activeDischarge,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getBuckVoltageRange = (i: number) =>
+const buckVoltageRange = () =>
     ({
         min: 1,
         max: 3.3,
         decimals: 1,
     } as RangeType);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getBuckRetVOutRange = (i: number) =>
+const buckRetVOutRange = () =>
     ({
         min: 1,
         max: 3,
         decimals: 1,
     } as RangeType);
 
-export default (
-    shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter,
-    sendCommand: (
-        command: string,
-        onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void,
-    dialogHandler: ((dialog: PmicDialog) => void) | null,
-    offlineMode: boolean,
-    noOfBucks: number
-) => ({
-    buckGet: buckGet(sendCommand),
-    buckSet: buckSet(eventEmitter, sendCommand, dialogHandler, offlineMode),
-    buckCallbacks: buckCallbacks(shellParser, eventEmitter, noOfBucks),
-    buckRanges: {
-        getBuckVoltageRange,
-        getBuckRetVOutRange,
-    },
-});
+export default class Module implements BuckModule {
+    private _get: BuckGet;
+    private _set: BuckSet;
+    private _callbacks: (() => void)[];
+    constructor(
+        readonly index: number,
+        shellParser: ShellParser | undefined,
+        eventEmitter: NpmEventEmitter,
+        sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+        offlineMode: boolean
+    ) {
+        this._get = new BuckGet(sendCommand, index);
+        this._set = new BuckSet(
+            eventEmitter,
+            sendCommand,
+            dialogHandler,
+            offlineMode,
+            index
+        );
+        this._callbacks = buckCallbacks(shellParser, eventEmitter, index);
+    }
+    get get() {
+        return this._get;
+    }
+
+    get set() {
+        return this._set;
+    }
+
+    get callbacks() {
+        return this._callbacks;
+    }
+
+    get ranges(): {
+        voltage: RangeType;
+        retVOut: RangeType;
+    } {
+        return {
+            voltage: buckVoltageRange(),
+            retVOut: buckRetVOutRange(),
+        };
+    }
+    get defaults(): Buck {
+        return buckDefaults();
+    }
+}

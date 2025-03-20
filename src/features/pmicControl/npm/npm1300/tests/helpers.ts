@@ -16,14 +16,15 @@ import {
     GPIO,
     Ldo,
     LED,
+    npm1300LowPowerConfig,
     PartialUpdate,
     PmicDialog,
     POF,
-    ShipModeConfig,
+    ResetConfig,
     TimerConfig,
     USBPower,
 } from '../../types';
-import { getNPM1300 } from '../pmic1300Device';
+import Npm1300 from '../pmic1300Device';
 
 export const PMIC_1300_BUCKS = [0, 1];
 export const PMIC_1300_LDOS = [0, 1];
@@ -38,7 +39,7 @@ export const setupMocksBase = (
         (_pmicDialog: PmicDialog) => {}
     );
 
-    const pmic = getNPM1300(shellParser, mockDialogHandler);
+    const pmic = new Npm1300(shellParser, mockDialogHandler);
 
     const mockOnActiveBatteryModelUpdate = jest.fn(() => {});
     const mockOnAdcSample = jest.fn(() => {});
@@ -74,9 +75,14 @@ export const setupMocksBase = (
         (_partialUpdate: Partial<TimerConfig>) => {}
     );
 
-    const mockOnShipUpdate = jest.fn(
+    const mockOnLowPowerUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<ShipModeConfig>) => {}
+        (_partialUpdate: Partial<npm1300LowPowerConfig>) => {}
+    );
+
+    const mockOnResetUpdate = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: Partial<ResetConfig>) => {}
     );
 
     const mockOnUsbPower = jest.fn(
@@ -103,7 +109,8 @@ export const setupMocksBase = (
     pmic.onLEDUpdate(mockOnLEDUpdate);
     pmic.onPOFUpdate(mockOnPOFUpdate);
     pmic.onTimerConfigUpdate(mockOnTimerConfigUpdate);
-    pmic.onShipUpdate(mockOnShipUpdate);
+    pmic.onLowPowerUpdate(mockOnLowPowerUpdate);
+    pmic.onResetUpdate(mockOnResetUpdate);
     pmic.onChargingStatusUpdate(mockOnChargingStatusUpdate);
     pmic.onFuelGaugeUpdate(mockOnFuelGaugeUpdate);
     pmic.onLdoUpdate(mockOnLdoUpdate);
@@ -128,7 +135,8 @@ export const setupMocksBase = (
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
-        mockOnShipUpdate,
+        mockOnLowPowerUpdate,
+        mockOnResetUpdate,
         mockOnLoggingEvent,
         mockOnPmicStateChange,
         mockOnReboot,
