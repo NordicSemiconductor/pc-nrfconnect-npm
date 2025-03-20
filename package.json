@@ -49,7 +49,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^201.0.0",
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^203.0.0",
         "chart.js": "^4.0.1",
         "chartjs-adapter-date-fns": "^2.0.1",
         "react-chartjs-2": "^5.0.1",
