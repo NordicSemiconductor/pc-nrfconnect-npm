@@ -78,6 +78,7 @@ export default abstract class BaseNpmDevice {
                   app: { pmicControl: { npmDevice: BaseNpmDevice } };
               }
     ): NpmExportLatest;
+    initialize?(): void;
 
     get deviceType() {
         return this._deviceType;
@@ -937,8 +938,4 @@ export default abstract class BaseNpmDevice {
     release() {
         this.releaseAll.forEach(release => release());
     }
-
-    // Only used in npm2100
-    // eslint-disable-next-line class-methods-use-this
-    initialize() {}
 }
