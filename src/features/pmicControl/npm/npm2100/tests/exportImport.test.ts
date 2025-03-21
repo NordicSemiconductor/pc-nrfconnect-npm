@@ -127,6 +127,8 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 softStart: 50,
                 activeDischarge: true,
                 onOffControl: 'GPIO1',
+                haltEnabled: true,
+                rampEnabled: true,
             },
             {
                 voltage: 2,
@@ -136,6 +138,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 softStart: 50,
                 activeDischarge: false,
                 onOffControl: 'GPIO2',
+                ocpEnabled: true,
             },
         ],
         gpios: [
