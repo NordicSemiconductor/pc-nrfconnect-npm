@@ -127,7 +127,7 @@ export default () => {
             pmicState === 'pmic-connected' &&
             supportedVersion
         ) {
-            npmDevice.initialize();
+            npmDevice.initialize?.();
             npmDevice.requestUpdate();
 
             npmDevice.getHardcodedBatteryModels().then(models => {
