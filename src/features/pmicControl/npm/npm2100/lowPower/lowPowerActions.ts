@@ -47,7 +47,7 @@ export class LowPowerActions {
             'npm2100 low_power_control wakeup_configure edge_polarity set RISING'
         );
         this.sendCommand(
-            'npm2100 low_power_control ship_mode_configure current set WEAK/LOW/MODERATE/HIGH'
+            'npm2100 low_power_control ship_mode_configure current set LOW'
         );
         this.sendCommand('npm2100 low_power_control ship_mode set ENABLE');
     }
