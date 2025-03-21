@@ -1,3 +1,16 @@
+## 2.0.0 - UNRELEASED
+
+### Added
+
+-   Support for the nPM2100 Evaluation Kit.
+-   Offline support with the virtual device feature.
+
+### Changed
+
+-   The default view at the application start is now a welcome screen without
+    any device-specific tabs, which are now added and removed based on the
+    selected device.
+
 ## 1.3.1 - 2024-11-11
 
 ### Changed
