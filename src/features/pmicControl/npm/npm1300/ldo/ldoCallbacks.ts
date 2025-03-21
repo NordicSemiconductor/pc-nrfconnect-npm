@@ -13,7 +13,7 @@ import {
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { GPIOValues, Ldo, Npm1300LoadSwitchSoftStart } from '../../types';
+import { GPIOValues, Ldo, SoftStart } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -101,9 +101,7 @@ export default (
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            softStart: parseToNumber(
-                                res
-                            ) as Npm1300LoadSwitchSoftStart,
+                            softStart: parseToNumber(res) as SoftStart,
                         },
                         index
                     );

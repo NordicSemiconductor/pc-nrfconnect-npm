@@ -5,13 +5,12 @@
  */
 
 import { NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
-import { Ldo, LdoExport, LdoMode, PmicDialog } from '../../types';
+import { Ldo, LdoExport, LdoMode, PmicDialog, SoftStart } from '../../types';
 import {
     nPM2100GPIOControlMode,
     nPM2100GPIOControlPinSelect,
     nPM2100LdoModeControl,
     nPM2100LDOSoftStart,
-    nPM2100LoadSwitchSoftStart,
 } from '../types';
 import { LdoGet } from './ldoGet';
 
@@ -37,8 +36,7 @@ export class LdoSet {
         if (config.modeControl) await this.modeControl(config.modeControl);
         if (config.pinSel) await this.pinSel(config.pinSel);
         if (config.ldoSoftStart) await this.ldoSoftstart(config.ldoSoftStart);
-        if (config.loadSwitchSoftStart)
-            await this.loadSwitchSoftstart(config.loadSwitchSoftStart);
+        if (config.softStart) await this.softStart(config.softStart);
         if (config.pinMode) await this.pinMode(config.pinMode);
         if (config.ocpEnabled) await this.ocpEnabled(config.ocpEnabled);
         if (config.rampEnabled) await this.rampEnabled(config.rampEnabled);
@@ -167,23 +165,23 @@ export class LdoSet {
         });
     }
 
-    loadSwitchSoftstart(loadSwitchSoftStart: nPM2100LoadSwitchSoftStart) {
+    softStart(softStart: SoftStart) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        loadSwitchSoftStart,
+                        softStart,
                     },
                     0
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm2100 ldosw softstart LOADSW set ${loadSwitchSoftStart}`,
+                    `npm2100 ldosw softstart LOADSW set ${softStart}`,
                     () => resolve(),
                     () => {
-                        this.get.softStartLoadSw();
+                        this.get.softStart();
                         reject();
                     }
                 );

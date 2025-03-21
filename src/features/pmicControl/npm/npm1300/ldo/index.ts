@@ -12,6 +12,7 @@ import { Ldo, LdoExport, LdoModule, PmicDialog } from '../../types';
 import ldoCallbacks from './ldoCallbacks';
 import { LdoGet } from './ldoGet';
 import { LdoSet } from './ldoSet';
+import { SoftStart, SoftStartValues } from './types';
 
 const ldoDefaults = (): Ldo => ({
     voltage: getLdoVoltageRange().min,
@@ -82,6 +83,17 @@ export default class Module implements LdoModule {
 
     get callbacks() {
         return this._callbacks;
+    }
+
+    get values(): {
+        softstart: { label: string; value: SoftStart }[];
+    } {
+        return {
+            softstart: [...SoftStartValues].map((item, i) => ({
+                label: `${SoftStartValues[i]}`,
+                value: item,
+            })),
+        };
     }
 
     get ranges(): { voltage: RangeType } {
