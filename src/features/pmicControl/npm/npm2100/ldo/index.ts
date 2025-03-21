@@ -39,8 +39,12 @@ export const toLdoExport = (ldo: Ldo): LdoExport => ({
     pinSel: ldo.pinSel,
     softStartEnabled: ldo.softStartEnabled,
     softStart: ldo.softStart,
+    ldoSoftStart: ldo.ldoSoftStart,
     activeDischarge: ldo.activeDischarge,
     onOffControl: ldo.onOffControl,
+    haltEnabled: ldo.haltEnabled,
+    rampEnabled: ldo.rampEnabled,
+    ocpEnabled: ldo.ocpEnabled,
 });
 
 const getLdoVoltageRange = () =>

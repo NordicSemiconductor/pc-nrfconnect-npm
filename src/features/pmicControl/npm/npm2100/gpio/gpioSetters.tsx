@@ -42,6 +42,7 @@ export class GpioSet {
         await this.drive(gpio.drive);
         await this.openDrain(gpio.openDrain);
         await this.debounce(gpio.debounce);
+        await this.state(gpio.state as GPIOState);
         await this.mode(gpio.mode as GPIOMode2100);
     }
 
