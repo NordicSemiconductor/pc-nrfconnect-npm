@@ -1,3 +1,9 @@
+## 2.0.0 - unreleased
+
+### Added
+
+-   Clear error message when validating battery name.
+
 ## 1.3.1 - 2024-11-11
 
 ### Changed
