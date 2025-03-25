@@ -127,17 +127,22 @@ export default ({
                     </DocumentationTooltip>
                 )}
                 {lowPowerModule.actions.enterBreakToWakeStep1 && (
-                    <Button
-                        variant="secondary"
-                        className="tw-w-full"
-                        onClick={() => {
-                            lowPowerModule.actions.enterBreakToWakeStep1?.();
-                            dispatch(setBreakToWakeDialogVisible(true));
-                        }}
-                        disabled={disabled}
+                    <DocumentationTooltip
+                        card={card}
+                        item="EnterBreakToWakeMode"
                     >
-                        Enter Break-to-wake Mode
-                    </Button>
+                        <Button
+                            variant="secondary"
+                            className="tw-w-full"
+                            onClick={() => {
+                                lowPowerModule.actions.enterBreakToWakeStep1?.();
+                                dispatch(setBreakToWakeDialogVisible(true));
+                            }}
+                            disabled={disabled}
+                        >
+                            Enter Break-to-wake Mode
+                        </Button>
+                    </DocumentationTooltip>
                 )}
             </div>
         </Card>
