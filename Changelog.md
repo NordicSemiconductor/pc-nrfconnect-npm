@@ -1,14 +1,21 @@
-## 2.0.0 - unreleased
+## 2.0.0 - UNRELEASED
 
 ### Added
 
 -   Error message for incorrect names when validating the battery name.
+-   Support for the nPM2100 Evaluation Kit.
+-   Offline support with the virtual device feature.
+
+### Changed
+
+-   The default view at the application start is now a welcome screen without
+    any device-specific tabs, which are now added and removed based on the
+    selected device.
 
 ## 1.3.1 - 2024-11-11
 
 ### Changed
 
--   Updated `nrfutil device` to v2.6.4.
 -   Updated firmware to v1.2.4.
 -   USB is now detected when VBUSIN power is applied without CC lines present.
 
@@ -98,7 +105,6 @@
 
 ### Changed
 
--   nPM PowerUp now uses nrfutil device v2.0.3.
 -   Soft Start Current range is now at 10mA 20mA 35mA 50mA.
 -   Tooltip text has been improved.
 -   `Export configuration` file save dialog now has default filename.
