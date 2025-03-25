@@ -172,7 +172,7 @@ export default ({
                         card={card}
                     />
 
-                    {ldoModule.set.ocpEnabled ?? (
+                    {ldoModule.set.ocpEnabled && (
                         <Toggle
                             label={
                                 <DocumentationTooltip
