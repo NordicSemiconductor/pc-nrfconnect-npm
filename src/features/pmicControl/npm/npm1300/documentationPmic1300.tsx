@@ -599,6 +599,8 @@ export const documentation: Documentation = {
                 ],
             },
         ],
+    },
+    lowPowerControl: {
         EnterShipMode: [
             {
                 title: 'Enter Ship Mode',
@@ -622,7 +624,7 @@ export const documentation: Documentation = {
                 ],
             },
         ],
-        EnterHibernationMode: [
+        EnterHibernateMode: [
             {
                 title: 'Enter Hibernation Mode',
                 content: [

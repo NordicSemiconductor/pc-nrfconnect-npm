@@ -44,7 +44,7 @@ export default ({
                 <div className="tw-flex tw-justify-between">
                     <DocumentationTooltip
                         card={card}
-                        item="VbUSInputCurrentLimiter"
+                        item="VBusInputCurrentLimiter"
                     >
                         <>
                             V<span className="subscript">BUS</span> input
