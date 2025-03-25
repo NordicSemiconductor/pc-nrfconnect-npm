@@ -30,12 +30,12 @@ const buckDoc = (n: number) => ({
                 </>
             ),
             content: [
-                <p key="p1">BUCK output voltage level.</p>,
+                <p key="p1">Set the BUCK output voltage level.</p>,
                 <p key="p2">
                     When V<span className="subscript">{`SET${n}`}</span> pin is
-                    used to set voltage level this indicates the voltage level
-                    at V<span className="subscript">{`OUT${n}`}</span> (read
-                    only).
+                    used to set the voltage level, this indicates the voltage
+                    level at V<span className="subscript">{`OUT${n}`}</span>{' '}
+                    (read-only).
                 </p>,
                 <p key="p3">
                     When software is used to set voltage level, the range is 1.0
@@ -54,7 +54,7 @@ const buckDoc = (n: number) => ({
             ),
             content: [
                 <p key="p1">
-                    Configures the retention/sleep mode voltage level of the
+                    Configure the retention/sleep mode voltage level of the
                     BUCK. A GPIO can be configured to select between V
                     <span className="subscript">{`RET${n}`}</span> and V
                     <span className="subscript">{`OUT${n}`}</span> BUCK voltage
@@ -69,7 +69,7 @@ const buckDoc = (n: number) => ({
             title: 'Active Output Capacitor Discharge',
             content: [
                 <p key="p1">
-                    Active discharge using R
+                    When enabled, active discharge is using R
                     <span className="subscript">DISCH</span> from the output
                     capacitors when the converter is disabled.
                 </p>,
@@ -81,13 +81,18 @@ const buckDoc = (n: number) => ({
             title: 'Buck Mode Control',
             content: [
                 <p key="p1">
-                    Configures BUCK mode. The BUCK can be in the forced PFM
+                    Configure the BUCK mode. The BUCK can be in the forced PFM
                     (hysteretic) mode, the forced PWM (pulse width modulation)
-                    mode, or in the automatic mode (default). In the automatic
-                    mode, the BUCK selects the PFM mode for low load currents,
-                    and the PWM mode for high load currents, to ensure the
-                    highest efficiency across the whole load current range. The
-                    PWM mode can be enabled and disabled using a GPIO pin if
+                    mode, or in the automatic mode (default).
+                </p>,
+                <p key="p2">
+                    In the automatic mode, the BUCK selects the PFM mode for low
+                    load currents, and the PWM mode for high load currents, to
+                    ensure the highest efficiency across the whole load current
+                    range.
+                </p>,
+                <p key="p3">
+                    The PWM mode can be enabled and disabled using a GPIO pin if
                     GPIO[n] is selected.
                 </p>,
             ],
@@ -98,7 +103,7 @@ const buckDoc = (n: number) => ({
             title: 'On/Off Control',
             content: [
                 <p key="p1">
-                    BUCK on or off can be controlled by software, V
+                    Setting BUCK on or off can be controlled by software, V
                     <span className="subscript">{`SET${n}`}</span> pin, or a
                     GPIO pin.
                 </p>,
@@ -110,12 +115,20 @@ const buckDoc = (n: number) => ({
             title: 'Retention control',
             content: [
                 <p key="p1">
+                    Select the GPIO[n] to control the retention/sleep mode you
+                    set above in <span className="subscript">{`RET${n}`}</span>.
+                </p>,
+                <p key="p2">
                     A GPIO can be configured to select between two voltage
                     levels. For example, a GPIO can be set to correspond with
-                    active/normal and retention/sleep states of the host. V
-                    <span className="subscript">{`OUT${n}`}</span> sets the BUCK
-                    output voltage level in active/normal mode, while RET
-                    <span className="subscript">{`VOUT${n}`}</span> sets the
+                    active/normal and retention/sleep states of the host.
+                </p>,
+                <p key="p3">
+                    V<span className="subscript">{`OUT${n}`}</span> sets the
+                    BUCK output voltage level in active/normal mode.
+                </p>,
+                <p key="p4">
+                    RET <span className="subscript">{`VOUT${n}`}</span> sets the
                     BUCK output voltage level in the retention/sleep mode.
                 </p>,
             ],
@@ -151,7 +164,7 @@ const ldoDoc = () => ({
                     <span className="subscript">OUTLDO2</span>
                 </>
             ),
-            content: [<p key="p1">LDO output voltage level.</p>],
+            content: [<p key="p1">Set the LDO output voltage level.</p>],
         },
         {
             title: 'Range',
@@ -172,7 +185,9 @@ const ldoDoc = () => ({
     SoftStartCurrent: [
         {
             title: 'Soft Start Current',
-            content: [<p key="p1">The current limit for the soft start.</p>],
+            content: [
+                <p key="p1">Select the current limit for the soft start.</p>,
+            ],
         },
     ],
     ActiveDischarge: [
@@ -180,7 +195,7 @@ const ldoDoc = () => ({
             title: 'Active Discharge',
             content: [
                 <p key="p1">
-                    Active discharge using R
+                    When enabled, active discharge is using R
                     <span className="subscript">LSPD</span> when the load switch
                     is disabled.
                 </p>,
@@ -194,7 +209,7 @@ const gpioDoc = (n: number) => ({
         {
             title: 'Mode',
             content: [
-                <p key="p1">Selects the GPIO mode. Available options are:</p>,
+                <p key="p1">Select the GPIO mode:</p>,
                 <p key="p2">
                     <strong>Input</strong> – In this mode, {`GPIO${n}`} is used
                     to control the BUCKs or Load Switches. Refer to the
@@ -220,7 +235,7 @@ const gpioDoc = (n: number) => ({
                     <strong>Out Low</strong> – Sets {`GPIO${n}`} output low.
                 </p>,
                 <p key="p7">
-                    <strong>Output Interrupt</strong> – Configures {`GPIO${n}`}{' '}
+                    <strong>Output Interrupt</strong> – Configure {`GPIO${n}`}{' '}
                     to issue an interrupt. The wanted interrupts must be enabled
                     in “Interrupt Configuration”.
                 </p>,
@@ -239,7 +254,7 @@ const gpioDoc = (n: number) => ({
     Pull: [
         {
             title: 'Pull',
-            content: [<p key="p1">Enable pull-up or pull-down.</p>],
+            content: [<p key="p1">Select pull-up or pull-down.</p>],
         },
     ],
     Drive: [
@@ -247,22 +262,21 @@ const gpioDoc = (n: number) => ({
             title: 'Drive Strength',
             content: [
                 <p key="p1">
-                    Set output drive strength. Available options are:
+                    Select the output drive strength: 1 mA (default) or 6 mA.
                 </p>,
-                <p key="p2">1 mA (default) or 6 mA</p>,
             ],
         },
     ],
     OpenDrain: [
         {
             title: 'Open Drain',
-            content: [<p key="p1">Enable or Disable Open Drain.</p>],
+            content: [<p key="p1">Enable or disable Open Drain.</p>],
         },
     ],
     Debounce: [
         {
             title: 'Debounce',
-            content: [<p key="p1">Enable or Disable input debounce.</p>],
+            content: [<p key="p1">Enable or disable the input debounce.</p>],
         },
     ],
 });
@@ -294,7 +308,7 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Battery current, I<span className="subscript">BAT</span>
-                        , measured by PMIC’s ADC.
+                        , measured by PMIC&apos;s ADC.
                     </p>,
                     <p key="p2">
                         The current measurement is designed to satisfy the
@@ -336,7 +350,7 @@ export const documentation: Documentation = {
         ChargingMode: [
             {
                 title: 'Charging Mode',
-                content: [<p key="p1">The charger’s charging mode.</p>],
+                content: [<p key="p1">The charger&apos;s charging mode.</p>],
             },
             {
                 title: 'Trickle',
@@ -365,18 +379,26 @@ export const documentation: Documentation = {
                 title: 'Constant Voltage',
                 content: [
                     <p key="p1">
-                        When V<span className="subscript">BAT</span> reaches V
-                        <span className="subscript">TERM </span>
-                        constant voltage, the charging starts. The battery
-                        voltage is maintained at V
-                        <span className="subscript">TERM </span>
-                        while monitoring current flow into the battery. When the
-                        current into the battery drops below I
-                        <span className="subscript">TERM</span> (by default 10%
-                        of I<span className="subscript">CHG</span>), the
-                        charging is complete.
+                        <ul className="tw-ml-6 tw-list-disc">
+                            <li>
+                                When V<span className="subscript">BAT</span>{' '}
+                                reaches V
+                                <span className="subscript">TERM </span>
+                                constant voltage, the charging starts. The
+                                battery voltage is maintained at V
+                                <span className="subscript">TERM </span>
+                                while monitoring current flow into the battery.
+                            </li>
+                            <li>
+                                When the current into the battery drops below I
+                                <span className="subscript">TERM</span> (by
+                                default 10% of I
+                                <span className="subscript">CHG</span>), the
+                                charging is complete.
+                            </li>
+                            <li>N/A - Charger is not charging.</li>
+                        </ul>
                     </p>,
-                    <p key="p2">N/A: Charger is not charging.</p>,
                 ],
             },
         ],
@@ -393,7 +415,7 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Load profile and the rate of change of state-of-charge
+                        Load profile and the rate of change of State of Charge
                         are used to estimate the time until the battery is full,
                         in hours and minutes.
                     </p>,
@@ -411,7 +433,7 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Load profile and the rate of change of state-of-charge
+                        Load profile and the rate of change of State of Charge
                         are used to estimate the time until the battery is
                         empty, in hours and minutes.
                     </p>,
@@ -420,11 +442,11 @@ export const documentation: Documentation = {
         ],
         FuelGauge: [
             {
-                title: 'Fuel gauge',
+                title: 'Fuel Gauge',
                 content: [
                     <p key="p1">
                         Battery voltage, current, and temperature are used to
-                        calculate the battery’s state-of-charge.
+                        calculate the battery&apos;s State of Charge.
                     </p>,
                 ],
             },
@@ -452,7 +474,7 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Battery voltage, current, and temperature are used to
-                        calculate the battery state-of-charge.
+                        calculate the battery&apos;s State of Charge.
                     </p>,
                 ],
             },
@@ -504,7 +526,9 @@ export const documentation: Documentation = {
                     </>
                 ),
                 content: [
-                    <p key="p1">Threshold to trigger a power failure.</p>,
+                    <p key="p1">
+                        Set the threshold to trigger a power failure.
+                    </p>,
                     <p key="p2">Range: 2.6 V to 3.5 V, in 100-mV steps.</p>,
                 ],
             },
@@ -514,8 +538,8 @@ export const documentation: Documentation = {
                 title: 'POF Polarity',
                 content: [
                     <p key="p1">
-                        Polarity of the GPIO output configured as “Output power
-                        loss warning”.
+                        Select the polarity of the GPIO output configured as
+                        “Output power loss warning”.
                     </p>,
                 ],
             },
@@ -541,11 +565,12 @@ export const documentation: Documentation = {
         ],
         TimeMode: [
             {
-                title: 'Time Mode',
+                title: 'Timer Mode',
                 content: [
-                    <p key="p1">
+                    <p key="p1">Select the Timer Mode.</p>,
+                    <p key="p2">
                         TIMER can be used in different ways, depending on
-                        configuration.
+                        configuration:
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>General purpose timer</li>
                             <li>Watchdog warning</li>
@@ -559,23 +584,26 @@ export const documentation: Documentation = {
         ],
         TimePrescaler: [
             {
-                title: 'Time Prescaler',
+                title: 'Timer Prescaler',
                 content: [
-                    <p key="p1">
-                        Configure timer prescaler. The fast one uses a 2-ms
-                        prescaler, while the slow one uses a 16-ms prescaler.
-                    </p>,
+                    <p key="p1">Select the timer prescaler.</p>,
+                    <p key="p2">The fast one uses a 2-ms prescaler.</p>,
+                    <p key="p3">The slow one uses a 16-ms prescaler.</p>,
                 ],
             },
         ],
         TimePeriod: [
             {
-                title: 'Time Period',
+                title: 'Timer Period',
                 content: [
-                    <p key="p1">Configure the timer period.</p>,
+                    <p key="p1">Set the timer period.</p>,
                     <p key="p2">
-                        Range is 2 ms to 9 hours in 2-ms steps in the fast mode,
-                        and 16 ms to 3 days in 16-ms steps in the slow mode.
+                        For the Timer Fast mode, the range is 2 ms to 9 hours in
+                        2-ms steps.
+                    </p>,
+                    <p key="p3">
+                        For the Timer Slow mode, the range is 16 ms to 3 days in
+                        16-ms steps.
                     </p>,
                 ],
             },
@@ -587,14 +615,21 @@ export const documentation: Documentation = {
                 title: 'Long Press Reset',
                 content: [
                     <p key="p1">
+                        Select an option for how to handle Long Press Reset.
+                    </p>,
+                    <p key="p2">
                         A long press (&gt; t
                         <span className="subscript">RESETBUT</span>) of the
                         button causes a power cycle and resets the whole system.
-                        This feature is enabled by default after power-up.
                     </p>,
-                    <p key="p2">
-                        When two-button reset is selected, both SHPHLD and GPIO0
-                        must be pressed simultaneously to trigger a reset.
+                    <p key="p3">
+                        After power-up, this feature is by default set to
+                        &quot;one button&quot;.
+                    </p>,
+                    <p key="p4">
+                        When &quot;two buttons&quot; is selected, both SHPHLD
+                        and GPIO0 must be pressed simultaneously to trigger a
+                        reset.
                     </p>,
                 ],
             },
@@ -693,12 +728,16 @@ export const documentation: Documentation = {
             {
                 title: 'Current Limiter',
                 content: [
-                    <p key="p1">
-                        There are two USB compliant, accurate current limits:
+                    <p key="p1">Set the current limit.</p>,
+                    <p key="p2">
+                        There are two USB-compliant, accurate current limits:
                         IBUS100MA (100 mA) and IBUS500MA (500 mA). In addition,
                         there are current limits in 100-mA steps from 600 mA to
                         1500 mA. The 1500 mA limit is compatible with USB
-                        Type-C. The default current limit is IBUS100MA (100 mA).
+                        Type-C.
+                    </p>,
+                    <p key="p3">
+                        The default current limit is IBUS100MA (100 mA).
                     </p>,
                 ],
             },
@@ -727,8 +766,8 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Charger termination voltage is the maximum battery
-                        voltage allowed. When V
+                        Set the charger termination voltage. This is the maximum
+                        battery voltage allowed. When V
                         <span className="subscript">BAT</span> reaches this
                         level, the charger changes from constant current to
                         constant voltage charging mode. V
@@ -756,8 +795,7 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Charging current limit. I
-                        <span className="subscript">CHG</span> should be
+                        Set the charging current limit. This should be
                         configured according to your battery specification.
                     </p>,
                 ],
@@ -769,15 +807,16 @@ export const documentation: Documentation = {
         ],
         EnableRecharging: [
             {
-                title: 'Enable Recharging',
+                title: 'Recharging',
                 content: [
-                    <p key="p1">
-                        After the charging is completed and V
-                        <span className="subscript">BAT</span> decreases below V
+                    <p key="p1">Enable or disable recharging.</p>,
+                    <p key="p2">
+                        If this option and the Charger tile are enabled, the
+                        automatic recharge starts every time after the charging
+                        is completed and V<span className="subscript">BAT</span>{' '}
+                        decreases below V
                         <span className="subscript">RECHARGE</span> (95% of V
-                        <span className="subscript">TERM</span>), the automatic
-                        recharge is started, if enabled (and if the charger is
-                        enabled).
+                        <span className="subscript">TERM</span>).
                     </p>,
                 ],
             },
@@ -792,9 +831,9 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Allow charging of a heavily discharged battery. This
-                        should be configured according to your battery
-                        specification.
+                        Enable to allow charging of a heavily discharged
+                        battery. This should be configured according to your
+                        battery specification.
                     </p>,
                 ],
             },
@@ -809,11 +848,16 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Sets the charging termination current level as a percent
+                        Set the charging termination current level as a percent
                         of I<span className="subscript">CHG</span>, either 10%
-                        (default) or 20%. When the charging mode is “Constant
-                        Voltage”, the current flow into the battery is
-                        monitored. When the current drops below I
+                        (default) or 20%.
+                    </p>,
+                    <p key="p2">
+                        When the charging mode is “Constant Voltage”, the
+                        current flow into the battery is monitored.
+                    </p>,
+                    <p key="p3">
+                        When the current drops below I
                         <span className="subscript">TERM</span>, the charging is
                         complete.
                     </p>,
@@ -845,7 +889,7 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Sets the V<span className="subscript">BAT</span> level
+                        Set the V<span className="subscript">BAT</span> level
                         where the charger goes from trickle charging to constant
                         current charging. Available voltage levels are 2.9 V
                         (default) and 2.5 V.
@@ -869,7 +913,7 @@ export const documentation: Documentation = {
                 title: 'Charger Thermal Regulation',
                 content: [
                     <p key="p1">
-                        Configures the die temperature monitoring, which is
+                        Configure the die temperature monitoring, which is
                         active during charging.
                     </p>,
                 ],
@@ -885,7 +929,7 @@ export const documentation: Documentation = {
                 ),
                 content: [
                     <p key="p1">
-                        Temperature threshold for charging to resume.
+                        Temperature threshold for the charging to resume.
                     </p>,
                 ],
             },
@@ -899,7 +943,9 @@ export const documentation: Documentation = {
                     </>
                 ),
                 content: [
-                    <p key="p1">Temperature threshold for charging to stop.</p>,
+                    <p key="p1">
+                        Temperature threshold for the charging to stop.
+                    </p>,
                 ],
             },
         ],
@@ -927,9 +973,11 @@ export const documentation: Documentation = {
                 title: 'Tbat Monitoring – JEITA Compliance',
                 content: [
                     <p key="p1">
-                        This section configures the different battery
-                        temperature thresholds according to JEITA. The default
-                        values match the JEITA guidelines.
+                        Configure the different battery temperature thresholds
+                        according to JEITA.
+                    </p>,
+                    <p key="p2">
+                        The default values match the JEITA guidelines.
                     </p>,
                 ],
             },
@@ -958,12 +1006,15 @@ export const documentation: Documentation = {
                 title: 'NTC thermistor',
                 content: [
                     <p key="p1">
-                        The charger supports three NTC thermistors for battery
-                        temperature monitoring. The available options are 10 kΩ,
-                        47 kΩ, 100 kΩ, or no NTC thermistor. If no NTC
-                        thermistor is chosen, the NTC pin must be connected to
-                        GND and the battery pack must have a thermal fuse for
-                        safety.
+                        Select the NTC thermistor from among the three NTC
+                        thermistors for battery temperature monitoring supported
+                        by the charger. The available options are 10 kΩ, 47 kΩ,
+                        100 kΩ, or no NTC thermistor.
+                    </p>,
+                    <p key="p2">
+                        If no NTC thermistor is chosen, the NTC pin must be
+                        connected to GND and the battery pack must have a
+                        thermal fuse for safety.
                     </p>,
                 ],
             },
@@ -974,7 +1025,7 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">Use default value for NTC Beta.</p>,
                     <p key="p2">
-                        Defaults:
+                        Defaults for the NTC thermistor selected:
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>10 kΩ: 3380</li>
                             <li>47 kΩ: 4050</li>
@@ -1001,12 +1052,13 @@ export const documentation: Documentation = {
             {
                 title: 'LEDs',
                 content: [
-                    <p key="p1">nPM1300 have three 5-mA LED drivers.</p>,
+                    <p key="p1">nPM1300 has three 5-mA LED drivers.</p>,
                     <p key="p2">
-                        These can be configured as:
+                        These can be configured for one of the following
+                        purposes:
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>Charging indication</li>
-                            <li>Charging error indication</li>
+                            <li>Charger error indication</li>
                             <li>An RGB LED (using all three LED pins)</li>
                             <li>
                                 Output high (open drain, requires external
@@ -1028,20 +1080,21 @@ export const documentation: Documentation = {
                 title: 'Reset Cause',
                 content: [
                     <p key="p1">
+                        One of the following:
                         <ul className="tw-ml-6 tw-list-disc">
-                            <li>SHIPMODEXIT: Reset by Ship Mode exit.</li>
-                            <li>BOOTMONITORTIMEOUT: Boot monitor timeout.</li>
-                            <li>WATCHDOGTIMEOUT: Watchdog timeout.</li>
+                            <li>SHIPMODEXIT - Reset by Ship Mode exit.</li>
+                            <li>BOOTMONITORTIMEOUT - Boot monitor timeout.</li>
+                            <li>WATCHDOGTIMEOUT - Watchdog timeout.</li>
                             <li>
-                                LONGPRESSTIMEOUT: Long press of the SHPHLD/RESET
-                                button.
+                                LONGPRESSTIMEOUT - Long press of the
+                                SHPHLD/RESET button.
                             </li>
-                            <li>THERMASHUTDOWN: Thermal shutdown.</li>
+                            <li>THERMASHUTDOWN - Thermal shutdown.</li>
                             <li>
-                                VSYSLOW: POF (Power Failure) or V
+                                VSYSLOW - POF (Power Failure) or V
                                 <span className="subscript">SYS</span> low.
                             </li>
-                            <li>SWRESET: Software reset.</li>
+                            <li>SWRESET - Software reset.</li>
                         </ul>
                     </p>,
                 ],
@@ -1052,21 +1105,25 @@ export const documentation: Documentation = {
                 title: 'Charger Errors',
                 content: [
                     <p key="p1">
+                        One of the following:
                         <ul className="tw-ml-6 tw-list-disc">
-                            <li>NTCSENSORERR: NTC thermistor sensor error.</li>
+                            <li>N/A - No charger error detected.</li>
+                            <li>NTCSENSORERR - NTC thermistor sensor error.</li>
+                            <li>NTCSENSORERR - NTC thermistor sensor error.</li>
                             <li>
-                                VBATSENSORERR: V
+                                VBATSENSORERR - V
                                 <span className="subscript">BAT</span> sensor
                                 error.
                             </li>
                             <li>
-                                VBATLOW: V<span className="subscript">BAT</span>{' '}
-                                low error.
+                                VBATLOW - V
+                                <span className="subscript">BAT</span> low
+                                error.
                             </li>
-                            <li>VTRICKLE: Vtrickle error.</li>
-                            <li>MEASTIMEOUT: Measurement timeout error.</li>
-                            <li>CHARGETIMEOUT: Charge timeout error.</li>
-                            <li>TRICKLETIMEOUT: Trickle timeout error.</li>
+                            <li>VTRICKLE - Vtrickle error.</li>
+                            <li>MEASTIMEOUT - Measurement timeout error.</li>
+                            <li>CHARGETIMEOUT - Charge timeout error.</li>
+                            <li>TRICKLETIMEOUT - Trickle timeout error.</li>
                         </ul>
                     </p>,
                 ],
@@ -1077,35 +1134,37 @@ export const documentation: Documentation = {
                 title: 'Sensor Errors',
                 content: [
                     <p key="p1">
+                        One of the following:
                         <ul className="tw-ml-6 tw-list-disc">
+                            <li>N/A - No sensor error detected.</li>
                             <li>
-                                SENSORNTCCOLD: Error triggered by NTC thermistor
-                                Cold sensor value.
+                                SENSORNTCCOLD - Error triggered by NTC
+                                thermistor Cold sensor value.
                             </li>
                             <li>
-                                SENSORNTCCOOL: Error triggered by NTC thermistor
-                                Cool sensor value.
+                                SENSORNTCCOOL - Error triggered by NTC
+                                thermistor Cool sensor value.
                             </li>
                             <li>
-                                SENSORNTCHOT: Error triggered by NTC thermistor
+                                SENSORNTCHOT - Error triggered by NTC thermistor
                                 Hot sensor value.
                             </li>
                             <li>
-                                SENSORVTERM: Error triggered by V
+                                SENSORVTERM - Error triggered by V
                                 <span className="subscript">term</span> sensor
                                 value.
                             </li>
                             <li>
-                                SENSORRECHARGE: Error triggered by Recharge
+                                SENSORRECHARGE - Error triggered by Recharge
                                 sensor value.
                             </li>
                             <li>
-                                SENSORVTRICKLE: Error triggered by V
+                                SENSORVTRICKLE - Error triggered by V
                                 <span className="subscript">trickle</span>{' '}
                                 sensor value.
                             </li>
                             <li>
-                                SENSORVBATLOW: Error triggered by V
+                                SENSORVBATLOW - Error triggered by V
                                 <span className="subscript">batLow</span> sensor
                                 value.
                             </li>
@@ -1125,8 +1184,8 @@ export const documentation: Documentation = {
                         in nPM PowerUP. To add new battery models, use the{' '}
                         <b>Add New Active Battery Model</b> drop-down menu
                         below. You can use the default battery model for initial
-                        evaluation, but this will not give the best
-                        state-of-charge accuracy.
+                        evaluation, but this will not give the best State of
+                        Charge accuracy.
                     </p>,
                 ],
             },
@@ -1150,8 +1209,8 @@ export const documentation: Documentation = {
                     <p key="p3">
                         For quick evaluation, you can also use one of the
                         branded battery models matching the capacity of your
-                        battery. However, this will not give the best
-                        state-of-charge accuracy.
+                        battery. However, this will not give the best State of
+                        Charge accuracy.
                     </p>,
                 ],
             },
@@ -1161,7 +1220,7 @@ export const documentation: Documentation = {
                 title: 'Profile Battery',
                 content: [
                     <p key="p1">
-                        {`Battery profiling provides accurate state-of-charge
+                        {`Battery profiling provides accurate State of Charge
                         estimation across voltage, current, and temperature
                         range for the specific battery used. The result of the
                         battery profiling is a battery model. To evaluate the
@@ -1222,7 +1281,7 @@ export const documentation: Documentation = {
                 title: 'Reset Device',
                 content: [
                     <p key="p1">
-                        Resets the PMIC and nPM Controller. The PMIC default
+                        Reset the PMIC and nPM Controller. The PMIC default
                         device configuration is restored.
                     </p>,
                 ],
@@ -1235,7 +1294,7 @@ export const documentation: Documentation = {
                     <p key="p1">
                         Saves all terminal log events to CSV files, including
                         commands executed, battery voltage, current temperature,
-                        voltage, state-of-charge, time to empty, and time to
+                        voltage, State of Charge, time to empty, and time to
                         full.
                     </p>,
                 ],
@@ -1274,11 +1333,10 @@ export const documentation: Documentation = {
                         temperatures range from 0°C to 60°C, in steps of 1°C.
                     </p>,
                     <p key="p2">
-                        {' '}
-                        Profile at three different temperatures for best
-                        state-of-charge accuracy. For example, if your
-                        application temperature range is 5°C to 45°C, set
-                        profiling at 5°C, 25°C, and 45°C.
+                        Profile at three different temperatures for best State
+                        of Charge accuracy. For example, if your application
+                        temperature range is 5°C to 45°C, set profiling at 5°C,
+                        25°C, and 45°C.
                     </p>,
                 ],
             },

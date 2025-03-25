@@ -91,7 +91,7 @@ export default ({
                             card={card}
                             item="LongPressResetEnable"
                         >
-                            Long Press Reset Enable
+                            Long Press Reset
                         </DocumentationTooltip>
                     }
                     isToggled={reset.longPressResetEnable === true}
