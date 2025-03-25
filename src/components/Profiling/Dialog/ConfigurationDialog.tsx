@@ -356,8 +356,8 @@ export default ({
                                     content={
                                         <p className="mb-0">
                                             Battery name must not be empty and
-                                            must include only latin characters
-                                            or numbers.
+                                            must include only numbers or Latin
+                                            characters (or both).
                                         </p>
                                     }
                                 />

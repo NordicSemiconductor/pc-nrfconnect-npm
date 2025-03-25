@@ -2,7 +2,7 @@
 
 ### Added
 
--   Clear error message when validating battery name.
+-   Error message for incorrect names when validating the battery name.
 
 ## 1.3.1 - 2024-11-11
 
