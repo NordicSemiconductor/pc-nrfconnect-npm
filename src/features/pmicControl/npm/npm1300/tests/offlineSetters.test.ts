@@ -397,11 +397,11 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set timer config mode ', async () => {
-        await pmic.timerConfigModule?.set.mode(npm1300TimerMode.Wakeup);
+        await pmic.timerConfigModule?.set.mode(npm1300TimerMode['Wake-up']);
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({
-            mode: npm1300TimerMode.Wakeup,
+            mode: npm1300TimerMode['Wake-up'],
         });
     });
 
