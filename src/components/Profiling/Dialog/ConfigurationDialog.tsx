@@ -12,6 +12,7 @@ import {
     DialogButton,
     Dropdown,
     GenericDialog,
+    NoticeBox,
     NumberInput,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
@@ -49,6 +50,7 @@ export default ({
     const [vUpperCutOff, setUpperVCutOff] = useState(4.2);
     const [validName, setValidName] = useState(false);
     const [name, setName] = useState('');
+    const [showValidationError, setShowValidationError] = useState(false);
 
     const [capacity, setCapacity] = useState(800);
     const [ntcThermistor, setNTCThermistor] = useState<NTCThermistor>('10 kΩ');
@@ -64,6 +66,84 @@ export default ({
         value: `${item}`,
     }));
 
+    const onSelectFolder = () => {
+        if (!validName) {
+            setShowValidationError(true);
+            return;
+        }
+
+        selectDirectoryDialog().then(dirPath => {
+            const restingProfiles: CCProfile[] = [
+                {
+                    tLoad: 500,
+                    tRest: 500,
+                    iLoad: 0,
+                    iRest: 0,
+                    cycles: REST_DURATION,
+                },
+            ];
+            const profilingProfiles: CCProfile[] = [
+                {
+                    tLoad: 500,
+                    tRest: 500,
+                    iLoad: 0,
+                    iRest: 0,
+                    cycles: 300, // 5Min
+                },
+                {
+                    tLoad: 600000, // 10Min
+                    tRest: 2400000, // 40Min
+                    iLoad: capacity / 5 / 1000, // A
+                    iRest: 0,
+                    vCutoff: vUpperCutOff - 0.3,
+                },
+                {
+                    tLoad: 300000, // 5Min
+                    tRest: 1800000, // 30Min
+                    iLoad: capacity / 5 / 1000, // A
+                    iRest: 0,
+                    vCutoff: vLowerCutOff + 0.5,
+                },
+                {
+                    tLoad: 300000, // 5Min
+                    tRest: 1800000, // 30Min
+                    iLoad: capacity / 10 / 1000, // A
+                    iRest: 0,
+                },
+            ];
+
+            const profile: Profile = {
+                name,
+                vLowerCutOff,
+                vUpperCutOff,
+                capacity,
+                ratedChargingCurrent,
+                ntcThermistor,
+                temperatures,
+                baseDirectory: dirPath,
+                restingProfiles,
+                profilingProfiles,
+            };
+
+            const project: Omit<ProfilingProject, 'appVersion'> = {
+                name,
+                capacity,
+                vLowerCutOff,
+                vUpperCutOff,
+                profiles: profile.temperatures.map(temperature => ({
+                    temperature,
+                    csvReady: false,
+                })),
+            };
+
+            dispatch(setProfile(profile));
+            dispatch(setProfilingStage('Checklist'));
+
+            const fileName = generateDefaultProjectPath(profile);
+            dispatch(saveProjectSettings(fileName, project));
+        });
+    };
+
     return (
         <GenericDialog
             title={`Battery Profiling ${name.length > 0 ? `- ${name}` : ''}`}
@@ -75,87 +155,8 @@ export default ({
                 <>
                     <DialogButton
                         variant="primary"
-                        disabled={!validName}
-                        onClick={() => {
-                            selectDirectoryDialog().then(dirPath => {
-                                const restingProfiles: CCProfile[] = [
-                                    {
-                                        tLoad: 500,
-                                        tRest: 500,
-                                        iLoad: 0,
-                                        iRest: 0,
-                                        cycles: REST_DURATION,
-                                    },
-                                ];
-                                const profilingProfiles: CCProfile[] = [
-                                    {
-                                        tLoad: 500,
-                                        tRest: 500,
-                                        iLoad: 0,
-                                        iRest: 0,
-                                        cycles: 300, // 5Min
-                                    },
-                                    {
-                                        tLoad: 600000, // 10Min
-                                        tRest: 2400000, // 40Min
-                                        iLoad: capacity / 5 / 1000, // A
-                                        iRest: 0,
-                                        vCutoff: vUpperCutOff - 0.3,
-                                    },
-                                    {
-                                        tLoad: 300000, // 5Min
-                                        tRest: 1800000, // 30Min
-                                        iLoad: capacity / 5 / 1000, // A
-                                        iRest: 0,
-                                        vCutoff: vLowerCutOff + 0.5,
-                                    },
-                                    {
-                                        tLoad: 300000, // 5Min
-                                        tRest: 1800000, // 30Min
-                                        iLoad: capacity / 10 / 1000, // A
-                                        iRest: 0,
-                                    },
-                                ];
-
-                                const profile: Profile = {
-                                    name,
-                                    vLowerCutOff,
-                                    vUpperCutOff,
-                                    capacity,
-                                    ratedChargingCurrent,
-                                    ntcThermistor,
-                                    temperatures,
-                                    baseDirectory: dirPath,
-                                    restingProfiles,
-                                    profilingProfiles,
-                                };
-
-                                const project: Omit<
-                                    ProfilingProject,
-                                    'appVersion'
-                                > = {
-                                    name,
-                                    capacity,
-                                    vLowerCutOff,
-                                    vUpperCutOff,
-                                    profiles: profile.temperatures.map(
-                                        temperature => ({
-                                            temperature,
-                                            csvReady: false,
-                                        })
-                                    ),
-                                };
-
-                                dispatch(setProfile(profile));
-                                dispatch(setProfilingStage('Checklist'));
-
-                                const fileName =
-                                    generateDefaultProjectPath(profile);
-                                dispatch(
-                                    saveProjectSettings(fileName, project)
-                                );
-                            });
-                        }}
+                        onClick={onSelectFolder}
+                        disabled={showValidationError}
                     >
                         Select folder
                     </DialogButton>
@@ -183,6 +184,8 @@ export default ({
                         placeholder="Name your battery"
                         onChange={event => {
                             setName(event.target.value);
+                            setShowValidationError(false);
+
                             const match =
                                 event.target.value.match(/^[a-zA-Z0-9]+$/);
                             setValidName(
@@ -342,6 +345,23 @@ export default ({
                             >
                                 + Add Temperature
                             </Button>
+                        )}
+
+                        {showValidationError && (
+                            <div className="mt-2">
+                                <NoticeBox
+                                    mdiIcon="mdi-lightbulb-alert-outline"
+                                    color="tw-text-red"
+                                    title="Invalid name" // must be short string
+                                    content={
+                                        <p className="mb-0">
+                                            Battery name must not be empty and
+                                            must include only numbers or Latin
+                                            characters (or both).
+                                        </p>
+                                    }
+                                />
+                            </div>
                         )}
                     </React.Fragment>
                 ))}
