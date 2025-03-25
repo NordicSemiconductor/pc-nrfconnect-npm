@@ -623,12 +623,13 @@ export const documentation: Documentation = {
                         button causes a power cycle and resets the whole system.
                     </p>,
                     <p key="p3">
-                        After power-up, this feature is by default set to "one
-                        button".
+                        After power-up, this feature is by default set to
+                        &quot;one button&quot;.
                     </p>,
                     <p key="p4">
-                        When "two button" is selected, both SHPHLD and GPIO0
-                        must be pressed simultaneously to trigger a reset.
+                        When &quot;two buttons&quot; is selected, both SHPHLD
+                        and GPIO0 must be pressed simultaneously to trigger a
+                        reset.
                     </p>,
                 ],
             },
