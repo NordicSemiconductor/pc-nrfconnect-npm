@@ -16,7 +16,6 @@
 
 ### Changed
 
--   Updated `nrfutil device` to v2.6.4.
 -   Updated firmware to v1.2.4.
 -   USB is now detected when VBUSIN power is applied without CC lines present.
 
@@ -106,7 +105,6 @@
 
 ### Changed
 
--   nPM PowerUp now uses nrfutil device v2.0.3.
 -   Soft Start Current range is now at 10mA 20mA 35mA 50mA.
 -   Tooltip text has been improved.
 -   `Export configuration` file save dialog now has default filename.
