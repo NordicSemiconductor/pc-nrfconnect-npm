@@ -74,8 +74,8 @@ This side panel area lets you select the power source for nPM2100:
 
 |               Menu               | Description |
 | -------------------------------- | ----------- |
-| **Battery**                      | The default setting. With this power source selected, the application automatically detects the battery type connected to the PMIC. You can also select the battery type from the drop-down menu.        |
-| **USB**                          | Select if you are powering the PMIC from the USB. With this power source selected, the application disables the **Fuel Gauge** tile on the [**Dashboard**](#dashboard-tab) tab, as no battery evaluation is available.        |
+| **Battery**                      | The default setting when a battery is connected to the nPM device. With this power source selected, the application automatically detects the battery type connected to the PMIC. You can also select the battery type from the drop-down menu.        |
+| **USB**                          | Select if you are powering the PMIC from the USB. With this power source selected, the application disables the **Fuel Gauge** tile on the [**Dashboard**](#dashboard-tab) tab, as no battery evaluation is available. If you are connecting your nPM device to the computer using an USB cable without a battery connected, **USB** is automatically selected as `VEXT` and cannot be unselected.        |
 
 ### Settings
 
@@ -110,7 +110,7 @@ Using the built-in battery models, you can get an estimated time-to-full and tim
 
 ## Regulators tab
 
-You can use the options in the **Regulators** tab to enable or disable specific voltage regulators (like **BUCK** or **LDO**).
+You can use the options in the **Regulators** tab to enable or disable specific voltage regulators (like **BUCK** or **LDO**, or **Boost** for nPM2100).
 
 Here you can also set the output and retention voltage for each regulator and monitor its status.
 
@@ -167,12 +167,12 @@ The following drop-down menu options are available for the project and profile s
 
 ### Bundled profiles
 
-Here you write and save battery models from selected vendors that has been profiled by Nordic Semiconductor.
+Here you can write and save battery models from selected vendors that has been profiled by Nordic Semiconductor.
 
-When writing, you are going to write new battery model on the nPM Controller to one of its available battery model slots.
+When you **Write Model**, you are going to write new battery model on the nPM Controller to one of its available battery model slots.
 This can overwrite the [**Active Battery Model**](#npm1300-fuel-gauge).
 
-When saving, the battery model is saved in the selected directory either to a JSON file that can be downloaded to the nPM Controller or to an INC file. The INC file format is meant for integrating the battery model into your final application with a Nordic System on Chip (SoC).
+When you **Save Model**, the battery model is saved in the selected directory either to a JSON file that can be downloaded to the nPM Controller or to an INC file. The INC file format is meant for integrating the battery model into your final application with a Nordic System on Chip (SoC).
 
 ## Graph tab
 
