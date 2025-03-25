@@ -379,7 +379,7 @@ export const documentation: Documentation = {
                 title: 'Constant Voltage',
                 content: [
                     <p key="p1">
-                        <ul>
+                        <ul className="tw-ml-6 tw-list-disc">
                             <li>
                                 When V<span className="subscript">BAT</span>{' '}
                                 reaches V
@@ -1332,7 +1332,6 @@ export const documentation: Documentation = {
                         temperatures range from 0°C to 60°C, in steps of 1°C.
                     </p>,
                     <p key="p2">
-                        {' '}
                         Profile at three different temperatures for best State
                         of Charge accuracy. For example, if your application
                         temperature range is 5°C to 45°C, set profiling at 5°C,
