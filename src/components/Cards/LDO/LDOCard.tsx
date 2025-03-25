@@ -309,7 +309,7 @@ const OnOffControl = ({
 
     return (
         <>
-            {ldoModule.set.onOffControl ?? (
+            {ldoModule.set.onOffControl && (
                 <Dropdown
                     label="On/Off Control"
                     items={ldoOnOffControlItems}
