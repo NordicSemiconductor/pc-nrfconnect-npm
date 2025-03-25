@@ -28,7 +28,7 @@ In **Select Device**, you can also select a virtual device.
 
 ![Select Devices with virtual devices listed](./screenshots/npm_select_device_virtual_menu.png "Select Devices with virtual devices listed")
 
-This allows you to work in an offline mode, where you can configure the PMIC without connecting a physical device to your computer.
+This allows you to work in an offline mode, where you can explore the different configuration options of the PMIC without connecting a physical device to your computer.
 The **Export Configuration** button lets you then save the configuration to a file, while the **Load Configuration** allows you to import such a configuration from a file.
 
 ![nPM PowerUP with a virtual device selected](./screenshots/npm_select_device_virtual.png "nPM PowerUP with a virtual device selected")
