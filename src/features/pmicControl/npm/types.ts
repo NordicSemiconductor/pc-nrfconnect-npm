@@ -246,7 +246,7 @@ export enum npm1300TimerMode {
     'Watchdog warning' = '1',
     'Watchdog reset' = '2',
     'General purpose' = '3',
-    'Wakeup' = '4',
+    'Wake-up' = '4',
 }
 export type TimerMode = npm1300TimerMode | npm2100TimerMode;
 

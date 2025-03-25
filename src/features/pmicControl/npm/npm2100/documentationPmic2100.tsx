@@ -25,7 +25,7 @@ const boostDoc = () => ({
             title: 'Mode Control',
             content: [
                 <p key="p1">
-                    Configures the BOOST mode.
+                    Configure the BOOST mode.
                     <ul className="tw-ml-6 tw-list-disc">
                         <li>
                             Auto - BOOST automatically choose mode depending on
@@ -33,7 +33,7 @@ const boostDoc = () => ({
                         </li>
                         <li>
                             Auto no HP - same as Auto, except BOOST is blocked
-                            from entering the High Power mode.
+                            from entering the High Power (HP) mode.
                         </li>
                         <li>
                             High Power - highest output current capability (150
@@ -54,7 +54,7 @@ const boostDoc = () => ({
             title: 'GPIO Control - Pin Selection',
             content: [
                 <p key="p1">
-                    Configures the GPIO pin and polarity for the BOOST mode
+                    Configure the GPIO pin and polarity for the BOOST mode
                     control.
                 </p>,
             ],
@@ -65,7 +65,7 @@ const boostDoc = () => ({
             title: 'GPIO Control - Mode Selection',
             content: [
                 <p key="p1">
-                    Configures the GPIO mode selected in GPIO Control – Pin
+                    Configure the GPIO mode selected in GPIO Control – Pin
                     Selection.
                 </p>,
             ],
@@ -86,11 +86,12 @@ const boostDoc = () => ({
         {
             title: 'VOUT',
             content: [
-                <p key="p1">
-                    BOOST output voltage level. When the VSET pin is used to set
-                    the voltage level, this indicates the voltage level at VOUT
-                    (read only). When software is used to set the voltage level,
-                    this has value between 1.8 V to 3.3 V in 50-mV steps.
+                <p key="p1">Set the BOOST output voltage level.</p>,
+                <p key="p2">
+                    When the VSET pin is used to set the voltage level, this
+                    indicates the voltage level at VOUT (read-only). When
+                    software is used to set the voltage level, this has value
+                    between 1.8 V to 3.3 V in 50-mV steps.
                 </p>,
             ],
         },
@@ -115,7 +116,7 @@ const ldoDoc = () => ({
         {
             title: 'Load Switch/LDO Soft Start Current',
             content: [
-                <p key="p1">Configures Load Switch/LDO Soft Start Current.</p>,
+                <p key="p1">Configure Load Switch/LDO Soft Start Current.</p>,
             ],
         },
     ],
@@ -124,7 +125,7 @@ const ldoDoc = () => ({
             title: 'Mode',
             content: [
                 <p key="p1">
-                    Configures the Load Switch/LDO mode.
+                    Configure the Load Switch/LDO mode.
                     <ul className="tw-ml-6 tw-list-disc">
                         <li>
                             Auto - The device operating mode determines the Load
@@ -152,9 +153,7 @@ const ldoDoc = () => ({
         {
             title: 'Pin Mode',
             content: [
-                <p key="p1">
-                    Configures the GPIO mode selected in Pin Select.
-                </p>,
+                <p key="p1">Configure the GPIO mode selected in Pin Select.</p>,
             ],
         },
     ],
@@ -163,7 +162,7 @@ const ldoDoc = () => ({
             title: 'Pin Select',
             content: [
                 <p key="p1">
-                    Configures the GPIO pin and polarity for the Load Switch/LDO
+                    Configure the GPIO pin and polarity for the Load Switch/LDO
                     mode control.
                 </p>,
             ],
@@ -215,9 +214,9 @@ const gpioDoc = () => ({
                         <li>
                             Input
                             <ul className="tw-ml-6 tw-list-disc">
-                                <li>General purpose intent</li>
+                                <li>General purpose</li>
                                 <li>
-                                    Control input for BOOST and Load Switch/LDO
+                                    Input control for BOOST and Load Switch/LDO
                                 </li>
                             </ul>
                         </li>
@@ -268,11 +267,11 @@ export const documentation: Documentation = {
     battery: {
         FuelGauge: [
             {
-                title: 'Fuel gauge',
+                title: 'Fuel Gauge',
                 content: [
                     <p key="p1">
                         Battery voltage and temperature is used to accurately
-                        calculate the battery&apos;s state-of-charge.
+                        calculate the battery&apos;s State of Charge.
                     </p>,
                 ],
             },
@@ -283,11 +282,11 @@ export const documentation: Documentation = {
         ],
         StateOfCharge: [
             {
-                title: 'State of charge',
+                title: 'State of Charge',
                 content: [
                     <p key="p1">
                         Battery voltage and temperature is used to accurately
-                        calculate the battery&apos;s state-of-charge.
+                        calculate the battery&apos;s State of Charge.
                     </p>,
                 ],
             },
@@ -381,7 +380,8 @@ export const documentation: Documentation = {
                 title: 'Long Press Reset',
                 content: [
                     <p key="p1">
-                        Long Press Reset configuration. Enabled by default.
+                        Configure whether to enable or disable Long Press Reset.
+                        Enabled by default.
                     </p>,
                 ],
             },
@@ -391,8 +391,7 @@ export const documentation: Documentation = {
                 title: 'Long Press Reset Debounce',
                 content: [
                     <p key="p1">
-                        Configure Long Press Reset debounce time. Available
-                        options:
+                        Configure the Long Press Reset debounce time:
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>5 s</li>
                             <li>10 s (default)</li>
@@ -408,8 +407,7 @@ export const documentation: Documentation = {
                 title: 'Power Cycle',
                 content: [
                     <p key="p1">
-                        Pressing this button will reset the device and perform a
-                        power cycle.
+                        Press to reset the device and perform a power cycle.
                     </p>,
                 ],
             },
@@ -448,8 +446,8 @@ export const documentation: Documentation = {
                 content: [
                     <p key="p1">
                         Enable power off button (default: enabled). Pressing the
-                        SHPHLD button for 2 s will put the device in the ship
-                        mode.
+                        SHPHLD button for 2 s will put the device in the Ship
+                        Mode.
                     </p>,
                 ],
             },
@@ -459,7 +457,7 @@ export const documentation: Documentation = {
                 title: 'tSHPHLD_DEB_HIB',
                 content: [
                     <p key="p1">
-                        Configures the SHPHLD pin debounce time, that is the
+                        Configure the SHPHLD pin debounce time, that is the
                         amount of time you need to push down the SHPHLD button
                         for nPM2100 to wake up from hibernate and the
                         hibernate_pt mode.
@@ -472,7 +470,7 @@ export const documentation: Documentation = {
                 title: 'Enter Ship Mode',
                 content: [
                     <p key="p1">
-                        Press for nPM2100 to enter the ship mode. Wake up
+                        Press for nPM2100 to enter the Ship Mode. Wake up
                         nPM2100 by pressing the SHPHLD button for 1 s (typ). The
                         ship mode is the lowest power consumption mode (35 nA).
                     </p>,
@@ -560,9 +558,7 @@ export const documentation: Documentation = {
             {
                 title: 'Start Timer',
                 content: [
-                    <p key="p1">
-                        Starts or stops the timer (default: stopped).
-                    </p>,
+                    <p key="p1">Start or stop the timer (default: stopped).</p>,
                 ],
             },
         ],
@@ -571,7 +567,7 @@ export const documentation: Documentation = {
                 title: 'Timer Mode',
                 content: [
                     <p key="p1">
-                        Selects Timer mode of operation. Available options:
+                        Select Timer mode of operation:
                         <ul className="tw-ml-6 tw-list-disc">
                             <li>General Purpose (default)</li>
                             <li>Watchdog Reset</li>
