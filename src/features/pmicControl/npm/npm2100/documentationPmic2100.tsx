@@ -535,6 +535,25 @@ export const documentation: Documentation = {
                 ],
             },
         ],
+        EnterBreakToWakeMode: [
+            {
+                title: 'Enter Break-to-wake Mode',
+                content: [
+                    <p key="p1">
+                        Press for nPM2100 to enter the break-to-wake mode.
+                    </p>,
+                    <p key="p2">
+                        In the Break-to-wake Mode, the behavior is similar to
+                        the Ship Mode. Unlike the Ship Mode, Break-to-wake
+                        expects a wire to be connected between the SHPHLD pin
+                        and GND. When this wire is disconnected, nPM2100 wakes
+                        up. The power consumption is the same as in the Ship
+                        Mode, with the addition of a configurable pull-up
+                        current across the SHPHLD wire.
+                    </p>,
+                ],
+            },
+        ],
     },
     timer: {
         TimeState: [
