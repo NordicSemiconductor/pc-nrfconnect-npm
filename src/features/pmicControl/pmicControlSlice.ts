@@ -247,8 +247,13 @@ const pmicControlSlice = createSlice({
         setBatteryConnected(state, action: PayloadAction<boolean>) {
             state.batteryConnected = action.payload;
         },
-        setFuelGauge(state, action: PayloadAction<boolean>) {
-            state.fuelGaugeSettings.enabled = action.payload;
+        updateFuelGauge(state, action: PayloadAction<Partial<FuelGauge>>) {
+            if (state.fuelGaugeSettings) {
+                state.fuelGaugeSettings = {
+                    ...state.fuelGaugeSettings,
+                    ...action.payload,
+                };
+            }
         },
         setActiveBatterModel(state, action: PayloadAction<BatteryModel>) {
             state.fuelGaugeSettings.activeBatterModel = action.payload;
@@ -293,18 +298,6 @@ const pmicControlSlice = createSlice({
                     ...action.payload,
                 };
             }
-        },
-        setFuelGaugeChargingSamplingRate(state, action: PayloadAction<number>) {
-            state.fuelGaugeSettings.chargingSamplingRate = action.payload;
-        },
-        setFuelGaugeNotChargingSamplingRate(
-            state,
-            action: PayloadAction<number>
-        ) {
-            state.fuelGaugeSettings.notChargingSamplingRate = action.payload;
-        },
-        setFuelGaugeReportingRate(state, action: PayloadAction<number>) {
-            state.fuelGaugeSettings.reportingRate = action.payload;
         },
         setErrorLogs(state, action: PayloadAction<Partial<ErrorLogs>>) {
             state.errorLogs = { ...state.errorLogs, ...action.payload };
@@ -379,6 +372,8 @@ export const isBatteryModuleConnected = (state: RootState) =>
     state.app.pmicControl.batteryAddonBoardId !== 0;
 export const getFuelGaugeEnabled = (state: RootState) =>
     state.app.pmicControl.fuelGaugeSettings.enabled;
+export const getFuelGaugeSettings = (state: RootState) =>
+    state.app.pmicControl.fuelGaugeSettings;
 export const getActiveBatterModel = (state: RootState) =>
     state.app.pmicControl.fuelGaugeSettings.activeBatterModel;
 export const getHardcodedBatterModels = (state: RootState) =>
@@ -441,7 +436,7 @@ export const {
     setBatteryConnected,
     setBatteryAddonBoardId,
     setPowerId,
-    setFuelGauge,
+    updateFuelGauge,
     setActiveBatterModel,
     setHardcodedBatterModels,
     setStoredBatterModel,
@@ -452,9 +447,6 @@ export const {
     stopEventRecording,
     setUsbPower,
     updateUsbPower,
-    setFuelGaugeChargingSamplingRate,
-    setFuelGaugeNotChargingSamplingRate,
-    setFuelGaugeReportingRate,
     setErrorLogs,
     setBreakToWakeDialogVisible,
 } = pmicControlSlice.actions;

@@ -5,7 +5,7 @@
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { FuelGaugeExport } from '../../types';
+import { FuelGauge, FuelGaugeExport } from '../../types';
 import { FuelGaugeGet } from './fuelGaugeGet';
 
 export class FuelGaugeSet {
@@ -30,7 +30,9 @@ export class FuelGaugeSet {
     enabled(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emit('onFuelGauge', enabled);
+                this.eventEmitter.emit('onFuelGauge', {
+                    enabled,
+                } satisfies Partial<FuelGauge>);
                 resolve();
             } else {
                 this.sendCommand(

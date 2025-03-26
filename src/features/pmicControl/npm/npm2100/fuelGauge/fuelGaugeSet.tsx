@@ -7,7 +7,7 @@
 import React from 'react';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { FuelGaugeExport, PmicDialog } from '../../types';
+import { FuelGauge, FuelGaugeExport, PmicDialog } from '../../types';
 import { FuelGaugeGet } from './fuelGaugeGet';
 
 export class FuelGaugeSet {
@@ -30,12 +30,17 @@ export class FuelGaugeSet {
 
     async all(fuelGauge: FuelGaugeExport) {
         await this.enabled(fuelGauge.enabled);
+        if (fuelGauge.discardPosiiveDeltaZ !== undefined) {
+            await this.discardPosiiveDeltaZ(fuelGauge.discardPosiiveDeltaZ);
+        }
     }
 
     enabled(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emit('onFuelGauge', enabled);
+                this.eventEmitter.emit('onFuelGauge', {
+                    enabled,
+                } satisfies Partial<FuelGauge>);
                 resolve();
             } else {
                 this.sendCommand(
@@ -92,5 +97,27 @@ export class FuelGaugeSet {
         }
 
         return action();
+    }
+
+    discardPosiiveDeltaZ(enabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emit('onFuelGauge', {
+                    discardPosiiveDeltaZ: enabled,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `fuel_gauge params runtime discard_positive_deltaz set ${
+                        enabled ? '1' : '0'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        this.get.discardPosiiveDeltaZ();
+                        reject();
+                    }
+                );
+            }
+        });
     }
 }

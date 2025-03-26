@@ -6,6 +6,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Toggle } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
@@ -13,8 +14,9 @@ import {
     PmicChargingState,
 } from '../../features/pmicControl/npm/types';
 import {
-    getFuelGaugeEnabled,
+    getFuelGaugeSettings,
     getLatestAdcSample,
+    getNpmDevice,
     getPmicChargingState,
     isBatteryConnected,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -73,7 +75,7 @@ const formatSecondsToString = (seconds: number) => {
 interface BatterySideTextProperties {
     batteryConnected: boolean;
     latestAdcSample?: AdcSample;
-    fuelGauge: boolean;
+    fuelGaugeEnabled: boolean;
 }
 
 const TimeToFullTimeToEmpty = (latestAdcSample: AdcSample) =>
@@ -105,7 +107,7 @@ const TimeToFullTimeToEmpty = (latestAdcSample: AdcSample) =>
 const SideText = ({
     batteryConnected,
     latestAdcSample,
-    fuelGauge,
+    fuelGaugeEnabled,
 }: BatterySideTextProperties) => (
     <div className="battery-side-panel">
         {!batteryConnected && (
@@ -120,7 +122,7 @@ const SideText = ({
             <>
                 <DocumentationTooltip card={card} item="StateOfCharge">
                     <h2>
-                        {fuelGauge &&
+                        {fuelGaugeEnabled &&
                         latestAdcSample &&
                         !Number.isNaN(latestAdcSample.soc)
                             ? `${latestAdcSample.soc ?? 0}%`
@@ -146,10 +148,11 @@ export default ({ disabled }: BatteryProperties) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
 
-    const fuelGauge = useSelector(getFuelGaugeEnabled);
+    const fuelGaugeSettings = useSelector(getFuelGaugeSettings);
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const batteryConnected = useSelector(isBatteryConnected);
+    const npmDevice = useSelector(getNpmDevice);
 
     useEffect(() => {
         const newIconSize = (iconWrapper.current?.clientHeight ?? 20) * 0.9;
@@ -159,44 +162,68 @@ export default ({ disabled }: BatteryProperties) => {
     const charging = isCharging(pmicChargingState);
 
     return (
-        <div className={`battery ${disabled ? 'disabled' : ''}`}>
-            <div className="battery-wrapper">
-                <div className="battery-graphic-wrapper">
-                    <div className="battery-graphic-wrapper-wrapper">
-                        <div className="battery-graphic">
-                            <div className="battery-nipple" />
-                            <div className="battery">
+        <div className="tw-flex tw-flex-col tw-gap-4 ">
+            {npmDevice?.fuelGaugeModule?.set.discardPosiiveDeltaZ !==
+                undefined && (
+                <Toggle
+                    label={
+                        <DocumentationTooltip
+                            card="battery"
+                            item="DiscardPositiveDeltaZ"
+                        >
+                            <span>Allow state-of-charge to increase</span>
+                        </DocumentationTooltip>
+                    }
+                    isToggled={!fuelGaugeSettings.discardPosiiveDeltaZ}
+                    disabled={disabled}
+                    onToggle={v =>
+                        npmDevice?.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(
+                            v
+                        )
+                    }
+                />
+            )}
+            <div className={`battery ${disabled ? 'disabled' : ''}`}>
+                <div className="battery-wrapper">
+                    <div className="battery-graphic-wrapper">
+                        <div className="battery-graphic-wrapper-wrapper">
+                            <div className="battery-graphic">
+                                <div className="battery-nipple" />
+                                <div className="battery">
+                                    <div
+                                        className={`gauge ${
+                                            charging ? 'animated' : ''
+                                        } ${charging ? 'charging' : ''}`}
+                                        style={{
+                                            height: `calc(${
+                                                fuelGaugeSettings.enabled &&
+                                                batteryConnected &&
+                                                !Number.isNaN(
+                                                    latestAdcSample?.soc ?? 0
+                                                )
+                                                    ? latestAdcSample?.soc ?? 0
+                                                    : 0
+                                            }% + 2px)`,
+                                        }}
+                                    />
+                                </div>
                                 <div
-                                    className={`gauge ${
-                                        charging ? 'animated' : ''
-                                    } ${charging ? 'charging' : ''}`}
-                                    style={{
-                                        height: `calc(${
-                                            fuelGauge &&
-                                            batteryConnected &&
-                                            !Number.isNaN(
-                                                latestAdcSample?.soc ?? 0
-                                            )
-                                                ? latestAdcSample?.soc ?? 0
-                                                : 0
-                                        }% + 2px)`,
-                                    }}
+                                    className={`state-missing ${
+                                        !batteryConnected ? '' : 'hidden'
+                                    }`}
+                                />
+                                <BatterIcon
+                                    pmicChargingState={pmicChargingState}
                                 />
                             </div>
-                            <div
-                                className={`state-missing ${
-                                    !batteryConnected ? '' : 'hidden'
-                                }`}
-                            />
-                            <BatterIcon pmicChargingState={pmicChargingState} />
                         </div>
                     </div>
+                    <SideText
+                        batteryConnected={batteryConnected}
+                        latestAdcSample={latestAdcSample}
+                        fuelGaugeEnabled={fuelGaugeSettings.enabled}
+                    />
                 </div>
-                <SideText
-                    batteryConnected={batteryConnected}
-                    latestAdcSample={latestAdcSample}
-                    fuelGauge={fuelGauge}
-                />
             </div>
         </div>
     );

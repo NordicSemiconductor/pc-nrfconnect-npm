@@ -198,6 +198,26 @@ describe('PMIC 2100 - Setters Online tests', () => {
             expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
         });
 
+        test.each([true, false])(
+            'Set fuel_gauge discard_positive_deltaz enabled: false',
+            async enabled => {
+                await pmic.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(enabled);
+
+                expect(mockEnqueueRequest).toBeCalledTimes(1);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `fuel_gauge params runtime discard_positive_deltaz set ${
+                        enabled ? '1' : '0'
+                    }`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
+            }
+        );
+
         test('Set setFuelGaugeEnabled enabled: true', async () => {
             pmic.fuelGaugeModule?.set.enabled(true);
             await new Promise<void>(resolve => {
@@ -553,6 +573,37 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
                     `fuel_gauge get`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Updates should only be emitted when we get response
+                expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
+            }
+        );
+
+        test.each([true, false])(
+            'Set discard_positive_deltaz - Fail immediately: %p',
+            async enabled => {
+                await expect(
+                    pmic.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(enabled)
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `fuel_gauge params runtime discard_positive_deltaz set ${
+                        enabled ? '1' : '0'
+                    }`,
+                    expect.anything(),
+                    undefined,
+                    true
+                );
+
+                // Refresh data due to error
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `fuel_gauge params runtime discard_positive_deltaz get`,
                     expect.anything(),
                     undefined,
                     true

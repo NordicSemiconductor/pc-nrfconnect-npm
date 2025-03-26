@@ -40,10 +40,6 @@ import {
     setBucks,
     setCharger,
     setErrorLogs,
-    setFuelGauge,
-    setFuelGaugeChargingSamplingRate,
-    setFuelGaugeNotChargingSamplingRate,
-    setFuelGaugeReportingRate,
     setGPIOs,
     setHardcodedBatterModels,
     setLatestAdcSample,
@@ -63,6 +59,7 @@ import {
     updateBoost,
     updateBuck,
     updateCharger,
+    updateFuelGauge,
     updateGPIOs,
     updateLdo,
     updateLEDs,
@@ -163,19 +160,24 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onAdcSettingsChange(settings => {
-                    dispatch(setFuelGaugeReportingRate(settings.reportRate));
+                    dispatch(
+                        updateFuelGauge({
+                            reportingRate: settings.reportRate,
+                        })
+                    );
                     dispatch((_, getState) => {
                         if (getState().app.pmicControl.charger?.enabled) {
                             dispatch(
-                                setFuelGaugeChargingSamplingRate(
-                                    settings.samplingRate
-                                )
+                                updateFuelGauge({
+                                    chargingSamplingRate: settings.samplingRate,
+                                })
                             );
                         } else {
                             dispatch(
-                                setFuelGaugeNotChargingSamplingRate(
-                                    settings.samplingRate
-                                )
+                                updateFuelGauge({
+                                    notChargingSamplingRate:
+                                        settings.samplingRate,
+                                })
                             );
                         }
                     });
@@ -227,7 +229,7 @@ export default () => {
 
             releaseAll.push(
                 npmDevice.onFuelGaugeUpdate(payload => {
-                    dispatch(setFuelGauge(payload));
+                    dispatch(updateFuelGauge(payload));
                 })
             );
 

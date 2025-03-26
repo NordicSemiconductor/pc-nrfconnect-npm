@@ -396,6 +396,8 @@ export default class Npm2100 extends BaseNpmDevice {
                 enabled: currentState.fuelGaugeSettings.enabled,
                 chargingSamplingRate:
                     currentState.fuelGaugeSettings.chargingSamplingRate,
+                discardPosiiveDeltaZ:
+                    currentState.fuelGaugeSettings.discardPosiiveDeltaZ,
             },
             firmwareVersion: currentState.npmDevice.supportedVersion,
             deviceType: currentState.npmDevice.deviceType,
