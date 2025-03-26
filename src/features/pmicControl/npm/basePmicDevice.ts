@@ -29,6 +29,7 @@ import {
     Charger,
     ChargerModule,
     ErrorLogs,
+    FuelGauge,
     FuelGaugeModule,
     GPIO,
     GpioModule,
@@ -528,8 +529,8 @@ export default abstract class BaseNpmDevice {
             handler
         );
     }
-    onFuelGaugeUpdate(handler: (payload: boolean) => void) {
-        return this.setupHandler<boolean>('onFuelGauge')(handler);
+    onFuelGaugeUpdate(handler: (payload: FuelGauge) => void) {
+        return this.setupHandler<FuelGauge>('onFuelGauge')(handler);
     }
     onLdoUpdate(handler: (payload: PartialUpdate<Ldo>, error: string) => void) {
         return this.setupHandler<PartialUpdate<Ldo>, true>('onLdoUpdate')(

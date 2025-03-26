@@ -139,6 +139,7 @@ export type FuelGauge = {
     reportingRate: number;
     chargingSamplingRate?: number;
     activeBatterModel?: BatteryModel;
+    discardPosiiveDeltaZ?: boolean;
 };
 
 export type Charger = {
@@ -438,12 +439,14 @@ export interface FuelGaugeModule {
         enabled: () => void;
         activeBatteryModel: () => void;
         storedBatteryModel: () => void;
+        discardPosiiveDeltaZ?: () => void;
     };
     set: {
         all: (config: FuelGaugeExport) => Promise<void>;
         enabled: (enabled: boolean) => Promise<void>;
         activeBatteryModel: (name: string) => Promise<void>;
         batteryStatusCheckEnabled?: (enabled: boolean) => Promise<void>;
+        discardPosiiveDeltaZ?: (value: boolean) => void;
     };
     actions: {
         abortDownloadFuelGaugeProfile: () => Promise<void>;

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { BatteryModel } from '../../types';
+import { BatteryModel, FuelGauge } from '../../types';
 import {
     GPIODriveValues,
     GPIOMode2100,
@@ -73,8 +73,39 @@ describe('PMIC 2100 - Command callbacks', () => {
         callback?.onSuccess(`Value: ${enabled ? '1' : '0'}`, command);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
-        expect(mockOnFuelGaugeUpdate).toBeCalledWith(enabled);
+        expect(mockOnFuelGaugeUpdate).toBeCalledWith({
+            enabled,
+        } satisfies Partial<FuelGauge>);
     });
+
+    test.each(
+        [true, false]
+            .map(enabled => [
+                {
+                    enabled,
+                    append: 'get',
+                },
+                {
+                    enabled,
+                    append: `set ${enabled ? '1' : '0'}`,
+                },
+            ])
+            .flat()
+    )(
+        'fuel_gauge params runtime discard_positive_deltaz %p',
+        ({ enabled, append }) => {
+            const command = `fuel_gauge params runtime discard_positive_deltaz ${append}`;
+            const callback =
+                eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+            callback?.onSuccess(`Value: ${enabled ? '1' : '0'}`, command);
+
+            expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
+            expect(mockOnFuelGaugeUpdate).toBeCalledWith({
+                discardPosiiveDeltaZ: enabled,
+            } satisfies Partial<FuelGauge>);
+        }
+    );
 
     test.each(['get', 'set "Generic_AA"'])('fuel_gauge model %p', append => {
         const command = `fuel_gauge model ${append}`;

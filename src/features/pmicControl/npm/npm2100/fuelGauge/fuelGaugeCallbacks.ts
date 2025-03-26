@@ -18,6 +18,7 @@ import {
 import {
     BatteryModel,
     BatteryModelCharacterization,
+    FuelGauge,
     ProfileDownload,
 } from '../../types';
 import type FuelGaugeModule from '.';
@@ -37,7 +38,9 @@ export default (
                 toRegex('fuel_gauge', true, undefined, '(1|0)'),
 
                 res => {
-                    eventEmitter.emit('onFuelGauge', parseToBoolean(res));
+                    eventEmitter.emit('onFuelGauge', {
+                        enabled: parseToBoolean(res),
+                    } satisfies Partial<FuelGauge>);
                 },
                 noop
             )
@@ -48,6 +51,23 @@ export default (
                 toRegex('fuel_gauge model download begin'),
                 () => shellParser?.setShellEchos(false),
                 () => shellParser?.setShellEchos(true)
+            )
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'fuel_gauge params runtime discard_positive_deltaz',
+                    true,
+                    undefined,
+                    '(1|0)'
+                ),
+                res => {
+                    eventEmitter.emit('onFuelGauge', {
+                        discardPosiiveDeltaZ: parseToBoolean(res),
+                    } satisfies Partial<FuelGauge>);
+                },
+                noop
             )
         );
 

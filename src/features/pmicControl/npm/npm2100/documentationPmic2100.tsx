@@ -295,6 +295,21 @@ export const documentation: Documentation = {
                 content: [<p key="p1">0% to 100%, in 0.1% steps</p>],
             },
         ],
+        DiscardPositiveDeltaZ: [
+            {
+                title: 'Allow State of Charge to increase',
+                content: [
+                    <p key="p1">
+                        Enable or disable allowing State of Charge to increase.
+                    </p>,
+                    <p key="p2">
+                        It is recommended to have this option enabled during
+                        evaluation to see how the fuel gauge performs in varying
+                        conditions.
+                    </p>,
+                ],
+            },
+        ],
     },
     batteryStatus: {
         Voltage: [

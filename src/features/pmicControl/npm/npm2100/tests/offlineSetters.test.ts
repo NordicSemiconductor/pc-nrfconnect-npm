@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { PmicDialog } from '../../types';
+import { FuelGauge, PmicDialog } from '../../types';
 import { GPIOMode2100, GPIOPull2100 } from '../gpio/types';
 import { PMIC_2100_GPIOS, PMIC_2100_LDOS, setupMocksBase } from './helpers';
 
@@ -21,6 +21,22 @@ describe('PMIC 2100 - Setters Offline tests', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
+
+    test.each([true, false])(
+        'Set setFuelGuageEnable index: %p',
+        async enabled => {
+            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
+                dialog.onConfirm();
+            });
+
+            await pmic.fuelGaugeModule?.set.enabled(enabled);
+
+            expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
+            expect(mockOnFuelGaugeUpdate).toBeCalledWith({
+                enabled,
+            });
+        }
+    );
 
     test.each(PMIC_2100_LDOS)('Set setLdoVoltage index: %p', async index => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
@@ -108,7 +124,9 @@ describe('PMIC 2100 - Setters Offline tests', () => {
         await pmic.fuelGaugeModule?.set.enabled(false);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
-        expect(mockOnFuelGaugeUpdate).toBeCalledWith(false);
+        expect(mockOnFuelGaugeUpdate).toBeCalledWith({
+            enabled: false,
+        } satisfies Partial<FuelGauge>);
     });
 });
 

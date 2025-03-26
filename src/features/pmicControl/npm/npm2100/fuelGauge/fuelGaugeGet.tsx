@@ -18,6 +18,7 @@ export class FuelGaugeGet {
         this.enabled();
         this.activeBatteryModel();
         this.storedBatteryModel();
+        this.discardPosiiveDeltaZ();
     }
 
     enabled() {
@@ -28,5 +29,10 @@ export class FuelGaugeGet {
     }
     storedBatteryModel() {
         this.sendCommand(`fuel_gauge model list`);
+    }
+    discardPosiiveDeltaZ() {
+        this.sendCommand(
+            `fuel_gauge params runtime discard_positive_deltaz get`
+        );
     }
 }

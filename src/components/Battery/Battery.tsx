@@ -73,7 +73,7 @@ const formatSecondsToString = (seconds: number) => {
 interface BatterySideTextProperties {
     batteryConnected: boolean;
     latestAdcSample?: AdcSample;
-    fuelGauge: boolean;
+    fuelGaugeEnabled: boolean;
 }
 
 const TimeToFullTimeToEmpty = (latestAdcSample: AdcSample) =>
@@ -105,7 +105,7 @@ const TimeToFullTimeToEmpty = (latestAdcSample: AdcSample) =>
 const SideText = ({
     batteryConnected,
     latestAdcSample,
-    fuelGauge,
+    fuelGaugeEnabled,
 }: BatterySideTextProperties) => (
     <div className="battery-side-panel">
         {!batteryConnected && (
@@ -120,7 +120,7 @@ const SideText = ({
             <>
                 <DocumentationTooltip card={card} item="StateOfCharge">
                     <h2>
-                        {fuelGauge &&
+                        {fuelGaugeEnabled &&
                         latestAdcSample &&
                         !Number.isNaN(latestAdcSample.soc)
                             ? `${latestAdcSample.soc ?? 0}%`
@@ -146,7 +146,7 @@ export default ({ disabled }: BatteryProperties) => {
     const [iconSize, setIconSize] = useState(0);
     const iconWrapper = useRef<HTMLDivElement | null>(null);
 
-    const fuelGauge = useSelector(getFuelGaugeEnabled);
+    const fuelGaugeEnabled = useSelector(getFuelGaugeEnabled);
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const batteryConnected = useSelector(isBatteryConnected);
@@ -172,7 +172,7 @@ export default ({ disabled }: BatteryProperties) => {
                                     } ${charging ? 'charging' : ''}`}
                                     style={{
                                         height: `calc(${
-                                            fuelGauge &&
+                                            fuelGaugeEnabled &&
                                             batteryConnected &&
                                             !Number.isNaN(
                                                 latestAdcSample?.soc ?? 0
@@ -195,7 +195,7 @@ export default ({ disabled }: BatteryProperties) => {
                 <SideText
                     batteryConnected={batteryConnected}
                     latestAdcSample={latestAdcSample}
-                    fuelGauge={fuelGauge}
+                    fuelGaugeEnabled={fuelGaugeEnabled}
                 />
             </div>
         </div>

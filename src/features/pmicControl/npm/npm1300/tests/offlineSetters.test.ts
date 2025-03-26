@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { npm1300TimerMode, npm1300TimeToActive, PmicDialog } from '../../types';
+import {
+    FuelGauge,
+    npm1300TimerMode,
+    npm1300TimeToActive,
+    PmicDialog,
+} from '../../types';
 import { GPIOMode1300, GPIOPull1300 } from '../gpio/types';
 import {
     PMIC_1300_BUCKS,
@@ -464,7 +469,9 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         await pmic.fuelGaugeModule?.set.enabled(false);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
-        expect(mockOnFuelGaugeUpdate).toBeCalledWith(false);
+        expect(mockOnFuelGaugeUpdate).toBeCalledWith({
+            enabled: false,
+        } satisfies Partial<FuelGauge>);
     });
 
     test('Set VBusin currentLimiter', async () => {

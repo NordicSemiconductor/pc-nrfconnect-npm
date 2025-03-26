@@ -10,7 +10,7 @@ import { Card, Toggle } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    getFuelGaugeEnabled,
+    getFuelGaugeSettings,
     getNpmDevice,
 } from '../../../features/pmicControl/pmicControlSlice';
 import Battery, {
@@ -19,7 +19,7 @@ import Battery, {
 
 export default ({ disabled }: BatteryCardProperties) => {
     const npmDevice = useSelector(getNpmDevice);
-    const fuelGauge = useSelector(getFuelGaugeEnabled);
+    const fuelGaugeSettings = useSelector(getFuelGaugeSettings);
 
     return (
         <Card
@@ -30,7 +30,7 @@ export default ({ disabled }: BatteryCardProperties) => {
                     </DocumentationTooltip>
                     <Toggle
                         label="Enable"
-                        isToggled={fuelGauge}
+                        isToggled={fuelGaugeSettings.enabled}
                         onToggle={enabled =>
                             npmDevice?.fuelGaugeModule?.set.enabled(enabled)
                         }
@@ -39,6 +39,26 @@ export default ({ disabled }: BatteryCardProperties) => {
                 </div>
             }
         >
+            {npmDevice?.fuelGaugeModule?.set.discardPosiiveDeltaZ !==
+                undefined && (
+                <Toggle
+                    label={
+                        <DocumentationTooltip
+                            card="battery"
+                            item="DiscardPositiveDeltaZ"
+                        >
+                            <span>Allow State of Charge to increase</span>
+                        </DocumentationTooltip>
+                    }
+                    isToggled={!fuelGaugeSettings.discardPosiiveDeltaZ}
+                    disabled={disabled}
+                    onToggle={enabled =>
+                        npmDevice?.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(
+                            !enabled
+                        )
+                    }
+                />
+            )}
             <Battery disabled={disabled} />
         </Card>
     );

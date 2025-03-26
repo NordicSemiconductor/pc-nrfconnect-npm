@@ -7,6 +7,7 @@
 import {
     Buck,
     Charger,
+    FuelGauge,
     GPIO,
     GPIOExport,
     Ldo,
@@ -403,7 +404,9 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(3);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
-        expect(mockOnFuelGaugeUpdate).toBeCalledWith(true);
+        expect(mockOnFuelGaugeUpdate).toBeCalledWith({
+            enabled: true,
+        } satisfies Partial<FuelGauge>);
 
         expect(mockOnUsbPower).toBeCalledTimes(1);
     };
