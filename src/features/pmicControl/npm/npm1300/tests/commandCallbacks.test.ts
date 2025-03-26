@@ -7,6 +7,7 @@
 import {
     BatteryModel,
     BuckOnOffControlValues,
+    FuelGauge,
     GPIOValues,
     LdoOnOffControlValues,
     LEDModeValues,
@@ -412,7 +413,9 @@ describe('PMIC 1300 - Command callbacks', () => {
         callback?.onSuccess(`Value: ${enabled ? '1' : '0'}`, command);
 
         expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
-        expect(mockOnFuelGaugeUpdate).toBeCalledWith(enabled);
+        expect(mockOnFuelGaugeUpdate).toBeCalledWith({
+            enabled,
+        } satisfies Partial<FuelGauge>);
     });
 
     test.each(['get', 'set "LP803448"'])('fuel_gauge model %p', append => {

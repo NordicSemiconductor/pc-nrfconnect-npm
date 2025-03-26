@@ -15,7 +15,7 @@ import {
     parseToBoolean,
     toRegex,
 } from '../../pmicHelpers';
-import { ProfileDownload } from '../../types';
+import { FuelGauge, ProfileDownload } from '../../types';
 import type FuelGaugeModule from '.';
 import { FuelGaugeGet } from './fuelGaugeGet';
 
@@ -33,7 +33,9 @@ export default (
                 toRegex('fuel_gauge', true, undefined, '(1|0)'),
 
                 res => {
-                    eventEmitter.emit('onFuelGauge', parseToBoolean(res));
+                    eventEmitter.emit('onFuelGauge', {
+                        enabled: parseToBoolean(res),
+                    } satisfies Partial<FuelGauge>);
                 },
                 noop
             )
