@@ -514,8 +514,8 @@ export const documentation: Documentation = {
                     </p>,
                     <p key="p2">
                         In the hibernate PT mode, BOOST is running in
-                        pass-through pass-through mode, mode, VOUT is
-                        discharged, and Load Switch/LDO is disabled.
+                        pass-through mode, mode, VOUT is discharged, and Load
+                        Switch/LDO is disabled.
                     </p>,
                     <p key="p3">
                         Wake up nPM2100 by pressing the SHPHLD button for
