@@ -297,12 +297,15 @@ export const documentation: Documentation = {
         ],
         DiscardPositiveDeltaZ: [
             {
-                title: 'Allow state-of-charge to increase',
+                title: 'Allow State of Charge to increase',
                 content: [
                     <p key="p1">
-                        Enable/disable allowing state of charge to increase.
-                        It’s recommended to have this enabled during evaluation
-                        to see how fuel gauge performs with varying conditions.
+                        Enable or disable allowing State of Charge to increase.
+                    </p>,
+                    <p key="p2">
+                        It is recommended to have this option enabled during
+                        evaluation to see how the fuel gauge performs in varying
+                        conditions.
                     </p>,
                 ],
             },

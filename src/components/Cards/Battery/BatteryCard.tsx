@@ -47,7 +47,7 @@ export default ({ disabled }: BatteryCardProperties) => {
                             card="battery"
                             item="DiscardPositiveDeltaZ"
                         >
-                            <span>Allow state-of-charge to increase</span>
+                            <span>Allow State of Charge to increase</span>
                         </DocumentationTooltip>
                     }
                     isToggled={!fuelGaugeSettings.discardPosiiveDeltaZ}
