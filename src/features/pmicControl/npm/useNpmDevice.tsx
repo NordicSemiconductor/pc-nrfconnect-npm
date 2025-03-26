@@ -135,7 +135,7 @@ export default () => {
             });
 
             npmDevice.batteryProfiler?.isProfiling();
-            npmDevice.fuelGaugeModule?.set.batteryStatusCheckEnabled(true);
+            npmDevice.fuelGaugeModule?.set.batteryStatusCheckEnabled?.(true);
         }
     }, [dispatch, isPMICPowered, npmDevice, pmicState, supportedVersion]);
 

@@ -443,7 +443,7 @@ export interface FuelGaugeModule {
         all: (config: FuelGaugeExport) => Promise<void>;
         enabled: (enabled: boolean) => Promise<void>;
         activeBatteryModel: (name: string) => Promise<void>;
-        batteryStatusCheckEnabled: (enabled: boolean) => Promise<void>;
+        batteryStatusCheckEnabled?: (enabled: boolean) => Promise<void>;
     };
     actions: {
         abortDownloadFuelGaugeProfile: () => Promise<void>;
