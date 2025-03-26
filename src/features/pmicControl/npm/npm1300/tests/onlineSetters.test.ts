@@ -1328,7 +1328,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each([true, false])(
             'startBatteryStatusCheck enabled: %p',
             async enabled => {
-                await pmic.fuelGaugeModule?.set.batteryStatusCheckEnabled(
+                await pmic.fuelGaugeModule?.set.batteryStatusCheckEnabled?.(
                     enabled
                 );
 

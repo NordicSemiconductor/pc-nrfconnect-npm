@@ -333,23 +333,6 @@ describe('PMIC 2100 - Setters Online tests', () => {
             // Updates should only be emitted when we get response
             expect(mockOnActiveBatteryModelUpdate).toBeCalledTimes(0);
         });
-
-        test.each([true, false])(
-            'startBatteryStatusCheck enabled: %p',
-            async enabled => {
-                await pmic.fuelGaugeModule?.set.batteryStatusCheckEnabled(
-                    enabled
-                );
-
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npm_chg_status_check set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
-            }
-        );
     });
 
     describe('Setters and effects state - error', () => {
