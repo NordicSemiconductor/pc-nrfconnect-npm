@@ -136,7 +136,7 @@ const buckDoc = (n: number) => ({
     ],
 });
 
-const ldoDoc = () => ({
+const ldoDoc = (index: number) => ({
     LoadSwitchLDO: [
         {
             title: 'Load Switch/LDO',
@@ -161,7 +161,7 @@ const ldoDoc = () => ({
             title: (
                 <>
                     <span>V</span>
-                    <span className="subscript">OUTLDO2</span>
+                    <span className="subscript">OUTLDO{index}</span>
                 </>
             ),
             content: [<p key="p1">Set the LDO output voltage level.</p>],
@@ -898,8 +898,8 @@ export const documentation: Documentation = {
             },
         ],
     },
-    ldo1: ldoDoc(),
-    ldo2: ldoDoc(),
+    ldo1: ldoDoc(1),
+    ldo2: ldoDoc(2),
     buck1: buckDoc(1),
     buck2: buckDoc(2),
     gpio0: gpioDoc(0),
