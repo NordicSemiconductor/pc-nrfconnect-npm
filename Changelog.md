@@ -1,3 +1,9 @@
+## 2.0.1 - unreleased
+
+### Changed
+
+-   Update dependencies to support the nRF Connect for Desktop v5.2.0 release.
+
 ## 2.0.0 - 2025-03-28
 
 ### Added

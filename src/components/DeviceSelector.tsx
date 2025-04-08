@@ -9,12 +9,11 @@ import {
     DeviceSelector,
     DeviceSetupConfig,
     getAppFile,
-    logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { DeviceTraits } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import path from 'path';
 
-import { closeDevice, openDevice } from '../actions/deviceActions';
+import { closeDevice } from '../actions/deviceActions';
 import {
     npm1300DeviceSetup,
     npm2100DeviceSetup,
@@ -76,23 +75,7 @@ export default () => {
         <DeviceSelector
             deviceSetupConfig={deviceSetupConfig}
             deviceListing={deviceListing}
-            onDeviceConnected={device =>
-                logger.info(`Device Connected SN:${device.serialNumber}`)
-            }
-            onDeviceDisconnected={device =>
-                logger.info(`Device Disconnected SN:${device.serialNumber}`)
-            }
-            onDeviceSelected={device =>
-                logger.info(`Selected device with s/n ${device.serialNumber}`)
-            }
-            onDeviceIsReady={device => {
-                logger.info(
-                    `Device setup ready for device with s/n ${device.serialNumber}`
-                );
-                dispatch(openDevice(device));
-            }}
             onDeviceDeselected={() => {
-                logger.info('Deselected device');
                 dispatch(closeDevice());
                 dispatch(
                     setCompleteStep({
