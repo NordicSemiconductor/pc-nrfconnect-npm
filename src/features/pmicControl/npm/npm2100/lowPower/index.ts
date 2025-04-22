@@ -11,6 +11,7 @@ import {
     LowPowerConfig,
     LowPowerModule,
     npm2100TimeToActive,
+    PmicDialog,
     TimeToActive,
 } from '../../types';
 import { LowPowerActions } from './lowPowerActions';
@@ -34,15 +35,12 @@ export default class Module implements LowPowerModule {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void
         ) => void,
+        dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
         offlineMode: boolean
     ) {
         this._get = new LowPowerGet(sendCommand);
         this._set = new LowPowerSet(eventEmitter, sendCommand, offlineMode);
-        this._actions = new LowPowerActions(
-            eventEmitter,
-            sendCommand,
-            offlineMode
-        );
+        this._actions = new LowPowerActions(sendCommand, dialogHandler);
         this._callbacks = shipModeCallbacks(shellParser, eventEmitter);
     }
 

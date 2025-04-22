@@ -22,7 +22,6 @@ import {
     getUsbPower,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
-import EnterBreakToWakeDialog from './EnterBreakToWakeDialog';
 import ErrorStatuses from './ErrorStatuses';
 import LowPower from './LowPower';
 import PowerFailure from './PowerFailure';
@@ -85,7 +84,6 @@ export default ({ active }: PaneProps) => {
                         supportedErrorLogs={npmDevice.supportedErrorLogs}
                     />
                 )}
-            <EnterBreakToWakeDialog />
         </MasonryLayout>
     ) : null;
 };
