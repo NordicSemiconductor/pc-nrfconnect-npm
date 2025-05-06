@@ -240,19 +240,23 @@ export default () => {
                 </div>
 
                 <div className="d-flex flex-column-reverse">
-                    {projects.map(project => (
-                        <React.Fragment key={project.path}>
-                            {project.error && (
-                                <MissingProjectSettingsCard project={project} />
-                            )}
-                            {project.settings && (
-                                <ProjectCard
-                                    projectSettingsPath={project.path}
-                                    settings={project.settings}
-                                />
-                            )}
-                        </React.Fragment>
-                    ))}
+                    {projects
+                        .sort(a => (a.error ? 1 : -1))
+                        .map(project => (
+                            <React.Fragment key={project.path}>
+                                {project.error && (
+                                    <MissingProjectSettingsCard
+                                        project={project}
+                                    />
+                                )}
+                                {project.settings && !project.error && (
+                                    <ProjectCard
+                                        projectSettingsPath={project.path}
+                                        settings={project.settings}
+                                    />
+                                )}
+                            </React.Fragment>
+                        ))}
                 </div>
                 {showAddProjectDialog && (
                     <AddEditProjectDialog

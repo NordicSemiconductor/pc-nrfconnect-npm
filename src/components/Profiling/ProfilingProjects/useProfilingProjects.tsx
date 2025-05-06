@@ -15,9 +15,12 @@ import {
     getProjectProfileProgress,
     getRecentProjects,
     setProfilingProjects,
-    updateProfilingProject,
 } from '../../../features/pmicControl/profilingProjectsSlice.';
-import { readProjectSettingsFromFile, reloadRecentProjects } from '../helpers';
+import {
+    readAndUpdateProjectSettings,
+    readProjectSettingsFromFile,
+    reloadRecentProjects,
+} from '../helpers';
 
 export const useProfilingProjects = () => {
     const dispatch = useDispatch();
@@ -60,22 +63,13 @@ export const useProfilingProjects = () => {
         dispatch(
             setProfilingProjects(
                 recentProjects.map(recentProject => ({
-                    path: recentProject,
                     ...readProjectSettingsFromFile(recentProject),
                 }))
             )
         );
 
-        recentProjects.forEach(recentProject => {
-            const profilingProject = readProjectSettingsFromFile(recentProject);
-
-            dispatch(
-                updateProfilingProject({
-                    path: recentProject,
-                    settings: profilingProject.settings,
-                    error: profilingProject.error,
-                })
-            );
-        });
+        recentProjects.forEach(recentProject =>
+            dispatch(readAndUpdateProjectSettings(recentProject))
+        );
     }, [dispatch, recentProjects]);
 };

@@ -15,6 +15,7 @@ import path from 'path';
 import packageJsons from '../../../package.json';
 import { RootState } from '../../appReducer';
 import { Profile } from '../../features/pmicControl/npm/types';
+import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import {
     addRecentProject,
     loadRecentProject,
@@ -69,9 +70,9 @@ const updateSettingsWithValidPath = (project?: ProfilingProject) =>
 
 export const readProjectSettingsFromFile = (
     filePath: string
-): Omit<ProjectPathPair, 'path'> => {
+): ProjectPathPair => {
     if (!fs.existsSync(filePath)) {
-        return { settings: undefined, error: 'fileMissing' };
+        return { path: filePath, settings: undefined, error: 'fileMissing' };
     }
 
     try {
@@ -79,43 +80,53 @@ export const readProjectSettingsFromFile = (
             fs.readFileSync(filePath).toString()
         ) as ProfilingProject;
 
-        zodProfilingProject.parse(profilingProject);
+        const project = updateSettingsWithValidPath(
+            zodProfilingProject.parse(profilingProject)
+        );
 
-        return { settings: updateSettingsWithValidPath(profilingProject) };
+        return {
+            path: filePath,
+            settings: project,
+        };
     } catch (error) {
-        return { settings: undefined, error: 'fileCorrupted' };
+        return { path: filePath, settings: undefined, error: 'fileCorrupted' };
     }
 };
 
 export const readAndUpdateProjectSettings =
     (
         filePath: string,
-        updateProject: (currentProject: ProfilingProject) => ProfilingProject
+        updateProject?: (currentProject: ProfilingProject) => ProfilingProject
     ): AppThunk =>
-    dispatch => {
-        const profilingProject = JSON.parse(
-            fs.readFileSync(filePath).toString()
-        ) as ProfilingProject;
+    (dispatch, getState) => {
+        const project = readProjectSettingsFromFile(filePath);
 
-        zodProfilingProject.parse(profilingProject);
+        // It is assumed here that the file exists and is valid
 
-        const oldProject = updateSettingsWithValidPath(profilingProject);
-
-        if (oldProject) {
+        if (project?.settings && updateProject) {
             try {
-                const newProject = updateProject(oldProject);
-                newProject.appVersion = packageJsons.version;
-                fs.writeFileSync(filePath, JSON.stringify(newProject, null, 2));
-                dispatch(
-                    updateProfilingProject({
-                        path: filePath,
-                        settings: newProject,
-                    })
+                const newSettings = updateProject(project.settings);
+                newSettings.appVersion = packageJsons.version;
+                fs.writeFileSync(
+                    filePath,
+                    JSON.stringify(newSettings, null, 2)
                 );
+                project.settings = newSettings;
             } catch (error) {
                 logger.error(describeError(error));
             }
         }
+        dispatch(
+            updateProfilingProject({
+                path: filePath,
+                settings: project.settings,
+                error:
+                    getNpmDevice(getState())?.deviceType ===
+                    project.settings?.deviceType
+                        ? undefined
+                        : 'unsupportedDevice',
+            })
+        );
     };
 
 export const saveProjectSettings =

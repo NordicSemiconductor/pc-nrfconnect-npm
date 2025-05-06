@@ -9,6 +9,7 @@ import {
     ShellParser,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
+import { z } from 'zod';
 
 import { RangeType } from '../../../utils/helpers';
 import type {
@@ -526,6 +527,7 @@ export interface ChargerModule {
         current: RangeType;
         nTCBeta: RangeType;
         iBatLim: FixedListRange;
+        vLowerCutOff?: RangeType;
     };
     defaults: Charger;
 }
@@ -814,7 +816,12 @@ export interface PmicDialog {
     progress?: number;
 }
 
-export type NpmModel = 'npm1300' | 'npm1304' | 'npm2100';
+export const zodSchemaNpmMode = z.union([
+    z.literal('npm1300'),
+    z.literal('npm1304'),
+    z.literal('npm2100'),
+]);
+export type NpmModel = z.infer<typeof zodSchemaNpmMode>;
 
 export type FuelGaugeExport = Omit<
     FuelGauge,
