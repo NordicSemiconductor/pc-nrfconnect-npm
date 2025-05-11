@@ -32,8 +32,6 @@ import overlay from './overlay';
 import ResetModule from './reset';
 import TimerModule from './timerConfig';
 
-/* eslint-disable no-underscore-dangle */
-
 export const npm2100FWVersion = '0.7.1+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
@@ -68,7 +66,7 @@ export default class Npm2100 extends BaseNpmDevice {
             }
         );
 
-        this._ldoModule = [
+        this.ldoModule = [
             new LdoModule(
                 0,
                 this.shellParser,
@@ -79,7 +77,7 @@ export default class Npm2100 extends BaseNpmDevice {
             ),
         ];
 
-        this._gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
+        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
             i =>
                 new GpioModule(
                     i,
@@ -91,7 +89,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 )
         );
 
-        this._fuelGaugeModule = new FuelGaugeModule(
+        this.fuelGaugeModule = new FuelGaugeModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
@@ -100,13 +98,13 @@ export default class Npm2100 extends BaseNpmDevice {
             this.initializeFuelGauge.bind(this)
         );
 
-        this._batteryModule = new BatteryModule(
+        this.batteryModule = new BatteryModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this)
         );
 
-        this._boostModule = [
+        this.boostModule = [
             new BoostModule(
                 this.shellParser,
                 this.eventEmitter,
@@ -116,21 +114,21 @@ export default class Npm2100 extends BaseNpmDevice {
             ),
         ];
 
-        this._lowPowerModule = new LowPowerModule(
+        this.lowPowerModule = new LowPowerModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
             this.offlineMode
         );
 
-        this._resetModule = new ResetModule(
+        this.resetModule = new ResetModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
             this.offlineMode
         );
 
-        this._timerConfigModule = new TimerModule(
+        this.timerConfigModule = new TimerModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
@@ -168,19 +166,6 @@ export default class Npm2100 extends BaseNpmDevice {
                         });
                     });
                 })
-            );
-
-            this.releaseAll.push(...this._batteryModule.callbacks);
-            this.releaseAll.push(...this._timerConfigModule.callbacks);
-            this.releaseAll.push(...this._resetModule.callbacks);
-            this.releaseAll.push(
-                ...this.boostModule.map(boost => boost.callbacks).flat()
-            );
-            this.releaseAll.push(
-                ...this.ldoModule.map(ldo => ldo.callbacks).flat()
-            );
-            this.releaseAll.push(
-                ...this.gpioModule.map(module => module.callbacks).flat()
             );
         }
     }
@@ -350,7 +335,7 @@ export default class Npm2100 extends BaseNpmDevice {
                         const listenerADtor = this.onAdcSample(async () => {
                             listenerADtor();
                             try {
-                                await this._fuelGaugeModule?.actions.reset();
+                                await this.fuelGaugeModule?.actions.reset();
                                 const listenerBDtor = this.onAdcSample(() => {
                                     listenerBDtor();
                                     this.boostModule[0].set

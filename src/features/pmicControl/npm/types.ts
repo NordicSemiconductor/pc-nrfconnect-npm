@@ -103,6 +103,17 @@ export const NTCValues = ['Ignore NTC', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
 export type VTrickleFast = (typeof VTrickleFastValues)[number];
 export type NTCThermistor = (typeof NTCValues)[number];
 
+export type ModuleSettings = {
+    charger: boolean;
+    maxEnergyExtraction: boolean;
+    noOfBoosts: number;
+    noOfBucks: number;
+    noOfLdos: number;
+    noOfLEDs: number;
+    noOfBatterySlots: number;
+    noOfGPIOs: number;
+};
+
 export type CCProfilingState =
     | 'Off'
     | 'Running'
@@ -805,7 +816,7 @@ export interface PmicDialog {
     progress?: number;
 }
 
-export type NpmModel = 'npm1300' | 'npm2100';
+export type NpmModel = 'npm1300' | 'npm1304' | 'npm2100';
 
 export type FuelGaugeExport = Omit<
     FuelGauge,

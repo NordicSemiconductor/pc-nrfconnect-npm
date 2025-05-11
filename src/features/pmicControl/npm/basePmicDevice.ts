@@ -90,61 +90,146 @@ export default abstract class BaseNpmDevice {
     get supportedErrorLogs() {
         return this._supportedErrorLogs;
     }
-    protected _pmicState: PmicState;
+
+    #pmicState: PmicState;
     get pmicState() {
-        return this._pmicState;
+        return this.#pmicState;
     }
+
     protected set pmicState(newState: PmicState) {
-        this._pmicState = newState;
+        this.#pmicState = newState;
     }
-    protected _boostModule: BoostModule[] = [];
+
+    #boostModule: BoostModule[] = [];
     get boostModule() {
-        return [...this._boostModule];
+        return [...this.#boostModule];
     }
-    protected _buckModule: BuckModule[] = [];
+
+    protected set boostModule(boostModule: BoostModule[]) {
+        this.releaseAll.push(
+            ...boostModule.map(boost => boost.callbacks).flat()
+        );
+        this.#boostModule = boostModule;
+    }
+
+    #buckModule: BuckModule[] = [];
     get buckModule() {
-        return [...this._buckModule];
+        return [...this.#buckModule];
     }
-    protected _ldoModule: LdoModule[] = [];
+
+    protected set buckModule(buckModule: BuckModule[]) {
+        this.releaseAll.push(...buckModule.map(buck => buck.callbacks).flat());
+        this.#buckModule = buckModule;
+    }
+
+    #ldoModule: LdoModule[] = [];
     get ldoModule() {
-        return [...this._ldoModule];
+        return [...this.#ldoModule];
     }
-    protected _gpioModule: GpioModule[] = [];
+
+    protected set ldoModule(ldoModule: LdoModule[]) {
+        this.releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
+        this.#ldoModule = ldoModule;
+    }
+
+    #gpioModule: GpioModule[] = [];
     get gpioModule() {
-        return [...this._gpioModule];
+        return [...this.#gpioModule];
     }
-    protected _fuelGaugeModule?: FuelGaugeModule;
+
+    protected set gpioModule(gpioModule: GpioModule[]) {
+        this.releaseAll.push(...gpioModule.map(gpio => gpio.callbacks).flat());
+        this.#gpioModule = gpioModule;
+    }
+
+    #fuelGaugeModule?: FuelGaugeModule;
     get fuelGaugeModule() {
-        return this._fuelGaugeModule;
+        return this.#fuelGaugeModule;
     }
-    protected _batteryModule?: BatteryModule;
+
+    protected set fuelGaugeModule(
+        fuelGaugeModule: FuelGaugeModule | undefined
+    ) {
+        !!fuelGaugeModule && this.releaseAll.push(...fuelGaugeModule.callbacks);
+        this.#fuelGaugeModule = fuelGaugeModule;
+    }
+
+    #batteryModule?: BatteryModule;
     get batteryModule() {
-        return this._batteryModule;
+        return this.#batteryModule;
     }
-    protected _lowPowerModule?: LowPowerModule;
+
+    protected set batteryModule(batteryModule: BatteryModule | undefined) {
+        !!batteryModule && this.releaseAll.push(...batteryModule.callbacks);
+        this.#batteryModule = batteryModule;
+    }
+
+    #lowPowerModule?: LowPowerModule;
     get lowPowerModule() {
-        return this._lowPowerModule;
+        return this.#lowPowerModule;
     }
-    protected _resetModule?: ResetModule;
+
+    protected set lowPowerModule(lowPowerModule: LowPowerModule | undefined) {
+        !!lowPowerModule && this.releaseAll.push(...lowPowerModule.callbacks);
+        this.#lowPowerModule = lowPowerModule;
+    }
+
+    #resetModule?: ResetModule;
     get resetModule() {
-        return this._resetModule;
+        return this.#resetModule;
     }
-    protected _timerConfigModule?: TimerConfigModule;
+
+    protected set resetModule(resetModule: ResetModule | undefined) {
+        !!resetModule && this.releaseAll.push(...resetModule.callbacks);
+        this.#resetModule = resetModule;
+    }
+
+    #timerConfigModule?: TimerConfigModule;
     get timerConfigModule() {
-        return this._timerConfigModule;
+        return this.#timerConfigModule;
     }
-    protected _usbCurrentLimiterModule?: UsbCurrentLimiterModule;
+
+    protected set timerConfigModule(
+        timerConfigModule: TimerConfigModule | undefined
+    ) {
+        !!timerConfigModule &&
+            this.releaseAll.push(...timerConfigModule.callbacks);
+        this.#timerConfigModule = timerConfigModule;
+    }
+
+    #usbCurrentLimiterModule?: UsbCurrentLimiterModule;
     get usbCurrentLimiterModule() {
-        return this._usbCurrentLimiterModule;
+        return this.#usbCurrentLimiterModule;
     }
-    protected _pofModule?: PofModule;
+
+    protected set usbCurrentLimiterModule(
+        usbCurrentLimiterModule: UsbCurrentLimiterModule | undefined
+    ) {
+        !!usbCurrentLimiterModule &&
+            this.releaseAll.push(...usbCurrentLimiterModule.callbacks);
+        this.#usbCurrentLimiterModule = usbCurrentLimiterModule;
+    }
+
+    #pofModule?: PofModule;
     get pofModule() {
-        return this._pofModule;
+        return this.#pofModule;
     }
-    protected _chargerModule?: ChargerModule;
+
+    protected set pofModule(pofModule: PofModule | undefined) {
+        !!pofModule && this.releaseAll.push(...pofModule.callbacks);
+        this.#pofModule = pofModule;
+    }
+
+    #chargerModule?: ChargerModule;
     get chargerModule() {
-        return this._chargerModule;
+        return this.#chargerModule;
     }
+
+    protected set chargerModule(chargerModule: ChargerModule | undefined) {
+        !!chargerModule && this.releaseAll.push(...chargerModule.callbacks);
+        this.#chargerModule = chargerModule;
+    }
+
     protected _batteryProfiler?: BatteryProfiler;
     get batteryProfiler() {
         return this._batteryProfiler;
@@ -171,7 +256,7 @@ export default abstract class BaseNpmDevice {
         readonly batteryConnectedVoltageThreshold: number,
         private readonly _supportedErrorLogs: SupportedErrorLogs
     ) {
-        this._pmicState = shellParser ? 'pmic-connected' : 'ek-disconnected';
+        this.#pmicState = shellParser ? 'pmic-connected' : 'ek-disconnected';
         this.offlineMode = !shellParser;
 
         if (shellParser) {
