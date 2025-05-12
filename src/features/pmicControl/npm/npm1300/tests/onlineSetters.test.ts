@@ -8,13 +8,8 @@ import { LEDModeValues, PmicDialog } from '../../types';
 import { helpers, PMIC_1300_LEDS, setupMocksWithShellParser } from './helpers';
 
 describe('PMIC 1300 - Setters Online tests', () => {
-    const {
-        mockDialogHandler,
-        mockOnLEDUpdate,
-        mockEnqueueRequest,
-        mockOnUsbPower,
-        pmic,
-    } = setupMocksWithShellParser();
+    const { mockDialogHandler, mockOnLEDUpdate, mockEnqueueRequest, pmic } =
+        setupMocksWithShellParser();
     describe('Setters and effects state - success', () => {
         beforeEach(() => {
             jest.clearAllMocks();
@@ -46,22 +41,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Updates should only be emitted when we get response
             expect(mockOnLEDUpdate).toBeCalledTimes(0);
         });
-
-        test('Set vBusinCurrentLimiter', async () => {
-            await pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(5);
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx vbusin current_limit set 5000`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnUsbPower).toBeCalledTimes(0);
-        });
     });
     describe('Setters and effects state - error', () => {
         beforeEach(() => {
@@ -81,7 +60,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 }))
             ).flat()
         )(
-            'Set setGpioMode - Fail immediately - index: %p',
+            'Set setLedMode - Fail immediately - index: %p',
             async ({ index, mode, modeIndex }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
@@ -114,32 +93,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 expect(mockOnLEDUpdate).toBeCalledTimes(0);
             }
         );
-
-        test('Set vBusinCurrentLimiter - Fail immediately', async () => {
-            await expect(
-                pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(5)
-            ).rejects.toBeUndefined();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx vbusin current_limit set 5000`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npmx vbusin current_limit get`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnUsbPower).toBeCalledTimes(0);
-        });
     });
 });
 

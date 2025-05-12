@@ -8,7 +8,7 @@ import { PMIC_1300_LEDS, setupMocksBase } from './helpers';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell
 describe('PMIC 1300 - Setters Offline tests', () => {
-    const { mockOnLEDUpdate, mockOnUsbPower, pmic } = setupMocksBase();
+    const { mockOnLEDUpdate, pmic } = setupMocksBase();
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -22,13 +22,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
             data: { mode: 'Charger error' },
             index,
         });
-    });
-
-    test('Set VBusin currentLimiter', async () => {
-        await pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(500);
-
-        expect(mockOnUsbPower).toBeCalledTimes(1);
-        expect(mockOnUsbPower).toBeCalledWith({ currentLimiter: 500 });
     });
 });
 

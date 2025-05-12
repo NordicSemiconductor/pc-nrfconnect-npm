@@ -12,6 +12,7 @@ import {
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
+import { USBDetectStatusValues, USBPower } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -26,6 +27,22 @@ export default (
                 res => {
                     eventEmitter.emit('onUsbPower', {
                         currentLimiter: parseToNumber(res) / 1000,
+                    });
+                },
+                noop
+            )
+        );
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'powerup_vbusin status get',
+                    false,
+                    undefined,
+                    '(0|1|2|3)'
+                ),
+                res => {
+                    eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
+                        detectStatus: USBDetectStatusValues[parseToNumber(res)],
                     });
                 },
                 noop

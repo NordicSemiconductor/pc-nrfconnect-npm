@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { LEDModeValues, USBDetectStatusValues } from '../../types';
+import { LEDModeValues } from '../../types';
 import { PMIC_1300_LEDS, setupMocksWithShellParser } from './helpers';
 
 describe('PMIC 1300 - Command callbacks', () => {
-    const { eventHandlers, mockOnUsbPower, mockOnLEDUpdate, mockOnReboot } =
+    const { eventHandlers, mockOnLEDUpdate, mockOnReboot } =
         setupMocksWithShellParser();
 
     beforeEach(() => {
@@ -36,20 +36,6 @@ describe('PMIC 1300 - Command callbacks', () => {
         expect(mockOnReboot).toBeCalledTimes(1);
         expect(mockOnReboot).toBeCalledWith(false, 'Error: some message');
     });
-
-    test.each(USBDetectStatusValues.map((state, index) => ({ state, index })))(
-        'powerup_vbusin status get %p',
-        ({ state, index }) => {
-            const command = `powerup_vbusin status get`;
-            const callback =
-                eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-            callback?.onSuccess(`Value: ${index}`, command);
-
-            expect(mockOnUsbPower).toBeCalledTimes(1);
-            expect(mockOnUsbPower).toBeCalledWith({ detectStatus: state });
-        }
-    );
 
     test.each(
         PMIC_1300_LEDS.map(index =>
@@ -79,18 +65,6 @@ describe('PMIC 1300 - Command callbacks', () => {
         expect(mockOnLEDUpdate).toBeCalledWith({
             data: { mode },
             index,
-        });
-    });
-    test.each(['get', 'set 500'])('npmx vbusin current_limit %p', append => {
-        const command = `npmx vbusin current_limit ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-        callback?.onSuccess(`Value: 500 mA.`, command);
-
-        expect(mockOnUsbPower).toBeCalledTimes(1);
-        expect(mockOnUsbPower).toBeCalledWith({
-            currentLimiter: 0.5,
         });
     });
 });
