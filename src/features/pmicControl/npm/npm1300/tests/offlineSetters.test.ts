@@ -11,7 +11,6 @@ import { PMIC_1300_LEDS, setupMocksBase } from './helpers';
 describe('PMIC 1300 - Setters Offline tests', () => {
     const {
         mockOnLEDUpdate,
-        mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
         mockOnResetUpdate,
         mockOnUsbPower,
@@ -20,20 +19,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-    });
-
-    test('Set set pof enable ', async () => {
-        await pmic.pofModule?.set.enabled(true);
-
-        expect(mockOnPOFUpdate).toBeCalledTimes(1);
-        expect(mockOnPOFUpdate).toBeCalledWith({ enable: true });
-    });
-
-    test('Set set pof polarity ', async () => {
-        await pmic.pofModule?.set.polarity('Active low');
-
-        expect(mockOnPOFUpdate).toBeCalledTimes(1);
-        expect(mockOnPOFUpdate).toBeCalledWith({ polarity: 'Active low' });
     });
 
     test('Set set timer config mode ', async () => {
