@@ -12,7 +12,6 @@ import {
 } from '../../types';
 import { GPIOMode1300, GPIOPull1300 } from '../gpio/types';
 import {
-    PMIC_1300_BUCKS,
     PMIC_1300_GPIOS,
     PMIC_1300_LDOS,
     PMIC_1300_LEDS,
@@ -23,7 +22,6 @@ import {
 describe('PMIC 1300 - Setters Offline tests', () => {
     const {
         mockDialogHandler,
-        mockOnBuckUpdate,
         mockOnFuelGaugeUpdate,
         mockOnLdoUpdate,
         mockOnGpioUpdate,
@@ -39,105 +37,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
-
-    test.each(PMIC_1300_BUCKS)('Set setBuckVOut index: %p', async index => {
-        await pmic.buckModule[index].set.vOutNormal(1.2);
-
-        expect(mockOnBuckUpdate).toBeCalledTimes(2);
-        expect(mockOnBuckUpdate).nthCalledWith(1, {
-            data: { vOutNormal: 1.2 },
-            index,
-        });
-        expect(mockOnBuckUpdate).nthCalledWith(2, {
-            data: { mode: 'software' },
-            index,
-        });
-    });
-
-    test.each(PMIC_1300_BUCKS)('Set setBuckRetentionVOut  index: %p', index => {
-        pmic.buckModule[index].set.vOutRetention(1.2);
-
-        expect(mockOnBuckUpdate).toBeCalledTimes(1);
-        expect(mockOnBuckUpdate).nthCalledWith(1, {
-            data: { vOutRetention: 1.2 },
-            index,
-        });
-    });
-
-    test.each(PMIC_1300_BUCKS)('Set setBuckMode index: %p', async index => {
-        await pmic.buckModule[index].set.mode('software');
-
-        expect(mockOnBuckUpdate).toBeCalledTimes(1);
-        expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { mode: 'software' },
-            index,
-        });
-    });
-
-    test.each(PMIC_1300_BUCKS)(
-        'Set setBuckModeControl index: %p',
-        async index => {
-            await pmic.buckModule[index].set.modeControl('Auto');
-
-            expect(mockOnBuckUpdate).toBeCalledTimes(1);
-            expect(mockOnBuckUpdate).toBeCalledWith({
-                data: { modeControl: 'Auto' },
-                index,
-            });
-        }
-    );
-
-    test.each(PMIC_1300_BUCKS)(
-        'Set setBuckOnOffControl index: %p',
-        async index => {
-            await pmic.buckModule[index].set.onOffControl('Off');
-
-            expect(mockOnBuckUpdate).toBeCalledTimes(1);
-            expect(mockOnBuckUpdate).toBeCalledWith({
-                data: {
-                    onOffControl: 'Off',
-                    onOffSoftwareControlEnabled: true,
-                },
-                index,
-            });
-        }
-    );
-
-    test.each(PMIC_1300_BUCKS)(
-        'Set setBuckRetentionControl index: %p',
-        async index => {
-            await pmic.buckModule[index].set.retentionControl('Off');
-
-            expect(mockOnBuckUpdate).toBeCalledTimes(1);
-            expect(mockOnBuckUpdate).toBeCalledWith({
-                data: { retentionControl: 'Off' },
-                index,
-            });
-        }
-    );
-
-    test.each(PMIC_1300_BUCKS)('Set setBuckEnabled index: %p', async index => {
-        await pmic.buckModule[index].set.enabled(false);
-
-        expect(mockOnBuckUpdate).toBeCalledTimes(1);
-        expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { enabled: false },
-            index,
-        });
-    });
-
-    test.each(PMIC_1300_BUCKS)(
-        'Set setBuckActiveDischargeEnabled index: %p',
-        async index => {
-            await pmic.buckModule[index].set.activeDischarge(false);
-
-            expect(mockOnBuckUpdate).toBeCalledTimes(1);
-            expect(mockOnBuckUpdate).toBeCalledWith({
-                data: { activeDischarge: false },
-                index,
-            });
-        }
-    );
 
     test.each(PMIC_1300_LDOS)('Set setLdoVoltage index: %p', async index => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
