@@ -11,6 +11,7 @@ import {
 
 import BaseNpmDevice from '../basePmicDevice';
 import {
+    Boost,
     Buck,
     Charger,
     ErrorLogs,
@@ -46,6 +47,10 @@ export const setupMocksBase = (
     const mockOnBuckUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_partialUpdate: PartialUpdate<Buck>) => {}
+    );
+    const mockOnBoostUpdate = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: PartialUpdate<Boost>) => {}
     );
     const mockOnChargerUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -103,6 +108,7 @@ export const setupMocksBase = (
     pmic.onAdcSample(mockOnAdcSample);
     pmic.onBeforeReboot(mockOnBeforeReboot);
     pmic.onBuckUpdate(mockOnBuckUpdate);
+    pmic.onBoostUpdate(mockOnBoostUpdate);
     pmic.onChargerUpdate(mockOnChargerUpdate);
     pmic.onGPIOUpdate(mockOnGpioUpdate);
     pmic.onLEDUpdate(mockOnLEDUpdate);
@@ -126,6 +132,7 @@ export const setupMocksBase = (
         mockOnAdcSample,
         mockOnBeforeReboot,
         mockOnBuckUpdate,
+        mockOnBoostUpdate,
         mockOnChargerUpdate,
         mockOnChargingStatusUpdate,
         mockOnFuelGaugeUpdate,
