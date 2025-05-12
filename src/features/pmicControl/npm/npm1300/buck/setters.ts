@@ -16,7 +16,7 @@ import {
     GPIOValues,
     PmicDialog,
 } from '../../types';
-import { BuckGet } from './buckGet';
+import { BuckGet } from './getters';
 
 export class BuckSet {
     private get: BuckGet;
