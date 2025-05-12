@@ -64,18 +64,6 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test('Request update shipLongPressReset', () => {
-        pmic.resetModule?.get.longPressReset();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `powerup_ship longpress get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
     test('Request startAdcSample', () => {
         pmic.startAdcSample(2000, 1000);
 

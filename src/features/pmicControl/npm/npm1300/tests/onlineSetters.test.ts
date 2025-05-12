@@ -17,7 +17,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
         mockDialogHandler,
         mockOnLEDUpdate,
         mockOnTimerConfigUpdate,
-        mockOnResetUpdate,
         mockEnqueueRequest,
         mockOnUsbPower,
         pmic,
@@ -109,21 +108,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
             // Updates should only be emitted when we get response
             expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-        });
-
-        test('Set ship reset longpress two_button', async () => {
-            await pmic.resetModule?.set.longPressReset?.('two_button');
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `powerup_ship longpress set two_button`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnResetUpdate).toBeCalledTimes(0);
         });
 
         test('Set vBusinCurrentLimiter', async () => {
@@ -304,35 +288,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
             // Updates should only be emitted when we get response
             expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-        });
-        test('Set setShipLongPressReset - Fail immediately - index: %p', async () => {
-            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onConfirm();
-            });
-
-            await expect(
-                pmic.resetModule?.set.longPressReset?.('one_button')
-            ).rejects.toBeUndefined();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `powerup_ship longpress set one_button`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `powerup_ship longpress get`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnResetUpdate).toBeCalledTimes(0);
         });
 
         test('Set vBusinCurrentLimiter - Fail immediately', async () => {

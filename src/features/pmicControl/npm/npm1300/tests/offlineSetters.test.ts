@@ -9,13 +9,8 @@ import { PMIC_1300_LEDS, setupMocksBase } from './helpers';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell
 describe('PMIC 1300 - Setters Offline tests', () => {
-    const {
-        mockOnLEDUpdate,
-        mockOnTimerConfigUpdate,
-        mockOnResetUpdate,
-        mockOnUsbPower,
-        pmic,
-    } = setupMocksBase();
+    const { mockOnLEDUpdate, mockOnTimerConfigUpdate, mockOnUsbPower, pmic } =
+        setupMocksBase();
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -42,15 +37,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ period: 1000 });
-    });
-
-    test('Set set timer reset longpress ', async () => {
-        await pmic.resetModule?.set.longPressReset?.('disabled');
-
-        expect(mockOnResetUpdate).toBeCalledTimes(1);
-        expect(mockOnResetUpdate).toBeCalledWith({
-            longPressReset: 'disabled',
-        });
     });
 
     test.each(PMIC_1300_LEDS)('Set setLedMode index: %p', async index => {

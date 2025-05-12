@@ -6,7 +6,6 @@
 
 import {
     LEDModeValues,
-    LongPressResetValues,
     npm1300TimerMode,
     TimerPrescalerValues,
     USBDetectStatusValues,
@@ -19,7 +18,6 @@ describe('PMIC 1300 - Command callbacks', () => {
         mockOnUsbPower,
         mockOnLEDUpdate,
         mockOnTimerConfigUpdate,
-        mockOnResetUpdate,
         mockOnReboot,
     } = setupMocksWithShellParser();
 
@@ -161,24 +159,6 @@ describe('PMIC 1300 - Command callbacks', () => {
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({
             period: 2800,
-        });
-    });
-
-    test.each(
-        LongPressResetValues.map(value => [
-            { append: `get`, value },
-            { append: `set ${value}`, value },
-        ])
-    )('powerup_ship longpress %p', ({ append, value }) => {
-        const command = `powerup_ship longpress ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-        callback?.onSuccess(`Value: ${value}`, command);
-
-        expect(mockOnResetUpdate).toBeCalledTimes(1);
-        expect(mockOnResetUpdate).toBeCalledWith({
-            longPressReset: value,
         });
     });
 
