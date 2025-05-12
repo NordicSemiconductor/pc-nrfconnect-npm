@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     classNames,
     DialogButton,
@@ -15,6 +15,7 @@ import {
 
 import { showSaveDialog } from '../../../actions/fileActions';
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
+import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import { readAndUpdateProjectSettings, saveProjectSettings } from '../helpers';
 import { ProfilingProject } from '../types';
 
@@ -30,6 +31,7 @@ export default ({
     };
     onClose: () => void;
 }) => {
+    const npmDevice = useSelector(getNpmDevice);
     const [validName, setValidName] = useState(!!projectSettings);
     const [name, setName] = useState(projectSettings?.project.name ?? '');
 
@@ -43,6 +45,9 @@ export default ({
     const [capacity, setCapacity] = useState(800);
     const dispatch = useDispatch();
     const maxLength = 20;
+
+    if (!npmDevice || !npmDevice.chargerModule?.ranges.vLowerCutOff)
+        return null;
 
     return (
         <GenericDialog
@@ -90,6 +95,8 @@ export default ({
                                                     result.filePath,
                                                     {
                                                         name,
+                                                        deviceType:
+                                                            npmDevice?.deviceType,
                                                         capacity,
                                                         vLowerCutOff,
                                                         vUpperCutOff,
@@ -152,12 +159,7 @@ export default ({
                     }
                     unit="V"
                     value={vUpperCutOff}
-                    range={{
-                        min: 4,
-                        max: 4.4,
-                        step: 0.05,
-                        decimals: 2,
-                    }}
+                    range={npmDevice.chargerModule.ranges.voltage}
                     onChange={setUpperVCutOff}
                 />
                 <NumberInput
@@ -171,12 +173,7 @@ export default ({
                     }
                     unit="V"
                     value={vLowerCutOff}
-                    range={{
-                        min: 2.7,
-                        max: 3.1,
-                        step: 0.05,
-                        decimals: 2,
-                    }}
+                    range={npmDevice.chargerModule.ranges.vLowerCutOff}
                     onChange={setLowerVCutOff}
                 />
             </div>

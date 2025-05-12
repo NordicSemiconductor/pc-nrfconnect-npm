@@ -127,6 +127,7 @@ export default ({
 
             const project: Omit<ProfilingProject, 'appVersion'> = {
                 name,
+                deviceType: npmDevice.deviceType,
                 capacity,
                 vLowerCutOff,
                 vUpperCutOff,

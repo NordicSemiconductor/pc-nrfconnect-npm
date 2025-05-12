@@ -69,7 +69,9 @@ export const generateParamsFromCSV =
     async dispatch => {
         const project = readProjectSettingsFromFile(projectAbsolutePath);
 
-        if (!project || !project.settings) {
+        // Checking error AND settings should be superfluous
+        // but is necessary due to type conflicts as settings is required later
+        if (!project || project.error || !project.settings) {
             throw new Error('Invalid project index');
         }
         const profile = project.settings?.profiles[index];

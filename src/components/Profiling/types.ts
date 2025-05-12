@@ -6,10 +6,12 @@
 
 import { z } from 'zod';
 
+import { zodSchemaNpmMode } from '../../features/pmicControl/npm/types';
+
 export type ProjectPathPair = {
     path: string;
     settings: ProfilingProject | undefined;
-    error?: 'fileMissing' | 'fileCorrupted';
+    error?: 'fileMissing' | 'fileCorrupted' | 'unsupportedDevice';
 };
 
 export type ProfilingCSVProgress = {
@@ -38,6 +40,7 @@ export type ProfilingProjectProfile = z.infer<
 
 export const zodProfilingProject = z.object({
     name: z.string(),
+    deviceType: zodSchemaNpmMode.default('npm1300'),
     capacity: z.number(),
     vLowerCutOff: z.number(),
     vUpperCutOff: z.number(),

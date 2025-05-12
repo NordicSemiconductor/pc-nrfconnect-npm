@@ -20,16 +20,18 @@ export default ({ project }: { project: ProjectPathPair }) => {
                     <div>
                         <span>{project.path}</span>
                     </div>
-                    <div>
-                        <Button
-                            onClick={() =>
-                                dispatch(removeRecentProject(project.path))
-                            }
-                            variant="secondary"
-                        >
-                            Remove
-                        </Button>
-                    </div>
+                    {project.error !== 'unsupportedDevice' && (
+                        <div>
+                            <Button
+                                onClick={() =>
+                                    dispatch(removeRecentProject(project.path))
+                                }
+                                variant="secondary"
+                            >
+                                Remove
+                            </Button>
+                        </div>
+                    )}
                 </div>
             }
         >
@@ -42,6 +44,14 @@ export default ({ project }: { project: ProjectPathPair }) => {
                 {project.error === 'fileCorrupted' && (
                     <Alert label="Error: " variant="danger">
                         Project settings are corrupt or not valid format
+                    </Alert>
+                )}
+                {project.error === 'unsupportedDevice' && (
+                    <Alert label="Info: " variant="info">
+                        This project is not supported for this device{' '}
+                        {project.settings?.deviceType
+                            ? `(supports ${project.settings.deviceType})`
+                            : ''}
                     </Alert>
                 )}
             </div>
