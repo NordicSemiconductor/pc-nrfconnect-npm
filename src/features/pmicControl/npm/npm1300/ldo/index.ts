@@ -9,9 +9,9 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Ldo, LdoExport, LdoModule, PmicDialog } from '../../types';
-import ldoCallbacks from './ldoCallbacks';
-import { LdoGet } from './ldoGet';
-import { LdoSet } from './ldoSet';
+import ldoCallbacks from './callbacks';
+import { LdoGet } from './getters';
+import { LdoSet } from './setters';
 import { SoftStart, SoftStartValues } from './types';
 
 const ldoDefaults = (): Ldo => ({
