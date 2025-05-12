@@ -27,6 +27,8 @@ import {
     dialogHandler,
     isNpm1300SerialApplicationMode,
     isNpm1300SerialRecoverMode,
+    isNpm1304SerialApplicationMode,
+    isNpm1304SerialRecoverMode,
     isNpm2100SerialApplicationMode,
     isNpm2100SerialRecoverMode,
 } from './pmicHelpers';
@@ -242,6 +244,107 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
                     return p;
                 }
+
+                return action();
+            } catch (e) {
+                await dispose();
+                throw e;
+            }
+        },
+    tryToSwitchToApplicationMode: () => () =>
+        new Promise<Device | null>(resolve => {
+            resolve(null);
+        }),
+});
+
+export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
+    supportsProgrammingMode: (device: Device) =>
+        device.traits.mcuBoot === true &&
+        device.traits.serialPorts === true &&
+        (isNpm1304SerialRecoverMode(device) ||
+            isNpm1304SerialApplicationMode(device)),
+    getFirmwareOptions: device => [
+        {
+            key: firmware.key,
+            description: firmware.description,
+            programDevice: onProgress => dispatch =>
+                new Promise<Device>((resolve, reject) => {
+                    let success = false;
+                    dispatch(
+                        setWaitForDevice({
+                            timeout: 60000,
+                            when: programmedDevice =>
+                                // device lib report device with wrong value initially so we have to wait until device is fully recognized
+                                programmedDevice.serialPorts?.length === 2 &&
+                                programmedDevice.traits.mcuBoot === true &&
+                                device.traits.serialPorts === true &&
+                                isNpm1304SerialApplicationMode(
+                                    programmedDevice
+                                ),
+                            once: true,
+                            onSuccess: dev => {
+                                success = true;
+                                resolve(dev);
+                            },
+                            onFail: reject,
+                        })
+                    );
+                    NrfutilDeviceLib.program(device, firmware.hex, progress => {
+                        onProgress(
+                            progress.stepProgressPercentage,
+                            progress.message
+                        );
+                    })
+                        .then(() => {
+                            onProgress(
+                                100,
+                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.'
+                            );
+                        })
+                        .catch(err => {
+                            if (err && !success) {
+                                reject(err.message);
+                            }
+                        });
+                    logger.debug('firmware updated finished');
+                }),
+        },
+    ],
+    isExpectedFirmware:
+        (
+            device: Device
+        ): AppThunk<
+            RootState,
+            Promise<{
+                device: Device;
+                validFirmware: boolean;
+            }>
+        > =>
+        async () => {
+            if (!(device.serialPorts && device.serialPorts[0].comName)) {
+                throw new Error('device does not have a serial port');
+            }
+
+            if (isNpm1304SerialRecoverMode(device)) {
+                return {
+                    device,
+                    validFirmware: false,
+                };
+            }
+
+            const { npmDevice, dispose } = await getNpmDeviceObject(
+                device.serialPorts[0].comName
+            );
+
+            try {
+                const result = await npmDevice.isSupportedVersion();
+
+                const action = () => ({
+                    device,
+                    validFirmware: result.supported,
+                });
+
+                await dispose();
 
                 return action();
             } catch (e) {
