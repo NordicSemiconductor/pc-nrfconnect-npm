@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { helpers } from '../../../tests/helpers';
 import { LdoMode, PmicDialog } from '../../../types';
-import { helpers, PMIC_2100_LDOS, setupMocksWithShellParser } from '../helpers';
+import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../helpers';
 
 describe('PMIC 2100 - Setters Online tests - LDO', () => {
     const { mockDialogHandler, mockOnLdoUpdate, mockEnqueueRequest, pmic } =
