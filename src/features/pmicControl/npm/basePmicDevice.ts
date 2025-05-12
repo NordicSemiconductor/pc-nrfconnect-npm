@@ -21,7 +21,6 @@ import {
     AdcSampleSettings,
     BatteryModel,
     BatteryModule,
-    BatteryProfiler,
     Boost,
     BoostModule,
     Buck,
@@ -33,6 +32,7 @@ import {
     FuelGaugeModule,
     GPIO,
     GpioModule,
+    IBatteryProfiler,
     Ldo,
     LdoModule,
     LED,
@@ -230,7 +230,7 @@ export default abstract class BaseNpmDevice {
         this.#chargerModule = chargerModule;
     }
 
-    protected _batteryProfiler?: BatteryProfiler;
+    protected _batteryProfiler?: IBatteryProfiler;
     get batteryProfiler() {
         return this._batteryProfiler;
     }

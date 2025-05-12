@@ -911,11 +911,7 @@ export interface Profile {
     profilingProfiles: CCProfile[];
 }
 
-export interface IBatteryProfiler {
-    (shellParser: ShellParser, eventEmitter: EventEmitter): BatteryProfiler;
-}
-
-export type BatteryProfiler = {
+export type IBatteryProfiler = {
     release: () => void;
     setProfile: (
         reportIntervalCc: number,
