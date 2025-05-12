@@ -12,7 +12,7 @@ import {
     GPIOMode as GPIOModeBase,
     GPIOPull as GPIOPullModeBase,
 } from '../../types';
-import { GpioGet } from './gpioGetters';
+import { GpioGet } from './getters';
 import { GPIOMode1300, GPIOModeKeys, GPIOModeValues } from './types';
 
 export class GpioSet {

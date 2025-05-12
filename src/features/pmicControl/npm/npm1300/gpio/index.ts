@@ -8,9 +8,9 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { GPIO, GPIODrive, GPIOMode, GpioModule, GPIOPull } from '../../types';
-import gpioCallbacks from './gpioCallbacks';
-import { GpioGet } from './gpioGetters';
-import { GpioSet } from './gpioSetters';
+import gpioCallbacks from './callbacks';
+import { GpioGet } from './getters';
+import { GpioSet } from './setters';
 import {
     GPIODriveKeys,
     GPIODriveValues,
