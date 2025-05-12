@@ -12,6 +12,7 @@ import {
     GPIOExport,
     Ldo,
     LED,
+    LowPowerConfig,
     npm1300LowPowerConfig,
     npm1300TimerConfig,
     npm1300TimerMode,
@@ -348,11 +349,11 @@ describe('PMIC 1300 - Apply Config ', () => {
         });
 
         mockOnLowPowerUpdate.mockImplementation(
-            (partialUpdate: Partial<npm1300LowPowerConfig>) => {
+            (partialUpdate: Partial<LowPowerConfig>) => {
                 ship = {
                     ...ship,
                     ...partialUpdate,
-                };
+                } as npm1300LowPowerConfig;
             }
         );
 

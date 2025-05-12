@@ -17,9 +17,16 @@ export const getRange = (ranges: RangeType[]): number[] => {
     const out: number[] = [];
 
     ranges.forEach(range => {
-        lodashRange(range.min, range.max + (range.step ?? 1), range.step).map(
-            (_value, index) => out.push(range.min + index * (range.step ?? 1))
-        );
+        lodashRange(
+            range.min,
+            range.max + (range.step ?? 1),
+            range.step
+        ).forEach((_value, index) => {
+            const v = range.min + index * (range.step ?? 1);
+            if (v >= range.min && v <= range.max) {
+                out.push(range.min + index * (range.step ?? 1));
+            }
+        });
     });
 
     return out;
