@@ -13,10 +13,10 @@ import {
     npm1300TimeToActive,
     TimeToActive,
 } from '../../types';
-import { LowPowerActions } from './lowPowerActions';
-import shipModeCallbacks from './lowPowerCallbacks';
-import { LowPowerGet } from './lowPowerGetters';
-import { LowPowerSet } from './lowPowerSetters';
+import { LowPowerActions } from './actions';
+import shipModeCallbacks from './callbacks';
+import { LowPowerGet } from './getters';
+import { LowPowerSet } from './setters';
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */

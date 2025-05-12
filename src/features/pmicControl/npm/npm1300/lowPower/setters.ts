@@ -6,7 +6,7 @@
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { npm1300LowPowerConfig, npm1300TimeToActive } from '../../types';
-import { LowPowerGet } from './lowPowerGetters';
+import { LowPowerGet } from './getters';
 
 export class LowPowerSet {
     private get: LowPowerGet;
