@@ -14,9 +14,9 @@ import {
     type ChargerModule as ChargerModuleBase,
     FixedListRange,
 } from '../../types';
-import chargerCallbacks from './chargerCallbacks';
-import { ChargerGet } from './chargerGetters';
-import { ChargerSet } from './chargerSetters';
+import chargerCallbacks from './callbacks';
+import { ChargerGet } from './getters';
+import { ChargerSet } from './setters';
 
 export default class Module implements ChargerModuleBase {
     private _get: ChargerGet;
