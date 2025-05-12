@@ -4,12 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { helpers } from '../../tests/helpers';
 import { PmicDialog } from '../../types';
-import {
-    helpers,
-    PMIC_1300_LDOS,
-    setupMocksWithShellParser,
-} from '../tests/helpers';
+import { PMIC_1300_LDOS, setupMocksWithShellParser } from '../tests/helpers';
 import { SoftStartValues } from './types';
 
 describe('PMIC 1300 - Setters Online tests', () => {

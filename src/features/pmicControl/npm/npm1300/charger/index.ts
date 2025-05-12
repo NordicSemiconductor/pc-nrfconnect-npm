@@ -72,11 +72,10 @@ export default class Module implements ChargerModuleBase {
         };
     }
 
-    // eslint-disable-next-line class-methods-use-this
     get ranges() {
         return {
-            voltage: Module.voltageRange,
-            vTermR: Module.voltageRange,
+            voltage: this.voltageRange,
+            vTermR: this.voltageRange,
             jeita: {
                 min: -20,
                 max: 60,
@@ -125,7 +124,8 @@ export default class Module implements ChargerModuleBase {
         return result;
     }
 
-    private static get voltageRange() {
+    // eslint-disable-next-line class-methods-use-this
+    protected get voltageRange() {
         return getRange([
             {
                 min: 3.5,
