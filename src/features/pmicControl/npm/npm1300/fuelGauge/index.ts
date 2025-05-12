@@ -9,10 +9,10 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { FuelGauge, FuelGaugeModule as FuelGaugeModuleBase } from '../../types';
-import { FuelGaugeActions } from './fuelGaugeActions';
-import fuelGaugeCallbacks from './fuelGaugeCallbacks';
-import { FuelGaugeGet } from './fuelGaugeGet';
-import { FuelGaugeSet } from './fuelGaugeSet';
+import { FuelGaugeActions } from './actions';
+import fuelGaugeCallbacks from './callbacks';
+import { FuelGaugeGet } from './getters';
+import { FuelGaugeSet } from './setters';
 
 export default class Module implements FuelGaugeModuleBase {
     profileDownloadInProgress = false;

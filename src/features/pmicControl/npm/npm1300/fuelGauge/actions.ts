@@ -7,7 +7,7 @@
 import { NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
 import { ProfileDownload } from '../../types';
 import type FuelGaugeModule from '.';
-import { FuelGaugeGet } from './fuelGaugeGet';
+import { FuelGaugeGet } from './getters';
 
 export class FuelGaugeActions {
     private get: FuelGaugeGet;
