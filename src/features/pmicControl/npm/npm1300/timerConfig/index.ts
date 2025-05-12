@@ -14,9 +14,9 @@ import {
     TimerConfigModule,
     TimerMode,
 } from '../../types';
-import timerCallbacks from './timerConfigCallbacks';
-import { TimerConfigGet } from './timerConfigGetter';
-import { TimerConfigSet } from './timerConfigSetter';
+import timerCallbacks from './callbacks';
+import { TimerConfigGet } from './getters';
+import { TimerConfigSet } from './setters';
 
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
