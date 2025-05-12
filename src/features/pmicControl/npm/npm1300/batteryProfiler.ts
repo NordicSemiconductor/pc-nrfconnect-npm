@@ -7,7 +7,7 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';
 
-import { noop, parseLogData, parseToBoolean, toRegex } from './pmicHelpers';
+import { noop, parseLogData, parseToBoolean, toRegex } from '../pmicHelpers';
 import {
     CCProfile,
     CCProfilingState,
@@ -15,7 +15,7 @@ import {
     LoggingEvent,
     ProfilingEvent,
     ProfilingEventData,
-} from './types';
+} from '../types';
 
 export const BatteryProfiler: IBatteryProfiler = (
     shellParser: ShellParser,
