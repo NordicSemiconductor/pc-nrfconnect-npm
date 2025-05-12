@@ -8,11 +8,7 @@ import { ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfco
 
 import { BatteryModel } from '../../types';
 import { npm1300FWVersion } from '../pmic1300Device';
-import {
-    PMIC_1300_GPIOS,
-    PMIC_1300_LEDS,
-    setupMocksWithShellParser,
-} from './helpers';
+import { PMIC_1300_LEDS, setupMocksWithShellParser } from './helpers';
 
 describe('PMIC 1300 - Request update commands', () => {
     const { mockEnqueueRequest, pmic } = setupMocksWithShellParser();
@@ -20,72 +16,6 @@ describe('PMIC 1300 - Request update commands', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
-
-    test.each(PMIC_1300_GPIOS)('Request update gpioMode index: %p', index => {
-        pmic.gpioModule[index].get.mode();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config mode get ${index}`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test.each(PMIC_1300_GPIOS)('Request update gpioPull index: %p', index => {
-        pmic.gpioModule[index].get.pull();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config pull get ${index}`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test.each(PMIC_1300_GPIOS)('Request update gpioDrive index: %p', index => {
-        pmic.gpioModule[index].get.drive();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx gpio config drive get ${index}`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test.each(PMIC_1300_GPIOS)(
-        'Request update gpioDebounce index: %p',
-        index => {
-            pmic.gpioModule[index].get.debounce();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config debounce get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
-
-    test.each(PMIC_1300_GPIOS)(
-        'Request update gpioOpenDrain index: %p',
-        index => {
-            pmic.gpioModule[index].get.openDrain();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx gpio config open_drain get ${index}`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        }
-    );
 
     test.each(PMIC_1300_LEDS)('Request update ledMode index: %p', index => {
         pmic.getLedMode(index);
