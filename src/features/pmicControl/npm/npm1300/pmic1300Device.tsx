@@ -69,7 +69,7 @@ export default class Npm1300 extends BaseNpmDevice {
         );
 
         this._batteryProfiler = shellParser
-            ? BatteryProfiler(shellParser, this.eventEmitter)
+            ? new BatteryProfiler(shellParser, this.eventEmitter)
             : undefined;
 
         this.chargerModule = new ChargerModule(
