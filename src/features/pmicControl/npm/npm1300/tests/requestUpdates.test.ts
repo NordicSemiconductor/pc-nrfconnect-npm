@@ -28,42 +28,6 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test('Request update timerConfigMode', () => {
-        pmic.timerConfigModule?.get.mode();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx timer config mode get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request update timerConfigPrescaler', () => {
-        pmic.timerConfigModule?.get.prescaler!();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx timer config prescaler get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request update timerConfigPeriod', () => {
-        pmic.timerConfigModule?.get.period();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx timer config compare get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
     test('Request startAdcSample', () => {
         pmic.startAdcSample(2000, 1000);
 
