@@ -76,14 +76,14 @@ export default class Npm1300 extends BaseNpmDevice {
             ? BatteryProfiler(shellParser, this.eventEmitter)
             : undefined;
 
-        this._chargerModule = new ChargerModule(
+        this.chargerModule = new ChargerModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
             this.offlineMode
         );
 
-        this._buckModule = [...Array(this.devices.noOfBucks).keys()].map(
+        this.buckModule = [...Array(this.devices.noOfBucks).keys()].map(
             index =>
                 new BuckModule(
                     index,
@@ -95,7 +95,7 @@ export default class Npm1300 extends BaseNpmDevice {
                 )
         );
 
-        this._ldoModule = [...Array(this.devices.noOfLdos).keys()].map(
+        this.ldoModule = [...Array(this.devices.noOfLdos).keys()].map(
             index =>
                 new LdoModule(
                     index,
@@ -107,7 +107,7 @@ export default class Npm1300 extends BaseNpmDevice {
                 )
         );
 
-        this._gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
+        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
             index =>
                 new GpioModule(
                     index,
@@ -118,42 +118,42 @@ export default class Npm1300 extends BaseNpmDevice {
                 )
         );
 
-        this._pofModule = new PofModule(
+        this.pofModule = new PofModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
             this.offlineMode
         );
 
-        this._lowPowerModule = new LowPowerModule(
+        this.lowPowerModule = new LowPowerModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
             this.offlineMode
         );
 
-        this._resetModule = new ResetModule(
+        this.resetModule = new ResetModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
             this.offlineMode
         );
 
-        this._timerConfigModule = new TimerModule(
+        this.timerConfigModule = new TimerModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
             this.offlineMode
         );
 
-        this._fuelGaugeModule = new FuelGaugeModule(
+        this.fuelGaugeModule = new FuelGaugeModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
             this.offlineMode
         );
 
-        this._usbCurrentLimiterModule = new UsbCurrentLimiterModule(
+        this.usbCurrentLimiterModule = new UsbCurrentLimiterModule(
             this.shellParser,
             this.eventEmitter,
             this.sendCommand.bind(this),
@@ -190,8 +190,6 @@ export default class Npm1300 extends BaseNpmDevice {
                 })
             );
 
-            this.releaseAll.push(...this._chargerModule.callbacks);
-            this.releaseAll.push(...this._fuelGaugeModule.callbacks);
             this.releaseAll.push(
                 shellParser.registerCommandCallback(
                     toRegex(
@@ -212,22 +210,6 @@ export default class Npm1300 extends BaseNpmDevice {
                     noop
                 )
             );
-
-            this.releaseAll.push(
-                ...this._buckModule.map(buck => buck.callbacks).flat()
-            );
-            this.releaseAll.push(
-                ...this._ldoModule.map(ldo => ldo.callbacks).flat()
-            );
-            this.releaseAll.push(
-                ...this._gpioModule.map(module => module.callbacks).flat()
-            );
-
-            this.releaseAll.push(...this._pofModule.callbacks);
-            this.releaseAll.push(...this._timerConfigModule.callbacks);
-            this.releaseAll.push(...this._lowPowerModule.callbacks);
-            this.releaseAll.push(...this._resetModule.callbacks);
-            this.releaseAll.push(...this._usbCurrentLimiterModule.callbacks);
         }
     }
 
