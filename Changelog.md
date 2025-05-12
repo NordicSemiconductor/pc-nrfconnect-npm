@@ -1,3 +1,9 @@
+## 2.0.1 - Unreleased
+
+### Fixed
+
+-   `Break-to-wake` dialog did not close on cancel.
+
 ## 2.0.0 - 2025-03-28
 
 ### Added
