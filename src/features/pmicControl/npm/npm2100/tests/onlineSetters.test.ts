@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { helpers } from '../../tests/helpers';
 import { LEDModeValues, PmicDialog } from '../../types';
 import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
-import { helpers, PMIC_2100_GPIOS, setupMocksWithShellParser } from './helpers';
+import { PMIC_2100_GPIOS, setupMocksWithShellParser } from './helpers';
 
 describe('PMIC 2100 - Setters Online tests', () => {
     describe('Setters and effects state - success', () => {
