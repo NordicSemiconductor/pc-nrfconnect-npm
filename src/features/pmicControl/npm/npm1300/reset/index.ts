@@ -18,9 +18,9 @@ import {
     ResetModule,
     ResetPinSelection,
 } from '../../types';
-import resetCallbacks from './resetCallbacks';
-import { ResetGet } from './resetGetters';
-import { ResetSet } from './resetSetters';
+import resetCallbacks from './callbacks';
+import { ResetGet } from './getters';
+import { ResetSet } from './setters';
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */

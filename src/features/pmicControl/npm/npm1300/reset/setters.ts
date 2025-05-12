@@ -6,7 +6,7 @@
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { LongPressReset, npm1300ResetConfig, ResetConfig } from '../../types';
-import { ResetGet } from './resetGetters';
+import { ResetGet } from './getters';
 
 export class ResetSet {
     private get: ResetGet;
