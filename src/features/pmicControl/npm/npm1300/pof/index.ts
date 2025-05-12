@@ -9,9 +9,9 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { POF, PofModule } from '../../types';
-import pofCallbacks from './pofCallbacks';
-import { PofGet } from './pofGetters';
-import { PofSet } from './pofSetter';
+import pofCallbacks from './callbacks';
+import { PofGet } from './getters';
+import { PofSet } from './setter';
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
