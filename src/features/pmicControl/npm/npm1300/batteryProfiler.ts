@@ -18,23 +18,23 @@ import {
 } from '../types';
 
 export class BatteryProfiler implements IBatteryProfiler {
-    #profiling: CCProfilingState = 'Off';
-    #releaseAll: (() => void)[] = [];
+    protected profiling: CCProfilingState = 'Off';
+    protected releaseAll: (() => void)[] = [];
 
     constructor(
-        private shellParser: ShellParser,
-        private eventEmitter: EventEmitter
+        protected shellParser: ShellParser,
+        protected eventEmitter: EventEmitter
     ) {
         if (shellParser) {
-            this.#releaseAll.push(
+            this.releaseAll.push(
                 shellParser.registerCommandCallback(
                     toRegex('cc_profile start'),
                     () => {
-                        if (this.#profiling !== 'Running') {
-                            this.#profiling = 'Running';
+                        if (this.profiling !== 'Running') {
+                            this.profiling = 'Running';
                             eventEmitter.emit(
                                 'onProfilingStateChange',
-                                this.#profiling
+                                this.profiling
                             );
                         }
                     },
@@ -42,15 +42,15 @@ export class BatteryProfiler implements IBatteryProfiler {
                 )
             );
 
-            this.#releaseAll.push(
+            this.releaseAll.push(
                 shellParser.registerCommandCallback(
                     toRegex('cc_profile active'),
                     res => {
                         const newState = parseToBoolean(res)
                             ? 'Running'
                             : 'Off';
-                        if (newState !== this.#profiling) {
-                            this.#profiling = newState;
+                        if (newState !== this.profiling) {
+                            this.profiling = newState;
                             eventEmitter.emit(
                                 'onProfilingStateChange',
                                 newState
@@ -61,25 +61,25 @@ export class BatteryProfiler implements IBatteryProfiler {
                 )
             );
 
-            this.#releaseAll.push(
+            this.releaseAll.push(
                 shellParser.registerCommandCallback(
                     toRegex('cc_profile stop'),
                     () => {
-                        if (this.#profiling !== 'Off') {
-                            this.#profiling = 'Off';
+                        if (this.profiling !== 'Off') {
+                            this.profiling = 'Off';
                             eventEmitter.emit(
                                 'onProfilingStateChange',
-                                this.#profiling
+                                this.profiling
                             );
                         }
                     },
                     res => {
                         if (res.includes('No profiling ongoing')) {
-                            if (this.#profiling !== 'Off') {
-                                this.#profiling = 'Off';
+                            if (this.profiling !== 'Off') {
+                                this.profiling = 'Off';
                                 eventEmitter.emit(
                                     'onProfilingStateChange',
-                                    this.#profiling
+                                    this.profiling
                                 );
                             }
                         }
@@ -87,7 +87,7 @@ export class BatteryProfiler implements IBatteryProfiler {
                 )
             );
 
-            this.#releaseAll.push(
+            this.releaseAll.push(
                 shellParser.onShellLoggingEvent(logEvent => {
                     parseLogData(logEvent, loggingEvent => {
                         if (loggingEvent.module === 'module_cc_profiling') {
@@ -101,16 +101,16 @@ export class BatteryProfiler implements IBatteryProfiler {
 
     private processModuleCcProfiling({ timestamp, message }: LoggingEvent) {
         if (message.includes('Success: Profiling sequence completed')) {
-            this.#profiling = 'Ready';
-            this.eventEmitter.emit('onProfilingStateChange', this.#profiling);
+            this.profiling = 'Ready';
+            this.eventEmitter.emit('onProfilingStateChange', this.profiling);
         } else if (message.includes('vcutoff reached')) {
-            this.#profiling = 'vCutOff';
-            this.eventEmitter.emit('onProfilingStateChange', this.#profiling);
+            this.profiling = 'vCutOff';
+            this.eventEmitter.emit('onProfilingStateChange', this.profiling);
         } else if (
             message.includes('Profiling stopped due to a thermal event')
         ) {
-            this.#profiling = 'ThermalError';
-            this.eventEmitter.emit('onProfilingStateChange', this.#profiling);
+            this.profiling = 'ThermalError';
+            this.eventEmitter.emit('onProfilingStateChange', this.profiling);
         } else {
             const messageParts = message.split(',');
             const data: ProfilingEventData = {
@@ -256,7 +256,7 @@ export class BatteryProfiler implements IBatteryProfiler {
     }
 
     getProfilingState() {
-        return this.#profiling;
+        return this.profiling;
     }
 
     onProfilingEvent(handler: (state: ProfilingEvent) => void) {
@@ -267,13 +267,13 @@ export class BatteryProfiler implements IBatteryProfiler {
     }
 
     pofError() {
-        if (this.#profiling !== 'Off' && this.#profiling !== 'POF') {
-            this.#profiling = 'POF';
-            this.eventEmitter.emit('onProfilingStateChange', this.#profiling);
+        if (this.profiling !== 'Off' && this.profiling !== 'POF') {
+            this.profiling = 'POF';
+            this.eventEmitter.emit('onProfilingStateChange', this.profiling);
         }
     }
 
     release() {
-        this.#releaseAll.forEach(release => release());
+        this.releaseAll.forEach(release => release());
     }
 }

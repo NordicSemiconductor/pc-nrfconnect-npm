@@ -8,7 +8,6 @@ import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RootState } from '../../../../appReducer';
 import BaseNpmDevice from '../basePmicDevice';
-import { BatteryProfiler } from '../npm1300/batteryProfiler';
 import { toBuckExport } from '../npm1300/buck';
 import { toLdoExport } from '../npm1300/ldo';
 import {
@@ -24,6 +23,7 @@ import {
     PmicDialog,
     USBPower,
 } from '../types';
+import { BatteryProfiler } from './batteryProfiler';
 import BuckModule from './buck';
 import ChargerModule from './charger';
 import FuelGaugeModule from './fuelGauge';
@@ -69,7 +69,7 @@ export default class Npm1304 extends BaseNpmDevice {
         );
 
         this._batteryProfiler = shellParser
-            ? BatteryProfiler(shellParser, this.eventEmitter)
+            ? new BatteryProfiler(shellParser, this.eventEmitter)
             : undefined;
 
         this.chargerModule = new ChargerModule(
