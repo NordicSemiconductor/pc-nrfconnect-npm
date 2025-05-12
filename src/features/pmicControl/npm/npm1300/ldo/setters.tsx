@@ -17,7 +17,7 @@ import {
     PmicDialog,
     SoftStart,
 } from '../../types';
-import { LdoGet } from './ldoGet';
+import { LdoGet } from './getters';
 
 export class LdoSet {
     private get: LdoGet;

@@ -12,7 +12,7 @@ import {
     TimerPrescaler,
     TimerPrescalerValues,
 } from '../../types';
-import { TimerConfigGet } from './timerConfigGetter';
+import { TimerConfigGet } from './getters';
 
 export class TimerConfigSet {
     private get: TimerConfigGet;

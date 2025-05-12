@@ -6,7 +6,7 @@
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Charger, ITerm, NTCThermistor, VTrickleFast } from '../../types';
-import { ChargerGet } from './chargerGetters';
+import { ChargerGet } from './getters';
 
 export class ChargerSet {
     private get: ChargerGet;

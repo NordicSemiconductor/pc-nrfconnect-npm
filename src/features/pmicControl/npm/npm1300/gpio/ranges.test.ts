@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { setupMocksBase } from './helpers';
+import { setupMocksBase } from '../tests/helpers';
 
 describe('PMIC 1300 - Static getters', () => {
     const { pmic } = setupMocksBase();
@@ -12,9 +12,7 @@ describe('PMIC 1300 - Static getters', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
-    test('Number of LEDs', () => expect(pmic.getNumberOfLEDs()).toBe(3));
-
-    test('Device Type', () => expect(pmic.deviceType).toBe('npm1300'));
+    test('Number of GPIOs', () => expect(pmic.gpioModule.length).toBe(5));
 });
 
 export {};

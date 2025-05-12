@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2024 Nordic Semiconductor ASA
+ * Copyright (c) 2015 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { USBPower, USBPowerExport } from '../../types';
-import { UsbCurrentLimiterGet } from './getter';
+import { LongPressReset, npm1300ResetConfig, ResetConfig } from '../../types';
+import { ResetGet } from './getters';
 
-export class UsbCurrentLimiterSet {
-    private get: UsbCurrentLimiterGet;
+export class ResetSet {
+    private get: ResetGet;
 
     constructor(
         private eventEmitter: NpmEventEmitter,
@@ -20,26 +20,29 @@ export class UsbCurrentLimiterSet {
         ) => void,
         private offlineMode: boolean
     ) {
-        this.get = new UsbCurrentLimiterGet(sendCommand);
+        this.get = new ResetGet(sendCommand);
     }
 
-    async all(usb: USBPowerExport) {
-        await this.vBusInCurrentLimiter(usb.currentLimiter);
+    async all(shipMode: npm1300ResetConfig) {
+        await this.longPressReset(shipMode.longPressReset);
     }
 
-    vBusInCurrentLimiter(amps: number) {
+    longPressReset(longPressReset: LongPressReset) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
-                    currentLimiter: amps,
-                });
+                this.eventEmitter.emitPartialEvent<ResetConfig>(
+                    'onResetUpdate',
+                    {
+                        longPressReset,
+                    }
+                );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx vbusin current_limit set ${amps * 1000}`,
+                    `powerup_ship longpress set ${longPressReset}`,
                     () => resolve(),
                     () => {
-                        this.get.vBusInCurrentLimiter();
+                        this.get.longPressReset();
                         reject();
                     }
                 );

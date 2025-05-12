@@ -5,11 +5,11 @@
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { LongPressReset, npm1300ResetConfig, ResetConfig } from '../../types';
-import { ResetGet } from './resetGetters';
+import { npm1300LowPowerConfig, npm1300TimeToActive } from '../../types';
+import { LowPowerGet } from './getters';
 
-export class ResetSet {
-    private get: ResetGet;
+export class LowPowerSet {
+    private get: LowPowerGet;
 
     constructor(
         private eventEmitter: NpmEventEmitter,
@@ -20,29 +20,29 @@ export class ResetSet {
         ) => void,
         private offlineMode: boolean
     ) {
-        this.get = new ResetGet(sendCommand);
+        this.get = new LowPowerGet(sendCommand);
     }
 
-    async all(shipMode: npm1300ResetConfig) {
-        await this.longPressReset(shipMode.longPressReset);
+    async all(shipMode: npm1300LowPowerConfig) {
+        await this.timeToActive(shipMode.timeToActive);
     }
 
-    longPressReset(longPressReset: LongPressReset) {
+    timeToActive(timeToActive: npm1300TimeToActive) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<ResetConfig>(
-                    'onResetUpdate',
+                this.eventEmitter.emitPartialEvent<npm1300LowPowerConfig>(
+                    'onLowPowerUpdate',
                     {
-                        longPressReset,
+                        timeToActive,
                     }
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `powerup_ship longpress set ${longPressReset}`,
+                    `npmx ship config time set ${timeToActive}`,
                     () => resolve(),
                     () => {
-                        this.get.longPressReset();
+                        this.get.timeToActive();
                         reject();
                     }
                 );

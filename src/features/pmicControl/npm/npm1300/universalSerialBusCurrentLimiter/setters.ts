@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2015 Nordic Semiconductor ASA
+ * Copyright (c) 2024 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { npm1300LowPowerConfig, npm1300TimeToActive } from '../../types';
-import { LowPowerGet } from './lowPowerGetters';
+import { USBPower, USBPowerExport } from '../../types';
+import { UsbCurrentLimiterGet } from './getters';
 
-export class LowPowerSet {
-    private get: LowPowerGet;
+export class UsbCurrentLimiterSet {
+    private get: UsbCurrentLimiterGet;
 
     constructor(
         private eventEmitter: NpmEventEmitter,
@@ -20,29 +20,26 @@ export class LowPowerSet {
         ) => void,
         private offlineMode: boolean
     ) {
-        this.get = new LowPowerGet(sendCommand);
+        this.get = new UsbCurrentLimiterGet(sendCommand);
     }
 
-    async all(shipMode: npm1300LowPowerConfig) {
-        await this.timeToActive(shipMode.timeToActive);
+    async all(usb: USBPowerExport) {
+        await this.vBusInCurrentLimiter(usb.currentLimiter);
     }
 
-    timeToActive(timeToActive: npm1300TimeToActive) {
+    vBusInCurrentLimiter(amps: number) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<npm1300LowPowerConfig>(
-                    'onLowPowerUpdate',
-                    {
-                        timeToActive,
-                    }
-                );
+                this.eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
+                    currentLimiter: amps,
+                });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx ship config time set ${timeToActive}`,
+                    `npmx vbusin current_limit set ${amps * 1000}`,
                     () => resolve(),
                     () => {
-                        this.get.timeToActive();
+                        this.get.vBusInCurrentLimiter();
                         reject();
                     }
                 );

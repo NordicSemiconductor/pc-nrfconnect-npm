@@ -6,7 +6,7 @@
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { FuelGauge, FuelGaugeExport } from '../../types';
-import { FuelGaugeGet } from './fuelGaugeGet';
+import { FuelGaugeGet } from './getters';
 
 export class FuelGaugeSet {
     private get: FuelGaugeGet;

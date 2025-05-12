@@ -12,11 +12,8 @@ import { BatteryProfiler } from '../batteryProfiler';
 import {
     isModuleDataPair,
     MAX_TIMESTAMP,
-    noop,
     NpmEventEmitter,
     parseLogData,
-    parseToNumber,
-    toRegex,
 } from '../pmicHelpers';
 import {
     AdcSample,
@@ -24,7 +21,6 @@ import {
     LoggingEvent,
     NpmExportV2,
     PmicDialog,
-    USBDetectStatusValues,
     USBPower,
 } from '../types';
 import BuckModule, { toBuckExport } from './buck';
@@ -188,27 +184,6 @@ export default class Npm1300 extends BaseNpmDevice {
                         });
                     });
                 })
-            );
-
-            this.releaseAll.push(
-                shellParser.registerCommandCallback(
-                    toRegex(
-                        'powerup_vbusin status get',
-                        false,
-                        undefined,
-                        '(0|1|2|3)'
-                    ),
-                    res => {
-                        this.eventEmitter.emitPartialEvent<USBPower>(
-                            'onUsbPower',
-                            {
-                                detectStatus:
-                                    USBDetectStatusValues[parseToNumber(res)],
-                            }
-                        );
-                    },
-                    noop
-                )
             );
         }
     }

@@ -6,7 +6,7 @@
 
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { POF, POFPolarity, POFPolarityValues } from '../../types';
-import { PofGet } from './pofGetters';
+import { PofGet } from './getters';
 
 export class PofSet {
     private get: PofGet;

@@ -9,9 +9,9 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { RangeType } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Buck, BuckExport, BuckModule, PmicDialog } from '../../types';
-import buckCallbacks from './buckCallbacks';
-import { BuckGet } from './buckGet';
-import { BuckSet } from './buckSet';
+import buckCallbacks from './callbacks';
+import { BuckGet } from './getters';
+import { BuckSet } from './setters';
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */

@@ -17,7 +17,7 @@ import {
 } from '../../pmicHelpers';
 import { FuelGauge, ProfileDownload } from '../../types';
 import type FuelGaugeModule from '.';
-import { FuelGaugeGet } from './fuelGaugeGet';
+import { FuelGaugeGet } from './getters';
 
 export default (
     shellParser: ShellParser | undefined,
