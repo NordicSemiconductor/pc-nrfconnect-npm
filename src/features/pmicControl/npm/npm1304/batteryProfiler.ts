@@ -9,6 +9,6 @@ import { BatteryProfiler as nPM1300BatteryProfiler } from '../npm1300/batteryPro
 export class BatteryProfiler extends nPM1300BatteryProfiler {
     // eslint-disable-next-line class-methods-use-this
     canProfile() {
-        return Promise.resolve(true);
+        return Promise.resolve(true); // TODO check VSYS
     }
 }
