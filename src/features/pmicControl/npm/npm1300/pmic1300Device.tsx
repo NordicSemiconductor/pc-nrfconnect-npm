@@ -8,7 +8,7 @@ import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RootState } from '../../../../appReducer';
 import BaseNpmDevice from '../basePmicDevice';
-import { BatteryProfiler } from '../batteryProfiler';
+import { BatteryProfiler } from './batteryProfiler';
 import {
     isModuleDataPair,
     MAX_TIMESTAMP,
