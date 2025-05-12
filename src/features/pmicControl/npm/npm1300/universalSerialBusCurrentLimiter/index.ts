@@ -10,8 +10,8 @@ import { getRange } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { UsbCurrentLimiterModule, USBPower } from '../../types';
 import callbacks from './callbacks';
-import { UsbCurrentLimiterGet } from './getter';
-import { UsbCurrentLimiterSet } from './setter';
+import { UsbCurrentLimiterGet } from './getters';
+import { UsbCurrentLimiterSet } from './setters';
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
