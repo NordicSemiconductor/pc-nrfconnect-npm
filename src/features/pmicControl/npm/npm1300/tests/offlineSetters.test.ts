@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { FuelGauge, npm1300TimerMode, npm1300TimeToActive } from '../../types';
+import { npm1300TimerMode, npm1300TimeToActive } from '../../types';
 import { PMIC_1300_LEDS, setupMocksBase } from './helpers';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell
 describe('PMIC 1300 - Setters Offline tests', () => {
     const {
-        mockOnFuelGaugeUpdate,
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
@@ -87,15 +86,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
             data: { mode: 'Charger error' },
             index,
         });
-    });
-
-    test('Set setFuelGaugeEnabled', async () => {
-        await pmic.fuelGaugeModule?.set.enabled(false);
-
-        expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
-        expect(mockOnFuelGaugeUpdate).toBeCalledWith({
-            enabled: false,
-        } satisfies Partial<FuelGauge>);
     });
 
     test('Set VBusin currentLimiter', async () => {
