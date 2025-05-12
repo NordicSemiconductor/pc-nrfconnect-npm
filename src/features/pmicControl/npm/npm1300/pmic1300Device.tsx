@@ -8,7 +8,6 @@ import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RootState } from '../../../../appReducer';
 import BaseNpmDevice from '../basePmicDevice';
-import { BatteryProfiler } from './batteryProfiler';
 import {
     isModuleDataPair,
     MAX_TIMESTAMP,
@@ -23,6 +22,7 @@ import {
     PmicDialog,
     USBPower,
 } from '../types';
+import { BatteryProfiler } from './batteryProfiler';
 import BuckModule, { toBuckExport } from './buck';
 import ChargerModule from './charger';
 import FuelGaugeModule from './fuelGauge';

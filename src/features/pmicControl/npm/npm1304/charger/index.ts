@@ -56,6 +56,12 @@ export default class Module extends nPM1300Charger {
                 step: 1,
             },
             iBatLim: Module.iBatRange(),
+            vLowerCutOff: {
+                min: 2.7,
+                max: 3.1,
+                step: 0.05,
+                decimals: 2,
+            },
         };
     }
 
