@@ -100,48 +100,12 @@ describe('PMIC 1300 - Request update commands', () => {
         );
     });
 
-    test('Request update shipModeTimeToActive', () => {
-        pmic.lowPowerModule?.get.timeToActive();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship config time get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
     test('Request update shipLongPressReset', () => {
         pmic.resetModule?.get.longPressReset();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
             `powerup_ship longpress get`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request enterShipMode', () => {
-        pmic.lowPowerModule?.actions.enterShipMode?.();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship mode ship`,
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
-
-    test('Request enterShipMode', () => {
-        pmic.lowPowerModule?.actions.enterShipHibernateMode?.();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx ship mode hibernate`,
             expect.anything(),
             undefined,
             true

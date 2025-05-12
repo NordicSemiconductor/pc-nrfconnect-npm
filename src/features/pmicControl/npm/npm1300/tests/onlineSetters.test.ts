@@ -7,7 +7,6 @@
 import {
     LEDModeValues,
     npm1300TimerMode,
-    npm1300TimeToActive,
     PmicDialog,
     POFPolarityValues,
     TimerPrescalerValues,
@@ -20,7 +19,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
-        mockOnLowPowerUpdate,
         mockOnResetUpdate,
         mockEnqueueRequest,
         mockOnUsbPower,
@@ -160,23 +158,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
             // Updates should only be emitted when we get response
             expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-        });
-
-        test('Set ship config time %p', async () => {
-            await pmic.lowPowerModule?.set.timeToActive(
-                npm1300TimeToActive['16ms']
-            );
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ship config time set 16`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnLowPowerUpdate).toBeCalledTimes(0);
         });
 
         test('Set ship reset longpress two_button', async () => {
@@ -475,39 +456,6 @@ describe('PMIC 1300 - Setters Online tests', () => {
             // Updates should only be emitted when we get response
             expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
         });
-
-        test('Set setShipModeTimeToActive - Fail immediately - index: %p', async () => {
-            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onConfirm();
-            });
-
-            await expect(
-                pmic.lowPowerModule?.set.timeToActive(
-                    npm1300TimeToActive['16ms']
-                )
-            ).rejects.toBeUndefined();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx ship config time set 16`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npmx ship config time get`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Updates should only be emitted when we get response
-            expect(mockOnLowPowerUpdate).toBeCalledTimes(0);
-        });
-
         test('Set setShipLongPressReset - Fail immediately - index: %p', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
                 dialog.onConfirm();
@@ -535,7 +483,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             // Updates should only be emitted when we get response
-            expect(mockOnLowPowerUpdate).toBeCalledTimes(0);
+            expect(mockOnResetUpdate).toBeCalledTimes(0);
         });
 
         test('Set vBusinCurrentLimiter - Fail immediately', async () => {

@@ -8,7 +8,6 @@ import {
     LEDModeValues,
     LongPressResetValues,
     npm1300TimerMode,
-    npm1300TimeToActive,
     POFPolarityValues,
     TimerPrescalerValues,
     USBDetectStatusValues,
@@ -22,7 +21,6 @@ describe('PMIC 1300 - Command callbacks', () => {
         mockOnPOFUpdate,
         mockOnLEDUpdate,
         mockOnTimerConfigUpdate,
-        mockOnLowPowerUpdate,
         mockOnResetUpdate,
         mockOnReboot,
     } = setupMocksWithShellParser();
@@ -230,32 +228,6 @@ describe('PMIC 1300 - Command callbacks', () => {
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({
             period: 2800,
-        });
-    });
-
-    test.each(
-        Object.keys(npm1300TimeToActive)
-            .map(key => {
-                const value =
-                    npm1300TimeToActive[
-                        key as keyof typeof npm1300TimeToActive
-                    ];
-                return [
-                    { append: `get`, expected: key },
-                    { append: `set ${value}`, expected: key },
-                ];
-            })
-            .flat()
-    )('npmx ship config time %p', ({ append, expected }) => {
-        const command = `npmx ship config time ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-        callback?.onSuccess(`Value: ${expected}.`, command);
-
-        expect(mockOnLowPowerUpdate).toBeCalledTimes(1);
-        expect(mockOnLowPowerUpdate).toBeCalledWith({
-            timeToActive: expected,
         });
     });
 

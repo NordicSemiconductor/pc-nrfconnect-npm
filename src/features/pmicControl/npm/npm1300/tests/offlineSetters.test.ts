@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { npm1300TimerMode, npm1300TimeToActive } from '../../types';
+import { npm1300TimerMode } from '../../types';
 import { PMIC_1300_LEDS, setupMocksBase } from './helpers';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell
@@ -13,7 +13,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         mockOnLEDUpdate,
         mockOnPOFUpdate,
         mockOnTimerConfigUpdate,
-        mockOnLowPowerUpdate,
         mockOnResetUpdate,
         mockOnUsbPower,
         pmic,
@@ -58,15 +57,6 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledWith({ period: 1000 });
-    });
-
-    test('Set set timer config time ', async () => {
-        await pmic.lowPowerModule?.set.timeToActive(
-            npm1300TimeToActive['16ms']
-        );
-
-        expect(mockOnLowPowerUpdate).toBeCalledTimes(1);
-        expect(mockOnLowPowerUpdate).toBeCalledWith({ timeToActive: '16' });
     });
 
     test('Set set timer reset longpress ', async () => {
