@@ -253,16 +253,12 @@ export default ({ disabled }: { disabled: boolean }) => {
                             npmDevice?.batteryProfiler
                                 ?.canProfile()
                                 .then(result => {
-                                    if (result) {
+                                    if (result === true) {
                                         dispatch(
                                             setProfilingStage('Configuration')
                                         );
                                     } else {
-                                        dispatch(
-                                            setProfilingStage(
-                                                'MissingSyncBoard'
-                                            )
-                                        );
+                                        dispatch(setProfilingStage(result));
                                     }
                                 });
                         }}
