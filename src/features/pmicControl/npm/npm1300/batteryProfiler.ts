@@ -236,18 +236,22 @@ export class BatteryProfiler implements BatteryProfilerBase {
     }
 
     canProfile() {
-        return new Promise<boolean>((resolve, reject) => {
-            this.shellParser?.enqueueRequest('cc_sink available', {
-                onSuccess: res => {
-                    resolve(parseToBoolean(res));
-                },
-                onError: reject,
-                onTimeout: error => {
-                    reject(error);
-                    console.warn(error);
-                },
-            });
-        });
+        return new Promise<true | 'MissingSyncBoard' | 'ActiveLoadNotVSYS'>(
+            (resolve, reject) => {
+                this.shellParser?.enqueueRequest('cc_sink available', {
+                    onSuccess: res => {
+                        resolve(
+                            parseToBoolean(res) ? true : 'MissingSyncBoard'
+                        );
+                    },
+                    onError: reject,
+                    onTimeout: error => {
+                        reject(error);
+                        console.warn(error);
+                    },
+                });
+            }
+        );
     }
 
     onProfilingStateChange(handler: (state: CCProfilingState) => void) {
