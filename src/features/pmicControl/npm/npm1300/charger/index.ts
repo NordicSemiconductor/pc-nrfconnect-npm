@@ -5,14 +5,12 @@
  */
 
 /* eslint-disable no-underscore-dangle */
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import { getRange } from '../../../../../utils/helpers';
-import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Charger,
     type ChargerModule as ChargerModuleBase,
     FixedListRange,
+    ModuleParams,
 } from '../../types';
 import chargerCallbacks from './callbacks';
 import { ChargerGet } from './getters';
@@ -23,16 +21,12 @@ export default class Module implements ChargerModuleBase {
     private _set: ChargerSet;
     private _callbacks: (() => void)[];
 
-    constructor(
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        offlineMode: boolean
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        offlineMode,
+        shellParser,
+    }: ModuleParams) {
         this._get = new ChargerGet(sendCommand);
         this._set = new ChargerSet(eventEmitter, sendCommand, offlineMode);
         this._callbacks = chargerCallbacks(shellParser, eventEmitter);

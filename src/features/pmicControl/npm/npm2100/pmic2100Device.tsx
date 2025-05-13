@@ -30,92 +30,12 @@ import LdoModule, { toLdoExport } from './ldo';
 import LowPowerModule from './lowPower';
 import overlay from './overlay';
 import ResetModule from './reset';
-import TimerModule from './timerConfig';
+import TimerConfigModule from './timerConfig';
 
 export const npm2100FWVersion = '0.7.1+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
 export default class Npm2100 extends BaseNpmDevice {
-    protected initBoostModule(): void {
-        this.boostModule = [
-            new BoostModule(
-                this.shellParser,
-                this.eventEmitter,
-                this.sendCommand.bind(this),
-                this.dialogHandler,
-                this.offlineMode
-            ),
-        ];
-    }
-
-    protected initLDOModule(): void {
-        this.ldoModule = [
-            new LdoModule(
-                0,
-                this.shellParser,
-                this.eventEmitter,
-                this.sendCommand.bind(this),
-                this.dialogHandler,
-                this.offlineMode
-            ),
-        ];
-    }
-    protected initGPIOModule(): void {
-        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
-            i =>
-                new GpioModule(
-                    i,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-    }
-    protected initFuelGaugeModule(): void {
-        this.fuelGaugeModule = new FuelGaugeModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.dialogHandler,
-            this.offlineMode,
-            this.initializeFuelGauge.bind(this)
-        );
-    }
-    protected initBatteryModule(): void {
-        this.batteryModule = new BatteryModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this)
-        );
-    }
-    protected initLowPowerModule(): void {
-        this.lowPowerModule = new LowPowerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.dialogHandler,
-            this.offlineMode
-        );
-    }
-    protected initResetModule(): void {
-        this.resetModule = new ResetModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-    protected initTimerConfigModule(): void {
-        this.timerConfigModule = new TimerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-
     private waitingForReset = false;
     private recentReset = false;
     constructor(
@@ -129,14 +49,26 @@ export default class Npm2100 extends BaseNpmDevice {
             dialogHandler,
             new NpmEventEmitter(),
             {
-                charger: false,
-                noOfBoosts: 1,
-                noOfBucks: 0,
+                ldos: {
+                    count: 1,
+                    Module: LdoModule,
+                },
                 maxEnergyExtraction: true,
-                noOfLdos: 1,
                 noOfLEDs: 0,
                 noOfBatterySlots: 1,
-                noOfGPIOs: 2,
+                gpios: {
+                    Module: GpioModule,
+                    count: 2,
+                },
+                boosts: {
+                    Module: BoostModule,
+                    count: 2,
+                },
+                TimerConfigModule,
+                BatteryModule,
+                LowPowerModule,
+                ResetModule,
+                FuelGaugeModule,
             },
             0,
             {
@@ -336,7 +268,7 @@ export default class Npm2100 extends BaseNpmDevice {
         }
     }
 
-    private initializeFuelGauge() {
+    initializeFuelGauge() {
         if (this.offlineMode) return Promise.resolve();
         return new Promise<void>((resolve, reject) => {
             this.startAdcSample(1000, 500)

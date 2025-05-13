@@ -9,22 +9,24 @@ import EventEmitter from 'events';
 
 import { noop, parseLogData, parseToBoolean, toRegex } from '../pmicHelpers';
 import {
+    BatteryProfiler as BatteryProfilerBase,
     CCProfile,
     CCProfilingState,
-    IBatteryProfiler,
     LoggingEvent,
+    ModuleParams,
     ProfilingEvent,
     ProfilingEventData,
 } from '../types';
 
-export class BatteryProfiler implements IBatteryProfiler {
+export class BatteryProfiler implements BatteryProfilerBase {
     protected profiling: CCProfilingState = 'Off';
     protected releaseAll: (() => void)[] = [];
+    protected shellParser?: ShellParser;
+    protected eventEmitter: EventEmitter;
 
-    constructor(
-        protected shellParser: ShellParser,
-        protected eventEmitter: EventEmitter
-    ) {
+    constructor({ eventEmitter, shellParser }: ModuleParams) {
+        this.eventEmitter = eventEmitter;
+        this.shellParser = shellParser;
         if (shellParser) {
             this.releaseAll.push(
                 shellParser.registerCommandCallback(
