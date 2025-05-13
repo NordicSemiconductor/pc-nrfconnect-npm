@@ -4,11 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import { getRange } from '../../../../../utils/helpers';
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { UsbCurrentLimiterModule, USBPower } from '../../types';
+import { ModuleParams, UsbCurrentLimiterModule, USBPower } from '../../types';
 import callbacks from './callbacks';
 import { UsbCurrentLimiterGet } from './getters';
 import { UsbCurrentLimiterSet } from './setters';
@@ -21,16 +18,12 @@ export default class Module implements UsbCurrentLimiterModule {
     private _set: UsbCurrentLimiterSet;
     private _callbacks: (() => void)[];
 
-    constructor(
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        offlineMode: boolean
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        offlineMode,
+        shellParser,
+    }: ModuleParams) {
         this._get = new UsbCurrentLimiterGet(sendCommand);
         this._set = new UsbCurrentLimiterSet(
             eventEmitter,

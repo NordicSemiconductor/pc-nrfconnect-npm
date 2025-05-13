@@ -8,10 +8,10 @@ import {
     DropdownItem,
     ShellParser,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import EventEmitter from 'events';
 import { z } from 'zod';
 
 import { RangeType } from '../../../utils/helpers';
+import type BaseNpmDevice from './basePmicDevice';
 import type {
     GPIODrive1300,
     GPIOMode1300,
@@ -35,6 +35,7 @@ import {
     nPM2100SoftStart,
     npm2100TimerMode,
 } from './npm2100/types';
+import { NpmEventEmitter } from './pmicHelpers';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
 
@@ -471,6 +472,24 @@ export interface FuelGaugeModule {
     };
     callbacks: (() => void)[];
     defaults: FuelGauge;
+}
+
+export type ModuleParams = {
+    index: number;
+    shellParser: ShellParser | undefined;
+    eventEmitter: NpmEventEmitter;
+    sendCommand: (
+        command: string,
+        onSuccess?: (response: string, command: string) => void,
+        onError?: (response: string, command: string) => void
+    ) => void;
+    dialogHandler: ((dialog: PmicDialog) => void) | null;
+    offlineMode: boolean;
+    npmDevice: BaseNpmDevice;
+};
+
+export interface IModule<T> {
+    new (params: ModuleParams): T;
 }
 
 export interface ChargerModule {
@@ -911,7 +930,7 @@ export interface Profile {
     profilingProfiles: CCProfile[];
 }
 
-export type IBatteryProfiler = {
+export type BatteryProfiler = {
     release: () => void;
     setProfile: (
         reportIntervalCc: number,
@@ -942,4 +961,35 @@ export type Documentation = {
     [key: string]: {
         [key: string]: DocumentationItem[];
     };
+};
+
+export type NpmPeripherals = {
+    ChargerModule?: IModule<ChargerModule>;
+    maxEnergyExtraction: boolean;
+    noOfLEDs: number;
+    noOfBatterySlots: number;
+    ldos?: {
+        Module: IModule<LdoModule>;
+        count: number;
+    };
+    bucks?: {
+        Module: IModule<BuckModule>;
+        count: number;
+    };
+    gpios?: {
+        Module: IModule<GpioModule>;
+        count: number;
+    };
+    boosts?: {
+        Module: IModule<BoostModule>;
+        count: number;
+    };
+    BatteryProfiler?: IModule<BatteryProfiler>;
+    PofModule?: IModule<PofModule>;
+    UsbCurrentLimiterModule?: IModule<UsbCurrentLimiterModule>;
+    TimerConfigModule?: IModule<TimerConfigModule>;
+    BatteryModule?: IModule<BatteryModule>;
+    LowPowerModule?: IModule<LowPowerModule>;
+    ResetModule?: IModule<ResetModule>;
+    FuelGaugeModule?: IModule<FuelGaugeModule>;
 };

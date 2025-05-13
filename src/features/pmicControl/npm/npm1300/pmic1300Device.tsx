@@ -19,6 +19,7 @@ import {
     IrqEvent,
     LoggingEvent,
     NpmExportV2,
+    NpmPeripherals,
     PmicDialog,
     USBPower,
 } from '../types';
@@ -32,17 +33,16 @@ import LowPowerModule from './lowPower';
 import overlay from './overlay';
 import PofModule from './pof';
 import ResetModule from './reset';
-import TimerModule from './timerConfig';
+import TimerConfigModule from './timerConfig';
 import UsbCurrentLimiterModule from './universalSerialBusCurrentLimiter';
 
 export const npm1300FWVersion = '1.2.4+0';
-
-/* eslint-disable no-underscore-dangle */
 
 export default class Npm1300 extends BaseNpmDevice {
     constructor(
         shellParser: ShellParser | undefined,
         dialogHandler: ((dialog: PmicDialog) => void) | null,
+        peripherals?: Partial<NpmPeripherals>,
         type: 'npm1300' | 'npm1304' = 'npm1300',
         fw: string = npm1300FWVersion
     ) {
@@ -53,14 +53,30 @@ export default class Npm1300 extends BaseNpmDevice {
             dialogHandler,
             new NpmEventEmitter(),
             {
-                charger: true,
-                noOfBoosts: 0,
-                noOfBucks: 2,
-                noOfLdos: 2,
+                ChargerModule,
                 noOfLEDs: 3,
-                noOfGPIOs: 5,
                 noOfBatterySlots: 3,
                 maxEnergyExtraction: false,
+                ldos: {
+                    Module: LdoModule,
+                    count: 2,
+                },
+                bucks: {
+                    Module: BuckModule,
+                    count: 2,
+                },
+                gpios: {
+                    Module: GpioModule,
+                    count: 5,
+                },
+                BatteryProfiler,
+                PofModule,
+                UsbCurrentLimiterModule,
+                TimerConfigModule,
+                LowPowerModule,
+                ResetModule,
+                FuelGaugeModule,
+                ...peripherals,
             },
             1,
             {
@@ -373,107 +389,5 @@ export default class Npm1300 extends BaseNpmDevice {
 
     generateOverlay(npmExport: NpmExportV2) {
         return overlay(npmExport, this);
-    }
-
-    protected initBuckModule(): void {
-        this.buckModule = [...Array(this.devices.noOfBucks).keys()].map(
-            index =>
-                new BuckModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-    }
-    protected initLDOModule(): void {
-        this.ldoModule = [...Array(this.devices.noOfLdos).keys()].map(
-            index =>
-                new LdoModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-    }
-    protected initGPIOModule(): void {
-        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
-            index =>
-                new GpioModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.offlineMode
-                )
-        );
-    }
-    protected initFuelGaugeModule(): void {
-        this.fuelGaugeModule = new FuelGaugeModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-
-    protected initLowPowerModule(): void {
-        this.lowPowerModule = new LowPowerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-    protected initResetModule(): void {
-        this.resetModule = new ResetModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-    protected initTimerConfigModule(): void {
-        this.timerConfigModule = new TimerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-    protected initUsbCurrentLimiterModule(): void {
-        this.usbCurrentLimiterModule = new UsbCurrentLimiterModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-    protected initPOFModule(): void {
-        this.pofModule = new PofModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-    protected initChargerModule(): void {
-        this.chargerModule = new ChargerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-    }
-
-    protected initBatteryModule(): void {
-        this._batteryProfiler = this.shellParser
-            ? new BatteryProfiler(this.shellParser, this.eventEmitter)
-            : undefined;
     }
 }
