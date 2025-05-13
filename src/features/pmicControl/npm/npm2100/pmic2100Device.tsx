@@ -36,6 +36,86 @@ export const npm2100FWVersion = '0.7.1+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
 export default class Npm2100 extends BaseNpmDevice {
+    protected initBoostModule(): void {
+        this.boostModule = [
+            new BoostModule(
+                this.shellParser,
+                this.eventEmitter,
+                this.sendCommand.bind(this),
+                this.dialogHandler,
+                this.offlineMode
+            ),
+        ];
+    }
+
+    protected initLDOModule(): void {
+        this.ldoModule = [
+            new LdoModule(
+                0,
+                this.shellParser,
+                this.eventEmitter,
+                this.sendCommand.bind(this),
+                this.dialogHandler,
+                this.offlineMode
+            ),
+        ];
+    }
+    protected initGPIOModule(): void {
+        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
+            i =>
+                new GpioModule(
+                    i,
+                    this.shellParser,
+                    this.eventEmitter,
+                    this.sendCommand.bind(this),
+                    this.dialogHandler,
+                    this.offlineMode
+                )
+        );
+    }
+    protected initFuelGaugeModule(): void {
+        this.fuelGaugeModule = new FuelGaugeModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.dialogHandler,
+            this.offlineMode,
+            this.initializeFuelGauge.bind(this)
+        );
+    }
+    protected initBatteryModule(): void {
+        this.batteryModule = new BatteryModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this)
+        );
+    }
+    protected initLowPowerModule(): void {
+        this.lowPowerModule = new LowPowerModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.dialogHandler,
+            this.offlineMode
+        );
+    }
+    protected initResetModule(): void {
+        this.resetModule = new ResetModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+    protected initTimerConfigModule(): void {
+        this.timerConfigModule = new TimerModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+
     private waitingForReset = false;
     private recentReset = false;
     constructor(
@@ -64,76 +144,6 @@ export default class Npm2100 extends BaseNpmDevice {
                 charger: false,
                 sensor: false,
             }
-        );
-
-        this.ldoModule = [
-            new LdoModule(
-                0,
-                this.shellParser,
-                this.eventEmitter,
-                this.sendCommand.bind(this),
-                this.dialogHandler,
-                this.offlineMode
-            ),
-        ];
-
-        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
-            i =>
-                new GpioModule(
-                    i,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-
-        this.fuelGaugeModule = new FuelGaugeModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.dialogHandler,
-            this.offlineMode,
-            this.initializeFuelGauge.bind(this)
-        );
-
-        this.batteryModule = new BatteryModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this)
-        );
-
-        this.boostModule = [
-            new BoostModule(
-                this.shellParser,
-                this.eventEmitter,
-                this.sendCommand.bind(this),
-                this.dialogHandler,
-                this.offlineMode
-            ),
-        ];
-
-        this.lowPowerModule = new LowPowerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.dialogHandler,
-            this.offlineMode
-        );
-
-        this.resetModule = new ResetModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.timerConfigModule = new TimerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
         );
 
         if (shellParser) {
