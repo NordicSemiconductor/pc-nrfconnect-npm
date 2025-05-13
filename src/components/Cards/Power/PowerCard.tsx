@@ -20,7 +20,6 @@ import {
     isFixedListRangeWithLabel,
     ITerm,
     VTrickleFast,
-    VTrickleFastValues,
 } from '../../../features/pmicControl/npm/types';
 
 interface PowerCardProperties {
@@ -30,11 +29,6 @@ interface PowerCardProperties {
     disabled: boolean;
     defaultSummary?: boolean;
 }
-
-const vTrickleFastItems = [...VTrickleFastValues].map(item => ({
-    label: `${item}`,
-    value: `${item}`,
-}));
 
 export default ({
     chargerModule,
@@ -259,23 +253,16 @@ export default ({
                                 </>
                             </DocumentationTooltip>
                         }
-                        items={vTrickleFastItems}
+                        items={chargerModule.values.vTrickleFast}
                         onSelect={item =>
                             chargerModule.set.vTrickleFast(
-                                Number.parseFloat(item.value) as VTrickleFast
+                                item.value as VTrickleFast
                             )
                         }
                         selectedItem={
-                            vTrickleFastItems[
-                                Math.max(
-                                    0,
-                                    vTrickleFastItems.findIndex(
-                                        item =>
-                                            Number.parseFloat(item.value) ===
-                                            charger.vTrickleFast
-                                    )
-                                ) ?? 0
-                            ]
+                            chargerModule.values.vTrickleFast.find(
+                                item => item.value === charger.vTrickleFast
+                            ) ?? chargerModule.values.vTrickleFast[0]
                         }
                         disabled={disabled}
                     />
