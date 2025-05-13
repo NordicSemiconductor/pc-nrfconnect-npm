@@ -42,11 +42,13 @@ export const npm1300FWVersion = '1.2.4+0';
 export default class Npm1300 extends BaseNpmDevice {
     constructor(
         shellParser: ShellParser | undefined,
-        dialogHandler: ((dialog: PmicDialog) => void) | null
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+        type: 'npm1300' | 'npm1304' = 'npm1300',
+        fw: string = npm1300FWVersion
     ) {
         super(
-            'npm1300',
-            npm1300FWVersion,
+            type,
+            fw,
             shellParser,
             dialogHandler,
             new NpmEventEmitter(),
@@ -66,94 +68,6 @@ export default class Npm1300 extends BaseNpmDevice {
                 charger: true,
                 sensor: true,
             }
-        );
-
-        this._batteryProfiler = shellParser
-            ? new BatteryProfiler(shellParser, this.eventEmitter)
-            : undefined;
-
-        this.chargerModule = new ChargerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.buckModule = [...Array(this.devices.noOfBucks).keys()].map(
-            index =>
-                new BuckModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-
-        this.ldoModule = [...Array(this.devices.noOfLdos).keys()].map(
-            index =>
-                new LdoModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-
-        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
-            index =>
-                new GpioModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.offlineMode
-                )
-        );
-
-        this.pofModule = new PofModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.lowPowerModule = new LowPowerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.resetModule = new ResetModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.timerConfigModule = new TimerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.fuelGaugeModule = new FuelGaugeModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.usbCurrentLimiterModule = new UsbCurrentLimiterModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
         );
 
         if (shellParser) {
@@ -459,5 +373,107 @@ export default class Npm1300 extends BaseNpmDevice {
 
     generateOverlay(npmExport: NpmExportV2) {
         return overlay(npmExport, this);
+    }
+
+    protected initBuckModule(): void {
+        this.buckModule = [...Array(this.devices.noOfBucks).keys()].map(
+            index =>
+                new BuckModule(
+                    index,
+                    this.shellParser,
+                    this.eventEmitter,
+                    this.sendCommand.bind(this),
+                    this.dialogHandler,
+                    this.offlineMode
+                )
+        );
+    }
+    protected initLDOModule(): void {
+        this.ldoModule = [...Array(this.devices.noOfLdos).keys()].map(
+            index =>
+                new LdoModule(
+                    index,
+                    this.shellParser,
+                    this.eventEmitter,
+                    this.sendCommand.bind(this),
+                    this.dialogHandler,
+                    this.offlineMode
+                )
+        );
+    }
+    protected initGPIOModule(): void {
+        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
+            index =>
+                new GpioModule(
+                    index,
+                    this.shellParser,
+                    this.eventEmitter,
+                    this.sendCommand.bind(this),
+                    this.offlineMode
+                )
+        );
+    }
+    protected initFuelGaugeModule(): void {
+        this.fuelGaugeModule = new FuelGaugeModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+
+    protected initLowPowerModule(): void {
+        this.lowPowerModule = new LowPowerModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+    protected initResetModule(): void {
+        this.resetModule = new ResetModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+    protected initTimerConfigModule(): void {
+        this.timerConfigModule = new TimerModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+    protected initUsbCurrentLimiterModule(): void {
+        this.usbCurrentLimiterModule = new UsbCurrentLimiterModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+    protected initPOFModule(): void {
+        this.pofModule = new PofModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+    protected initChargerModule(): void {
+        this.chargerModule = new ChargerModule(
+            this.shellParser,
+            this.eventEmitter,
+            this.sendCommand.bind(this),
+            this.offlineMode
+        );
+    }
+
+    protected initBatteryModule(): void {
+        this._batteryProfiler = this.shellParser
+            ? new BatteryProfiler(this.shellParser, this.eventEmitter)
+            : undefined;
     }
 }

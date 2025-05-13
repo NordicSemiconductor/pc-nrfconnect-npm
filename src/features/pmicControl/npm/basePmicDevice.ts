@@ -62,7 +62,6 @@ import {
 } from './types';
 
 /* eslint-disable no-underscore-dangle */
-
 export default abstract class BaseNpmDevice {
     private rebooting = false;
     private deviceUptimeToSystemDelta = 0;
@@ -112,6 +111,9 @@ export default abstract class BaseNpmDevice {
         this.#boostModule = boostModule;
     }
 
+    // eslint-disable-next-line class-methods-use-this
+    protected initBoostModule() {}
+
     #buckModule: BuckModule[] = [];
     get buckModule() {
         return [...this.#buckModule];
@@ -121,16 +123,19 @@ export default abstract class BaseNpmDevice {
         this.releaseAll.push(...buckModule.map(buck => buck.callbacks).flat());
         this.#buckModule = buckModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initBuckModule() {}
 
     #ldoModule: LdoModule[] = [];
     get ldoModule() {
         return [...this.#ldoModule];
     }
-
     protected set ldoModule(ldoModule: LdoModule[]) {
         this.releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         this.#ldoModule = ldoModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initLDOModule() {}
 
     #gpioModule: GpioModule[] = [];
     get gpioModule() {
@@ -141,6 +146,8 @@ export default abstract class BaseNpmDevice {
         this.releaseAll.push(...gpioModule.map(gpio => gpio.callbacks).flat());
         this.#gpioModule = gpioModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initGPIOModule() {}
 
     #fuelGaugeModule?: FuelGaugeModule;
     get fuelGaugeModule() {
@@ -153,6 +160,8 @@ export default abstract class BaseNpmDevice {
         !!fuelGaugeModule && this.releaseAll.push(...fuelGaugeModule.callbacks);
         this.#fuelGaugeModule = fuelGaugeModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initFuelGaugeModule() {}
 
     #batteryModule?: BatteryModule;
     get batteryModule() {
@@ -163,6 +172,8 @@ export default abstract class BaseNpmDevice {
         !!batteryModule && this.releaseAll.push(...batteryModule.callbacks);
         this.#batteryModule = batteryModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initBatteryModule() {}
 
     #lowPowerModule?: LowPowerModule;
     get lowPowerModule() {
@@ -173,6 +184,8 @@ export default abstract class BaseNpmDevice {
         !!lowPowerModule && this.releaseAll.push(...lowPowerModule.callbacks);
         this.#lowPowerModule = lowPowerModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initLowPowerModule() {}
 
     #resetModule?: ResetModule;
     get resetModule() {
@@ -183,6 +196,8 @@ export default abstract class BaseNpmDevice {
         !!resetModule && this.releaseAll.push(...resetModule.callbacks);
         this.#resetModule = resetModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initResetModule() {}
 
     #timerConfigModule?: TimerConfigModule;
     get timerConfigModule() {
@@ -196,6 +211,8 @@ export default abstract class BaseNpmDevice {
             this.releaseAll.push(...timerConfigModule.callbacks);
         this.#timerConfigModule = timerConfigModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initTimerConfigModule() {}
 
     #usbCurrentLimiterModule?: UsbCurrentLimiterModule;
     get usbCurrentLimiterModule() {
@@ -209,6 +226,8 @@ export default abstract class BaseNpmDevice {
             this.releaseAll.push(...usbCurrentLimiterModule.callbacks);
         this.#usbCurrentLimiterModule = usbCurrentLimiterModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initUsbCurrentLimiterModule() {}
 
     #pofModule?: PofModule;
     get pofModule() {
@@ -219,6 +238,8 @@ export default abstract class BaseNpmDevice {
         !!pofModule && this.releaseAll.push(...pofModule.callbacks);
         this.#pofModule = pofModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initPOFModule() {}
 
     #chargerModule?: ChargerModule;
     get chargerModule() {
@@ -229,11 +250,15 @@ export default abstract class BaseNpmDevice {
         !!chargerModule && this.releaseAll.push(...chargerModule.callbacks);
         this.#chargerModule = chargerModule;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initChargerModule() {}
 
     protected _batteryProfiler?: IBatteryProfiler;
     get batteryProfiler() {
         return this._batteryProfiler;
     }
+    // eslint-disable-next-line class-methods-use-this
+    protected initBatteryProfiler() {}
 
     constructor(
         protected _deviceType: NpmModel,
@@ -393,6 +418,20 @@ export default abstract class BaseNpmDevice {
         }
 
         this.updateUptimeOverflowCounter();
+
+        this.initChargerModule();
+        this.initBuckModule();
+        this.initLDOModule();
+        this.initGPIOModule();
+        this.initPOFModule();
+        this.initLowPowerModule();
+        this.initResetModule();
+        this.initTimerConfigModule();
+        this.initFuelGaugeModule();
+        this.initUsbCurrentLimiterModule();
+        this.initBoostModule();
+        this.initBatteryModule();
+        this.initBatteryProfiler();
     }
 
     // Return a set of default LED settings
