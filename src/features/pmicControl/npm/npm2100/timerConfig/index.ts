@@ -4,11 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import { RangeType } from '../../../../../utils/helpers';
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { TimerConfig, TimerConfigModule, TimerMode } from '../../types';
+import {
+    ModuleParams,
+    TimerConfig,
+    TimerConfigModule,
+    TimerMode,
+} from '../../types';
 import { npm2100TimerMode } from '../types';
 import timerCallbacks from './timerConfigCallbacks';
 import { TimerConfigGet } from './timerConfigGetter';
@@ -21,16 +23,12 @@ export default class Module implements TimerConfigModule {
     private _get: TimerConfigGet;
     private _set: TimerConfigSet;
     private _callbacks: (() => void)[];
-    constructor(
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        offlineMode: boolean
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        offlineMode,
+        shellParser,
+    }: ModuleParams) {
         this._get = new TimerConfigGet(sendCommand);
         this._set = new TimerConfigSet(eventEmitter, sendCommand, offlineMode);
         this._callbacks = timerCallbacks(shellParser, eventEmitter);

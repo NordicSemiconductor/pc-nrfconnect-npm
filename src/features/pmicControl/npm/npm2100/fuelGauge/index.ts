@@ -5,13 +5,11 @@
  */
 
 /* eslint-disable no-underscore-dangle */
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     FuelGauge,
     FuelGaugeModule as FuelGaugeModuleBase,
-    PmicDialog,
+    ModuleParams,
 } from '../../types';
 import { FuelGaugeActions } from './fuelGaugeActions';
 import fuelGaugeCallbacks from './fuelGaugeCallbacks';
@@ -26,25 +24,20 @@ export default class Module implements FuelGaugeModuleBase {
     private _actions: FuelGaugeActions;
     private _callbacks: ReturnType<typeof fuelGaugeCallbacks>;
 
-    constructor(
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void,
-            unique?: boolean
-        ) => void,
-        dialogHandler: ((dialog: PmicDialog) => void) | null,
-        offlineMode: boolean,
-        initializeFuelGauge: () => Promise<void>
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        shellParser,
+        offlineMode,
+        dialogHandler,
+        npmDevice,
+    }: ModuleParams) {
         this._get = new FuelGaugeGet(sendCommand);
         this._set = new FuelGaugeSet(
             eventEmitter,
             sendCommand,
             offlineMode,
-            initializeFuelGauge,
+            npmDevice.initializeFuelGauge.bind(npmDevice),
             dialogHandler
         );
         this._actions = new FuelGaugeActions(eventEmitter, sendCommand, this);

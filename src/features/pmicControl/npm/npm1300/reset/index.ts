@@ -4,16 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import {
-    DropdownItem,
-    ShellParser,
-} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { DropdownItem } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     LongPressReset,
     LongPressResetDebounce,
     LongPressResetValues,
+    ModuleParams,
     ResetConfig,
     ResetModule,
     ResetPinSelection,
@@ -29,16 +26,12 @@ export default class Module implements ResetModule {
     private _get: ResetGet;
     private _set: ResetSet;
     private _callbacks: (() => void)[];
-    constructor(
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        offlineMode: boolean
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        shellParser,
+        offlineMode,
+    }: ModuleParams) {
         this._get = new ResetGet(sendCommand);
         this._set = new ResetSet(eventEmitter, sendCommand, offlineMode);
         this._callbacks = resetCallbacks(shellParser, eventEmitter);

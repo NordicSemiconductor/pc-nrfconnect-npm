@@ -4,11 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import { RangeType } from '../../../../../utils/helpers';
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { Ldo, LdoExport, LdoModule, PmicDialog } from '../../types';
+import { Ldo, LdoExport, LdoModule, ModuleParams } from '../../types';
 import {
     nPM2100LDOSoftStart,
     nPM2100LDOSoftStartKeys,
@@ -64,21 +61,19 @@ const getLdoVoltageRange = () =>
     } as RangeType);
 
 export default class Module implements LdoModule {
+    index: number;
     private _get: LdoGet;
     private _set: LdoSet;
     private _callbacks: (() => void)[];
-    constructor(
-        public readonly index: number,
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        dialogHandler: ((dialog: PmicDialog) => void) | null,
-        offlineMode: boolean
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        dialogHandler,
+        offlineMode,
+        index,
+        shellParser,
+    }: ModuleParams) {
+        this.index = index;
         this._get = new LdoGet(sendCommand);
         this._set = new LdoSet(
             eventEmitter,
