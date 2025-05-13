@@ -33,6 +33,8 @@ import {
     dialogHandler,
     isNpm1300SerialApplicationMode,
     isNpm1300SerialRecoverMode,
+    isNpm1304SerialApplicationMode,
+    isNpm1304SerialRecoverMode,
     isNpm2100SerialApplicationMode,
     isNpm2100SerialRecoverMode,
 } from '../features/pmicControl/npm/pmicHelpers';
@@ -116,6 +118,8 @@ export default () => {
             deviceFilter={device =>
                 isNpm1300SerialRecoverMode(device) ||
                 isNpm1300SerialApplicationMode(device) ||
+                isNpm1304SerialRecoverMode(device) ||
+                isNpm1304SerialApplicationMode(device) ||
                 isNpm2100SerialApplicationMode(device) ||
                 isNpm2100SerialRecoverMode(device)
             }
