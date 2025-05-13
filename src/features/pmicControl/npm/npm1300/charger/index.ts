@@ -5,31 +5,37 @@
  */
 
 /* eslint-disable no-underscore-dangle */
+import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import { getRange } from '../../../../../utils/helpers';
+import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Charger,
     type ChargerModule as ChargerModuleBase,
     FixedListRange,
+    ITerm,
     ModuleParams,
 } from '../../types';
 import chargerCallbacks from './callbacks';
 import { ChargerGet } from './getters';
 import { ChargerSet } from './setters';
+import { ITermKeys, ITermValues } from './types';
 
 export default class Module implements ChargerModuleBase {
     private _get: ChargerGet;
     private _set: ChargerSet;
     private _callbacks: (() => void)[];
 
-    constructor({
-        sendCommand,
-        eventEmitter,
-        offlineMode,
-        shellParser,
-    }: ModuleParams) {
+    constructor(
+        { sendCommand, eventEmitter, offlineMode, shellParser }: ModuleParams,
+        callbacks: (
+            shellParser: ShellParser | undefined,
+            eventEmitter: NpmEventEmitter
+        ) => (() => void)[] = chargerCallbacks
+    ) {
         this._get = new ChargerGet(sendCommand);
         this._set = new ChargerSet(eventEmitter, sendCommand, offlineMode);
-        this._callbacks = chargerCallbacks(shellParser, eventEmitter);
+        this._callbacks = callbacks(shellParser, eventEmitter);
     }
 
     get get() {
@@ -50,7 +56,7 @@ export default class Module implements ChargerModuleBase {
             vTrickleFast: 2.5,
             iChg: this.ranges.current.min,
             enabled: false,
-            iTerm: '10%',
+            iTerm: 10,
             iBatLim: 1340,
             enableRecharging: false,
             enableVBatLow: false,
@@ -132,5 +138,17 @@ export default class Module implements ChargerModuleBase {
                 step: 0.05,
             },
         ]).map(v => Number(v.toFixed(2)));
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    get values(): {
+        iTerm: { label: string; value: ITerm }[];
+    } {
+        return {
+            iTerm: [...ITermValues].map((item, i) => ({
+                label: `${ITermKeys[i]}`,
+                value: item,
+            })),
+        };
     }
 }

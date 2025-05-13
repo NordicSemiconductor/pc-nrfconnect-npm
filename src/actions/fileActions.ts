@@ -66,6 +66,14 @@ const upgradeToLatest = (exportJson: AnyNpmExport): NpmExportLatest => {
             enabled: exportJson.fuelGauge,
             chargingSamplingRate: exportJson.fuelGaugeChargingSamplingRate,
         };
+
+        if (exportJson.charger) {
+            exportJson.charger.iTerm = Number.parseInt(
+                exportJson.charger.iTerm.toString(),
+                10
+            );
+        }
+
         return {
             ...exportJson,
             ...fuelGaugeSettings,

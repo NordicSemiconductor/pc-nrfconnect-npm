@@ -103,7 +103,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerITerm', async () => {
-            await pmic.chargerModule?.set.iTerm('10%');
+            await pmic.chargerModule?.set.iTerm(10);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger termination_current set 10`,
@@ -666,11 +666,11 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setChargerITerm  onError case 1 - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.iTerm('10%')
+                pmic.chargerModule?.set.iTerm(10)
             ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: '10%' });
+            expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: 10 });
 
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
@@ -703,11 +703,11 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             await expect(
-                pmic.chargerModule?.set.iTerm('10%')
+                pmic.chargerModule?.set.iTerm(10)
             ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: '10%' });
+            expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: 10 });
 
             // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(3);
