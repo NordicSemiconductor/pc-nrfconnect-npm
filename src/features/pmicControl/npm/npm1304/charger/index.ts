@@ -4,18 +4,33 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import { getRange } from '../../../../../utils/helpers';
 import nPM1300Charger from '../../npm1300/charger';
-import { Charger } from '../../types';
+import chargerCallbacks from '../../npm1300/charger/callbacks';
+import { NpmEventEmitter } from '../../pmicHelpers';
+import { Charger, ModuleParams } from '../../types';
+import { ITermKeys, ITermNpm1304, ITermValues } from './types';
 
 export default class Module extends nPM1300Charger {
+    constructor(parms: ModuleParams) {
+        super(
+            parms,
+            (
+                shellParser: ShellParser | undefined,
+                eventEmitter: NpmEventEmitter
+            ) => chargerCallbacks(shellParser, eventEmitter, ITermValues)
+        );
+    }
+
     get defaults(): Charger {
         return {
             vTerm: this.ranges.voltage[0],
             vTrickleFast: 2.5,
             iChg: this.ranges.current.min,
             enabled: false,
-            iTerm: '10%',
+            iTerm: 5,
             iBatLim: 1340,
             enableRecharging: false,
             enableVBatLow: false,
@@ -79,5 +94,17 @@ export default class Module extends nPM1300Charger {
                 step: 0.05,
             },
         ]).map(v => Number(v.toFixed(2)));
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    get values(): {
+        iTerm: { label: string; value: ITermNpm1304 }[];
+    } {
+        return {
+            iTerm: [...ITermValues].map((item, i) => ({
+                label: `${ITermKeys[i]}`,
+                value: item,
+            })),
+        };
     }
 }

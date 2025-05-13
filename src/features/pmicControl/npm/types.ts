@@ -12,12 +12,14 @@ import { z } from 'zod';
 
 import { RangeType } from '../../../utils/helpers';
 import type BaseNpmDevice from './basePmicDevice';
+import { ITermNpm1300 } from './npm1300/charger/types';
 import type {
     GPIODrive1300,
     GPIOMode1300,
     GPIOPull1300,
 } from './npm1300/gpio/types';
 import type { SoftStart as SoftStart1300 } from './npm1300/ldo/types';
+import { ITermNpm1304 } from './npm1304/charger/types';
 import type { PowerID2100 } from './npm2100/battery';
 import type {
     GPIODrive2100,
@@ -97,8 +99,7 @@ export type BuckRetentionControl =
     | (typeof BuckRetentionControlValues)[number]
     | GPIONames;
 
-export const ITermValues = ['10%', '20%'] as const;
-export type ITerm = (typeof ITermValues)[number];
+export type ITerm = ITermNpm1300 | ITermNpm1304;
 
 export const VTrickleFastValues = [2.5, 2.9] as const;
 export const NTCValues = ['Ignore NTC', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
@@ -550,6 +551,9 @@ export interface ChargerModule {
         vLowerCutOff?: RangeType;
     };
     defaults: Charger;
+    values: {
+        iTerm: { label: string; value: ITerm }[];
+    };
 }
 
 export interface BoostModule {
