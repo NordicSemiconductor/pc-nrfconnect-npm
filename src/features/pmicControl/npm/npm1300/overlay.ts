@@ -57,7 +57,7 @@ npm1300_ek_charger: charger {
     compatible = "nordic,npm1300-charger";
     term-microvolt = <${toMicro(charger.vTerm)}>;
     term-warm-microvolt = <${toMicro(charger.vTermR)}>;
-    // term-current-percent = <${Number.parseInt(charger.iTerm, 10)}>;
+    // term-current-percent = <${charger.iTerm}>;
     current-microamp = <${toMicro(charger.iChg / 1000)}>;
     // trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
     dischg-limit-microamp = <${toMicro(charger.iBatLim / 1000)}>;

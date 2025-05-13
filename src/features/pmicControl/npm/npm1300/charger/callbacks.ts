@@ -15,10 +15,12 @@ import {
     toRegex,
 } from '../../pmicHelpers';
 import { Charger, NTCThermistor, PmicChargingState } from '../../types';
+import { ITermValues } from './types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
+    ITermAllowedValues: number[] = ITermValues
 ) => {
     const cleanupCallbacks = [];
 
@@ -181,19 +183,14 @@ export default (
                     'npmx charger termination_current',
                     true,
                     undefined,
-                    '(10|20)'
+                    `(${ITermAllowedValues.map(v => v.toString()).join('|')})`
                 ),
                 res => {
                     const result = parseToNumber(res);
 
-                    if (result === 10 || result === 20) {
-                        eventEmitter.emitPartialEvent<Charger>(
-                            'onChargerUpdate',
-                            {
-                                iTerm: `${result}%`,
-                            }
-                        );
-                    }
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iTerm: result,
+                    });
                 },
                 noop
             )

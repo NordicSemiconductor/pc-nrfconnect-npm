@@ -19,7 +19,6 @@ import {
     ChargerModule,
     isFixedListRangeWithLabel,
     ITerm,
-    ITermValues,
     VTrickleFast,
     VTrickleFastValues,
 } from '../../../features/pmicControl/npm/types';
@@ -35,11 +34,6 @@ interface PowerCardProperties {
 const vTrickleFastItems = [...VTrickleFastValues].map(item => ({
     label: `${item}`,
     value: `${item}`,
-}));
-
-const iTermItems = [...ITermValues].map(item => ({
-    label: item,
-    value: item,
 }));
 
 export default ({
@@ -240,19 +234,14 @@ export default ({
                                 </>
                             </DocumentationTooltip>
                         }
-                        items={iTermItems}
+                        items={chargerModule.values.iTerm}
                         onSelect={item =>
                             chargerModule.set.iTerm(item.value as ITerm)
                         }
                         selectedItem={
-                            iTermItems[
-                                Math.max(
-                                    0,
-                                    iTermItems.findIndex(
-                                        item => item.value === charger.iTerm
-                                    )
-                                ) ?? 0
-                            ]
+                            chargerModule.values.iTerm.find(
+                                item => item.value === charger.iTerm
+                            ) ?? chargerModule.values.iTerm[0]
                         }
                         disabled={disabled}
                     />

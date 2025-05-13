@@ -62,5 +62,31 @@ export const documentation: Documentation = {
                 ],
             },
         ],
+        ITERM: [
+            {
+                title: (
+                    <>
+                        <span>I</span>
+                        <span className="subscript">TERM</span>
+                    </>
+                ),
+                content: [
+                    <p key="p1">
+                        Set the charging termination current level as a percent
+                        of I<span className="subscript">CHG</span>, either 5%
+                        (default) or 10%.
+                    </p>,
+                    <p key="p2">
+                        When the charging mode is “Constant Voltage”, the
+                        current flow into the battery is monitored.
+                    </p>,
+                    <p key="p3">
+                        When the current drops below I
+                        <span className="subscript">TERM</span>, the charging is
+                        complete.
+                    </p>,
+                ],
+            },
+        ],
     },
 };

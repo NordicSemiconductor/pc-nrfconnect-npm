@@ -6,6 +6,7 @@
 
 import { NTCThermistor, PmicChargingState } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
+import { ITermValues } from './types';
 
 describe('PMIC 1304 - Command callbacks', () => {
     const { eventHandlers, mockOnChargerUpdate, mockOnChargingStatusUpdate } =
@@ -69,15 +70,20 @@ describe('PMIC 1304 - Command callbacks', () => {
         });
     });
 
-    test.each(['get', 'set 20'])('npmx charger iTerm %p', append => {
+    test.each(
+        ITermValues.flatMap(v => [
+            { append: 'get', v },
+            { append: `set ${v}%`, v },
+        ])
+    )('npmx charger iTerm %p', ({ append, v }) => {
         const command = `npmx charger termination_current ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess('Value: 20%', command);
+        callback?.onSuccess(`Value: ${v}%`, command);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).nthCalledWith(1, { iTerm: '20%' });
+        expect(mockOnChargerUpdate).nthCalledWith(1, { iTerm: v });
     });
 
     test.each(['get', 'set 1340'])('npmx charger iBatLim %p', append => {

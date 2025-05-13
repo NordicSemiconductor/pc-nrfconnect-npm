@@ -163,10 +163,7 @@ export class ChargerSet {
                 this.enabled(false)
                     .then(() => {
                         this.sendCommand(
-                            `npmx charger termination_current set ${Number.parseInt(
-                                iTerm,
-                                10
-                            )}`,
+                            `npmx charger termination_current set ${iTerm}`,
                             () => resolve(),
                             () => {
                                 this.get.iTerm();
