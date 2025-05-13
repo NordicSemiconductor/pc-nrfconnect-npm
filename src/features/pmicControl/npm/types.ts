@@ -12,7 +12,7 @@ import { z } from 'zod';
 
 import { RangeType } from '../../../utils/helpers';
 import type BaseNpmDevice from './basePmicDevice';
-import { ITermNpm1300 } from './npm1300/charger/types';
+import { ITermNpm1300, VTrickleFast1300 } from './npm1300/charger/types';
 import type {
     GPIODrive1300,
     GPIOMode1300,
@@ -101,9 +101,8 @@ export type BuckRetentionControl =
 
 export type ITerm = ITermNpm1300 | ITermNpm1304;
 
-export const VTrickleFastValues = [2.5, 2.9] as const;
 export const NTCValues = ['Ignore NTC', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
-export type VTrickleFast = (typeof VTrickleFastValues)[number];
+export type VTrickleFast = VTrickleFast1300;
 export type NTCThermistor = (typeof NTCValues)[number];
 
 export type ModuleSettings = {
@@ -553,6 +552,7 @@ export interface ChargerModule {
     defaults: Charger;
     values: {
         iTerm: { label: string; value: ITerm }[];
+        vTrickleFast: { label: string; value: VTrickleFast }[];
     };
 }
 
