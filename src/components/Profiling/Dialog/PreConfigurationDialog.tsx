@@ -14,9 +14,12 @@ import {
 
 import { closeProfiling } from '../../../features/pmicControl/profilingSlice';
 
-export default () => {
+export default ({
+    type,
+}: {
+    type: 'MissingSyncBoard' | 'ActiveLoadNotVSYS';
+}) => {
     const dispatch = useDispatch();
-
     return (
         <GenericDialog
             title="Battery Profiling"
@@ -33,10 +36,17 @@ export default () => {
                 </DialogButton>
             }
         >
-            <Alert label="Error: " variant="danger">
-                nPM-FG board is not connected. Turn off EK and connect nPM-FG to
-                the EK
-            </Alert>
+            {type === 'MissingSyncBoard' && (
+                <Alert label="Error: " variant="danger">
+                    nPM-FG board is not connected. Turn off EK and connect
+                    nPM-FG to the EK
+                </Alert>
+            )}
+            {type === 'ActiveLoadNotVSYS' && (
+                <Alert label="Error: " variant="danger">
+                    Active Load should be set to VSYS to be able to profile
+                </Alert>
+            )}
         </GenericDialog>
     );
 };

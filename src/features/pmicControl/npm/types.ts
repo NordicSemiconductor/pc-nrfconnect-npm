@@ -122,7 +122,8 @@ export type CCProfilingState =
     | 'vCutOff'
     | 'POF'
     | 'ThermalError'
-    | 'Ready';
+    | 'Ready'
+    | 'NOT VSYS';
 
 export type ProfilingEvent = {
     timestamp: number;
@@ -938,7 +939,7 @@ export type BatteryProfiler = {
         vCutoff: number,
         profiles: CCProfile[]
     ) => Promise<void>;
-    canProfile: () => Promise<boolean>;
+    canProfile: () => Promise<true | 'MissingSyncBoard' | 'ActiveLoadNotVSYS'>;
     startProfiling: () => Promise<void>;
     stopProfiling: () => Promise<void>;
     isProfiling: () => Promise<boolean>;
