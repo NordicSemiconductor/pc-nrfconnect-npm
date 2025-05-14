@@ -101,6 +101,10 @@ export const readAndUpdateProjectSettings =
     (dispatch, getState) => {
         const project = readProjectSettingsFromFile(filePath);
 
+        if (project.error) {
+            return project;
+        }
+
         // It is assumed here that the file exists and is valid
 
         if (project?.settings && updateProject) {
