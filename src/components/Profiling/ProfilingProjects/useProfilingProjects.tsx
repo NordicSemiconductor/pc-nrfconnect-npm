@@ -11,6 +11,7 @@ import {
     clearConfirmBeforeClose,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import {
     getProjectProfileProgress,
     getRecentProjects,
@@ -25,6 +26,7 @@ import {
 export const useProfilingProjects = () => {
     const dispatch = useDispatch();
     const recentProjects = useSelector(getRecentProjects);
+    const npmDevice = useSelector(getNpmDevice);
     const progress = useSelector(getProjectProfileProgress);
 
     useEffect(() => {
@@ -71,5 +73,5 @@ export const useProfilingProjects = () => {
         recentProjects.forEach(recentProject =>
             dispatch(readAndUpdateProjectSettings(recentProject))
         );
-    }, [dispatch, recentProjects]);
+    }, [dispatch, recentProjects, npmDevice]);
 };
