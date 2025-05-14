@@ -50,7 +50,10 @@ export default ({ project }: { project: ProjectPathPair }) => {
                     <Alert label="Info: " variant="info">
                         This project is not supported for this device{' '}
                         {project.settings?.deviceType
-                            ? `(supports ${project.settings.deviceType})`
+                            ? `(supports ${project.settings.deviceType.replace(
+                                  'npm',
+                                  'nPM'
+                              )})`
                             : ''}
                     </Alert>
                 )}
