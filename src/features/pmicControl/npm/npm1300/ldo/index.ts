@@ -90,7 +90,7 @@ export default class Module implements LdoModule {
     } {
         return {
             softstart: [...SoftStartValues].map((item, i) => ({
-                label: `${SoftStartValues[i]}`,
+                label: `${SoftStartValues[i]} mA`,
                 value: item,
             })),
         };
