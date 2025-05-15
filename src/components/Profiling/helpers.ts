@@ -102,7 +102,8 @@ export const readAndUpdateProjectSettings =
         const project = readProjectSettingsFromFile(filePath);
 
         if (project.error) {
-            return project;
+            dispatch(updateProfilingProject(project));
+            return;
         }
 
         // It is assumed here that the file exists and is valid

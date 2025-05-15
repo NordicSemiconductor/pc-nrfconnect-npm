@@ -240,7 +240,7 @@ export default () => {
                 </div>
 
                 <div className="d-flex flex-column-reverse">
-                    {projects
+                    {[...projects]
                         .sort(a => (a.error ? 1 : -1))
                         .map(project => (
                             <React.Fragment key={project.path}>
