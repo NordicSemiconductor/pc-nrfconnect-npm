@@ -34,7 +34,7 @@ render(
     <App
         appReducer={appReducer}
         deviceSelect={<DeviceSelector />}
-        feedbackCategories={['nPM PowerUP', 'nPM1300']}
+        feedbackCategories={['nPM PowerUP', 'nPM1300', 'nPM1304', 'nPM2100']}
         sidePanel={
             <>
                 <SidePanel />
