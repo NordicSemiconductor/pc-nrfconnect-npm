@@ -3,6 +3,7 @@
 ### Fixed
 
 -   `Break-to-wake` dialog did not close on cancel.
+-   Units (`mA`) for nPM 1300 soft start current.
 
 ## 2.0.0 - 2025-03-28
 
