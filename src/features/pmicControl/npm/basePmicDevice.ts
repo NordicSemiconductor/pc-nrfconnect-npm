@@ -936,7 +936,7 @@ export default abstract class BaseNpmDevice {
 
     applyConfig(config: NpmExportLatest) {
         return new Promise<void>(resolve => {
-            if (config.deviceType !== 'npm1300') {
+            if (config.deviceType !== this.deviceType) {
                 resolve();
                 return;
             }

@@ -252,7 +252,7 @@ describe('PMIC 1304 - Apply Config ', () => {
             chargingSamplingRate: 1000,
         },
         firmwareVersion: npm1304FWVersion,
-        deviceType: 'npm1300',
+        deviceType: 'npm1304',
         usbPower: {
             currentLimiter: 500,
         },
