@@ -30,11 +30,7 @@ import {
     setProfile,
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
-import {
-    generateDefaultProjectPath,
-    REST_DURATION,
-    saveProjectSettings,
-} from '../helpers';
+import { generateDefaultProjectPath, saveProjectSettings } from '../helpers';
 import { ProfilingProject } from '../types';
 
 import '../profiling.scss';
@@ -73,44 +69,14 @@ export default ({
         }
 
         selectDirectoryDialog().then(dirPath => {
-            const restingProfiles: CCProfile[] = [
-                {
-                    tLoad: 500,
-                    tRest: 500,
-                    iLoad: 0,
-                    iRest: 0,
-                    cycles: REST_DURATION,
-                },
-            ];
-            const profilingProfiles: CCProfile[] = [
-                {
-                    tLoad: 500,
-                    tRest: 500,
-                    iLoad: 0,
-                    iRest: 0,
-                    cycles: 300, // 5Min
-                },
-                {
-                    tLoad: 600000, // 10Min
-                    tRest: 2400000, // 40Min
-                    iLoad: capacity / 5 / 1000, // A
-                    iRest: 0,
-                    vCutoff: vUpperCutOff - 0.3,
-                },
-                {
-                    tLoad: 300000, // 5Min
-                    tRest: 1800000, // 30Min
-                    iLoad: capacity / 5 / 1000, // A
-                    iRest: 0,
-                    vCutoff: vLowerCutOff + 0.5,
-                },
-                {
-                    tLoad: 300000, // 5Min
-                    tRest: 1800000, // 30Min
-                    iLoad: capacity / 10 / 1000, // A
-                    iRest: 0,
-                },
-            ];
+            const restingProfiles: CCProfile[] =
+                npmDevice.batteryProfiler?.restingProfile() ?? [];
+            const profilingProfiles: CCProfile[] =
+                npmDevice.batteryProfiler?.loadProfile(
+                    capacity,
+                    vUpperCutOff,
+                    vLowerCutOff
+                ) ?? [];
 
             const profile: Profile = {
                 name,

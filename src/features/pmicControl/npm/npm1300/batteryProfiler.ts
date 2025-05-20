@@ -19,6 +19,8 @@ import {
 } from '../types';
 
 export class BatteryProfiler implements BatteryProfilerBase {
+    protected restDurtion = 900; // seconds
+
     protected profiling: CCProfilingState = 'Off';
     protected releaseAll: (() => void)[] = [];
     protected shellParser?: ShellParser;
@@ -281,5 +283,54 @@ export class BatteryProfiler implements BatteryProfilerBase {
 
     release() {
         this.releaseAll.forEach(release => release());
+    }
+
+    restingProfile(): CCProfile[] {
+        return [
+            {
+                tLoad: 500,
+                tRest: 500,
+                iLoad: 0,
+                iRest: 0,
+                cycles: this.restDurtion, // to be 30 min for 1304
+            },
+        ];
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    loadProfile(
+        capacity: number,
+        vUpperCutOff: number,
+        vLowerCutOff: number
+    ): CCProfile[] {
+        return [
+            {
+                tLoad: 500,
+                tRest: 500,
+                iLoad: 0,
+                iRest: 0,
+                cycles: 300, // 5Min
+            },
+            {
+                tLoad: 600000, // 10Min
+                tRest: 2400000, // 40Min // 1304 1hr
+                iLoad: capacity / 5 / 1000, // A // 1304 apacity / 6 / 1000
+                iRest: 0,
+                vCutoff: vUpperCutOff - 0.3,
+            },
+            {
+                tLoad: 300000, // 5Min
+                tRest: 1800000, // 30Min // 1304 45min
+                iLoad: capacity / 5 / 1000, // A  // 1304 apacity / 6 / 1000
+                iRest: 0,
+                vCutoff: vLowerCutOff + 0.5,
+            },
+            {
+                tLoad: 300000, // 5Min
+                tRest: 1800000, // 30Min // 1304 45min
+                iLoad: capacity / 10 / 1000, // A  // 1304 apacity / 12 / 1000
+                iRest: 0,
+            },
+        ];
     }
 }
