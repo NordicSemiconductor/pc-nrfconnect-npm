@@ -955,6 +955,12 @@ export type BatteryProfiler = {
         handler: (state: ProfilingEvent, error?: string) => void
     ) => () => void;
     pofError: () => void;
+    restingProfile(): CCProfile[];
+    loadProfile(
+        capacity: number,
+        vUpperCutOff: number,
+        vLowerCutOff: number
+    ): CCProfile[];
 };
 
 interface DocumentationItem {
