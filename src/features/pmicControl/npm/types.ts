@@ -547,7 +547,8 @@ export interface ChargerModule {
         current: RangeType;
         nTCBeta: RangeType;
         iBatLim: FixedListRange;
-        vLowerCutOff?: RangeType;
+        vLowerCutOff: RangeType;
+        batterySize: RangeType;
     };
     defaults: Charger;
     values: {

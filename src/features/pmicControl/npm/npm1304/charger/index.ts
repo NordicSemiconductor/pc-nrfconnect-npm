@@ -81,6 +81,10 @@ export default class Module extends nPM1300Charger {
                 step: 0.05,
                 decimals: 2,
             },
+            batterySize: {
+                min: 4,
+                max: 100,
+            },
         };
     }
 
