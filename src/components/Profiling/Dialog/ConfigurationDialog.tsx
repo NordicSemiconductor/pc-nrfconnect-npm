@@ -48,7 +48,9 @@ export default ({
     const [name, setName] = useState('');
     const [showValidationError, setShowValidationError] = useState(false);
 
-    const [capacity, setCapacity] = useState(800);
+    const [capacity, setCapacity] = useState(
+        npmDevice.chargerModule?.ranges.current.max ?? 800
+    );
     const [ntcThermistor, setNTCThermistor] = useState<NTCThermistor>('10 kΩ');
     const [temperatures, setTemperatures] = useState<number[]>([25]);
     const [ratedChargingCurrent, setRatedChargingCurrent] = useState(
@@ -61,6 +63,10 @@ export default ({
         label: `${item}`,
         value: `${item}`,
     }));
+
+    if (!npmDevice.chargerModule) {
+        return null;
+    }
 
     const onSelectFolder = () => {
         if (!validName) {
@@ -175,7 +181,7 @@ export default ({
                     unit="V"
                     value={vUpperCutOff}
                     // Only nPM1300 which has the chargerModule will get access to this dialog
-                    range={npmDevice.chargerModule?.ranges.voltage || [0, 1]}
+                    range={npmDevice.chargerModule.ranges.voltage}
                     onChange={setUpperVCutOff}
                 />
 
@@ -190,12 +196,7 @@ export default ({
                     }
                     unit="V"
                     value={vLowerCutOff}
-                    range={{
-                        min: 2.7,
-                        max: 3.1,
-                        step: 0.05,
-                        decimals: 2,
-                    }}
+                    range={npmDevice.chargerModule.ranges.vLowerCutOff}
                     onChange={setLowerVCutOff}
                 />
 
@@ -210,7 +211,7 @@ export default ({
                     }
                     unit="mAh"
                     value={capacity}
-                    range={{ min: 32, max: 3000 }}
+                    range={npmDevice.chargerModule.ranges.batterySize}
                     onChange={c => {
                         setCapacity(c);
                         if (ratedChargingCurrent > c) {
@@ -232,8 +233,11 @@ export default ({
                     unit="mA"
                     value={ratedChargingCurrent}
                     range={{
-                        min: 32,
-                        max: Math.min(800, capacity),
+                        min: npmDevice.chargerModule.ranges.current.min,
+                        max: Math.min(
+                            npmDevice.chargerModule.ranges.current.max,
+                            capacity
+                        ),
                     }}
                     onChange={setRatedChargingCurrent}
                 />

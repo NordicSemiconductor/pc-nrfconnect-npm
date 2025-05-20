@@ -109,6 +109,10 @@ export default class Module implements ChargerModuleBase {
                 step: 0.05,
                 decimals: 2,
             },
+            batterySize: {
+                min: 32,
+                max: 800,
+            },
         };
     }
 
