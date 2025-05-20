@@ -64,6 +64,16 @@ const npm1300EngineeringCMessage = (
     </>
 );
 
+const npm1304EngineeringCMessage = (
+    <p>
+        You have connected an nPM1304-EK with HW Revision 0.1.0. VDDIO must be
+        configured to 1.8 V via jumper selections for battery profiling and
+        on-board load to work with this EK version. This is done by setting the
+        P18 jumper in the V<span className="subscript">OUT1</span> position, and
+        P13 in the R<span className="subscript">SET1</span> position.
+    </p>
+);
+
 const npm2100TooOldMessage = (reject: (error: Error) => void): PmicDialog => ({
     type: 'alert',
     message:
@@ -320,7 +330,7 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 validFirmware: boolean;
             }>
         > =>
-        async () => {
+        async dispatch => {
             if (!(device.serialPorts && device.serialPorts[0].comName)) {
                 throw new Error('device does not have a serial port');
             }
@@ -338,6 +348,7 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
             try {
                 const result = await npmDevice.isSupportedVersion();
+                const hwVersion = (await npmDevice.getHwVersion()).version;
 
                 const action = () => ({
                     device,
@@ -345,6 +356,36 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                 });
 
                 await dispose();
+
+                if (hwVersion === '0.1.0') {
+                    const p = new Promise<{
+                        device: Device;
+                        validFirmware: boolean;
+                    }>((resolve, reject) => {
+                        const information: PmicDialog = {
+                            type: 'alert',
+                            doNotAskAgainStoreID: 'pmic1304-hw0.1.0-issues',
+                            message: npm1304EngineeringCMessage,
+                            confirmLabel: 'Yes',
+                            cancelLabel: 'No',
+                            optionalLabel: "Yes, don't ask again",
+                            title: 'Important notice!',
+                            onConfirm: () => {
+                                resolve(action());
+                            },
+                            onCancel: () => {
+                                reject(new Error('Device setup cancelled'));
+                            },
+                            onOptional: () => {
+                                action();
+                            },
+                        };
+
+                        dispatch(dialogHandler(information));
+                    });
+
+                    return p;
+                }
 
                 return action();
             } catch (e) {
