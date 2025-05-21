@@ -1,3 +1,13 @@
+## 2.1.0 - Unreleased
+
+### Added
+
+-   Added Expremental support for nPM1304.
+
+### Fixed
+
+-   Loading `json` configutation file now works for nPM 2100.
+
 ## 2.0.1 - 2025-05-22
 
 ### Fixed

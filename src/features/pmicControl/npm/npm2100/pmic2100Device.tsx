@@ -62,7 +62,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 },
                 boosts: {
                     Module: BoostModule,
-                    count: 2,
+                    count: 1,
                 },
                 TimerConfigModule,
                 BatteryModule,
