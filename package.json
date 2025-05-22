@@ -11,7 +11,7 @@
     "author": "Nordic Semiconductor ASA",
     "license": "SEE LICENSE IN LICENSE",
     "engines": {
-        "nrfconnect": ">=5.0.1"
+        "nrfconnect": ">=5.2.0"
     },
     "main": "dist/bundle.js",
     "nrfConnectForDesktop": {
@@ -49,7 +49,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^207.0.0",
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^210.0.0",
         "chart.js": "^4.0.1",
         "chartjs-adapter-date-fns": "^2.0.1",
         "react-chartjs-2": "^5.0.1",
