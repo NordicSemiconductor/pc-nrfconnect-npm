@@ -151,7 +151,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 // device lib report device with wrong value initially so we have to wait until device is fully recognized
                                 programmedDevice.serialPorts?.length === 2 &&
                                 programmedDevice.traits.mcuBoot === true &&
-                                device.traits.serialPorts === true &&
+                                programmedDevice.traits.serialPorts === true &&
                                 isNpm1300SerialApplicationMode(
                                     programmedDevice
                                 ),
@@ -287,7 +287,7 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 // device lib report device with wrong value initially so we have to wait until device is fully recognized
                                 programmedDevice.serialPorts?.length === 2 &&
                                 programmedDevice.traits.mcuBoot === true &&
-                                device.traits.serialPorts === true &&
+                                programmedDevice.traits.serialPorts === true &&
                                 isNpm1304SerialApplicationMode(
                                     programmedDevice
                                 ),
@@ -419,7 +419,7 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 // device lib report device with wrong value initially so we have to wait until device is fully recognized
                                 programmedDevice.serialPorts?.length === 2 &&
                                 programmedDevice.traits.mcuBoot === true &&
-                                device.traits.serialPorts === true &&
+                                programmedDevice.traits.serialPorts === true &&
                                 isNpm2100SerialApplicationMode(
                                     programmedDevice
                                 ),

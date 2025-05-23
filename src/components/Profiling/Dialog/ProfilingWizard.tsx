@@ -368,7 +368,10 @@ export default () => {
             const initWaitForDevice = () => {
                 dispatch(
                     setWaitForDevice({
-                        when: 'sameTraits',
+                        when: device =>
+                            device.serialPorts?.length === 2 &&
+                            device.traits.mcuBoot === true &&
+                            device.traits.serialPorts === true,
                         once: true,
                         timeout:
                             profilingStage === 'Checklist' ||

@@ -471,7 +471,10 @@ export default () => {
                             getState().deviceAutoSelect.waitForDevice;
                         dis(
                             setWaitForDevice({
-                                when: 'sameTraits',
+                                when: device =>
+                                    device.serialPorts?.length === 2 &&
+                                    device.traits.mcuBoot === true &&
+                                    device.traits.serialPorts === true,
                                 once: true,
                                 timeout: 10000,
                                 onSuccess: async device => {
@@ -503,7 +506,10 @@ export default () => {
 
                             dis(
                                 setWaitForDevice({
-                                    when: 'sameTraits',
+                                    when: device =>
+                                        device.serialPorts?.length === 2 &&
+                                        device.traits.mcuBoot === true &&
+                                        device.traits.serialPorts === true,
                                     once: true,
                                     timeout: 10000,
                                     onSuccess: async device => {
