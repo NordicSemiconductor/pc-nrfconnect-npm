@@ -181,7 +181,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 reject(err.message);
                             }
                         });
-                    logger.debug('firmware updated finished');
+                    logger.debug('Firmware updated finished');
                 }),
         },
     ],
@@ -197,7 +197,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
         > =>
         async dispatch => {
             if (!(device.serialPorts && device.serialPorts[0].comName)) {
-                throw new Error('device does not have a serial port');
+                throw new Error('Device does not have a serial port');
             }
 
             if (isNpm1300SerialRecoverMode(device)) {
