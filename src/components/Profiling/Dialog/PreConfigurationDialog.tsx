@@ -38,13 +38,13 @@ export default ({
         >
             {type === 'MissingSyncBoard' && (
                 <Alert label="Error: " variant="danger">
-                    nPM-FG board is not connected. Turn off EK and connect
-                    nPM-FG to the EK
+                    nPM Fuel Gauge board is not connected. Turn off the EK and
+                    connect nPM Fuel Gauge to the EK.
                 </Alert>
             )}
             {type === 'ActiveLoadNotVSYS' && (
                 <Alert label="Error: " variant="danger">
-                    Active Load should be set to VSYS to be able to profile
+                    Set Active Load to VSYS to profile the battery.
                 </Alert>
             )}
         </GenericDialog>

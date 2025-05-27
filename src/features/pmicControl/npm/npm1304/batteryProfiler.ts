@@ -27,7 +27,7 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
     }
 
     private processModuleCCSink({ message }: LoggingEvent) {
-        if (message.includes('Active load switch position')) {
+        if (message.includes('Active Load switch position')) {
             this.eventEmitter.emit('onProfilingStateChange', this.profiling);
             const value = parseColonBasedAnswer(message);
             switch (value) {

@@ -66,11 +66,12 @@ const npm1300EngineeringCMessage = (
 
 const npm1304EngineeringCMessage = (
     <p>
-        You have connected an nPM1304-EK with HW Revision 0.1.0. VDDIO must be
-        configured to 1.8 V via jumper selections for battery profiling and
-        on-board load to work with this EK version. This is done by setting the
-        P18 jumper in the V<span className="subscript">OUT1</span> position, and
-        P13 in the R<span className="subscript">SET1</span> position.
+        You have connected an nPM1304 EK revision 0.1.0. For battery profiling
+        and on-board load to work with this revision, you must configure VDDIO
+        to 1.8 V using jumper selections. To do this, set the <b>P18</b> jumper
+        in the V<span className="subscript">OUT1</span> position, and the{' '}
+        <b>P13</b>
+        jumper in the R<span className="subscript">SET1</span> position.
     </p>
 );
 
@@ -172,7 +173,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                         .then(() => {
                             onProgress(
                                 100,
-                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.'
+                                'Programming upload complete. Waiting for device to apply firmware and restart. This can take a minute.'
                             );
                         })
                         .catch(err => {

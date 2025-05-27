@@ -349,7 +349,7 @@ export default () => {
                     setCompleteStep({
                         level: 'danger',
                         message:
-                            'Profiling was stopped. Active load swicth is no longer set to VSYS.',
+                            'Profiling stopped. The Active Load switch is no longer set to VSYS.',
                     })
                 );
                 break;
