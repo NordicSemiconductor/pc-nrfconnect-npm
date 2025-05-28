@@ -119,6 +119,24 @@ export default ({
                 onChangeComplete={v => chargerModule.set.iChg(v)}
                 showSlider
             />
+            <Dropdown
+                label={
+                    <DocumentationTooltip card="charger" item="ITERM">
+                        <>
+                            <span>I</span>
+                            <span className="subscript">TERM</span>
+                        </>
+                    </DocumentationTooltip>
+                }
+                items={chargerModule.values.iTerm}
+                onSelect={item => chargerModule.set.iTerm(item.value as ITerm)}
+                selectedItem={
+                    chargerModule.values.iTerm.find(
+                        item => item.value === charger.iTerm
+                    ) ?? chargerModule.values.iTerm[0]
+                }
+                disabled={disabled}
+            />
 
             {!summary && (
                 <>
@@ -216,26 +234,6 @@ export default ({
                         isToggled={charger.enableVBatLow}
                         onToggle={value =>
                             chargerModule.set.enabledVBatLow(value)
-                        }
-                        disabled={disabled}
-                    />
-                    <Dropdown
-                        label={
-                            <DocumentationTooltip card="charger" item="ITERM">
-                                <>
-                                    <span>I</span>
-                                    <span className="subscript">TERM</span>
-                                </>
-                            </DocumentationTooltip>
-                        }
-                        items={chargerModule.values.iTerm}
-                        onSelect={item =>
-                            chargerModule.set.iTerm(item.value as ITerm)
-                        }
-                        selectedItem={
-                            chargerModule.values.iTerm.find(
-                                item => item.value === charger.iTerm
-                            ) ?? chargerModule.values.iTerm[0]
                         }
                         disabled={disabled}
                     />
