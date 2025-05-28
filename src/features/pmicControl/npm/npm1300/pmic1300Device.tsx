@@ -355,6 +355,11 @@ export default class Npm1300 extends BaseNpmDevice {
     }
 
     // eslint-disable-next-line class-methods-use-this
+    get canUploadBatteryProfiles() {
+        return true;
+    }
+
+    // eslint-disable-next-line class-methods-use-this
     generateExport(
         getState: () => RootState & {
             app: { pmicControl: { npmDevice: BaseNpmDevice } };

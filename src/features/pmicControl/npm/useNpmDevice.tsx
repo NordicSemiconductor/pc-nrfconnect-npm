@@ -746,7 +746,7 @@ export default () => {
             dispatch(
                 setPaneHidden({
                     name: 'Profiles',
-                    hidden: !npmDevice?.batteryProfiler,
+                    hidden: !npmDevice?.canUploadBatteryProfiles,
                 })
             );
 

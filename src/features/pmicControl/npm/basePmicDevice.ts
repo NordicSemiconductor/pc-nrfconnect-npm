@@ -171,6 +171,8 @@ export default abstract class BaseNpmDevice {
         this.#batteryModule = batteryModule;
     }
 
+    abstract get canUploadBatteryProfiles(): boolean;
+
     #lowPowerModule?: LowPowerModule;
     get lowPowerModule() {
         return this.#lowPowerModule;

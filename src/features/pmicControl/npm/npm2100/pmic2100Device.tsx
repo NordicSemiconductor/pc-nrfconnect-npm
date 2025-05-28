@@ -336,6 +336,11 @@ export default class Npm2100 extends BaseNpmDevice {
         } as NpmExportLatest;
     }
 
+    // eslint-disable-next-line class-methods-use-this
+    get canUploadBatteryProfiles() {
+        return false;
+    }
+
     generateOverlay(npmExport: NpmExportV2) {
         return overlay(npmExport, this);
     }
