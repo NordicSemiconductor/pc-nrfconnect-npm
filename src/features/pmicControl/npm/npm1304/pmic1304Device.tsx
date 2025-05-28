@@ -11,7 +11,7 @@ import { PmicDialog } from '../types';
 import { BatteryProfiler } from './batteryProfiler';
 import ChargerModule from './charger';
 
-export const npm1304FWVersion = '0.1.0+0';
+export const npm1304FWVersion = '0.1.1+0';
 
 export default class Npm1304 extends nPM1300Device {
     constructor(
