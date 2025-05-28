@@ -45,7 +45,7 @@ describe('PMIC 1304 - Static getters', () => {
             min: 4,
             max: 100,
             decimals: 1,
-            step: 0.5,
+            step: 1,
         }));
 
     test('Charger Current Range', () => {
