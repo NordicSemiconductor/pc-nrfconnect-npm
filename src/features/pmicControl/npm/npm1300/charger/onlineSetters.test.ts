@@ -68,7 +68,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerBatLim', async () => {
-            await pmic.chargerModule?.set.batLim(1000);
+            await pmic.chargerModule?.set.batLim?.(1000);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
@@ -517,7 +517,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setChargerBatLim onError case 1 - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.batLim(1000)
+                pmic.chargerModule?.set.batLim?.(1000)
             ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
@@ -555,7 +555,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             await expect(
-                pmic.chargerModule?.set.batLim(1000)
+                pmic.chargerModule?.set.batLim?.(1000)
             ).rejects.toBeUndefined();
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);

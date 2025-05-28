@@ -85,17 +85,6 @@ describe('PMIC 1304 - Request update commands', () => {
         );
     });
 
-    test('Request update chargerBatLim', () => {
-        pmic.chargerModule?.get.batLim();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            'npm_adc fullscale get',
-            expect.anything(),
-            undefined,
-            true
-        );
-    });
     test('Request update chargerEnabledRecharging', () => {
         pmic.chargerModule?.get.enabledRecharging();
 

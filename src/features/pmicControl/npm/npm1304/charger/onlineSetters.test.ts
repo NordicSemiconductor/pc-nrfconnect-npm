@@ -67,30 +67,6 @@ describe('PMIC 1304 - Setters Online tests', () => {
             );
         });
 
-        test('Set setChargerBatLim', async () => {
-            await pmic.chargerModule?.set.batLim(1000);
-
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
-
-            // turn off charging
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx charger module charger set 0`,
-                expect.anything(),
-                undefined,
-                true
-            );
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npm_adc fullscale set 1000`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        });
-
         test('Set setChargerVTrickleFast', async () => {
             await pmic.chargerModule?.set.vTrickleFast(2.5);
 
@@ -509,79 +485,6 @@ describe('PMIC 1304 - Setters Online tests', () => {
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
                 `npmx charger charging_current get`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        });
-
-        test('Set setChargerBatLim onError case 1 - Fail immediately', async () => {
-            await expect(
-                pmic.chargerModule?.set.batLim(1000)
-            ).rejects.toBeUndefined();
-
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
-
-            expect(mockEnqueueRequest).toBeCalledTimes(3);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx charger module charger set 0`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npmx charger module charger get`,
-                expect.anything(),
-                undefined,
-                true
-            );
-            expect(mockEnqueueRequest).nthCalledWith(
-                3,
-                `npm_adc fullscale get`,
-                expect.anything(),
-                undefined,
-                true
-            );
-        });
-
-        test('Set setChargerBatLim onError case 2 - Fail on second command', async () => {
-            mockEnqueueRequest.mockImplementationOnce(
-                helpers.registerCommandCallbackSuccess
-            );
-
-            await expect(
-                pmic.chargerModule?.set.batLim(1000)
-            ).rejects.toBeUndefined();
-
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });
-
-            // turn off charging
-            expect(mockEnqueueRequest).toBeCalledTimes(3);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx charger module charger set 0`,
-                expect.anything(),
-                undefined,
-                true
-            );
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npm_adc fullscale set 1000`,
-                expect.anything(),
-                undefined,
-                true
-            );
-
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                3,
-                `npm_adc fullscale get`,
                 expect.anything(),
                 undefined,
                 true

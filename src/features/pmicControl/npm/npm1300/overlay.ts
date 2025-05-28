@@ -60,7 +60,11 @@ npm1300_ek_charger: charger {
     // term-current-percent = <${charger.iTerm}>;
     current-microamp = <${toMicro(charger.iChg / 1000)}>;
     // trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
-    dischg-limit-microamp = <${toMicro(charger.iBatLim / 1000)}>;
+    ${
+        charger.iBatLim
+            ? `dischg-limit-microamp = <${toMicro(charger.iBatLim / 1000)}>;`
+            : ''
+    }
     vbus-limit-microamp = <500000>;
     thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
     thermistor-beta = <${charger.ntcBeta}>;

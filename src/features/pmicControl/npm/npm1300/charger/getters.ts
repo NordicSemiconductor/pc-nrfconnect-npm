@@ -4,16 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-export class ChargerGet {
-    // eslint-disable-next-line no-useless-constructor
-    constructor(
-        private sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void
-    ) {}
+import { ChargerModuleGetBase } from '../../types';
 
+export class ChargerGet extends ChargerModuleGetBase {
     all() {
         this.state();
         this.vTerm();
@@ -21,7 +14,7 @@ export class ChargerGet {
         this.enabled();
         this.vTrickleFast();
         this.iTerm();
-        this.batLim();
+        this.batLim?.();
         this.enabledRecharging();
         this.enabledVBatLow();
         this.nTCThermistor();
@@ -54,9 +47,9 @@ export class ChargerGet {
     iTerm() {
         this.sendCommand('npmx charger termination_current get');
     }
-    batLim() {
+    batLim: (() => void) | undefined = () => {
         this.sendCommand('npm_adc fullscale get');
-    }
+    };
     enabledRecharging() {
         this.sendCommand('npmx charger module recharge get');
     }

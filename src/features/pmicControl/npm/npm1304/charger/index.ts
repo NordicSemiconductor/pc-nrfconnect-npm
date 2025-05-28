@@ -15,6 +15,8 @@ import {
 } from '../../npm1300/charger/types';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import { Charger, ModuleParams, VTrickleFast } from '../../types';
+import { ChargerGet } from './getters';
+import { ChargerSet } from './setters';
 import { ITermKeys, ITermNpm1304, ITermValues } from './types';
 
 export default class Module extends nPM1300Charger {
@@ -24,7 +26,9 @@ export default class Module extends nPM1300Charger {
             (
                 shellParser: ShellParser | undefined,
                 eventEmitter: NpmEventEmitter
-            ) => chargerCallbacks(shellParser, eventEmitter, ITermValues)
+            ) => chargerCallbacks(shellParser, eventEmitter, ITermValues),
+            ChargerGet,
+            ChargerSet
         );
     }
 

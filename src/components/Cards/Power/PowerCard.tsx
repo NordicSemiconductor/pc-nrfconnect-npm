@@ -30,6 +30,95 @@ interface PowerCardProperties {
     defaultSummary?: boolean;
 }
 
+const card = 'charger';
+
+const IBatLimUI = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalBatLim, setInternalBatLim] = useState(charger.iBatLim);
+
+    useEffect(() => {
+        setInternalBatLim(charger.iBatLim);
+    }, [charger]);
+
+    if (
+        !chargerModule.set.batLim ||
+        charger.iBatLim === undefined ||
+        internalBatLim === undefined
+    )
+        return null;
+
+    const setBatLim = chargerModule.set.batLim.bind(chargerModule.set);
+
+    const chargerIBatLimRange = chargerModule.ranges.iBatLim;
+
+    if (
+        isFixedListRangeWithLabel(chargerIBatLimRange) &&
+        chargerIBatLimRange.toLabel
+    ) {
+        return (
+            <Dropdown
+                items={[
+                    ...(!chargerIBatLimRange.find(v => v === charger.iBatLim)
+                        ? [
+                              {
+                                  value: charger.iBatLim,
+                                  label: chargerIBatLimRange.toLabel(
+                                      charger.iBatLim
+                                  ),
+                              },
+                          ]
+                        : []),
+                    ...chargerIBatLimRange.map(v => ({
+                        value: v.valueOf(),
+                        label: chargerIBatLimRange.toLabel(v),
+                    })),
+                ]}
+                label={
+                    <DocumentationTooltip card={card} item="IBATLIM">
+                        <div>
+                            <span>IBAT</span>
+                            <span className="subscript">LIM</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                disabled={disabled}
+                onSelect={v => setBatLim(v.value)}
+                selectedItem={{
+                    value: charger.iBatLim,
+                    label: chargerIBatLimRange.toLabel(charger.iBatLim),
+                }}
+            />
+        );
+    }
+
+    return (
+        <NumberInput
+            label={
+                <DocumentationTooltip card={card} item="IBATLIM">
+                    <div>
+                        <span>IBAT</span>
+                        <span className="subscript">LIM</span>
+                    </div>
+                </DocumentationTooltip>
+            }
+            unit="mA"
+            disabled={disabled}
+            range={chargerIBatLimRange}
+            value={internalBatLim}
+            onChange={setInternalBatLim}
+            onChangeComplete={v => setBatLim(v)}
+            showSlider
+        />
+    );
+};
+
 export default ({
     chargerModule,
     charger,
@@ -37,21 +126,16 @@ export default ({
     disabled,
     defaultSummary = false,
 }: PowerCardProperties) => {
-    const card = 'charger';
     const [summary, setSummary] = useState(defaultSummary);
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
-    const [internalBatLim, setInternalBatLim] = useState(charger.iBatLim);
 
     // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVTerm(charger.vTerm);
         setInternalIChg(charger.iChg);
-        setInternalBatLim(charger.iBatLim);
     }, [charger]);
-
-    const chargerIBatLimRange = chargerModule.ranges.iBatLim;
 
     return (
         <Card
@@ -140,70 +224,11 @@ export default ({
 
             {!summary && (
                 <>
-                    {isFixedListRangeWithLabel(chargerIBatLimRange) &&
-                    chargerIBatLimRange.toLabel !== undefined ? (
-                        <Dropdown
-                            items={[
-                                ...(!chargerIBatLimRange.find(
-                                    v => v === charger.iBatLim
-                                )
-                                    ? [
-                                          {
-                                              value: charger.iBatLim,
-                                              label: chargerIBatLimRange.toLabel(
-                                                  charger.iBatLim
-                                              ),
-                                          },
-                                      ]
-                                    : []),
-                                ...chargerIBatLimRange.map(v => ({
-                                    value: v.valueOf(),
-                                    label: chargerIBatLimRange.toLabel(v),
-                                })),
-                            ]}
-                            label={
-                                <DocumentationTooltip
-                                    card={card}
-                                    item="IBATLIM"
-                                >
-                                    <div>
-                                        <span>IBAT</span>
-                                        <span className="subscript">LIM</span>
-                                    </div>
-                                </DocumentationTooltip>
-                            }
-                            disabled={disabled}
-                            onSelect={v => chargerModule.set.batLim(v.value)}
-                            selectedItem={{
-                                value: charger.iBatLim,
-                                label: chargerIBatLimRange.toLabel(
-                                    charger.iBatLim
-                                ),
-                            }}
-                        />
-                    ) : (
-                        <NumberInput
-                            label={
-                                <DocumentationTooltip
-                                    card={card}
-                                    item="IBATLIM"
-                                >
-                                    <div>
-                                        <span>IBAT</span>
-                                        <span className="subscript">LIM</span>
-                                    </div>
-                                </DocumentationTooltip>
-                            }
-                            unit="mA"
-                            disabled={disabled}
-                            range={chargerIBatLimRange}
-                            value={internalBatLim}
-                            onChange={setInternalBatLim}
-                            onChangeComplete={v => chargerModule.set.batLim(v)}
-                            showSlider
-                        />
-                    )}
-
+                    <IBatLimUI
+                        charger={charger}
+                        chargerModule={chargerModule}
+                        disabled={disabled}
+                    />
                     <Toggle
                         label={
                             <DocumentationTooltip

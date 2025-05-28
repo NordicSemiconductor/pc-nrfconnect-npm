@@ -12,6 +12,10 @@ import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Charger,
     type ChargerModule as ChargerModuleBase,
+    ChargerModuleGet,
+    ChargerModuleGetBase,
+    ChargerModuleSet,
+    ChargerModuleSetBase,
     FixedListRange,
     ITerm,
     ModuleParams,
@@ -28,8 +32,8 @@ import {
 } from './types';
 
 export default class Module implements ChargerModuleBase {
-    private _get: ChargerGet;
-    private _set: ChargerSet;
+    private _get: ChargerModuleGetBase;
+    private _set: ChargerModuleSetBase;
     private _callbacks: (() => void)[];
 
     constructor(
@@ -37,10 +41,12 @@ export default class Module implements ChargerModuleBase {
         callbacks: (
             shellParser: ShellParser | undefined,
             eventEmitter: NpmEventEmitter
-        ) => (() => void)[] = chargerCallbacks
+        ) => (() => void)[] = chargerCallbacks,
+        Get: ChargerModuleGet = ChargerGet,
+        Set: ChargerModuleSet = ChargerSet
     ) {
-        this._get = new ChargerGet(sendCommand);
-        this._set = new ChargerSet(eventEmitter, sendCommand, offlineMode);
+        this._get = new Get(sendCommand);
+        this._set = new Set(eventEmitter, sendCommand, offlineMode, this._get);
         this._callbacks = callbacks(shellParser, eventEmitter);
     }
 

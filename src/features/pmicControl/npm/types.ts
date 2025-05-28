@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+/* eslint-disable max-classes-per-file */
+
 import {
     DropdownItem,
     ShellParser,
@@ -164,7 +166,7 @@ export type Charger = {
     enableRecharging: boolean;
     enableVBatLow: boolean;
     iTerm: ITerm;
-    iBatLim: number;
+    iBatLim?: number;
     ntcThermistor: NTCThermistor;
     ntcBeta: number;
     tChgStop: number;
@@ -493,51 +495,95 @@ export interface IModule<T> {
     new (params: ModuleParams): T;
 }
 
+export type ChargerModuleSet = new (
+    eventEmitter: NpmEventEmitter,
+    sendCommand: (
+        command: string,
+        onSuccess?: (response: string, command: string) => void,
+        onError?: (response: string, command: string) => void
+    ) => void,
+    offlineMode: boolean,
+    get: ChargerModuleGetBase
+) => ChargerModuleSetBase;
+
+export abstract class ChargerModuleSetBase {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(
+        protected eventEmitter: NpmEventEmitter,
+        protected sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        protected offlineMode: boolean,
+        protected get: ChargerModuleGetBase
+    ) {}
+
+    abstract all(charger: Charger): Promise<void>;
+    abstract vTerm(value: number): Promise<void>;
+    abstract iChg(value: number): Promise<void>;
+    abstract enabled(value: boolean): Promise<void>;
+    abstract vTrickleFast(value: VTrickleFast): Promise<void>;
+    abstract iTerm(iTerm: ITerm): Promise<void>;
+    abstract batLim?(value: number): Promise<void>;
+    abstract enabledRecharging(value: boolean): Promise<void>;
+    abstract enabledVBatLow(value: boolean): Promise<void>;
+    abstract nTCThermistor(
+        mode: NTCThermistor,
+        autoSetBeta?: boolean
+    ): Promise<void>;
+    abstract nTCBeta(value: number): Promise<void>;
+    abstract tChgStop(value: number): Promise<void>;
+    abstract tChgResume(value: number): Promise<void>;
+    abstract vTermR(value: number): Promise<void>;
+    abstract tCold(value: number): Promise<void>;
+    abstract tCool(value: number): Promise<void>;
+    abstract tWarm(value: number): Promise<void>;
+    abstract tHot(value: number): Promise<void>;
+}
+
+export type ChargerModuleGet = new (
+    sendCommand: (
+        command: string,
+        onSuccess?: (response: string, command: string) => void,
+        onError?: (response: string, command: string) => void
+    ) => void
+) => ChargerModuleGetBase;
+
+export abstract class ChargerModuleGetBase {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(
+        protected sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void
+    ) {}
+
+    abstract all(): void;
+    abstract state(): void;
+    abstract vTerm(): void;
+    abstract iChg(): void;
+    abstract enabled(): void;
+    abstract vTrickleFast(): void;
+    abstract iTerm(): void;
+    abstract batLim?(): void;
+    abstract enabledRecharging(): void;
+    abstract enabledVBatLow(): void;
+    abstract nTCThermistor(): void;
+    abstract nTCBeta(): void;
+    abstract tChgStop(): void;
+    abstract tChgResume(): void;
+    abstract vTermR(): void;
+    abstract tCold(): void;
+    abstract tCool(): void;
+    abstract tWarm(): void;
+    abstract tHot(): void;
+}
+
 export interface ChargerModule {
-    get: {
-        all: () => void;
-        state: () => void;
-        vTerm: () => void;
-        iChg: () => void;
-        enabled: () => void;
-        vTrickleFast: () => void;
-        iTerm: () => void;
-        batLim: () => void;
-        enabledRecharging: () => void;
-        enabledVBatLow: () => void;
-        nTCThermistor: () => void;
-        nTCBeta: () => void;
-        tChgStop: () => void;
-        tChgResume: () => void;
-        vTermR: () => void;
-        tCold: () => void;
-        tCool: () => void;
-        tWarm: () => void;
-        tHot: () => void;
-    };
-    set: {
-        all(charger: Charger): Promise<void>;
-        vTerm: (value: number) => Promise<void>;
-        iChg: (value: number) => Promise<void>;
-        enabled: (value: boolean) => Promise<void>;
-        vTrickleFast: (value: VTrickleFast) => Promise<void>;
-        iTerm: (iTerm: ITerm) => Promise<void>;
-        batLim: (value: number) => Promise<void>;
-        enabledRecharging: (value: boolean) => Promise<void>;
-        enabledVBatLow: (value: boolean) => Promise<void>;
-        nTCThermistor: (
-            mode: NTCThermistor,
-            autoSetBeta?: boolean
-        ) => Promise<void>;
-        nTCBeta: (value: number) => Promise<void>;
-        tChgStop: (value: number) => Promise<void>;
-        tChgResume: (value: number) => Promise<void>;
-        vTermR: (value: number) => Promise<void>;
-        tCold: (value: number) => Promise<void>;
-        tCool: (value: number) => Promise<void>;
-        tWarm: (value: number) => Promise<void>;
-        tHot: (value: number) => Promise<void>;
-    };
+    get: ChargerModuleGetBase;
+    set: ChargerModuleSetBase;
     callbacks: (() => void)[];
     ranges: {
         voltage: number[];
