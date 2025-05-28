@@ -22,18 +22,15 @@ export const getNpmDevice = (
                 const hwVersion = response
                     .split(',')
                     .find(s => s.startsWith('hw_version'));
-                switch (hwVersion) {
-                    case 'hw_version=npm1300ek_nrf5340_cpuapp':
-                        resolve(new Npm1300(shellParser, dialogHandler));
-                        break;
-                    case 'hw_version=npm1304ek':
-                        resolve(new Npm1304(shellParser, dialogHandler));
-                        break;
-                    case 'hw_version=npm2100ek_nrf5340_cpuapp':
-                        resolve(new Npm2100(shellParser, dialogHandler));
-                        break;
-                    default:
-                        reject(new Error('Unknown hardware'));
+                const version = hwVersion?.split('=').at(1);
+                if (version?.startsWith('npm1300ek')) {
+                    resolve(new Npm1300(shellParser, dialogHandler));
+                } else if (version?.startsWith('npm1304ek')) {
+                    resolve(new Npm1304(shellParser, dialogHandler));
+                } else if (version?.startsWith('npm2100ek')) {
+                    resolve(new Npm2100(shellParser, dialogHandler));
+                } else {
+                    reject(new Error('Unknown hardware'));
                 }
             },
             onError: reject,
