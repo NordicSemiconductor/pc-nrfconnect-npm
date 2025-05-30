@@ -4,11 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import { RangeType } from '../../../../../utils/helpers';
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { Boost, BoostModule, PmicDialog } from '../../types';
+import { Boost, BoostModule, ModuleParams } from '../../types';
 import boostCallbacks from './callbacks';
 import { BoostGet } from './getters';
 import { BoostSet } from './setters';
@@ -37,19 +34,17 @@ const voltageRange = () =>
 export default class Module implements BoostModule {
     private _get: BoostGet;
     private _set: BoostSet;
+    readonly index: number;
     private _callbacks: (() => void)[];
-    constructor(
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        dialogHandler: ((dialog: PmicDialog) => void) | null,
-        offlineMode: boolean,
-        readonly index = 0
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        dialogHandler,
+        offlineMode,
+        index,
+        shellParser,
+    }: ModuleParams) {
+        this.index = index;
         this._get = new BoostGet(sendCommand);
         this._set = new BoostSet(
             eventEmitter,

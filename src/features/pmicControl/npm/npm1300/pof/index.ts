@@ -4,11 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import { RangeType } from '../../../../../utils/helpers';
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { POF, PofModule } from '../../types';
+import { ModuleParams, POF, PofModule } from '../../types';
 import pofCallbacks from './callbacks';
 import { PofGet } from './getters';
 import { PofSet } from './setter';
@@ -20,16 +17,12 @@ export default class Module implements PofModule {
     private _get: PofGet;
     private _set: PofSet;
     private _callbacks: (() => void)[];
-    constructor(
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        offlineMode: boolean
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        offlineMode,
+        shellParser,
+    }: ModuleParams) {
         this._get = new PofGet(sendCommand);
         this._set = new PofSet(eventEmitter, sendCommand, offlineMode);
         this._callbacks = pofCallbacks(shellParser, eventEmitter);

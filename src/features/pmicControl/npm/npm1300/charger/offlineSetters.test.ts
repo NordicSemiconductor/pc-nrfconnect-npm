@@ -36,14 +36,14 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set setChargerITerm', async () => {
-        await pmic.chargerModule?.set.iTerm('10%');
+        await pmic.chargerModule?.set.iTerm(10);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
-        expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: '10%' });
+        expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: 10 });
     });
 
     test('Set setChargerBatLim', async () => {
-        await pmic.chargerModule?.set.batLim(1000);
+        await pmic.chargerModule?.set.batLim?.(1000);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({ iBatLim: 1000 });

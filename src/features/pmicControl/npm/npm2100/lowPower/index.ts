@@ -4,14 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
-import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     LowPowerConfig,
     LowPowerModule,
+    ModuleParams,
     npm2100TimeToActive,
-    PmicDialog,
     TimeToActive,
 } from '../../types';
 import { LowPowerActions } from './lowPowerActions';
@@ -27,17 +24,13 @@ export default class Module implements LowPowerModule {
     private _set: LowPowerSet;
     private _actions: LowPowerActions;
     private _callbacks: (() => void)[];
-    constructor(
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
-        offlineMode: boolean
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        shellParser,
+        offlineMode,
+        dialogHandler,
+    }: ModuleParams) {
         this._get = new LowPowerGet(sendCommand);
         this._set = new LowPowerSet(eventEmitter, sendCommand, offlineMode);
         this._actions = new LowPowerActions(sendCommand, dialogHandler);

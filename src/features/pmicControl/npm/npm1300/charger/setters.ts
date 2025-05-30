@@ -4,30 +4,22 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { Charger, ITerm, NTCThermistor, VTrickleFast } from '../../types';
-import { ChargerGet } from './getters';
+import {
+    Charger,
+    ChargerModuleSetBase,
+    ITerm,
+    NTCThermistor,
+    VTrickleFast,
+} from '../../types';
 
-export class ChargerSet {
-    private get: ChargerGet;
-
-    constructor(
-        private eventEmitter: NpmEventEmitter,
-        private sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        private offlineMode: boolean
-    ) {
-        this.get = new ChargerGet(sendCommand);
-    }
-
+export class ChargerSet extends ChargerModuleSetBase {
     async all(charger: Charger) {
         await this.vTerm(charger.vTerm);
         await this.iChg(charger.iChg);
         await this.iTerm(charger.iTerm);
-        await this.batLim(charger.iBatLim);
+        if (charger.iBatLim) {
+            await this.batLim?.(charger.iBatLim);
+        }
         await this.enabledRecharging(charger.enableRecharging);
         await this.enabledVBatLow(charger.enableVBatLow);
         await this.vTrickleFast(charger.vTrickleFast);
@@ -163,10 +155,7 @@ export class ChargerSet {
                 this.enabled(false)
                     .then(() => {
                         this.sendCommand(
-                            `npmx charger termination_current set ${Number.parseInt(
-                                iTerm,
-                                10
-                            )}`,
+                            `npmx charger termination_current set ${iTerm}`,
                             () => resolve(),
                             () => {
                                 this.get.iTerm();
@@ -182,8 +171,10 @@ export class ChargerSet {
         });
     }
 
-    batLim(iBatLim: number) {
-        return new Promise<void>((resolve, reject) => {
+    batLim: ((iBatLim: number) => Promise<void>) | undefined = (
+        iBatLim: number
+    ) =>
+        new Promise<void>((resolve, reject) => {
             this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 iBatLim,
             });
@@ -197,18 +188,17 @@ export class ChargerSet {
                             `npm_adc fullscale set ${iBatLim}`,
                             () => resolve(),
                             () => {
-                                this.get.batLim();
+                                this.get.batLim?.();
                                 reject();
                             }
                         );
                     })
                     .catch(() => {
-                        this.get.batLim();
+                        this.get.batLim?.();
                         reject();
                     });
             }
         });
-    }
 
     enabledRecharging(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {

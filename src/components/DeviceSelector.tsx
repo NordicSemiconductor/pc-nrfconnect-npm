@@ -17,11 +17,15 @@ import path from 'path';
 import { closeDevice, openDevice } from '../actions/deviceActions';
 import {
     npm1300DeviceSetup,
+    npm1304DeviceSetup,
     npm2100DeviceSetup,
 } from '../features/pmicControl/npm/deviceSetups';
 import Npm1300, {
     npm1300FWVersion,
 } from '../features/pmicControl/npm/npm1300/pmic1300Device';
+import Npm1304, {
+    npm1304FWVersion,
+} from '../features/pmicControl/npm/npm1304/pmic1304Device';
 import Npm2100, {
     npm2100FWVersion,
 } from '../features/pmicControl/npm/npm2100/pmic2100Device';
@@ -29,6 +33,8 @@ import {
     dialogHandler,
     isNpm1300SerialApplicationMode,
     isNpm1300SerialRecoverMode,
+    isNpm1304SerialApplicationMode,
+    isNpm1304SerialRecoverMode,
     isNpm2100SerialApplicationMode,
     isNpm2100SerialRecoverMode,
 } from '../features/pmicControl/npm/pmicHelpers';
@@ -55,6 +61,13 @@ const deviceSetupConfig: DeviceSetupConfig = {
             description: '',
             hex: getAppFile(
                 path.join('fw', `app_signed_nPM1300_${npm1300FWVersion}.hex`)
+            ),
+        }),
+        npm1304DeviceSetup({
+            key: 'nPM1304',
+            description: '',
+            hex: getAppFile(
+                path.join('fw', `app_signed_nPM1304_${npm1304FWVersion}.hex`)
             ),
         }),
         npm2100DeviceSetup({
@@ -105,15 +118,25 @@ export default () => {
             deviceFilter={device =>
                 isNpm1300SerialRecoverMode(device) ||
                 isNpm1300SerialApplicationMode(device) ||
+                isNpm1304SerialRecoverMode(device) ||
+                isNpm1304SerialApplicationMode(device) ||
                 isNpm2100SerialApplicationMode(device) ||
                 isNpm2100SerialRecoverMode(device)
             }
-            virtualDevices={['nPM1300', 'nPM2100']}
+            virtualDevices={['nPM1300', 'nPM1304', 'nPM2100']}
             onVirtualDeviceSelected={device => {
                 if (device === 'nPM1300') {
                     dispatch(
                         setNpmDevice(
                             new Npm1300(undefined, pmicDialog =>
+                                dispatch(dialogHandler(pmicDialog))
+                            )
+                        )
+                    );
+                } else if (device === 'nPM1304') {
+                    dispatch(
+                        setNpmDevice(
+                            new Npm1304(undefined, pmicDialog =>
                                 dispatch(dialogHandler(pmicDialog))
                             )
                         )

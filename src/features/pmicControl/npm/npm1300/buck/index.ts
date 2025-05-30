@@ -4,11 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import { RangeType } from '../../../../../utils/helpers';
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { Buck, BuckExport, BuckModule, PmicDialog } from '../../types';
+import { Buck, BuckExport, BuckModule, ModuleParams } from '../../types';
 import buckCallbacks from './callbacks';
 import { BuckGet } from './getters';
 import { BuckSet } from './setters';
@@ -54,21 +51,19 @@ const buckRetVOutRange = () =>
     } as RangeType);
 
 export default class Module implements BuckModule {
+    readonly index: number;
     private _get: BuckGet;
     private _set: BuckSet;
     private _callbacks: (() => void)[];
-    constructor(
-        readonly index: number,
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        dialogHandler: ((dialog: PmicDialog) => void) | null,
-        offlineMode: boolean
-    ) {
+    constructor({
+        index,
+        sendCommand,
+        eventEmitter,
+        offlineMode,
+        shellParser,
+        dialogHandler,
+    }: ModuleParams) {
+        this.index = index;
         this._get = new BuckGet(sendCommand, index);
         this._set = new BuckSet(
             eventEmitter,

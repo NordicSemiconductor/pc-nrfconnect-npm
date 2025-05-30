@@ -1,3 +1,13 @@
+## 2.1.0 - Unreleased
+
+### Added
+
+-   Added experimental support for nPM1304.
+
+### Fixed
+
+-   Loading of JSON configuration files for nPM2100.
+
 ## 2.0.1 - 2025-05-22
 
 ### Fixed

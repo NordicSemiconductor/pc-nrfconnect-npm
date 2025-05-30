@@ -27,6 +27,8 @@ import {
     dialogHandler,
     isNpm1300SerialApplicationMode,
     isNpm1300SerialRecoverMode,
+    isNpm1304SerialApplicationMode,
+    isNpm1304SerialRecoverMode,
     isNpm2100SerialApplicationMode,
     isNpm2100SerialRecoverMode,
 } from './pmicHelpers';
@@ -139,7 +141,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 // device lib report device with wrong value initially so we have to wait until device is fully recognized
                                 programmedDevice.serialPorts?.length === 2 &&
                                 programmedDevice.traits.mcuBoot === true &&
-                                device.traits.serialPorts === true &&
+                                programmedDevice.traits.serialPorts === true &&
                                 isNpm1300SerialApplicationMode(
                                     programmedDevice
                                 ),
@@ -160,7 +162,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                         .then(() => {
                             onProgress(
                                 100,
-                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.'
+                                'Programming upload complete. Waiting for device to apply firmware and restart. This can take a minute.'
                             );
                         })
                         .catch(err => {
@@ -168,7 +170,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 reject(err.message);
                             }
                         });
-                    logger.debug('firmware updated finished');
+                    logger.debug('Firmware updated finished');
                 }),
         },
     ],
@@ -184,7 +186,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
         > =>
         async dispatch => {
             if (!(device.serialPorts && device.serialPorts[0].comName)) {
-                throw new Error('device does not have a serial port');
+                throw new Error('Device does not have a serial port');
             }
 
             if (isNpm1300SerialRecoverMode(device)) {
@@ -255,6 +257,107 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
         }),
 });
 
+export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
+    supportsProgrammingMode: (device: Device) =>
+        device.traits.mcuBoot === true &&
+        device.traits.serialPorts === true &&
+        (isNpm1304SerialRecoverMode(device) ||
+            isNpm1304SerialApplicationMode(device)),
+    getFirmwareOptions: device => [
+        {
+            key: firmware.key,
+            description: firmware.description,
+            programDevice: onProgress => dispatch =>
+                new Promise<Device>((resolve, reject) => {
+                    let success = false;
+                    dispatch(
+                        setWaitForDevice({
+                            timeout: 60000,
+                            when: programmedDevice =>
+                                // device lib report device with wrong value initially so we have to wait until device is fully recognized
+                                programmedDevice.serialPorts?.length === 2 &&
+                                programmedDevice.traits.mcuBoot === true &&
+                                programmedDevice.traits.serialPorts === true &&
+                                isNpm1304SerialApplicationMode(
+                                    programmedDevice
+                                ),
+                            once: true,
+                            onSuccess: dev => {
+                                success = true;
+                                resolve(dev);
+                            },
+                            onFail: reject,
+                        })
+                    );
+                    NrfutilDeviceLib.program(device, firmware.hex, progress => {
+                        onProgress(
+                            progress.stepProgressPercentage,
+                            progress.message
+                        );
+                    })
+                        .then(() => {
+                            onProgress(
+                                100,
+                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.'
+                            );
+                        })
+                        .catch(err => {
+                            if (err && !success) {
+                                reject(err.message);
+                            }
+                        });
+                    logger.debug('firmware updated finished');
+                }),
+        },
+    ],
+    isExpectedFirmware:
+        (
+            device: Device
+        ): AppThunk<
+            RootState,
+            Promise<{
+                device: Device;
+                validFirmware: boolean;
+            }>
+        > =>
+        async () => {
+            if (!(device.serialPorts && device.serialPorts[0].comName)) {
+                throw new Error('device does not have a serial port');
+            }
+
+            if (isNpm1304SerialRecoverMode(device)) {
+                return {
+                    device,
+                    validFirmware: false,
+                };
+            }
+
+            const { npmDevice, dispose } = await getNpmDeviceObject(
+                device.serialPorts[0].comName
+            );
+
+            try {
+                const result = await npmDevice.isSupportedVersion();
+
+                const action = () => ({
+                    device,
+                    validFirmware: result.supported,
+                });
+
+                await dispose();
+
+                return action();
+            } catch (e) {
+                await dispose();
+                throw e;
+            }
+        },
+    tryToSwitchToApplicationMode: () => () =>
+        new Promise<Device | null>(resolve => {
+            resolve(null);
+        }),
+});
+
 export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
     supportsProgrammingMode: (device: Device) =>
         device.traits.mcuBoot === true &&
@@ -275,7 +378,7 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 // device lib report device with wrong value initially so we have to wait until device is fully recognized
                                 programmedDevice.serialPorts?.length === 2 &&
                                 programmedDevice.traits.mcuBoot === true &&
-                                device.traits.serialPorts === true &&
+                                programmedDevice.traits.serialPorts === true &&
                                 isNpm2100SerialApplicationMode(
                                     programmedDevice
                                 ),

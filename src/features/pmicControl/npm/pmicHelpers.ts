@@ -294,6 +294,14 @@ export const isNpm1300SerialRecoverMode = (device: Device) =>
     device.usb?.device.descriptor.idProduct === 0x53ac &&
     device.usb?.device.descriptor.idVendor === 0x1915;
 
+export const isNpm1304SerialApplicationMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53af &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
+export const isNpm1304SerialRecoverMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53b0 &&
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
 export const isNpm2100SerialApplicationMode = (device: Device) =>
     device.usb?.device.descriptor.idProduct === 0x53ad &&
     device.usb?.device.descriptor.idVendor === 0x1915;

@@ -40,10 +40,12 @@ import {
     LEDModeValues,
     LoggingEvent,
     LowPowerModule,
+    ModuleParams,
     npm1300LowPowerConfig,
     NpmExportLatest,
     NpmExportV2,
     NpmModel,
+    NpmPeripherals,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
@@ -62,7 +64,6 @@ import {
 } from './types';
 
 /* eslint-disable no-underscore-dangle */
-
 export default abstract class BaseNpmDevice {
     private rebooting = false;
     private deviceUptimeToSystemDelta = 0;
@@ -79,7 +80,14 @@ export default abstract class BaseNpmDevice {
                   app: { pmicControl: { npmDevice: BaseNpmDevice } };
               }
     ): NpmExportLatest;
-    initialize?(): void;
+    initialize() {
+        this.initializeFuelGauge();
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    initializeFuelGauge() {
+        return Promise.resolve();
+    }
 
     get deviceType() {
         return this._deviceType;
@@ -126,7 +134,6 @@ export default abstract class BaseNpmDevice {
     get ldoModule() {
         return [...this.#ldoModule];
     }
-
     protected set ldoModule(ldoModule: LdoModule[]) {
         this.releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         this.#ldoModule = ldoModule;
@@ -163,6 +170,8 @@ export default abstract class BaseNpmDevice {
         !!batteryModule && this.releaseAll.push(...batteryModule.callbacks);
         this.#batteryModule = batteryModule;
     }
+
+    abstract get canUploadBatteryProfiles(): boolean;
 
     #lowPowerModule?: LowPowerModule;
     get lowPowerModule() {
@@ -230,6 +239,110 @@ export default abstract class BaseNpmDevice {
         this.#chargerModule = chargerModule;
     }
 
+    private initPeripherals() {
+        const args: ModuleParams = {
+            index: 0,
+            shellParser: this.shellParser,
+            eventEmitter: this.eventEmitter,
+            sendCommand: this.sendCommand.bind(this),
+            offlineMode: this.offlineMode,
+            dialogHandler: this.dialogHandler,
+            npmDevice: this,
+        };
+        if (this.peripherals.ChargerModule) {
+            this.chargerModule = new this.peripherals.ChargerModule({
+                ...args,
+            });
+        }
+
+        if (this.peripherals.ldos) {
+            const ldo = this.peripherals.ldos;
+            this.ldoModule = [...Array(ldo.count).keys()].map(
+                index =>
+                    new ldo.Module({
+                        ...args,
+                        index,
+                    })
+            );
+        }
+
+        if (this.peripherals.bucks) {
+            const bucks = this.peripherals.bucks;
+            this.buckModule = [...Array(bucks.count ?? 0).keys()].map(
+                index =>
+                    new bucks.Module({
+                        ...args,
+                        index,
+                    })
+            );
+        }
+
+        if (this.peripherals.gpios) {
+            const gpios = this.peripherals.gpios;
+            this.gpioModule = [...Array(gpios.count ?? 0).keys()].map(
+                index =>
+                    new gpios.Module({
+                        ...args,
+                        index,
+                    })
+            );
+        }
+
+        if (this.peripherals.boosts) {
+            const boosts = this.peripherals.boosts;
+            this.boostModule = [...Array(boosts.count ?? 0).keys()].map(
+                index =>
+                    new boosts.Module({
+                        ...args,
+                        index,
+                    })
+            );
+        }
+
+        if (this.peripherals.BatteryProfiler) {
+            this._batteryProfiler = new this.peripherals.BatteryProfiler({
+                ...args,
+            });
+        }
+
+        if (this.peripherals.PofModule) {
+            this.#pofModule = new this.peripherals.PofModule({
+                ...args,
+            });
+        }
+
+        if (this.peripherals.FuelGaugeModule) {
+            this.#fuelGaugeModule = new this.peripherals.FuelGaugeModule({
+                ...args,
+            });
+        }
+
+        if (this.peripherals.UsbCurrentLimiterModule) {
+            this.#usbCurrentLimiterModule =
+                new this.peripherals.UsbCurrentLimiterModule({
+                    ...args,
+                });
+        }
+
+        if (this.peripherals.ResetModule) {
+            this.#resetModule = new this.peripherals.ResetModule({
+                ...args,
+            });
+        }
+
+        if (this.peripherals.TimerConfigModule) {
+            this.#timerConfigModule = new this.peripherals.TimerConfigModule({
+                ...args,
+            });
+        }
+
+        if (this.peripherals.LowPowerModule) {
+            this.#lowPowerModule = new this.peripherals.LowPowerModule({
+                ...args,
+            });
+        }
+    }
+
     protected _batteryProfiler?: BatteryProfiler;
     get batteryProfiler() {
         return this._batteryProfiler;
@@ -243,16 +356,7 @@ export default abstract class BaseNpmDevice {
             | ((pmicDialog: PmicDialog) => void)
             | null,
         protected readonly eventEmitter: NpmEventEmitter,
-        protected readonly devices: {
-            charger: boolean;
-            maxEnergyExtraction: boolean;
-            noOfBoosts: number;
-            noOfBucks: number;
-            noOfLdos: number;
-            noOfLEDs: number;
-            noOfBatterySlots: number;
-            noOfGPIOs: number;
-        },
+        protected readonly peripherals: NpmPeripherals,
         readonly batteryConnectedVoltageThreshold: number,
         private readonly _supportedErrorLogs: SupportedErrorLogs
     ) {
@@ -370,7 +474,7 @@ export default abstract class BaseNpmDevice {
                 )
             );
 
-            for (let i = 0; i < this.devices.noOfLEDs; i += 1) {
+            for (let i = 0; i < this.peripherals.noOfLEDs; i += 1) {
                 this.releaseAll.push(
                     shellParser.registerCommandCallback(
                         toRegex('npmx led mode', true, i, '[0-3]'),
@@ -393,12 +497,14 @@ export default abstract class BaseNpmDevice {
         }
 
         this.updateUptimeOverflowCounter();
+
+        this.initPeripherals();
     }
 
     // Return a set of default LED settings
     ledDefaults(): LED[] {
         const defaultLEDs: LED[] = [];
-        for (let i = 0; i < this.devices.noOfLEDs; i += 1) {
+        for (let i = 0; i < this.peripherals.noOfLEDs; i += 1) {
             defaultLEDs.push({
                 mode: LEDModeValues[i],
             });
@@ -445,7 +551,7 @@ export default abstract class BaseNpmDevice {
         this.gpioModule.forEach(module => module.get.all());
         this.boostModule.forEach(boost => boost.get.all());
 
-        for (let i = 0; i < this.devices.noOfLEDs; i += 1) {
+        for (let i = 0; i < this.peripherals.noOfLEDs; i += 1) {
             this.getLedMode(i);
         }
 
@@ -711,17 +817,14 @@ export default abstract class BaseNpmDevice {
             });
     }
 
-    hasCharger() {
-        return this.devices.charger;
-    }
     hasMaxEnergyExtraction() {
-        return this.devices.maxEnergyExtraction;
+        return this.peripherals.maxEnergyExtraction;
     }
     getNumberOfLEDs() {
-        return this.devices.noOfLEDs;
+        return this.peripherals.noOfLEDs;
     }
     getNumberOfBatteryModelSlots() {
-        return this.devices.noOfBatterySlots;
+        return this.peripherals.noOfBatterySlots;
     }
 
     isSupportedVersion() {
@@ -835,7 +938,7 @@ export default abstract class BaseNpmDevice {
 
     applyConfig(config: NpmExportLatest) {
         return new Promise<void>(resolve => {
-            if (config.deviceType !== 'npm1300') {
+            if (config.deviceType !== this.deviceType) {
                 resolve();
                 return;
             }

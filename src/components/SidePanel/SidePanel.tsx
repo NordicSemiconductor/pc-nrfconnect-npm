@@ -66,6 +66,7 @@ export default () => {
                     card={card}
                     item="ExportConfiguration"
                     placement="right-start"
+                    keepShowingOnHoverTooltip
                 >
                     <Button
                         variant="secondary"
@@ -134,7 +135,8 @@ export default () => {
                     />
                 </DocumentationTooltip>
             </Group>
-            {npmDevice?.deviceType === 'npm1300' && (
+            {(npmDevice?.deviceType === 'npm1300' || // TODO avoid using device types...
+                npmDevice?.deviceType === 'npm1304') && (
                 <Group
                     collapsible
                     defaultCollapsed={false}

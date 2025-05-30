@@ -30,7 +30,7 @@ import LdoModule, { toLdoExport } from './ldo';
 import LowPowerModule from './lowPower';
 import overlay from './overlay';
 import ResetModule from './reset';
-import TimerModule from './timerConfig';
+import TimerConfigModule from './timerConfig';
 
 export const npm2100FWVersion = '0.7.1+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
@@ -49,14 +49,26 @@ export default class Npm2100 extends BaseNpmDevice {
             dialogHandler,
             new NpmEventEmitter(),
             {
-                charger: false,
-                noOfBoosts: 1,
-                noOfBucks: 0,
+                ldos: {
+                    count: 1,
+                    Module: LdoModule,
+                },
                 maxEnergyExtraction: true,
-                noOfLdos: 1,
                 noOfLEDs: 0,
                 noOfBatterySlots: 1,
-                noOfGPIOs: 2,
+                gpios: {
+                    Module: GpioModule,
+                    count: 2,
+                },
+                boosts: {
+                    Module: BoostModule,
+                    count: 1,
+                },
+                TimerConfigModule,
+                BatteryModule,
+                LowPowerModule,
+                ResetModule,
+                FuelGaugeModule,
             },
             0,
             {
@@ -64,76 +76,6 @@ export default class Npm2100 extends BaseNpmDevice {
                 charger: false,
                 sensor: false,
             }
-        );
-
-        this.ldoModule = [
-            new LdoModule(
-                0,
-                this.shellParser,
-                this.eventEmitter,
-                this.sendCommand.bind(this),
-                this.dialogHandler,
-                this.offlineMode
-            ),
-        ];
-
-        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
-            i =>
-                new GpioModule(
-                    i,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-
-        this.fuelGaugeModule = new FuelGaugeModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.dialogHandler,
-            this.offlineMode,
-            this.initializeFuelGauge.bind(this)
-        );
-
-        this.batteryModule = new BatteryModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this)
-        );
-
-        this.boostModule = [
-            new BoostModule(
-                this.shellParser,
-                this.eventEmitter,
-                this.sendCommand.bind(this),
-                this.dialogHandler,
-                this.offlineMode
-            ),
-        ];
-
-        this.lowPowerModule = new LowPowerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.dialogHandler,
-            this.offlineMode
-        );
-
-        this.resetModule = new ResetModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.timerConfigModule = new TimerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
         );
 
         if (shellParser) {
@@ -326,7 +268,7 @@ export default class Npm2100 extends BaseNpmDevice {
         }
     }
 
-    private initializeFuelGauge() {
+    initializeFuelGauge() {
         if (this.offlineMode) return Promise.resolve();
         return new Promise<void>((resolve, reject) => {
             this.startAdcSample(1000, 500)
@@ -392,6 +334,11 @@ export default class Npm2100 extends BaseNpmDevice {
                 : undefined,
             fileFormatVersion: 2 as const,
         } as NpmExportLatest;
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    get canUploadBatteryProfiles() {
+        return false;
     }
 
     generateOverlay(npmExport: NpmExportV2) {

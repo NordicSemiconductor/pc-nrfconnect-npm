@@ -8,7 +8,6 @@ import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { RootState } from '../../../../appReducer';
 import BaseNpmDevice from '../basePmicDevice';
-import { BatteryProfiler } from '../batteryProfiler';
 import {
     isModuleDataPair,
     MAX_TIMESTAMP,
@@ -20,9 +19,11 @@ import {
     IrqEvent,
     LoggingEvent,
     NpmExportV2,
+    NpmPeripherals,
     PmicDialog,
     USBPower,
 } from '../types';
+import { BatteryProfiler } from './batteryProfiler';
 import BuckModule, { toBuckExport } from './buck';
 import ChargerModule from './charger';
 import FuelGaugeModule from './fuelGauge';
@@ -32,33 +33,50 @@ import LowPowerModule from './lowPower';
 import overlay from './overlay';
 import PofModule from './pof';
 import ResetModule from './reset';
-import TimerModule from './timerConfig';
+import TimerConfigModule from './timerConfig';
 import UsbCurrentLimiterModule from './universalSerialBusCurrentLimiter';
 
 export const npm1300FWVersion = '1.2.4+0';
 
-/* eslint-disable no-underscore-dangle */
-
 export default class Npm1300 extends BaseNpmDevice {
     constructor(
         shellParser: ShellParser | undefined,
-        dialogHandler: ((dialog: PmicDialog) => void) | null
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+        peripherals?: Partial<NpmPeripherals>,
+        type: 'npm1300' | 'npm1304' = 'npm1300',
+        fw: string = npm1300FWVersion
     ) {
         super(
-            'npm1300',
-            npm1300FWVersion,
+            type,
+            fw,
             shellParser,
             dialogHandler,
             new NpmEventEmitter(),
             {
-                charger: true,
-                noOfBoosts: 0,
-                noOfBucks: 2,
-                noOfLdos: 2,
+                ChargerModule,
                 noOfLEDs: 3,
-                noOfGPIOs: 5,
                 noOfBatterySlots: 3,
                 maxEnergyExtraction: false,
+                ldos: {
+                    Module: LdoModule,
+                    count: 2,
+                },
+                bucks: {
+                    Module: BuckModule,
+                    count: 2,
+                },
+                gpios: {
+                    Module: GpioModule,
+                    count: 5,
+                },
+                BatteryProfiler,
+                PofModule,
+                UsbCurrentLimiterModule,
+                TimerConfigModule,
+                LowPowerModule,
+                ResetModule,
+                FuelGaugeModule,
+                ...peripherals,
             },
             1,
             {
@@ -66,94 +84,6 @@ export default class Npm1300 extends BaseNpmDevice {
                 charger: true,
                 sensor: true,
             }
-        );
-
-        this._batteryProfiler = shellParser
-            ? BatteryProfiler(shellParser, this.eventEmitter)
-            : undefined;
-
-        this.chargerModule = new ChargerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.buckModule = [...Array(this.devices.noOfBucks).keys()].map(
-            index =>
-                new BuckModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-
-        this.ldoModule = [...Array(this.devices.noOfLdos).keys()].map(
-            index =>
-                new LdoModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.dialogHandler,
-                    this.offlineMode
-                )
-        );
-
-        this.gpioModule = [...Array(this.devices.noOfGPIOs).keys()].map(
-            index =>
-                new GpioModule(
-                    index,
-                    this.shellParser,
-                    this.eventEmitter,
-                    this.sendCommand.bind(this),
-                    this.offlineMode
-                )
-        );
-
-        this.pofModule = new PofModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.lowPowerModule = new LowPowerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.resetModule = new ResetModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.timerConfigModule = new TimerModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.fuelGaugeModule = new FuelGaugeModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
-        );
-
-        this.usbCurrentLimiterModule = new UsbCurrentLimiterModule(
-            this.shellParser,
-            this.eventEmitter,
-            this.sendCommand.bind(this),
-            this.offlineMode
         );
 
         if (shellParser) {
@@ -422,6 +352,11 @@ export default class Npm1300 extends BaseNpmDevice {
         super.release();
         this.batteryProfiler?.release();
         this.releaseAll.forEach(release => release());
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    get canUploadBatteryProfiles() {
+        return true;
     }
 
     // eslint-disable-next-line class-methods-use-this

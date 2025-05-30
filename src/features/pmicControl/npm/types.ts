@@ -4,20 +4,24 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+/* eslint-disable max-classes-per-file */
+
 import {
     DropdownItem,
     ShellParser,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import EventEmitter from 'events';
 import { z } from 'zod';
 
 import { RangeType } from '../../../utils/helpers';
+import type BaseNpmDevice from './basePmicDevice';
+import { ITermNpm1300, VTrickleFast1300 } from './npm1300/charger/types';
 import type {
     GPIODrive1300,
     GPIOMode1300,
     GPIOPull1300,
 } from './npm1300/gpio/types';
 import type { SoftStart as SoftStart1300 } from './npm1300/ldo/types';
+import { ITermNpm1304 } from './npm1304/charger/types';
 import type { PowerID2100 } from './npm2100/battery';
 import type {
     GPIODrive2100,
@@ -35,6 +39,7 @@ import {
     nPM2100SoftStart,
     npm2100TimerMode,
 } from './npm2100/types';
+import { NpmEventEmitter } from './pmicHelpers';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
 
@@ -96,12 +101,10 @@ export type BuckRetentionControl =
     | (typeof BuckRetentionControlValues)[number]
     | GPIONames;
 
-export const ITermValues = ['10%', '20%'] as const;
-export type ITerm = (typeof ITermValues)[number];
+export type ITerm = ITermNpm1300 | ITermNpm1304;
 
-export const VTrickleFastValues = [2.5, 2.9] as const;
 export const NTCValues = ['Ignore NTC', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
-export type VTrickleFast = (typeof VTrickleFastValues)[number];
+export type VTrickleFast = VTrickleFast1300;
 export type NTCThermistor = (typeof NTCValues)[number];
 
 export type ModuleSettings = {
@@ -121,7 +124,8 @@ export type CCProfilingState =
     | 'vCutOff'
     | 'POF'
     | 'ThermalError'
-    | 'Ready';
+    | 'Ready'
+    | 'NOT VSYS';
 
 export type ProfilingEvent = {
     timestamp: number;
@@ -162,7 +166,7 @@ export type Charger = {
     enableRecharging: boolean;
     enableVBatLow: boolean;
     iTerm: ITerm;
-    iBatLim: number;
+    iBatLim?: number;
     ntcThermistor: NTCThermistor;
     ntcBeta: number;
     tChgStop: number;
@@ -473,51 +477,113 @@ export interface FuelGaugeModule {
     defaults: FuelGauge;
 }
 
+export type ModuleParams = {
+    index: number;
+    shellParser: ShellParser | undefined;
+    eventEmitter: NpmEventEmitter;
+    sendCommand: (
+        command: string,
+        onSuccess?: (response: string, command: string) => void,
+        onError?: (response: string, command: string) => void
+    ) => void;
+    dialogHandler: ((dialog: PmicDialog) => void) | null;
+    offlineMode: boolean;
+    npmDevice: BaseNpmDevice;
+};
+
+export interface IModule<T> {
+    new (params: ModuleParams): T;
+}
+
+export type ChargerModuleSet = new (
+    eventEmitter: NpmEventEmitter,
+    sendCommand: (
+        command: string,
+        onSuccess?: (response: string, command: string) => void,
+        onError?: (response: string, command: string) => void
+    ) => void,
+    offlineMode: boolean,
+    get: ChargerModuleGetBase
+) => ChargerModuleSetBase;
+
+export abstract class ChargerModuleSetBase {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(
+        protected eventEmitter: NpmEventEmitter,
+        protected sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void,
+        protected offlineMode: boolean,
+        protected get: ChargerModuleGetBase
+    ) {}
+
+    abstract all(charger: Charger): Promise<void>;
+    abstract vTerm(value: number): Promise<void>;
+    abstract iChg(value: number): Promise<void>;
+    abstract enabled(value: boolean): Promise<void>;
+    abstract vTrickleFast(value: VTrickleFast): Promise<void>;
+    abstract iTerm(iTerm: ITerm): Promise<void>;
+    abstract batLim?(value: number): Promise<void>;
+    abstract enabledRecharging(value: boolean): Promise<void>;
+    abstract enabledVBatLow(value: boolean): Promise<void>;
+    abstract nTCThermistor(
+        mode: NTCThermistor,
+        autoSetBeta?: boolean
+    ): Promise<void>;
+    abstract nTCBeta(value: number): Promise<void>;
+    abstract tChgStop(value: number): Promise<void>;
+    abstract tChgResume(value: number): Promise<void>;
+    abstract vTermR(value: number): Promise<void>;
+    abstract tCold(value: number): Promise<void>;
+    abstract tCool(value: number): Promise<void>;
+    abstract tWarm(value: number): Promise<void>;
+    abstract tHot(value: number): Promise<void>;
+}
+
+export type ChargerModuleGet = new (
+    sendCommand: (
+        command: string,
+        onSuccess?: (response: string, command: string) => void,
+        onError?: (response: string, command: string) => void
+    ) => void
+) => ChargerModuleGetBase;
+
+export abstract class ChargerModuleGetBase {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(
+        protected sendCommand: (
+            command: string,
+            onSuccess?: (response: string, command: string) => void,
+            onError?: (response: string, command: string) => void
+        ) => void
+    ) {}
+
+    abstract all(): void;
+    abstract state(): void;
+    abstract vTerm(): void;
+    abstract iChg(): void;
+    abstract enabled(): void;
+    abstract vTrickleFast(): void;
+    abstract iTerm(): void;
+    abstract batLim?(): void;
+    abstract enabledRecharging(): void;
+    abstract enabledVBatLow(): void;
+    abstract nTCThermistor(): void;
+    abstract nTCBeta(): void;
+    abstract tChgStop(): void;
+    abstract tChgResume(): void;
+    abstract vTermR(): void;
+    abstract tCold(): void;
+    abstract tCool(): void;
+    abstract tWarm(): void;
+    abstract tHot(): void;
+}
+
 export interface ChargerModule {
-    get: {
-        all: () => void;
-        state: () => void;
-        vTerm: () => void;
-        iChg: () => void;
-        enabled: () => void;
-        vTrickleFast: () => void;
-        iTerm: () => void;
-        batLim: () => void;
-        enabledRecharging: () => void;
-        enabledVBatLow: () => void;
-        nTCThermistor: () => void;
-        nTCBeta: () => void;
-        tChgStop: () => void;
-        tChgResume: () => void;
-        vTermR: () => void;
-        tCold: () => void;
-        tCool: () => void;
-        tWarm: () => void;
-        tHot: () => void;
-    };
-    set: {
-        all(charger: Charger): Promise<void>;
-        vTerm: (value: number) => Promise<void>;
-        iChg: (value: number) => Promise<void>;
-        enabled: (value: boolean) => Promise<void>;
-        vTrickleFast: (value: VTrickleFast) => Promise<void>;
-        iTerm: (iTerm: ITerm) => Promise<void>;
-        batLim: (value: number) => Promise<void>;
-        enabledRecharging: (value: boolean) => Promise<void>;
-        enabledVBatLow: (value: boolean) => Promise<void>;
-        nTCThermistor: (
-            mode: NTCThermistor,
-            autoSetBeta?: boolean
-        ) => Promise<void>;
-        nTCBeta: (value: number) => Promise<void>;
-        tChgStop: (value: number) => Promise<void>;
-        tChgResume: (value: number) => Promise<void>;
-        vTermR: (value: number) => Promise<void>;
-        tCold: (value: number) => Promise<void>;
-        tCool: (value: number) => Promise<void>;
-        tWarm: (value: number) => Promise<void>;
-        tHot: (value: number) => Promise<void>;
-    };
+    get: ChargerModuleGetBase;
+    set: ChargerModuleSetBase;
     callbacks: (() => void)[];
     ranges: {
         voltage: number[];
@@ -527,9 +593,14 @@ export interface ChargerModule {
         current: RangeType;
         nTCBeta: RangeType;
         iBatLim: FixedListRange;
-        vLowerCutOff?: RangeType;
+        vLowerCutOff: RangeType;
+        batterySize: RangeType;
     };
     defaults: Charger;
+    values: {
+        iTerm: { label: string; value: ITerm }[];
+        vTrickleFast: { label: string; value: VTrickleFast }[];
+    };
 }
 
 export interface BoostModule {
@@ -911,10 +982,6 @@ export interface Profile {
     profilingProfiles: CCProfile[];
 }
 
-export interface IBatteryProfiler {
-    (shellParser: ShellParser, eventEmitter: EventEmitter): BatteryProfiler;
-}
-
 export type BatteryProfiler = {
     release: () => void;
     setProfile: (
@@ -923,7 +990,7 @@ export type BatteryProfiler = {
         vCutoff: number,
         profiles: CCProfile[]
     ) => Promise<void>;
-    canProfile: () => Promise<boolean>;
+    canProfile: () => Promise<true | 'MissingSyncBoard' | 'ActiveLoadNotVSYS'>;
     startProfiling: () => Promise<void>;
     stopProfiling: () => Promise<void>;
     isProfiling: () => Promise<boolean>;
@@ -935,6 +1002,12 @@ export type BatteryProfiler = {
         handler: (state: ProfilingEvent, error?: string) => void
     ) => () => void;
     pofError: () => void;
+    restingProfile(): CCProfile[];
+    loadProfile(
+        capacity: number,
+        vUpperCutOff: number,
+        vLowerCutOff: number
+    ): CCProfile[];
 };
 
 interface DocumentationItem {
@@ -946,4 +1019,35 @@ export type Documentation = {
     [key: string]: {
         [key: string]: DocumentationItem[];
     };
+};
+
+export type NpmPeripherals = {
+    ChargerModule?: IModule<ChargerModule>;
+    maxEnergyExtraction: boolean;
+    noOfLEDs: number;
+    noOfBatterySlots: number;
+    ldos?: {
+        Module: IModule<LdoModule>;
+        count: number;
+    };
+    bucks?: {
+        Module: IModule<BuckModule>;
+        count: number;
+    };
+    gpios?: {
+        Module: IModule<GpioModule>;
+        count: number;
+    };
+    boosts?: {
+        Module: IModule<BoostModule>;
+        count: number;
+    };
+    BatteryProfiler?: IModule<BatteryProfiler>;
+    PofModule?: IModule<PofModule>;
+    UsbCurrentLimiterModule?: IModule<UsbCurrentLimiterModule>;
+    TimerConfigModule?: IModule<TimerConfigModule>;
+    BatteryModule?: IModule<BatteryModule>;
+    LowPowerModule?: IModule<LowPowerModule>;
+    ResetModule?: IModule<ResetModule>;
+    FuelGaugeModule?: IModule<FuelGaugeModule>;
 };

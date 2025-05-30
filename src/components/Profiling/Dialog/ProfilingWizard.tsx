@@ -223,6 +223,7 @@ export default () => {
                 break;
             case 'Configuration':
             case 'MissingSyncBoard':
+            case 'ActiveLoadNotVSYS':
                 telemetry.sendEvent(`Profiling (${profilingStage})`);
                 break;
         }
@@ -343,6 +344,15 @@ export default () => {
                     );
                 }
                 break;
+            case 'NOT VSYS':
+                dispatch(
+                    setCompleteStep({
+                        level: 'danger',
+                        message:
+                            'Profiling stopped. The Active Load switch is no longer set to VSYS.',
+                    })
+                );
+                break;
         }
     }, [ccProfilingState, dispatch, profilingStage]);
 
@@ -358,7 +368,10 @@ export default () => {
             const initWaitForDevice = () => {
                 dispatch(
                     setWaitForDevice({
-                        when: 'sameTraits',
+                        when: device =>
+                            device.serialPorts?.length === 2 &&
+                            device.traits.mcuBoot === true &&
+                            device.traits.serialPorts === true,
                         once: true,
                         timeout:
                             profilingStage === 'Checklist' ||
@@ -406,9 +419,11 @@ export default () => {
                     </Alert>
                 </ConfirmationDialog>
             )}
-            {profilingStage === 'MissingSyncBoard' && (
-                <PreConfigurationDialog />
+            {(profilingStage === 'MissingSyncBoard' ||
+                profilingStage === 'ActiveLoadNotVSYS') && (
+                <PreConfigurationDialog type={profilingStage} />
             )}
+
             {npmDevice && profilingStage === 'Configuration' && (
                 <ConfigurationDialog
                     npmDevice={npmDevice}

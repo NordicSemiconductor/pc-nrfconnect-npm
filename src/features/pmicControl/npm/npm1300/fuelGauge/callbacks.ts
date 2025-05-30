@@ -51,12 +51,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex(
-                    'fuel_gauge model',
-                    true,
-                    undefined,
-                    '"[A-Za-z0-9\\s]+"'
-                ),
+                toRegex('fuel_gauge model', true, undefined, '"[^"]*"'),
                 res => {
                     eventEmitter.emit(
                         'onActiveBatteryModelUpdate',

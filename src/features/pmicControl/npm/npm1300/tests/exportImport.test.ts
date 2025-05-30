@@ -12,6 +12,7 @@ import {
     GPIOExport,
     Ldo,
     LED,
+    LowPowerConfig,
     npm1300LowPowerConfig,
     npm1300TimerConfig,
     npm1300TimerMode,
@@ -54,7 +55,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         enabled: true,
         enableRecharging: true,
         enableVBatLow: false,
-        iTerm: '20%',
+        iTerm: 20,
         iBatLim: 1340,
         ntcThermistor: '10 kΩ',
         ntcBeta: 3380,
@@ -125,7 +126,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             vTrickleFast: 2.5,
             iChg: 32,
             enabled: false,
-            iTerm: '10%',
+            iTerm: 10,
             iBatLim: 270,
             enableRecharging: false,
             enableVBatLow: false,
@@ -348,11 +349,11 @@ describe('PMIC 1300 - Apply Config ', () => {
         });
 
         mockOnLowPowerUpdate.mockImplementation(
-            (partialUpdate: Partial<npm1300LowPowerConfig>) => {
+            (partialUpdate: Partial<LowPowerConfig>) => {
                 ship = {
                     ...ship,
                     ...partialUpdate,
-                };
+                } as npm1300LowPowerConfig;
             }
         );
 

@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
-import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     GPIO,
     GPIODrive,
@@ -14,7 +11,7 @@ import {
     type GpioModule,
     GPIOPull,
     GPIOState,
-    PmicDialog,
+    ModuleParams,
 } from '../../types';
 import gpioCallbacks from './gpioCallbacks';
 import { GpioGet } from './gpioGetters';
@@ -34,21 +31,19 @@ import {
 /* eslint-disable class-methods-use-this */
 
 export default class Module implements GpioModule {
+    readonly index: number;
     private _get: GpioGet;
     private _set: GpioSet;
     private _callbacks: (() => void)[];
-    constructor(
-        readonly index: number,
-        shellParser: ShellParser | undefined,
-        eventEmitter: NpmEventEmitter,
-        sendCommand: (
-            command: string,
-            onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void,
-        dialogHandler: ((dialog: PmicDialog) => void) | null,
-        offlineMode: boolean
-    ) {
+    constructor({
+        sendCommand,
+        eventEmitter,
+        dialogHandler,
+        offlineMode,
+        index,
+        shellParser,
+    }: ModuleParams) {
+        this.index = index;
         this._get = new GpioGet(sendCommand, index);
         this._set = new GpioSet(
             eventEmitter,

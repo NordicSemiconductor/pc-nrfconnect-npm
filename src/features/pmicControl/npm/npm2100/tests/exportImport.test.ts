@@ -52,7 +52,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         enabled: true,
         enableRecharging: true,
         enableVBatLow: false,
-        iTerm: '20%',
+        iTerm: 20,
         iBatLim: 1340,
         ntcThermistor: '10 kΩ',
         ntcBeta: 3380,

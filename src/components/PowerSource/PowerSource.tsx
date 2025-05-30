@@ -34,7 +34,6 @@ function generateBatteryTypeItems(
 }
 
 export default () => {
-    // const batteryAddonBoardId = useSelector(getBatteryAddonBoardId);
     const powerid = useSelector(getPowerId);
 
     const powerSourceItems = ['Battery', 'USB'] as PowerSource[];

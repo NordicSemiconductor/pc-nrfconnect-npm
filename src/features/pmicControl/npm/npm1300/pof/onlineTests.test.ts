@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { helpers } from '../../tests/helpers';
 import { PmicDialog, POFPolarityValues } from '../../types';
-import { helpers, setupMocksWithShellParser } from '../tests/helpers';
+import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1300 - Setters Online tests', () => {
     const { mockDialogHandler, mockOnPOFUpdate, mockEnqueueRequest, pmic } =

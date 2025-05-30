@@ -6,13 +6,14 @@
 
 import { ShellParserCallbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
+import { helpers } from '../../tests/helpers';
 import {
     BoostModeControlValues,
     BoostPinModeValues,
     BoostPinSelectionValues,
     BoostVOutSelValues,
 } from '../../types';
-import { helpers, setupMocksWithShellParser } from '../tests/helpers';
+import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 2100 - Boost Setters Online tests', () => {
     const { mockOnBoostUpdate, mockEnqueueRequest, pmic } =
