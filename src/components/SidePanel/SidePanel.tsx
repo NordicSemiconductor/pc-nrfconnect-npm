@@ -66,6 +66,7 @@ export default () => {
                     card={card}
                     item="ExportConfiguration"
                     placement="right-start"
+                    keepShowingOnHoverTooltip
                 >
                     <Button
                         variant="secondary"
