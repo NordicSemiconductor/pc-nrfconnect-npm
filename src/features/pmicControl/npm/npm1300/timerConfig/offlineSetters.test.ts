@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { npm1300TimerMode } from '../../types';
 import { setupMocksBase } from '../tests/helpers';
+import { npm1300TimerMode } from './types';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell
 describe('PMIC 1300 - Setters Offline tests', () => {

@@ -5,12 +5,9 @@
  */
 
 import { helpers } from '../../tests/helpers';
-import {
-    npm1300TimerMode,
-    PmicDialog,
-    TimerPrescalerValues,
-} from '../../types';
+import { PmicDialog, TimerPrescalerValues } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
+import { TimerModeValues } from './types';
 
 describe('PMIC 1300 - Setters Online tests', () => {
     const {
@@ -29,13 +26,11 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test.each(
-            Object.keys(npm1300TimerMode).map((modeKey, index) => ({
-                modeKey,
+            TimerModeValues.map((mode, index) => ({
+                mode,
                 index,
             }))
-        )('Set timer config mode %p', async ({ modeKey, index }) => {
-            const mode =
-                npm1300TimerMode[modeKey as keyof typeof npm1300TimerMode];
+        )('Set timer config mode %p', async ({ mode, index }) => {
             await pmic.timerConfigModule?.set.mode(mode);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -95,21 +90,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test.each(
-            Object.keys(npm1300TimerMode).map((modeKey, index) => ({
-                modeKey,
+            TimerModeValues.map((mode, index) => ({
+                mode,
                 index,
             }))
         )(
             'Set setTimerConfigMode - Fail immediately - index: %p',
-            async ({ modeKey, index }) => {
+            async ({ mode, index }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
                     }
                 );
 
-                const mode =
-                    npm1300TimerMode[modeKey as keyof typeof npm1300TimerMode];
                 await expect(
                     pmic.timerConfigModule?.set.mode(mode)
                 ).rejects.toBeUndefined();

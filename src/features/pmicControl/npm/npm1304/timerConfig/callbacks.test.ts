@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { npm1300TimerMode, TimerPrescalerValues } from '../../types';
+import { TimerModeValues } from '../../npm1300/timerConfig/types';
+import { TimerPrescalerValues } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1304 - Command callbacks', () => {
@@ -16,20 +17,18 @@ describe('PMIC 1304 - Command callbacks', () => {
     });
 
     test.each(
-        Object.keys(npm1300TimerMode)
-            .map((mode, modeIndex) => [
-                {
-                    append: `get`,
-                    mode,
-                    modeIndex,
-                },
-                {
-                    append: `set ${modeIndex}`,
-                    mode,
-                    modeIndex,
-                },
-            ])
-            .flat()
+        TimerModeValues.map((mode, modeIndex) => [
+            {
+                append: `get`,
+                mode,
+                modeIndex,
+            },
+            {
+                append: `set ${modeIndex}`,
+                mode,
+                modeIndex,
+            },
+        ]).flat()
     )('npmx timer config mode %p', ({ append, mode, modeIndex }) => {
         const command = `npmx timer config mode ${append}`;
         const callback =
