@@ -1,3 +1,9 @@
+## 2.1.1 - 2025-06-02
+
+### Fixed
+
+-   Issues with phrasing of some tooltips.
+
 ## 2.1.0 - 2025-06-02
 
 ### Added
