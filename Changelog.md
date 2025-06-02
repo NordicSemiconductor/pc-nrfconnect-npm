@@ -7,6 +7,8 @@
 ### Fixed
 
 -   Loading of JSON configuration files for nPM2100.
+-   Loading of JSON configuration for `Fuel Gauge` enable/disable state for all
+    devices.
 
 ## 2.0.1 - 2025-05-22
 

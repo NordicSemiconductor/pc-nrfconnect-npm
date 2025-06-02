@@ -945,6 +945,8 @@ export default abstract class BaseNpmDevice {
 
             const action = async () => {
                 try {
+                    this.fuelGaugeModule?.set.all(config.fuelGaugeSettings);
+
                     if (config.charger) {
                         const charger = config.charger;
                         await this.chargerModule?.set.all(charger);

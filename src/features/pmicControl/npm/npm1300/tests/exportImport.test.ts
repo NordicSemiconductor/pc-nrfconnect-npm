@@ -404,7 +404,7 @@ describe('PMIC 1300 - Apply Config ', () => {
         expect(mockOnResetUpdate).toBeCalledTimes(1);
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(3);
 
-        expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
+        expect(mockOnFuelGaugeUpdate).toBeCalledTimes(2);
         expect(mockOnFuelGaugeUpdate).toBeCalledWith({
             enabled: true,
         } satisfies Partial<FuelGauge>);
