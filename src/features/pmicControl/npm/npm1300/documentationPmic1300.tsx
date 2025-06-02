@@ -468,7 +468,7 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         <p key="p1">
                             The {deviceType} fuel gauge algorithm adjusts to
                             correct for possible initialization errors due to a
-                            stressed battery or unexpected reset conditions.
+                            battery under stress or unexpected reset conditions.
                             Typically, the impact of these errors is minor and
                             the predictions will converge to an accurate value
                             within a few minutes of normal operation.
@@ -496,10 +496,10 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                     content: [
                         <p key="p1">
                             The {deviceType} fuel gauge algorithm accounts for
-                            possible initialization errors due to a stressed
-                            battery or unexpected reset conditions. Typically,
-                            the impact of these errors is minor and the
-                            predictions will converge to an accurate value
+                            possible initialization errors due to a battery
+                            under stress or unexpected reset conditions.
+                            Typically, the impact of these errors is minor and
+                            the predictions will converge to an accurate value
                             within a few minutes of normal operation.
                         </p>,
                     ],
