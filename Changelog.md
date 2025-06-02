@@ -9,7 +9,8 @@
 -   Loading of JSON configuration files for nPM2100.
 -   All devices: Loading of JSON configuration for the Fuel Gauge enable or
     disable state (or both).
--   `Timer` card in `System Features` now reflects user setting changes.
+-   Issue with applying user setting changes on the Timer card in the System
+    Features tab.
 
 ## 2.0.1 - 2025-05-22
 
