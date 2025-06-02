@@ -41,7 +41,7 @@ const buckDoc = (n: number) => ({
                 </p>,
                 <p key="p3">
                     When software is used to set voltage level, the range is 1.0
-                    V to 3.3 V, in 100-mV steps.
+                    V to 3.3 V, in steps of 100 mV.
                 </p>,
             ],
         },
@@ -153,7 +153,7 @@ const ldoDoc = (index: number) => ({
                 <p key="p3">
                     As an LDO, it supports an input voltage range from 2.6 V to
                     5.5 V, and an output voltage range from 1.0 V to 3.3 V, in
-                    100-mV steps and up to 50 mA.
+                    steps of 100 mV and up to 50 mA.
                 </p>,
             ],
         },
@@ -170,7 +170,7 @@ const ldoDoc = (index: number) => ({
         },
         {
             title: 'Range',
-            content: [<p key="p1">1.0 V to 3.3 V, in 100-mV steps</p>],
+            content: [<p key="p1">1.0 V to 3.3 V, in steps of 100 mV</p>],
         },
     ],
     SoftStartEnable: [
@@ -213,40 +213,36 @@ const gpioDoc = (n: number) => ({
             content: [
                 <p key="p1">Select the GPIO mode:</p>,
                 <p key="p2">
-                    <strong>Input</strong> – In this mode, {`GPIO${n}`} is used
-                    to control the BUCKs or Load Switches. Refer to the
-                    respective controls to configure what {`GPIO${n}`} should
-                    control. The {`GPIO${n}`} can also be used as a
-                    general-purpose input in this mode.
+                    <strong>Input</strong> - Use {`GPIO${n}`} to control the
+                    BUCKs or Load Switches. Refer to the respective controls to
+                    configure what {`GPIO${n}`} should control. You can also use{' '}
+                    {`GPIO${n}`} as a general-purpose input in this mode.
                 </p>,
                 <p key="p3">
-                    <strong>Input Rising Edge</strong> – In this mode,{' '}
-                    {`GPIO${n}`} is used to generate an event on the rising
-                    edge.
+                    <strong>Input Rising Edge</strong> - Use {`GPIO${n}`} to
+                    generate an event on the rising edge.
                 </p>,
                 <p key="p4">
-                    <strong>Input Falling Edge</strong> – In this mode,{' '}
-                    {`GPIO${n}`} is used to generate an event on the falling
-                    edge.
+                    <strong>Input Falling Edge</strong> - Use {`GPIO${n}`} to
+                    generate an event on the falling edge.
                 </p>,
                 <p key="p5">
-                    <strong>Output High</strong> – Sets {`GPIO${n}`} output
-                    high.
+                    <strong>Output High</strong> - Set {`GPIO${n}`} output high.
                 </p>,
                 <p key="p6">
-                    <strong>Out Low</strong> – Sets {`GPIO${n}`} output low.
+                    <strong>Out Low</strong> - Set {`GPIO${n}`} output low.
                 </p>,
                 <p key="p7">
-                    <strong>Output Interrupt</strong> – Configure {`GPIO${n}`}{' '}
+                    <strong>Output Interrupt</strong> - Configure {`GPIO${n}`}{' '}
                     to issue an interrupt. The wanted interrupts must be enabled
                     in “Interrupt Configuration”.
                 </p>,
                 <p key="p8">
-                    <strong>Output Reset</strong> – Configure {`GPIO${n}`} as
+                    <strong>Output Reset</strong> - Configure {`GPIO${n}`} as
                     Reset (NRESETOUT) from the watchdog.
                 </p>,
                 <p key="p9">
-                    <strong>Output POF</strong> – Configure {`GPIO${n}`} to
+                    <strong>Output POF</strong> - Configure {`GPIO${n}`} to
                     issue a warning when a power loss occurs. Requires POF
                     warning to be enabled.
                 </p>,
@@ -294,7 +290,7 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         <p key="p1">
                             Battery voltage, V
                             <span className="subscript">BAT</span>, measured by
-                            PMIC’s ADC.
+                            PMIC&apos;s ADC.
                         </p>,
                     ],
                 },
@@ -324,8 +320,8 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         </p>,
                         <p key="p3">
                             A positive value indicates a load on the battery (it
-                            is discharging), while a negative value indicates
-                            that the battery is being charged.
+                            is discharging). A negative value indicates that the
+                            battery is being charged.
                         </p>,
                     ],
                 },
@@ -345,7 +341,7 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         <p key="p1">
                             Battery temperature, T
                             <span className="subscript">BAT</span>, measured by
-                            PMIC’s ADC.
+                            PMIC&apos;s ADC.
                         </p>,
                     ],
                 },
@@ -368,7 +364,7 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                             Charging mode for batteries at low voltage, V
                             <span className="subscript">BAT</span> &lt; V
                             <span className="subscript">TRICKLE_FAST</span>{' '}
-                            (default 2.9 V). Charging current is 10% of
+                            (default 2.9 V). The charging current is 10% of the
                             configured I<span className="subscript">CHG</span>.
                         </p>,
                     ],
@@ -379,9 +375,9 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         <p key="p1">
                             When V<span className="subscript">BAT</span> goes
                             above V
-                            <span className="subscript">TRICKLE_FAST </span>
-                            constant current charging at configured I
-                            <span className="subscript">CHG</span> starts.
+                            <span className="subscript">TRICKLE_FAST</span>
+                            constant current, the charging starts at the
+                            configured I<span className="subscript">CHG</span>.
                         </p>,
                     ],
                 },
@@ -464,7 +460,7 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                 },
                 {
                     title: 'Range',
-                    content: [<p key="p1">0% to 100%, in 0.1% steps</p>],
+                    content: [<p key="p1">0% to 100%, in steps of 0.1%</p>],
                 },
                 {
                     title: 'Note',
@@ -492,18 +488,18 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                 },
                 {
                     title: 'Range',
-                    content: [<p key="p1">0% to 100%, in 0.1% steps</p>],
+                    content: [<p key="p1">0% to 100%, in steps of 0.1%</p>],
                 },
 
                 {
                     title: 'Note',
                     content: [
                         <p key="p1">
-                            The {deviceType} fuel gauge algorithm adjusts to
-                            correct for possible initialization errors due to a
-                            stressed battery or unexpected reset conditions.
-                            Typically, the impact of these errors is minor and
-                            the predictions will converge to an accurate value
+                            The {deviceType} fuel gauge algorithm accounts for
+                            possible initialization errors due to a stressed
+                            battery or unexpected reset conditions. Typically,
+                            the impact of these errors is minor and the
+                            predictions will converge to an accurate value
                             within a few minutes of normal operation.
                         </p>,
                     ],
@@ -525,8 +521,8 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                             time to prepare for an orderly power-down.
                         </p>,
                         <p key="p2">
-                            Enable GPIO Mode “Output power loss warning” for the
-                            desired GPIO in the GPIOS tab.
+                            Enable the GPIO Mode “Output power loss warning” for
+                            the desired GPIO in the GPIOs tab.
                         </p>,
                     ],
                 },
@@ -542,7 +538,9 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         <p key="p1">
                             Set the threshold to trigger a power failure.
                         </p>,
-                        <p key="p2">Range: 2.6 V to 3.5 V, in 100-mV steps.</p>,
+                        <p key="p2">
+                            Range: 2.6 V to 3.5 V, in steps of 100 mV.
+                        </p>,
                     ],
                 },
             ],
@@ -613,11 +611,11 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         <p key="p1">Set the timer period.</p>,
                         <p key="p2">
                             For the Timer Fast mode, the range is 2 ms to 9
-                            hours in 2-ms steps.
+                            hours, in steps of 2 ms.
                         </p>,
                         <p key="p3">
                             For the Timer Slow mode, the range is 16 ms to 3
-                            days in 16-ms steps.
+                            days, in steps of 16 ms.
                         </p>,
                     ],
                 },
@@ -748,8 +746,8 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         <p key="p2">
                             There are two USB-compliant, accurate current
                             limits: IBUS100MA (100 mA) and IBUS500MA (500 mA).
-                            In addition, there are current limits in 100-mA
-                            steps from 600 mA to 1500 mA. The 1500 mA limit is
+                            In addition, there are current limits in steps of
+                            100 mA, from 600 mA to 1500 mA. The 1500 mA limit is
                             compatible with USB Type-C.
                         </p>,
                         <p key="p3">
@@ -785,10 +783,10 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                             Set the charger termination voltage. This is the
                             maximum battery voltage allowed. When V
                             <span className="subscript">BAT</span> reaches this
-                            level, the charger changes from constant current to
-                            constant voltage charging mode. V
-                            <span className="subscript">TERM</span> should be
-                            configured according to your battery specification.
+                            level, the charger changes the charging mode from
+                            constant current to constant voltage. Check your
+                            battery specification to configure V
+                            <span className="subscript">TERM</span> correctly.
                         </p>,
                     ],
                 },
@@ -796,8 +794,8 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                     title: 'Range',
                     content: [
                         <p key="p1">
-                            3.50 V to 3.65 V, and 4.00 V to 4.45 V, in 50-mV
-                            steps.
+                            3.50 V to 3.65 V, and 4.00 V to 4.45 V, in steps of
+                            50 mV.
                         </p>,
                     ],
                 },
@@ -812,14 +810,17 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                     ),
                     content: [
                         <p key="p1">
-                            Set the charging current limit. This should be
-                            configured according to your battery specification.
+                            Set the charging current limit. Check your battery
+                            specification to configure I
+                            <span className="subscript">CHG</span> correctly.
                         </p>,
                     ],
                 },
                 {
                     title: 'Range',
-                    content: [<p key="p1">32 mA to 800 mA, in 2 mA steps.</p>],
+                    content: [
+                        <p key="p1">32 mA to 800 mA, in steps of 2 mA.</p>,
+                    ],
                 },
             ],
             EnableRecharging: [

@@ -91,7 +91,7 @@ const boostDoc = () => ({
                     When the VSET pin is used to set the voltage level, this
                     indicates the voltage level at VOUT (read-only). When
                     software is used to set the voltage level, this has value
-                    between 1.8 V to 3.3 V in 50-mV steps.
+                    between 1.8 V to 3.3 V, in steps of 50 mV.
                 </p>,
             ],
         },
@@ -106,8 +106,8 @@ const ldoDoc = () => ({
                 <p key="p1">
                     The load switch is supplied by the BOOST and can either
                     function as a switch or as an LDO. It supports an output
-                    voltage range between 0.8 V and 3.0 V in 50-mV steps, and a
-                    maximum output current of 50 mA.
+                    voltage range between 0.8 V and 3.0 V in steps of 50 mV, and
+                    a maximum output current of 50 mA.
                 </p>,
             ],
         },
@@ -277,7 +277,7 @@ export const documentation: Documentation = {
             },
             {
                 title: 'Range',
-                content: [<p key="p1">0% to 100%, in 0.1% steps</p>],
+                content: [<p key="p1">0% to 100%, in steps of 0.1%</p>],
             },
         ],
         StateOfCharge: [
@@ -292,7 +292,7 @@ export const documentation: Documentation = {
             },
             {
                 title: 'Range',
-                content: [<p key="p1">0% to 100%, in 0.1% steps</p>],
+                content: [<p key="p1">0% to 100%, in steps of 0.1%</p>],
             },
         ],
         DiscardPositiveDeltaZ: [
