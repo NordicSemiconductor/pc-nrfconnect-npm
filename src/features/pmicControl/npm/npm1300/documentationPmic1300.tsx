@@ -747,7 +747,7 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                             There are two USB-compliant, accurate current
                             limits: IBUS100MA (100 mA) and IBUS500MA (500 mA).
                             In addition, there are current limits in steps of
-                            100 mA, from 600 mA to 1500 mA. The 1500 mA limit is
+                            100 mA, from 600 mA to 1500 mA. The 1500-mA limit is
                             compatible with USB Type-C.
                         </p>,
                         <p key="p3">
