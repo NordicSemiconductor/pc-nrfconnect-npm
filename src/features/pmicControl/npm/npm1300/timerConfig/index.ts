@@ -7,7 +7,6 @@
 import { RangeType } from '../../../../../utils/helpers';
 import {
     ModuleParams,
-    npm1300TimerMode,
     TimerConfig,
     TimerConfigModule,
     TimerMode,
@@ -15,6 +14,7 @@ import {
 import timerCallbacks from './callbacks';
 import { TimerConfigGet } from './getters';
 import { TimerConfigSet } from './setters';
+import { npm1300TimerMode, TimerModeKeys, TimerModeValues } from './types';
 
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
@@ -45,9 +45,9 @@ export default class Module implements TimerConfigModule {
     }
     get values(): { mode: { label: string; value: TimerMode }[] } {
         return {
-            mode: Object.keys(npm1300TimerMode).map(key => ({
-                label: `${key}`,
-                value: npm1300TimerMode[key as keyof typeof npm1300TimerMode],
+            mode: [...TimerModeValues].map((item, i) => ({
+                label: `${TimerModeKeys[i]}`,
+                value: item,
             })),
         };
     }

@@ -7,6 +7,7 @@
 import { toBuckExport } from '../../npm1300/buck';
 import { GPIOMode1300, GPIOPull1300 } from '../../npm1300/gpio/types';
 import { toLdoExport } from '../../npm1300/ldo';
+import { npm1300TimerMode } from '../../npm1300/timerConfig/types';
 import {
     Buck,
     Charger,
@@ -18,7 +19,6 @@ import {
     LowPowerConfig,
     npm1300LowPowerConfig,
     npm1300TimerConfig,
-    npm1300TimerMode,
     npm1300TimeToActive,
     NpmExportLatest,
     PartialUpdate,

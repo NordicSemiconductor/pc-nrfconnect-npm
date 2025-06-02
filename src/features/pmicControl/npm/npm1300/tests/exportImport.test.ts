@@ -15,7 +15,6 @@ import {
     LowPowerConfig,
     npm1300LowPowerConfig,
     npm1300TimerConfig,
-    npm1300TimerMode,
     npm1300TimeToActive,
     NpmExportLatest,
     PartialUpdate,
@@ -29,6 +28,7 @@ import { toBuckExport } from '../buck';
 import { GPIOMode1300, GPIOPull1300 } from '../gpio/types';
 import { toLdoExport } from '../ldo';
 import { npm1300FWVersion } from '../pmic1300Device';
+import { npm1300TimerMode } from '../timerConfig/types';
 import { setupMocksBase } from './helpers';
 
 describe('PMIC 1300 - Apply Config ', () => {

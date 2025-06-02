@@ -9,16 +9,10 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     noop,
     NpmEventEmitter,
-    parseColonBasedAnswer,
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import {
-    npm1300TimerMode,
-    TimerConfig,
-    TimerMode,
-    TimerPrescalerValues,
-} from '../../types';
+import { TimerConfig, TimerPrescalerValues } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -31,16 +25,12 @@ export default (
             shellParser.registerCommandCallback(
                 toRegex('npmx timer config mode', true, undefined, '[0-4]'),
                 res => {
-                    const enumKey = Object.keys(npm1300TimerMode)[
-                        Object.values(npm1300TimerMode).findIndex(
-                            v => v === parseColonBasedAnswer(res)
-                        )
-                    ] as keyof typeof npm1300TimerMode;
+                    const value = parseToNumber(res);
 
                     eventEmitter.emitPartialEvent<TimerConfig>(
                         'onTimerConfigUpdate',
                         {
-                            mode: enumKey as TimerMode,
+                            mode: value,
                         }
                     );
                 },

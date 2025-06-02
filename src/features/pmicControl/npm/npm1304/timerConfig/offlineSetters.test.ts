@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { npm1300TimerMode } from '../../types';
+import { npm1300TimerMode } from '../../npm1300/timerConfig/types';
 import { setupMocksBase } from '../tests/helpers';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell

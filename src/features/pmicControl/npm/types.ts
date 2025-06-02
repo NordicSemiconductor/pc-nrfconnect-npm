@@ -21,6 +21,7 @@ import type {
     GPIOPull1300,
 } from './npm1300/gpio/types';
 import type { SoftStart as SoftStart1300 } from './npm1300/ldo/types';
+import { npm1300TimerMode } from './npm1300/timerConfig/types';
 import { ITermNpm1304 } from './npm1304/charger/types';
 import type { PowerID2100 } from './npm2100/battery';
 import type {
@@ -258,13 +259,6 @@ export type POF = {
     threshold: number;
 };
 
-export enum npm1300TimerMode {
-    'Boot monitor' = '0',
-    'Watchdog warning' = '1',
-    'Watchdog reset' = '2',
-    'General purpose' = '3',
-    'Wake-up' = '4',
-}
 export type TimerMode = npm1300TimerMode | npm2100TimerMode;
 
 export const TimerPrescalerValues = ['Slow', 'Fast'] as const;
