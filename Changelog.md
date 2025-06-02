@@ -2,7 +2,7 @@
 
 ### Fixed
 
--   Tooltips content.
+-   Issues with phrasing of some tooltips.
 
 ## 2.1.0 - 2025-06-02
 
