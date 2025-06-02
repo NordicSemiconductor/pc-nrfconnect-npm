@@ -538,9 +538,12 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         <p key="p1">
                             Set the threshold to trigger a power failure.
                         </p>,
-                        <p key="p2">
-                            Range: 2.6 V to 3.5 V, in steps of 100 mV.
-                        </p>,
+                    ],
+                },
+                {
+                    title: 'Range',
+                    content: [
+                        <p key="p1">2.6 V to 3.5 V, in steps of 100 mV.</p>,
                     ],
                 },
             ],
