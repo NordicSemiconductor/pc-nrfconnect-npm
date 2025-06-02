@@ -26,14 +26,17 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                     ),
                     content: [
                         <p key="p1">
-                            Set the charging current limit. This should be
-                            configured according to your battery specification.
+                            Set the charging current limit. Check your battery
+                            specification to configure I
+                            <span className="subscript">CHG</span> correctly.
                         </p>,
                     ],
                 },
                 {
                     title: 'Range',
-                    content: [<p key="p1">4 mA to 100 mA, in 0.5 mA steps.</p>],
+                    content: [
+                        <p key="p1">4 mA to 100 mA, in steps of 0.5 mA.</p>,
+                    ],
                 },
             ],
             VTERM: [
@@ -49,10 +52,10 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                             Set the charger termination voltage. This is the
                             maximum battery voltage allowed. When V
                             <span className="subscript">BAT</span> reaches this
-                            level, the charger changes from constant current to
-                            constant voltage charging mode. V
-                            <span className="subscript">TERM</span> should be
-                            configured according to your battery specification.
+                            level, the charger changes the charging mode from
+                            constant current to constant voltage. Check your
+                            battery specification to configure V
+                            <span className="subscript">TERM</span> correctly.
                         </p>,
                     ],
                 },
@@ -60,8 +63,8 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                     title: 'Range',
                     content: [
                         <p key="p1">
-                            3.6 V to 3.65 V, and 4.00 V to 4.65 V, in 50-mV
-                            steps.
+                            3.6 V to 3.65 V, and 4.00 V to 4.65 V, in steps of
+                            50 mV.
                         </p>,
                     ],
                 },
@@ -81,8 +84,8 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                             either 5% (default) or 10%.
                         </p>,
                         <p key="p2">
-                            When the charging mode is “Constant Voltage”, the
-                            current flow into the battery is monitored.
+                            When the charging mode is set to constant voltage,
+                            the app monitors the current flow into the battery.
                         </p>,
                         <p key="p3">
                             When the current drops below I
@@ -102,7 +105,7 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                         <p key="p1">
                             Battery voltage, V
                             <span className="subscript">BAT</span>, measured by
-                            PMIC’s ADC.
+                            PMIC&apos;s ADC.
                         </p>,
                     ],
                 },
@@ -132,8 +135,8 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                         </p>,
                         <p key="p3">
                             A positive value indicates a load on the battery (it
-                            is discharging), while a negative value indicates
-                            that the battery is being charged.
+                            is discharging). A negative value indicates that the
+                            battery is being charged.
                         </p>,
                     ],
                 },
