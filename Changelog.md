@@ -1,3 +1,9 @@
+## 2.2.0 - Unreleased
+
+### Added
+
+-   Support for `Ichg` to support 0.5mA increments
+
 ## 2.1.1 - 2025-06-02
 
 ### Fixed

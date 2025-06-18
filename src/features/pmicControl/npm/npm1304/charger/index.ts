@@ -70,7 +70,7 @@ export default class Module extends nPM1300Charger {
                 min: 4,
                 max: 100,
                 decimals: 1,
-                step: 1, // Temporary
+                step: 0.5,
             },
             nTCBeta: {
                 min: 0,
