@@ -60,7 +60,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger charging_current set 32`,
+                `npmx charger charging_current set 32000`,
                 expect.anything(),
                 undefined,
                 true
@@ -475,7 +475,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger charging_current set 32`,
+                `npmx charger charging_current set 32000`,
                 expect.anything(),
                 undefined,
                 true

@@ -47,6 +47,7 @@ import {
     setLEDs,
     setLowPowerConfig,
     setNpmDevice,
+    setOnBoardLoad,
     setPmicChargingState,
     setPmicState,
     setPOFs,
@@ -64,6 +65,7 @@ import {
     updateLdo,
     updateLEDs,
     updateLowPowerConfig,
+    updateOnBoardLoad,
     updatePOFs,
     updateResetConfig,
     updateTimerConfig,
@@ -242,6 +244,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onBuckUpdate(payload => {
                     dispatch(updateBuck(payload));
+                })
+            );
+
+            releaseAll.push(
+                npmDevice.onOnBoardLoadUpdate(payload => {
+                    dispatch(updateOnBoardLoad(payload));
                 })
             );
 
@@ -538,6 +546,7 @@ export default () => {
 
             dispatch(setPmicState(npmDevice.pmicState));
             dispatch(setCharger(npmDevice.chargerModule?.defaults));
+            dispatch(setOnBoardLoad(npmDevice.onBoardLoadModule?.defaults));
 
             dispatch(
                 setBoosts(npmDevice.boostModule.map(boost => boost.defaults))

@@ -89,7 +89,7 @@ export default (
                 res => {
                     const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iChg: value,
+                        iChg: value / 1000, // uA to mA
                     });
                 },
                 noop

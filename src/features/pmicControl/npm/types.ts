@@ -179,6 +179,10 @@ export type Charger = {
     tHot: number;
 };
 
+export type OnBoardLoad = {
+    iLoad: number;
+};
+
 export type Boost = {
     vOutVSet: number;
     vOutSoftware: number;
@@ -705,6 +709,23 @@ export interface LdoModule {
     };
     defaults: Ldo;
 }
+
+export interface OnBoardLoadModule {
+    get: {
+        all: () => void;
+        iLoad: () => void;
+    };
+    set: {
+        all: (onBoardLoad: OnBoardLoad) => Promise<void>;
+        iLoad: (value: number) => Promise<void>;
+    };
+    callbacks: (() => void)[];
+    ranges: {
+        iLoad: RangeType;
+    };
+    defaults: OnBoardLoad;
+}
+
 export type GpioModule = {
     index: number;
     get: {
@@ -928,6 +949,7 @@ export interface NpmExportV2 {
     gpios: GPIOExport[];
     leds: LED[];
     pof?: POF;
+    onBoardLoad?: OnBoardLoad;
     lowPower?: LowPowerConfig;
     reset?: ResetConfig;
     timerConfig?: TimerConfig;
@@ -1045,4 +1067,5 @@ export type NpmPeripherals = {
     LowPowerModule?: IModule<LowPowerModule>;
     ResetModule?: IModule<ResetModule>;
     FuelGaugeModule?: IModule<FuelGaugeModule>;
+    OnBoardLoadModule?: IModule<OnBoardLoadModule>;
 };

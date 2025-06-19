@@ -37,7 +37,7 @@ describe('PMIC 1300 - Command callbacks', () => {
             const callback =
                 eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-            callback?.onSuccess('Value: 400 mA', command);
+            callback?.onSuccess('Value: 400000 mA', command);
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).nthCalledWith(1, { iChg: 400 });

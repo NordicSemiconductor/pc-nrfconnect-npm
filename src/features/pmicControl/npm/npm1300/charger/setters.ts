@@ -107,7 +107,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 this.enabled(false)
                     .then(() =>
                         this.sendCommand(
-                            `npmx charger charging_current set ${value}`,
+                            `npmx charger charging_current set ${value * 1000}`, // mA to uA
                             () => resolve(),
                             () => {
                                 this.get.iChg();
