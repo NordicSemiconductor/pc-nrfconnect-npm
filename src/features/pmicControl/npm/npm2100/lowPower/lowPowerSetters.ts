@@ -24,8 +24,10 @@ export class LowPowerSet {
     }
 
     async all(lowPower: npm2100LowPowerConfig) {
-        await this.timeToActive(lowPower.timeToActive);
-        await this.powerButtonEnable(lowPower.powerButtonEnable);
+        await Promise.allSettled([
+            this.timeToActive(lowPower.timeToActive),
+            this.powerButtonEnable(lowPower.powerButtonEnable),
+        ]);
     }
 
     powerButtonEnable(powerButtonEnable: boolean) {

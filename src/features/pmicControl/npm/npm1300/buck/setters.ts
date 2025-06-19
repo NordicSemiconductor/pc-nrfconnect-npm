@@ -36,14 +36,16 @@ export class BuckSet {
     }
 
     async all(config: BuckExport) {
-        await this.vOutNormal(config.vOutNormal);
-        await this.enabled(config.enabled);
-        await this.modeControl(config.modeControl);
-        await this.vOutRetention(config.vOutRetention);
-        await this.retentionControl(config.retentionControl);
-        await this.onOffControl(config.onOffControl);
-        await this.activeDischarge(config.activeDischarge);
-        await this.mode(config.mode);
+        await Promise.allSettled([
+            this.vOutNormal(config.vOutNormal),
+            this.enabled(config.enabled),
+            this.modeControl(config.modeControl),
+            this.vOutRetention(config.vOutRetention),
+            this.retentionControl(config.retentionControl),
+            this.onOffControl(config.onOffControl),
+            this.activeDischarge(config.activeDischarge),
+            this.mode(config.mode),
+        ]);
     }
 
     vOutNormal(value: number) {

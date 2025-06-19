@@ -37,13 +37,14 @@ export class GpioSet {
     async all(gpio: GPIOExport) {
         // needed as some of the other properties cannot be set while GPIO is not output.
         // Hence we set it to output set the others and the set the intended gpio mode
-        await this.mode(GPIOMode2100.Output);
-        await this.pull(gpio.pull);
-        await this.drive(gpio.drive);
-        await this.openDrain(gpio.openDrain);
-        await this.debounce(gpio.debounce);
-        await this.state(gpio.state as GPIOState);
-        await this.mode(gpio.mode as GPIOMode2100);
+        await Promise.allSettled([
+            this.mode(gpio.mode as GPIOMode2100),
+            this.pull(gpio.pull),
+            this.drive(gpio.drive),
+            this.openDrain(gpio.openDrain),
+            this.debounce(gpio.debounce),
+            this.state(gpio.state as GPIOState),
+        ]);
     }
 
     mode(mode: GPIOMode) {

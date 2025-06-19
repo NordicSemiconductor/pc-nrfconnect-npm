@@ -24,9 +24,11 @@ export class PofSet {
     }
 
     async all(pof: POF) {
-        await this.enabled(pof.enable);
-        await this.polarity(pof.polarity);
-        await this.threshold(pof.threshold);
+        await Promise.allSettled([
+            this.enabled(pof.enable),
+            this.polarity(pof.polarity),
+            this.threshold(pof.threshold),
+        ]);
     }
     enabled(enable: boolean) {
         return new Promise<void>((resolve, reject) => {

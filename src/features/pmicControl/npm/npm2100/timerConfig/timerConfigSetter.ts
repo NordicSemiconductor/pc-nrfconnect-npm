@@ -25,9 +25,11 @@ export class TimerConfigSet {
     }
 
     async all(timerConfig: npm2100TimerConfig) {
-        await this.mode(timerConfig.mode as npm2100TimerMode);
-        await this.enabled(timerConfig.enabled);
-        await this.period(timerConfig.period);
+        await Promise.allSettled([
+            this.mode(timerConfig.mode as npm2100TimerMode),
+            this.enabled(timerConfig.enabled),
+            this.period(timerConfig.period),
+        ]);
     }
 
     mode(mode: npm2100TimerMode) {

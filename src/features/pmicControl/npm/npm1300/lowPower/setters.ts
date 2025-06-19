@@ -24,7 +24,7 @@ export class LowPowerSet {
     }
 
     async all(shipMode: npm1300LowPowerConfig) {
-        await this.timeToActive(shipMode.timeToActive);
+        await Promise.allSettled([this.timeToActive(shipMode.timeToActive)]);
     }
 
     timeToActive(timeToActive: npm1300TimeToActive) {

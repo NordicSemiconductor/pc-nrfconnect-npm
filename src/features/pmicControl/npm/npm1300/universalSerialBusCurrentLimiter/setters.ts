@@ -24,7 +24,9 @@ export class UsbCurrentLimiterSet {
     }
 
     async all(usb: USBPowerExport) {
-        await this.vBusInCurrentLimiter(usb.currentLimiter);
+        await Promise.allSettled([
+            this.vBusInCurrentLimiter(usb.currentLimiter),
+        ]);
     }
 
     vBusInCurrentLimiter(amps: number) {

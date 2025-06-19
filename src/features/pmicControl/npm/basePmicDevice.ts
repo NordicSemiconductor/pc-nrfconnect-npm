@@ -949,13 +949,17 @@ export default abstract class BaseNpmDevice {
 
                     if (config.charger) {
                         const charger = config.charger;
-                        await this.chargerModule?.set.all(charger);
+                        await this.chargerModule?.set
+                            .all(charger)
+                            .catch(() => {});
                     }
 
                     await Promise.all(
                         config.boosts.map((boost, index) =>
-                            (async () => {
-                                await this.boostModule[index].set.all(boost);
+                            (() => {
+                                this.boostModule[index].set
+                                    .all(boost)
+                                    .catch(() => {});
                             })()
                         )
                     );
@@ -963,8 +967,10 @@ export default abstract class BaseNpmDevice {
                     if (config.bucks) {
                         await Promise.all(
                             config.bucks.map((buck, index) =>
-                                (async () => {
-                                    await this.buckModule[index].set.all(buck);
+                                (() => {
+                                    this.buckModule[index].set
+                                        .all(buck)
+                                        .catch(() => {});
                                 })()
                             )
                         );
@@ -972,52 +978,66 @@ export default abstract class BaseNpmDevice {
 
                     await Promise.all(
                         config.ldos.map((ldo, index) =>
-                            (async () => {
-                                await this.ldoModule[index].set.all(ldo);
+                            (() => {
+                                this.ldoModule[index].set
+                                    .all(ldo)
+                                    .catch(() => {});
                             })()
                         )
                     );
 
                     await Promise.all(
                         config.gpios.map((gpio, index) =>
-                            (async () => {
-                                await this.gpioModule[index].set.all(gpio);
+                            (() => {
+                                this.gpioModule[index].set
+                                    .all(gpio)
+                                    .catch(() => {});
                             })()
                         )
                     );
 
                     await Promise.all(
                         config.leds.map((led, index) =>
-                            this.setLedMode(index, led.mode)
+                            (() => {
+                                this.setLedMode(index, led.mode).catch(
+                                    () => {}
+                                );
+                            })()
                         )
                     );
 
                     if (config.pof) {
-                        await this.pofModule?.set.all(config.pof);
+                        await this.pofModule?.set
+                            .all(config.pof)
+                            .catch(() => {});
                     }
 
                     if (config.timerConfig) {
-                        await this.timerConfigModule?.set.all(
-                            config.timerConfig
-                        );
+                        await this.timerConfigModule?.set
+                            .all(config.timerConfig)
+                            .catch(() => {});
                     }
 
                     if (config.lowPower) {
-                        await this.lowPowerModule?.set.all(config.lowPower);
+                        await this.lowPowerModule?.set
+                            .all(config.lowPower)
+                            .catch(() => {});
                     }
 
                     if (config.reset) {
-                        await this.resetModule?.set.all(config.reset);
+                        await this.resetModule?.set
+                            .all(config.reset)
+                            .catch(() => {});
                     }
 
-                    await this.fuelGaugeModule?.set.enabled(
-                        config.fuelGaugeSettings.enabled
-                    );
+                    await this.fuelGaugeModule?.set
+                        .enabled(config.fuelGaugeSettings.enabled)
+                        .catch(() => {});
 
                     if (config.usbPower) {
-                        await this.usbCurrentLimiterModule?.set.all(
-                            config.usbPower
-                        );
+                        await this.usbCurrentLimiterModule?.set
+                            .all(config.usbPower)
+                            .catch(() => {});
                     }
                 } catch (error) {
                     logger.error('Invalid File.');

@@ -31,11 +31,13 @@ export class GpioSet {
     }
 
     async all(gpio: GPIOExport) {
-        await this.mode(gpio.mode as GPIOMode1300);
-        await this.pull(gpio.pull);
-        await this.drive(gpio.drive);
-        await this.openDrain(gpio.openDrain);
-        await this.debounce(gpio.debounce);
+        await Promise.allSettled([
+            this.mode(gpio.mode as GPIOMode1300),
+            this.pull(gpio.pull),
+            this.drive(gpio.drive),
+            this.openDrain(gpio.openDrain),
+            this.debounce(gpio.debounce),
+        ]);
     }
 
     mode(mode: GPIOModeBase) {
