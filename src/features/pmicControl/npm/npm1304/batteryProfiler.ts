@@ -9,6 +9,8 @@ import { parseColonBasedAnswer, parseLogData } from '../pmicHelpers';
 import { CCProfile, LoggingEvent, ModuleParams } from '../types';
 
 export class BatteryProfiler extends nPM1300BatteryProfiler {
+    protected restDurtion = 2700; // seconds
+
     constructor(params: ModuleParams) {
         super(params);
         this.restDurtion = 1800; // 30 min
@@ -66,18 +68,6 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
         );
     }
 
-    restingProfile(): CCProfile[] {
-        return [
-            {
-                tLoad: 500,
-                tRest: 500,
-                iLoad: 0,
-                iRest: 0,
-                cycles: this.restDurtion,
-            },
-        ];
-    }
-
     // eslint-disable-next-line class-methods-use-this
     loadProfile(
         capacity: number,
@@ -93,15 +83,15 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
                 cycles: 300, // 5Min
             },
             {
-                tLoad: 600000, // 10Min
-                tRest: 3600000, // 60Min
+                tLoad: 420000, // 7 Min
+                tRest: 3000000, // 50Min
                 iLoad: capacity / 6 / 1000, // A
                 iRest: 0,
-                vCutoff: vUpperCutOff - 0.3,
+                vCutoff: vLowerCutOff + 1,
             },
             {
                 tLoad: 300000, // 5Min
-                tRest: 2700000, // 45Min
+                tRest: 2400000, // 40Min
                 iLoad: capacity / 6 / 1000, // A
                 iRest: 0,
                 vCutoff: vLowerCutOff + 0.5,
