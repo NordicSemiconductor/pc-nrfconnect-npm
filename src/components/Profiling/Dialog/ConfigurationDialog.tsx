@@ -220,12 +220,7 @@ export default ({
                     unit="mAh"
                     value={capacity}
                     range={npmDevice.chargerModule.ranges.batterySize}
-                    onChange={c => {
-                        setCapacity(c);
-                        if (ratedChargingCurrent > c) {
-                            setRatedChargingCurrent(c);
-                        }
-                    }}
+                    onChange={c => setCapacity(c)}
                 />
 
                 <NumberInput
@@ -242,10 +237,7 @@ export default ({
                     value={ratedChargingCurrent}
                     range={{
                         min: npmDevice.chargerModule.ranges.current.min,
-                        max: Math.min(
-                            npmDevice.chargerModule.ranges.current.max,
-                            capacity
-                        ),
+                        max: npmDevice.chargerModule.ranges.current.max,
                     }}
                     onChange={setRatedChargingCurrent}
                 />
