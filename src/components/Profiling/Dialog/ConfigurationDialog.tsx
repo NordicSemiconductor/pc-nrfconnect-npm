@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     classNames,
@@ -21,10 +21,12 @@ import BaseNpmDevice from '../../../features/pmicControl/npm/basePmicDevice';
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
     CCProfile,
+    ITerm,
     NTCThermistor,
     NTCValues,
     Profile,
 } from '../../../features/pmicControl/npm/types';
+import { getCharger } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
     setProfile,
@@ -56,6 +58,15 @@ export default ({
     const [ratedChargingCurrent, setRatedChargingCurrent] = useState(
         capacity / 2
     );
+    const charger = useSelector(getCharger);
+
+    if (!npmDevice.chargerModule) {
+        return null;
+    }
+
+    const [iTerm, setITerm] = useState<ITerm>(
+        charger?.iTerm ?? npmDevice.chargerModule.values.iTerm[0].value
+    );
     const dispatch = useDispatch();
     const maxLength = 20;
 
@@ -63,10 +74,6 @@ export default ({
         label: `${item}`,
         value: `${item}`,
     }));
-
-    if (!npmDevice.chargerModule) {
-        return null;
-    }
 
     const onSelectFolder = () => {
         if (!validName) {
@@ -95,6 +102,7 @@ export default ({
                 baseDirectory: dirPath,
                 restingProfiles,
                 profilingProfiles,
+                iTerm,
             };
 
             const project: Omit<ProfilingProject, 'appVersion'> = {
@@ -244,6 +252,24 @@ export default ({
 
                 <Dropdown
                     label={
+                        <DocumentationTooltip card="charger" item="ITERM">
+                            <>
+                                <span>I</span>
+                                <span className="subscript">TERM</span>
+                            </>
+                        </DocumentationTooltip>
+                    }
+                    items={npmDevice.chargerModule.values.iTerm}
+                    onSelect={item => setITerm(item.value as ITerm)}
+                    selectedItem={
+                        npmDevice.chargerModule.values.iTerm.find(
+                            item => item.value === iTerm
+                        ) ?? npmDevice.chargerModule.values.iTerm[0]
+                    }
+                />
+
+                <Dropdown
+                    label={
                         <DocumentationTooltip card="JEITA" item="NTCThermistor">
                             <span>NTC thermistor</span>
                         </DocumentationTooltip>
@@ -263,6 +289,7 @@ export default ({
                         ]
                     }
                 />
+
                 {temperatures.map((temp, index) => (
                     <React.Fragment key={`temp-${index + 1}`}>
                         <div className="tw-flex tw-flex-row tw-items-center">

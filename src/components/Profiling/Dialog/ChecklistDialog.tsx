@@ -103,6 +103,16 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     );
                                 });
                             await npmDevice?.chargerModule?.set
+                                .iTerm(profile.iTerm)
+                                .catch(message => {
+                                    dispatch(
+                                        setCompleteStep({
+                                            message,
+                                            level: 'danger',
+                                        })
+                                    );
+                                });
+                            await npmDevice?.chargerModule?.set
                                 .enabled(true)
                                 .catch(message => {
                                     dispatch(

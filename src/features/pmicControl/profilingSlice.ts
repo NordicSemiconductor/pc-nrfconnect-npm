@@ -48,6 +48,7 @@ const initialState: profilingState = {
         baseDirectory: '~/',
         restingProfiles: [],
         profilingProfiles: [],
+        iTerm: 10,
     },
     capacityConsumed: 0,
     ccProfilingState: 'Off',
