@@ -974,6 +974,7 @@ export interface Profile {
     baseDirectory: string;
     restingProfiles: CCProfile[];
     profilingProfiles: CCProfile[];
+    iTerm: ITerm;
 }
 
 export type BatteryProfiler = {

@@ -29,9 +29,4 @@ export default class Npm1304 extends nPM1300Device {
             npm1304FWVersion
         );
     }
-
-    // eslint-disable-next-line class-methods-use-this
-    get batteryProfiler() {
-        return undefined;
-    }
 }
