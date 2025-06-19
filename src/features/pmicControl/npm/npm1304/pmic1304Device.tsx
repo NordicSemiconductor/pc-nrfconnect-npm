@@ -15,7 +15,7 @@ import { BatteryProfiler } from './batteryProfiler';
 import ChargerModule from './charger';
 import OnBoardLoadModule from './onBoardLoad';
 
-export const npm1304FWVersion = '0.2.0+0';
+export const npm1304FWVersion = '0.2.1+0';
 
 export default class Npm1304 extends nPM1300Device {
     constructor(
