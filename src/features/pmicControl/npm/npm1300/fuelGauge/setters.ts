@@ -24,7 +24,7 @@ export class FuelGaugeSet {
     }
 
     async all(fuelGauge: FuelGaugeExport) {
-        await this.enabled(fuelGauge.enabled);
+        await Promise.allSettled([this.enabled(fuelGauge.enabled)]);
     }
 
     enabled(enabled: boolean) {

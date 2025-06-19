@@ -14,25 +14,33 @@ import {
 
 export class ChargerSet extends ChargerModuleSetBase {
     async all(charger: Charger) {
-        await this.vTerm(charger.vTerm);
-        await this.iChg(charger.iChg);
-        await this.iTerm(charger.iTerm);
-        if (charger.iBatLim) {
-            await this.batLim?.(charger.iBatLim);
+        const promises = [
+            this.vTerm(charger.vTerm),
+            this.iChg(charger.iChg),
+            this.iTerm(charger.iTerm),
+        ];
+
+        if (charger.iBatLim && this.batLim) {
+            promises.push(this.batLim(charger.iBatLim));
         }
-        await this.enabledRecharging(charger.enableRecharging);
-        await this.enabledVBatLow(charger.enableVBatLow);
-        await this.vTrickleFast(charger.vTrickleFast);
-        await this.nTCThermistor(charger.ntcThermistor);
-        await this.nTCBeta(charger.ntcBeta);
-        await this.tChgResume(charger.tChgResume);
-        await this.tChgStop(charger.tChgStop);
-        await this.vTermR(charger.vTermR);
-        await this.tCold(charger.tCold);
-        await this.tCool(charger.tCool);
-        await this.tWarm(charger.tWarm);
-        await this.tHot(charger.tHot);
-        await this.enabled(charger.enabled);
+
+        promises.push(
+            this.enabledRecharging(charger.enableRecharging),
+            this.enabledVBatLow(charger.enableVBatLow),
+            this.vTrickleFast(charger.vTrickleFast),
+            this.nTCThermistor(charger.ntcThermistor),
+            this.nTCBeta(charger.ntcBeta),
+            this.tChgResume(charger.tChgResume),
+            this.tChgStop(charger.tChgStop),
+            this.vTermR(charger.vTermR),
+            this.tCold(charger.tCold),
+            this.tCool(charger.tCool),
+            this.tWarm(charger.tWarm),
+            this.tHot(charger.tHot),
+            this.enabled(charger.enabled)
+        );
+
+        await Promise.allSettled(promises);
     }
 
     enabled(enabled: boolean) {

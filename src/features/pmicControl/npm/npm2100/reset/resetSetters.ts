@@ -28,7 +28,9 @@ export class ResetSet {
     }
 
     async all(shipMode: npm2100ResetConfig) {
-        await this.longPressResetEnable(shipMode.longPressResetEnable);
+        await Promise.allSettled([
+            this.longPressResetEnable(shipMode.longPressResetEnable),
+        ]);
     }
 
     longPressResetEnable(longPressResetEnable: boolean) {

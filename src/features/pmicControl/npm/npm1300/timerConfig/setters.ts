@@ -30,9 +30,11 @@ export class TimerConfigSet {
     }
 
     async all(timerConfig: npm1300TimerConfig) {
-        await this.mode(timerConfig.mode);
-        await this.prescaler(timerConfig.prescaler);
-        await this.period(timerConfig.period);
+        await Promise.allSettled([
+            this.mode(timerConfig.mode),
+            this.prescaler(timerConfig.prescaler),
+            this.period(timerConfig.period),
+        ]);
     }
 
     mode(mode: TimerMode) {

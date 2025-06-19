@@ -29,10 +29,15 @@ export class FuelGaugeSet {
     }
 
     async all(fuelGauge: FuelGaugeExport) {
-        await this.enabled(fuelGauge.enabled);
+        const promises = [this.enabled(fuelGauge.enabled)];
+
         if (fuelGauge.discardPosiiveDeltaZ !== undefined) {
-            await this.discardPosiiveDeltaZ(fuelGauge.discardPosiiveDeltaZ);
+            promises.push(
+                this.discardPosiiveDeltaZ(fuelGauge.discardPosiiveDeltaZ)
+            );
         }
+
+        await Promise.allSettled(promises);
     }
 
     enabled(enabled: boolean) {

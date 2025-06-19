@@ -33,12 +33,14 @@ export class BoostSet {
     }
 
     async all(config: BoostExport) {
-        await this.vOut(config.vOutSoftware);
-        await this.vOutSel(config.vOutSelect);
-        await this.modeControl(config.modeControl);
-        await this.pinSelection(config.pinSelection);
-        await this.pinMode(config.pinMode);
-        await this.overCurrent(config.overCurrentProtection);
+        await Promise.allSettled([
+            this.vOut(config.vOutSoftware),
+            this.vOutSel(config.vOutSelect),
+            this.modeControl(config.modeControl),
+            this.pinSelection(config.pinSelection),
+            this.pinMode(config.pinMode),
+            this.overCurrent(config.overCurrentProtection),
+        ]);
     }
 
     vOut(value: number) {

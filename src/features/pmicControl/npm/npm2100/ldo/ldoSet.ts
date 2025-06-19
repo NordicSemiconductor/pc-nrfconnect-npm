@@ -30,17 +30,27 @@ export class LdoSet {
     }
 
     async all(config: LdoExport) {
-        await this.voltage(config.voltage);
-        await this.enabled(config.enabled);
-        await this.mode(config.mode);
-        if (config.modeControl) await this.modeControl(config.modeControl);
-        if (config.pinSel) await this.pinSel(config.pinSel);
-        if (config.ldoSoftStart) await this.ldoSoftstart(config.ldoSoftStart);
-        if (config.softStart) await this.softStart(config.softStart);
-        if (config.pinMode) await this.pinMode(config.pinMode);
-        if (config.ocpEnabled) await this.ocpEnabled(config.ocpEnabled);
-        if (config.rampEnabled) await this.rampEnabled(config.rampEnabled);
-        if (config.haltEnabled) await this.haltEnabled(config.haltEnabled);
+        const promises = [
+            this.voltage(config.voltage),
+            this.enabled(config.enabled),
+            this.mode(config.mode),
+        ];
+
+        if (config.modeControl)
+            promises.push(this.modeControl(config.modeControl));
+        if (config.pinSel) promises.push(this.pinSel(config.pinSel));
+        if (config.ldoSoftStart)
+            promises.push(this.ldoSoftstart(config.ldoSoftStart));
+        if (config.softStart) promises.push(this.softStart(config.softStart));
+        if (config.pinMode) promises.push(this.pinMode(config.pinMode));
+        if (config.ocpEnabled)
+            promises.push(this.ocpEnabled(config.ocpEnabled));
+        if (config.rampEnabled)
+            promises.push(this.rampEnabled(config.rampEnabled));
+        if (config.haltEnabled)
+            promises.push(this.haltEnabled(config.haltEnabled));
+
+        await Promise.allSettled(promises);
     }
 
     mode(mode: LdoMode) {
