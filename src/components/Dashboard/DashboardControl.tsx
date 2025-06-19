@@ -17,6 +17,7 @@ import {
     getCharger,
     getLdos,
     getNpmDevice,
+    getOnBoardLoad,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import BatteryCard from '../Cards/Battery/BatteryCard';
@@ -24,12 +25,14 @@ import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
+import OnBoardLoadCard from '../Cards/OnBoardLoad/OnBoardLoadCard';
 import PowerCard from '../Cards/Power/PowerCard';
 
 export default ({ active }: PaneProps) => {
     const disabled = useIsUIDisabled();
     const npmDevice = useSelector(getNpmDevice);
     const charger = useSelector(getCharger);
+    const onBoardLoad = useSelector(getOnBoardLoad);
     const bucks = useSelector(getBucks);
     const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
@@ -65,6 +68,13 @@ export default ({ active }: PaneProps) => {
                     cardLabel="Charger"
                     disabled={disabled}
                     defaultSummary
+                />
+            )}
+            {npmDevice && npmDevice.onBoardLoadModule && onBoardLoad && (
+                <OnBoardLoadCard
+                    onBoardLoad={onBoardLoad}
+                    onBoardLoadModule={npmDevice.onBoardLoadModule}
+                    disabled={disabled}
                 />
             )}
             {npmDevice &&

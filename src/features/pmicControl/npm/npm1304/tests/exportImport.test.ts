@@ -21,6 +21,7 @@ import {
     npm1300TimerConfig,
     npm1300TimeToActive,
     NpmExportLatest,
+    OnBoardLoad,
     PartialUpdate,
     PmicDialog,
     POF,
@@ -34,6 +35,7 @@ import { setupMocksBase } from './helpers';
 describe('PMIC 1304 - Apply Config ', () => {
     const {
         mockOnChargerUpdate,
+        mockOnBoardLoadUpdate,
         mockOnBuckUpdate,
         mockOnLdoUpdate,
         mockOnGpioUpdate,
@@ -65,6 +67,10 @@ describe('PMIC 1304 - Apply Config ', () => {
         tCool: 12,
         tWarm: 47,
         tHot: 69,
+    };
+
+    const initOnBoardLoad: OnBoardLoad = {
+        iLoad: 5,
     };
 
     const initBuck: Buck = {
@@ -137,6 +143,9 @@ describe('PMIC 1304 - Apply Config ', () => {
             tCool: 20,
             tWarm: 50,
             tHot: 80,
+        },
+        onBoardLoad: {
+            iLoad: 10,
         },
         bucks: [
             {
@@ -268,6 +277,7 @@ describe('PMIC 1304 - Apply Config ', () => {
     let charger: Charger | undefined;
     let bucks: Buck[] = [];
     let ldos: Ldo[] = [];
+    let onBoardLoad: OnBoardLoad | undefined;
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
@@ -283,6 +293,7 @@ describe('PMIC 1304 - Apply Config ', () => {
         bucks = [];
         ldos = [];
         gpios = [];
+        onBoardLoad = undefined;
         leds = [];
         pof = { ...initPOF };
         ship = { ...initShip };
@@ -293,6 +304,15 @@ describe('PMIC 1304 - Apply Config ', () => {
             (partialUpdate: Partial<Charger>) => {
                 charger = {
                     ...(charger ?? initCharger),
+                    ...partialUpdate,
+                };
+            }
+        );
+
+        mockOnBoardLoadUpdate.mockImplementation(
+            (partialUpdate: Partial<OnBoardLoad>) => {
+                onBoardLoad = {
+                    ...(onBoardLoad ?? initOnBoardLoad),
                     ...partialUpdate,
                 };
             }
@@ -390,9 +410,12 @@ describe('PMIC 1304 - Apply Config ', () => {
 
         expect(ldos.map(toLdoExport)).toStrictEqual(sampleConfig.ldos);
 
+        expect(onBoardLoad).toStrictEqual(sampleConfig.onBoardLoad);
+
         expect(gpios).toStrictEqual(sampleConfig.gpios);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(16);
+        expect(mockOnBoardLoadUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledTimes(18); // 7 states + 1 (mode change on vOut) * 2 Bucks
         expect(mockOnLdoUpdate).toBeCalledTimes(14);
         expect(mockOnGpioUpdate).toBeCalledTimes(25);

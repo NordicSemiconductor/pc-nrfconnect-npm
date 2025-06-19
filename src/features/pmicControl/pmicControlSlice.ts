@@ -20,6 +20,7 @@ import type {
     Ldo,
     LED,
     LowPowerConfig,
+    OnBoardLoad,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
@@ -36,6 +37,7 @@ interface pmicControlState {
     charger?: Charger;
     boosts: Boost[];
     bucks: Buck[];
+    onBoardLoad?: OnBoardLoad;
     ldos: Ldo[];
     gpios: GPIO[];
     leds: LED[];
@@ -149,6 +151,17 @@ const pmicControlSlice = createSlice({
                 state.bucks[action.payload.index] = {
                     ...state.bucks[action.payload.index],
                     ...action.payload.data,
+                };
+            }
+        },
+        setOnBoardLoad(state, action: PayloadAction<OnBoardLoad | undefined>) {
+            state.onBoardLoad = action.payload;
+        },
+        updateOnBoardLoad(state, action: PayloadAction<Partial<OnBoardLoad>>) {
+            if (state.onBoardLoad) {
+                state.onBoardLoad = {
+                    ...state.onBoardLoad,
+                    ...action.payload,
                 };
             }
         },
@@ -314,6 +327,8 @@ export const getNpmDevice = (state: RootState) =>
 export const getPmicState = (state: RootState) =>
     state.app.pmicControl.pmicState;
 export const getCharger = (state: RootState) => state.app.pmicControl.charger;
+export const getOnBoardLoad = (state: RootState) =>
+    state.app.pmicControl.onBoardLoad;
 export const getLatestAdcSample = (state: RootState) => {
     const { pmicState, latestAdcSample } = state.app.pmicControl;
     return parseConnectedState(
@@ -412,6 +427,8 @@ export const {
     updateBoost,
     setBucks,
     updateBuck,
+    setOnBoardLoad,
+    updateOnBoardLoad,
     setLdos,
     updateLdo,
     setGPIOs,

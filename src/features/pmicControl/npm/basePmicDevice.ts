@@ -46,6 +46,8 @@ import {
     NpmExportV2,
     NpmModel,
     NpmPeripherals,
+    OnBoardLoad,
+    OnBoardLoadModule,
     PartialUpdate,
     PmicChargingState,
     PmicDialog,
@@ -239,6 +241,19 @@ export default abstract class BaseNpmDevice {
         this.#chargerModule = chargerModule;
     }
 
+    #onBoardLoadModule?: OnBoardLoadModule;
+    get onBoardLoadModule() {
+        return this.#onBoardLoadModule;
+    }
+
+    protected set onBoardLoadModule(
+        onBoardLoadModule: OnBoardLoadModule | undefined
+    ) {
+        !!onBoardLoadModule &&
+            this.releaseAll.push(...onBoardLoadModule.callbacks);
+        this.#onBoardLoadModule = onBoardLoadModule;
+    }
+
     private initPeripherals() {
         const args: ModuleParams = {
             index: 0,
@@ -297,6 +312,12 @@ export default abstract class BaseNpmDevice {
                         index,
                     })
             );
+        }
+
+        if (this.peripherals.OnBoardLoadModule) {
+            this.onBoardLoadModule = new this.peripherals.OnBoardLoadModule({
+                ...args,
+            });
         }
 
         if (this.peripherals.BatteryProfiler) {
@@ -545,6 +566,7 @@ export default abstract class BaseNpmDevice {
     requestUpdate() {
         this.usbCurrentLimiterModule?.get.all();
         this.chargerModule?.get.all();
+        this.onBoardLoadModule?.get.all();
 
         this.buckModule.forEach(buck => buck.get.all());
         this.ldoModule.forEach(ldo => ldo.get.all());
@@ -719,6 +741,13 @@ export default abstract class BaseNpmDevice {
         return this.setupHandler<PartialUpdate<Buck>, true>('onBuckUpdate')(
             handler
         );
+    }
+    onOnBoardLoadUpdate(
+        handler: (payload: Partial<OnBoardLoad>, error: string) => void
+    ) {
+        return this.setupHandler<Partial<OnBoardLoad>, true>(
+            'onOnBoardLoadUpdate'
+        )(handler);
     }
     onFuelGaugeUpdate(handler: (payload: FuelGauge) => void) {
         return this.setupHandler<FuelGauge>('onFuelGauge')(handler);
@@ -1037,6 +1066,13 @@ export default abstract class BaseNpmDevice {
                     if (config.usbPower) {
                         await this.usbCurrentLimiterModule?.set
                             .all(config.usbPower)
+                            .catch(() => {});
+                    }
+
+                    if (config.onBoardLoad) {
+                        const onBoardLoad = config.onBoardLoad;
+                        await this.onBoardLoadModule?.set
+                            .all(onBoardLoad)
                             .catch(() => {});
                     }
                 } catch (error) {

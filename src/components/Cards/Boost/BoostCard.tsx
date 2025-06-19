@@ -89,7 +89,7 @@ export default ({
         }
     }, [boost]);
 
-    return boost ? (
+    return (
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
@@ -228,5 +228,5 @@ export default ({
                 </>
             )}
         </Card>
-    ) : null;
+    );
 };
