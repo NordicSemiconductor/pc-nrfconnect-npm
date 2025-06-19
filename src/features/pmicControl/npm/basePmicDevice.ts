@@ -419,7 +419,10 @@ export default abstract class BaseNpmDevice {
 
                         if (error) {
                             logger.error(
-                                response.replaceAll(/(\r\n|\r|\n)/g, ' ')
+                                `${command} => ${response.replaceAll(
+                                    /(\r\n|\r|\n)/g,
+                                    ' '
+                                )}`
                             );
                         }
                     }
