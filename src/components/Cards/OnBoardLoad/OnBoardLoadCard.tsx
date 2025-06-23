@@ -64,7 +64,7 @@ export default ({
                         </div>
                     </DocumentationTooltip>
                 }
-                unit="V"
+                unit="mA"
                 disabled={disabled}
                 range={range}
                 value={internalILoad}
