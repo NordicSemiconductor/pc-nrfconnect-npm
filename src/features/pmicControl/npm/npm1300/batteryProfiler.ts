@@ -292,7 +292,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
                 tRest: 500,
                 iLoad: 0,
                 iRest: 0,
-                cycles: this.restDurtion, // to be 30 min for 1304
+                cycles: this.restDurtion,
             },
         ];
     }
