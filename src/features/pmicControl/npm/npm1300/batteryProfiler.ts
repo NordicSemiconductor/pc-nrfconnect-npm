@@ -19,8 +19,6 @@ import {
 } from '../types';
 
 export class BatteryProfiler implements BatteryProfilerBase {
-    protected restDurtion = 900; // seconds
-
     protected profiling: CCProfilingState = 'Off';
     protected releaseAll: (() => void)[] = [];
     protected shellParser?: ShellParser;
@@ -285,6 +283,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
         this.releaseAll.forEach(release => release());
     }
 
+    // eslint-disable-next-line class-methods-use-this
     restingProfile(): CCProfile[] {
         return [
             {
@@ -292,7 +291,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
                 tRest: 500,
                 iLoad: 0,
                 iRest: 0,
-                cycles: this.restDurtion,
+                cycles: 900,
             },
         ];
     }

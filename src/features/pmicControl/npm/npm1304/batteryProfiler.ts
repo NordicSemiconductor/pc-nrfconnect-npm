@@ -9,11 +9,8 @@ import { parseColonBasedAnswer, parseLogData } from '../pmicHelpers';
 import { CCProfile, LoggingEvent, ModuleParams } from '../types';
 
 export class BatteryProfiler extends nPM1300BatteryProfiler {
-    protected restDurtion = 2700; // seconds
-
     constructor(params: ModuleParams) {
         super(params);
-        this.restDurtion = 1800; // 30 min
 
         if (this.shellParser) {
             this.releaseAll.push(
@@ -66,6 +63,19 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
                 );
             }
         );
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    restingProfile(): CCProfile[] {
+        return [
+            {
+                tLoad: 500,
+                tRest: 500,
+                iLoad: 0,
+                iRest: 0,
+                cycles: 2700,
+            },
+        ];
     }
 
     // eslint-disable-next-line class-methods-use-this
