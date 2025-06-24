@@ -1074,22 +1074,28 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                     title: 'LEDs',
                     content: [
                         <p key="p1">
-                            {deviceType} has three 5-mA LED drivers.
+                            {deviceType} has three 5-mA LED drivers. When using
+                            all three LED pins, the LED drivers are configured
+                            as RGB LED.
                         </p>,
                         <p key="p2">
                             These can be configured for one of the following
                             purposes:
                             <ul className="tw-ml-6 tw-list-disc">
-                                <li>Charging indication</li>
                                 <li>Charger error indication</li>
-                                <li>An RGB LED (using all three LED pins)</li>
+                                <li>Charging indication</li>
                                 <li>
-                                    Output high (open drain, requires external
-                                    pull-up resistor)
-                                </li>
-                                <li>
-                                    Output low (open drain, requires external
-                                    pull-up resistor)
+                                    Host activity indication
+                                    <ul className="tw-ml-6 tw-list-disc">
+                                        <li>
+                                            Output high (open drain, requires
+                                            external pull-up resistor)
+                                        </li>
+                                        <li>
+                                            Output low (open drain, requires
+                                            external pull-up resistor)
+                                        </li>
+                                    </ul>
                                 </li>
                             </ul>
                         </p>,
