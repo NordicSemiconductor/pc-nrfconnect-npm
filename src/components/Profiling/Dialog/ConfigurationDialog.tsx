@@ -235,10 +235,7 @@ export default ({
                     }
                     unit="mA"
                     value={ratedChargingCurrent}
-                    range={{
-                        min: npmDevice.chargerModule.ranges.current.min,
-                        max: npmDevice.chargerModule.ranges.current.max,
-                    }}
+                    range={npmDevice.chargerModule.ranges.current}
                     onChange={setRatedChargingCurrent}
                 />
 
