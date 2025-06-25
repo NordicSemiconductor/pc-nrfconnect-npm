@@ -6,7 +6,12 @@
 
 import { BatteryProfiler as nPM1300BatteryProfiler } from '../npm1300/batteryProfiler';
 import { parseColonBasedAnswer, parseLogData } from '../pmicHelpers';
-import { CCProfile, LoggingEvent, ModuleParams } from '../types';
+import {
+    CCProfile,
+    LoggingEvent,
+    ModuleParams,
+    RestingCCProfile,
+} from '../types';
 
 export class BatteryProfiler extends nPM1300BatteryProfiler {
     constructor(params: ModuleParams) {
@@ -66,7 +71,7 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    restingProfile(): CCProfile[] {
+    restingProfile(): RestingCCProfile[] {
         return [
             {
                 tLoad: 500,

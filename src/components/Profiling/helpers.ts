@@ -29,7 +29,6 @@ import {
     zodProfilingProject,
 } from './types';
 
-export const REST_DURATION = 900; // seconds
 export const REPORTING_RATE = 1000;
 export const PROFILE_FOLDER_PREFIX = 'profile_';
 

@@ -25,6 +25,7 @@ import {
     NTCThermistor,
     NTCValues,
     Profile,
+    RestingCCProfile,
 } from '../../../features/pmicControl/npm/types';
 import { getCharger } from '../../../features/pmicControl/pmicControlSlice';
 import {
@@ -82,7 +83,7 @@ export default ({
         }
 
         selectDirectoryDialog().then(dirPath => {
-            const restingProfiles: CCProfile[] =
+            const restingProfiles: RestingCCProfile[] =
                 npmDevice.batteryProfiler?.restingProfile() ?? [];
             const profilingProfiles: CCProfile[] =
                 npmDevice.batteryProfiler?.loadProfile(

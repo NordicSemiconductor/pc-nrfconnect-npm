@@ -985,6 +985,10 @@ export interface CCProfile {
     vCutoff?: number;
 }
 
+export interface RestingCCProfile extends CCProfile {
+    cycles: number;
+}
+
 export interface Profile {
     name: string;
     vLowerCutOff: number;
@@ -994,7 +998,7 @@ export interface Profile {
     ntcThermistor: NTCThermistor;
     temperatures: number[];
     baseDirectory: string;
-    restingProfiles: CCProfile[];
+    restingProfiles: RestingCCProfile[];
     profilingProfiles: CCProfile[];
     iTerm: ITerm;
 }
@@ -1019,7 +1023,7 @@ export type BatteryProfiler = {
         handler: (state: ProfilingEvent, error?: string) => void
     ) => () => void;
     pofError: () => void;
-    restingProfile(): CCProfile[];
+    restingProfile(): RestingCCProfile[];
     loadProfile(
         capacity: number,
         vUpperCutOff: number,
