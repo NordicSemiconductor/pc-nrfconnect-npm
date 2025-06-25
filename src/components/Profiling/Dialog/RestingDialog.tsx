@@ -25,7 +25,6 @@ import {
     getProfileIndex,
     setAbortAction,
 } from '../../../features/pmicControl/profilingSlice';
-import { REST_DURATION } from '../helpers';
 import TimeComponent from '../TimeComponent';
 import {
     ProfilingTemperatureAlert,
@@ -98,7 +97,15 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 />
                 <TimeComponent
                     time={time}
-                    progress={(time / 1000 / REST_DURATION) * 100}
+                    progress={
+                        (time /
+                            1000 /
+                            profile.restingProfiles.reduce(
+                                (acc, curr) => acc + curr.cycles,
+                                0
+                            )) *
+                        100
+                    }
                 />
             </div>
         </GenericDialog>

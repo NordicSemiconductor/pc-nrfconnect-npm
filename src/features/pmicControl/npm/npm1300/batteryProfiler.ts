@@ -16,6 +16,7 @@ import {
     ModuleParams,
     ProfilingEvent,
     ProfilingEventData,
+    RestingCCProfile,
 } from '../types';
 
 export class BatteryProfiler implements BatteryProfilerBase {
@@ -284,7 +285,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    restingProfile(): CCProfile[] {
+    restingProfile(): RestingCCProfile[] {
         return [
             {
                 tLoad: 500,
