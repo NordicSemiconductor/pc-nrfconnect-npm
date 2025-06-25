@@ -81,7 +81,7 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                         <p key="p1">
                             Set the charging termination current level as a
                             percent of I<span className="subscript">CHG</span>,
-                            either 5% (default) or 10%.
+                            either 5% or 10% (default).
                         </p>,
                         <p key="p2">
                             When the charging mode is set to constant voltage,
