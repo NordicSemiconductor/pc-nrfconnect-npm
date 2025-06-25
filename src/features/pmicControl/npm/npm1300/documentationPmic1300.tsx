@@ -1358,8 +1358,8 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                     title: 'Capacity',
                     content: [
                         <p key="p1">
-                            The battery capacity in mAh. Set this according to
-                            the rated capacity of the battery used.
+                            Configure discharge cut-off voltage according to the
+                            battery specification.
                         </p>,
                     ],
                 },
