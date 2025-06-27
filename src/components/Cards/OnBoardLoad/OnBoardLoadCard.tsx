@@ -38,7 +38,7 @@ export default ({
         setInternalILoad(onBoardLoad.iLoad);
     }, [onBoardLoad]);
 
-    return onBoardLoad ? (
+    return (
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
@@ -73,5 +73,5 @@ export default ({
                 showSlider
             />
         </Card>
-    ) : null;
+    );
 };

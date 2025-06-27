@@ -10,7 +10,12 @@ import { RootState } from '../../../../appReducer';
 import BaseNpmDevice from '../basePmicDevice';
 import nPM1300Device from '../npm1300/pmic1300Device';
 import { parseLogData, parseToFloat } from '../pmicHelpers';
-import { LoggingEvent, OnBoardLoad, PmicDialog } from '../types';
+import {
+    LoggingEvent,
+    OnBoardLoad,
+    OnBoardLoadModule as OnBoardLoadModuleBase,
+    PmicDialog,
+} from '../types';
 import { BatteryProfiler } from './batteryProfiler';
 import ChargerModule from './charger';
 import OnBoardLoadModule from './onBoardLoad';
@@ -69,5 +74,23 @@ export default class Npm1304 extends nPM1300Device {
             ...super.generateExport(getState),
             onBoardLoad: currentState.onBoardLoad,
         };
+    }
+
+    get onBoardLoadModule() {
+        return this.hardwareVersion === '0.1.0'
+            ? undefined
+            : super.onBoardLoadModule;
+    }
+
+    protected set onBoardLoadModule(
+        onBoardLoadModule: OnBoardLoadModuleBase | undefined
+    ) {
+        super.onBoardLoadModule = onBoardLoadModule;
+    }
+
+    get batteryProfiler() {
+        return this.hardwareVersion === '0.1.0'
+            ? undefined
+            : super.batteryProfiler;
     }
 }

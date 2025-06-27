@@ -67,6 +67,7 @@ import {
 
 /* eslint-disable no-underscore-dangle */
 export default abstract class BaseNpmDevice {
+    protected hardwareVersion?: string;
     private rebooting = false;
     private deviceUptimeToSystemDelta = 0;
     protected lastUptime = 0;
@@ -74,6 +75,7 @@ export default abstract class BaseNpmDevice {
     protected offlineMode: boolean;
     protected uptimeOverflowCounter = 0;
     protected releaseAll: (() => void)[] = [];
+
     generateOverlay?(npmExport: NpmExportV2): string;
     generateExport?(
         getState: () =>
@@ -83,6 +85,9 @@ export default abstract class BaseNpmDevice {
               }
     ): NpmExportLatest;
     initialize() {
+        this.getHwVersion().then(hwVersion => {
+            this.hardwareVersion = hwVersion.version;
+        });
         this.initializeFuelGauge();
     }
 
