@@ -135,20 +135,15 @@ export default () => {
                     />
                 </DocumentationTooltip>
             </Group>
-            {(npmDevice?.deviceType === 'npm1300' || // TODO avoid using device types...
-                npmDevice?.deviceType === 'npm1304') && (
-                <Group
-                    collapsible
-                    defaultCollapsed={false}
-                    heading="Fuel Gauge"
-                >
-                    <FuelGaugeSettings
-                        disabled={
-                            pmicConnection === 'ek-disconnected' || uiDisabled
-                        }
-                    />
-                </Group>
-            )}
+
+            <Group collapsible defaultCollapsed={false} heading="Fuel Gauge">
+                <FuelGaugeSettings
+                    disabled={
+                        pmicConnection === 'ek-disconnected' || uiDisabled
+                    }
+                />
+            </Group>
+
             {npmDevice?.deviceType === 'npm2100' &&
                 pmicConnection !== 'ek-disconnected' && (
                     <Group
