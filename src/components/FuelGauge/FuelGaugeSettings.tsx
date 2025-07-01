@@ -9,8 +9,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
     Button,
+    DialogButton,
     Dropdown,
     DropdownItem,
+    InfoDialog,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import path from 'path';
 
@@ -45,6 +47,10 @@ export default ({ disabled }: { disabled: boolean }) => {
     const hardcodedBatterModels = useSelector(getHardcodedBatterModels);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
+    const [
+        experimentalBatteryProfilingDialogVisible,
+        setExperimentalBatteryProfilingDialogVisible,
+    ] = useState(false);
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
@@ -249,18 +255,23 @@ export default ({ disabled }: { disabled: boolean }) => {
                     <Button
                         variant="secondary"
                         className="w-100"
-                        onClick={() => {
-                            npmDevice?.batteryProfiler
-                                ?.canProfile()
-                                .then(result => {
-                                    if (result === true) {
-                                        dispatch(
-                                            setProfilingStage('Configuration')
-                                        );
-                                    } else {
-                                        dispatch(setProfilingStage(result));
-                                    }
-                                });
+                        onClick={async () => {
+                            const result =
+                                await npmDevice?.batteryProfiler?.canProfile();
+
+                            if (result === true) {
+                                if (npmDevice?.deviceType === 'npm1304') {
+                                    setExperimentalBatteryProfilingDialogVisible(
+                                        true
+                                    );
+                                } else {
+                                    dispatch(
+                                        setProfilingStage('Configuration')
+                                    );
+                                }
+                            } else if (result !== undefined) {
+                                dispatch(setProfilingStage(result));
+                            }
                         }}
                         disabled={disabled}
                     >
@@ -268,6 +279,33 @@ export default ({ disabled }: { disabled: boolean }) => {
                     </Button>
                 </DocumentationTooltip>
             )}
+            {/* This is a temporary dialog until battery profiling for npm1304 is properly supported */}
+            <InfoDialog
+                isVisible={experimentalBatteryProfilingDialogVisible}
+                title="Experimental Battery Profiling"
+                headerIcon="information"
+                footer={
+                    <DialogButton
+                        variant="secondary"
+                        onClick={() => {
+                            setExperimentalBatteryProfilingDialogVisible(false);
+                            dispatch(setProfilingStage('Configuration'));
+                        }}
+                    >
+                        OK
+                    </DialogButton>
+                }
+                onHide={() => {
+                    setExperimentalBatteryProfilingDialogVisible(false);
+                    dispatch(setProfilingStage('Configuration'));
+                }}
+            >
+                Battery Profiling is experimental and the battery models created
+                are good for evaluation and early development. Nordic&apos;s
+                fuel gauge team is fine tuning the profiling for small
+                batteries, and support for battery models good for mass
+                production will be added soon
+            </InfoDialog>
         </>
     );
 };
