@@ -333,3 +333,25 @@ export const SupportsErrorLogs = (npmDevice: BaseNpmDevice): boolean =>
     Object.keys(npmDevice.supportedErrorLogs).some(
         k => npmDevice.supportedErrorLogs?.[k as keyof SupportedErrorLogs]
     );
+
+export const parseHwVersion = (hwVersion: string) => {
+    const splitResult = hwVersion.split(',');
+
+    const checkAndReplace = (label: string) =>
+        splitResult
+            .find(item => item.startsWith(label))
+            ?.replace(`${label}=`, '');
+
+    const labels = ['hw_version', 'version', 'pca'];
+    return labels.reduce(
+        (res, label) => ({
+            ...res,
+            [label]: checkAndReplace(label),
+        }),
+        {}
+    ) as {
+        hw_version: string;
+        pca?: string;
+        version?: string;
+    };
+};
