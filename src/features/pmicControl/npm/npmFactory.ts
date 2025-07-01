@@ -10,6 +10,7 @@ import BaseNpmDevice from './basePmicDevice';
 import Npm1300 from './npm1300/pmic1300Device';
 import Npm1304 from './npm1304/pmic1304Device';
 import Npm2100 from './npm2100/pmic2100Device';
+import { parseHwVersion } from './pmicHelpers';
 import { PmicDialog } from './types';
 
 export const getNpmDevice = (
@@ -19,15 +20,19 @@ export const getNpmDevice = (
     new Promise<BaseNpmDevice>((resolve, reject) => {
         shellParser.enqueueRequest('hw_version', {
             onSuccess: response => {
-                const hwVersion = response
-                    .split(',')
-                    .find(s => s.startsWith('hw_version'));
-                const version = hwVersion?.split('=').at(1);
-                if (version?.startsWith('npm1300ek')) {
+                const parsedHwVersion = parseHwVersion(response);
+                const hwVersion = parsedHwVersion.hw_version;
+                if (hwVersion?.startsWith('npm1300ek')) {
                     resolve(new Npm1300(shellParser, dialogHandler));
-                } else if (version?.startsWith('npm1304ek')) {
-                    resolve(new Npm1304(shellParser, dialogHandler));
-                } else if (version?.startsWith('npm2100ek')) {
+                } else if (hwVersion?.startsWith('npm1304ek')) {
+                    resolve(
+                        new Npm1304(
+                            shellParser,
+                            dialogHandler,
+                            parsedHwVersion.version
+                        )
+                    );
+                } else if (hwVersion?.startsWith('npm2100ek')) {
                     resolve(new Npm2100(shellParser, dialogHandler));
                 } else {
                     reject(new Error('Unknown hardware'));

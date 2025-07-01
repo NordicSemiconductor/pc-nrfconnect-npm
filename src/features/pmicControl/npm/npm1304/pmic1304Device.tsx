@@ -25,7 +25,8 @@ export const npm1304FWVersion = '0.2.2+0';
 export default class Npm1304 extends nPM1300Device {
     constructor(
         shellParser: ShellParser | undefined,
-        dialogHandler: ((dialog: PmicDialog) => void) | null
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+        hardwareVersion?: string
     ) {
         super(
             shellParser,
@@ -35,6 +36,7 @@ export default class Npm1304 extends nPM1300Device {
                 BatteryProfiler,
                 OnBoardLoadModule,
             },
+            hardwareVersion,
             'npm1304',
             npm1304FWVersion
         );

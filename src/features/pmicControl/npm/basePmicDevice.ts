@@ -13,6 +13,7 @@ import {
     NpmEventEmitter,
     parseBatteryModel,
     parseColonBasedAnswer,
+    parseHwVersion,
     parseToNumber,
     toRegex,
 } from './pmicHelpers';
@@ -67,7 +68,6 @@ import {
 
 /* eslint-disable no-underscore-dangle */
 export default abstract class BaseNpmDevice {
-    protected hardwareVersion?: string;
     private rebooting = false;
     private deviceUptimeToSystemDelta = 0;
     protected lastUptime = 0;
@@ -85,9 +85,6 @@ export default abstract class BaseNpmDevice {
               }
     ): NpmExportLatest;
     initialize() {
-        this.getHwVersion().then(hwVersion => {
-            this.hardwareVersion = hwVersion.version;
-        });
         this.initializeFuelGauge();
     }
 
@@ -384,7 +381,8 @@ export default abstract class BaseNpmDevice {
         protected readonly eventEmitter: NpmEventEmitter,
         protected readonly peripherals: NpmPeripherals,
         readonly batteryConnectedVoltageThreshold: number,
-        private readonly _supportedErrorLogs: SupportedErrorLogs
+        private readonly _supportedErrorLogs: SupportedErrorLogs,
+        protected hardwareVersion?: string
     ) {
         this.#pmicState = shellParser ? 'pmic-connected' : 'ek-disconnected';
         this.offlineMode = !shellParser;
@@ -900,27 +898,7 @@ export default abstract class BaseNpmDevice {
                 'hw_version',
                 {
                     onSuccess: result => {
-                        const splitResult = result.split(',');
-
-                        const checkAndReplace = (label: string) =>
-                            splitResult
-                                .find(item => item.startsWith(label))
-                                ?.replace(`${label}=`, '');
-
-                        const labels = ['hw_version', 'version', 'pca'];
-                        resolve(
-                            labels.reduce(
-                                (res, label) => ({
-                                    ...res,
-                                    [label]: checkAndReplace(label),
-                                }),
-                                {}
-                            ) as {
-                                hw_version: string;
-                                pca?: string;
-                                version?: string;
-                            }
-                        );
+                        resolve(parseHwVersion(result));
                     },
                     onError: reject,
                     onTimeout: error => {
