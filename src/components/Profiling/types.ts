@@ -46,6 +46,7 @@ export const zodProfilingProject = z.object({
     vUpperCutOff: z.number(),
     profiles: zodProfilingProjectProfile.array(),
     appVersion: z.string(),
+    iTerm: z.string().optional(),
 });
 
 export type ProfilingProject = z.infer<typeof zodProfilingProject>;

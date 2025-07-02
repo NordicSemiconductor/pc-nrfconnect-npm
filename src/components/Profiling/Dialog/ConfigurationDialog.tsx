@@ -116,6 +116,7 @@ export default ({
                     temperature,
                     csvReady: false,
                 })),
+                iTerm: iTerm.toString(),
             };
 
             dispatch(setProfile(profile));
