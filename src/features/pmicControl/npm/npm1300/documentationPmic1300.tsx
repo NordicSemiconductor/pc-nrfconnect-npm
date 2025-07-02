@@ -1347,8 +1347,8 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                     title: 'Discharge cut-off',
                     content: [
                         <p key="p1">
-                            The battery capacity in mAh. Set this according to
-                            the rated capacity of the battery used.
+                            The battery discharge cut-off voltage. Set this
+                            according to the rated capacity of the battery used.
                         </p>,
                     ],
                 },
