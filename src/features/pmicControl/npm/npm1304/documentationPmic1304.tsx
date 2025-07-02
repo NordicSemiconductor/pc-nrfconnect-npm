@@ -175,5 +175,34 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                 },
             ],
         },
+        sidePanel: {
+            ...npm1300BaseDoc.sidePanel,
+            ActiveBatteryModel: [
+                {
+                    title: 'Active Battery Model',
+                    content: [
+                        <p key="p1">
+                            Select the battery model you want to use for Fuel
+                            Gauge in nPM PowerUP. To add new battery models, use
+                            the <b>Add New Active Battery Model</b> drop-down
+                            menu below.
+                        </p>,
+                        <p key="p2">
+                            The nPM1304 EK is shipped with a 20 mAh LiPo
+                            battery. This is also the default battery model when
+                            connecting to the kit. Battery electrical
+                            specification:
+                            <ul className="tw-ml-6 tw-list-disc">
+                                <li>Nominal voltage: 3.70 V</li>
+                                <li>Max charge voltage (Vterm): 4.20 V</li>
+                                <li>Max charge current (Ichg): 10 mA</li>
+                                <li>Max continuous discharge current: 60 mA</li>
+                                <li>Discharge Cut Off voltage: 2.75 V</li>
+                            </ul>
+                        </p>,
+                    ],
+                },
+            ],
+        },
     };
 };
