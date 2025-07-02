@@ -67,9 +67,9 @@ const npm1300EngineeringCMessage = (
 const npm1304EngineeringCMessage = (
     <p>
         You have connected an nPM1304 EK version 0.1.0. This EK version does not
-        support battery profiling (used for fuel gauging) and the on-board
-        active load. Please reach out to Nordic to request a new EK if you want
-        to use these features.
+        support battery profiling and the on-board active load. Lack of battery
+        profiling means you cannot use fuel gauging. If you want to use any of
+        these features, contact Nordic Semiconductor to request a new EK.
     </p>
 );
 
