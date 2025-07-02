@@ -164,7 +164,7 @@ export const generateParamsFromCSV =
                 fs.existsSync(batteryModelJsonPath) &&
                 fs.existsSync(paramsPath)
             ) {
-                if (nrfUtilVersion) {
+                if (!nrfUtilVersion) {
                     const module = await getModule('npm');
                     nrfUtilVersion = (await module.getModuleVersion()).version;
                 }
