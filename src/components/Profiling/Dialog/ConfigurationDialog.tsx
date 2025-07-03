@@ -198,7 +198,10 @@ export default ({
                 <NumberInput
                     showSlider
                     label={
-                        <DocumentationTooltip card="profiling" item="Capacity">
+                        <DocumentationTooltip
+                            card="profiling"
+                            item="DischargeCutOff"
+                        >
                             <div>
                                 <span>Discharge cut-off voltage</span>
                             </div>

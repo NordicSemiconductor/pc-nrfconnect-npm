@@ -1347,8 +1347,10 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                     title: 'Discharge cut-off',
                     content: [
                         <p key="p1">
-                            The lowest battery operating voltage. Set this
-                            according to the battery specification.
+                            The battery discharge cut-off voltage. Set this
+                            according to the battery datasheet or based on the
+                            application&apos;s minimum operating voltage
+                            requirements.
                         </p>,
                     ],
                 },
