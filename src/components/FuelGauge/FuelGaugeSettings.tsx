@@ -300,11 +300,10 @@ export default ({ disabled }: { disabled: boolean }) => {
                     dispatch(setProfilingStage('Configuration'));
                 }}
             >
-                Battery Profiling is experimental and the battery models created
-                are good for evaluation and early development. Nordic&apos;s
-                fuel gauge team is fine tuning the profiling for small
-                batteries, and support for battery models good for mass
-                production will be added soon
+                The battery profiling feature is experimental. The available battery models 
+                are good for evaluation and early development. Nordic Semiconductor
+                is fine-tuning the profiling for small batteries, and support for battery models for mass
+                production will be added soon.
             </InfoDialog>
         </>
     );
