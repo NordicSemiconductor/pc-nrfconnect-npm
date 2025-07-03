@@ -303,8 +303,8 @@ export default ({ disabled }: { disabled: boolean }) => {
                 The battery profiling feature is experimental. The available
                 battery models are good for evaluation and early development.
                 Nordic Semiconductor is fine-tuning the profiling for small
-                batteries, and support for battery models for mass production
-                will be added soon.
+                batteries. Support for battery models for mass production will
+                be added soon.
             </InfoDialog>
         </>
     );
