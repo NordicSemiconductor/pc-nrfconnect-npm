@@ -2,10 +2,11 @@
 
 ### Added
 
--   Support for `Ichg` to support 0.5mA increments on nPM 1304 EK
--   `On Board Load` for nPM 1304 EK with hardware revision older then 0.1.0.
--   Expermental battery profiling for nPM 1304 EK with hardware revision older
-    then 0.1.0.
+-   Support for `Ichg` to support 0.5-mA increments on the nPM1304 EK.
+-   The on-board load feature (active load) for the nPM1304 EK with hardware
+    revision newer than 0.1.0.
+-   Experimental battery profiling for the nPM1304 EK with hardware revision
+    newer than 0.1.0.
 
 ## 2.1.1 - 2025-06-02
 
