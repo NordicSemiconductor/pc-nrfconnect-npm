@@ -156,16 +156,18 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                     title: 'iLoad',
                     content: [
                         <p key="p1">
-                            The nPM1304 EK includes an active load that is used
-                            for battery profiling connected to V
-                            <span className="subscript">SYS</span>. It can also
-                            be used as load during evaluation and development,
-                            connected to nPM1304&apos;s V
-                            <span className="subscript">SYS</span> rail, or to V
+                            The nPM1304 EK includes a switch <b>SW5</b>, which
+                            connects an active load to V
+                            <span className="subscript">SYS</span>. The active
+                            load is used for battery profiling. You can also use
+                            it as a generic load during evaluation and
+                            development. For such use, you can keep the active
+                            load connected to nPM1304&apos;s V
+                            <span className="subscript">SYS</span> rail.
+                            Alternatively, connect it to V
                             <span className="subscript">OUT1</span> or V
-                            <span className="subscript">OUT2</span> via the load
-                            switches (LS) using the EK&apos;s SW5 and P15 and
-                            P20 jumpers.
+                            <span className="subscript">OUT2</span> using the
+                            load switches (LS) and P15 and P20 jumpers.
                         </p>,
                     ],
                 },

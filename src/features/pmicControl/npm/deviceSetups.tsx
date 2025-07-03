@@ -66,10 +66,11 @@ const npm1300EngineeringCMessage = (
 
 const npm1304EngineeringCMessage = (
     <p>
-        You have connected an nPM1304 EK version 0.1.0. This EK version does not
-        support battery profiling and the on-board active load. Lack of battery
-        profiling means you cannot use fuel gauging. If you want to use any of
-        these features, contact Nordic Semiconductor to request a new EK.
+        You have connected an nPM1304 EK revision 0.1.0. For battery profiling
+        and active load to work with this revision, you must configure V
+        <span className="subscript">DDIO</span> to 1.8 V. Change BUCK2&apos;s V
+        <span className="subscript">OUT2</span> voltage to 1.8 V (that is, the
+        default V<span className="subscript">DDIO</span> jumper configuration).
     </p>
 );
 
