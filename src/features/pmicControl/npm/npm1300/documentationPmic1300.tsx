@@ -1347,8 +1347,8 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                     title: 'Discharge cut-off',
                     content: [
                         <p key="p1">
-                            The battery discharge cut-off voltage. Set this
-                            according to the rated capacity of the battery used.
+                            Configure discharge cut-off voltage according to the
+                            battery specification.
                         </p>,
                     ],
                 },
