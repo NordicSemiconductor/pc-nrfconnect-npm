@@ -12,6 +12,8 @@
 
 -   Issue in the firmware for nPM1304 where battery measurements would stop
     while the battery was charging.
+-   Battery status now shows `iBat` resolution correctly with 1 decimal point
+    for nPM1304.
 
 ## 2.2.0 - 2025-07-04
 
