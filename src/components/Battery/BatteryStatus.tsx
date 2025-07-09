@@ -77,10 +77,11 @@ export default ({ disabled }: { disabled: boolean }) => {
                         batteryConnected &&
                         latestAdcSample?.iBat != null &&
                         !Number.isNaN(latestAdcSample?.iBat)
-                            ? `${
-                                  latestAdcSample.iBat < 0 ? '—' : ''
-                              }${Math.round(
-                                  Math.abs(latestAdcSample.iBat ?? 0)
+                            ? `${latestAdcSample.iBat < 0 ? '—' : ''}${Math.abs(
+                                  latestAdcSample.iBat ?? 0
+                              ).toFixed(
+                                  npmDevice?.chargerModule?.ranges.current
+                                      .decimals ?? 0
                               )} mA`
                             : 'N/A'
                     }
