@@ -6,12 +6,12 @@
 
 ### Changed
 
--   Default battery model in FW for nPM1304 to LP18917.
+-   Default battery model in the firmware for nPM1304 to LP18917.
 
 ### Fixed
 
--   Fixed issue in FW for nPM1304 where battery measurements could stop while
-    charging.
+-   Issue in the firmware for nPM1304 where battery measurements would stop
+    while the battery was charging.
 
 ## 2.2.0 - 2025-07-04
 
