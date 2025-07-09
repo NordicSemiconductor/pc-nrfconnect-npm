@@ -2,7 +2,7 @@
 
 ### Added
 
--   Bundled battery model `LP181917` for nPM1304.
+-   Bundled battery model LP181917 for nPM1304.
 
 ## 2.2.0 - 2025-07-04
 
