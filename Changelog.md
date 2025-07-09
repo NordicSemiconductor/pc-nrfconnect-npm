@@ -4,6 +4,15 @@
 
 -   Bundled battery model LP181917 for nPM1304.
 
+### Changed
+
+-   Default battery model in the firmware for nPM1304 to LP18917.
+
+### Fixed
+
+-   Issue in the firmware for nPM1304 where battery measurements would stop
+    while the battery was charging.
+
 ## 2.2.0 - 2025-07-04
 
 ### Added
