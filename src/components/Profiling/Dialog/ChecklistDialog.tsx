@@ -76,6 +76,16 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 profile.ntcThermistor
                             );
                             await npmDevice?.chargerModule?.set
+                                .enabled(false)
+                                .catch(message => {
+                                    dispatch(
+                                        setCompleteStep({
+                                            message,
+                                            level: 'danger',
+                                        })
+                                    );
+                                });
+                            await npmDevice?.chargerModule?.set
                                 .vTerm(profile.vUpperCutOff)
                                 .catch(message => {
                                     dispatch(
@@ -86,14 +96,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     );
                                 });
                             await npmDevice?.chargerModule?.set
-                                .iChg(
-                                    Math.min(
-                                        800,
-                                        Math.floor(
-                                            profile.ratedChargingCurrent / 2
-                                        ) * 2 // even numbers only are allowed
-                                    )
-                                )
+                                .iChg(profile.ratedChargingCurrent)
                                 .catch(message => {
                                     dispatch(
                                         setCompleteStep({
