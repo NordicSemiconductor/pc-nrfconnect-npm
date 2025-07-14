@@ -1265,14 +1265,15 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         model in <p>Add New Active Battery Model</p> and write
                         its JSON file to the selected battery model slot. To
                         continue development and implementation on your own
-                        design, use the battery model INC file. See the
-                        following page for more details: `}
+                        design, use the battery model INC file. See the `}
                             <ExternalLink
-                                label={`${{
-                                    deviceType,
-                                }}: Fuel gauge in the nRF Connect SDK documentation`}
+                                label={`${deviceType.replace(
+                                    'npm',
+                                    'nPM'
+                                )} fuel gauge sample in the nRF Connect SDK documentation`}
                                 href={`https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/pmic/native/${npmDevice.deviceType}_fuel_gauge/README.html`}
                             />
+                            {' for more information.'}
                         </p>,
                         <p key="p2">
                             An additional board, nPM Fuel Gauge, is required to
