@@ -146,7 +146,7 @@ export default ({
                     }
                     unit="mAh"
                     value={capacity}
-                    range={{ min: 32, max: 3000 }}
+                    range={npmDevice.chargerModule.ranges.batterySize}
                     onChange={setCapacity}
                 />
                 <NumberInput

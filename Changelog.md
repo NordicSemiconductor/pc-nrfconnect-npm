@@ -3,7 +3,10 @@
 ### Fixed
 
 -   Issue where only even numbers were permitted for iChg when profiling battery
-    on nPM1304Ek. Now all allowed values from 4-mA - 100-mA will work
+    on nPM1304EK. Now all allowed values from 4-mA - 100-mA will work
+-   Add/Edit battery profile would only accept battery capacity values between
+    32-mAh - 3000-mAh for nPM1304EK. Now values from 4-mAh - 100-mAh are
+    allowed.
 
 ## 2.2.1 - 2025-07-09
 
