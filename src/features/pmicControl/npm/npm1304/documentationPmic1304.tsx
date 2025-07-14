@@ -189,27 +189,27 @@ export const documentation = (npmDevice: Npm1304): Documentation => {
                             the <b>Add New Active Battery Model</b> drop-down
                             menu below.
                         </p>,
-                        // <p key="p2">
-                        //     The nPM1304 EK is shipped with a 20-mAh LiPo
-                        //     battery. This is also the default battery model when
-                        //     connecting to the kit. Battery electrical
-                        //     specification:
-                        //     <ul className="tw-ml-6 tw-list-disc">
-                        //         <li>Nominal voltage: 3.70 V</li>
-                        //         <li>
-                        //             Max charge voltage (V
-                        //             <span className="subscript">term</span>):
-                        //             4.20 V
-                        //         </li>
-                        //         <li>
-                        //             Max charge current (I
-                        //             <span className="subscript">chg</span>): 10
-                        //             mA
-                        //         </li>
-                        //         <li>Max continuous discharge current: 60 mA</li>
-                        //         <li>Discharge cut-off voltage: 2.75 V</li>
-                        //     </ul>
-                        // </p>,
+                        <p key="p2">
+                            The nPM1304 EK is shipped with a 20-mAh LiPo
+                            battery. This is also the default battery model when
+                            connecting to the kit. Battery electrical
+                            specification:
+                            <ul className="tw-ml-6 tw-list-disc">
+                                <li>Nominal voltage: 3.70 V</li>
+                                <li>
+                                    Max charge voltage (V
+                                    <span className="subscript">term</span>):
+                                    4.20 V
+                                </li>
+                                <li>
+                                    Max charge current (I
+                                    <span className="subscript">chg</span>): 10
+                                    mA
+                                </li>
+                                <li>Max continuous discharge current: 60 mA</li>
+                                <li>Discharge cut-off voltage: 2.75 V</li>
+                            </ul>
+                        </p>,
                     ],
                 },
             ],
