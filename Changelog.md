@@ -2,8 +2,8 @@
 
 ### Fixed
 
--   Issue where only even numbers where permited when profiling battery on
-    nPM1304Ek. Now all allowed values from 4-mA - 100-mA will work
+-   Issue where only even numbers were permitted for iChg when profiling battery
+    on nPM1304Ek. Now all allowed values from 4-mA - 100-mA will work
 
 ## 2.2.1 - 2025-07-09
 
