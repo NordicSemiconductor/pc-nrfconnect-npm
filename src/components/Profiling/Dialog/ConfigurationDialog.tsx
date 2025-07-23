@@ -117,6 +117,7 @@ export default ({
                     csvReady: false,
                 })),
                 iTerm: iTerm.toString(),
+                iChg: ratedChargingCurrent.toString(),
             };
 
             dispatch(setProfile(profile));
