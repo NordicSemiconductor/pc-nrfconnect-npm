@@ -182,7 +182,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#include <dt-bindings/regulator/${npmDevice.deviceType}.h>
+#include <dt-bindings/regulator/npm13xx.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 
 &arduino_i2c {
