@@ -97,7 +97,7 @@ export default ({ disabled }: { disabled: boolean }) => {
 
     const brandsItems: DropdownItem<string>[] = [
         {
-            label: 'Select Brand',
+            label: 'Select Type',
             value: 'n/a',
         },
         ...bundledBatteries.map(batt => ({
