@@ -172,7 +172,7 @@ const generateLDORegulatorInitialModeProperty = (ldo: LdoExport) => {
         macros.push('NPM2100_REG_LDSW_EN');
     }
 
-    return `regulator-initial-mode = <${macros.join(' | ')}>;`;
+    return `regulator-initial-mode = <(${macros.join(' | ')})>;`;
 };
 
 const generateLDOSW = (
