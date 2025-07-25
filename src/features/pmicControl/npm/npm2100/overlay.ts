@@ -90,7 +90,11 @@ const generateModeGpiosProperty = (
 
     return `mode-gpios = <&npm2100_gpio ${number} (${
         isHigh ? 'GPIO_ACTIVE_HIGH' : 'GPIO_ACTIVE_LOW'
-    } |${pull})>;`;
+    } ${pull ? ` | ${pull}` : ''} | ${
+        gpios[number].debounce
+            ? 'NPM2100_GPIO_DEBOUNCE_ON'
+            : 'NPM2100_GPIO_DEBOUNCE_OFF'
+    })>;`;
 };
 
 const generateBoost = (
