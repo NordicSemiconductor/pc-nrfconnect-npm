@@ -107,7 +107,7 @@ const generateBoost = (
                     boostModule.ranges.voltage.min
                 )}>;
                 regulator-max-microvolt = <${toMicro(
-                    boostModule.ranges.voltage.min
+                    boostModule.ranges.voltage.max
                 )}>;
 
                 ${
