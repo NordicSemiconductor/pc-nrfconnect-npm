@@ -13,6 +13,8 @@ import {
     BoostPinMode,
     BoostPinSelection,
     GPIOExport,
+    GPIOMode,
+    GPIOPull,
     LdoExport,
     LdoModule,
     npm2100LowPowerConfig,
@@ -82,11 +84,7 @@ const generateModeGpiosProperty = (
 
     const number = parseInt(pinSelection.charAt(4), 10);
     const isHigh = pinSelection.endsWith('HI');
-    let pull = '';
-    if (gpios[number].pull !== 'NOPULL') {
-        pull =
-            gpios[number].pull === 'PULLUP' ? 'GPIO_PULL_UP' : 'GPIO_PULL_DOWN';
-    }
+    const pull = gpioPullToMacro(gpios[number].pull);
 
     return `mode-gpios = <&npm2100_gpio ${number} (${
         isHigh ? 'GPIO_ACTIVE_HIGH' : 'GPIO_ACTIVE_LOW'
@@ -233,22 +231,52 @@ const generateShipHoldLongPressProperty = (
     return 'shiphold-longpress = "disable"';
 };
 
+const gpioPullToMacro = (pull: GPIOPull) => {
+    if (pull === 'NOPULL') {
+        return undefined;
+    }
+    if (pull === 'PULLUP') {
+        return 'GPIO_PULL_UP';
+    }
+    return 'GPIO_PULL_DOWN';
+};
+
+const gpioInteruuptModeToMacro = (mode: GPIOMode) => {
+    if (
+        (mode as GPIOMode2100) === GPIOMode2100['Interrupt output, active high']
+    ) {
+        return 'GPIO_ACTIVE_HIGH';
+    }
+    if (
+        (mode as GPIOMode2100) === GPIOMode2100['Interrupt output, active low']
+    ) {
+        return 'GPIO_ACTIVE_LOW';
+    }
+    return undefined;
+};
+
+const isInterruptPin = (mode: GPIOMode) =>
+    (mode as GPIOMode2100) === GPIOMode2100['Interrupt output, active high'] ||
+    (mode as GPIOMode2100) === GPIOMode2100['Interrupt output, active low'];
+
 export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
     const numberOfGPIOInterrupts = npmConfig.gpios.reduce((pv, cv) => {
-        if (
-            (cv.mode as GPIOMode2100) ===
-                GPIOMode2100['Interrupt output, active high'] ||
-            (cv.mode as GPIOMode2100) ===
-                GPIOMode2100['Interrupt output, active low']
-        ) {
+        if (isInterruptPin(cv.mode)) {
             return pv + 1;
         }
         return pv;
     }, 0);
-    if (numberOfGPIOInterrupts > 1) {
+
+    const interruptPin = npmConfig.gpios.findIndex(gpio =>
+        isInterruptPin(gpio.mode)
+    );
+
+    if (interruptPin === -1 || numberOfGPIOInterrupts > 1) {
         logger.warn(`TODO: Even though it's possible to set both of them as such, we should probably disallow it or
          * warn when such config is exported, since it makes no sense in real application.`);
     }
+
+    const interruptGpio = npmConfig.gpios[interruptPin];
 
     return `/*
 * Copyright (C) 2025 Nordic Semiconductor ASA
@@ -268,11 +296,18 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
             numberOfGPIOInterrupts
                 ? `
         host-int-type = "level";
-        // pmic-int-pin = <pin number>; // TODO what should pin and number be?
-        pmic-int-flags = <pull | active_level | open drain>;
+        pmic-int-pin = <${interruptPin}>;
+        pmic-int-flags = <${[
+            gpioPullToMacro(interruptGpio.pull),
+            gpioInteruuptModeToMacro(interruptGpio.mode),
+            interruptGpio.openDrain ? 'GPIO_OPEN_DRAIN' : undefined,
+        ]
+            .filter(Boolean)
+            .join(' | ')}>; // TODO: confirm this is correct
             `
                 : ''
         }
+        
 
         ${generateShipHoldLongPressProperty(
             npmConfig.reset as npm2100ResetConfig,
