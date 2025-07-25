@@ -102,7 +102,6 @@ const generateBoost = (
     boostModule: BoostModule,
     gpios: GPIOExport[]
 ) => `npm2100ek_boost: BOOST {
-                /* ALWAYS PRESENT, FIXED PROPERTIES */
                 regulator-always-on;
                 regulator-min-microvolt = <${toMicro(
                     boostModule.ranges.voltage.min
@@ -111,7 +110,6 @@ const generateBoost = (
                     boostModule.ranges.voltage.min
                 )}>;
 
-                /* CONFIGURABLE PROPERTIES */
                 ${
                     boost.vOutSelect === 'Software'
                         ? `regulator-init-microvolt = <${toMicro(
@@ -183,15 +181,13 @@ const generateLDOSW = (
     gpios: GPIOExport[]
 ) =>
     `npm2100ek_ldosw: LDOSW {
-                /* ALWAYS PRESENT, FIXED PROPERTIES */
                 regulator-min-microvolt = <${toMicro(
                     ldoModule.ranges.voltage.min
                 )}>;
                 regulator-max-microvolt = <${toMicro(
                     ldoModule.ranges.voltage.max
                 )}>;
-
-                /* CONFIGURABLE PROPERTIES */
+ 
                 ${ldo.enabled ? 'regulator-boot-on;' : ''}
                 ${
                     ldo.mode === 'LDO'
@@ -271,30 +267,18 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
         ${
             numberOfGPIOInterrupts
                 ? `
-        /* PMIC output interrupt config */
-        /* Advised to achieve lower power consumption on SoC */ 
         host-int-type = "level";
-        pmic-int-pin = <pin number>; // TODO what should pin and number be?
-        /* PowerUP _should_ allow Pull and Open-Drain configuration on interrupt output */
+        // pmic-int-pin = <pin number>; // TODO what should pin and number be?
         pmic-int-flags = <pull | active_level | open drain>;
-        /* Maybe add a comment that 'host-int-gpios' should be set as well according to SoC wiring? */
-        /* End of interrupt config */
             `
                 : ''
         }
 
-        /* SHPHLD config - SYSTEM FEATURES */
         ${generateShipHoldLongPressProperty(
             npmConfig.reset as npm2100ResetConfig,
             npmConfig.lowPower as npm2100LowPowerConfig
         )}
         
-        /* missing SHPHLD features in PowerUP: */
-        /* 1. A switch in PowerUP to disable/enable SHPHLD wakeup from hibernate modes */
-        /* if SHPHLD wakeup is enabled */ shiphold-hibernate-wakeup;
-        /* 2. SHPHLD config flags */ shiphold-flags = <pull | active_level>;
-        /* 3. weak pullup current config (for break-to-wake) */ shiphold-current = "disable";
-        /* End of SHPHLD config */
 
         npm2100ek_gpio: gpio-controller {
             compatible = "nordic,npm2100-gpio";
@@ -327,7 +311,6 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
                 .join('\n\n')}
         };
 
-        /* WDT and VBAT configs are fixed */
         npm2100_wdt: watchdog {
             compatible = "nordic,npm2100-wdt";
         };
