@@ -11,6 +11,8 @@ import {
     BoostModeControl,
     BoostModule,
     BoostPinMode,
+    BoostPinSelection,
+    GPIOExport,
     LdoExport,
     LdoModule,
     npm2100LowPowerConfig,
@@ -70,24 +72,31 @@ const generateBoostRegulatorInitialModeProperty = (boost: BoostExport) => {
     return `regulator-initial-mode = <(${macros.join(' | ')})>;`;
 };
 
-const generateModeGpiosProperty = (pinSelection: string) => {
+const generateModeGpiosProperty = (
+    pinSelection: BoostPinSelection,
+    gpios: GPIOExport[]
+) => {
     if (pinSelection === 'OFF') {
         return '';
     }
 
     const number = parseInt(pinSelection.charAt(4), 10);
     const isHigh = pinSelection.endsWith('HI');
+    let pull = '';
+    if (gpios[number].pull !== 'NOPULL') {
+        pull =
+            gpios[number].pull === 'PULLUP' ? 'GPIO_PULL_UP' : 'GPIO_PULL_DOWN';
+    }
 
     return `mode-gpios = <&npm2100_gpio ${number} (${
-        isHigh
-            ? '(GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)'
-            : '(GPIO_ACTIVE_LOW | GPIO_PULL_UP)'
-    } | GPIO_PULL_UP)>;`;
+        isHigh ? 'GPIO_ACTIVE_HIGH' : 'GPIO_ACTIVE_LOW'
+    } |${pull})>;`;
 };
 
 const generateBoost = (
     boost: BoostExport,
-    boostModule: BoostModule
+    boostModule: BoostModule,
+    gpios: GPIOExport[]
 ) => `npm2100ek_boost: BOOST {
                 /* ALWAYS PRESENT, FIXED PROPERTIES */
                 regulator-always-on;
@@ -112,7 +121,7 @@ const generateBoost = (
                         : 'regulator-init-microamp = <0>;'
                 }
                 ${generateBoostRegulatorInitialModeProperty(boost)}
-                ${generateModeGpiosProperty(boost.pinMode)}
+                ${generateModeGpiosProperty(boost.pinSelection, gpios)}
             };
 `;
 
@@ -164,7 +173,11 @@ const generateLDORegulatorInitialModeProperty = (ldo: LdoExport) => {
     return `regulator-initial-mode = <${macros.join(' | ')}>;`;
 };
 
-const generateLDOSW = (ldo: LdoExport, ldoModule: LdoModule) =>
+const generateLDOSW = (
+    ldo: LdoExport,
+    ldoModule: LdoModule,
+    gpios: GPIOExport[]
+) =>
     `npm2100ek_ldosw: LDOSW {
                 /* ALWAYS PRESENT, FIXED PROPERTIES */
                 regulator-min-microvolt = <${toMicro(
@@ -197,7 +210,11 @@ const generateLDOSW = (ldo: LdoExport, ldoModule: LdoModule) =>
                         : ''
                 }
                 ${generateLDORegulatorInitialModeProperty(ldo)}
-                ${ldo.pinSel ? generateModeGpiosProperty(ldo.pinSel) : ''}
+                ${
+                    ldo.pinSel
+                        ? generateModeGpiosProperty(ldo.pinSel, gpios)
+                        : ''
+                }
             };
 `;
 
@@ -287,13 +304,21 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
 
             ${npmConfig.boosts
                 .map((boost, index) =>
-                    generateBoost(boost, npmDevice.boostModule[index])
+                    generateBoost(
+                        boost,
+                        npmDevice.boostModule[index],
+                        npmConfig.gpios
+                    )
                 )
                 .join('\n\n')}
 
             ${npmConfig.ldos
                 .map((ldos, index) =>
-                    generateLDOSW(ldos, npmDevice.ldoModule[index])
+                    generateLDOSW(
+                        ldos,
+                        npmDevice.ldoModule[index],
+                        npmConfig.gpios
+                    )
                 )
                 .join('\n\n')}
         };
