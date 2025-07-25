@@ -67,7 +67,7 @@ const generateBoostRegulatorInitialModeProperty = (boost: BoostExport) => {
         return '';
     }
 
-    return `regulator-initial-mode = <${macros.join(' | ')}>;`;
+    return `regulator-initial-mode = <(${macros.join(' | ')})>;`;
 };
 
 const generateModeGpiosProperty = (pinSelection: string) => {
