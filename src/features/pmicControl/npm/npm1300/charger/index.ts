@@ -14,6 +14,7 @@ import {
     type ChargerModule as ChargerModuleBase,
     ChargerModuleGet,
     ChargerModuleGetBase,
+    ChargerModuleRanges,
     ChargerModuleSet,
     ChargerModuleSetBase,
     FixedListRange,
@@ -69,7 +70,7 @@ export default class Module implements ChargerModuleBase {
             iChg: this.ranges.current.min,
             enabled: false,
             iTerm: 10,
-            iBatLim: 1340,
+            iBatLim: 1000,
             enableRecharging: false,
             enableVBatLow: false,
             ntcThermistor: '10 kΩ',
@@ -84,7 +85,7 @@ export default class Module implements ChargerModuleBase {
         };
     }
 
-    get ranges() {
+    get ranges(): ChargerModuleRanges {
         return {
             voltage: this.voltageRange,
             vTermR: this.voltageRange,
@@ -124,13 +125,13 @@ export default class Module implements ChargerModuleBase {
 
     static iBatRange(): FixedListRange {
         const result: number[] & { toLabel?: (v: number) => string } = [
-            1340, 270,
+            1000, 200,
         ];
         result.toLabel = (v: number) => {
             switch (v) {
-                case 1340:
+                case 1000:
                     return 'High';
-                case 270:
+                case 200:
                     return 'Low';
                 default:
                     return `Manual (${v} mA)`;

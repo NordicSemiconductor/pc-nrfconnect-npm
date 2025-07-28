@@ -1,5 +1,10 @@
 ## 2.2.2 - Unreleased
 
+### Changed
+
+-   IBatLim for nPM1300, high is now 1000 mA from 1370 mA and low is 200mA from
+    270 mA
+
 ### Fixed
 
 -   Issue where iChg would only allow even numbers when profiling a battery on

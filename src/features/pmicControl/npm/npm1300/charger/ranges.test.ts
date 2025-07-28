@@ -54,10 +54,10 @@ describe('PMIC 1300 - Static getters', () => {
         expect(range).toBeDefined();
         expect(isFixedListRangeWithLabel(range!)).toBeTruthy();
         if (isFixedListRangeWithLabel(range!)) {
-            expect(range.toLabel?.(1340)).toBe('High');
-            expect(range.toLabel?.(270)).toBe('Low');
-            expect(range.toLabel?.(1000)).toBe('Manual (1000 mA)');
-            expect(range.map(v => v.valueOf())).toStrictEqual([1340, 270]);
+            expect(range.toLabel?.(1000)).toBe('High');
+            expect(range.toLabel?.(200)).toBe('Low');
+            expect(range.toLabel?.(1200)).toBe('Manual (1200 mA)');
+            expect(range.map(v => v.valueOf())).toStrictEqual([1000, 200]);
         }
     });
 
