@@ -1,10 +1,15 @@
 ## 2.2.2 - Unreleased
 
+### Changed
+
+-   Battery current limit (IBATLIM) for nPM1300. High is now set at 1000 mA
+    (previously 1370 mA) and low is now set at 200 mA (previously 270 mA).
+
 ### Fixed
 
--   Issue where iChg would only allow even numbers when profiling a battery on
-    the nPM1304 EK. This has been fixed to allow all values in the range from 4
-    to 100 mA.
+-   Issue where the charging current limit (ICHG) would only allow even numbers
+    when profiling a battery on the nPM1304 EK. This has been fixed to allow all
+    values in the range from 4 to 100 mA.
 -   Issue where the option for adding or editing a battery profile would only
     accept battery capacity values between 32 and 3000 mAh for the nPM1304 EK.
     This has been fixed to allow all values in the range from 4 mAh to 3000 mAh.

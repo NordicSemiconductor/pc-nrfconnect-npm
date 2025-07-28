@@ -14,7 +14,12 @@ import {
     VTrickleFastValues,
 } from '../../npm1300/charger/types';
 import { NpmEventEmitter } from '../../pmicHelpers';
-import { Charger, ModuleParams, VTrickleFast } from '../../types';
+import {
+    Charger,
+    ChargerModuleRanges,
+    ModuleParams,
+    VTrickleFast,
+} from '../../types';
 import { ChargerGet } from './getters';
 import { ChargerSet } from './setters';
 import { ITermKeys, ITermNpm1304, ITermValues } from './types';
@@ -39,7 +44,6 @@ export default class Module extends nPM1300Charger {
             iChg: this.ranges.current.min,
             enabled: false,
             iTerm: 5,
-            iBatLim: 1340,
             enableRecharging: false,
             enableVBatLow: false,
             ntcThermistor: '10 kΩ',
@@ -54,7 +58,7 @@ export default class Module extends nPM1300Charger {
         };
     }
 
-    get ranges() {
+    get ranges(): ChargerModuleRanges {
         return {
             voltage: this.voltageRange,
             vTermR: this.voltageRange,
@@ -78,7 +82,6 @@ export default class Module extends nPM1300Charger {
                 decimals: 0,
                 step: 1,
             },
-            iBatLim: Module.iBatRange(),
             vLowerCutOff: {
                 min: 2.7,
                 max: 3.1,

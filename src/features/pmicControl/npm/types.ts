@@ -579,21 +579,23 @@ export abstract class ChargerModuleGetBase {
     abstract tHot(): void;
 }
 
+export type ChargerModuleRanges = {
+    voltage: number[];
+    vTermR: number[];
+    jeita: RangeType;
+    chipThermal: RangeType;
+    current: RangeType;
+    nTCBeta: RangeType;
+    iBatLim?: FixedListRange;
+    vLowerCutOff: RangeType;
+    batterySize: RangeType;
+};
+
 export interface ChargerModule {
     get: ChargerModuleGetBase;
     set: ChargerModuleSetBase;
     callbacks: (() => void)[];
-    ranges: {
-        voltage: number[];
-        vTermR: number[];
-        jeita: RangeType;
-        chipThermal: RangeType;
-        current: RangeType;
-        nTCBeta: RangeType;
-        iBatLim: FixedListRange;
-        vLowerCutOff: RangeType;
-        batterySize: RangeType;
-    };
+    ranges: ChargerModuleRanges;
     defaults: Charger;
     values: {
         iTerm: { label: string; value: ITerm }[];

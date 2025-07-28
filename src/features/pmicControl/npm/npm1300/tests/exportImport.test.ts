@@ -127,7 +127,7 @@ describe('PMIC 1300 - Apply Config ', () => {
             iChg: 32,
             enabled: false,
             iTerm: 10,
-            iBatLim: 270,
+            iBatLim: 200,
             enableRecharging: false,
             enableVBatLow: false,
             ntcThermistor: '100 kΩ',

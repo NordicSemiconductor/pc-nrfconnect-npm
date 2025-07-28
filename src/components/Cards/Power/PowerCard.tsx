@@ -47,7 +47,10 @@ const IBatLimUI = ({
         setInternalBatLim(charger.iBatLim);
     }, [charger]);
 
+    const chargerIBatLimRange = chargerModule.ranges.iBatLim;
+
     if (
+        !chargerIBatLimRange ||
         !chargerModule.set.batLim ||
         charger.iBatLim === undefined ||
         internalBatLim === undefined
@@ -55,8 +58,6 @@ const IBatLimUI = ({
         return null;
 
     const setBatLim = chargerModule.set.batLim.bind(chargerModule.set);
-
-    const chargerIBatLimRange = chargerModule.ranges.iBatLim;
 
     if (
         isFixedListRangeWithLabel(chargerIBatLimRange) &&
