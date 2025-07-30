@@ -4,6 +4,8 @@
 
 -   Battery current limit (IBATLIM) for nPM1300. High is now set at 1000 mA
     (previously 1370 mA) and low is now set at 200 mA (previously 270 mA).
+-   When profiling with nPM 1300 the maximum capacity allowed has been increse
+    to 3000 mAh from 800 mAh
 
 ### Fixed
 
