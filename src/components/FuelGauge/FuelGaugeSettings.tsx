@@ -9,10 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
     Button,
-    DialogButton,
     Dropdown,
     DropdownItem,
-    InfoDialog,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import path from 'path';
 
@@ -47,10 +45,6 @@ export default ({ disabled }: { disabled: boolean }) => {
     const hardcodedBatterModels = useSelector(getHardcodedBatterModels);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const profilingSupported = useSelector(canProfile);
-    const [
-        experimentalBatteryProfilingDialogVisible,
-        setExperimentalBatteryProfilingDialogVisible,
-    ] = useState(false);
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
@@ -260,15 +254,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                                 await npmDevice?.batteryProfiler?.canProfile();
 
                             if (result === true) {
-                                if (npmDevice?.deviceType === 'npm1304') {
-                                    setExperimentalBatteryProfilingDialogVisible(
-                                        true
-                                    );
-                                } else {
-                                    dispatch(
-                                        setProfilingStage('Configuration')
-                                    );
-                                }
+                                dispatch(setProfilingStage('Configuration'));
                             } else if (result !== undefined) {
                                 dispatch(setProfilingStage(result));
                             }
@@ -279,33 +265,6 @@ export default ({ disabled }: { disabled: boolean }) => {
                     </Button>
                 </DocumentationTooltip>
             )}
-            {/* This is a temporary dialog until battery profiling for npm1304 is properly supported */}
-            <InfoDialog
-                isVisible={experimentalBatteryProfilingDialogVisible}
-                title="Experimental Battery Profiling"
-                headerIcon="information"
-                footer={
-                    <DialogButton
-                        variant="secondary"
-                        onClick={() => {
-                            setExperimentalBatteryProfilingDialogVisible(false);
-                            dispatch(setProfilingStage('Configuration'));
-                        }}
-                    >
-                        OK
-                    </DialogButton>
-                }
-                onHide={() => {
-                    setExperimentalBatteryProfilingDialogVisible(false);
-                    dispatch(setProfilingStage('Configuration'));
-                }}
-            >
-                The battery profiling feature is experimental. The available
-                battery models are good for evaluation and early development.
-                Nordic Semiconductor is fine-tuning the profiling for small
-                batteries. Support for battery models for mass production will
-                be added soon.
-            </InfoDialog>
         </>
     );
 };
