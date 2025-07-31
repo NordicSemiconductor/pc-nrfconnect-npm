@@ -12,13 +12,14 @@ import { NTCThermistor } from '../../../features/pmicControl/npm/types';
 export const RestingProfilingAlerts = () => (
     <>
         <Alert variant="warning" label="Caution: ">
-            Modifying the device configuration during profiling aborts the
-            ongoing temperature profile.
+            Modifying the device configuration during profiling will abort the
+            ongoing process.
         </Alert>
         <Alert variant="info" label="Note: ">
-            Profiling takes approximately 48 hours, per temperature in the
-            Battery Profile. You must ensure that the computer does not go into
-            sleep or hibernate during this process.
+            Profiling takes approximately 48 hours, depending on your battery
+            size. High capacity batteries can require more time. Make sure that
+            your computer does not turn off or go into sleep mode or hibernation
+            during this process.
         </Alert>
     </>
 );
