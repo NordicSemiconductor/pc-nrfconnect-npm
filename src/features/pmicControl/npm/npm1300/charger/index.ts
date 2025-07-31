@@ -118,7 +118,7 @@ export default class Module implements ChargerModuleBase {
             },
             batterySize: {
                 min: 32,
-                max: 800,
+                max: 3000,
             },
         };
     }
