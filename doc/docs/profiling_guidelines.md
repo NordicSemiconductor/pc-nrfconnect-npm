@@ -21,9 +21,9 @@ The guidelines in this section optimize the use of the {{app_name}} for [battery
 
     - If the battery NTC sensor is available, the battery temperature from the NTC measurement will be used for creating the battery model.
     - If the NTC sensor is not available, the specified test temperatures will be used for creating the battery model.
-    - For NTC selection, refer to [Battery temperature monitoring](https://docs.nordicsemi.com/bundle/ps_npm1300/page/chapters/charger.html#ariaid-title6) in the [nPM1300 Product Specification](https://docs.nordicsemi.com/bundle/ps_npm1300/page/keyfeatures_html5.html).
+    - For NTC selection, refer to [Battery temperature monitoring](https://docs.nordicsemi.com/bundle/ps_npm1300/page/chapters/charger.html#ariaid-title6) in the PMIC device datasheet.
 
 - The battery must be fully charged before profiling at a new temperature. Follow the instructions in the application to charge the battery at room temperature to ensure consistent and reliable results during the profiling process.
-- When using the nPM1300 EK with the nPM Fuel Gauge Board, the [nPM1300 fuel gauge algorithm](https://docs.nordicsemi.com/bundle/nan_045/page/APP/nan_045/npm1300_fuel_gauge.html) incorporates internal adjustments to correct any initialization errors resulting from an unrested battery and unexpected reset conditions. These errors typically have a minor impact, and the predictions will converge to the accurate value within a few minutes of normal operation.
+- The [fuel gauge algorithm](https://docs.nordicsemi.com/bundle/nan_045/page/APP/nan_045/npm1300_fuel_gauge.html) incorporates internal adjustments to correct any initialization errors resulting from an unrested battery and unexpected reset conditions. These errors typically have a minor impact, and the predictions will converge to the accurate value within a few minutes of normal operation.
 
 For more information, or if you have any technical questions before, during, or after your development, contact our Technical Support team at [DevZone](https://devzone.nordicsemi.com/).
