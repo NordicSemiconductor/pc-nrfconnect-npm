@@ -61,3 +61,4 @@ nav:
   - Overview and user interface: overview.md
   - Profiling a battery: profiling_battery.md
   - Evaluating a battery: evaluating_battery.md
+  - Guidelines for battery profiling: profiling_guidelines.md
