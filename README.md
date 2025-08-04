@@ -3,9 +3,9 @@
 [![Build Status](https://dev.azure.com/NordicSemiconductor/Wayland/_apis/build/status/NordicPlayground.pc-nrfconnect-npm?branchName=main)](https://dev.azure.com/NordicSemiconductor/Wayland/_build/results?buildId=56483&view=results)
 [![License](https://img.shields.io/badge/license-Modified%20BSD%20License-blue.svg)](LICENSE)
 
-nRF Connect nPM PowerUP is a desktop application intended to work with Nordic Semiconductor's
-PMIC Evaluation Kits (EKs) to allow customers to quickly and efficiently evaluate PMIC devices
-for their projects.
+nRF Connect nPM PowerUP is a desktop application intended to work with Nordic
+Semiconductor's PMIC Evaluation Kits (EKs) to allow customers to quickly and
+efficiently evaluate PMIC devices for their projects.
 
 Once connected to an EK, the app gives full control over the adjustable settings
 of the PMIC. Using the included battery models, you can also get an estimated
