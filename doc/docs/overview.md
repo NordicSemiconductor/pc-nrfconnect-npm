@@ -46,16 +46,16 @@ This side panel area contains the following buttons:
 
 |          Button          | Description |
 | ------------------------ | ----------- |
-| **Export Configuration** | Export the PMIC configuration based on the nPM PowerUP application settings. You can save the configuration to an `.overlay` file for [use in the nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/pmic/npm1300.html#importing_an_overlay_from_npm_powerup) or to a JSON file for later use in nPM PowerUP.</br></br>You can also set the configuration before you select a device and export it to a file ([Offline Mode](#virtual-device-selection-and-offline-mode-actions)). |
+| **Export Configuration** | Export the PMIC configuration based on the nPM PowerUP application settings. You can save the configuration to an `.overlay` file for [use in the nRF Connect SDK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/pmic/npm1300.html#importing_an_overlay_from_the_npm_powerup_app) or to a JSON file for later use in nPM PowerUP.</br></br>You can also set the configuration before you select a device and export it to a file ([Offline Mode](#virtual-device-selection-and-offline-mode-actions)). |
 | **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device ([Offline Mode](#virtual-device-selection-and-offline-mode-actions)).  |
 | **Open Serial Terminal** | Open the [Serial Terminal app](https://docs.nordicsemi.com/bundle/nrf-connect-serial-terminal/page/index.html) application in a separate window. Make sure to first [install the application](). |
 | **Reset Device**         | Reset the PMIC device and the nPM Controller. The PMIC default device configuration is restored.  |
 | **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory. |
 
-### nPM1300: Fuel Gauge
+### nPM1300 and nPM1304: Fuel Gauge
 
 !!! note "Note"
-     This feature is available for the nPM1300 EK.
+     This feature is available for the nPM1300 EK and the nPM1304 EK.
 
 This side panel area lets you select the following options:
 
@@ -63,7 +63,7 @@ This side panel area lets you select the following options:
 | -------------------------------- | ----------- |
 | **Active Battery Model**         | Select the battery model you want to use for Fuel Gauge in nPM PowerUP.        |
 | **Add New Active Battery Model** | Select a battery from selected vendors that has been profiled by Nordic Semiconductor or your own custom battery model, added with the **Profile Battery** feature and saved in the [**Profiles**](#profiles-tab) tab.        |
-| **Profile Battery**              | Create your own, custom battery profile, and collect the data. These are then saved in the [**Profiles**](#npm1300-profiles-tab) tab and added to the **Add New Active Battery Model** drop-down menu.</br></br>An additional board, nPM Fuel Gauge, is required to perform the battery profiling. See [Profiling a battery with nPM PowerUP](profiling_battery.md) for more information.        |
+| **Profile Battery**              | Create your own, custom battery profile, and collect the data. The results are then saved in the [**Profiles**](#npm1300-and-npm1304-profiles-tab) tab and added to the **Add New Active Battery Model** drop-down menu.</br></br>Clicking the button opens a window where you can select several options for the battery profiling:<br/>![Profile Battery test configuration](./screenshots/battery_profiling.PNG "Profile Battery test configuration")<br/>See the tooltips for more information about each of the options.</br></br>To perform the battery profiling with the nPM1300 EK, you need the nPM Fuel Gauge Board. See [Profiling a battery with nPM PowerUP](profiling_battery.md) for more information. |
 
 ### nPM2100: Power Source
 
@@ -96,10 +96,10 @@ The **Dashboard** tab provides a quick look overview of the major PMIC settings 
 !!! info "Tip"
       Use the expand button in the top-right corner of some of the tiles to see all the options of the given setting.
 
-## nPM1300: Charger tab
+## nPM1300 and nPM1304: Charger tab
 
 !!! note "Note"
-     This feature is available for the nPM1300 EK.
+     This feature is available for the nPM1300 EK and the nPM1304 EK.
 
 You can use the options in the **Charger** tab to control and monitor the charging settings and status of the PMIC device.
 
@@ -123,12 +123,12 @@ You can use the options in the **GPIOs** tab to configure the GPIO and LED pins 
 You can use the options in the **System Features** tab to configure **Reset control**, **Low Power control**, and **Timer**.
 Some devices also allow you to configure **Power Failure** and **Vbus input current limiter**.
 
-## nPM1300: Profiles tab
+## nPM1300 and nPM1304: Profiles tab
 
 !!! note "Note"
-     This feature is available for the nPM1300 EK.
+     This feature is available for the nPM1300 EK and the nPM1304 EK.
 
-The **Profiles** tab provides an overview of all battery profiles that you can select using the [Fuel Gauge drop-down menus](#npm1300-fuel-gauge).
+The **Profiles** tab provides an overview of all battery profiles that you can select using the [Fuel Gauge drop-down menus](#npm1300-and-nPM1304-fuel-gauge).
 
 Here you can make changes to the generated battery model settings, make edits to your custom projects, or merge individual temperature profiles.
 
@@ -137,7 +137,7 @@ Here you can make changes to the generated battery model settings, make edits to
 
 ### Custom profiles
 
-Here you can find all the custom profiles you have added with the [**Profile Battery** option](#npm1300-fuel-gauge).
+Here you can find all the custom profiles you have added with the [**Profile Battery** option](#npm1300-and-nPM1304-fuel-gauge).
 
 The following options are available for the custom profiles:
 
@@ -145,7 +145,7 @@ The following options are available for the custom profiles:
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Reload Projects**      | Refresh the list of projects and profiles.                                                                                             |
 | **Add Existing Project** | Add a new project to the list from a JSON file.                                                                                        |
-| **Create New Project**   | Create a new custom project template. This option includes some of the fields present when using the [**Profile Battery** option](#npm1300-fuel-gauge), but without collecting data. |
+| **Create New Project**   | Create a new custom project template. This option includes some of the fields present when using the [**Profile Battery** option](#npm1300-and-nPM1304-fuel-gauge), but without collecting data. |
 
 The following drop-down menu options are available for the project and profile sections:
 
@@ -154,7 +154,7 @@ The following drop-down menu options are available for the project and profile s
 | **Process Included Data**| Project  | If your project includes multiple temperature profiles, you can include a selection of them with the **Include** toggle. Using this option processes only the included temperature profiles. |
 | **Save Battery Model**   | Project  | Save the battery model for the entire project to a JSON or an INC file. This only saves the temperature profiles you have selected with the **Include** toggle. |
 | **Write Battery Model**  | Project  | Write the battery model for the entire project to the nPM Controller on the EK. This only writes the temperature profiles you have selected with the **Include** toggle. |
-| **Add Profile**          | Project  | Add a new battery profile with a specific temperature and a CSV data file. Data files are generated when you use the [**Profile Battery** option](#npm1300-fuel-gauge). |
+| **Add Profile**          | Project  | Add a new battery profile with a specific temperature and a CSV data file. Data files are generated when you use the [**Profile Battery** option](#npm1300-and-nPM1304-fuel-gauge). |
 | **Open Folder**          | Project  | Open the project directory in the **File Explorer**. |
 | **Edit Project**         | Project  | Edit the project settings.  |
 | **Remove Project**       | Project  | Remove the current project, including all battery profiles. |
@@ -170,7 +170,7 @@ The following drop-down menu options are available for the project and profile s
 Here you can write and save battery models from selected vendors that has been profiled by Nordic Semiconductor.
 
 When you **Write Model**, you are going to write new battery model on the nPM Controller to one of its available battery model slots.
-This can overwrite the [**Active Battery Model**](#npm1300-fuel-gauge).
+This can overwrite the [**Active Battery Model**](#npm1300-and-nPM1304-fuel-gauge).
 
 When you **Save Model**, the battery model is saved in the selected directory either to a JSON file that can be downloaded to the nPM Controller or to an INC file. The INC file format is meant for integrating the battery model into your final application with a Nordic System on Chip (SoC).
 
