@@ -5,6 +5,8 @@
 
 Use the {{app_name}} together with the [nPM1300 Evaluation Kit (EK)](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/intro.html) or the nPM1304 Evaluation Kit (EK) to profile your battery and generate a battery model.
 
+Once the battery model is extracted, you only need the PMIC and the SoC (or SiP) in your application to do fuel gauging.
+
 ## Prerequisites
 
 Depending on the EK you are using:
@@ -18,8 +20,6 @@ Depending on the EK you are using:
 
     * The nPM Fuel Gauge Board is not required.
     * Connect the nPM1304 EK and download the software.
-
-Once the battery model is extracted, you only need the PMIC and the SoC (or SiP) in your application to do fuel gauging.
 
 ## Profiling a battery in the {{app_name}}
 
@@ -41,6 +41,6 @@ Complete the following steps to profile a battery and use the generated battery 
 1. After the temperature profiling at a given temperature is complete, follow the instructions in the application to charge the battery at room temperature before profiling at the next test temperature. When all the individual temperature models have been completed, they are merged to generate the final battery model file. The final battery model is automatically saved as both a JSON file and an INC file.
 1. Select [**Add New Active Battery Model**](./overview.md#npm1300-and-nPM1304-fuel-gauge) in the side panel.</br>
    A drop-down menu appears.
-1. Select **Custom Model** to load the generated JSON battery model file to the host System on Chip (SoC) of nPM1300 EK.
+1. Select **Custom Model** to load the generated JSON battery model file to the host System on Chip (SoC) of the nPM1300 EK or the nPM1304 EK.
 
 To start fuel gauge evaluations using a battery model, see [Evaluating a battery model with nPM PowerUP](evaluating_battery.md).
