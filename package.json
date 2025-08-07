@@ -17,7 +17,7 @@
     "nrfConnectForDesktop": {
         "nrfutil": {
             "device": [
-                "2.10.2"
+                "2.12.6"
             ],
             "npm": [
                 "0.3.1"
