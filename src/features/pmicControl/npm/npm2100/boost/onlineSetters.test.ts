@@ -88,16 +88,44 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
             async modeControl => {
                 await pmic.boostModule[0].set.modeControl(modeControl);
 
-                expect(mockEnqueueRequest).toBeCalledTimes(1);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npm2100 boost mode set ${modeControl}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+                if (modeControl === 'PASS') {
+                    expect(mockEnqueueRequest).toBeCalledTimes(3);
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        1,
+                        `npm2100 boost voutsel set Software`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npm2100 boost vout SOFTWARE set 1800`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        3,
+                        `npm2100 boost mode set ${modeControl}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                // Updates should only be emitted when we get response
-                expect(mockOnBoostUpdate).toBeCalledTimes(0);
+                    // Updates should only be emitted when we get response
+                    expect(mockOnBoostUpdate).toBeCalledTimes(0);
+                } else {
+                    expect(mockEnqueueRequest).toBeCalledTimes(1);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npm2100 boost mode set ${modeControl}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Updates should only be emitted when we get response
+                    expect(mockOnBoostUpdate).toBeCalledTimes(0);
+                }
             }
         );
 
@@ -185,7 +213,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
             expect(mockOnBoostUpdate).toBeCalledTimes(0);
         });
 
-        test.only('Set vOut - Fail on 2nd Call', async () => {
+        test('Set vOut - Fail on 2nd Call', async () => {
             const value = 2.7;
             const command = `npm2100 boost vout SOFTWARE set ${value * 1000}`;
 
@@ -268,27 +296,147 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     pmic.boostModule[0].set.modeControl(modeControl)
                 ).rejects.toBeUndefined();
 
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).toBeCalledWith(
-                    `npm2100 boost mode set ${modeControl}`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+                if (modeControl === 'PASS') {
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npm2100 boost voutsel set Software`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
 
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npm2100 boost mode get`,
-                    expect.anything(),
-                    undefined,
-                    true
-                );
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npm2100 boost voutsel get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                } else {
+                    expect(mockEnqueueRequest).toBeCalledTimes(2);
+                    expect(mockEnqueueRequest).toBeCalledWith(
+                        `npm2100 boost mode set ${modeControl}`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+
+                    // Refresh data due to error
+                    expect(mockEnqueueRequest).nthCalledWith(
+                        2,
+                        `npm2100 boost mode get`,
+                        expect.anything(),
+                        undefined,
+                        true
+                    );
+                }
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBoostUpdate).toBeCalledTimes(0);
             }
         );
+
+        test('Set modeControl - Fail on 2nd Call', async () => {
+            const modeControl = 'PASS';
+            const command = `npm2100 boost voutsel get`;
+
+            mockEnqueueRequest
+                .mockImplementationOnce(helpers.registerCommandCallbackSuccess)
+                .mockImplementationOnce(
+                    (_command: string, callback?: ShellParserCallbacks) => {
+                        callback?.onError('Error: Error case', command);
+                        return Promise.resolve();
+                    }
+                );
+
+            await expect(
+                pmic.boostModule[0].set.modeControl(modeControl)
+            ).rejects.toBeUndefined();
+
+            expect(mockEnqueueRequest).toBeCalledTimes(3);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npm2100 boost voutsel set Software`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npm2100 boost vout SOFTWARE set 1800`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Refresh data due to error
+            expect(mockEnqueueRequest).nthCalledWith(
+                3,
+                `npm2100 boost vout SOFTWARE get`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnBoostUpdate).toBeCalledTimes(0);
+        });
+
+        test('Set modeControl - Fail on 3rd Call', async () => {
+            const modeControl = 'PASS';
+            const command = `npm2100 boost voutsel get`;
+
+            mockEnqueueRequest
+                .mockImplementationOnce(helpers.registerCommandCallbackSuccess)
+                .mockImplementationOnce(helpers.registerCommandCallbackSuccess)
+                .mockImplementationOnce(
+                    (_command: string, callback?: ShellParserCallbacks) => {
+                        callback?.onError('Error: Error case', command);
+                        return Promise.resolve();
+                    }
+                );
+
+            await expect(
+                pmic.boostModule[0].set.modeControl(modeControl)
+            ).rejects.toBeUndefined();
+
+            expect(mockEnqueueRequest).toBeCalledTimes(4);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npm2100 boost voutsel set Software`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                `npm2100 boost vout SOFTWARE set 1800`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            expect(mockEnqueueRequest).nthCalledWith(
+                3,
+                `npm2100 boost mode set PASS`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Refresh data due to error
+            expect(mockEnqueueRequest).nthCalledWith(
+                4,
+                `npm2100 boost mode get`,
+                expect.anything(),
+                undefined,
+                true
+            );
+
+            // Updates should only be emitted when we get response
+            expect(mockOnBoostUpdate).toBeCalledTimes(0);
+        });
 
         test.each(BoostPinSelectionValues)(
             'Set pinSelection - Fail immediately',
