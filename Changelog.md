@@ -1,3 +1,11 @@
+## 2.2.3 - Unreleased
+
+### Changed
+
+-   nPM2100: Setting the Boost regulator to the forced pass-through mode will
+    now first set the output voltage VOUT to the minimum setting (1.8 V), in
+    accordance with the datasheet.
+
 ## 2.2.2 - 2025-08-04
 
 ### Changed
