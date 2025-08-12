@@ -159,20 +159,9 @@ export default ({
                         }
                         items={modeControlItems}
                         onSelect={item =>
-                            item.value === 'PASS'
-                                ? /* Decrease Vout below Vbat before forcing PT
-                                   * to avoid increased current consumption
-                                   */
-                                  boostModule.set
-                                      .vOut(range.min)
-                                      .then(() =>
-                                          boostModule.set.modeControl(
-                                              item.value as BoostModeControl
-                                          )
-                                      )
-                                : boostModule.set.modeControl(
-                                      item.value as BoostModeControl
-                                  )
+                            boostModule.set.modeControl(
+                                item.value as BoostModeControl
+                            )
                         }
                         selectedItem={
                             modeControlItems.find(
