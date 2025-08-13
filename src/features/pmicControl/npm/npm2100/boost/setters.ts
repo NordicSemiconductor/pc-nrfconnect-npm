@@ -9,6 +9,7 @@ import {
     Boost,
     BoostExport,
     BoostModeControl,
+    BoostModule,
     BoostPinMode,
     BoostPinSelection,
     BoostVOutSel,
@@ -27,7 +28,8 @@ export class BoostSet {
             onError?: (response: string, command: string) => void
         ) => void,
         private dialogHandler: ((dialog: PmicDialog) => void) | null,
-        private offlineMode: boolean
+        private offlineMode: boolean,
+        private range: BoostModule['ranges']
     ) {
         this.get = new BoostGet(sendCommand);
     }
@@ -134,14 +136,26 @@ export class BoostSet {
 
                 resolve();
             } else {
-                this.sendCommand(
-                    `npm2100 boost mode set ${modeControl}`,
-                    () => resolve(),
-                    () => {
-                        this.get.modeControl();
-                        reject();
-                    }
-                );
+                const action = () => {
+                    this.sendCommand(
+                        `npm2100 boost mode set ${modeControl}`,
+                        () => resolve(),
+                        () => {
+                            this.get.modeControl();
+                            reject();
+                        }
+                    );
+                };
+                if (modeControl === 'PASS') {
+                    /* Decrease Vout below Vbat before forcing PT
+                     * to avoid increased current consumption
+                     */
+                    this.vOut(this.range.voltage.min)
+                        .then(action)
+                        .catch(reject);
+                } else {
+                    action();
+                }
             }
         });
     }

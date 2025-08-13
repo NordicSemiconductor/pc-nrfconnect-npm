@@ -50,7 +50,8 @@ export default class Module implements BoostModule {
             eventEmitter,
             sendCommand,
             dialogHandler,
-            offlineMode
+            offlineMode,
+            this.ranges
         );
         this._callbacks = boostCallbacks(shellParser, eventEmitter);
     }
