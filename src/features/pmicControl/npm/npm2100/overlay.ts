@@ -228,7 +228,7 @@ const generateShipHoldLongPressProperty = (
         return 'shiphold-longpress = "ship";';
     }
 
-    return 'shiphold-longpress = "disable"';
+    return 'shiphold-longpress = "disable";';
 };
 
 const gpioPullToMacro = (pull: GPIOPull) => {
@@ -297,13 +297,13 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
                 ? `
         host-int-type = "level";
         pmic-int-pin = <${interruptPin}>;
-        pmic-int-flags = <${[
+        pmic-int-flags = <(${[
             gpioPullToMacro(interruptGpio.pull),
             gpioInteruuptModeToMacro(interruptGpio.mode),
             interruptGpio.openDrain ? 'GPIO_OPEN_DRAIN' : undefined,
         ]
             .filter(Boolean)
-            .join(' | ')}>; // TODO: confirm this is correct
+            .join(' | ')})>;
             `
                 : ''
         }
