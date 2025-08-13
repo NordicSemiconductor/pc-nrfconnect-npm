@@ -52,18 +52,14 @@ export class GpioSet {
             new Promise<void>((resolve, reject) => {
                 if (this.offlineMode) {
                     const isOutput = mode === GPIOMode2100.Output;
-                    const isInterrupt =
-                        mode ===
-                            GPIOMode2100['Interrupt output, active high'] ||
-                        mode === GPIOMode2100['Interrupt output, active low'];
 
                     this.eventEmitter.emitPartialEvent<GPIO>(
                         'onGPIOUpdate',
                         {
                             mode,
-                            driveEnabled: !isInterrupt,
+                            driveEnabled: true,
                             openDrainEnabled: isOutput,
-                            pullEnabled: !isInterrupt && !isOutput,
+                            pullEnabled: true,
                         },
                         this.index
                     );
