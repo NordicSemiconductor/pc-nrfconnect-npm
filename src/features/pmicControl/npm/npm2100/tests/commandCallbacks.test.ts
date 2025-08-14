@@ -227,10 +227,7 @@ Battery models stored in database:
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        const isOutput = mode === GPIOMode2100.Output;
-        const isInterrupt =
-            mode === GPIOMode2100['Interrupt output, active high'] ||
-            mode === GPIOMode2100['Interrupt output, active low'];
+        const isInput = mode === GPIOMode2100.Input;
 
         callback?.onSuccess(`Value: ${mode}.`, command);
 
@@ -238,9 +235,9 @@ Battery models stored in database:
         expect(mockOnGpioUpdate).toBeCalledWith({
             data: {
                 mode,
-                driveEnabled: !isInterrupt,
-                openDrainEnabled: isOutput,
-                pullEnabled: !isInterrupt,
+                driveEnabled: !isInput,
+                openDrainEnabled: !isInput,
+                pullEnabled: true,
             },
             index,
         });

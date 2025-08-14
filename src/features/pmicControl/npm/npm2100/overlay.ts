@@ -99,7 +99,7 @@ const generateBoost = (
     boost: BoostExport,
     boostModule: BoostModule,
     gpios: GPIOExport[]
-) => `npm2100ek_boost: BOOST {
+) => `npm2100_boost: BOOST {
                 regulator-always-on;
                 regulator-min-microvolt = <${toMicro(
                     boostModule.ranges.voltage.min
@@ -178,7 +178,7 @@ const generateLDOSW = (
     ldoModule: LdoModule,
     gpios: GPIOExport[]
 ) =>
-    `npm2100ek_ldosw: LDOSW {
+    `npm2100_ldosw: LDOSW {
                 regulator-min-microvolt = <${toMicro(
                     ldoModule.ranges.voltage.min
                 )}>;
@@ -288,7 +288,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
 #include <zephyr/dt-bindings/gpio/nordic-npm2100-gpio.h>
 
 &arduino_i2c {
-    npm2100ek_pmic: pmic@74 {
+    npm2100_pmic: pmic@74 {
         compatible = "nordic,npm2100";
         reg = <0x74>;
 
@@ -315,14 +315,14 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
         )}
         
 
-        npm2100ek_gpio: gpio-controller {
+        npm2100_gpio: gpio-controller {
             compatible = "nordic,npm2100-gpio";
             gpio-controller;
             #gpio-cells = <2>;
             ngpios = <2>;
         };
 
-        npm2100ek_regulators: regulators {
+        npm2100_regulators: regulators {
             compatible = "nordic,npm2100-regulator";
 
             ${npmConfig.boosts
