@@ -26,6 +26,7 @@ import type Npm2100 from './pmic2100Device';
 import { nPM2100GPIOControlMode, nPM2100LdoModeControl } from './types';
 
 const toMicro = (value: number) => value * 1000000;
+const milliToMicro = (value: number) => value * 1000;
 // const toMilli = (value: number) => value * 1000;
 
 const boostModeControlToMacro = (modeControl: BoostModeControl) => {
@@ -196,7 +197,7 @@ const generateLDOSW = (
                 }
                 ${
                     ldo.ocpEnabled
-                        ? `regulator-init-microamp = <${toMicro(
+                        ? `regulator-init-microamp = <${milliToMicro(
                               parseInt(
                                   (ldo.ldoSoftStart && ldo.mode === 'LDO'
                                       ? ldo.ldoSoftStart
@@ -271,7 +272,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
         isInterruptPin(gpio.mode)
     );
 
-    if (interruptPin === -1 || numberOfGPIOInterrupts > 1) {
+    if (numberOfGPIOInterrupts > 1) {
         logger.warn(`TODO: Even though it's possible to set both of them as such, we should probably disallow it or
          * warn when such config is exported, since it makes no sense in real application.`);
     }
