@@ -99,7 +99,7 @@ export default class Npm2100 extends BaseNpmDevice {
                                 // Handled in charger callbacks
                                 break;
                             case 'module_fg':
-                                // Handled in fuelGauge callbacks
+                                this.processModuleFg(loggingEvent);
                                 break;
                         }
 
@@ -110,6 +110,12 @@ export default class Npm2100 extends BaseNpmDevice {
                     });
                 })
             );
+        }
+    }
+
+    private processModuleFg({ message }: LoggingEvent) {
+        if (message.startsWith('Battery model applied:')) {
+            this.fuelGaugeModule?.get.activeBatteryModel();
         }
     }
 
@@ -263,7 +269,6 @@ export default class Npm2100 extends BaseNpmDevice {
 
         if (match && match.length === 2) {
             const holderId = parseInt(match[1], 10);
-            console.log(holderId);
             this.eventEmitter.emit('onBatteryAddonBoardIdUpdate', holderId);
         }
     }
