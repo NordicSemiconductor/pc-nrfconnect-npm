@@ -59,20 +59,15 @@ export default (
                                 ] as keyof typeof GPIOMode2100
                             ];
 
-                        const isOutput = mode === GPIOMode2100.Output;
-                        const isInterrupt =
-                            mode ===
-                                GPIOMode2100['Interrupt output, active high'] ||
-                            mode ===
-                                GPIOMode2100['Interrupt output, active low'];
+                        const isInput = mode === GPIOMode2100.Input;
 
                         eventEmitter.emitPartialEvent<GPIO>(
                             'onGPIOUpdate',
                             {
                                 mode,
-                                driveEnabled: !isInterrupt,
-                                openDrainEnabled: isOutput,
-                                pullEnabled: !isInterrupt,
+                                driveEnabled: !isInput,
+                                openDrainEnabled: !isInput,
+                                pullEnabled: true,
                             },
                             i
                         );
