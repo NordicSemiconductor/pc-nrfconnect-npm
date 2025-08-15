@@ -1,12 +1,21 @@
 ## 2.2.3 - Unreleased
 
+### Added
+
+-   Enhanced nPM2100 overlay file generation with comprehensive device
+    configuration export including GPIO interrupt handling, power management
+    settings, regulator modes, and improved naming conventions
+
 ### Changed
 
 -   nPM2100: Setting the Boost regulator to the forced pass-through mode will
     now first set the output voltage VOUT to the minimum setting (1.8 V), in
     accordance with the datasheet.
--   Overlay for nPM 2100 is now more complete to match the setting of in th nPM
-    PowerUP app.
+
+### Fixed
+
+-   Fixed syntax errors in generated nPM2100 overlay files, including proper
+    device tree property syntax and macro usage
 
 ## 2.2.2 - 2025-08-04
 
