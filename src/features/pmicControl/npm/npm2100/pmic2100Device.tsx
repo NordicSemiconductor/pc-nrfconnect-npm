@@ -55,7 +55,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 },
                 maxEnergyExtraction: true,
                 noOfLEDs: 0,
-                noOfBatterySlots: 1,
+                noOfBatterySlots: 3,
                 gpios: {
                     Module: GpioModule,
                     count: 2,
