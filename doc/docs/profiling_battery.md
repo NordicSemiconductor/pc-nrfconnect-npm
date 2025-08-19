@@ -38,9 +38,26 @@ Complete the following steps to profile a battery and use the generated battery 
 
     The measurement data is automatically processed in the Nordic battery modeling software to make a single battery model file for each test temperature.
 
-1. After the temperature profiling at a given temperature is complete, follow the instructions in the application to charge the battery at room temperature before profiling at the next test temperature. When all the individual temperature models have been completed, they are merged to generate the final battery model file. The final battery model is automatically saved as both a JSON file and an INC file.
-1. Select [**Add New Active Battery Model**](./overview.md#fuel-gauge) in the side panel.</br>
-   A drop-down menu appears.
-1. Select **Custom Model** to load the generated JSON battery model file to the host System on Chip (SoC) of the nPM1300 EK or the nPM1304 EK.
+1. After the temperature profiling at a given temperature is complete, follow the instructions in the application to charge the battery at room temperature before profiling at the next test temperature.
+
+When all the individual temperature models have been completed, they are merged to generate the final battery model file. The final battery model is automatically saved as both a JSON file and an INC file.
 
 To start fuel gauge evaluations using a battery model, see [Evaluating a battery model with nPM PowerUP](evaluating_battery.md).
+
+## Profiling output files
+
+All or some of the following files are generated as the result of profiling a battery:
+
+* A JSON file for the combined temperature model, used for fuel gauge evaluations in the {{app_name}}
+* An INC file that you can use to integrate the battery model into your application
+* `profileSettings.json` that contains the {{app_name}} settings for the profiling process
+* Directory for each battery profile, which includes the following files:
+
+    * CSV data file for the given profile and temperature, which can be used to [merge temperature profiles](./working_with_temperature_profiles.md)
+    * Optional debug directory that is created if you click [**Record Events**](./overview.md#record-events) in the side panel.<br>
+     The debug directory contains the following files:
+
+        * `all_events.csv` - All events recorded during the profiling process
+        * `module_cc_profiling.csv` - Coulomb counter profiling data
+        * `module_pmic_adc.csv` - PMIC ADC measurements
+        * `module_pmic_irq.csv` - PMIC interrupt events
