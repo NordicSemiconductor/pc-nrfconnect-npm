@@ -32,7 +32,7 @@ import overlay from './overlay';
 import ResetModule from './reset';
 import TimerConfigModule from './timerConfig';
 
-export const npm2100FWVersion = '0.7.1+0';
+export const npm2100FWVersion = '0.7.2+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
 export default class Npm2100 extends BaseNpmDevice {
