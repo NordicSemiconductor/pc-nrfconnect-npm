@@ -1,5 +1,9 @@
 ## 2.2.3 - Unreleased
 
+### Added
+
+-   nPM2100: Uploading of custom battery models.
+
 ### Changed
 
 -   nPM2100: Setting the Boost regulator to the forced pass-through mode will
