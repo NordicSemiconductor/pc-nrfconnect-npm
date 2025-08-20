@@ -2,9 +2,9 @@
 
 ### Added
 
--   Enhanced nPM2100 overlay file generation with comprehensive device
-    configuration export including GPIO interrupt handling, power management
-    settings, regulator modes, and improved naming conventions
+-   Improved nPM2100 overlay file generation. This covers comprehensive device
+    configuration export, including GPIO interrupt handling, power management
+    settings, regulator modes, and improved naming conventions.
 
 ### Changed
 
@@ -15,7 +15,7 @@
 ### Fixed
 
 -   Fixed syntax errors in generated nPM2100 overlay files, including proper
-    device tree property syntax and macro usage
+    devicetree property syntax and macro usage.
 
 ## 2.2.2 - 2025-08-04
 
