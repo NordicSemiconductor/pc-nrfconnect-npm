@@ -2,7 +2,8 @@
 
 ### Added
 
--   nPM2100: Uploading of custom battery models from the **Fuel Gauge** side panel.
+-   nPM2100: Uploading of custom battery models from the **Fuel Gauge** side
+    panel.
 
 ### Changed
 
