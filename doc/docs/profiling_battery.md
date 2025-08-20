@@ -25,7 +25,7 @@ Depending on the EK you are using:
 
 Complete the following steps to profile a battery and use the generated battery model to initialize and run the fuel gauge in the {{app_name}}:
 
-1. Click the [**Profile Battery**](overview.md#npm1300-and-npm1304-fuel-gauge) button in the side panel.
+1. Click the [**Profile Battery**](overview.md#fuel-gauge) button in the side panel.
 1. Enter the battery data and one or more temperatures for the profiling test. Provide the generic information about the selected battery. Refer to the battery datasheet for information. For further information on profiling, see [Guidelines for battery profiling](profiling_guidelines.md).
 
     ![Profile Battery test configuration](./screenshots/battery_profiling.PNG "Profile Battery test configuration")
@@ -39,7 +39,7 @@ Complete the following steps to profile a battery and use the generated battery 
     The measurement data is automatically processed in the Nordic battery modeling software to make a single battery model file for each test temperature.
 
 1. After the temperature profiling at a given temperature is complete, follow the instructions in the application to charge the battery at room temperature before profiling at the next test temperature. When all the individual temperature models have been completed, they are merged to generate the final battery model file. The final battery model is automatically saved as both a JSON file and an INC file.
-1. Select [**Add New Active Battery Model**](./overview.md#npm1300-and-nPM1304-fuel-gauge) in the side panel.</br>
+1. Select [**Add New Active Battery Model**](./overview.md#fuel-gauge) in the side panel.</br>
    A drop-down menu appears.
 1. Select **Custom Model** to load the generated JSON battery model file to the host System on Chip (SoC) of the nPM1300 EK or the nPM1304 EK.
 

@@ -32,7 +32,7 @@ import overlay from './overlay';
 import ResetModule from './reset';
 import TimerConfigModule from './timerConfig';
 
-export const npm2100FWVersion = '0.7.1+0';
+export const npm2100FWVersion = '0.7.2+0';
 export const minimumHWVersion = '0.8.0'; // TODO test with new kits once we have one!!
 
 export default class Npm2100 extends BaseNpmDevice {
@@ -55,7 +55,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 },
                 maxEnergyExtraction: true,
                 noOfLEDs: 0,
-                noOfBatterySlots: 1,
+                noOfBatterySlots: 3,
                 gpios: {
                     Module: GpioModule,
                     count: 2,
@@ -99,7 +99,7 @@ export default class Npm2100 extends BaseNpmDevice {
                                 // Handled in charger callbacks
                                 break;
                             case 'module_fg':
-                                // Handled in fuelGauge callbacks
+                                this.processModuleFg(loggingEvent);
                                 break;
                         }
 
@@ -110,6 +110,12 @@ export default class Npm2100 extends BaseNpmDevice {
                     });
                 })
             );
+        }
+    }
+
+    private processModuleFg({ message }: LoggingEvent) {
+        if (message.startsWith('Battery model applied:')) {
+            this.fuelGaugeModule?.get.activeBatteryModel();
         }
     }
 
@@ -263,7 +269,6 @@ export default class Npm2100 extends BaseNpmDevice {
 
         if (match && match.length === 2) {
             const holderId = parseInt(match[1], 10);
-            console.log(holderId);
             this.eventEmitter.emit('onBatteryAddonBoardIdUpdate', holderId);
         }
     }

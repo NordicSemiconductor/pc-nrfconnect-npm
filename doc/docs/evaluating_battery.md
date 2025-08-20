@@ -6,7 +6,7 @@ To start fuel gauge evaluations using a battery model, complete the following st
 
     - You have a battery connected to the EK.
     - You have the **Fuel Gauge** setting enabled on the [**Dashboard**](./overview.md#dashboard-tab) tab.
-    - For nPM1300 and nPM1304: You have an active battery model selected in the [**Fuel Gauge**](./overview.md#npm1300-and-nPM1304-fuel-gauge) side panel, either using the **Active Battery Model** for a preloaded battery model or the **Add New Battery Model** > **Custom Model** for your own custom battery model from a JSON file.
+    - You have an active battery model selected in the [**Fuel Gauge**](./overview.md#fuel-gauge) side panel, either using the **Active Battery Model** for a preloaded battery model or the **Add New Battery Model** > **Custom Model** for your own custom battery model from a JSON file.
 
 1. Open the [**Graph**](./overview.md#graph-tab) tab.
 1. Make sure the **Live** toggle is enabled.</br>

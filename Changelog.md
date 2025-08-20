@@ -1,5 +1,10 @@
 ## 2.2.3 - Unreleased
 
+### Added
+
+-   nPM2100: Uploading of custom battery models from the **Fuel Gauge** side
+    panel.
+
 ### Changed
 
 -   nPM2100: Setting the Boost regulator to the forced pass-through mode will
