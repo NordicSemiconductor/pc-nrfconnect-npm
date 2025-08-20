@@ -19,7 +19,7 @@ Depending on the EK you are using:
 * nPM1304 EK:
 
     * The nPM Fuel Gauge Board is not required.
-    * Connect the nPM1304 EK and download the software.
+    * Connect the nPM1304 EK and download the software as described in [Connect the nPM1304 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1304_ek/page/UG/nPM1304_EK/use_ek_power_up.html).
 
 ## Profiling a battery in the {{app_name}}
 
@@ -54,10 +54,5 @@ All or some of the following files are generated as the result of profiling a ba
 * Directory for each battery profile, which includes the following files:
 
     * CSV data file for the given profile and temperature, which can be used to [merge temperature profiles](./working_with_temperature_profiles.md)
-    * Optional debug directory that is created if you click [**Record Events**](./overview.md#record-events) in the side panel.<br>
-     The debug directory contains the following files:
-
-        * `all_events.csv` - All events recorded during the profiling process
-        * `module_cc_profiling.csv` - Coulomb counter profiling data
-        * `module_pmic_adc.csv` - PMIC ADC measurements
-        * `module_pmic_irq.csv` - PMIC interrupt events
+    * Debug directory that includes debugging files with information about the profiling process, such as profiling commands and logs, and about the functioning of the app.<br/>
+      You can share these files with Nordic Semiconductor if you encounter issues while profiling. You can also manually create these files with the [**Record Events**](overview.md#record-events) button in the side panel, but the contents might be different when not profiling.

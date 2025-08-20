@@ -50,7 +50,7 @@ This side panel area contains the following buttons:
 | **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device ([Offline Mode](#virtual-device-selection-and-offline-mode-actions)).  |
 | **Open Serial Terminal** | Open the [Serial Terminal app](https://docs.nordicsemi.com/bundle/nrf-connect-serial-terminal/page/index.html) application in a separate window. Make sure to first [install the application](). |
 | **Reset Device**         | Reset the PMIC device and the nPM Controller. The PMIC default device configuration is restored.  |
-| **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory. |
+| **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory.<br/>You can share these files with Nordic Semiconductor if you encounter issues while profiling.<br/><br/>Recording events is automatically started when you [profile a battery](profiling_battery.md). |
 
 ### Fuel Gauge
 

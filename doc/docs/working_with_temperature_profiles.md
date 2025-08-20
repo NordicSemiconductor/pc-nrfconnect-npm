@@ -59,6 +59,9 @@ Complete the following steps to use a pre-profiled battery model:
 
     ![Bundled profiles section](./screenshots/npm_profiles_tab_bundled.png "Bundled profiles section")
 
-1. For the battery model you want to use, click the **Save Model** button next to it to save the model to your computer in [INC or JSON](profiling_battery.md#profiling-output-files) format.
-1. Configure your application to use the [nRF Fuel Gauge library](https://docs.nordicsemi.com/bundle/nrfxlib-apis-latest/page/group_nrf_fuel_gauge.html) from the nRF Connect SDK.<br/>
-   You can also check out the [fuel gauge sample](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/pmic.html) for your PMIC device for an implementation example.
+1. For the battery model you want to use, click the **Save Model** button next to it to save the model to your computer in [INC](profiling_battery.md#profiling-output-files) format.
+1. Configure your application to use the [nRF Fuel Gauge library](https://docs.nordicsemi.com/bundle/nrfxlib-apis-latest/page/group_nrf_fuel_gauge.html) from the nRF Connect SDK.
+
+You can also check out the [nPM1300 and nPM1304 fuel gauge sample](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/pmic.html) for an implementation example. If you decide to use the sample, replace the default battery model used in the fuel gauge sample with the downloaded model. See the sample documentation for more information.
+
+Once your application is ready, you can run it on your PMIC device and proceed to [evaluate the battery model](evaluating_battery.md).
