@@ -3,11 +3,10 @@
 ### Added
 
 -   nPM2100:
-    -   Uploading of custom battery models from the **Fuel Gauge** side
-        panel.
-    -   Improved nPM2100 overlay file generation. This covers comprehensive device
-        configuration export, including GPIO interrupt handling, power management
-        settings, regulator modes, and improved naming conventions.
+    -   Uploading of custom battery models from the **Fuel Gauge** side panel.
+    -   Improved nPM2100 overlay file generation. This covers comprehensive
+        device configuration export, including GPIO interrupt handling, power
+        management settings, regulator modes, and improved naming conventions.
 
 ### Changed
 
