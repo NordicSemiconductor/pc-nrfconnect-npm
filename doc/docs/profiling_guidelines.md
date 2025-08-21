@@ -9,7 +9,7 @@ The guidelines in this section optimize the use of the {{app_name}} for [battery
 - Ensure a solid, low-resistance battery connection to the EK. Make sure to use stable connectors. Poor contacts can cause profiling or model errors (or both).
 
     !!! info "Tip"
-        For batteries without leads (pads only, for example smart-ring batteries): solder them directly to the nPM1304 EK Battery pads and add a 100-nF capacitor between the battery and the nPM1304 EK Battery pads. For more information, see the [Power supply](https://docs.nordicsemi.com/bundle/ug_npm1304_ek/page/UG/nPM1304_EK/power_supply.html) chapterin the nPM1304 EK hardware user guide.
+        For batteries without leads (pads only, for example smart-ring batteries), solder them directly to the nPM1304 EK Battery pads. For more information, see the [Power supply](https://docs.nordicsemi.com/bundle/ug_npm1304_ek/page/UG/nPM1304_EK/power_supply.html) chapter in the nPM1304 EK hardware user guide.
 
 - Due to the increased non-linearities of batteries operating at temperatures below zero degrees Celsius, it is recommended to conduct battery profiling exclusively above zero degrees. Avoid profiling at temperatures below freezing or in extreme heat conditions.
 
