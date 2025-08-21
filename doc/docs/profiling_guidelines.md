@@ -6,12 +6,21 @@
 The guidelines in this section optimize the use of the {{app_name}} for [battery profiling](profiling_battery.md).
 
 - Before starting battery profiling, refer to the battery datasheet and ensure that the parameters are set correctly. This includes specification of the battery capacity, termination voltages, and any other relevant parameters provided in the datasheet.
+- Ensure a solid, low-resistance battery connection to the EK. Make sure to use stable connectors. Poor contacts can cause profiling or model errors (or both).
+
+    !!! info "Tip"
+        For batteries without leads (pads only, for example smart-ring batteries), solder them directly to the nPM1304 EK Battery pads. For more information, see the [Power supply](https://docs.nordicsemi.com/bundle/ug_npm1304_ek/page/UG/nPM1304_EK/power_supply.html) chapter in the nPM1304 EK hardware user guide.
+
 - Due to the increased non-linearities of batteries operating at temperatures below zero degrees Celsius, it is recommended to conduct battery profiling exclusively above zero degrees. Avoid profiling at temperatures below freezing or in extreme heat conditions.
 
     !!! note "Note"
         Even if the battery is profiled at temperatures above zero Celsius, the fuel gauge can still perform reliably below zero within the standard discharge conditions of the battery.
 
 - To account for temperature variations and improve the accuracy of state-of-charge estimations, profile the battery at three different test temperatures. For example, if the operating temperature of the device ranges from -15°C to 45°C, you can profile the battery at 5°C, 25°C, and 45°C. The final battery model will be created by combining the individual temperature profiles.
+
+    !!! note "Note"
+        You can also profile the battery at each temperature separately and then use the nPM PowerUP [**Profiles**](./overview.md#npm1300-and-npm1304-profiles-tab) tab to merge the individual models into a single multi-temperature model. For details, see [Working with profiles](working_with_profiles.md).
+
 - The time to profile the battery takes approximately 48 hours per temperature, but can be longer for higher capacity batteries. Do not modify the device configuration during the profiling process as this causes the profiling to abort.
 - Ensure that your computer does not go into sleep mode or hibernate during the profiling process.
 - To avoid issues with computer restarting due to system updates, the computer can be put in flight mode during profiling.

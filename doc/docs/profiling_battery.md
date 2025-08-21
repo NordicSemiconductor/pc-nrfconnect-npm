@@ -19,7 +19,7 @@ Depending on the EK you are using:
 * nPM1304 EK:
 
     * The nPM Fuel Gauge Board is not required.
-    * Connect the nPM1304 EK and download the software.
+    * Connect the nPM1304 EK and download the software as described in [Connect the nPM1304 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1304_ek/page/UG/nPM1304_EK/use_ek_power_up.html).
 
 ## Profiling a battery in the {{app_name}}
 
@@ -38,9 +38,21 @@ Complete the following steps to profile a battery and use the generated battery 
 
     The measurement data is automatically processed in the Nordic battery modeling software to make a single battery model file for each test temperature.
 
-1. After the temperature profiling at a given temperature is complete, follow the instructions in the application to charge the battery at room temperature before profiling at the next test temperature. When all the individual temperature models have been completed, they are merged to generate the final battery model file. The final battery model is automatically saved as both a JSON file and an INC file.
-1. Select [**Add New Active Battery Model**](./overview.md#fuel-gauge) in the side panel.</br>
-   A drop-down menu appears.
-1. Select **Custom Model** to load the generated JSON battery model file to the host System on Chip (SoC) of the nPM1300 EK or the nPM1304 EK.
+1. After the temperature profiling at a given temperature is complete, follow the instructions in the application to charge the battery at room temperature before profiling at the next test temperature.
+
+When all the individual temperature models have been completed, they are merged to generate the final battery model file. The final battery model is automatically saved as both a JSON file and an INC file.
 
 To start fuel gauge evaluations using a battery model, see [Evaluating a battery model with nPM PowerUP](evaluating_battery.md).
+
+## Profiling output files
+
+All or some of the following files are generated as the result of profiling a battery:
+
+* A JSON file for the combined temperature model, used for fuel gauge evaluations in the {{app_name}}
+* An INC file that you can use to integrate the battery model into your application
+* `profileSettings.json` that contains the {{app_name}} settings for the profiling process
+* Directory for each battery profile, which includes the following files:
+
+    * CSV data file for the given profile and temperature, which can be used to [merge temperature profiles](./working_with_profiles.md)
+    * Debug directory that includes debugging files with information about the profiling process, such as profiling commands and logs, and about the functioning of the app.<br/>
+      You can share these files with Nordic Semiconductor if you encounter issues while profiling. You can also manually create these files with the [**Record Events**](overview.md#record-events) button in the side panel, but the contents might be different when not profiling.

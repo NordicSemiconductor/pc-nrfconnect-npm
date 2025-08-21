@@ -12,7 +12,7 @@ The {{app_name}} supports the following Power Management IC devices from Nordic 
 
 | PMIC device | Documentation | Setup |
 |-------------|---------------|-------|
-| nPM1304 Evaluation Kit (EK) | *Not yet available* | *Not yet available* |
+| nPM1304 Evaluation Kit (EK) | [nPM1304 EK Hardware](https://docs.nordicsemi.com/bundle/ug_npm1304_ek/page/UG/nPM1304_EK/intro.html) | [Connect the nPM1304 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1304_ek/page/UG/nPM1304_EK/use_ek_power_up.html) |
 | nPM2100 Evaluation Kit (EK) | [nPM2100 EK Hardware](https://docs.nordicsemi.com/bundle/ug_npm2100_ek/page/UG/nPM2100_EK/intro/intro.html) | [Connect the nPM2100 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm2100_ek/page/UG/nPM2100_EK/connect_ek/use_ek_power_up.html) |
 | nPM1300 Evaluation Kit (EK) | [nPM1300 EK Hardware](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/intro.html) | [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) |
 | nPM Fuel Gauge Board | [nPM Fuel Gauge Board Hardware](https://docs.nordicsemi.com/bundle/ug_npm_fuel_gauge/page/UG/nPM_fuel_gauge/intro.html) | [Connect the nPM1300 EK with the nPM Fuel Gauge Board](https://docs.nordicsemi.com/bundle/nan_045/page/APP/nan_045/battery_profiling.html) |

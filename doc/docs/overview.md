@@ -50,7 +50,7 @@ This side panel area contains the following buttons:
 | **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device ([Offline Mode](#virtual-device-selection-and-offline-mode-actions)).  |
 | **Open Serial Terminal** | Open the [Serial Terminal app](https://docs.nordicsemi.com/bundle/nrf-connect-serial-terminal/page/index.html) application in a separate window. Make sure to first [install the application](). |
 | **Reset Device**         | Reset the PMIC device and the nPM Controller. The PMIC default device configuration is restored.  |
-| **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory. |
+| **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory.<br/>You can share these files with Nordic Semiconductor if you encounter issues.<br/><br/>Recording events is automatically started when you [profile a battery](profiling_battery.md). |
 
 ### Fuel Gauge
 
@@ -126,11 +126,14 @@ Some devices also allow you to configure **Power Failure** and **Vbus input curr
 ## nPM1300 and nPM1304: Profiles tab
 
 !!! note "Note"
-     This feature is available for the nPM1300 EK and the nPM1304 EK.
+     - This feature is available for the nPM1300 EK and the nPM1304 EK.
+     - You cannot use profiles for the nPM1300 EK with the nPM1304 EK and vice-versa.
 
 The **Profiles** tab provides an overview of all battery profiles that you can select using the [Fuel Gauge drop-down menus](#fuel-gauge).
 
-Here you can make changes to the generated battery model settings, make edits to your custom projects, or merge individual temperature profiles.
+![Profiles tab](./screenshots/npm_profiles_tab.png "Profiles tab")
+
+Here you can make changes to the generated battery model settings, make edits to your custom projects, or merge individual temperature profiles. See [Working with profiles](working_with_profiles.md) for more information.
 
 !!! note "Note"
       The battery model is automatically stored as a JSON and an INC file. Use the JSON file for evaluations in nPM PowerUP and the INC file when integrating the battery model into your final application with a Nordic System on Chip (SoC).
@@ -138,6 +141,8 @@ Here you can make changes to the generated battery model settings, make edits to
 ### Custom profiles
 
 Here you can find all the custom profiles you have added with the [**Profile Battery** option](#fuel-gauge).
+
+![Custom profiles in the Profiles tab](./screenshots/npm_profiles_tab_custom.png "Custom profiles in the Profiles tab")
 
 The following options are available for the custom profiles:
 
@@ -147,27 +152,42 @@ The following options are available for the custom profiles:
 | **Add Existing Project** | Add a new project to the list from a JSON file.                                                                                        |
 | **Create New Project**   | Create a new custom project template. This option includes some of the fields present when using the [**Profile Battery** option](#fuel-gauge), but without collecting data. |
 
-The following drop-down menu options are available for the project and profile sections:
+#### Project section
 
-|          Button          | Area     |                                                             Description                                                       |
-| ------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **Process Included Data**| Project  | If your project includes multiple temperature profiles, you can include a selection of them with the **Include** toggle. Using this option processes only the included temperature profiles. |
-| **Save Battery Model**   | Project  | Save the battery model for the entire project to a JSON or an INC file. This only saves the temperature profiles you have selected with the **Include** toggle. |
-| **Write Battery Model**  | Project  | Write the battery model for the entire project to the nPM Controller on the EK. This only writes the temperature profiles you have selected with the **Include** toggle. |
-| **Add Profile**          | Project  | Add a new battery profile with a specific temperature and a CSV data file. Data files are generated when you use the [**Profile Battery** option](#fuel-gauge). |
-| **Open Folder**          | Project  | Open the project directory in the **File Explorer**. |
-| **Edit Project**         | Project  | Edit the project settings.  |
-| **Remove Project**       | Project  | Remove the current project, including all battery profiles. |
-| **Include** toggle       | Profile  | Select the temperatures to be included for processing with **Process Included Data** button for the entire project. |
-| **Process Data**         | Profile  | Process the data for the given temperature profile only. |
-| **Save Battery Model**   | Profile  | Save the battery model to a JSON or an INC file. |
-| **Write Battery Model**  | Profile  | Write the battery model to the nPM Controller on the EK. |
-| **Edit Profile**         | Profile  | Edit the battery profile. |
-| **Remove Profile**       | Profile  | Remove the battery profile.|
+![Project section options in the Profiles tab](./screenshots/npm_profiles_tab_custom_project.png "Project section options in the Profiles tab")
+
+The following drop-down menu options are available for the project section:
+
+|          Button          |                                                             Description                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Process Included Data**| If your project includes multiple temperature profiles, you can include a selection of them with the **Include** toggle. Using this option processes only the included temperature profiles. |
+| **Save Battery Model**   | Save the battery model for the entire project to a JSON or an INC file. This only saves the temperature profiles you have selected with the **Include** toggle. |
+| **Write Battery Model**  | Write the battery model for the entire project to the nPM Controller on the EK. This only writes the temperature profiles you have selected with the **Include** toggle. |
+| **Add Profile**          | Add a new battery profile with a specific temperature and a CSV data file. Data files are generated when you use the [**Profile Battery** option](#npm1300-and-nPM1304-fuel-gauge). |
+| **Open Folder**          | Open the project directory in the **File Explorer**. |
+| **Edit Project**         | Edit the project settings.  |
+| **Remove Project**       | Remove the current project, including all battery profiles. |
+
+##### Profile entries
+
+![Profile options in the Profiles tab](./screenshots/npm_profiles_tab_custom_profile.png "Profile options in the Profiles tab")
+
+The following drop-down menu options are available for the profile entries:
+
+|          Button          |                                                             Description                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Include** toggle       | Select the temperatures to be included for processing with **Process Included Data** button for the entire project. |
+| **Process Data**         | Process the data for the given temperature profile only. |
+| **Save Battery Model**   | Save the battery model to a JSON or an INC file. |
+| **Write Battery Model**  | Write the battery model to the nPM Controller on the EK. |
+| **Edit Profile**         | Edit the battery profile. |
+| **Remove Profile**       | Remove the battery profile.|
 
 ### Bundled profiles
 
-Here you can write and save battery models from selected vendors that has been profiled by Nordic Semiconductor.
+Here you can write and save battery models from selected vendors that have been profiled by Nordic Semiconductor.
+
+![Bundled profiles in the Profiles tab](./screenshots/npm_profiles_tab_bundled.png "Bundled profiles in the Profiles tab")
 
 When you **Write Model**, you are going to write new battery model on the nPM Controller to one of its available battery model slots.
 This can overwrite the [**Active Battery Model**](#fuel-gauge).
