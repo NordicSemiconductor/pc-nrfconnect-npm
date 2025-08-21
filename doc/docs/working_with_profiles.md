@@ -1,4 +1,4 @@
-# Working with temperature profiles
+# Working with profiles
 
 The {{app_name}} comes with the [**Profiles**](overview.md#npm1300-and-npm1304-profiles-tab) tab, where you can interact with the battery profiles you create as well as with pre-profiled and generic battery models.
 

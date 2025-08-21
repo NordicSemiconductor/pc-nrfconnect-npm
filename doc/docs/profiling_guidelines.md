@@ -19,7 +19,7 @@ The guidelines in this section optimize the use of the {{app_name}} for [battery
 - To account for temperature variations and improve the accuracy of state-of-charge estimations, profile the battery at three different test temperatures. For example, if the operating temperature of the device ranges from -15°C to 45°C, you can profile the battery at 5°C, 25°C, and 45°C. The final battery model will be created by combining the individual temperature profiles.
 
     !!! note "Note"
-        You can also profile the battery at each temperature separately and then use the nPM PowerUP [**Profiles**](./overview.md#npm1300-and-npm1304-profiles-tab) tab to merge the individual models into a single multi-temperature model. For details, see [Working with temperature profiles](working_with_temperature_profiles.md).
+        You can also profile the battery at each temperature separately and then use the nPM PowerUP [**Profiles**](./overview.md#npm1300-and-npm1304-profiles-tab) tab to merge the individual models into a single multi-temperature model. For details, see [Working with profiles](working_with_profiles.md).
 
 - The time to profile the battery takes approximately 48 hours per temperature, but can be longer for higher capacity batteries. Do not modify the device configuration during the profiling process as this causes the profiling to abort.
 - Ensure that your computer does not go into sleep mode or hibernate during the profiling process.

@@ -133,7 +133,7 @@ The **Profiles** tab provides an overview of all battery profiles that you can s
 
 ![Profiles tab](./screenshots/npm_profiles_tab.png "Profiles tab")
 
-Here you can make changes to the generated battery model settings, make edits to your custom projects, or merge individual temperature profiles. See [Working with temperature profiles](working_with_temperature_profiles.md) for more information.
+Here you can make changes to the generated battery model settings, make edits to your custom projects, or merge individual temperature profiles. See [Working with profiles](working_with_profiles.md) for more information.
 
 !!! note "Note"
       The battery model is automatically stored as a JSON and an INC file. Use the JSON file for evaluations in nPM PowerUP and the INC file when integrating the battery model into your final application with a Nordic System on Chip (SoC).

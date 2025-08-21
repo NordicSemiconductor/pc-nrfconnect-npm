@@ -53,6 +53,6 @@ All or some of the following files are generated as the result of profiling a ba
 * `profileSettings.json` that contains the {{app_name}} settings for the profiling process
 * Directory for each battery profile, which includes the following files:
 
-    * CSV data file for the given profile and temperature, which can be used to [merge temperature profiles](./working_with_temperature_profiles.md)
+    * CSV data file for the given profile and temperature, which can be used to [merge temperature profiles](./working_with_profiles.md)
     * Debug directory that includes debugging files with information about the profiling process, such as profiling commands and logs, and about the functioning of the app.<br/>
       You can share these files with Nordic Semiconductor if you encounter issues while profiling. You can also manually create these files with the [**Record Events**](overview.md#record-events) button in the side panel, but the contents might be different when not profiling.
