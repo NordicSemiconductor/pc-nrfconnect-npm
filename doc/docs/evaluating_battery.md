@@ -3,8 +3,8 @@
 To start fuel gauge evaluations using a battery model, complete the following steps:
 
 1. Connect a battery to the EK.
-1. Select the **Fuel Gauge** setting on the [**Dashboard**](./overview.md#dashboard-tab) tab.
-1. If you are using nPM1300 EK or nPM1304 EK and you have a battery model, select the battery model for evaluation in the [**Fuel Gauge**](./overview.md#npm1300-and-nPM1304-fuel-gauge) side panel.<br/>
+1. Enable the **Fuel Gauge** setting on the [**Dashboard**](./overview.md#dashboard-tab) tab.
+1. If you are using nPM1300 EK or nPM1304 EK, select the battery model for evaluation in the [**Fuel Gauge**](./overview.md#npm1300-and-nPM1304-fuel-gauge) side panel.<br/>
    Use one of the following options:
 
     * Use the **Active Battery Model** for a preloaded battery model
