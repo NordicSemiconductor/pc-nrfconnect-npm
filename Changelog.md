@@ -13,6 +13,8 @@
 -   nPM2100: Setting the Boost regulator to the forced pass-through mode will
     now first set the output voltage VOUT to the minimum setting (1.8 V), in
     accordance with the datasheet.
+-   nPM1300 and nPM1304 Discharge cut-off voltage maxmum value has been increasd
+    to 3.6V from 3.1V.
 
 ### Fixed
 
