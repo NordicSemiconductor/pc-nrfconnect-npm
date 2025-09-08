@@ -1029,7 +1029,8 @@ export type BatteryProfiler = {
     loadProfile(
         capacity: number,
         vUpperCutOff: number,
-        vLowerCutOff: number
+        vLowerCutOff: number,
+        vTerm: number
     ): CCProfile[];
 };
 

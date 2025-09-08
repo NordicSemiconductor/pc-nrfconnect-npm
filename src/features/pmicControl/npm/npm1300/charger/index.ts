@@ -112,7 +112,7 @@ export default class Module implements ChargerModuleBase {
             iBatLim: Module.iBatRange(),
             vLowerCutOff: {
                 min: 2.7,
-                max: 3.1,
+                max: 3.6,
                 step: 0.05,
                 decimals: 2,
             },

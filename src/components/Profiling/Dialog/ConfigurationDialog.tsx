@@ -65,6 +65,8 @@ export default ({
         return null;
     }
 
+    const vTerm = Math.max(...npmDevice.chargerModule.ranges.voltage);
+
     const [iTerm, setITerm] = useState<ITerm>(
         charger?.iTerm ?? npmDevice.chargerModule.values.iTerm[0].value
     );
@@ -89,7 +91,8 @@ export default ({
                 npmDevice.batteryProfiler?.loadProfile(
                     capacity,
                     vUpperCutOff,
-                    vLowerCutOff
+                    vLowerCutOff,
+                    vTerm
                 ) ?? [];
 
             const profile: Profile = {

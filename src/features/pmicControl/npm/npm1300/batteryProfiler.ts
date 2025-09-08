@@ -301,7 +301,8 @@ export class BatteryProfiler implements BatteryProfilerBase {
     loadProfile(
         capacity: number,
         vUpperCutOff: number,
-        vLowerCutOff: number
+        vLowerCutOff: number,
+        vTerm: number
     ): CCProfile[] {
         return [
             {
@@ -323,7 +324,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
                 tRest: 1800000, // 30Min // 1304 45min
                 iLoad: capacity / 5 / 1000, // A  // 1304 apacity / 6 / 1000
                 iRest: 0,
-                vCutoff: vLowerCutOff + 0.5,
+                vCutoff: Math.min(vLowerCutOff + 0.5, vTerm),
             },
             {
                 tLoad: 300000, // 5Min
