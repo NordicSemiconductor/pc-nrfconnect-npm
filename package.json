@@ -23,7 +23,7 @@
                 "0.3.1"
             ]
         },
-        "nrfutilCore": "8.0.0",
+        "nrfutilCore": "8.1.1",
         "html": "dist/index.html"
     },
     "files": [
