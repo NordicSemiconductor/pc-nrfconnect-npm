@@ -60,6 +60,7 @@ export default (
                             ];
 
                         const isInput = mode === GPIOMode2100.Input;
+                        const isOutput = mode === GPIOMode2100.Output;
 
                         eventEmitter.emitPartialEvent<GPIO>(
                             'onGPIOUpdate',
@@ -68,6 +69,7 @@ export default (
                                 driveEnabled: !isInput,
                                 openDrainEnabled: !isInput,
                                 pullEnabled: true,
+                                stateShown: isOutput,
                             },
                             i
                         );
