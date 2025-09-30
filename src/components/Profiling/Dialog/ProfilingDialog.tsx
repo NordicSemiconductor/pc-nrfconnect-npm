@@ -88,7 +88,10 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             0
         );
         const maxVDelta = profile.vUpperCutOff - profile.vLowerCutOff;
-        const voltageProgress = Math.min((vDelta / maxVDelta) * 100, 100);
+        const voltageProgress = Math.max(
+            0,
+            Math.min((vDelta / maxVDelta) * 100, 100)
+        );
 
         const millAmpHrProgress = Math.min(
             (theoreticalProgressMillAmpHr * alpha +
