@@ -84,7 +84,7 @@ export default class Module extends nPM1300Charger {
             },
             vLowerCutOff: {
                 min: 2.7,
-                max: 3.1,
+                max: 3.6,
                 step: 0.05,
                 decimals: 2,
             },
