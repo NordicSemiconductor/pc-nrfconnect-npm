@@ -228,6 +228,7 @@ Battery models stored in database:
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
         const isInput = mode === GPIOMode2100.Input;
+        const isOutput = mode === GPIOMode2100.Output;
 
         callback?.onSuccess(`Value: ${mode}.`, command);
 
@@ -238,6 +239,7 @@ Battery models stored in database:
                 driveEnabled: !isInput,
                 openDrainEnabled: !isInput,
                 pullEnabled: true,
+                stateShown: isOutput,
             },
             index,
         });
