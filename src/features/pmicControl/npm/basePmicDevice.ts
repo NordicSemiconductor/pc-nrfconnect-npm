@@ -161,7 +161,9 @@ export default abstract class BaseNpmDevice {
     protected set fuelGaugeModule(
         fuelGaugeModule: FuelGaugeModule | undefined,
     ) {
-        !!fuelGaugeModule && this.releaseAll.push(...fuelGaugeModule.callbacks);
+        if (fuelGaugeModule) {
+            this.releaseAll.push(...fuelGaugeModule.callbacks);
+        }
         this.#fuelGaugeModule = fuelGaugeModule;
     }
 
@@ -171,7 +173,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set batteryModule(batteryModule: BatteryModule | undefined) {
-        !!batteryModule && this.releaseAll.push(...batteryModule.callbacks);
+        if (batteryModule) {
+            this.releaseAll.push(...batteryModule.callbacks);
+        }
         this.#batteryModule = batteryModule;
     }
 
@@ -183,7 +187,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set lowPowerModule(lowPowerModule: LowPowerModule | undefined) {
-        !!lowPowerModule && this.releaseAll.push(...lowPowerModule.callbacks);
+        if (lowPowerModule) {
+            this.releaseAll.push(...lowPowerModule.callbacks);
+        }
         this.#lowPowerModule = lowPowerModule;
     }
 
@@ -193,7 +199,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set resetModule(resetModule: ResetModule | undefined) {
-        !!resetModule && this.releaseAll.push(...resetModule.callbacks);
+        if (resetModule) {
+            this.releaseAll.push(...resetModule.callbacks);
+        }
         this.#resetModule = resetModule;
     }
 
@@ -205,8 +213,9 @@ export default abstract class BaseNpmDevice {
     protected set timerConfigModule(
         timerConfigModule: TimerConfigModule | undefined,
     ) {
-        !!timerConfigModule &&
+        if (timerConfigModule) {
             this.releaseAll.push(...timerConfigModule.callbacks);
+        }
         this.#timerConfigModule = timerConfigModule;
     }
 
@@ -218,8 +227,9 @@ export default abstract class BaseNpmDevice {
     protected set usbCurrentLimiterModule(
         usbCurrentLimiterModule: UsbCurrentLimiterModule | undefined,
     ) {
-        !!usbCurrentLimiterModule &&
+        if (usbCurrentLimiterModule) {
             this.releaseAll.push(...usbCurrentLimiterModule.callbacks);
+        }
         this.#usbCurrentLimiterModule = usbCurrentLimiterModule;
     }
 
@@ -229,7 +239,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set pofModule(pofModule: PofModule | undefined) {
-        !!pofModule && this.releaseAll.push(...pofModule.callbacks);
+        if (pofModule) {
+            this.releaseAll.push(...pofModule.callbacks);
+        }
         this.#pofModule = pofModule;
     }
 
@@ -239,7 +251,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set chargerModule(chargerModule: ChargerModule | undefined) {
-        !!chargerModule && this.releaseAll.push(...chargerModule.callbacks);
+        if (chargerModule) {
+            this.releaseAll.push(...chargerModule.callbacks);
+        }
         this.#chargerModule = chargerModule;
     }
 
@@ -251,8 +265,9 @@ export default abstract class BaseNpmDevice {
     protected set onBoardLoadModule(
         onBoardLoadModule: OnBoardLoadModule | undefined,
     ) {
-        !!onBoardLoadModule &&
+        if (onBoardLoadModule) {
             this.releaseAll.push(...onBoardLoadModule.callbacks);
+        }
         this.#onBoardLoadModule = onBoardLoadModule;
     }
 
