@@ -146,12 +146,13 @@ export const getProfileBuffer = () =>
             ],
             properties: ['openFile'],
         }).then(({ filePaths }: OpenDialogReturnValue) => {
-            filePaths.length === 1 &&
+            if (filePaths.length === 1) {
                 loadBatteryProfile(filePaths[0])
                     .then(buffer => {
                         resolve({ buffer, filePath: filePaths[0] });
                     })
                     .catch(reject);
+            }
         });
     });
 
