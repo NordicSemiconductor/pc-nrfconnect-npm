@@ -47,9 +47,9 @@ export default ({
         () =>
             allProgress.find(
                 prog =>
-                    prog.path === projectSettingsPath && prog.index === index
+                    prog.path === projectSettingsPath && prog.index === index,
             ),
-        [allProgress, index, projectSettingsPath]
+        [allProgress, index, projectSettingsPath],
     );
 
     const { time, reset, pause, isRunning } = useStopwatch({
@@ -92,7 +92,7 @@ export default ({
                         <Alert variant="danger" label="Error: ">
                             {`File ${path.resolve(
                                 projectSettingsPath,
-                                profile?.csvPath ?? ''
+                                profile?.csvPath ?? '',
                             )} no longer exists!`}
                         </Alert>
                     )}
@@ -114,8 +114,8 @@ export default ({
                                             dispatch(
                                                 generateParamsFromCSV(
                                                     projectSettingsPath,
-                                                    index
-                                                )
+                                                    index,
+                                                ),
                                             );
                                         }}
                                     >
@@ -151,8 +151,8 @@ export default ({
                                                 ].exclude = !value;
 
                                             return projectSettings;
-                                        }
-                                    )
+                                        },
+                                    ),
                                 );
                             }}
                             isToggled={!(!!profile.exclude || !dataCollected)}

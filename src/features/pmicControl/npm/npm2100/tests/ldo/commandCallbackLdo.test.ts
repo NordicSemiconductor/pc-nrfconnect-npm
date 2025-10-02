@@ -33,9 +33,9 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                             append: `set ${enabled ? 'ON' : 'OFF'} `,
                             enabled,
                         },
-                    ].flat()
+                    ].flat(),
                 ),
-            ]).flat()
+            ]).flat(),
         )('npm2100 ldosw enable %p', ({ index, append, enabled }) => {
             const command = `npm2100 ldosw enable ${append}`;
             const callback =
@@ -65,7 +65,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                         append: `set 1300`,
                     },
                 ].flat(),
-            ]).flat()
+            ]).flat(),
         )('npm2100 ldosw vout %p', ({ index, append }) => {
             const command = `npm2100 ldosw vout ${append}`;
             const callback =
@@ -97,9 +97,9 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                             append: `set ${mode}`,
                             mode,
                         },
-                    ].flat()
+                    ].flat(),
                 ),
-            ]).flat()
+            ]).flat(),
         )('npm2100 ldosw mode %p', ({ index, append, mode }) => {
             const command = `npm2100 ldosw mode ${append}`;
             const callback =
@@ -131,9 +131,9 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                             append: `set ${modeControl}`,
                             modeControl,
                         },
-                    ].flat()
+                    ].flat(),
                 ),
-            ]).flat()
+            ]).flat(),
         )('npm2100 ldosw modectrl %p', ({ index, append, modeControl }) => {
             const command = `npm2100 ldosw modectrl ${append}`;
             const callback =
@@ -168,9 +168,9 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                             append: `set ${pinSel}`,
                             pinSel,
                         },
-                    ].flat()
+                    ].flat(),
                 ),
-            ]).flat()
+            ]).flat(),
         )('npm2100 ldosw pinsel %p', ({ index, append, pinSel }) => {
             const command = `npm2100 ldosw pinsel ${append}`;
             const callback =
@@ -202,7 +202,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                         enabled: current,
                     },
                 ]),
-            ]).flat()
+            ]).flat(),
         )(
             'npm2100 ldosw softstart LDO %p',
             ({ index, append, enabled: current }) => {
@@ -217,7 +217,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                     data: { ldoSoftStart: current },
                     index,
                 });
-            }
+            },
         );
     });
 
@@ -237,7 +237,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                         value,
                     },
                 ]),
-            ]).flat()
+            ]).flat(),
         )('npm2100 ldosw softstart LOADSW %p', ({ index, append, value }) => {
             const command = `npm2100 ldosw softstart LOADSW ${append}`;
             const callback =
@@ -269,9 +269,9 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                             append: `set ${ocpEnabled ? '1' : '0'} `,
                             activeDischarge: ocpEnabled,
                         },
-                    ].flat()
+                    ].flat(),
                 ),
-            ]).flat()
+            ]).flat(),
         )(
             'npm2100 ldosw ocp %p',
             ({ index, append, activeDischarge: ocpEnabled }) => {
@@ -281,7 +281,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
                 callback?.onSuccess(
                     `Value: ${ocpEnabled ? 'ON' : 'OFF'}`,
-                    command
+                    command,
                 );
 
                 expect(mockOnLdoUpdate).toBeCalledTimes(1);
@@ -289,7 +289,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                     data: { ocpEnabled },
                     index,
                 });
-            }
+            },
         );
     });
 
@@ -309,9 +309,9 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                             append: `set ${rampEnabled ? 'ON' : 'OFF'} `,
                             rampEnabled,
                         },
-                    ].flat()
+                    ].flat(),
                 ),
-            ]).flat()
+            ]).flat(),
         )('npm2100 ldosw ldoramp %p', ({ index, append, rampEnabled }) => {
             const command = `npm2100 ldosw ldoramp ${append}`;
             const callback =
@@ -319,7 +319,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
             callback?.onSuccess(
                 `Value: ${rampEnabled ? 'ON' : 'OFF'}`,
-                command
+                command,
             );
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
@@ -346,9 +346,9 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
                             append: `set ${haltEnabled ? 'ON' : 'OFF'} `,
                             haltEnabled,
                         },
-                    ].flat()
+                    ].flat(),
                 ),
-            ]).flat()
+            ]).flat(),
         )('npm2100 ldosw ldohalt %p', ({ index, append, haltEnabled }) => {
             const command = `npm2100 ldosw ldohalt ${append}`;
             const callback =
@@ -356,7 +356,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
             callback?.onSuccess(
                 `Value: ${haltEnabled ? 'ON' : 'OFF'}`,
-                command
+                command,
             );
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);

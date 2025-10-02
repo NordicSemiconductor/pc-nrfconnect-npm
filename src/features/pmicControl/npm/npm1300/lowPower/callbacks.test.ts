@@ -27,7 +27,7 @@ describe('PMIC 1300 - Command callbacks', () => {
                     { append: `set ${value}`, expected: key },
                 ];
             })
-            .flat()
+            .flat(),
     )('npmx ship config time %p', ({ append, expected }) => {
         const command = `npmx ship config time ${append}`;
         const callback =

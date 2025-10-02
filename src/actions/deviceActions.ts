@@ -43,9 +43,9 @@ export const openDevice =
                                 path: comPort,
                                 baudRate: 115200,
                             } as SerialPortOpenOptions<AutoDetectTypes>,
-                            { overwrite: true, settingsLocked: true }
-                        )
-                    )
+                            { overwrite: true, settingsLocked: true },
+                        ),
+                    ),
                 );
             }
         }

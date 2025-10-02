@@ -21,7 +21,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx pof status get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -33,7 +33,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx pof polarity get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -45,7 +45,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx pof threshold get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

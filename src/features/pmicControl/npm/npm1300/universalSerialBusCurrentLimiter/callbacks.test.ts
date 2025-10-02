@@ -25,7 +25,7 @@ describe('PMIC 1300 - Command callbacks', () => {
 
             expect(mockOnUsbPower).toBeCalledTimes(1);
             expect(mockOnUsbPower).toBeCalledWith({ detectStatus: state });
-        }
+        },
     );
 
     test.each(['get', 'set 500'])('npmx vbusin current_limit %p', append => {

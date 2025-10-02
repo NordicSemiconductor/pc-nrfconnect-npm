@@ -1269,7 +1269,7 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                             <ExternalLink
                                 label={`${deviceType.replace(
                                     'npm',
-                                    'nPM'
+                                    'nPM',
                                 )} fuel gauge sample in the nRF Connect SDK documentation`}
                                 href={`https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/pmic/native/${npmDevice.deviceType}_fuel_gauge/README.html`}
                             />

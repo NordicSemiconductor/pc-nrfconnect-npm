@@ -105,7 +105,7 @@ export default () => {
     useEffect(() => {
         if (shellParser) {
             getNpmDevice(shellParser, pmicDialog =>
-                dispatch(dialogHandler(pmicDialog))
+                dispatch(dialogHandler(pmicDialog)),
             ).then(dev => {
                 dispatch(setNpmDevice(dev));
 
@@ -145,7 +145,7 @@ export default () => {
             releaseAll.push(
                 npmDevice.onPmicStateChange(state => {
                     dispatch(setPmicState(state));
-                })
+                }),
             );
 
             releaseAll.push(
@@ -153,11 +153,11 @@ export default () => {
                     dispatch(
                         setBatteryConnected(
                             sample.vBat >
-                                npmDevice.batteryConnectedVoltageThreshold
-                        )
+                                npmDevice.batteryConnectedVoltageThreshold,
+                        ),
                     );
                     dispatch(setLatestAdcSample(sample));
-                })
+                }),
             );
 
             releaseAll.push(
@@ -165,25 +165,25 @@ export default () => {
                     dispatch(
                         updateFuelGauge({
                             reportingRate: settings.reportRate,
-                        })
+                        }),
                     );
                     dispatch((_, getState) => {
                         if (getState().app.pmicControl.charger?.enabled) {
                             dispatch(
                                 updateFuelGauge({
                                     chargingSamplingRate: settings.samplingRate,
-                                })
+                                }),
                             );
                         } else {
                             dispatch(
                                 updateFuelGauge({
                                     notChargingSamplingRate:
                                         settings.samplingRate,
-                                })
+                                }),
                             );
                         }
                     });
-                })
+                }),
             );
 
             if (!npmDevice.chargerModule) {
@@ -219,129 +219,129 @@ export default () => {
                                     getState().app.pmicControl.fuelGaugeSettings
                                         .reportingRate,
                                     payload.enabled
-                                        ? chargingSamplingRate ??
-                                              notChargingSamplingRate
-                                        : notChargingSamplingRate
+                                        ? (chargingSamplingRate ??
+                                              notChargingSamplingRate)
+                                        : notChargingSamplingRate,
                                 );
                             }
                         });
-                    })
+                    }),
                 );
             }
 
             releaseAll.push(
                 npmDevice.onFuelGaugeUpdate(payload => {
                     dispatch(updateFuelGauge(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onChargingStatusUpdate(payload => {
                     dispatch(setPmicChargingState(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onBuckUpdate(payload => {
                     dispatch(updateBuck(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onOnBoardLoadUpdate(payload => {
                     dispatch(updateOnBoardLoad(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onBoostUpdate(payload => {
                     dispatch(updateBoost(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onLdoUpdate(payload => {
                     dispatch(updateLdo(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onGPIOUpdate(payload => {
                     dispatch(updateGPIOs(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onLEDUpdate(payload => {
                     dispatch(updateLEDs(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onPOFUpdate(payload => {
                     dispatch(updatePOFs(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onTimerConfigUpdate(payload => {
                     dispatch(updateTimerConfig(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onLowPowerUpdate(payload => {
                     dispatch(updateLowPowerConfig(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onResetUpdate(payload => {
                     dispatch(updateResetConfig(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onActiveBatteryModelUpdate(payload => {
                     dispatch(setActiveBatterModel(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onStoredBatteryModelUpdate(payload => {
                     dispatch(setStoredBatterModel(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onPowerIdUpdate(payload => {
                     dispatch(setPowerId(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onBatteryAddonBoardIdUpdate(payload => {
                     dispatch(setBatteryAddonBoardId(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onTimerExpiryInterrupt(payload => {
                     console.log(`Got onTimerExpiryINterrupt with ${payload}`);
                     dispatch(updateTimerConfig({ enabled: false }));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onUsbPower(payload => {
                     dispatch(updateUsbPower(payload));
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.onErrorLogs(payload => {
                     dispatch(setErrorLogs(payload));
-                })
+                }),
             );
 
             releaseAll.push(
@@ -365,7 +365,7 @@ export default () => {
                                 payload.completeChunks === payload.totalChunks
                             ) {
                                 npmDevice.fuelGaugeModule?.actions.applyDownloadFuelGaugeProfile(
-                                    payload.slot
+                                    payload.slot,
                                 );
                             }
                             dispatch(
@@ -391,9 +391,9 @@ export default () => {
                                     progress: Math.ceil(
                                         ((payload.completeChunks ?? 1) /
                                             (payload.totalChunks ?? 1)) *
-                                            100
+                                            100,
                                     ),
-                                })
+                                }),
                             );
                             break;
                         case 'aborting':
@@ -408,7 +408,7 @@ export default () => {
                                             Aborting download
                                         </>
                                     ),
-                                })
+                                }),
                             );
                             break;
                         case 'aborted':
@@ -427,7 +427,7 @@ export default () => {
                                             </Alert>
                                         </>
                                     ),
-                                })
+                                }),
                             );
                             break;
                         case 'applied':
@@ -446,7 +446,7 @@ export default () => {
                                             </Alert>
                                         </>
                                     ),
-                                })
+                                }),
                             );
                             break;
                         case 'failed':
@@ -465,11 +465,11 @@ export default () => {
                                             </Alert>
                                         </>
                                     ),
-                                })
+                                }),
                             );
                             break;
                     }
-                })
+                }),
             );
 
             releaseAll.push(
@@ -491,15 +491,15 @@ export default () => {
                                     if (previousWaitForDevice) {
                                         dis(
                                             setWaitForDevice(
-                                                previousWaitForDevice
-                                            )
+                                                previousWaitForDevice,
+                                            ),
                                         );
                                     }
                                 },
-                            })
+                            }),
                         );
                     });
-                })
+                }),
             );
 
             releaseAll.push(
@@ -526,22 +526,22 @@ export default () => {
                                         if (previousWaitForDevice) {
                                             dis(
                                                 setWaitForDevice(
-                                                    previousWaitForDevice
-                                                )
+                                                    previousWaitForDevice,
+                                                ),
                                             );
                                         }
                                     },
-                                })
+                                }),
                             );
                         });
                     }
-                })
+                }),
             );
 
             releaseAll.push(
                 npmDevice.batteryProfiler?.onProfilingStateChange(profiling => {
                     dispatch(setCcProfiling(profiling));
-                }) ?? noop
+                }) ?? noop,
             );
 
             dispatch(setPmicState(npmDevice.pmicState));
@@ -549,14 +549,14 @@ export default () => {
             dispatch(setOnBoardLoad(npmDevice.onBoardLoadModule?.defaults));
 
             dispatch(
-                setBoosts(npmDevice.boostModule.map(boost => boost.defaults))
+                setBoosts(npmDevice.boostModule.map(boost => boost.defaults)),
             );
             dispatch(setBucks(npmDevice.buckModule.map(buck => buck.defaults)));
             dispatch(
-                setLdos(npmDevice.ldoModule.map(module => module.defaults))
+                setLdos(npmDevice.ldoModule.map(module => module.defaults)),
             );
             dispatch(
-                setGPIOs(npmDevice.gpioModule.map(module => module.defaults))
+                setGPIOs(npmDevice.gpioModule.map(module => module.defaults)),
             );
             dispatch(setLEDs(npmDevice.ledDefaults()));
             dispatch(setPOFs(npmDevice.pofModule?.defaults));
@@ -608,7 +608,7 @@ export default () => {
             const baseDirectory = join(
                 profile.baseDirectory,
                 profile.name,
-                `${PROFILE_FOLDER_PREFIX}${profileIndex + 1}`
+                `${PROFILE_FOLDER_PREFIX}${profileIndex + 1}`,
             );
 
             const debugFolder = join(baseDirectory, 'debug');
@@ -625,12 +625,12 @@ export default () => {
                 switch (e.loggingEvent.logLevel) {
                     case 'wrn':
                         logger.warn(
-                            `${e.loggingEvent.module}: ${e.loggingEvent.message}`
+                            `${e.loggingEvent.module}: ${e.loggingEvent.message}`,
                         );
                         break;
                     case 'err':
                         logger.error(
-                            `${e.loggingEvent.module}: ${e.loggingEvent.message}`
+                            `${e.loggingEvent.module}: ${e.loggingEvent.message}`,
                         );
                         break;
                 }
@@ -666,7 +666,7 @@ export default () => {
                     e.loggingEvent.logLevel
                 },${e.loggingEvent.module},"${e.loggingEvent.message.replaceAll(
                     /(\r\n|\r|\n)/g,
-                    ' '
+                    ' ',
                 )}"\r\n`; // TODO look for escaping new lines in csvs
 
                 try {
@@ -692,7 +692,7 @@ export default () => {
                 setPaneDisabled({
                     name: 'Graph',
                     disabled: pmicState === 'ek-disconnected',
-                })
+                }),
             );
 
             dispatch(
@@ -704,19 +704,19 @@ export default () => {
                         !npmDevice?.buckModule?.length &&
                         !npmDevice?.ldoModule?.length &&
                         !npmDevice?.hasMaxEnergyExtraction?.(),
-                })
+                }),
             );
             dispatch(
                 setPaneHidden({
                     name: 'Graph',
                     hidden: !npmDevice,
-                })
+                }),
             );
             dispatch(
                 setPaneHidden({
                     name: 'Charger',
                     hidden: !npmDevice?.chargerModule,
-                })
+                }),
             );
             dispatch(
                 setPaneHidden({
@@ -725,13 +725,13 @@ export default () => {
                         !npmDevice?.boostModule?.length &&
                         !npmDevice?.buckModule?.length &&
                         !npmDevice?.ldoModule?.length, // TODO change to use ldoModule
-                })
+                }),
             );
             dispatch(
                 setPaneHidden({
                     name: 'GPIOs',
                     hidden: !npmDevice?.gpioModule?.length,
-                })
+                }),
             );
             dispatch(
                 setPaneHidden({
@@ -744,26 +744,26 @@ export default () => {
                         !npmDevice?.usbCurrentLimiterModule &&
                         (!npmDevice ||
                             (npmDevice && !SupportsErrorLogs(npmDevice))),
-                })
+                }),
             );
             dispatch(
                 setPaneHidden({
                     name: 'MEE',
                     hidden: !npmDevice?.hasMaxEnergyExtraction?.(),
-                })
+                }),
             );
             dispatch(
                 setPaneHidden({
                     name: 'Profiles',
                     hidden: !npmDevice?.canUploadBatteryProfiles,
-                })
+                }),
             );
 
             dispatch(
                 setPaneHidden({
                     name: 'Welcome',
                     hidden: !!npmDevice,
-                })
+                }),
             );
             if (!npmDevice) {
                 dispatch(setCurrentPane('Welcome'));

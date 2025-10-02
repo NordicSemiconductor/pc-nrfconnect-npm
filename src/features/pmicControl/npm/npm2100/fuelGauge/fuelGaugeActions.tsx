@@ -18,9 +18,9 @@ export class FuelGaugeActions {
             command: string,
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void,
-            unique?: boolean
+            unique?: boolean,
         ) => void,
-        private fuelGaugeModule: FuelGaugeModule
+        private fuelGaugeModule: FuelGaugeModule,
     ) {
         this.get = new FuelGaugeGet(sendCommand);
     }
@@ -40,7 +40,7 @@ export class FuelGaugeActions {
                 },
                 () => {
                     reject();
-                }
+                },
             );
         });
     }
@@ -52,7 +52,7 @@ export class FuelGaugeActions {
                 () => {
                     resolve();
                 },
-                () => reject()
+                () => reject(),
             );
         });
     }
@@ -73,13 +73,13 @@ export class FuelGaugeActions {
                             state: 'downloading',
                             completeChunks: chunk + 1,
                             totalChunks: Math.ceil(
-                                profile.byteLength / chunkSize
+                                profile.byteLength / chunkSize,
                             ),
                             slot,
                         };
                         this.eventEmitter.emit(
                             'onProfileDownloadUpdate',
-                            profileDownload
+                            profileDownload,
                         );
 
                         if (
@@ -99,10 +99,8 @@ export class FuelGaugeActions {
                             if (
                                 this.fuelGaugeModule.profileDownloadInProgress
                             ) {
-                                this.fuelGaugeModule.profileDownloadInProgress =
-                                    false;
-                                this.fuelGaugeModule.profileDownloadAborting =
-                                    false;
+                                this.fuelGaugeModule.profileDownloadInProgress = false;
+                                this.fuelGaugeModule.profileDownloadAborting = false;
                                 const profileDownload: ProfileDownload = {
                                     state: 'failed',
                                     alertMessage: parseColonBasedAnswer('res'),
@@ -110,13 +108,13 @@ export class FuelGaugeActions {
                                 };
                                 this.eventEmitter.emit(
                                     'onProfileDownloadUpdate',
-                                    profileDownload
+                                    profileDownload,
                                 );
                             }
                             reject(res);
                         };
                     },
-                    false
+                    false,
                 );
             };
 
@@ -125,7 +123,7 @@ export class FuelGaugeActions {
             this.sendCommand(
                 'fuel_gauge model download begin',
                 () => downloadData(),
-                () => reject()
+                () => reject(),
             );
         });
     }
@@ -137,7 +135,7 @@ export class FuelGaugeActions {
                 () => {
                     resolve();
                 },
-                () => reject()
+                () => reject(),
             );
         });
     }

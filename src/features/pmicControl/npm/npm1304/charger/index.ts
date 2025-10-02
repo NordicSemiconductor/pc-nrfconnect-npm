@@ -30,10 +30,10 @@ export default class Module extends nPM1300Charger {
             parms,
             (
                 shellParser: ShellParser | undefined,
-                eventEmitter: NpmEventEmitter
+                eventEmitter: NpmEventEmitter,
             ) => chargerCallbacks(shellParser, eventEmitter, ITermValues),
             ChargerGet,
-            ChargerSet
+            ChargerSet,
         );
     }
 

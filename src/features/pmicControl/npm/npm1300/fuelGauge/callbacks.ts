@@ -23,7 +23,7 @@ export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
     get: FuelGaugeGet,
-    fuelGaugeModule: FuelGaugeModule
+    fuelGaugeModule: FuelGaugeModule,
 ) => {
     const cleanupCallbacks = [];
 
@@ -37,16 +37,16 @@ export default (
                         enabled: parseToBoolean(res),
                     } satisfies Partial<FuelGauge>);
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
                 toRegex('fuel_gauge model download begin'),
                 () => shellParser?.setShellEchos(false),
-                () => shellParser?.setShellEchos(true)
-            )
+                () => shellParser?.setShellEchos(true),
+            ),
         );
 
         cleanupCallbacks.push(
@@ -55,11 +55,11 @@ export default (
                 res => {
                     eventEmitter.emit(
                         'onActiveBatteryModelUpdate',
-                        parseBatteryModel(parseColonBasedAnswer(res))
+                        parseBatteryModel(parseColonBasedAnswer(res)),
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -69,8 +69,8 @@ export default (
                     get.storedBatteryModel();
                     get.activeBatteryModel();
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -78,7 +78,7 @@ export default (
                 toRegex('fuel_gauge model list'),
                 res => {
                     const models = res.split(
-                        'Battery models stored in database:'
+                        'Battery models stored in database:',
                     );
                     if (models.length < 2) {
                         eventEmitter.emit('onStoredBatteryModelUpdate', []);
@@ -88,11 +88,11 @@ export default (
                     const list = stringModels.map(parseBatteryModel);
                     eventEmitter.emit(
                         'onStoredBatteryModelUpdate',
-                        list.filter(item => item != null)
+                        list.filter(item => item != null),
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -104,8 +104,7 @@ export default (
 
                             fuelGaugeModule.profileDownloadAborting = true;
                             if (fuelGaugeModule.profileDownloadInProgress) {
-                                fuelGaugeModule.profileDownloadInProgress =
-                                    false;
+                                fuelGaugeModule.profileDownloadInProgress = false;
                                 const payload: ProfileDownload = {
                                     state: 'aborted',
                                     alertMessage: loggingEvent.message,
@@ -113,13 +112,13 @@ export default (
 
                                 eventEmitter.emit(
                                     'onProfileDownloadUpdate',
-                                    payload
+                                    payload,
                                 );
                             }
                         }
                     }
                 });
-            })
+            }),
         );
 
         cleanupCallbacks.push(
@@ -134,7 +133,7 @@ export default (
                         };
                         eventEmitter.emit(
                             'onProfileDownloadUpdate',
-                            profileDownload
+                            profileDownload,
                         );
                     }
                     shellParser?.setShellEchos(true);
@@ -148,12 +147,12 @@ export default (
                         };
                         eventEmitter.emit(
                             'onProfileDownloadUpdate',
-                            profileDownload
+                            profileDownload,
                         );
                     }
                     shellParser?.setShellEchos(true);
-                }
-            )
+                },
+            ),
         );
 
         cleanupCallbacks.push(
@@ -168,7 +167,7 @@ export default (
                         };
                         eventEmitter.emit(
                             'onProfileDownloadUpdate',
-                            profileDownload
+                            profileDownload,
                         );
                     }
 
@@ -183,13 +182,13 @@ export default (
                         };
                         eventEmitter.emit(
                             'onProfileDownloadUpdate',
-                            profileDownload
+                            profileDownload,
                         );
                     }
 
                     shellParser?.setShellEchos(true);
-                }
-            )
+                },
+            ),
         );
     }
 

@@ -16,9 +16,9 @@ export class OnBoardLoadSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new OnBoardLoadGet(sendCommand);
     }
@@ -33,7 +33,7 @@ export class OnBoardLoadSet {
                 'onOnBoardLoadUpdate',
                 {
                     iLoad: load,
-                }
+                },
             );
 
             if (this.offlineMode) {
@@ -45,7 +45,7 @@ export class OnBoardLoadSet {
                     () => {
                         this.get.iLoad();
                         reject();
-                    }
+                    },
                 );
             }
         });

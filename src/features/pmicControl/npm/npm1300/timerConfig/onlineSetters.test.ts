@@ -21,7 +21,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -29,7 +29,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             TimerModeValues.map((mode, index) => ({
                 mode,
                 index,
-            }))
+            })),
         )('Set timer config mode %p', async ({ mode, index }) => {
             await pmic.timerConfigModule?.set.mode(mode);
 
@@ -38,7 +38,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx timer config mode set ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -49,7 +49,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             TimerPrescalerValues.map((prescaler, index) => ({
                 prescaler,
                 index,
-            }))
+            })),
         )('Set timer config mode %p', async ({ prescaler, index }) => {
             await pmic.timerConfigModule?.set.prescaler!(prescaler);
 
@@ -58,7 +58,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx timer config prescaler set ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -73,7 +73,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx timer config compare set 1000`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -85,7 +85,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -93,18 +93,18 @@ describe('PMIC 1300 - Setters Online tests', () => {
             TimerModeValues.map((mode, index) => ({
                 mode,
                 index,
-            }))
+            })),
         )(
             'Set setTimerConfigMode - Fail immediately - index: %p',
             async ({ mode, index }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.timerConfigModule?.set.mode(mode)
+                    pmic.timerConfigModule?.set.mode(mode),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -112,7 +112,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx timer config mode set ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -121,30 +121,30 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx timer config mode get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
             TimerPrescalerValues.map((prescaler, index) => ({
                 prescaler,
                 index,
-            }))
+            })),
         )(
             'Set setTimerConfigMode - Fail immediately - index: %p',
             async ({ prescaler, index }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.timerConfigModule?.set.prescaler!(prescaler)
+                    pmic.timerConfigModule?.set.prescaler!(prescaler),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -152,7 +152,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx timer config prescaler set ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -161,12 +161,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx timer config prescaler get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnTimerConfigUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setTimerConfigMode - Fail immediately - index: %p', async () => {
@@ -175,7 +175,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.timerConfigModule?.set.period(1000)
+                pmic.timerConfigModule?.set.period(1000),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -183,7 +183,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx timer config compare set 1000`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -192,7 +192,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx timer config compare get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response

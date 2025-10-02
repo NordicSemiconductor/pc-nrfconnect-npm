@@ -29,7 +29,7 @@ const downloadBatteryProfileSlice = createSlice({
         },
         showDialog(
             state,
-            action: PayloadAction<{ buffer: Buffer; name?: string }>
+            action: PayloadAction<{ buffer: Buffer; name?: string }>,
         ) {
             state.showDialog = true;
             state.bufferToWite = action.payload.buffer;

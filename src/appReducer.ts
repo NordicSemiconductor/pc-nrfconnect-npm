@@ -15,7 +15,6 @@ import serialReducer from './features/serial/serialSlice';
 
 type AppState = ReturnType<typeof appReducer>;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RootState extends NrfConnectState<AppState> {}
 
 const appReducer = combineReducers({

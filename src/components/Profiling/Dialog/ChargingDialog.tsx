@@ -52,7 +52,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const adcSample = useSelector(getLatestAdcSample);
     const index = useSelector(getProfileIndex);
     const [batteryFull, setBatteryFull] = useState(
-        pmicChargingState.batteryFull
+        pmicChargingState.batteryFull,
     );
 
     const { time, pause } = useStopwatch({
@@ -126,7 +126,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 await npmDevice?.pofModule?.set.threshold(2.6);
                                 npmDevice?.setAutoRebootDevice(false);
                                 await npmDevice?.chargerModule?.set.enabled(
-                                    false
+                                    false,
                                 );
                                 await npmDevice?.batteryProfiler?.setProfile(
                                     REPORTING_RATE, // iBat
@@ -135,7 +135,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     [
                                         ...profile.restingProfiles,
                                         ...profile.profilingProfiles,
-                                    ]
+                                    ],
                                 );
                                 await npmDevice?.batteryProfiler?.startProfiling();
                             } catch (e) {
@@ -143,7 +143,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     setCompleteStep({
                                         message: describeError(e),
                                         level: 'danger',
-                                    })
+                                    }),
                                 );
                             }
                         }}
@@ -156,7 +156,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 setAbortAction(() => {
                                     dispatch(closeProfiling());
                                     dispatch(clearWaitForDevice());
-                                })
+                                }),
                             );
                         }}
                     >

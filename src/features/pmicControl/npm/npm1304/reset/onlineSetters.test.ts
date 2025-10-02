@@ -16,7 +16,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -28,7 +28,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `powerup_ship longpress set two_button`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -40,7 +40,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -50,7 +50,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.resetModule?.set.longPressReset?.('one_button')
+                pmic.resetModule?.set.longPressReset?.('one_button'),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -58,7 +58,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `powerup_ship longpress set one_button`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -67,7 +67,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `powerup_ship longpress get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response

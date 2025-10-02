@@ -32,10 +32,10 @@ export default ({
     const completeStep = useSelector(getCompleteStep);
     const profilingStage = useSelector(getProfilingStage);
     const profileProject = useSelector(getProfileProjects).find(
-        p => p.path === generateDefaultProjectPath(profile)
+        p => p.path === generateDefaultProjectPath(profile),
     );
     const profileProgress = useSelector(getProjectProfileProgress).filter(
-        p => p.path === generateDefaultProjectPath(profile)
+        p => p.path === generateDefaultProjectPath(profile),
     );
 
     const steps: Step[] = [];
@@ -86,7 +86,7 @@ export default ({
         steps.push(stepDataCollection);
 
         const processingCSVProgress = profileProgress.find(
-            progress => progress.index === index
+            progress => progress.index === index,
         );
 
         const stepProcessing: Step = {

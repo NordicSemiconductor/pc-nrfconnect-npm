@@ -20,9 +20,9 @@ export class ResetSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new ResetGet(sendCommand);
     }
@@ -40,7 +40,7 @@ export class ResetSet {
                     'onResetUpdate',
                     {
                         longPressResetEnable,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -52,7 +52,7 @@ export class ResetSet {
                     () => {
                         this.get.longPressReset();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -65,7 +65,7 @@ export class ResetSet {
                     'onResetUpdate',
                     {
                         resetPinSelection,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -75,14 +75,14 @@ export class ResetSet {
                     () => {
                         this.get.pinSelection();
                         reject();
-                    }
+                    },
                 );
             }
         });
     }
 
     longPressResetDebounce(
-        longPressResetDebounce: npm2100LongPressResetDebounce
+        longPressResetDebounce: npm2100LongPressResetDebounce,
     ) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
@@ -90,7 +90,7 @@ export class ResetSet {
                     'onResetUpdate',
                     {
                         longPressResetDebounce,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -100,7 +100,7 @@ export class ResetSet {
                     () => {
                         this.get.longPressResetDebounce();
                         reject();
-                    }
+                    },
                 );
             }
         });

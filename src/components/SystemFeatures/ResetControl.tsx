@@ -46,12 +46,12 @@ export default ({
                 items={resetModule.values.longPressReset}
                 onSelect={item =>
                     resetModule.set.longPressReset?.(
-                        item.value as LongPressReset
+                        item.value as LongPressReset,
                     )
                 }
                 selectedItem={
                     resetModule.values.longPressReset.find(
-                        item => item.value === reset.longPressReset
+                        item => item.value === reset.longPressReset,
                     ) ?? resetModule.values.longPressReset[0]
                 }
                 disabled={disabled}
@@ -71,12 +71,12 @@ export default ({
                 items={resetModule.values.pinSelection}
                 onSelect={item =>
                     resetModule.set.selectResetPin?.(
-                        item.value as ResetPinSelection
+                        item.value as ResetPinSelection,
                     )
                 }
                 selectedItem={
                     resetModule.values.pinSelection.find(
-                        item => item.value === reset.resetPinSelection
+                        item => item.value === reset.resetPinSelection,
                     ) ?? resetModule.values.pinSelection[0]
                 }
                 disabled={disabled}
@@ -116,12 +116,12 @@ export default ({
                     items={resetModule.values.longPressResetDebounce}
                     onSelect={item =>
                         resetModule.set.longPressResetDebounce?.(
-                            item.value as LongPressResetDebounce
+                            item.value as LongPressResetDebounce,
                         )
                     }
                     selectedItem={
                         resetModule.values.longPressResetDebounce.find(
-                            item => item.value === reset.longPressResetDebounce
+                            item => item.value === reset.longPressResetDebounce,
                         ) ?? resetModule.values.longPressResetDebounce[0]
                     }
                     disabled={disabled}

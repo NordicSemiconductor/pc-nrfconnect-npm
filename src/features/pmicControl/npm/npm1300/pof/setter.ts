@@ -16,9 +16,9 @@ export class PofSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new PofGet(sendCommand);
     }
@@ -44,7 +44,7 @@ export class PofSet {
                     () => {
                         this.get.enable();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -64,7 +64,7 @@ export class PofSet {
                     () => {
                         this.get.threshold();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -80,13 +80,13 @@ export class PofSet {
             } else {
                 this.sendCommand(
                     `npmx pof polarity set ${POFPolarityValues.findIndex(
-                        p => p === polarity
+                        p => p === polarity,
                     )}`,
                     () => resolve(),
                     () => {
                         this.get.polarity();
                         reject();
-                    }
+                    },
                 );
             }
         });

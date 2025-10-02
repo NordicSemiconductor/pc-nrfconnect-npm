@@ -36,7 +36,7 @@ export default class Module implements FuelGaugeModuleBase {
             shellParser,
             eventEmitter,
             this._get,
-            this
+            this,
         );
     }
 

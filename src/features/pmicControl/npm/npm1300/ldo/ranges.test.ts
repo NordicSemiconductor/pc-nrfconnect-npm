@@ -21,7 +21,7 @@ describe('PMIC 1300 - Static getters', () => {
             max: 3.3,
             decimals: 1,
             step: 0.1,
-        })
+        }),
     );
 });
 

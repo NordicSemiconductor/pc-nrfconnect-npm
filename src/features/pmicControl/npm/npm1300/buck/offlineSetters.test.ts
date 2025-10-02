@@ -58,7 +58,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
                 data: { modeControl: 'Auto' },
                 index,
             });
-        }
+        },
     );
 
     test.each(PMIC_1300_BUCKS)(
@@ -74,7 +74,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
                 },
                 index,
             });
-        }
+        },
     );
 
     test.each(PMIC_1300_BUCKS)(
@@ -87,7 +87,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
                 data: { retentionControl: 'Off' },
                 index,
             });
-        }
+        },
     );
 
     test.each(PMIC_1300_BUCKS)('Set setBuckEnabled index: %p', async index => {
@@ -110,7 +110,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
                 data: { activeDischarge: false },
                 index,
             });
-        }
+        },
     );
 });
 

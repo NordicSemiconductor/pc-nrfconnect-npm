@@ -20,12 +20,12 @@ import { npm2100LowPowerConfig, npm2100TimeToActive } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
 
     const npm2100TimeToActiveValues = Object.keys(npm2100TimeToActive).map(
-        key => npm2100TimeToActive[key as keyof typeof npm2100TimeToActive]
+        key => npm2100TimeToActive[key as keyof typeof npm2100TimeToActive],
     );
 
     if (shellParser) {
@@ -35,7 +35,7 @@ export default (
                     'npm2100 low_power_control hibernate_debounce',
                     true,
                     undefined,
-                    toValueRegex(npm2100TimeToActiveValues)
+                    toValueRegex(npm2100TimeToActiveValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<npm2100LowPowerConfig>(
@@ -43,13 +43,13 @@ export default (
                         {
                             timeToActive: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                npm2100TimeToActiveValues
+                                npm2100TimeToActiveValues,
                             ) as npm2100TimeToActive,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Power button enable
@@ -59,30 +59,30 @@ export default (
                     'npm2100 low_power_control pwr_btn',
                     true,
                     undefined,
-                    onOffRegex
+                    onOffRegex,
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<npm2100LowPowerConfig>(
                         'onLowPowerUpdate',
                         {
                             powerButtonEnable: parseOnOff(res),
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
                 toRegex(
-                    'npm2100 low_power_control ship_mode (ship_mode|hibernate_mode|hibernate_pt_mode)'
+                    'npm2100 low_power_control ship_mode (ship_mode|hibernate_mode|hibernate_pt_mode)',
                 ),
                 () => {
                     eventEmitter.emit('onReboot', true);
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

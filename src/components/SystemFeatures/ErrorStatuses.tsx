@@ -69,7 +69,7 @@ export default ({
         >
             <div
                 className={`tw-preflight tw-flex tw-flex-col tw-gap-0.5 ${classNames(
-                    disabled && 'tw-text-gray-300'
+                    disabled && 'tw-text-gray-300',
                 )}`}
             >
                 {supportedErrorLogs.reset && (

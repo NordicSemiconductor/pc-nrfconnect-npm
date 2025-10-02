@@ -60,21 +60,21 @@ const deviceSetupConfig: DeviceSetupConfig = {
             key: 'nPM1300',
             description: '',
             hex: getAppFile(
-                path.join('fw', `app_signed_nPM1300_${npm1300FWVersion}.hex`)
+                path.join('fw', `app_signed_nPM1300_${npm1300FWVersion}.hex`),
             ),
         }),
         npm1304DeviceSetup({
             key: 'nPM1304',
             description: '',
             hex: getAppFile(
-                path.join('fw', `app_signed_nPM1304_${npm1304FWVersion}.hex`)
+                path.join('fw', `app_signed_nPM1304_${npm1304FWVersion}.hex`),
             ),
         }),
         npm2100DeviceSetup({
             key: 'nPM2100',
             description: '',
             hex: getAppFile(
-                path.join('fw', `app_signed_nPM2100_${npm2100FWVersion}.hex`)
+                path.join('fw', `app_signed_nPM2100_${npm2100FWVersion}.hex`),
             ),
         }),
     ],
@@ -100,7 +100,7 @@ export default () => {
             }
             onDeviceIsReady={device => {
                 logger.info(
-                    `Device setup ready for device with s/n ${device.serialNumber}`
+                    `Device setup ready for device with s/n ${device.serialNumber}`,
                 );
                 dispatch(openDevice(device));
             }}
@@ -111,7 +111,7 @@ export default () => {
                     setCompleteStep({
                         level: 'terminal',
                         message: `The device disconnected.`,
-                    })
+                    }),
                 );
                 dispatch(stopEventRecording());
             }}
@@ -129,25 +129,25 @@ export default () => {
                     dispatch(
                         setNpmDevice(
                             new Npm1300(undefined, pmicDialog =>
-                                dispatch(dialogHandler(pmicDialog))
-                            )
-                        )
+                                dispatch(dialogHandler(pmicDialog)),
+                            ),
+                        ),
                     );
                 } else if (device === 'nPM1304') {
                     dispatch(
                         setNpmDevice(
                             new Npm1304(undefined, pmicDialog =>
-                                dispatch(dialogHandler(pmicDialog))
-                            )
-                        )
+                                dispatch(dialogHandler(pmicDialog)),
+                            ),
+                        ),
                     );
                 } else if (device === 'nPM2100') {
                     dispatch(
                         setNpmDevice(
                             new Npm2100(undefined, pmicDialog =>
-                                dispatch(dialogHandler(pmicDialog))
-                            )
-                        )
+                                dispatch(dialogHandler(pmicDialog)),
+                            ),
+                        ),
                     );
                 }
             }}

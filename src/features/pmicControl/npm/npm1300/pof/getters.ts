@@ -5,13 +5,12 @@
  */
 
 export class PofGet {
-    // eslint-disable-next-line no-useless-constructor
     constructor(
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void
+            onError?: (response: string, command: string) => void,
+        ) => void,
     ) {}
 
     all() {
