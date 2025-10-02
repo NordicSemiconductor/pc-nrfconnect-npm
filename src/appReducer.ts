@@ -15,7 +15,7 @@ import serialReducer from './features/serial/serialSlice';
 
 type AppState = ReturnType<typeof appReducer>;
 
-export interface RootState extends NrfConnectState<AppState> {}
+export type RootState = NrfConnectState<AppState>;
 
 const appReducer = combineReducers({
     profilingProjects: profilingProjectsReducer,
