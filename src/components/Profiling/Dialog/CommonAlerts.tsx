@@ -42,7 +42,7 @@ const TemperatureAlert = ({
             ? 0
             : Math.abs(
                   (currentTemperature ?? expectedTemperature) -
-                      expectedTemperature
+                      expectedTemperature,
               );
     if (
         !showOnWarning ||

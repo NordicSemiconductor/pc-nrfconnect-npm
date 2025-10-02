@@ -32,7 +32,7 @@ describe('PMIC 1300 - Command callbacks', () => {
                     append: `set ${enabled ? '1' : '0'}`,
                 },
             ])
-            .flat()
+            .flat(),
     )('fuel_gauge %p', ({ enabled, append }) => {
         const command = `fuel_gauge ${append}`;
         const callback =
@@ -53,7 +53,7 @@ describe('PMIC 1300 - Command callbacks', () => {
 
         callback?.onSuccess(
             `Value: name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}`,
-            command
+            command,
         );
 
         expect(mockOnActiveBatteryModelUpdate).toBeCalledTimes(1);
@@ -83,7 +83,7 @@ describe('PMIC 1300 - Command callbacks', () => {
 
         callback?.onSuccess(
             'Success: Model stored to persistent memory.',
-            command
+            command,
         );
 
         expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -92,14 +92,14 @@ describe('PMIC 1300 - Command callbacks', () => {
             'fuel_gauge model list',
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             2,
             'fuel_gauge model get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 

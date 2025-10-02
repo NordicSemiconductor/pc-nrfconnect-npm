@@ -32,12 +32,12 @@ declare module 'chart.js' {
 
     interface Chart<
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        TType extends keyof ChartTypeRegistry = keyof ChartTypeRegistry
+        TType extends keyof ChartTypeRegistry = keyof ChartTypeRegistry,
     > {
         zoom: (
             resolution: number,
             centerOffset: number,
-            stickyAll?: boolean
+            stickyAll?: boolean,
         ) => void;
         addData: (data: ScatterDataPoint[][]) => void;
         resetData: () => void;

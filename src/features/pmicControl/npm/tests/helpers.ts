@@ -31,13 +31,13 @@ import {
 export const setupMocksBase = (
     createNpmDevice: (
         shellParser: ShellParser | undefined,
-        dialogHandler: ((dialog: PmicDialog) => void) | null
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
     ) => BaseNpmDevice,
-    shellParser: ShellParser | undefined = undefined
+    shellParser: ShellParser | undefined = undefined,
 ) => {
     const mockDialogHandler = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_pmicDialog: PmicDialog) => {}
+        (_pmicDialog: PmicDialog) => {},
     );
 
     const pmic = createNpmDevice(shellParser, mockDialogHandler);
@@ -47,19 +47,19 @@ export const setupMocksBase = (
     const mockOnBeforeReboot = jest.fn(() => {});
     const mockOnBuckUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: PartialUpdate<Buck>) => {}
+        (_partialUpdate: PartialUpdate<Buck>) => {},
     );
     const mockOnBoostUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: PartialUpdate<Boost>) => {}
+        (_partialUpdate: PartialUpdate<Boost>) => {},
     );
     const mockOnChargerUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<Charger>) => {}
+        (_partialUpdate: Partial<Charger>) => {},
     );
     const mockOnBoardLoadUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<OnBoardLoad>) => {}
+        (_partialUpdate: Partial<OnBoardLoad>) => {},
     );
     const mockOnChargingStatusUpdate = jest.fn(() => {});
     const mockOnFuelGaugeUpdate = jest.fn(() => {});
@@ -67,41 +67,41 @@ export const setupMocksBase = (
     const mockOnLdoUpdate = jest.fn((_partialUpdate: PartialUpdate<Ldo>) => {});
     const mockOnGpioUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: PartialUpdate<GPIO>) => {}
+        (_partialUpdate: PartialUpdate<GPIO>) => {},
     );
     const mockOnLEDUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: PartialUpdate<LED>) => {}
+        (_partialUpdate: PartialUpdate<LED>) => {},
     );
 
     const mockOnPOFUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<POF>) => {}
+        (_partialUpdate: Partial<POF>) => {},
     );
 
     const mockOnTimerConfigUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<TimerConfig>) => {}
+        (_partialUpdate: Partial<TimerConfig>) => {},
     );
 
     const mockOnLowPowerUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<LowPowerConfig>) => {}
+        (_partialUpdate: Partial<LowPowerConfig>) => {},
     );
 
     const mockOnResetUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<ResetConfig>) => {}
+        (_partialUpdate: Partial<ResetConfig>) => {},
     );
 
     const mockOnUsbPower = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_partialUpdate: Partial<USBPower>) => {}
+        (_partialUpdate: Partial<USBPower>) => {},
     );
 
     const mockOnErrorLogs = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_msg: Partial<ErrorLogs>) => {}
+        (_msg: Partial<ErrorLogs>) => {},
     );
 
     const mockOnLoggingEvent = jest.fn(() => {});
@@ -183,7 +183,7 @@ export const helpers = {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _timeout?: number,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _unique?: boolean
+        _unique?: boolean,
     ) => {
         callbacks?.onError('', '');
         return Promise.resolve();
@@ -194,7 +194,7 @@ export const helpers = {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _timeout?: number,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _unique?: boolean
+        _unique?: boolean,
     ) => {
         callbacks?.onSuccess('', '');
         return Promise.resolve();
@@ -204,17 +204,17 @@ export const helpers = {
 export const setupMocksWithShellParser = (
     createNpmDevice: (
         shellParser: ShellParser | undefined,
-        dialogHandler: ((dialog: PmicDialog) => void) | null
-    ) => BaseNpmDevice
+        dialogHandler: ((dialog: PmicDialog) => void) | null,
+    ) => BaseNpmDevice,
 ) => {
     const mockOnPausedChange = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_handler: (state: boolean) => void) => () => {}
+        (_handler: (state: boolean) => void) => () => {},
     );
 
     const mockOnShellLoggingEventHandler = (state: string) => {
         eventHandlers.mockOnShellLoggingEventHandlers.forEach(handler =>
-            handler(state)
+            handler(state),
         );
     };
 
@@ -225,7 +225,7 @@ export const setupMocksWithShellParser = (
         mockAnyCommandResponseHandlers: [] as AnyCommandHandler[],
         mockRegisterCommandCallbackHandler: (command: string) =>
             eventHandlers.mockRegisterCommandCallbackHandlers.find(element =>
-                command.match(`^(${element.command})`)
+                command.match(`^(${element.command})`),
             ),
     };
 
@@ -233,7 +233,7 @@ export const setupMocksWithShellParser = (
         (handler: (state: string) => void) => {
             eventHandlers.mockOnShellLoggingEventHandlers.push(handler);
             return () => {};
-        }
+        },
     );
     const mockOnAnyCommandResponse = jest.fn(
         (
@@ -245,15 +245,15 @@ export const setupMocksWithShellParser = (
                 command: string;
                 response: string;
                 error: boolean;
-            }) => void
+            }) => void,
         ) => {
             eventHandlers.mockAnyCommandResponseHandlers.push(handler);
             return () => {};
-        }
+        },
     );
     const mockOnUnknownCommand = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (_handler: (state: string) => void) => () => {}
+        (_handler: (state: string) => void) => () => {},
     );
 
     const mockEnqueueRequest = jest.fn(
@@ -265,14 +265,14 @@ export const setupMocksWithShellParser = (
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             _timeout?: number,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            _unique?: boolean
-        ) => Promise.resolve()
+            _unique?: boolean,
+        ) => Promise.resolve(),
     );
     const mockRegisterCommandCallback = jest.fn(
         (
             command: string,
             onSuccess: (data: string, command: string) => void,
-            onError: (error: string, command: string) => void
+            onError: (error: string, command: string) => void,
         ) => {
             eventHandlers.mockRegisterCommandCallbackHandlers.push({
                 command,
@@ -280,7 +280,7 @@ export const setupMocksWithShellParser = (
                 onError,
             });
             return () => {};
-        }
+        },
     );
 
     const mockUnregister = jest.fn(() => {});
@@ -308,12 +308,12 @@ export const setupMocksWithShellParser = (
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             _timeout?: number,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            _unique?: boolean
+            _unique?: boolean,
         ) => {
             expect(command).toBe('kernel uptime');
             callbacks?.onSuccess('Uptime: 0 ms', command);
             return Promise.resolve();
-        }
+        },
     );
 
     return {

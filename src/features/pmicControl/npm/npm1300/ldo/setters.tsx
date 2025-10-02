@@ -27,11 +27,11 @@ export class LdoSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
         private dialogHandler: ((dialog: PmicDialog) => void) | null,
         private offlineMode: boolean,
-        private index: number
+        private index: number,
     ) {
         this.get = new LdoGet(sendCommand, index);
     }
@@ -57,7 +57,7 @@ export class LdoSet {
                         {
                             mode,
                         },
-                        this.index
+                        this.index,
                     );
                     resolve();
                 } else {
@@ -69,7 +69,7 @@ export class LdoSet {
                         () => {
                             this.get.mode();
                             reject();
-                        }
+                        },
                     );
                 }
             });
@@ -156,7 +156,7 @@ export class LdoSet {
                 {
                     voltage,
                 },
-                this.index
+                this.index,
             );
 
             if (this.offlineMode) {
@@ -172,7 +172,7 @@ export class LdoSet {
                             () => {
                                 this.get.voltage();
                                 reject();
-                            }
+                            },
                         );
                     })
                     .catch(() => {
@@ -191,7 +191,7 @@ export class LdoSet {
                     {
                         enabled,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -201,7 +201,7 @@ export class LdoSet {
                     () => {
                         this.get.enabled();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -215,7 +215,7 @@ export class LdoSet {
                     {
                         softStartEnabled: enabled,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -227,7 +227,7 @@ export class LdoSet {
                     () => {
                         this.get.softStartEnabled();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -241,7 +241,7 @@ export class LdoSet {
                     {
                         softStart,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -251,7 +251,7 @@ export class LdoSet {
                     () => {
                         this.get.softStart();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -265,7 +265,7 @@ export class LdoSet {
                     {
                         activeDischarge,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -277,7 +277,7 @@ export class LdoSet {
                     () => {
                         this.get.activeDischarge();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -293,7 +293,7 @@ export class LdoSet {
                         onOffSoftwareControlEnabled:
                             onOffControl === LdoOnOffControlValues[0],
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -305,7 +305,7 @@ export class LdoSet {
                     () => {
                         this.get.onOffControl();
                         reject();
-                    }
+                    },
                 );
             }
         });

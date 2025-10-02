@@ -25,7 +25,7 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
                             this.processModuleCCSink(loggingEvent);
                         }
                     });
-                })
+                }),
             );
         }
     }
@@ -40,7 +40,7 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
                     this.profiling = 'NOT VSYS';
                     this.eventEmitter.emit(
                         'onProfilingStateChange',
-                        this.profiling
+                        this.profiling,
                     );
                     break;
             }
@@ -56,7 +56,7 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
                         onSuccess: res => {
                             const value = parseColonBasedAnswer(res);
                             resolve(
-                                value === 'VSYS' ? true : 'ActiveLoadNotVSYS'
+                                value === 'VSYS' ? true : 'ActiveLoadNotVSYS',
                             );
                         },
                         onError: reject,
@@ -64,9 +64,9 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
                             reject(error);
                             console.warn(error);
                         },
-                    }
+                    },
                 );
-            }
+            },
         );
     }
 
@@ -88,7 +88,7 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
         capacity: number,
         _vUpperCutOff: number,
         vLowerCutOff: number,
-        vTerm: number
+        vTerm: number,
     ): CCProfile[] {
         return [
             {

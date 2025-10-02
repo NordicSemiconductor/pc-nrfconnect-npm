@@ -70,10 +70,10 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             await npmDevice?.buckModule[0]?.set.enabled(false);
 
                             await npmDevice?.fuelGaugeModule?.set.enabled(
-                                false
+                                false,
                             );
                             await npmDevice?.chargerModule?.set.nTCThermistor(
-                                profile.ntcThermistor
+                                profile.ntcThermistor,
                             );
                             await npmDevice?.chargerModule?.set
                                 .enabled(false)
@@ -82,7 +82,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         setCompleteStep({
                                             message,
                                             level: 'danger',
-                                        })
+                                        }),
                                     );
                                 });
                             await npmDevice?.chargerModule?.set
@@ -92,7 +92,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         setCompleteStep({
                                             message,
                                             level: 'danger',
-                                        })
+                                        }),
                                     );
                                 });
                             await npmDevice?.chargerModule?.set
@@ -102,7 +102,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         setCompleteStep({
                                             message,
                                             level: 'danger',
-                                        })
+                                        }),
                                     );
                                 });
                             await npmDevice?.chargerModule?.set
@@ -112,7 +112,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         setCompleteStep({
                                             message,
                                             level: 'danger',
-                                        })
+                                        }),
                                     );
                                 });
                             await npmDevice?.chargerModule?.set
@@ -122,7 +122,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                         setCompleteStep({
                                             message,
                                             level: 'danger',
-                                        })
+                                        }),
                                     );
                                 });
                             dispatch(setProfilingStage('Charging'));
@@ -137,7 +137,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                 setAbortAction(() => {
                                     dispatch(closeProfiling());
                                     dispatch(clearWaitForDevice());
-                                })
+                                }),
                             );
                         }}
                     >

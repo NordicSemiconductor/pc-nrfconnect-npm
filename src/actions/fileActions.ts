@@ -53,7 +53,7 @@ const parseFile =
         const pathObject = path.parse(filePath);
         if (pathObject.ext === '.json') {
             const config = JSON.parse(
-                fs.readFileSync(filePath).toString()
+                fs.readFileSync(filePath).toString(),
             ) as unknown as AnyNpmExport;
 
             currentState.npmDevice?.applyConfig(upgradeToLatest(config));
@@ -70,7 +70,7 @@ const upgradeToLatest = (exportJson: AnyNpmExport): NpmExportLatest => {
         if (exportJson.charger) {
             exportJson.charger.iTerm = Number.parseInt(
                 exportJson.charger.iTerm.toString(),
-                10
+                10,
             );
         }
 
@@ -105,7 +105,7 @@ export const loadConfiguration = (): AppThunk => dispatch => {
         properties: ['openFile'],
     }).then(
         ({ filePaths }: OpenDialogReturnValue) =>
-            filePaths.length === 1 && dispatch(parseFile(filePaths[0]))
+            filePaths.length === 1 && dispatch(parseFile(filePaths[0])),
     );
 };
 
@@ -118,11 +118,11 @@ const stream2buffer = (stream: fs.ReadStream) =>
         });
         stream.on('end', () =>
             resolve(
-                Buffer.from(buf.replaceAll('\\s', '').replaceAll('\r\n', ''))
-            )
+                Buffer.from(buf.replaceAll('\\s', '').replaceAll('\r\n', '')),
+            ),
         );
         stream.on('error', err =>
-            reject(new Error(`error converting stream - ${err}`))
+            reject(new Error(`error converting stream - ${err}`)),
         );
     });
 
@@ -196,6 +196,6 @@ export const saveFileDialog = (): AppThunk => (dispatch, getState) => {
         result =>
             !result.canceled &&
             result.filePath &&
-            dispatch(saveSettings(result.filePath))
+            dispatch(saveSettings(result.filePath)),
     );
 };

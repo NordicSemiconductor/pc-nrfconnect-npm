@@ -34,8 +34,8 @@ describe('PMIC 1300 - Command callbacks', () => {
                     mode,
                     modeIndex,
                 },
-            ]).flat()
-        ).flat()
+            ]).flat(),
+        ).flat(),
     )('npmx gpio config mode %p', ({ index, append, mode, modeIndex }) => {
         const command = `npmx gpio config mode ${append}`;
         const callback =
@@ -71,8 +71,8 @@ describe('PMIC 1300 - Command callbacks', () => {
                     pull,
                     pullIndex,
                 },
-            ]).flat()
-        ).flat()
+            ]).flat(),
+        ).flat(),
     )('npmx gpio config pull %p', ({ index, append, pull, pullIndex }) => {
         const command = `npmx gpio config pull ${append}`;
         const callback =
@@ -100,8 +100,8 @@ describe('PMIC 1300 - Command callbacks', () => {
                     append: `set ${index} ${drive}`,
                     drive,
                 },
-            ]).flat()
-        ).flat()
+            ]).flat(),
+        ).flat(),
     )('npmx gpio config drive %p', ({ index, append, drive }) => {
         const command = `npmx gpio config drive ${append}`;
         const callback =
@@ -131,8 +131,8 @@ describe('PMIC 1300 - Command callbacks', () => {
                         debounce,
                     },
                 ])
-                .flat()
-        ).flat()
+                .flat(),
+        ).flat(),
     )('npmx gpio config debounce %p', ({ index, append, debounce }) => {
         const command = `npmx gpio config debounce ${append}`;
         const callback =
@@ -162,8 +162,8 @@ describe('PMIC 1300 - Command callbacks', () => {
                         openDrain,
                     },
                 ])
-                .flat()
-        ).flat()
+                .flat(),
+        ).flat(),
     )('npmx gpio config open_drain %p', ({ index, append, openDrain }) => {
         const command = `npmx gpio config open_drain ${append}`;
         const callback =

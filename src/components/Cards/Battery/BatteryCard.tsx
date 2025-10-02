@@ -54,7 +54,7 @@ export default ({ disabled }: BatteryCardProperties) => {
                     disabled={disabled}
                     onToggle={enabled =>
                         npmDevice?.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(
-                            !enabled
+                            !enabled,
                         )
                     }
                 />

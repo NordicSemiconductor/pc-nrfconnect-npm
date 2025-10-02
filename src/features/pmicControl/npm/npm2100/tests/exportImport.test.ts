@@ -235,7 +235,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                     ...(charger ?? initCharger),
                     ...partialUpdate,
                 };
-            }
+            },
         );
 
         mockOnLdoUpdate.mockImplementation(
@@ -244,7 +244,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                     ...(ldos[partialUpdate.index] ?? initLdo),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnGpioUpdate.mockImplementation(
@@ -258,7 +258,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                     ...(gpios[partialUpdate.index] ?? initGPIO),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnLEDUpdate.mockImplementation(
@@ -267,7 +267,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                     ...(leds[partialUpdate.index] ?? initLed),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnPOFUpdate.mockImplementation((partialUpdate: Partial<POF>) => {
@@ -283,7 +283,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                     ...ship,
                     ...partialUpdate,
                 } as npm2100LowPowerConfig;
-            }
+            },
         );
 
         mockOnResetUpdate.mockImplementation(
@@ -292,7 +292,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                     ...reset,
                     ...partialUpdate,
                 };
-            }
+            },
         );
 
         mockOnTimerConfigUpdate.mockImplementation(
@@ -301,7 +301,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                     ...timerConfig,
                     ...partialUpdate,
                 } as npm2100TimerConfig;
-            }
+            },
         );
 
         mockOnUsbPower.mockImplementation(
@@ -310,7 +310,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                     ...usbPower,
                     ...partialUpdate,
                 };
-            }
+            },
         );
     });
 

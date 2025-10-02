@@ -41,7 +41,7 @@ export default ({ disabled }: { disabled: boolean }) => {
     const pmicChargingState = useSelector(getPmicChargingState);
     const latestAdcSample = useSelector(getLatestAdcSample);
     const batteryConnected = useSelector(
-        isReceivingBatteryVoltageAboveThreshold
+        isReceivingBatteryVoltageAboveThreshold,
     );
 
     let mode = 'N/A';
@@ -56,7 +56,7 @@ export default ({ disabled }: { disabled: boolean }) => {
     return (
         <div
             className={`tw-preflight tw-flex tw-flex-col tw-gap-0.5 ${classNames(
-                disabled && 'tw-text-gray-300'
+                disabled && 'tw-text-gray-300',
             )}`}
         >
             <LineData
@@ -78,10 +78,10 @@ export default ({ disabled }: { disabled: boolean }) => {
                         latestAdcSample?.iBat != null &&
                         !Number.isNaN(latestAdcSample?.iBat)
                             ? `${latestAdcSample.iBat < 0 ? '—' : ''}${Math.abs(
-                                  latestAdcSample.iBat ?? 0
+                                  latestAdcSample.iBat ?? 0,
                               ).toFixed(
                                   npmDevice?.chargerModule?.ranges.current
-                                      .decimals ?? 0
+                                      .decimals ?? 0,
                               )} mA`
                             : 'N/A'
                     }

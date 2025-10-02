@@ -17,7 +17,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
 
     test('Set set timer config time ', async () => {
         await pmic.lowPowerModule?.set.timeToActive(
-            npm1300TimeToActive['16ms']
+            npm1300TimeToActive['16ms'],
         );
 
         expect(mockOnLowPowerUpdate).toBeCalledTimes(1);

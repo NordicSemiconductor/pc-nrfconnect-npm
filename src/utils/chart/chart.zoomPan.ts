@@ -44,7 +44,7 @@ const initRange = (chart: Chart) => {
 
 const getX = (
     data: ScatterDataPoint[][],
-    getValue: (d: ScatterDataPoint[]) => number
+    getValue: (d: ScatterDataPoint[]) => number,
 ) => {
     const selection: number[] = [];
 
@@ -78,7 +78,7 @@ const getMaxX = (data: ScatterDataPoint[][]) =>
 const getRange = (
     data: ScatterDataPoint[][],
     options: InternalPanPluginOptions,
-    live = options.live
+    live = options.live,
 ) => {
     const max = getMaxX(data);
     const min = getMinX(data);
@@ -87,7 +87,7 @@ const getRange = (
         const xMax = max;
         const xMin = Math.max(
             min,
-            max - getResolution(options.resolution, data)
+            max - getResolution(options.resolution, data),
         );
         return { xMin, xMax };
     }
@@ -116,7 +116,7 @@ const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
         data.findIndex((element: ScatterDataPoint) => element.x > range.xMin) -
         10;
     let endIndex = data.findIndex(
-        (element: ScatterDataPoint) => element.x > range.xMax
+        (element: ScatterDataPoint) => element.x > range.xMax,
     );
 
     // We need one extra element which is out of range to be able to show data
@@ -132,7 +132,7 @@ const mutateData = (data: ScatterDataPoint[], range: XAxisRange) => {
 const autoUpdateIsLive = (
     data: ScatterDataPoint[][],
     range: XAxisRange,
-    options: InternalPanPluginOptions
+    options: InternalPanPluginOptions,
 ) => {
     const xMax = getMaxX(data);
 
@@ -199,7 +199,7 @@ const updateData = (chart: Chart) => {
             // Point the chart to the decimated data
             chart.data.datasets[index].data = mutateData(
                 data,
-                chartState.options.currentRange
+                chartState.options.currentRange,
             );
         });
 
@@ -321,7 +321,7 @@ export default {
                 const newResolution = range.xMax - range.xMin;
                 chartState.options.resolution = Math.max(
                     newResolution,
-                    chartState.options.resolution
+                    chartState.options.resolution,
                 );
                 range = getRange(chartState.data, chartState.options);
             }
@@ -413,7 +413,7 @@ export default {
 
             const delta = Math.min(
                 Math.max(resolution * options.zoomFactor - resolution, 1000),
-                60000 * 10
+                60000 * 10,
             ); // min zoom at 1 sec, max zoom 10 min per scroll
 
             let newResolution =
@@ -426,9 +426,9 @@ export default {
                     state.options.minResolution,
                     Math.min(
                         newResolution,
-                        Math.min(fullResolution, state.options.maxResolution)
-                    )
-                )
+                        Math.min(fullResolution, state.options.maxResolution),
+                    ),
+                ),
             );
 
             // Zoom where the mouse pointer is

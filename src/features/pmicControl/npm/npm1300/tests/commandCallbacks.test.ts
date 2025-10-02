@@ -52,8 +52,8 @@ describe('PMIC 1300 - Command callbacks', () => {
                     mode,
                     modeIndex,
                 },
-            ]).flat()
-        ).flat()
+            ]).flat(),
+        ).flat(),
     )('npmx led mode %p', ({ index, append, mode, modeIndex }) => {
         const command = `npmx led mode ${append}`;
         const callback =

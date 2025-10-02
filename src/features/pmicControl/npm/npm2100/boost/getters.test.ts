@@ -22,49 +22,49 @@ describe('PMIC 2100 - Request update Boost commands', () => {
             `npm2100 boost vout VSET get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             2,
             `npm2100 boost vout SOFTWARE get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             3,
             `npm2100 boost voutsel get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             4,
             `npm2100 boost mode get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             5,
             `npm2100 boost pinsel get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             6,
             `npm2100 boost pinmode get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             7,
             `npm2100 boost ocp get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -76,7 +76,7 @@ describe('PMIC 2100 - Request update Boost commands', () => {
             `npm2100 boost vout VSET get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -88,7 +88,7 @@ describe('PMIC 2100 - Request update Boost commands', () => {
             `npm2100 boost vout SOFTWARE get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -100,7 +100,7 @@ describe('PMIC 2100 - Request update Boost commands', () => {
             `npm2100 boost voutsel get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -112,7 +112,7 @@ describe('PMIC 2100 - Request update Boost commands', () => {
             `npm2100 boost mode get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -124,7 +124,7 @@ describe('PMIC 2100 - Request update Boost commands', () => {
             `npm2100 boost pinsel get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -136,7 +136,7 @@ describe('PMIC 2100 - Request update Boost commands', () => {
             `npm2100 boost pinmode get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -148,7 +148,7 @@ describe('PMIC 2100 - Request update Boost commands', () => {
             `npm2100 boost ocp get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

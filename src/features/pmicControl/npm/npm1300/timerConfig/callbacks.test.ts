@@ -28,7 +28,7 @@ describe('PMIC 1300 - Command callbacks', () => {
                 mode,
                 modeIndex,
             },
-        ]).flat()
+        ]).flat(),
     )('npmx timer config mode %p', ({ append, mode, modeIndex }) => {
         const command = `npmx timer config mode ${append}`;
         const callback =
@@ -54,7 +54,7 @@ describe('PMIC 1300 - Command callbacks', () => {
                 prescaler,
                 prescalerIndex,
             },
-        ]).flat()
+        ]).flat(),
     )(
         'npmx timer config prescaler %p',
         ({ append, prescaler, prescalerIndex }) => {
@@ -68,7 +68,7 @@ describe('PMIC 1300 - Command callbacks', () => {
             expect(mockOnTimerConfigUpdate).toBeCalledWith({
                 prescaler,
             });
-        }
+        },
     );
 
     test.each([`get`, `set 2800`])('npmx timer config compare %p', append => {

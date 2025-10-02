@@ -124,7 +124,7 @@ export default () => {
                         onClick={() => {
                             if (!eventRecordingPath) {
                                 selectDirectoryDialog().then(filePath =>
-                                    dispatch(setEventRecordingPath(filePath))
+                                    dispatch(setEventRecordingPath(filePath)),
                                 );
                             } else {
                                 dispatch(stopEventRecording());
@@ -173,7 +173,7 @@ export default () => {
                         dispatch(
                             updateNpmAdcTimings({
                                 reportInterval: fuelGaugeReportingRateInternal,
-                            })
+                            }),
                         )
                     }
                     disabled={

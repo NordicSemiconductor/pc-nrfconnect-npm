@@ -85,19 +85,19 @@ export default ({ isVisible }: { isVisible: boolean }) => {
 
         const vDelta = Math.min(
             profile.vUpperCutOff - (latestVLoad ?? profile.vLowerCutOff),
-            0
+            0,
         );
         const maxVDelta = profile.vUpperCutOff - profile.vLowerCutOff;
         const voltageProgress = Math.max(
             0,
-            Math.min((vDelta / maxVDelta) * 100, 100)
+            Math.min((vDelta / maxVDelta) * 100, 100),
         );
 
         const millAmpHrProgress = Math.min(
             (theoreticalProgressMillAmpHr * alpha +
                 actualProgressMillAmpHr * actualProgressMillAmpHr) *
                 100,
-            100
+            100,
         );
 
         return voltageProgress * 0.05 + millAmpHrProgress * 0.95;
@@ -130,7 +130,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     npmDevice?.setAutoRebootDevice(true);
                                     dispatch(closeProfiling());
                                     dispatch(clearWaitForDevice());
-                                })
+                                }),
                             );
                         }}
                     >
@@ -150,7 +150,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 <StepperProgress
                     currentProfilingStepOverride={{
                         caption: `Profiling. ${capacityConsumed.toFixed(
-                            2
+                            2,
                         )} mAh of ${profile.capacity} mAh`,
                     }}
                 />

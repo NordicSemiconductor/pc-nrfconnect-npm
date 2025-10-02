@@ -42,7 +42,7 @@ export default ({
     const card = `Boost${boostModule.index}`;
 
     const [internalVBoost, setInternalVBoost] = useState(
-        boost.vOutSelect === 'Vset' ? boost.vOutVSet : boost.vOutSoftware
+        boost.vOutSelect === 'Vset' ? boost.vOutVSet : boost.vOutSoftware,
     );
 
     const modeItems = [
@@ -102,7 +102,7 @@ export default ({
                             className={classNames(
                                 'show-more-toggle mdi',
                                 summary && 'mdi-chevron-down',
-                                !summary && 'mdi-chevron-up'
+                                !summary && 'mdi-chevron-up',
                             )}
                             role="button"
                             tabIndex={0}
@@ -160,12 +160,12 @@ export default ({
                         items={modeControlItems}
                         onSelect={item =>
                             boostModule.set.modeControl(
-                                item.value as BoostModeControl
+                                item.value as BoostModeControl,
                             )
                         }
                         selectedItem={
                             modeControlItems.find(
-                                item => item.value === boost.modeControl
+                                item => item.value === boost.modeControl,
                             ) ?? modeControlItems[0]
                         }
                         disabled={disabled}
@@ -182,12 +182,12 @@ export default ({
                         items={pinSelectionItems}
                         onSelect={item =>
                             boostModule.set.pinSelection(
-                                item.value as BoostPinSelection
+                                item.value as BoostPinSelection,
                             )
                         }
                         selectedItem={
                             pinSelectionItems.find(
-                                item => item.value === boost.pinSelection
+                                item => item.value === boost.pinSelection,
                             ) ?? pinSelectionItems[0]
                         }
                         disabled={disabled}
@@ -207,7 +207,7 @@ export default ({
                         }
                         selectedItem={
                             pinModeItems.find(
-                                item => item.value === boost.pinMode
+                                item => item.value === boost.pinMode,
                             ) ?? pinModeItems[0]
                         }
                         disabled={disabled || !boost.pinModeEnabled}

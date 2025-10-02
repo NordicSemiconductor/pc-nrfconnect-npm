@@ -21,10 +21,10 @@ export class LdoSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
         private dialogHandler: ((dialog: PmicDialog) => void) | null,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new LdoGet(sendCommand);
     }
@@ -62,7 +62,7 @@ export class LdoSet {
                         mode,
                         enabled: false,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -74,7 +74,7 @@ export class LdoSet {
                             () => {
                                 this.get.mode();
                                 reject();
-                            }
+                            },
                         );
                     })
                     .catch(() => {
@@ -91,7 +91,7 @@ export class LdoSet {
                 {
                     voltage,
                 },
-                0
+                0,
             );
 
             if (this.offlineMode) {
@@ -108,7 +108,7 @@ export class LdoSet {
                                     type: 'alert',
                                     doNotAskAgainStoreID: `pmic2100-setLDOVoltage`,
                                     message: `${parseColonBasedAnswer(
-                                        response
+                                        response,
                                     )}.`,
                                     confirmLabel: 'OK',
                                     optionalLabel: "OK, don't ask again",
@@ -117,7 +117,7 @@ export class LdoSet {
                                 });
 
                                 reject();
-                            }
+                            },
                         );
                     })
                     .catch(() => {
@@ -135,7 +135,7 @@ export class LdoSet {
                     {
                         enabled,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -145,7 +145,7 @@ export class LdoSet {
                     () => {
                         this.get.enabled();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -159,7 +159,7 @@ export class LdoSet {
                     {
                         ldoSoftStart,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -169,7 +169,7 @@ export class LdoSet {
                     () => {
                         this.get.softStartLdo();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -183,7 +183,7 @@ export class LdoSet {
                     {
                         softStart,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -193,7 +193,7 @@ export class LdoSet {
                     () => {
                         this.get.softStart();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -208,7 +208,7 @@ export class LdoSet {
                         modeControl,
                         onOffSoftwareControlEnabled: modeControl !== 'gpio',
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -218,7 +218,7 @@ export class LdoSet {
                     () => {
                         this.get.modeCtrl();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -232,7 +232,7 @@ export class LdoSet {
                     {
                         pinSel,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -242,7 +242,7 @@ export class LdoSet {
                     () => {
                         this.get.pinSel();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -256,7 +256,7 @@ export class LdoSet {
                     {
                         pinMode,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -266,7 +266,7 @@ export class LdoSet {
                     () => {
                         this.get.pinMode();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -280,7 +280,7 @@ export class LdoSet {
                     {
                         ocpEnabled,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -290,7 +290,7 @@ export class LdoSet {
                     () => {
                         this.get.ocp();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -304,7 +304,7 @@ export class LdoSet {
                     {
                         rampEnabled: ldoRampEnabled,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -316,7 +316,7 @@ export class LdoSet {
                     () => {
                         this.get.ramp();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -330,7 +330,7 @@ export class LdoSet {
                     {
                         haltEnabled: ldoHaltEnabled,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -342,7 +342,7 @@ export class LdoSet {
                     () => {
                         this.get.halt();
                         reject();
-                    }
+                    },
                 );
             }
         });

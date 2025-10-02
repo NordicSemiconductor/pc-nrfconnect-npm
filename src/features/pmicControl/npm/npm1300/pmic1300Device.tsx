@@ -45,7 +45,7 @@ export default class Npm1300 extends BaseNpmDevice {
         peripherals?: Partial<NpmPeripherals>,
         hardwareVersion?: string,
         type: 'npm1300' | 'npm1304' = 'npm1300',
-        fw: string = npm1300FWVersion
+        fw: string = npm1300FWVersion,
     ) {
         super(
             type,
@@ -85,7 +85,7 @@ export default class Npm1300 extends BaseNpmDevice {
                 charger: true,
                 sensor: true,
             },
-            hardwareVersion
+            hardwareVersion,
         );
 
         if (shellParser) {
@@ -115,7 +115,7 @@ export default class Npm1300 extends BaseNpmDevice {
                             dataPair: isModuleDataPair(loggingEvent.module),
                         });
                     });
-                })
+                }),
             );
         }
     }
@@ -196,7 +196,7 @@ export default class Npm1300 extends BaseNpmDevice {
                 case 'soc':
                     adcSample.soc = Math.min(
                         100,
-                        Math.max(0, fixed(1, pair[1]))
+                        Math.max(0, fixed(1, pair[1])),
                     );
                     break;
                 case 'tte':
@@ -265,12 +265,12 @@ export default class Npm1300 extends BaseNpmDevice {
                                                 'onErrorLogs',
                                                 {
                                                     resetCause: errors,
-                                                }
+                                                },
                                             );
                                             logger.warn(
                                                 `Reset cause: ${errors.join(
-                                                    ', '
-                                                )}`
+                                                    ', ',
+                                                )}`,
                                             );
                                             break;
                                         case 'CHARGER_ERROR:':
@@ -278,12 +278,12 @@ export default class Npm1300 extends BaseNpmDevice {
                                                 'onErrorLogs',
                                                 {
                                                     chargerError: errors,
-                                                }
+                                                },
                                             );
                                             logger.error(
                                                 `Charger Errors: ${errors.join(
-                                                    ', '
-                                                )}`
+                                                    ', ',
+                                                )}`,
                                             );
                                             break;
                                         case 'SENSOR_ERROR:':
@@ -291,12 +291,12 @@ export default class Npm1300 extends BaseNpmDevice {
                                                 'onErrorLogs',
                                                 {
                                                     sensorError: errors,
-                                                }
+                                                },
                                             );
                                             logger.error(
                                                 `Sensor Errors: ${errors.join(
-                                                    ', '
-                                                )}`
+                                                    ', ',
+                                                )}`,
                                             );
                                             break;
                                     }
@@ -318,7 +318,7 @@ export default class Npm1300 extends BaseNpmDevice {
                             },
                             onError: () => {
                                 logger.warn(
-                                    'error message unable to read error from device'
+                                    'error message unable to read error from device',
                                 );
                             },
                             onTimeout: () => {
@@ -326,7 +326,7 @@ export default class Npm1300 extends BaseNpmDevice {
                             },
                         },
                         undefined,
-                        true
+                        true,
                     );
                 }
                 break;
@@ -365,7 +365,7 @@ export default class Npm1300 extends BaseNpmDevice {
     generateExport(
         getState: () => RootState & {
             app: { pmicControl: { npmDevice: BaseNpmDevice } };
-        }
+        },
     ) {
         const currentState = getState().app.pmicControl;
 

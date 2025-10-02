@@ -51,23 +51,23 @@ export default ({
     const npmDevice = useSelector(getNpmDevice);
     const pmicConnection = npmDevice?.pmicState;
     const allProgress = useSelector(getProjectProfileProgress).filter(
-        progress => progress.path === projectSettingsPath
+        progress => progress.path === projectSettingsPath,
     );
     const projectProgress = useMemo(
         () =>
             allProgress.filter(
-                progress => progress.path === projectSettingsPath
+                progress => progress.path === projectSettingsPath,
             ),
-        [allProgress, projectSettingsPath]
+        [allProgress, projectSettingsPath],
     );
 
     const includedProfiles = useMemo(
         () =>
             project.profiles.filter(
                 profile =>
-                    !profile.exclude && profile.csvReady && profile.csvPath
+                    !profile.exclude && profile.csvReady && profile.csvPath,
             ),
-        [project]
+        [project],
     );
     const [showAddProfileDialog, setShowAddProfileDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
@@ -86,28 +86,28 @@ export default ({
                         projectProgress.filter(
                             progress =>
                                 !project.profiles[progress.index].exclude &&
-                                !progress.errorLevel
+                                !progress.errorLevel,
                         ).length === includedProfiles.length ||
                         includedProfiles.filter(profile =>
                             isProfileReadyForProcessing(
                                 projectSettingsPath,
-                                profile
-                            )
+                                profile,
+                            ),
                         ).length === 0
                     }
                     onClick={() => {
                         includedProfiles.forEach((setting, index) => {
                             const inProgress =
                                 projectProgress.find(
-                                    progress => progress.index === index
+                                    progress => progress.index === index,
                                 ) !== undefined;
 
                             if (!setting.exclude && !inProgress) {
                                 dispatch(
                                     generateParamsFromCSV(
                                         projectSettingsPath,
-                                        index
-                                    )
+                                        index,
+                                    ),
                                 );
                             }
                         });
@@ -143,20 +143,20 @@ export default ({
                                         ) {
                                             stringToFile(
                                                 result.filePath,
-                                                data.json
+                                                data.json,
                                             );
                                         } else if (
                                             result.filePath?.endsWith('.inc')
                                         ) {
                                             stringToFile(
                                                 result.filePath,
-                                                data.inc
+                                                data.inc,
                                             );
                                         }
                                         setGeneratingBatterModel(false);
                                     })
                                     .catch(
-                                        setGeneratingBatterModelErrorMessage
+                                        setGeneratingBatterModelErrorMessage,
                                     );
                             }
                         });
@@ -168,8 +168,8 @@ export default ({
                                 profile.paramsJson === undefined ||
                                 !isProfileReadyForProcessing(
                                     projectSettingsPath,
-                                    profile
-                                )
+                                    profile,
+                                ),
                         ).length > 0
                     }
                 >
@@ -185,7 +185,7 @@ export default ({
                                         showDialog({
                                             buffer: Buffer.from(data.json),
                                             name: project.name,
-                                        })
+                                        }),
                                     );
                                 }
                                 setGeneratingBatterModel(false);
@@ -201,8 +201,8 @@ export default ({
                                 profile.paramsJson === undefined ||
                                 !isProfileReadyForProcessing(
                                     projectSettingsPath,
-                                    profile
-                                )
+                                    profile,
+                                ),
                         ).length > 0
                     }
                 >

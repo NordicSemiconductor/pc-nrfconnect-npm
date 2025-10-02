@@ -16,9 +16,9 @@ export class FuelGaugeSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new FuelGaugeGet(sendCommand);
     }
@@ -41,7 +41,7 @@ export class FuelGaugeSet {
                     () => {
                         this.get.enabled();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -55,7 +55,7 @@ export class FuelGaugeSet {
                 () => {
                     this.get.activeBatteryModel();
                     reject();
-                }
+                },
             );
         });
     }
@@ -65,7 +65,7 @@ export class FuelGaugeSet {
             this.sendCommand(
                 `npm_chg_status_check set ${enabled ? '1' : '0'}`,
                 () => resolve(),
-                () => reject()
+                () => reject(),
             );
         });
     }

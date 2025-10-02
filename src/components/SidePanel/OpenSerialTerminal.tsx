@@ -65,7 +65,7 @@ const openSerialTerminal = (device: Device, serialPortPath: string) => {
             device: {
                 serialPortPath,
             },
-        }
+        },
     );
 };
 
@@ -76,6 +76,6 @@ const detectInstalledApp = async () => {
         app =>
             app.source === 'official' &&
             app.name === 'pc-nrfconnect-serial-terminal' &&
-            apps.isInstalled(app)
+            apps.isInstalled(app),
     );
 };

@@ -5,13 +5,12 @@
  */
 
 export class FuelGaugeGet {
-    // eslint-disable-next-line no-useless-constructor
     constructor(
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void
+            onError?: (response: string, command: string) => void,
+        ) => void,
     ) {}
 
     all() {
@@ -32,7 +31,7 @@ export class FuelGaugeGet {
     }
     discardPosiiveDeltaZ() {
         this.sendCommand(
-            `fuel_gauge params runtime discard_positive_deltaz get`
+            `fuel_gauge params runtime discard_positive_deltaz get`,
         );
     }
 }

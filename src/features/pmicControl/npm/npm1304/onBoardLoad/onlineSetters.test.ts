@@ -20,7 +20,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -37,7 +37,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `cc_sink level set 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             expect(mockOnBoardLoadUpdate).toBeCalledTimes(1);
@@ -48,7 +48,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -58,7 +58,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.onBoardLoadModule?.set.iLoad(1)
+                pmic.onBoardLoadModule?.set.iLoad(1),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -67,7 +67,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `cc_sink level set 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             expect(mockEnqueueRequest).nthCalledWith(
@@ -75,7 +75,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `cc_sink level get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             expect(mockOnBoardLoadUpdate).toBeCalledTimes(1);

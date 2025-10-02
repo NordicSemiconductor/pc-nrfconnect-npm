@@ -26,7 +26,7 @@ describe('PMIC 1300 - Command callbacks', () => {
                     enable,
                 },
             ])
-            .flat()
+            .flat(),
     )('npmx pof status %p', ({ append, enable }) => {
         const command = `npmx pof status ${append}`;
         const callback =
@@ -52,7 +52,7 @@ describe('PMIC 1300 - Command callbacks', () => {
                 polarity,
                 polarityIndex,
             },
-        ]).flat()
+        ]).flat(),
     )('npmx pof polarity %p', ({ append, polarity, polarityIndex }) => {
         const command = `npmx pof polarity ${append}`;
         const callback =
