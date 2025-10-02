@@ -87,7 +87,7 @@ export const readProjectSettingsFromFile = (
             path: filePath,
             settings: project,
         };
-    } catch (error) {
+    } catch {
         return { path: filePath, settings: undefined, error: 'fileCorrupted' };
     }
 };

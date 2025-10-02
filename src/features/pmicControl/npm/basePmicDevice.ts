@@ -1061,7 +1061,7 @@ export default abstract class BaseNpmDevice {
                             .all(onBoardLoad)
                             .catch(() => {});
                     }
-                } catch (error) {
+                } catch {
                     logger.error('Invalid File.');
                 }
             };
