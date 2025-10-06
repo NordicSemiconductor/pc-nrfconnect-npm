@@ -82,7 +82,7 @@ export default ({
         eta.current = 0;
     }
 
-    if (ready) progress === 100;
+    if (ready) progress = 100;
 
     if (progress > 0 && progress <= 100) {
         const newEta = (100 / progress) * time - time;

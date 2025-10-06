@@ -212,7 +212,7 @@ export const onOffRegex = '([Oo][Nn]|[Oo][Ff][Ff])';
 export const dialogHandler =
     (pmicDialog: PmicDialog): AppThunk =>
     dispatch => {
-        if (!pmicDialog.uuid) pmicDialog.uuid === uuid();
+        if (!pmicDialog.uuid) pmicDialog.uuid = uuid();
 
         if (
             pmicDialog.doNotAskAgainStoreID !== undefined &&
