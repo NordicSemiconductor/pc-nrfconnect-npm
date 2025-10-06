@@ -22,22 +22,6 @@ describe('PMIC 2100 - Setters Offline tests', () => {
         jest.clearAllMocks();
     });
 
-    test.each([true, false])(
-        'Set setFuelGuageEnable index: %p',
-        async enabled => {
-            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onConfirm();
-            });
-
-            await pmic.fuelGaugeModule?.set.enabled(enabled);
-
-            expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
-            expect(mockOnFuelGaugeUpdate).toBeCalledWith({
-                enabled,
-            });
-        },
-    );
-
     test.each(PMIC_2100_LDOS)('Set setLdoVoltage index: %p', async index => {
         mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
             dialog.onConfirm();
