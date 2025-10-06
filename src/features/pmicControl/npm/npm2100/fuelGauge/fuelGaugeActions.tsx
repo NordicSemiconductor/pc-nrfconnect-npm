@@ -95,24 +95,20 @@ export class FuelGaugeActions {
                         }
                     },
                     res => {
-                        () => {
-                            if (
-                                this.fuelGaugeModule.profileDownloadInProgress
-                            ) {
-                                this.fuelGaugeModule.profileDownloadInProgress = false;
-                                this.fuelGaugeModule.profileDownloadAborting = false;
-                                const profileDownload: ProfileDownload = {
-                                    state: 'failed',
-                                    alertMessage: parseColonBasedAnswer('res'),
-                                    slot,
-                                };
-                                this.eventEmitter.emit(
-                                    'onProfileDownloadUpdate',
-                                    profileDownload,
-                                );
-                            }
-                            reject(res);
-                        };
+                        if (this.fuelGaugeModule.profileDownloadInProgress) {
+                            this.fuelGaugeModule.profileDownloadInProgress = false;
+                            this.fuelGaugeModule.profileDownloadAborting = false;
+                            const profileDownload: ProfileDownload = {
+                                state: 'failed',
+                                alertMessage: parseColonBasedAnswer('res'),
+                                slot,
+                            };
+                            this.eventEmitter.emit(
+                                'onProfileDownloadUpdate',
+                                profileDownload,
+                            );
+                        }
+                        reject(res);
                     },
                     false,
                 );
