@@ -56,7 +56,7 @@ export const markProfilersAsReady = (): AppThunk => (dispatch, getState) => {
             profileSettings.profiles[index].csvReady = true;
 
             return profileSettings;
-        })
+        }),
     );
 
     dispatch(startProcessingCsv(profile, index));
@@ -117,12 +117,12 @@ const SaveBatteryModelButton = ({
     const profile = useSelector(getProfile);
 
     const project = useSelector(getProfileProjects).find(
-        p => p.path === generateDefaultProjectPath(profile)
+        p => p.path === generateDefaultProjectPath(profile),
     );
 
     const finishedProfiles =
         project?.settings?.profiles.filter(
-            prof => prof.batteryJson && prof.paramsJson && prof.batteryInc
+            prof => prof.batteryJson && prof.paramsJson && prof.batteryInc,
         ) ?? [];
 
     return (
@@ -139,7 +139,7 @@ const SaveBatteryModelButton = ({
                                 profile.name,
                                 `${profile.name}_${finishedProfiles
                                     .map(p => p.temperature)
-                                    .join('_')}C`
+                                    .join('_')}C`,
                             );
                             stringToFile(`${filePath}.json`, data.json);
                             stringToFile(`${filePath}.inc`, data.inc);
@@ -175,13 +175,13 @@ const RestartProfileButton = ({
                     .filter(
                         prog =>
                             prog.path === generateDefaultProjectPath(profile) &&
-                            prog.index === index
+                            prog.index === index,
                     )
                     .forEach(prog => prog.cancel());
                 const baseDirector = path.join(
                     profile.baseDirectory,
                     profile.name,
-                    `${PROFILE_FOLDER_PREFIX}${index + 1}`
+                    `${PROFILE_FOLDER_PREFIX}${index + 1}`,
                 );
 
                 if (existsSync(baseDirector)) {
@@ -195,7 +195,7 @@ const RestartProfileButton = ({
                         profileSettings.profiles[index].csvReady = false;
                         profileSettings.profiles[index].csvPath = undefined;
                         return profileSettings;
-                    })
+                    }),
                 );
 
                 mkdirSync(baseDirector, { recursive: true });
@@ -283,7 +283,7 @@ const AbortProfileButton = () => {
                                 });
                             npmDevice?.setAutoRebootDevice(true);
                         }
-                    })
+                    }),
                 );
             }}
         >
@@ -316,7 +316,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
 
     const profileProgress = useSelector(getProjectProfileProgress).filter(
-        p => p.path === generateDefaultProjectPath(profile)
+        p => p.path === generateDefaultProjectPath(profile),
     );
 
     const allProcessedSuccessfully = profileProgress.length === 0;

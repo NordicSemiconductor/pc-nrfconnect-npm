@@ -36,7 +36,7 @@ export default class Module implements LowPowerModule {
         this._actions = new LowPowerActions(
             eventEmitter,
             sendCommand,
-            offlineMode
+            offlineMode,
         );
         this._callbacks = shipModeCallbacks(shellParser, eventEmitter);
     }

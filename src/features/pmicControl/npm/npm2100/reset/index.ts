@@ -42,7 +42,7 @@ export default class Module implements ResetModule {
         this._actions = new ResetActions(
             eventEmitter,
             sendCommand,
-            offlineMode
+            offlineMode,
         );
         this._callbacks = resetCallbacks(shellParser, eventEmitter);
     }
@@ -74,7 +74,7 @@ export default class Module implements ResetModule {
                 item => ({
                     label: `${item}`,
                     value: `${item}`,
-                })
+                }),
             ),
             longPressReset: [],
         };

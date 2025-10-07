@@ -54,7 +54,7 @@ const BundledBatteryItem = ({
                     variant="secondary"
                     onClick={() => {
                         loadBatteryProfile(
-                            path.join(rootFolder, `${model.name}.json`)
+                            path.join(rootFolder, `${model.name}.json`),
                         ).then(buffer => {
                             dispatch(showDialog({ buffer, name: model.name }));
                         });
@@ -96,9 +96,9 @@ const BundledBatteryItem = ({
                                         rootFolder,
                                         `${model.name}${
                                             path.parse(result.filePath).ext
-                                        }`
+                                        }`,
                                     ),
-                                    result.filePath
+                                    result.filePath,
                                 );
                             }
                         });
@@ -191,7 +191,7 @@ export default () => {
 
     const bundledBatteries = useMemo(
         () => getBundledBatteries(npmDevice?.deviceType ?? 'npm1300'),
-        [npmDevice]
+        [npmDevice],
     );
 
     return (

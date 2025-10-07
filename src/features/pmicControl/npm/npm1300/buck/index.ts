@@ -41,14 +41,14 @@ const buckVoltageRange = () =>
         min: 1,
         max: 3.3,
         decimals: 1,
-    } as RangeType);
+    }) as RangeType;
 
 const buckRetVOutRange = () =>
     ({
         min: 1,
         max: 3,
         decimals: 1,
-    } as RangeType);
+    }) as RangeType;
 
 export default class Module implements BuckModule {
     readonly index: number;
@@ -70,7 +70,7 @@ export default class Module implements BuckModule {
             sendCommand,
             dialogHandler,
             offlineMode,
-            index
+            index,
         );
         this._callbacks = buckCallbacks(shellParser, eventEmitter, index);
     }

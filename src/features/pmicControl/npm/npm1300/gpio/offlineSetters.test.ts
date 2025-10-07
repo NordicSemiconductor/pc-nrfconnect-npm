@@ -70,7 +70,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
                 data: { openDrain: true },
                 index,
             });
-        }
+        },
     );
 });
 

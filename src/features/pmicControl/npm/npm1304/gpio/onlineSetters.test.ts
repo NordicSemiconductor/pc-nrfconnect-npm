@@ -21,7 +21,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -31,8 +31,8 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     index,
                     mode,
                     modeIndex,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioMode index: %p', async ({ index, mode, modeIndex }) => {
             await pmic.gpioModule[index].set.mode(mode);
 
@@ -41,7 +41,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx gpio config mode set ${index} ${modeIndex}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -54,8 +54,8 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     index,
                     pull,
                     pullIndex,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioPull index: %p', async ({ index, pull, pullIndex }) => {
             await pmic.gpioModule[index].set.pull(pull);
 
@@ -64,7 +64,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx gpio config pull set ${index} ${pullIndex}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -76,8 +76,8 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 GPIODriveValues.map(drive => ({
                     index,
                     drive,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioDrive index: %p', async ({ index, drive }) => {
             await pmic.gpioModule[index].set.drive(drive);
 
@@ -86,7 +86,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx gpio config drive set ${index} ${drive}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -98,8 +98,8 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 [true, false].map(debounce => ({
                     index,
                     debounce,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioDebounce index: %p', async ({ index, debounce }) => {
             await pmic.gpioModule[index].set.debounce(debounce);
 
@@ -110,7 +110,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 }`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -122,8 +122,8 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 [true, false].map(openDrain => ({
                     index,
                     openDrain,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioOpenDrain index: %p', async ({ index, openDrain }) => {
             await pmic.gpioModule[index].set.openDrain(openDrain);
 
@@ -134,7 +134,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 }`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -146,7 +146,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -156,19 +156,19 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     index,
                     mode,
                     modeIndex,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioMode - Fail immediately - index: %p',
             async ({ index, mode, modeIndex }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.gpioModule[index].set.mode(mode)
+                    pmic.gpioModule[index].set.mode(mode),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -176,7 +176,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx gpio config mode set ${index} ${modeIndex}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -185,12 +185,12 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx gpio config mode get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -198,19 +198,19 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 GPIODriveValues.map(drive => ({
                     index,
                     drive,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioDrive - Fail immediately - index: %p',
             async ({ index, drive }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.gpioModule[index].set.drive(drive)
+                    pmic.gpioModule[index].set.drive(drive),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -218,7 +218,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx gpio config drive set ${index} ${drive}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -227,12 +227,12 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx gpio config drive get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -241,19 +241,19 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     index,
                     pull,
                     pullIndex,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioPull - Fail immediately - index: %p',
             async ({ index, pull, pullIndex }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.gpioModule[index].set.pull(pull)
+                    pmic.gpioModule[index].set.pull(pull),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -261,7 +261,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx gpio config pull set ${index} ${pullIndex}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -270,12 +270,12 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx gpio config pull get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -283,19 +283,19 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 [true, false].map(debounce => ({
                     index,
                     debounce,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioDebounce - Fail immediately - index: %p',
             async ({ index, debounce }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.gpioModule[index].set.debounce(debounce)
+                    pmic.gpioModule[index].set.debounce(debounce),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -305,7 +305,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     }`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -314,12 +314,12 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx gpio config debounce get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -327,19 +327,19 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 [true, false].map(openDrain => ({
                     index,
                     openDrain,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioOpenDrain - Fail immediately - index: %p',
             async ({ index, openDrain }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.gpioModule[index].set.openDrain(openDrain)
+                    pmic.gpioModule[index].set.openDrain(openDrain),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -349,7 +349,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     }`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -358,12 +358,12 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx gpio config open_drain get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
     });
 });

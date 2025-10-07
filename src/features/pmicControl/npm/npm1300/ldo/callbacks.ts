@@ -18,7 +18,7 @@ import { GPIOValues, Ldo, SoftStart } from '../../types';
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    index: number
+    index: number,
 ) => {
     const cleanupCallbacks = [];
     if (shellParser) {
@@ -31,11 +31,11 @@ export default (
                         {
                             enabled: parseToBoolean(res),
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -50,11 +50,11 @@ export default (
                                     ? 'Load_switch'
                                     : 'LDO',
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -66,11 +66,11 @@ export default (
                         {
                             voltage: parseToNumber(res) / 1000, // mV to V
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -82,11 +82,11 @@ export default (
                         {
                             softStartEnabled: parseToBoolean(res),
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -95,7 +95,7 @@ export default (
                     'npmx ldsw soft_start current',
                     true,
                     index,
-                    '(10|20|35|50)'
+                    '(10|20|35|50)',
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
@@ -103,11 +103,11 @@ export default (
                         {
                             softStart: parseToNumber(res) as SoftStart,
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -119,11 +119,11 @@ export default (
                         {
                             activeDischarge: parseToBoolean(res),
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -138,11 +138,11 @@ export default (
                                 result === -1 ? 'SW' : GPIOValues[result],
                             onOffSoftwareControlEnabled: result === -1, // Disable on GPIO control, enable on SW control
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

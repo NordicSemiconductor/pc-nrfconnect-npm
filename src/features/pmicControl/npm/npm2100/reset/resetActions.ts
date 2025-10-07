@@ -7,15 +7,14 @@
 import { NpmEventEmitter } from '../../pmicHelpers';
 
 export class ResetActions {
-    // eslint-disable-next-line no-useless-constructor
     constructor(
         private eventEmitter: NpmEventEmitter,
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {}
 
     powerCycle() {
@@ -26,7 +25,7 @@ export class ResetActions {
                 this.sendCommand(
                     `npm2100 reset_ctrl power_cycle set ENABLE`,
                     () => resolve(),
-                    () => reject()
+                    () => reject(),
                 );
             }
         });

@@ -37,7 +37,7 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.tCool(charger.tCool),
             this.tWarm(charger.tWarm),
             this.tHot(charger.tHot),
-            this.enabled(charger.enabled)
+            this.enabled(charger.enabled),
         );
 
         await Promise.allSettled(promises);
@@ -59,7 +59,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.enabled();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -84,7 +84,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                             () => {
                                 this.get.vTerm();
                                 reject();
-                            }
+                            },
                         );
                     })
                     .catch(() => {
@@ -112,8 +112,8 @@ export class ChargerSet extends ChargerModuleSetBase {
                             () => {
                                 this.get.iChg();
                                 reject();
-                            }
-                        )
+                            },
+                        ),
                     )
                     .catch(() => {
                         this.get.iChg();
@@ -140,7 +140,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                             () => {
                                 this.get.vTrickleFast();
                                 reject();
-                            }
+                            },
                         );
                     })
                     .catch(() => {
@@ -168,7 +168,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                             () => {
                                 this.get.iTerm();
                                 reject();
-                            }
+                            },
                         );
                     })
                     .catch(() => {
@@ -180,7 +180,7 @@ export class ChargerSet extends ChargerModuleSetBase {
     }
 
     batLim: ((iBatLim: number) => Promise<void>) | undefined = (
-        iBatLim: number
+        iBatLim: number,
     ) =>
         new Promise<void>((resolve, reject) => {
             this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
@@ -198,7 +198,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                             () => {
                                 this.get.batLim?.();
                                 reject();
-                            }
+                            },
                         );
                     })
                     .catch(() => {
@@ -222,7 +222,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.enabledRecharging();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -242,7 +242,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.enabledVBatLow();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -299,7 +299,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                             () => {
                                 this.get.nTCThermistor();
                                 reject();
-                            }
+                            },
                         );
                     })
                     .catch(() => {
@@ -329,8 +329,8 @@ export class ChargerSet extends ChargerModuleSetBase {
                             () => {
                                 this.get.nTCBeta();
                                 reject();
-                            }
-                        )
+                            },
+                        ),
                     )
                     .catch(reject);
             }
@@ -351,7 +351,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.tChgStop();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -371,7 +371,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.tChgResume();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -391,7 +391,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.vTermR();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -411,7 +411,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.tCold();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -431,7 +431,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.tCool();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -451,7 +451,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.tWarm();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -471,7 +471,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => {
                         this.get.tHot();
                         reject();
-                    }
+                    },
                 );
             }
         });

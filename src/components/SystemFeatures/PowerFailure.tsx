@@ -33,7 +33,7 @@ const pofPolarityValuesItems = POFPolarityValues.map(item => ({
 
 export default ({ pofModule, pof, disabled }: GPIOProperties) => {
     const [internalPOFThreshold, setInternalPOFThreshold] = useState(
-        pof.threshold
+        pof.threshold,
     );
 
     // NumberInputSliderWithUnit do not use pof.<prop> as value as we send only at on change complete
@@ -94,8 +94,8 @@ export default ({ pofModule, pof, disabled }: GPIOProperties) => {
                         Math.max(
                             0,
                             pofPolarityValuesItems.findIndex(
-                                item => item.value === pof.polarity
-                            )
+                                item => item.value === pof.polarity,
+                            ),
                         ) ?? 0
                     ]
                 }

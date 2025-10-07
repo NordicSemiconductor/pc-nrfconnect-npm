@@ -16,7 +16,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -28,7 +28,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx pof status set ${enable ? '1' : '0'}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -43,7 +43,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx pof threshold set 3000`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -51,7 +51,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
         });
 
         test.each(
-            POFPolarityValues.map((polarity, index) => ({ polarity, index }))
+            POFPolarityValues.map((polarity, index) => ({ polarity, index })),
         )('Set pof polarity %p', async ({ polarity, index }) => {
             await pmic.pofModule?.set.polarity(polarity);
 
@@ -60,7 +60,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx pof polarity set ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -72,7 +72,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -82,11 +82,11 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.pofModule?.set.enabled(enable)
+                    pmic.pofModule?.set.enabled(enable),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -94,7 +94,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx pof status set ${enable ? '1' : '0'}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -103,27 +103,27 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx pof status get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnPOFUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
-            POFPolarityValues.map((polarity, index) => ({ polarity, index }))
+            POFPolarityValues.map((polarity, index) => ({ polarity, index })),
         )(
             'Set setPOFPolarity - Fail immediately - index: %p',
             async ({ polarity, index }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.pofModule?.set.polarity(polarity)
+                    pmic.pofModule?.set.polarity(polarity),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -131,7 +131,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx pof polarity set ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -140,12 +140,12 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     `npmx pof polarity get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnPOFUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setPOFThreshold - Fail immediately - index: %p', async () => {
@@ -154,7 +154,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.pofModule?.set.threshold(2.7)
+                pmic.pofModule?.set.threshold(2.7),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -162,7 +162,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx pof threshold set 2700`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -171,7 +171,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx pof threshold get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response

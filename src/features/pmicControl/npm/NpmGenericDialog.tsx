@@ -24,9 +24,11 @@ export default () => {
 
     useEffect(() => {
         if (!device && currentPmicDialog) {
-            currentPmicDialog?.onCancel
-                ? currentPmicDialog?.onCancel()
-                : currentPmicDialog?.onConfirm();
+            if (currentPmicDialog?.onCancel) {
+                currentPmicDialog?.onCancel();
+            } else {
+                currentPmicDialog?.onConfirm();
+            }
         }
     }, [currentPmicDialog, device]);
 

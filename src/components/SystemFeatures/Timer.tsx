@@ -39,7 +39,7 @@ export default ({
     disabled,
 }: TimerConfigProperties) => {
     const [internalTimerPeriod, setInternalTimerPeriod] = useState(
-        timerConfig.period
+        timerConfig.period,
     );
 
     const prescalerMultiplier =
@@ -112,7 +112,7 @@ export default ({
                 }
                 selectedItem={
                     timerConfigModule.values.mode.find(
-                        item => item.value === timerConfig.mode
+                        item => item.value === timerConfig.mode,
                     ) ?? timerConfigModule.values.mode[0]
                 }
                 disabled={disabled}
@@ -128,7 +128,7 @@ export default ({
                     items={timerPrescalerItems}
                     onSelect={item =>
                         timerConfigModule.set.prescaler?.(
-                            item.value as TimerPrescaler
+                            item.value as TimerPrescaler,
                         )
                     }
                     selectedItem={
@@ -136,8 +136,9 @@ export default ({
                             Math.max(
                                 0,
                                 timerPrescalerItems.findIndex(
-                                    item => item.value === timerConfig.prescaler
-                                )
+                                    item =>
+                                        item.value === timerConfig.prescaler,
+                                ),
                             ) ?? 0
                         ]
                     }

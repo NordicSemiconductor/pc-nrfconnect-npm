@@ -13,7 +13,7 @@ export const ITermValues = Object.keys(ITermNpm1300)
     .filter(key => !Number.isNaN(Number(key)))
     .map(Number);
 export const ITermKeys = Object.values(ITermNpm1300).filter(key =>
-    Number.isNaN(Number(key))
+    Number.isNaN(Number(key)),
 );
 
 export enum VTrickleFast1300 {
@@ -25,5 +25,5 @@ export const VTrickleFastValues = Object.keys(VTrickleFast1300)
     .filter(key => !Number.isNaN(Number(key)))
     .map(Number);
 export const VTrickleFastKeys = Object.values(VTrickleFast1300).filter(key =>
-    Number.isNaN(Number(key))
+    Number.isNaN(Number(key)),
 );

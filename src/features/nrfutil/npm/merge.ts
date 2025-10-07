@@ -15,7 +15,7 @@ export default async (
     vUpperCutOff: number,
     vLowerCutOff: number,
     onProgress?: (progress: Progress) => void,
-    controller?: AbortController
+    controller?: AbortController,
 ) => {
     const box = await getModule('npm');
     const args: string[] = [
@@ -38,6 +38,6 @@ export default async (
         onProgress,
         undefined,
         undefined,
-        controller
+        controller,
     );
 };

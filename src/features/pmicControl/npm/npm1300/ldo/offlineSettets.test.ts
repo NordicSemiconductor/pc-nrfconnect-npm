@@ -49,7 +49,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
                 data: { softStartEnabled: true },
                 index,
             });
-        }
+        },
     );
 
     test.each(PMIC_1300_LDOS)('Set setLdoSoftStart index: %p', async index => {
@@ -72,7 +72,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
                 data: { activeDischarge: true },
                 index,
             });
-        }
+        },
     );
 
     test.each(PMIC_1300_LDOS)(
@@ -88,7 +88,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
                 },
                 index,
             });
-        }
+        },
     );
 });
 

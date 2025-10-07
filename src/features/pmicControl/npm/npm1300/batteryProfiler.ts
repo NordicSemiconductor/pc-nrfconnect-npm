@@ -37,12 +37,12 @@ export class BatteryProfiler implements BatteryProfilerBase {
                             this.profiling = 'Running';
                             eventEmitter.emit(
                                 'onProfilingStateChange',
-                                this.profiling
+                                this.profiling,
                             );
                         }
                     },
-                    noop
-                )
+                    noop,
+                ),
             );
 
             this.releaseAll.push(
@@ -56,12 +56,12 @@ export class BatteryProfiler implements BatteryProfilerBase {
                             this.profiling = newState;
                             eventEmitter.emit(
                                 'onProfilingStateChange',
-                                newState
+                                newState,
                             );
                         }
                     },
-                    noop
-                )
+                    noop,
+                ),
             );
 
             this.releaseAll.push(
@@ -72,7 +72,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
                             this.profiling = 'Off';
                             eventEmitter.emit(
                                 'onProfilingStateChange',
-                                this.profiling
+                                this.profiling,
                             );
                         }
                     },
@@ -82,12 +82,12 @@ export class BatteryProfiler implements BatteryProfilerBase {
                                 this.profiling = 'Off';
                                 eventEmitter.emit(
                                     'onProfilingStateChange',
-                                    this.profiling
+                                    this.profiling,
                                 );
                             }
                         }
-                    }
-                )
+                    },
+                ),
             );
 
             this.releaseAll.push(
@@ -97,7 +97,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
                             this.processModuleCcProfiling(loggingEvent);
                         }
                     });
-                })
+                }),
             );
         }
     }
@@ -161,7 +161,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
         reportIntervalCc: number,
         reportIntervalNtc: number,
         vCutoff: number,
-        profiles: CCProfile[]
+        profiles: CCProfile[],
     ) {
         return new Promise<void>((resolve, reject) => {
             const profilesString = profiles.map(
@@ -170,12 +170,12 @@ export class BatteryProfiler implements BatteryProfilerBase {
                         profile.iRest
                     },${profile.cycles ? `${profile.cycles}` : 'NaN'}${
                         profile.vCutoff ? `,${profile.vCutoff}` : ''
-                    }"`
+                    }"`,
             );
 
             this.shellParser?.enqueueRequest(
                 `cc_profile profile set ${reportIntervalCc} ${reportIntervalNtc} ${vCutoff} ${profilesString.join(
-                    ' '
+                    ' ',
                 )}`,
                 {
                     onSuccess: () => {
@@ -186,7 +186,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
                         reject(error);
                         console.warn(error);
                     },
-                }
+                },
             );
         });
     }
@@ -242,7 +242,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
                 this.shellParser?.enqueueRequest('cc_sink available', {
                     onSuccess: res => {
                         resolve(
-                            parseToBoolean(res) ? true : 'MissingSyncBoard'
+                            parseToBoolean(res) ? true : 'MissingSyncBoard',
                         );
                     },
                     onError: reject,
@@ -251,7 +251,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
                         console.warn(error);
                     },
                 });
-            }
+            },
         );
     }
 
@@ -302,7 +302,7 @@ export class BatteryProfiler implements BatteryProfilerBase {
         capacity: number,
         vUpperCutOff: number,
         vLowerCutOff: number,
-        vTerm: number
+        vTerm: number,
     ): CCProfile[] {
         return [
             {

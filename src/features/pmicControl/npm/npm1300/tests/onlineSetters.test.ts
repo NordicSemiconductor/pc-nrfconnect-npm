@@ -16,7 +16,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -26,8 +26,8 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     index,
                     mode,
                     modeIndex,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setLedMode index: %p', async ({ index, mode, modeIndex }) => {
             await pmic.setLedMode(index, mode);
 
@@ -36,7 +36,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx led mode set ${index} ${modeIndex}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -48,7 +48,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -58,19 +58,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     index,
                     mode,
                     modeIndex,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setLedMode - Fail immediately - index: %p',
             async ({ index, mode, modeIndex }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.setLedMode(index, mode)
+                    pmic.setLedMode(index, mode),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -78,7 +78,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx led mode set ${index} ${modeIndex}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -87,12 +87,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx led mode get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnLEDUpdate).toBeCalledTimes(0);
-            }
+            },
         );
     });
 });

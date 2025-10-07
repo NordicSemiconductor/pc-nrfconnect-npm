@@ -25,11 +25,11 @@ export class BoostSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
         private dialogHandler: ((dialog: PmicDialog) => void) | null,
         private offlineMode: boolean,
-        private range: BoostModule['ranges']
+        private range: BoostModule['ranges'],
     ) {
         this.get = new BoostGet(sendCommand);
     }
@@ -54,7 +54,7 @@ export class BoostSet {
                         vOutSelect: 'Software',
                         vOutSoftware: value,
                     },
-                    0
+                    0,
                 );
 
                 resolve();
@@ -71,7 +71,7 @@ export class BoostSet {
                                     type: 'alert',
                                     doNotAskAgainStoreID: `pmic2100-setBoostVOut`,
                                     message: `${parseColonBasedAnswer(
-                                        response
+                                        response,
                                     )}.`,
                                     confirmLabel: 'OK',
                                     optionalLabel: "OK, don't ask again",
@@ -80,13 +80,13 @@ export class BoostSet {
                                 });
 
                                 reject();
-                            }
+                            },
                         );
                     },
                     () => {
                         this.get.vOutSel();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -100,7 +100,7 @@ export class BoostSet {
                     {
                         vOutSelect: mode,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -117,7 +117,7 @@ export class BoostSet {
                     () => {
                         this.get.vOutSel();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -131,7 +131,7 @@ export class BoostSet {
                     {
                         modeControl,
                     },
-                    0
+                    0,
                 );
 
                 resolve();
@@ -143,7 +143,7 @@ export class BoostSet {
                         () => {
                             this.get.modeControl();
                             reject();
-                        }
+                        },
                     );
                 };
                 if (modeControl === 'PASS') {
@@ -169,7 +169,7 @@ export class BoostSet {
                         pinSelection,
                         pinModeEnabled: pinSelection !== 'OFF',
                     },
-                    0
+                    0,
                 );
 
                 resolve();
@@ -180,7 +180,7 @@ export class BoostSet {
                     () => {
                         this.get.pinSelection();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -194,7 +194,7 @@ export class BoostSet {
                     {
                         pinMode,
                     },
-                    0
+                    0,
                 );
 
                 resolve();
@@ -205,7 +205,7 @@ export class BoostSet {
                     () => {
                         this.get.pinMode();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -219,7 +219,7 @@ export class BoostSet {
                     {
                         overCurrentProtection: enabled,
                     },
-                    0
+                    0,
                 );
                 resolve();
             } else {
@@ -229,7 +229,7 @@ export class BoostSet {
                     () => {
                         this.get.overCurrent();
                         reject();
-                    }
+                    },
                 );
             }
         });

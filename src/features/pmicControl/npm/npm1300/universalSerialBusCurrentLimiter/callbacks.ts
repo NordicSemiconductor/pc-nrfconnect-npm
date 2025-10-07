@@ -16,7 +16,7 @@ import { USBDetectStatusValues, USBPower } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
 
@@ -29,8 +29,8 @@ export default (
                         currentLimiter: parseToNumber(res) / 1000,
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
@@ -38,15 +38,15 @@ export default (
                     'powerup_vbusin status get',
                     false,
                     undefined,
-                    '(0|1|2|3)'
+                    '(0|1|2|3)',
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<USBPower>('onUsbPower', {
                         detectStatus: USBDetectStatusValues[parseToNumber(res)],
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

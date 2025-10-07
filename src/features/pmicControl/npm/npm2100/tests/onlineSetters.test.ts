@@ -25,7 +25,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -34,8 +34,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 GPIOModeValues.map(mode => ({
                     index,
                     mode,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioMode index: %p', async ({ index, mode }) => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
                 dialog.onConfirm();
@@ -44,14 +44,14 @@ describe('PMIC 2100 - Setters Online tests', () => {
             await pmic.gpioModule[index].set.mode(mode);
 
             expect(mockEnqueueRequest).toBeCalledTimes(
-                mode === 'OUTPUT' ? 2 : 1
+                mode === 'OUTPUT' ? 2 : 1,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
                 `npm2100 gpio mode set ${index} ${mode}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             if (mode === 'OUTPUT') {
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -59,7 +59,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio state get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
             }
 
@@ -72,8 +72,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 GPIOPullValues.map(pull => ({
                     index,
                     pull,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioPull index: %p', async ({ index, pull }) => {
             mockDialogHandler.mockImplementation((dialog: PmicDialog) => {
                 dialog.onConfirm();
@@ -86,7 +86,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm2100 gpio pull set ${index} ${pull}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -98,8 +98,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 GPIODriveValues.map(drive => ({
                     index,
                     drive,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioDrive index: %p', async ({ index, drive }) => {
             await pmic.gpioModule[index].set.drive(drive);
 
@@ -108,7 +108,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm2100 gpio drive set ${index} ${drive}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -120,8 +120,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 [true, false].map(debounce => ({
                     index,
                     debounce,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioDebounce index: %p', async ({ index, debounce }) => {
             await pmic.gpioModule[index].set.debounce(debounce);
 
@@ -130,7 +130,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm2100 gpio debounce set ${index} ${debounce ? 'ON' : 'OFF'}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -142,8 +142,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 [true, false].map(openDrain => ({
                     index,
                     openDrain,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setGpioOpenDrain index: %p', async ({ index, openDrain }) => {
             await pmic.gpioModule[index].set.openDrain(openDrain);
 
@@ -154,7 +154,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 }`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -167,8 +167,8 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     index,
                     mode,
                     modeIndex,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setLedMode index: %p', async ({ index, mode, modeIndex }) => {
             await pmic.setLedMode(index, mode);
 
@@ -177,7 +177,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npmx led mode set ${index} ${modeIndex}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -192,7 +192,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `fuel_gauge set 0`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -211,12 +211,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     }`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setFuelGaugeEnabled enabled: true', async () => {
@@ -230,7 +230,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                             `fuel_gauge set 1`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
                         // init fuel gauge with some load NCD-1074
                         expect(mockEnqueueRequest).nthCalledWith(
@@ -238,14 +238,14 @@ describe('PMIC 2100 - Setters Online tests', () => {
                             `npm_adc sample 500 1000`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
                         expect(mockEnqueueRequest).nthCalledWith(
                             3,
                             `npm2100 boost mode set HP`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
 
                         resolve();
@@ -254,16 +254,16 @@ describe('PMIC 2100 - Setters Online tests', () => {
                                 command,
                                 callbacks,
                                 timeout,
-                                unique
+                                unique,
                             )
                             .then(() => {
                                 process.nextTick(() => {
                                     eventHandlers.mockOnShellLoggingEventHandler(
-                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
                                     );
                                 });
                             });
-                    }
+                    },
                 );
             });
 
@@ -275,7 +275,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                             `fuel_gauge reset`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
 
                         resolve();
@@ -284,16 +284,16 @@ describe('PMIC 2100 - Setters Online tests', () => {
                                 command,
                                 callbacks,
                                 timeout,
-                                unique
+                                unique,
                             )
                             .then(() => {
                                 process.nextTick(() => {
                                     eventHandlers.mockOnShellLoggingEventHandler(
-                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
                                     );
                                 });
                             });
-                    }
+                    },
                 );
             });
 
@@ -305,24 +305,24 @@ describe('PMIC 2100 - Setters Online tests', () => {
                             `npm2100 boost mode set AUTO`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
                         return helpers
                             .registerCommandCallbackSuccess(
                                 command,
                                 callbacks,
                                 timeout,
-                                unique
+                                unique,
                             )
                             .then(() => {
                                 process.nextTick(() => {
                                     eventHandlers.mockOnShellLoggingEventHandler(
-                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
                                     );
                                 });
                                 resolve();
                             });
-                    }
+                    },
                 );
             });
 
@@ -331,7 +331,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm_adc sample 500 2000`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -340,7 +340,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
         test('Set setActiveBatteryModel', async () => {
             await pmic.fuelGaugeModule?.set.activeBatteryModel(
-                'someProfileName'
+                'someProfileName',
             );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -348,7 +348,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `fuel_gauge model set "someProfileName"`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -363,7 +363,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 low_power_control pwr_btn set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
                 dialog.onConfirm();
             });
@@ -376,28 +376,28 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm2100 low_power_control ship_mode_configure resistor set NONE`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
                 `npm2100 low_power_control wakeup_configure edge_polarity set RISING`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 4,
                 `npm2100 low_power_control ship_mode_configure current set LOW`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 5,
                 `npm2100 low_power_control ship_mode set ENABLE`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
         });
 
@@ -409,7 +409,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 low_power_control pwr_btn set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 dialog.onCancel?.();
@@ -423,7 +423,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm2100 low_power_control pwr_btn set ON`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
         });
     });
@@ -441,7 +441,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -450,19 +450,19 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 GPIOModeValues.map(mode => ({
                     index,
                     mode,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioMode - Fail immediately - index: %p',
             async ({ index, mode }) => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await expect(
-                    pmic.gpioModule[index].set.mode(mode)
+                    pmic.gpioModule[index].set.mode(mode),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -470,7 +470,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio mode set ${index} ${mode}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -479,12 +479,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio mode get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -492,13 +492,13 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 GPIODriveValues.map(drive => ({
                     index,
                     drive,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioDrive - Fail immediately - index: %p',
             async ({ index, drive }) => {
                 await expect(
-                    pmic.gpioModule[index].set.drive(drive)
+                    pmic.gpioModule[index].set.drive(drive),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -506,7 +506,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio drive set ${index} ${drive}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -515,12 +515,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio drive get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -528,13 +528,13 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 GPIOPullValues.map(pull => ({
                     index,
                     pull,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioPull - Fail immediately - index: %p',
             async ({ index, pull }) => {
                 await expect(
-                    pmic.gpioModule[index].set.pull(pull)
+                    pmic.gpioModule[index].set.pull(pull),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -542,7 +542,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio pull set ${index} ${pull}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -551,12 +551,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio pull get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -564,13 +564,13 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 [true, false].map(debounce => ({
                     index,
                     debounce,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioDebounce - Fail immediately - index: %p',
             async ({ index, debounce }) => {
                 await expect(
-                    pmic.gpioModule[index].set.debounce(debounce)
+                    pmic.gpioModule[index].set.debounce(debounce),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -580,7 +580,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     }`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -589,12 +589,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio debounce get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -602,13 +602,13 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 [true, false].map(openDrain => ({
                     index,
                     openDrain,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setGpioOpenDrain - Fail immediately - index: %p',
             async ({ index, openDrain }) => {
                 await expect(
-                    pmic.gpioModule[index].set.openDrain(openDrain)
+                    pmic.gpioModule[index].set.openDrain(openDrain),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -618,7 +618,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     }`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -627,19 +627,19 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 gpio opendrain get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnGpioUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each([true, false])(
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.fuelGaugeModule?.set.enabled(enabled)
+                    pmic.fuelGaugeModule?.set.enabled(enabled),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -647,7 +647,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `fuel_gauge set ${enabled ? '1' : '0'}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -656,19 +656,19 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `fuel_gauge get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each([true, false])(
             'Set discard_positive_deltaz - Fail immediately: %p',
             async enabled => {
                 await expect(
-                    pmic.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(enabled)
+                    pmic.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(enabled),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -678,7 +678,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     }`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -687,17 +687,17 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `fuel_gauge params runtime discard_positive_deltaz get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setActiveBatteryModel - Fail immediately', async () => {
             await expect(
-                pmic.fuelGaugeModule?.set.activeBatteryModel('someProfileName')
+                pmic.fuelGaugeModule?.set.activeBatteryModel('someProfileName'),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -705,7 +705,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `fuel_gauge model set "someProfileName"`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -714,7 +714,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `fuel_gauge model get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response

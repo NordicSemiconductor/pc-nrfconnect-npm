@@ -16,9 +16,9 @@ export class LowPowerSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new LowPowerGet(sendCommand);
     }
@@ -34,7 +34,7 @@ export class LowPowerSet {
                     'onLowPowerUpdate',
                     {
                         timeToActive,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -44,7 +44,7 @@ export class LowPowerSet {
                     () => {
                         this.get.timeToActive();
                         reject();
-                    }
+                    },
                 );
             }
         });

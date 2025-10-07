@@ -40,7 +40,7 @@ export default class Npm2100 extends BaseNpmDevice {
     private recentReset = false;
     constructor(
         shellParser: ShellParser | undefined,
-        dialogHandler: ((pmicDialog: PmicDialog) => void) | null
+        dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
     ) {
         super(
             'npm2100',
@@ -75,7 +75,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 reset: false,
                 charger: false,
                 sensor: false,
-            }
+            },
         );
 
         if (shellParser) {
@@ -108,7 +108,7 @@ export default class Npm2100 extends BaseNpmDevice {
                             dataPair: isModuleDataPair(loggingEvent.module),
                         });
                     });
-                })
+                }),
             );
         }
     }
@@ -149,7 +149,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 if (message.startsWith('powerid=')) {
                     this.eventEmitter.emit(
                         'onPowerIdUpdate',
-                        message.split('=')[1] as PowerID2100
+                        message.split('=')[1] as PowerID2100,
                     );
                 }
         }
@@ -218,7 +218,7 @@ export default class Npm2100 extends BaseNpmDevice {
                 case 'soc':
                     adcSample.soc = Math.min(
                         100,
-                        Math.max(0, fixed(1, pair[1]))
+                        Math.max(0, fixed(1, pair[1])),
                     );
                     break;
             }
@@ -313,7 +313,7 @@ export default class Npm2100 extends BaseNpmDevice {
     generateExport(
         getState: () => RootState & {
             app: { pmicControl: { npmDevice: BaseNpmDevice } };
-        }
+        },
     ) {
         const currentState = getState().app.pmicControl;
 

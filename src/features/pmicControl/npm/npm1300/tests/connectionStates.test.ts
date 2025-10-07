@@ -21,7 +21,7 @@ describe('PMIC 1300 - Pmic State Change tests', () => {
             setupMocksWithShellParser();
 
         eventHandlers.mockOnShellLoggingEventHandler(
-            '[00:00:02.019,531] <wrn> module_pmic: No response from PMIC.'
+            '[00:00:02.019,531] <wrn> module_pmic: No response from PMIC.',
         );
 
         expect(mockOnPmicStateChange).toBeCalledTimes(1);
@@ -33,7 +33,7 @@ describe('PMIC 1300 - Pmic State Change tests', () => {
             setupMocksWithShellParser();
 
         eventHandlers.mockOnShellLoggingEventHandler(
-            '[00:00:02.019,531] <wrn> module_pmic: No response from PMIC.'
+            '[00:00:02.019,531] <wrn> module_pmic: No response from PMIC.',
         );
 
         expect(mockOnPmicStateChange).toBeCalledTimes(1);
@@ -53,7 +53,7 @@ describe('PMIC 1300 - Pmic State Change tests', () => {
             `delayed_reboot 100`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

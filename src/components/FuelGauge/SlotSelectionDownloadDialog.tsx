@@ -60,7 +60,7 @@ export default () => {
                             if (npmDevice && buffer) {
                                 npmDevice.fuelGaugeModule?.actions.downloadFuelGaugeProfile(
                                     buffer,
-                                    slot
+                                    slot,
                                 );
                             }
                         }}

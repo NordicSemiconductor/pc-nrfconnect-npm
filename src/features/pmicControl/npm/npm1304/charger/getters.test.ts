@@ -21,7 +21,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger status all get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -33,7 +33,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger termination_voltage normal get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -45,7 +45,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger charging_current get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -57,7 +57,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger module charger get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -69,7 +69,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger trickle_voltage get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -81,7 +81,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger termination_current get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -93,7 +93,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger module recharge get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -105,7 +105,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'powerup_charger vbatlow get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -117,7 +117,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx adc ntc type get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -129,7 +129,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx adc ntc beta get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -141,7 +141,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger die_temp resume get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -153,7 +153,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger die_temp stop get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -165,7 +165,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger ntc_temperature cold get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -177,7 +177,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger ntc_temperature cool get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -189,7 +189,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger ntc_temperature warm get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -201,7 +201,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger ntc_temperature hot get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -213,7 +213,7 @@ describe('PMIC 1304 - Request update commands', () => {
             'npmx charger termination_voltage warm get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

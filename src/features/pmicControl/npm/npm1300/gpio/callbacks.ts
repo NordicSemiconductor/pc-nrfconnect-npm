@@ -27,7 +27,7 @@ import {
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    index: number
+    index: number,
 ) => {
     const cleanupCallbacks = [];
 
@@ -38,7 +38,7 @@ export default (
                     'npmx gpio config mode',
                     true,
                     index,
-                    toValueRegex(GPIOModeValues)
+                    toValueRegex(GPIOModeValues),
                 ),
                 res => {
                     const mode: GPIOMode1300 = parseToNumber(res);
@@ -52,12 +52,12 @@ export default (
                                 driveEnabled: !isInput,
                                 debounceEnabled: isInput,
                             },
-                            index
+                            index,
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -66,7 +66,7 @@ export default (
                     'npmx gpio config pull',
                     true,
                     index,
-                    toValueRegex(GPIOPullValues)
+                    toValueRegex(GPIOPullValues),
                 ),
                 res => {
                     const pull: GPIOPull1300 = parseToNumber(res);
@@ -76,12 +76,12 @@ export default (
                             {
                                 pull,
                             },
-                            index
+                            index,
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -90,7 +90,7 @@ export default (
                     'npmx gpio config drive',
                     true,
                     index,
-                    toValueRegex(GPIODriveValues)
+                    toValueRegex(GPIODriveValues),
                 ),
                 res => {
                     const drive: GPIODrive1300 = parseToNumber(res);
@@ -100,12 +100,12 @@ export default (
                             {
                                 drive: parseToNumber(res),
                             },
-                            index
+                            index,
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -117,11 +117,11 @@ export default (
                         {
                             openDrain: parseToBoolean(res),
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -133,11 +133,11 @@ export default (
                         {
                             debounce: parseToBoolean(res),
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

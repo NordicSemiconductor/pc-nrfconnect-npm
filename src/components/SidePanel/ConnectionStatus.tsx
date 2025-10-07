@@ -122,7 +122,7 @@ export default () => {
                         npmDevice
                             ?.isSupportedVersion()
                             .then(result =>
-                                dispatch(setIsPaused(result.supported))
+                                dispatch(setIsPaused(result.supported)),
                             ),
                 },
             ];

@@ -297,7 +297,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...(charger ?? initCharger),
                     ...partialUpdate,
                 };
-            }
+            },
         );
 
         mockOnBuckUpdate.mockImplementation(
@@ -306,7 +306,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...(bucks[partialUpdate.index] ?? initBuck),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnLdoUpdate.mockImplementation(
@@ -315,7 +315,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...(ldos[partialUpdate.index] ?? initLdo),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnGpioUpdate.mockImplementation(
@@ -329,7 +329,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...(gpios[partialUpdate.index] ?? initGPIO),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnLEDUpdate.mockImplementation(
@@ -338,7 +338,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...(leds[partialUpdate.index] ?? initLed),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnPOFUpdate.mockImplementation((partialUpdate: Partial<POF>) => {
@@ -354,7 +354,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...ship,
                     ...partialUpdate,
                 } as npm1300LowPowerConfig;
-            }
+            },
         );
 
         mockOnResetUpdate.mockImplementation(
@@ -363,7 +363,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...reset,
                     ...partialUpdate,
                 };
-            }
+            },
         );
 
         mockOnTimerConfigUpdate.mockImplementation(
@@ -372,7 +372,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...timerConfig,
                     ...partialUpdate,
                 } as npm1300TimerConfig;
-            }
+            },
         );
 
         mockOnUsbPower.mockImplementation(
@@ -381,7 +381,7 @@ describe('PMIC 1300 - Apply Config ', () => {
                     ...usbPower,
                     ...partialUpdate,
                 };
-            }
+            },
         );
     });
 

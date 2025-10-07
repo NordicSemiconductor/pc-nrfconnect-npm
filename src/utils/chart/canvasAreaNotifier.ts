@@ -11,7 +11,7 @@ export default {
     afterLayout(chart) {
         if (chart.options.plugins?.canvasAreaNotifier?.onChartAreaChanged)
             chart.options.plugins.canvasAreaNotifier.onChartAreaChanged(
-                chart.chartArea
+                chart.chartArea,
             );
     },
 } as Plugin;

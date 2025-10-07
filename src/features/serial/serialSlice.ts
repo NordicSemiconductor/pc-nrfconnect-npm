@@ -33,13 +33,13 @@ const serialSlice = createSlice({
     reducers: {
         setSerialPort: (
             state,
-            action: PayloadAction<SerialPort | undefined>
+            action: PayloadAction<SerialPort | undefined>,
         ) => {
             state.serialPort = action.payload;
         },
         setShellParser: (
             state,
-            action: PayloadAction<ShellParser | undefined>
+            action: PayloadAction<ShellParser | undefined>,
         ) => {
             if (state.shellParser) {
                 state.shellParser.unregister();

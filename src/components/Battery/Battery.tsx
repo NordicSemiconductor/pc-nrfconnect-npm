@@ -175,9 +175,9 @@ export default ({ disabled }: BatteryProperties) => {
                                             fuelGaugeEnabled &&
                                             batteryConnected &&
                                             !Number.isNaN(
-                                                latestAdcSample?.soc ?? 0
+                                                latestAdcSample?.soc ?? 0,
                                             )
-                                                ? latestAdcSample?.soc ?? 0
+                                                ? (latestAdcSample?.soc ?? 0)
                                                 : 0
                                         }% + 2px)`,
                                     }}

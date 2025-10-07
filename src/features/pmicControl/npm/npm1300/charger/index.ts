@@ -41,10 +41,10 @@ export default class Module implements ChargerModuleBase {
         { sendCommand, eventEmitter, offlineMode, shellParser }: ModuleParams,
         callbacks: (
             shellParser: ShellParser | undefined,
-            eventEmitter: NpmEventEmitter
+            eventEmitter: NpmEventEmitter,
         ) => (() => void)[] = chargerCallbacks,
         Get: ChargerModuleGet = ChargerGet,
-        Set: ChargerModuleSet = ChargerSet
+        Set: ChargerModuleSet = ChargerSet,
     ) {
         this._get = new Get(sendCommand);
         this._set = new Set(eventEmitter, sendCommand, offlineMode, this._get);

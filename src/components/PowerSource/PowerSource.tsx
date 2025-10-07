@@ -25,7 +25,7 @@ import {
 type PowerSource = 'USB' | 'Battery';
 
 function generateBatteryTypeItems(
-    batteryModels: BatteryModel[]
+    batteryModels: BatteryModel[],
 ): DropdownItem[] {
     return batteryModels.map(model => ({
         label: model.name.replace(/[_]/, ' '),
@@ -90,19 +90,19 @@ const BatteryModelDropdown = ({ disabled }: BatteryModelDropdownAttr) => {
     const batteryTypeItems = generateBatteryTypeItems(hardCodedBatteries);
 
     const selectedBatteryType = batteryTypeItems.find(
-        listItem => listItem.value === (batteryModel?.name ?? 'unknown')
+        listItem => listItem.value === (batteryModel?.name ?? 'unknown'),
     );
     return (
         <Dropdown
             items={batteryTypeItems}
             onSelect={item => {
                 const selectedBatteryModel = hardCodedBatteries.find(
-                    model => model.name === item.value
+                    model => model.name === item.value,
                 );
 
                 if (selectedBatteryModel) {
                     npmDevice?.fuelGaugeModule?.set.activeBatteryModel(
-                        item.value
+                        item.value,
                     );
                 }
             }}

@@ -29,7 +29,7 @@ export default ({
     disabled,
 }: VBusProperties) => {
     const [internalCurrentLimiter, setInternalCurrentLimiter] = useState(
-        usbPower.currentLimiter
+        usbPower.currentLimiter,
     );
 
     useEffect(() => {
@@ -56,7 +56,7 @@ export default ({
         >
             <div
                 className={`tw-preflight tw-flex tw-flex-col tw-gap-0.5 ${classNames(
-                    disabled && 'tw-text-gray-300'
+                    disabled && 'tw-text-gray-300',
                 )}`}
             >
                 <div className="tw-flex tw-justify-between tw-pb-0.5 tw-text-xs">

@@ -5,14 +5,13 @@
  */
 
 export class GpioGet {
-    // eslint-disable-next-line no-useless-constructor
     constructor(
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private index: number
+        private index: number,
     ) {}
 
     all() {

@@ -16,7 +16,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -29,7 +29,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck voltage normal set ${index} 1800`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // change from vSet to Software
@@ -38,7 +38,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck vout_select set ${index} 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -51,7 +51,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.buckModule[1].set.vOutNormal(1.6)
+                pmic.buckModule[1].set.vOutNormal(1.6),
             ).rejects.toBeUndefined();
 
             expect(mockDialogHandler).toBeCalledTimes(1);
@@ -62,7 +62,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck voltage normal get 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -83,7 +83,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck voltage normal set 1 1600`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // change from vSet to Software
@@ -92,7 +92,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck vout_select set 1 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -113,7 +113,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck voltage normal set 1 1600`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // change from vSet to Software
@@ -122,7 +122,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck vout_select set 1 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -139,12 +139,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck voltage retention set ${index} 1800`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)('Set setBuckMode - vSet', async index => {
@@ -156,7 +156,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck vout_select set ${index} 0`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // We need to request the buckVOut
@@ -165,7 +165,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck voltage normal get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -178,7 +178,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.buckModule[1].set.mode('software')
+                pmic.buckModule[1].set.mode('software'),
             ).rejects.toBeUndefined();
 
             expect(mockDialogHandler).toBeCalledTimes(1);
@@ -202,7 +202,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck vout_select set 1 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // We need to request the buckVOut
@@ -211,7 +211,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck voltage normal get 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -233,7 +233,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck vout_select set 1 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // We need to request the buckVOut
@@ -242,7 +242,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck voltage normal get 1`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -259,12 +259,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `powerup_buck mode set ${index} GPIO2`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
@@ -277,12 +277,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck gpio on_off index set ${index} 2`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
@@ -295,12 +295,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck gpio retention index set ${index} 2`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
@@ -314,12 +314,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck status set ${index} 1`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
@@ -333,12 +333,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck active_discharge set ${index} 1`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setBuckEnabled index: 1 false - cancel', async () => {
@@ -347,7 +347,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.buckModule[1].set.enabled(false)
+                pmic.buckModule[1].set.enabled(false),
             ).rejects.toBeUndefined();
             expect(mockDialogHandler).toBeCalledTimes(1);
 
@@ -374,7 +374,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck status set 1 0`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -397,7 +397,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx buck status set 1 0`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -409,14 +409,14 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckVOut - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.vOutNormal(1.8)
+                    pmic.buckModule[index].set.vOutNormal(1.8),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -425,7 +425,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck voltage normal set ${index} 1800`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -434,23 +434,23 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck voltage normal get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckVOut - Fail on second command - index: %p',
             async index => {
                 mockEnqueueRequest.mockImplementationOnce(
-                    helpers.registerCommandCallbackSuccess
+                    helpers.registerCommandCallbackSuccess,
                 );
 
                 await expect(
-                    pmic.buckModule[index].set.vOutNormal(1.8)
+                    pmic.buckModule[index].set.vOutNormal(1.8),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(3);
@@ -459,7 +459,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck voltage normal set ${index} 1800`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // change from vSet to Software
@@ -468,7 +468,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck vout_select set ${index} 1`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -477,19 +477,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck vout_select get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckRetentionVOut - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.vOutRetention(1.7)
+                    pmic.buckModule[index].set.vOutRetention(1.7),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -498,7 +498,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck voltage retention set ${index} 1700`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -507,19 +507,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck voltage retention get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckMode - Fail immediately - vSet',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.mode('vSet')
+                    pmic.buckModule[index].set.mode('vSet'),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -528,7 +528,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck vout_select set ${index} 0`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -537,19 +537,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck vout_select get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckModeControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.modeControl('GPIO2')
+                    pmic.buckModule[index].set.modeControl('GPIO2'),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -558,7 +558,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `powerup_buck mode set ${index} GPIO2`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -567,19 +567,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `powerup_buck mode get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckOnOffControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.onOffControl('GPIO2')
+                    pmic.buckModule[index].set.onOffControl('GPIO2'),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -588,7 +588,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck gpio on_off index set ${index} 2`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -597,19 +597,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck gpio on_off index get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckRetentionControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.retentionControl('GPIO2')
+                    pmic.buckModule[index].set.retentionControl('GPIO2'),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -618,7 +618,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck gpio retention index set ${index} 2`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -627,19 +627,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck gpio retention index get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckEnabled - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.enabled(true)
+                    pmic.buckModule[index].set.enabled(true),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -648,7 +648,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck status set ${index} 1`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -656,19 +656,19 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck status get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckActiveDischargeEnabled - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.activeDischarge(true)
+                    pmic.buckModule[index].set.activeDischarge(true),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -677,7 +677,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck active_discharge set ${index} 1`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -685,12 +685,12 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npmx buck active_discharge get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBuckUpdate).toBeCalledTimes(0);
-            }
+            },
         );
     });
 });

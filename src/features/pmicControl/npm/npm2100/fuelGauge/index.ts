@@ -38,14 +38,14 @@ export default class Module implements FuelGaugeModuleBase {
             sendCommand,
             offlineMode,
             npmDevice.initializeFuelGauge.bind(npmDevice),
-            dialogHandler
+            dialogHandler,
         );
         this._actions = new FuelGaugeActions(eventEmitter, sendCommand, this);
         this._callbacks = fuelGaugeCallbacks(
             shellParser,
             eventEmitter,
             this._get,
-            this
+            this,
         );
     }
 

@@ -17,7 +17,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
         test.each(PMIC_2100_LDOS)(
@@ -26,7 +26,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 await pmic.ldoModule[index].set.voltage(1);
@@ -38,7 +38,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -46,7 +46,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw mode set LDO`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -54,11 +54,11 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw vout set ${1000}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            }
+            },
         );
 
         test.each(
@@ -66,8 +66,8 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                 [true, false].map(enabled => ({
                     index,
                     enabled,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )('Set setLdoEnabled %p', async ({ index, enabled }) => {
             await pmic.ldoModule[index].set.enabled(enabled);
 
@@ -76,7 +76,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                 `npm2100 ldosw enable set ${enabled ? 'ON' : 'OFF'}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -93,7 +93,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     index,
                     mode: 'LDO' as LdoMode,
                 },
-            ]).flat()
+            ]).flat(),
         )('Set setLdoMode index: %p', async ({ index, mode }) => {
             await pmic.ldoModule[index].set.mode(mode);
 
@@ -103,14 +103,14 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                 `npm2100 ldosw enable set OFF`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
                 `npm2100 ldosw mode set ${mode}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -125,7 +125,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -133,7 +133,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
             'Set setLdoVoltage onError case 1  - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.ldoModule[index].set.voltage(3)
+                    pmic.ldoModule[index].set.voltage(3),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -142,7 +142,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -150,11 +150,11 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            }
+            },
         );
 
         test.each(PMIC_2100_LDOS)(
@@ -163,20 +163,20 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                 mockDialogHandler.mockImplementationOnce(
                     (dialog: PmicDialog) => {
                         dialog.onConfirm();
-                    }
+                    },
                 );
 
                 // Mock success on set enable and set mode
                 mockEnqueueRequest
                     .mockImplementationOnce(
-                        helpers.registerCommandCallbackSuccess
+                        helpers.registerCommandCallbackSuccess,
                     )
                     .mockImplementationOnce(
-                        helpers.registerCommandCallbackSuccess
+                        helpers.registerCommandCallbackSuccess,
                     );
 
                 await expect(
-                    pmic.ldoModule[index].set.voltage(3)
+                    pmic.ldoModule[index].set.voltage(3),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(4);
@@ -185,7 +185,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -193,7 +193,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw mode set LDO`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -201,7 +201,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw vout set 3000`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -210,11 +210,11 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw vout get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockOnLdoUpdate).toBeCalledTimes(1);
-            }
+            },
         );
 
         test.each(
@@ -222,13 +222,13 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                 [true, false].map(enabled => ({
                     index,
                     enabled,
-                }))
-            ).flat()
+                })),
+            ).flat(),
         )(
             'Set setLdoEnabled - Fail immediately - %p',
             async ({ index, enabled }) => {
                 await expect(
-                    pmic.ldoModule[index].set.enabled(enabled)
+                    pmic.ldoModule[index].set.enabled(enabled),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -236,7 +236,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable set ${enabled ? 'ON' : 'OFF'}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -245,12 +245,12 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnLdoUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -263,12 +263,12 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     index,
                     mode: 'LDO' as LdoMode,
                 },
-            ])
+            ]),
         )(
             'Set setLdoMode - Fail immediately - index: %p',
             async ({ index, mode }) => {
                 await expect(
-                    pmic.ldoModule[index].set.mode(mode)
+                    pmic.ldoModule[index].set.mode(mode),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -276,7 +276,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -285,12 +285,12 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnLdoUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(
@@ -303,16 +303,16 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     index,
                     mode: 'LDO' as LdoMode,
                 },
-            ])
+            ]),
         )(
             'Set setLdoMode - Succeed setting enable, fail setting mode - index: %p',
             async ({ index, mode }) => {
                 mockEnqueueRequest.mockImplementationOnce(
-                    helpers.registerCommandCallbackSuccess
+                    helpers.registerCommandCallbackSuccess,
                 );
 
                 await expect(
-                    pmic.ldoModule[index].set.mode(mode)
+                    pmic.ldoModule[index].set.mode(mode),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(3);
@@ -320,7 +320,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw enable set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -328,7 +328,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw mode set ${mode}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -337,12 +337,12 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                     `npm2100 ldosw mode get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnLdoUpdate).toBeCalledTimes(0);
-            }
+            },
         );
     });
 });

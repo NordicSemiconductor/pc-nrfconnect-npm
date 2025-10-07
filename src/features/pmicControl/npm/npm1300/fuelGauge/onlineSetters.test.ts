@@ -19,7 +19,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -33,17 +33,17 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `fuel_gauge set ${enabled ? '1' : '0'}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setActiveBatteryModel', async () => {
             await pmic.fuelGaugeModule?.set.activeBatteryModel(
-                'someProfileName'
+                'someProfileName',
             );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -51,7 +51,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `fuel_gauge model set "someProfileName"`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -62,7 +62,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'startBatteryStatusCheck enabled: %p',
             async enabled => {
                 await pmic.fuelGaugeModule?.set.batteryStatusCheckEnabled?.(
-                    enabled
+                    enabled,
                 );
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -70,9 +70,9 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `npm_chg_status_check set ${enabled ? '1' : '0'}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
-            }
+            },
         );
     });
     describe('Setters and effects state - error', () => {
@@ -80,7 +80,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -88,7 +88,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.fuelGaugeModule?.set.enabled(enabled)
+                    pmic.fuelGaugeModule?.set.enabled(enabled),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -96,7 +96,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `fuel_gauge set ${enabled ? '1' : '0'}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -105,17 +105,17 @@ describe('PMIC 1300 - Setters Online tests', () => {
                     `fuel_gauge get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setActiveBatteryModel - Fail immediately', async () => {
             await expect(
-                pmic.fuelGaugeModule?.set.activeBatteryModel('someProfileName')
+                pmic.fuelGaugeModule?.set.activeBatteryModel('someProfileName'),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -123,7 +123,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `fuel_gauge model set "someProfileName"`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -132,7 +132,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `fuel_gauge model get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response

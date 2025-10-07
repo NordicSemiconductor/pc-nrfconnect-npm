@@ -24,7 +24,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx led mode get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -36,7 +36,7 @@ describe('PMIC 1300 - Request update commands', () => {
             'npm_adc sample 1000 2000',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -48,7 +48,7 @@ describe('PMIC 1300 - Request update commands', () => {
             'npm_adc sample 0',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -60,11 +60,11 @@ describe('PMIC 1300 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _timeout?: number,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean
+                _unique?: boolean,
             ) => {
                 callbacks?.onSuccess('Uptime: 2945165 ms', command);
                 return Promise.resolve();
-            }
+            },
         );
 
         await expect(pmic.getKernelUptime()).resolves.toBe(2945165);
@@ -74,7 +74,7 @@ describe('PMIC 1300 - Request update commands', () => {
             'kernel uptime',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -86,14 +86,14 @@ describe('PMIC 1300 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _timeout?: number,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean
+                _unique?: boolean,
             ) => {
                 callbacks?.onSuccess(
                     `app_version=${npm1300FWVersion}`,
-                    command
+                    command,
                 );
                 return Promise.resolve();
-            }
+            },
         );
 
         await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
@@ -106,7 +106,7 @@ describe('PMIC 1300 - Request update commands', () => {
             'app_version',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -118,11 +118,11 @@ describe('PMIC 1300 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _timeout?: number,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean
+                _unique?: boolean,
             ) => {
                 callbacks?.onSuccess('app_version=0.0.0+9', command);
                 return Promise.resolve();
-            }
+            },
         );
 
         await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
@@ -135,7 +135,7 @@ describe('PMIC 1300 - Request update commands', () => {
             'app_version',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

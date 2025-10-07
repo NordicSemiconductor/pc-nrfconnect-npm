@@ -13,5 +13,5 @@ export const ITermValues = Object.keys(ITermNpm1304)
     .filter(key => !Number.isNaN(Number(key)))
     .map(Number);
 export const ITermKeys = Object.values(ITermNpm1304).filter(key =>
-    Number.isNaN(Number(key))
+    Number.isNaN(Number(key)),
 );

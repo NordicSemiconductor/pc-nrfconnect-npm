@@ -73,7 +73,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                                     npmDevice?.setAutoRebootDevice(true);
                                     dispatch(closeProfiling());
                                     dispatch(clearWaitForDevice());
-                                })
+                                }),
                             );
                         }}
                     >
@@ -102,7 +102,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             1000 /
                             profile.restingProfiles.reduce(
                                 (acc, curr) => acc + curr.cycles,
-                                0
+                                0,
                             )) *
                         100
                     }

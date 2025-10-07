@@ -18,20 +18,20 @@ export const PMIC_2100_LDOS = [0];
 export const PMIC_2100_GPIOS = [0, 1];
 
 export const setupMocksBase = (
-    shellParser: ShellParser | undefined = undefined
+    shellParser: ShellParser | undefined = undefined,
 ) =>
     GenericsetupMocksBase(
         (
             sp: ShellParser | undefined,
-            dialogHandler: ((dialog: PmicDialog) => void) | null
+            dialogHandler: ((dialog: PmicDialog) => void) | null,
         ) => new Npm2100(sp, dialogHandler),
-        shellParser
+        shellParser,
     );
 
 export const setupMocksWithShellParser = () =>
     GenericSetupMocksWithShellParser(
         (
             sp: ShellParser | undefined,
-            dialogHandler: ((dialog: PmicDialog) => void) | null
-        ) => new Npm2100(sp, dialogHandler)
+            dialogHandler: ((dialog: PmicDialog) => void) | null,
+        ) => new Npm2100(sp, dialogHandler),
     );

@@ -42,9 +42,9 @@ export default ({
         () =>
             allProgress.find(
                 prog =>
-                    prog.path === projectSettingsPath && prog.index === index
+                    prog.path === projectSettingsPath && prog.index === index,
             ),
-        [allProgress, index, projectSettingsPath]
+        [allProgress, index, projectSettingsPath],
     );
     const [showEditDialog, setShowEditDialog] = useState(false);
     const isProcessing = !!progress && !progress.errorLevel;
@@ -62,12 +62,12 @@ export default ({
                         isProcessing ||
                         !isProfileReadyForProcessing(
                             projectSettingsPath,
-                            profile
+                            profile,
                         )
                     }
                     onClick={() => {
                         dispatch(
-                            generateParamsFromCSV(projectSettingsPath, index)
+                            generateParamsFromCSV(projectSettingsPath, index),
                         );
                     }}
                 >
@@ -100,12 +100,12 @@ export default ({
                                 if (result.filePath?.endsWith('.json')) {
                                     stringToFile(
                                         result.filePath,
-                                        profile.batteryJson
+                                        profile.batteryJson,
                                     );
                                 } else if (result.filePath?.endsWith('.inc')) {
                                     stringToFile(
                                         result.filePath,
-                                        profile.batteryInc
+                                        profile.batteryInc,
                                     );
                                 }
                             }
@@ -126,7 +126,7 @@ export default ({
                                 showDialog({
                                     buffer: Buffer.from(profile.batteryJson),
                                     name: project.name,
-                                })
+                                }),
                             );
                         }
                     }}
@@ -153,8 +153,8 @@ export default ({
                                     projectSettings.profiles.splice(index, 1);
 
                                     return projectSettings;
-                                }
-                            )
+                                },
+                            ),
                         );
                     }}
                 >

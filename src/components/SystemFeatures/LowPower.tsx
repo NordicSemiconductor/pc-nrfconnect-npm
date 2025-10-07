@@ -69,8 +69,8 @@ export default ({
                     Math.max(
                         0,
                         lowPowerModule.values.timeToActive.findIndex(
-                            item => item.value === lowPower.timeToActive
-                        )
+                            item => item.value === lowPower.timeToActive,
+                        ),
                     ) ?? 0
                 ]
             }

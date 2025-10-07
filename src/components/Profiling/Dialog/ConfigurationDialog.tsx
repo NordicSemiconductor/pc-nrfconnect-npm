@@ -52,12 +52,12 @@ export default ({
     const [showValidationError, setShowValidationError] = useState(false);
 
     const [capacity, setCapacity] = useState(
-        npmDevice.chargerModule?.ranges.current.max ?? 800
+        npmDevice.chargerModule?.ranges.current.max ?? 800,
     );
     const [ntcThermistor, setNTCThermistor] = useState<NTCThermistor>('10 kΩ');
     const [temperatures, setTemperatures] = useState<number[]>([25]);
     const [ratedChargingCurrent, setRatedChargingCurrent] = useState(
-        capacity / 2
+        capacity / 2,
     );
     const charger = useSelector(getCharger);
 
@@ -68,7 +68,7 @@ export default ({
     const vTerm = Math.max(...npmDevice.chargerModule.ranges.voltage);
 
     const [iTerm, setITerm] = useState<ITerm>(
-        charger?.iTerm ?? npmDevice.chargerModule.values.iTerm[0].value
+        charger?.iTerm ?? npmDevice.chargerModule.values.iTerm[0].value,
     );
     const dispatch = useDispatch();
     const maxLength = 20;
@@ -92,7 +92,7 @@ export default ({
                     capacity,
                     vUpperCutOff,
                     vLowerCutOff,
-                    vTerm
+                    vTerm,
                 ) ?? [];
 
             const profile: Profile = {
@@ -162,7 +162,7 @@ export default ({
                 <div
                     className={classNames(
                         'name-input',
-                        !validName && 'invalid'
+                        !validName && 'invalid',
                     )}
                 >
                     <div className="max-length">{`${name.length}/${maxLength}`}</div>
@@ -176,7 +176,7 @@ export default ({
                             const match =
                                 event.target.value.match(/^[a-zA-Z0-9]+$/);
                             setValidName(
-                                !!match && event.target.value !== 'default'
+                                !!match && event.target.value !== 'default',
                             );
                         }}
                         value={name}
@@ -261,7 +261,7 @@ export default ({
                     onSelect={item => setITerm(item.value as ITerm)}
                     selectedItem={
                         npmDevice.chargerModule.values.iTerm.find(
-                            item => item.value === iTerm
+                            item => item.value === iTerm,
                         ) ?? npmDevice.chargerModule.values.iTerm[0]
                     }
                 />
@@ -281,8 +281,8 @@ export default ({
                             Math.max(
                                 0,
                                 ntcThermistorItems.findIndex(
-                                    item => item.value === ntcThermistor
-                                )
+                                    item => item.value === ntcThermistor,
+                                ),
                             ) ?? 0
                         ]
                     }

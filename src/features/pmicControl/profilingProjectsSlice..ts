@@ -54,19 +54,19 @@ const profilingProjectsSlice = createSlice({
                 getPersistentStore().set(`profiling_projects`, projects);
                 state.recentProjects = projects;
                 state.profilingCSVProgress = state.profilingCSVProgress.filter(
-                    progress => progress.path !== action.payload
+                    progress => progress.path !== action.payload,
                 );
             }
         },
         removeRecentProject(state, action: PayloadAction<string>) {
             const projects = loadRecentProject().filter(
-                dir => !pathsAreEqual(dir, action.payload)
+                dir => !pathsAreEqual(dir, action.payload),
             );
             getPersistentStore().set(`profiling_projects`, projects);
 
             state.recentProjects = projects;
             state.profilingCSVProgress = state.profilingCSVProgress.filter(
-                progress => progress.path !== action.payload
+                progress => progress.path !== action.payload,
             );
         },
         setProfilingProjects(state, action: PayloadAction<ProjectPathPair[]>) {
@@ -74,7 +74,7 @@ const profilingProjectsSlice = createSlice({
         },
         updateProfilingProject(state, action: PayloadAction<ProjectPathPair>) {
             const index = state.profilingProjects.findIndex(
-                profile => profile.path === action.payload.path
+                profile => profile.path === action.payload.path,
             );
             if (index !== -1) {
                 state.profilingProjects[index] = action.payload;
@@ -82,12 +82,12 @@ const profilingProjectsSlice = createSlice({
         },
         addProjectProfileProgress(
             state,
-            action: PayloadAction<ProfilingCSVProgress>
+            action: PayloadAction<ProfilingCSVProgress>,
         ) {
             const index = state.profilingCSVProgress.findIndex(
                 progress =>
                     progress.path === action.payload.path &&
-                    progress.index === action.payload.index
+                    progress.index === action.payload.index,
             );
 
             if (index !== -1) {
@@ -101,12 +101,12 @@ const profilingProjectsSlice = createSlice({
             action: PayloadAction<
                 Partial<ProfilingCSVProgress> &
                     Pick<ProfilingCSVProgress, 'path' | 'index'>
-            >
+            >,
         ) {
             const index = state.profilingCSVProgress.findIndex(
                 progress =>
                     progress.path === action.payload.path &&
-                    progress.index === action.payload.index
+                    progress.index === action.payload.index,
             );
 
             if (index !== -1) {
@@ -118,12 +118,12 @@ const profilingProjectsSlice = createSlice({
         },
         removeProjectProfileProgress(
             state,
-            action: PayloadAction<Pick<ProfilingCSVProgress, 'path' | 'index'>>
+            action: PayloadAction<Pick<ProfilingCSVProgress, 'path' | 'index'>>,
         ) {
             const index = state.profilingCSVProgress.findIndex(
                 progress =>
                     progress.path === action.payload.path &&
-                    progress.index === action.payload.index
+                    progress.index === action.payload.index,
             );
 
             if (index !== -1) {

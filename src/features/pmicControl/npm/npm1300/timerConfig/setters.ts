@@ -22,9 +22,9 @@ export class TimerConfigSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new TimerConfigGet(sendCommand);
     }
@@ -44,7 +44,7 @@ export class TimerConfigSet {
                     'onTimerConfigUpdate',
                     {
                         mode,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -54,7 +54,7 @@ export class TimerConfigSet {
                     () => {
                         this.get.mode();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -67,19 +67,19 @@ export class TimerConfigSet {
                     'onTimerConfigUpdate',
                     {
                         prescaler,
-                    }
+                    },
                 );
                 resolve();
             } else {
                 this.sendCommand(
                     `npmx timer config prescaler set ${TimerPrescalerValues.findIndex(
-                        p => p === prescaler
+                        p => p === prescaler,
                     )}`,
                     () => resolve(),
                     () => {
                         this.get.prescaler();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -92,7 +92,7 @@ export class TimerConfigSet {
                     'onTimerConfigUpdate',
                     {
                         period,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -102,7 +102,7 @@ export class TimerConfigSet {
                     () => {
                         this.get.period();
                         reject();
-                    }
+                    },
                 );
             }
         });

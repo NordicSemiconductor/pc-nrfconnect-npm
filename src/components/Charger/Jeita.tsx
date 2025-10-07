@@ -136,7 +136,7 @@ export default ({
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat < internalJeitaTemps[0] &&
-                                'tw-bg-indigo-100'
+                                'tw-bg-indigo-100',
                         )}`}
                     >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
@@ -162,7 +162,7 @@ export default ({
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[0] &&
                                 latestAdcSample.tBat < internalJeitaTemps[1] &&
-                                'tw-bg-lightBlue-100'
+                                'tw-bg-lightBlue-100',
                         )}`}
                     >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
@@ -192,7 +192,7 @@ export default ({
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[1] &&
                                 latestAdcSample?.tBat < internalJeitaTemps[2] &&
-                                'tw-bg-green-100'
+                                'tw-bg-green-100',
                         )}`}
                     >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
@@ -222,7 +222,7 @@ export default ({
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[2] &&
                                 latestAdcSample.tBat < internalJeitaTemps[3] &&
-                                'tw-bg-orange-100'
+                                'tw-bg-orange-100',
                         )}`}
                     >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
@@ -251,7 +251,7 @@ export default ({
                         className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[3] &&
-                                'tw-bg-red-100'
+                                'tw-bg-red-100',
                         )}`}
                     >
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
@@ -269,7 +269,7 @@ export default ({
                             values={internalJeitaTemps}
                             range={chargerModule.ranges.jeita}
                             onChange={[0, 1, 2, 3].map(
-                                i => v => updateInternal(i, v)
+                                i => v => updateInternal(i, v),
                             )}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
                             disabled={disabled}
@@ -305,7 +305,7 @@ export default ({
                 onSelect={item =>
                     chargerModule.set.nTCThermistor(
                         item.value as NTCThermistor,
-                        autoNTCBeta
+                        autoNTCBeta,
                     )
                 }
                 selectedItem={
@@ -313,8 +313,8 @@ export default ({
                         Math.max(
                             0,
                             ntcThermistorItems.findIndex(
-                                item => item.value === charger.ntcThermistor
-                            )
+                                item => item.value === charger.ntcThermistor,
+                            ),
                         ) ?? 0
                     ]
                 }
@@ -327,7 +327,7 @@ export default ({
                     if (!v) return;
                     chargerModule.set.nTCThermistor(
                         charger.ntcThermistor,
-                        true
+                        true,
                     );
                 }}
                 label={
@@ -358,7 +358,7 @@ export default ({
 const Line = ({ className }: { className?: string }) => (
     <div
         className={`tw-relative tw-h-full tw-border-r tw-border-r-gray-300 ${classNames(
-            className
+            className,
         )}`}
     />
 );

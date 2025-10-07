@@ -28,7 +28,7 @@ export default class Module implements UsbCurrentLimiterModule {
         this._set = new UsbCurrentLimiterSet(
             eventEmitter,
             sendCommand,
-            offlineMode
+            offlineMode,
         );
         this._callbacks = callbacks(shellParser, eventEmitter);
     }

@@ -82,7 +82,7 @@ export default abstract class BaseNpmDevice {
             | RootState
             | {
                   app: { pmicControl: { npmDevice: BaseNpmDevice } };
-              }
+              },
     ): NpmExportLatest;
     initialize() {
         this.initializeFuelGauge();
@@ -119,7 +119,7 @@ export default abstract class BaseNpmDevice {
 
     protected set boostModule(boostModule: BoostModule[]) {
         this.releaseAll.push(
-            ...boostModule.map(boost => boost.callbacks).flat()
+            ...boostModule.map(boost => boost.callbacks).flat(),
         );
         this.#boostModule = boostModule;
     }
@@ -159,9 +159,11 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set fuelGaugeModule(
-        fuelGaugeModule: FuelGaugeModule | undefined
+        fuelGaugeModule: FuelGaugeModule | undefined,
     ) {
-        !!fuelGaugeModule && this.releaseAll.push(...fuelGaugeModule.callbacks);
+        if (fuelGaugeModule) {
+            this.releaseAll.push(...fuelGaugeModule.callbacks);
+        }
         this.#fuelGaugeModule = fuelGaugeModule;
     }
 
@@ -171,7 +173,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set batteryModule(batteryModule: BatteryModule | undefined) {
-        !!batteryModule && this.releaseAll.push(...batteryModule.callbacks);
+        if (batteryModule) {
+            this.releaseAll.push(...batteryModule.callbacks);
+        }
         this.#batteryModule = batteryModule;
     }
 
@@ -183,7 +187,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set lowPowerModule(lowPowerModule: LowPowerModule | undefined) {
-        !!lowPowerModule && this.releaseAll.push(...lowPowerModule.callbacks);
+        if (lowPowerModule) {
+            this.releaseAll.push(...lowPowerModule.callbacks);
+        }
         this.#lowPowerModule = lowPowerModule;
     }
 
@@ -193,7 +199,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set resetModule(resetModule: ResetModule | undefined) {
-        !!resetModule && this.releaseAll.push(...resetModule.callbacks);
+        if (resetModule) {
+            this.releaseAll.push(...resetModule.callbacks);
+        }
         this.#resetModule = resetModule;
     }
 
@@ -203,10 +211,11 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set timerConfigModule(
-        timerConfigModule: TimerConfigModule | undefined
+        timerConfigModule: TimerConfigModule | undefined,
     ) {
-        !!timerConfigModule &&
+        if (timerConfigModule) {
             this.releaseAll.push(...timerConfigModule.callbacks);
+        }
         this.#timerConfigModule = timerConfigModule;
     }
 
@@ -216,10 +225,11 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set usbCurrentLimiterModule(
-        usbCurrentLimiterModule: UsbCurrentLimiterModule | undefined
+        usbCurrentLimiterModule: UsbCurrentLimiterModule | undefined,
     ) {
-        !!usbCurrentLimiterModule &&
+        if (usbCurrentLimiterModule) {
             this.releaseAll.push(...usbCurrentLimiterModule.callbacks);
+        }
         this.#usbCurrentLimiterModule = usbCurrentLimiterModule;
     }
 
@@ -229,7 +239,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set pofModule(pofModule: PofModule | undefined) {
-        !!pofModule && this.releaseAll.push(...pofModule.callbacks);
+        if (pofModule) {
+            this.releaseAll.push(...pofModule.callbacks);
+        }
         this.#pofModule = pofModule;
     }
 
@@ -239,7 +251,9 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set chargerModule(chargerModule: ChargerModule | undefined) {
-        !!chargerModule && this.releaseAll.push(...chargerModule.callbacks);
+        if (chargerModule) {
+            this.releaseAll.push(...chargerModule.callbacks);
+        }
         this.#chargerModule = chargerModule;
     }
 
@@ -249,10 +263,11 @@ export default abstract class BaseNpmDevice {
     }
 
     protected set onBoardLoadModule(
-        onBoardLoadModule: OnBoardLoadModule | undefined
+        onBoardLoadModule: OnBoardLoadModule | undefined,
     ) {
-        !!onBoardLoadModule &&
+        if (onBoardLoadModule) {
             this.releaseAll.push(...onBoardLoadModule.callbacks);
+        }
         this.#onBoardLoadModule = onBoardLoadModule;
     }
 
@@ -279,7 +294,7 @@ export default abstract class BaseNpmDevice {
                     new ldo.Module({
                         ...args,
                         index,
-                    })
+                    }),
             );
         }
 
@@ -290,7 +305,7 @@ export default abstract class BaseNpmDevice {
                     new bucks.Module({
                         ...args,
                         index,
-                    })
+                    }),
             );
         }
 
@@ -301,7 +316,7 @@ export default abstract class BaseNpmDevice {
                     new gpios.Module({
                         ...args,
                         index,
-                    })
+                    }),
             );
         }
 
@@ -312,7 +327,7 @@ export default abstract class BaseNpmDevice {
                     new boosts.Module({
                         ...args,
                         index,
-                    })
+                    }),
             );
         }
 
@@ -382,7 +397,7 @@ export default abstract class BaseNpmDevice {
         protected readonly peripherals: NpmPeripherals,
         readonly batteryConnectedVoltageThreshold: number,
         private readonly _supportedErrorLogs: SupportedErrorLogs,
-        protected hardwareVersion?: string
+        protected hardwareVersion?: string,
     ) {
         this.#pmicState = shellParser ? 'pmic-connected' : 'ek-disconnected';
         this.offlineMode = !shellParser;
@@ -391,7 +406,7 @@ export default abstract class BaseNpmDevice {
             this.releaseAll.push(
                 shellParser.registerCommandCallback(
                     toRegex(
-                        '(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))'
+                        '(delayed_reboot [0-1]+)|(kernel reboot (cold|warm))',
                     ),
                     () => {
                         this.rebooting = true;
@@ -400,8 +415,8 @@ export default abstract class BaseNpmDevice {
                     error => {
                         this.rebooting = false;
                         eventEmitter.emit('onReboot', false, error);
-                    }
-                )
+                    },
+                ),
             );
 
             this.releaseAll.push(
@@ -424,12 +439,12 @@ export default abstract class BaseNpmDevice {
                             logger.error(
                                 `${command} => ${response.replaceAll(
                                     /(\r\n|\r|\n)/g,
-                                    ' '
-                                )}`
+                                    ' ',
+                                )}`,
                             );
                         }
-                    }
-                )
+                    },
+                ),
             );
 
             this.releaseAll.push(
@@ -445,7 +460,7 @@ export default abstract class BaseNpmDevice {
                         loggingEvent: event,
                         dataPair: false,
                     });
-                })
+                }),
             );
 
             this.releaseAll.push(
@@ -454,7 +469,7 @@ export default abstract class BaseNpmDevice {
                         'npm_adc sample',
                         false,
                         undefined,
-                        '[0-9]+ [0-9]+'
+                        '[0-9]+ [0-9]+',
                     ),
                     res => {
                         const results = parseColonBasedAnswer(res).split(',');
@@ -469,13 +484,13 @@ export default abstract class BaseNpmDevice {
                                     case 'sample interval':
                                         settings.samplingRate = Number.parseInt(
                                             pair[1],
-                                            10
+                                            10,
                                         );
                                         break;
                                     case 'report interval':
                                         settings.reportRate = Number.parseInt(
                                             pair[1],
-                                            10
+                                            10,
                                         );
                                         break;
                                 }
@@ -483,8 +498,8 @@ export default abstract class BaseNpmDevice {
                         });
                         this.eventEmitter.emit('onAdcSettingsChange', settings);
                     },
-                    noop
-                )
+                    noop,
+                ),
             );
 
             this.releaseAll.push(
@@ -494,11 +509,11 @@ export default abstract class BaseNpmDevice {
                         this.pmicState = 'pmic-pending-rebooting';
                         this.eventEmitter.emit(
                             'onPmicStateChange',
-                            this.pmicState
+                            this.pmicState,
                         );
                     },
-                    noop
-                )
+                    noop,
+                ),
             );
 
             for (let i = 0; i < this.peripherals.noOfLEDs; i += 1) {
@@ -513,12 +528,12 @@ export default abstract class BaseNpmDevice {
                                     {
                                         mode,
                                     },
-                                    i
+                                    i,
                                 );
                             }
                         },
-                        noop
-                    )
+                        noop,
+                    ),
                 );
             }
         }
@@ -551,19 +566,19 @@ export default abstract class BaseNpmDevice {
                     {
                         mode,
                     },
-                    index
+                    index,
                 );
                 resolve();
             } else {
                 this.sendCommand(
                     `npmx led mode set ${index} ${LEDModeValues.findIndex(
-                        m => m === mode
+                        m => m === mode,
                     )}`,
                     () => resolve(),
                     () => {
                         this.getLedMode(index);
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -596,7 +611,7 @@ export default abstract class BaseNpmDevice {
         command: string,
         onSuccess: (response: string, command: string) => void = noop,
         onError: (response: string, command: string) => void = noop,
-        unique = true
+        unique = true,
     ) {
         if (this.pmicState !== 'ek-disconnected') {
             this.shellParser?.enqueueRequest(
@@ -611,7 +626,7 @@ export default abstract class BaseNpmDevice {
                             this.pmicState = 'pmic-disconnected';
                             this.eventEmitter.emit(
                                 'onPmicStateChange',
-                                this.pmicState
+                                this.pmicState,
                             );
                         }
                         onError(error, cmd);
@@ -622,7 +637,7 @@ export default abstract class BaseNpmDevice {
                     },
                 },
                 undefined,
-                unique
+                unique,
             );
         } else {
             onError('No Shell connection', command);
@@ -644,7 +659,7 @@ export default abstract class BaseNpmDevice {
                     },
                 },
                 undefined,
-                true
+                true,
             );
         });
     }
@@ -668,7 +683,7 @@ export default abstract class BaseNpmDevice {
                 },
             },
             undefined,
-            true
+            true,
         );
     }
 
@@ -676,7 +691,7 @@ export default abstract class BaseNpmDevice {
         this.getKernelUptime().then(milliseconds => {
             this.deviceUptimeToSystemDelta = Date.now() - milliseconds;
             this.uptimeOverflowCounter = Math.floor(
-                milliseconds / MAX_TIMESTAMP
+                milliseconds / MAX_TIMESTAMP,
             );
         });
     }
@@ -685,7 +700,7 @@ export default abstract class BaseNpmDevice {
         return (
             handler: WithError extends true
                 ? (payload: T, error: string) => void
-                : (payload: T) => void
+                : (payload: T) => void,
         ) => {
             this.eventEmitter.on(name, handler);
             return () => {
@@ -702,28 +717,28 @@ export default abstract class BaseNpmDevice {
     }
     onAdcSettingsChange(handler: (payload: AdcSampleSettings) => void) {
         return this.setupHandler<AdcSampleSettings>('onAdcSettingsChange')(
-            handler
+            handler,
         );
     }
     onChargingStatusUpdate(
-        handler: (payload: PmicChargingState, error: string) => void
+        handler: (payload: PmicChargingState, error: string) => void,
     ) {
         return this.setupHandler<PmicChargingState, true>(
-            'onChargingStatusUpdate'
+            'onChargingStatusUpdate',
         )(handler);
     }
     onChargerUpdate(
-        handler: (payload: Partial<Charger>, error: string) => void
+        handler: (payload: Partial<Charger>, error: string) => void,
     ) {
         return this.setupHandler<Partial<Charger>, true>('onChargerUpdate')(
-            handler
+            handler,
         );
     }
     onBatteryAddonBoardIdUpdate(
-        handler: (payload: number, error: string) => void
+        handler: (payload: number, error: string) => void,
     ) {
         return this.setupHandler<number, true>('onBatteryAddonBoardIdUpdate')(
-            handler
+            handler,
         );
     }
     onPowerIdUpdate(handler: (payload: PowerID, error: string) => void) {
@@ -731,28 +746,28 @@ export default abstract class BaseNpmDevice {
     }
     onTimerExpiryInterrupt(handler: (payload: string, error: string) => void) {
         return this.setupHandler<string, true>('onTimerExpiryInterrupt')(
-            handler
+            handler,
         );
     }
     onBoostUpdate(
-        handler: (payload: PartialUpdate<Boost>, error: string) => void
+        handler: (payload: PartialUpdate<Boost>, error: string) => void,
     ) {
         return this.setupHandler<PartialUpdate<Boost>, true>('onBoostUpdate')(
-            handler
+            handler,
         );
     }
     onBuckUpdate(
-        handler: (payload: PartialUpdate<Buck>, error: string) => void
+        handler: (payload: PartialUpdate<Buck>, error: string) => void,
     ) {
         return this.setupHandler<PartialUpdate<Buck>, true>('onBuckUpdate')(
-            handler
+            handler,
         );
     }
     onOnBoardLoadUpdate(
-        handler: (payload: Partial<OnBoardLoad>, error: string) => void
+        handler: (payload: Partial<OnBoardLoad>, error: string) => void,
     ) {
         return this.setupHandler<Partial<OnBoardLoad>, true>(
-            'onOnBoardLoadUpdate'
+            'onOnBoardLoadUpdate',
         )(handler);
     }
     onFuelGaugeUpdate(handler: (payload: FuelGauge) => void) {
@@ -760,53 +775,53 @@ export default abstract class BaseNpmDevice {
     }
     onLdoUpdate(handler: (payload: PartialUpdate<Ldo>, error: string) => void) {
         return this.setupHandler<PartialUpdate<Ldo>, true>('onLdoUpdate')(
-            handler
+            handler,
         );
     }
     onGPIOUpdate(
-        handler: (payload: PartialUpdate<GPIO>, error: string) => void
+        handler: (payload: PartialUpdate<GPIO>, error: string) => void,
     ) {
         return this.setupHandler<PartialUpdate<GPIO>, true>('onGPIOUpdate')(
-            handler
+            handler,
         );
     }
     onLEDUpdate(handler: (payload: PartialUpdate<LED>, error: string) => void) {
         return this.setupHandler<PartialUpdate<LED>, true>('onLEDUpdate')(
-            handler
+            handler,
         );
     }
     onPOFUpdate(handler: (payload: Partial<POF>, error: string) => void) {
         return this.setupHandler<Partial<POF>, true>('onPOFUpdate')(handler);
     }
     onTimerConfigUpdate(
-        handler: (payload: Partial<TimerConfig>, error: string) => void
+        handler: (payload: Partial<TimerConfig>, error: string) => void,
     ) {
         return this.setupHandler<Partial<TimerConfig>, true>(
-            'onTimerConfigUpdate'
+            'onTimerConfigUpdate',
         )(handler);
     }
     onLowPowerUpdate(
         handler: (
             payload: Partial<npm1300LowPowerConfig>,
-            error: string
-        ) => void
+            error: string,
+        ) => void,
     ) {
         return this.setupHandler<Partial<npm1300LowPowerConfig>, true>(
-            'onLowPowerUpdate'
+            'onLowPowerUpdate',
         )(handler);
     }
     onResetUpdate(
-        handler: (payload: Partial<ResetConfig>, error: string) => void
+        handler: (payload: Partial<ResetConfig>, error: string) => void,
     ) {
         return this.setupHandler<Partial<ResetConfig>, true>('onResetUpdate')(
-            handler
+            handler,
         );
     }
     onLoggingEvent(
         handler: (payload: {
             loggingEvent: LoggingEvent;
             dataPair: boolean;
-        }) => void
+        }) => void,
     ) {
         return this.setupHandler<{
             loggingEvent: LoggingEvent;
@@ -815,12 +830,12 @@ export default abstract class BaseNpmDevice {
     }
     onActiveBatteryModelUpdate(handler: (payload: BatteryModel) => void) {
         return this.setupHandler<BatteryModel>('onActiveBatteryModelUpdate')(
-            handler
+            handler,
         );
     }
     onStoredBatteryModelUpdate(handler: (payload: BatteryModel[]) => void) {
         return this.setupHandler<BatteryModel[]>('onStoredBatteryModelUpdate')(
-            handler
+            handler,
         );
     }
     onBeforeReboot(handler: (payload: number) => void) {
@@ -834,7 +849,7 @@ export default abstract class BaseNpmDevice {
     }
     onErrorLogs(handler: (payload: Partial<ErrorLogs>, error: string) => void) {
         return this.setupHandler<Partial<ErrorLogs>, true>('onErrorLogs')(
-            handler
+            handler,
         );
     }
 
@@ -882,9 +897,9 @@ export default abstract class BaseNpmDevice {
                         },
                     },
                     undefined,
-                    true
+                    true,
                 );
-            }
+            },
         );
     }
 
@@ -907,7 +922,7 @@ export default abstract class BaseNpmDevice {
                     },
                 },
                 undefined,
-                true
+                true,
             );
         });
     }
@@ -927,7 +942,7 @@ export default abstract class BaseNpmDevice {
                     },
                 },
                 undefined,
-                true
+                true,
             );
         });
     }
@@ -946,7 +961,7 @@ export default abstract class BaseNpmDevice {
                     },
                 },
                 undefined,
-                true
+                true,
             );
         });
     }
@@ -975,8 +990,8 @@ export default abstract class BaseNpmDevice {
                                 this.boostModule[index].set
                                     .all(boost)
                                     .catch(() => {});
-                            })()
-                        )
+                            })(),
+                        ),
                     );
 
                     if (config.bucks) {
@@ -986,8 +1001,8 @@ export default abstract class BaseNpmDevice {
                                     this.buckModule[index].set
                                         .all(buck)
                                         .catch(() => {});
-                                })()
-                            )
+                                })(),
+                            ),
                         );
                     }
 
@@ -997,8 +1012,8 @@ export default abstract class BaseNpmDevice {
                                 this.ldoModule[index].set
                                     .all(ldo)
                                     .catch(() => {});
-                            })()
-                        )
+                            })(),
+                        ),
                     );
 
                     await Promise.all(
@@ -1007,18 +1022,18 @@ export default abstract class BaseNpmDevice {
                                 this.gpioModule[index].set
                                     .all(gpio)
                                     .catch(() => {});
-                            })()
-                        )
+                            })(),
+                        ),
                     );
 
                     await Promise.all(
                         config.leds.map((led, index) =>
                             (() => {
                                 this.setLedMode(index, led.mode).catch(
-                                    () => {}
+                                    () => {},
                                 );
-                            })()
-                        )
+                            })(),
+                        ),
                     );
 
                     if (config.pof) {
@@ -1061,7 +1076,7 @@ export default abstract class BaseNpmDevice {
                             .all(onBoardLoad)
                             .catch(() => {});
                     }
-                } catch (error) {
+                } catch {
                     logger.error('Invalid File.');
                 }
             };
@@ -1115,7 +1130,9 @@ export default abstract class BaseNpmDevice {
                         const stringModels = models[2].trim().split('\n');
                         const list = stringModels.map(parseBatteryModel);
                         resolve(
-                            list.filter(item => item !== null) as BatteryModel[]
+                            list.filter(
+                                item => item !== null,
+                            ) as BatteryModel[],
                         );
                     },
                     onError: reject,
@@ -1125,18 +1142,18 @@ export default abstract class BaseNpmDevice {
                     },
                 },
                 undefined,
-                true
+                true,
             );
         });
     }
     onProfileDownloadUpdate(
-        handler: (payload: ProfileDownload, error?: string) => void
+        handler: (payload: ProfileDownload, error?: string) => void,
     ) {
         this.eventEmitter.on('onProfileDownloadUpdate', handler);
         return () => {
             this.eventEmitter.removeListener(
                 'onProfileDownloadUpdate',
-                handler
+                handler,
             );
         };
     }
@@ -1159,7 +1176,7 @@ export default abstract class BaseNpmDevice {
             this.sendCommand(
                 `npm_adc sample ${samplingRate} ${intervalMs}`,
                 () => resolve(),
-                () => reject()
+                () => reject(),
             );
         });
     }

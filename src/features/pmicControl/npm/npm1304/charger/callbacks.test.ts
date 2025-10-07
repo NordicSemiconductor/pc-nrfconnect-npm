@@ -27,7 +27,7 @@ describe('PMIC 1304 - Command callbacks', () => {
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).nthCalledWith(1, { vTerm: 2.3 });
-        }
+        },
     );
 
     test.each(['get', 'set 400'])(
@@ -41,7 +41,7 @@ describe('PMIC 1304 - Command callbacks', () => {
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).nthCalledWith(1, { iChg: 400 });
-        }
+        },
     );
 
     test.each(['get', 'set 1'])('npmx charger enable recharging %p', append => {
@@ -74,7 +74,7 @@ describe('PMIC 1304 - Command callbacks', () => {
         ITermValues.flatMap(v => [
             { append: 'get', v },
             { append: `set ${v}%`, v },
-        ])
+        ]),
     )('npmx charger iTerm %p', ({ append, v }) => {
         const command = `npmx charger termination_current ${append}`;
         const callback =
@@ -104,7 +104,7 @@ describe('PMIC 1304 - Command callbacks', () => {
 
         callback?.onSuccess(
             'Info: Requested value was 200 but reading will return 300 due to approximations.',
-            command
+            command,
         );
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
@@ -174,7 +174,7 @@ describe('PMIC 1304 - Command callbacks', () => {
 
             expect(mockOnChargerUpdate).toBeCalledTimes(1);
             expect(mockOnChargerUpdate).nthCalledWith(1, { ntcThermistor });
-        }
+        },
     );
 
     test.each(['get', 'set 100'])('npmx charger ntc beta %p', append => {
@@ -198,7 +198,7 @@ describe('PMIC 1304 - Command callbacks', () => {
                     value: setValue,
                 },
             ])
-            .flat()
+            .flat(),
     )('npmx charger status %p', ({ append, value }) => {
         const command = `npmx charger status all ${append}`;
         const callback =
@@ -239,7 +239,7 @@ describe('PMIC 1304 - Command callbacks', () => {
                     enabled,
                 },
             ])
-            .flat()
+            .flat(),
     )('npmx charger module charger %p', ({ append, enabled }) => {
         const command = `npmx charger module charger ${append}`;
         const callback =
@@ -264,7 +264,7 @@ describe('PMIC 1304 - Command callbacks', () => {
             expect(mockOnChargerUpdate).nthCalledWith(1, {
                 vTermR: 3.55,
             });
-        }
+        },
     );
 
     test.each(['get', 'set 20'])(
@@ -280,7 +280,7 @@ describe('PMIC 1304 - Command callbacks', () => {
             expect(mockOnChargerUpdate).nthCalledWith(1, {
                 tCold: 20,
             });
-        }
+        },
     );
 
     test.each(['get', 'set 20'])(
@@ -296,7 +296,7 @@ describe('PMIC 1304 - Command callbacks', () => {
             expect(mockOnChargerUpdate).nthCalledWith(1, {
                 tCool: 20,
             });
-        }
+        },
     );
 
     test.each(['get', 'set 20'])(
@@ -312,7 +312,7 @@ describe('PMIC 1304 - Command callbacks', () => {
             expect(mockOnChargerUpdate).nthCalledWith(1, {
                 tWarm: 20,
             });
-        }
+        },
     );
 
     test.each(['get', 'set 20'])(
@@ -328,7 +328,7 @@ describe('PMIC 1304 - Command callbacks', () => {
             expect(mockOnChargerUpdate).nthCalledWith(1, {
                 tHot: 20,
             });
-        }
+        },
     );
 });
 export {};

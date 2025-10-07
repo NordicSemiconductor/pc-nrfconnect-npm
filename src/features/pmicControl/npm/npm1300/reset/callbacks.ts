@@ -16,7 +16,7 @@ import { LongPressReset, ResetConfig } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
 
@@ -30,11 +30,11 @@ export default (
                         'onResetUpdate',
                         {
                             longPressReset: result as LongPressReset,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

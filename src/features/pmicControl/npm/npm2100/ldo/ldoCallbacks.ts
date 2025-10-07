@@ -33,7 +33,7 @@ import {
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
     if (shellParser) {
@@ -46,11 +46,11 @@ export default (
                         {
                             voltage: parseToNumber(res) / 1000, // mV to V
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Enable
@@ -63,11 +63,11 @@ export default (
                         {
                             enabled: parseOnOff(res),
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Mode
@@ -77,7 +77,7 @@ export default (
                     'npm2100 ldosw mode',
                     true,
                     undefined,
-                    toValueRegexString(LdoModeValues)
+                    toValueRegexString(LdoModeValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
@@ -85,14 +85,14 @@ export default (
                         {
                             mode: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                LdoModeValues
+                                LdoModeValues,
                             ) as LdoMode,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Modectrl
@@ -102,26 +102,26 @@ export default (
                     'npm2100 ldosw modectrl',
                     true,
                     undefined,
-                    toValueRegexString(nPM2100LdoModeControlValues)
+                    toValueRegexString(nPM2100LdoModeControlValues),
                 ),
                 res => {
                     const modeControl = parseColonBasedAnswer(
-                        res
+                        res,
                     ) as nPM2100LdoModeControl;
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
                             modeControl: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                nPM2100LdoModeControlValues
+                                nPM2100LdoModeControlValues,
                             ) as nPM2100LdoModeControl,
                             onOffSoftwareControlEnabled: modeControl !== 'gpio',
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Pinsel
@@ -131,7 +131,7 @@ export default (
                     'npm2100 ldosw pinsel',
                     true,
                     undefined,
-                    toValueRegexString(nPM2100GPIOControlPinSelectValues)
+                    toValueRegexString(nPM2100GPIOControlPinSelectValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
@@ -139,14 +139,14 @@ export default (
                         {
                             pinSel: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                nPM2100GPIOControlPinSelectValues
+                                nPM2100GPIOControlPinSelectValues,
                             ) as nPM2100GPIOControlPinSelect,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Softstart LDO
@@ -156,7 +156,7 @@ export default (
                     'npm2100 ldosw softstart LDO',
                     true,
                     undefined,
-                    toValueRegexString(nPM2100LDOSoftStartValues)
+                    toValueRegexString(nPM2100LDOSoftStartValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
@@ -164,14 +164,14 @@ export default (
                         {
                             ldoSoftStart: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                nPM2100LDOSoftStartValues
+                                nPM2100LDOSoftStartValues,
                             ) as nPM2100LDOSoftStart,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Softstart loadsw
@@ -181,7 +181,7 @@ export default (
                     'npm2100 ldosw softstart LOADSW',
                     true,
                     undefined,
-                    toValueRegexString(nPM2100SoftStartValues)
+                    toValueRegexString(nPM2100SoftStartValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
@@ -189,14 +189,14 @@ export default (
                         {
                             softStart: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                nPM2100SoftStartValues
+                                nPM2100SoftStartValues,
                             ) as nPM2100SoftStart,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -205,7 +205,7 @@ export default (
                     'npm2100 ldosw pinmode',
                     true,
                     undefined,
-                    toValueRegexString(nPM2100GPIOControlModeValues)
+                    toValueRegexString(nPM2100GPIOControlModeValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
@@ -213,14 +213,14 @@ export default (
                         {
                             pinMode: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                nPM2100GPIOControlModeValues
+                                nPM2100GPIOControlModeValues,
                             ) as nPM2100GPIOControlMode,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // OCP - Over Current Protection
@@ -233,11 +233,11 @@ export default (
                         {
                             ocpEnabled: parseOnOff(res),
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // LDO Ramping
@@ -250,11 +250,11 @@ export default (
                         {
                             rampEnabled: parseOnOff(res),
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // LDO Halt Ramping
@@ -267,11 +267,11 @@ export default (
                         {
                             haltEnabled: parseOnOff(res),
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

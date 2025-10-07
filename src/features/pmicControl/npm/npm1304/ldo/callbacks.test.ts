@@ -29,9 +29,9 @@ describe('PMIC 1304 - Command callbacks', () => {
                         append: `set ${index} ${enabled ? '1' : '0'} `,
                         enabled,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx ldsw %p', ({ index, append, enabled }) => {
         const command = `npmx ldsw status ${append}`;
         const callback =
@@ -58,7 +58,7 @@ describe('PMIC 1304 - Command callbacks', () => {
                     append: `set ${index} 1300`,
                 },
             ].flat(),
-        ]).flat()
+        ]).flat(),
     )('npmx ldsw voltage %p', ({ index, append }) => {
         const command = `npmx ldsw ldo_voltage ${append}`;
         const callback =
@@ -87,9 +87,9 @@ describe('PMIC 1304 - Command callbacks', () => {
                         append: `set ${index} ${mode === 'LDO' ? '1' : '0'} `,
                         mode,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx ldsw mode %p', ({ index, append, mode }) => {
         const command = `npmx ldsw mode ${append}`;
         const callback =
@@ -118,7 +118,7 @@ describe('PMIC 1304 - Command callbacks', () => {
                     enabled,
                 },
             ]),
-        ]).flat()
+        ]).flat(),
     )('npmx ldsw soft_start enable %p', ({ index, append, enabled }) => {
         const command = `npmx ldsw soft_start enable ${append}`;
         const callback =
@@ -148,7 +148,7 @@ describe('PMIC 1304 - Command callbacks', () => {
                         value,
                     },
                 ]),
-            ]).flat()
+            ]).flat(),
         )('npmx ldsw soft_start current %p', ({ index, append, value }) => {
             const command = `npmx ldsw soft_start current ${append}`;
             const callback =
@@ -178,9 +178,9 @@ describe('PMIC 1304 - Command callbacks', () => {
                         append: `set ${index} ${activeDischarge ? '1' : '0'} `,
                         activeDischarge,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx ldsw active_discharge %p', ({ index, append, activeDischarge }) => {
         const command = `npmx ldsw active_discharge ${append}`;
         const callback =
@@ -209,9 +209,9 @@ describe('PMIC 1304 - Command callbacks', () => {
                         append: `set ${index} ${value} 0`,
                         value,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx ldsw gpio %p', ({ index, append, value }) => {
         const command = `npmx ldsw gpio index ${append}`;
         const callback =

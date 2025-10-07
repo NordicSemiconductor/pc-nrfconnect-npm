@@ -15,7 +15,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -28,7 +28,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx vbusin current_limit set 5000`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -40,13 +40,13 @@ describe('PMIC 1300 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
         test('Set vBusinCurrentLimiter - Fail immediately', async () => {
             await expect(
-                pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(5)
+                pmic.usbCurrentLimiterModule?.set.vBusInCurrentLimiter(5),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -55,7 +55,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx vbusin current_limit set 5000`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             expect(mockEnqueueRequest).nthCalledWith(
@@ -63,7 +63,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 `npmx vbusin current_limit get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response

@@ -29,7 +29,7 @@ describe('PMIC 2100 - Static getters', () => {
             max: 3,
             decimals: 1,
             step: 0.1,
-        })
+        }),
     );
 });
 

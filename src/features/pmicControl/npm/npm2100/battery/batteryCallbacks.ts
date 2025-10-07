@@ -15,7 +15,7 @@ import {
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const batteryCommandCallbacks = [];
 
@@ -27,11 +27,11 @@ export default (
                 res => {
                     eventEmitter.emit(
                         'onBatteryAddonBoardIdUpdate',
-                        parseToNumber(res)
+                        parseToNumber(res),
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         batteryCommandCallbacks.push(
@@ -40,8 +40,8 @@ export default (
                 res => {
                     eventEmitter.emit('onPowerIdUpdate', res.split('=')[1]);
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

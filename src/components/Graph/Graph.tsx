@@ -75,7 +75,7 @@ ChartJS.register(
     Legend,
     TimeScale,
     zoomPanPlugin,
-    canvasAreaNotifier
+    canvasAreaNotifier,
 );
 
 const chartDataSoc: ChartData<'line'> = {
@@ -230,7 +230,7 @@ export default ({ active }: PaneProps) => {
                 },
             },
         }),
-        []
+        [],
     );
 
     const optionsTBat: ChartOptions<'line'> = useMemo(
@@ -258,7 +258,7 @@ export default ({ active }: PaneProps) => {
                 },
             },
         }),
-        []
+        [],
     );
 
     const optionsVBat: ChartOptions<'line'> = useMemo(
@@ -286,7 +286,7 @@ export default ({ active }: PaneProps) => {
                 },
             },
         }),
-        []
+        [],
     );
 
     const optionsIBat: ChartOptions<'line'> = useMemo(
@@ -314,7 +314,7 @@ export default ({ active }: PaneProps) => {
                 },
             },
         }),
-        []
+        [],
     );
 
     const optionsTDie: ChartOptions<'line'> = useMemo(
@@ -342,7 +342,7 @@ export default ({ active }: PaneProps) => {
                 },
             },
         }),
-        []
+        [],
     );
 
     const chartMetaData = useMemo(
@@ -407,7 +407,7 @@ export default ({ active }: PaneProps) => {
             optionsTBat,
             optionsVBat,
             optionsTDie,
-        ]
+        ],
     );
 
     useEffect(() => {
@@ -417,7 +417,7 @@ export default ({ active }: PaneProps) => {
     }, [chartMetaData, npmDevice]);
 
     const [enabledCharts, setEnabledCharts] = useState<Set<keyof AdcSample>>(
-        new Set()
+        new Set(),
     );
 
     useEffect(() => {
@@ -512,7 +512,7 @@ export default ({ active }: PaneProps) => {
                 const chartOptions = chartStates?.options;
                 chart?.zoom(
                     resolution,
-                    chartOptions?.live || resolution <= 0 ? 1 : 0.5
+                    chartOptions?.live || resolution <= 0 ? 1 : 0.5,
                 );
             }
         });
@@ -608,7 +608,7 @@ export default ({ active }: PaneProps) => {
                                 />
                             </div>
                         </Fragment>
-                    ) : null
+                    ) : null,
             )}
             <TimeSpanDeltaLine range={range} chartArea={chartArea} />
         </div>

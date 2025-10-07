@@ -24,7 +24,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `fuel_gauge get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -36,7 +36,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `fuel_gauge model get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -48,7 +48,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `fuel_gauge model list`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -60,7 +60,7 @@ describe('PMIC 1304 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _timeout?: number,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean
+                _unique?: boolean,
             ) => {
                 callbacks?.onSuccess(
                     `Currently active battery model:
@@ -72,10 +72,10 @@ describe('PMIC 1304 - Request update commands', () => {
                             Slot 0: Empty
                             Slot 1: Empty
                             Slot 2: Empty`,
-                    'fuel_gauge model list'
+                    'fuel_gauge model list',
                 );
                 return Promise.resolve();
-            }
+            },
         );
 
         await expect(pmic.getHardcodedBatteryModels()).resolves.toStrictEqual([
@@ -114,7 +114,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `fuel_gauge model list`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

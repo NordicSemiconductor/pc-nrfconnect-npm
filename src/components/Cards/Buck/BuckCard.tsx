@@ -67,7 +67,7 @@ export default ({
         item => ({
             label: item,
             value: item,
-        })
+        }),
     );
 
     const buckOnOffControlItems = [...BuckOnOffControlValues, ...gpioNames].map(
@@ -87,7 +87,7 @@ export default ({
                 label: i === 0 ? label : item,
                 value: item,
             };
-        }
+        },
     );
 
     const buckRetentionControlItems = [
@@ -143,7 +143,7 @@ export default ({
                             className={classNames(
                                 'show-more-toggle mdi',
                                 summary && 'mdi-chevron-down',
-                                !summary && 'mdi-chevron-up'
+                                !summary && 'mdi-chevron-up',
                             )}
                             role="button"
                             tabIndex={0}
@@ -232,7 +232,7 @@ export default ({
                         items={modeControlItems}
                         onSelect={item =>
                             buckModule.set.modeControl(
-                                item.value as BuckModeControl
+                                item.value as BuckModeControl,
                             )
                         }
                         selectedItem={
@@ -240,8 +240,8 @@ export default ({
                                 Math.max(
                                     0,
                                     modeControlItems.findIndex(
-                                        item => item.value === buck.modeControl
-                                    )
+                                        item => item.value === buck.modeControl,
+                                    ),
                                 ) ?? 0
                             ]
                         }
@@ -259,7 +259,7 @@ export default ({
                         items={buckOnOffControlItems}
                         onSelect={item =>
                             buckModule.set.onOffControl(
-                                item.value as BuckOnOffControl
+                                item.value as BuckOnOffControl,
                             )
                         }
                         selectedItem={
@@ -267,8 +267,9 @@ export default ({
                                 Math.max(
                                     0,
                                     buckOnOffControlItems.findIndex(
-                                        item => item.value === buck.onOffControl
-                                    )
+                                        item =>
+                                            item.value === buck.onOffControl,
+                                    ),
                                 ) ?? 0
                             ]
                         }
@@ -286,7 +287,7 @@ export default ({
                         items={buckRetentionControlItems}
                         onSelect={item =>
                             buckModule.set.retentionControl(
-                                item.value as BuckRetentionControl
+                                item.value as BuckRetentionControl,
                             )
                         }
                         selectedItem={
@@ -295,8 +296,9 @@ export default ({
                                     0,
                                     buckRetentionControlItems.findIndex(
                                         item =>
-                                            item.value === buck.retentionControl
-                                    )
+                                            item.value ===
+                                            buck.retentionControl,
+                                    ),
                                 ) ?? 0
                             ]
                         }

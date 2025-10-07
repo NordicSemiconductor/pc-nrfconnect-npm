@@ -17,12 +17,12 @@ import { npm1300LowPowerConfig, npm1300TimeToActive } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
 
     const npm1300TimeToActiveValues = Object.keys(npm1300TimeToActive).map(
-        key => npm1300TimeToActive[key as keyof typeof npm1300TimeToActive]
+        key => npm1300TimeToActive[key as keyof typeof npm1300TimeToActive],
     );
 
     if (shellParser) {
@@ -32,20 +32,20 @@ export default (
                     'npmx ship config time',
                     true,
                     undefined,
-                    toValueRegex(npm1300TimeToActiveValues)
+                    toValueRegex(npm1300TimeToActiveValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<npm1300LowPowerConfig>(
                         'onLowPowerUpdate',
                         {
                             timeToActive: parseColonBasedAnswer(
-                                res
+                                res,
                             ) as npm1300TimeToActive,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -54,8 +54,8 @@ export default (
                 () => {
                     eventEmitter.emit('onReboot', true);
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

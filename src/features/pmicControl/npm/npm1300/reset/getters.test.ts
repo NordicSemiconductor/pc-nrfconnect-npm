@@ -21,7 +21,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `powerup_ship longpress get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

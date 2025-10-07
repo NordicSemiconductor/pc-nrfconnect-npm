@@ -35,7 +35,7 @@ describe('PMIC 2100 - Setters Offline tests', () => {
             expect(mockOnFuelGaugeUpdate).toBeCalledWith({
                 enabled,
             });
-        }
+        },
     );
 
     test.each(PMIC_2100_LDOS)('Set setLdoVoltage index: %p', async index => {
@@ -117,7 +117,7 @@ describe('PMIC 2100 - Setters Offline tests', () => {
                 data: { openDrain: true },
                 index,
             });
-        }
+        },
     );
 
     test('Set setFuelGaugeEnabled', async () => {

@@ -21,7 +21,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `npmx ship config time get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -33,7 +33,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `npmx ship mode ship`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -45,7 +45,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `npmx ship mode hibernate`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

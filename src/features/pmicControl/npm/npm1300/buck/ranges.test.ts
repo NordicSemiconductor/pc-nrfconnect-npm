@@ -20,7 +20,7 @@ describe('PMIC 1300 - Static getters', () => {
             min: 1,
             max: 3.3,
             decimals: 1,
-        })
+        }),
     );
 
     test.each(PMIC_1300_BUCKS)('Buck RetVOut Range index: %p', index =>
@@ -28,7 +28,7 @@ describe('PMIC 1300 - Static getters', () => {
             min: 1,
             max: 3,
             decimals: 1,
-        })
+        }),
     );
 });
 

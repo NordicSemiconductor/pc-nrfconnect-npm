@@ -11,7 +11,7 @@ const timeString = (
     days: number,
     hours: number,
     minutes: number,
-    seconds?: number
+    seconds?: number,
 ) =>
     seconds !== undefined || days > 0 || hours > 0 || minutes > 0
         ? `${days === 1 ? `${days} day ` : ''}${
@@ -82,7 +82,7 @@ export default ({
         eta.current = 0;
     }
 
-    if (ready) progress === 100;
+    if (ready) progress = 100;
 
     if (progress > 0 && progress <= 100) {
         const newEta = (100 / progress) * time - time;
@@ -108,7 +108,7 @@ export default ({
                             ? `Remaining time: ${timeString(
                                   etaDays,
                                   etaHours,
-                                  Math.round(etaMinutes + etaSeconds / 60)
+                                  Math.round(etaMinutes + etaSeconds / 60),
                               )} (estimated)` // don't show seconds
                             : ''}
                         {progress >= 100 ? 'Remaining time: almost done' : ''}

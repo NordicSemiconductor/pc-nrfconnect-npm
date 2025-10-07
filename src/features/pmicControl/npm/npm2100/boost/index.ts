@@ -29,7 +29,7 @@ const voltageRange = () =>
         min: 1.8,
         max: 3.3,
         decimals: 1,
-    } as RangeType);
+    }) as RangeType;
 
 export default class Module implements BoostModule {
     private _get: BoostGet;
@@ -51,7 +51,7 @@ export default class Module implements BoostModule {
             sendCommand,
             dialogHandler,
             offlineMode,
-            this.ranges
+            this.ranges,
         );
         this._callbacks = boostCallbacks(shellParser, eventEmitter);
     }

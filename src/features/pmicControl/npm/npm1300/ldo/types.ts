@@ -15,5 +15,5 @@ export const SoftStartValues = Object.keys(SoftStart)
     .filter(key => !Number.isNaN(Number(key)))
     .map(Number);
 export const SoftStartKeys = Object.values(SoftStart).filter(key =>
-    Number.isNaN(Number(key))
+    Number.isNaN(Number(key)),
 );

@@ -306,7 +306,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...(charger ?? initCharger),
                     ...partialUpdate,
                 };
-            }
+            },
         );
 
         mockOnBoardLoadUpdate.mockImplementation(
@@ -315,7 +315,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...(onBoardLoad ?? initOnBoardLoad),
                     ...partialUpdate,
                 };
-            }
+            },
         );
 
         mockOnBuckUpdate.mockImplementation(
@@ -324,7 +324,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...(bucks[partialUpdate.index] ?? initBuck),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnLdoUpdate.mockImplementation(
@@ -333,7 +333,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...(ldos[partialUpdate.index] ?? initLdo),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnGpioUpdate.mockImplementation(
@@ -347,7 +347,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...(gpios[partialUpdate.index] ?? initGPIO),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnLEDUpdate.mockImplementation(
@@ -356,7 +356,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...(leds[partialUpdate.index] ?? initLed),
                     ...partialUpdate.data,
                 };
-            }
+            },
         );
 
         mockOnPOFUpdate.mockImplementation((partialUpdate: Partial<POF>) => {
@@ -372,7 +372,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...ship,
                     ...partialUpdate,
                 } as npm1300LowPowerConfig;
-            }
+            },
         );
 
         mockOnResetUpdate.mockImplementation(
@@ -381,7 +381,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...reset,
                     ...partialUpdate,
                 };
-            }
+            },
         );
 
         mockOnTimerConfigUpdate.mockImplementation(
@@ -390,7 +390,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...timerConfig,
                     ...partialUpdate,
                 } as npm1300TimerConfig;
-            }
+            },
         );
 
         mockOnUsbPower.mockImplementation(
@@ -399,7 +399,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                     ...usbPower,
                     ...partialUpdate,
                 };
-            }
+            },
         );
     });
 

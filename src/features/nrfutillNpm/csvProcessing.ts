@@ -32,7 +32,7 @@ import {
 
 const generateProfileName = (
     project: ProfilingProject,
-    profile: ProfilingProjectProfile
+    profile: ProfilingProjectProfile,
 ) =>
     `${project.name}_${project.capacity}mAh_T${
         profile.temperature < 0 ? 'n' : 'p'
@@ -47,7 +47,7 @@ export const startProcessingCsv =
 
         const progress =
             getState().app.profilingProjects.profilingCSVProgress.find(
-                p => p.path === profilingProjectPath && p.index === index
+                p => p.path === profilingProjectPath && p.index === index,
             );
 
         if (progress && !progress.errorLevel) {
@@ -64,7 +64,7 @@ export const startProcessingCsv =
 export const generateParamsFromCSV =
     (
         projectAbsolutePath: string,
-        index: number
+        index: number,
     ): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
         const project = readProjectSettingsFromFile(projectAbsolutePath);
@@ -82,7 +82,7 @@ export const generateParamsFromCSV =
 
         const csvPathAbsolute = path.resolve(
             projectAbsolutePath,
-            profile.csvPath
+            profile.csvPath,
         );
 
         if (!fs.existsSync(csvPathAbsolute)) {
@@ -93,7 +93,7 @@ export const generateParamsFromCSV =
 
         const newCSVFileName = `${generateProfileName(
             project.settings,
-            profile
+            profile,
         )}.csv`;
 
         const inputFile = path.join(tempFolder, newCSVFileName);
@@ -117,10 +117,10 @@ export const generateParamsFromCSV =
                         removeProjectProfileProgress({
                             path: projectAbsolutePath,
                             index,
-                        })
+                        }),
                     );
                 },
-            })
+            }),
         );
 
         try {
@@ -136,10 +136,10 @@ export const generateParamsFromCSV =
                             index,
                             message: progress.description,
                             progress: progress.stepProgressPercentage,
-                        })
+                        }),
                     );
                 },
-                cancelController
+                cancelController,
             );
 
             profile.paramsJson = undefined;
@@ -148,16 +148,16 @@ export const generateParamsFromCSV =
 
             const batteryModelJsonPath = path.join(
                 resultsFolder,
-                'battery_model.json'
+                'battery_model.json',
             );
             const batteryModelIncPath = path.join(
                 resultsFolder,
-                'battery_model.inc'
+                'battery_model.inc',
             );
 
             const paramsPath = path.join(
                 resultsFolder,
-                `${generateProfileName(project.settings, profile)}_params.json`
+                `${generateProfileName(project.settings, profile)}_params.json`,
             );
 
             if (
@@ -172,21 +172,21 @@ export const generateParamsFromCSV =
                     readAndUpdateProjectSettings(projectAbsolutePath, proj => {
                         proj.profiles[index].batteryJson = fs.readFileSync(
                             batteryModelJsonPath,
-                            'utf8'
+                            'utf8',
                         );
                         proj.profiles[index].batteryInc = fs.readFileSync(
                             batteryModelIncPath,
-                            'utf8'
+                            'utf8',
                         );
 
                         proj.profiles[index].batteryJson = fs.readFileSync(
                             batteryModelJsonPath,
-                            'utf8'
+                            'utf8',
                         );
 
                         proj.profiles[index].paramsJson = fs.readFileSync(
                             paramsPath,
-                            'utf8'
+                            'utf8',
                         );
 
                         proj.profiles[index].nrfUtilVersion = nrfUtilVersion;
@@ -195,11 +195,11 @@ export const generateParamsFromCSV =
                             removeProjectProfileProgress({
                                 path: projectAbsolutePath,
                                 index,
-                            })
+                            }),
                         );
 
                         return proj;
-                    })
+                    }),
                 );
             }
 
@@ -223,17 +223,17 @@ export const generateParamsFromCSV =
                             removeProjectProfileProgress({
                                 path: projectAbsolutePath,
                                 index,
-                            })
+                            }),
                         );
                     },
-                })
+                }),
             );
         }
     };
 
 export const mergeBatteryParams = async (
     project: ProfilingProject,
-    profiles: ProfilingProjectProfile[]
+    profiles: ProfilingProjectProfile[],
 ) => {
     if (profiles.length === 0) {
         throw new Error('Nothing to process');
@@ -259,14 +259,14 @@ export const mergeBatteryParams = async (
         .map(profile => {
             const paramsPath = path.join(
                 tempFolder,
-                `${generateProfileName(project, profile)}_params.json`
+                `${generateProfileName(project, profile)}_params.json`,
             );
             stringToFile(
                 path.join(
                     tempFolder,
-                    `${generateProfileName(project, profile)}_params.json`
+                    `${generateProfileName(project, profile)}_params.json`,
                 ),
-                profile.paramsJson as string
+                profile.paramsJson as string,
             );
 
             return paramsPath;
@@ -277,7 +277,7 @@ export const mergeBatteryParams = async (
         resultsFolder,
         project.vUpperCutOff,
         project.vLowerCutOff,
-        console.log
+        console.log,
     );
 
     const batteryModelJsonPath = path.join(resultsFolder, 'battery_model.json');

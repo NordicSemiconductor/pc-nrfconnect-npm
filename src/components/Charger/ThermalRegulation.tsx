@@ -117,7 +117,7 @@ export default ({
                             chargerModule.set.tChgStop(internalChipThermal[1]);
                         if (internalChipThermal[0] !== charger.tChgResume)
                             chargerModule.set.tChgResume(
-                                internalChipThermal[0]
+                                internalChipThermal[0],
                             );
                     }}
                     disabled={disabled}
@@ -135,7 +135,7 @@ export default ({
                     className={` tw-h-4 tw-w-4 tw-rounded-full tw-border tw-border-solid tw-border-gray-200 ${classNames(
                         pmicChargingState.dieTempHigh
                             ? 'tw-bg-red'
-                            : 'tw-bg-green'
+                            : 'tw-bg-green',
                     )}`}
                 />
             </div>

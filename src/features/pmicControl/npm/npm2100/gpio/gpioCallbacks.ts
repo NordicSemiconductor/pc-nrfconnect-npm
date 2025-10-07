@@ -34,7 +34,7 @@ import {
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    i: number
+    i: number,
 ) => {
     const cleanupCallbacks = [];
     if (shellParser) {
@@ -44,11 +44,11 @@ export default (
                     'npm2100 gpio mode',
                     true,
                     i,
-                    toValueRegex(GPIOModeValues)
+                    toValueRegex(GPIOModeValues),
                 ),
                 res => {
                     const valueIndex = GPIOModeValues.findIndex(
-                        v => v === parseColonBasedAnswer(res)
+                        v => v === parseColonBasedAnswer(res),
                     );
 
                     if (valueIndex !== -1) {
@@ -69,12 +69,12 @@ export default (
                                 openDrainEnabled: !isInput,
                                 pullEnabled: true,
                             },
-                            i
+                            i,
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -83,11 +83,11 @@ export default (
                     'npm2100 gpio state',
                     true,
                     i,
-                    toValueRegex(GPIOStateValues)
+                    toValueRegex(GPIOStateValues),
                 ),
                 res => {
                     const valueIndex = GPIOStateValues.findIndex(
-                        v => v === parseColonBasedAnswer(res)
+                        v => v === parseColonBasedAnswer(res),
                     );
 
                     if (valueIndex !== -1) {
@@ -102,12 +102,12 @@ export default (
                             {
                                 state,
                             },
-                            i
+                            i,
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -116,11 +116,11 @@ export default (
                     'npm2100 gpio pull',
                     true,
                     i,
-                    toValueRegex(GPIOPullValues)
+                    toValueRegex(GPIOPullValues),
                 ),
                 res => {
                     const valueIndex = GPIOPullValues.findIndex(
-                        v => v === parseColonBasedAnswer(res)
+                        v => v === parseColonBasedAnswer(res),
                     );
 
                     if (valueIndex !== -1) {
@@ -135,12 +135,12 @@ export default (
                             {
                                 pull,
                             },
-                            i
+                            i,
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -149,11 +149,11 @@ export default (
                     'npm2100 gpio drive',
                     true,
                     i,
-                    toValueRegex(GPIODriveValues)
+                    toValueRegex(GPIODriveValues),
                 ),
                 res => {
                     const valueIndex = GPIODriveValues.findIndex(
-                        v => v === parseColonBasedAnswer(res)
+                        v => v === parseColonBasedAnswer(res),
                     );
 
                     if (valueIndex !== -1) {
@@ -168,12 +168,12 @@ export default (
                             {
                                 drive,
                             },
-                            i
+                            i,
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -185,11 +185,11 @@ export default (
                         {
                             openDrain: parseOnOff(res),
                         },
-                        i
+                        i,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -201,11 +201,11 @@ export default (
                         {
                             debounce: parseOnOff(res),
                         },
-                        i
+                        i,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

@@ -51,14 +51,14 @@ describe('PMIC 2100 - Boosts callbacks', () => {
                 },
                 index: 0,
             });
-        }
+        },
     );
 
     test.each(
         BoostVOutSelValues.map(vOutSelect => [
             { append: `get 0`, vOutSelect },
             { append: `set ${vOutSelect}`, vOutSelect },
-        ]).flat()
+        ]).flat(),
     )('npm2100 boost voutsel: %p', ({ append, vOutSelect }) => {
         const command = `npm2100 boost voutsel ${append}`;
         const callback =
@@ -79,7 +79,7 @@ describe('PMIC 2100 - Boosts callbacks', () => {
         BoostModeControlValues.map(modeControl => [
             { append: `get 0`, modeControl },
             { append: `set ${modeControl}`, modeControl },
-        ]).flat()
+        ]).flat(),
     )('npm2100 boost mode (control): %p', ({ append, modeControl }) => {
         const command = `npm2100 boost mode ${append}`;
         const callback =
@@ -100,7 +100,7 @@ describe('PMIC 2100 - Boosts callbacks', () => {
         BoostPinSelectionValues.map(pinSelection => [
             { append: `get 0`, pinSelection },
             { append: `set ${pinSelection}`, pinSelection },
-        ]).flat()
+        ]).flat(),
     )('npm2100 boost pinsel: %p', ({ append, pinSelection }) => {
         const command = `npm2100 boost pinsel ${append}`;
         const callback =
@@ -122,7 +122,7 @@ describe('PMIC 2100 - Boosts callbacks', () => {
         BoostPinModeValues.map(pinMode => [
             { append: `get 0`, pinMode },
             { append: `set ${pinMode}`, pinMode },
-        ]).flat()
+        ]).flat(),
     )('npm2100 boost pinmode: %p', ({ append, pinMode }) => {
         const command = `npm2100 boost pinmode ${append}`;
         const callback =
@@ -143,7 +143,7 @@ describe('PMIC 2100 - Boosts callbacks', () => {
         BoostPinModeValues.map(pinMode => [
             { append: `get 0`, pinMode },
             { append: `set ${pinMode}`, pinMode },
-        ]).flat()
+        ]).flat(),
     )('npm2100 boost pinmode: %p', ({ append, pinMode }) => {
         const command = `npm2100 boost pinmode ${append}`;
         const callback =
@@ -166,7 +166,7 @@ describe('PMIC 2100 - Boosts callbacks', () => {
                 { append: `get 0`, enabled },
                 { append: `set ${enabled}`, enabled },
             ])
-            .flat()
+            .flat(),
     )('npm2100 boost ocp: %p', ({ append, enabled }) => {
         const command = `npm2100 boost ocp ${append}`;
         const callback =

@@ -16,7 +16,7 @@ import { OnBoardLoad } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
     if (shellParser) {
@@ -28,11 +28,11 @@ export default (
                         'onOnBoardLoadUpdate',
                         {
                             iLoad: parseToFloat(res),
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

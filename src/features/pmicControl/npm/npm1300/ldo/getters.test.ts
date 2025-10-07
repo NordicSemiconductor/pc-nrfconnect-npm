@@ -21,7 +21,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx ldsw ldo_voltage get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -33,7 +33,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx ldsw status get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -45,7 +45,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx ldsw mode get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -59,9 +59,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx ldsw soft_start enable get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1300_LDOS)(
@@ -74,9 +74,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx ldsw soft_start current get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1300_LDOS)(
@@ -89,9 +89,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx ldsw active_discharge get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1300_LDOS)(
@@ -104,9 +104,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx ldsw gpio index get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 });
 

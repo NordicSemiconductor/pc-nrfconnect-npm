@@ -30,7 +30,7 @@ import {
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
     if (shellParser) {
@@ -44,11 +44,11 @@ export default (
                         {
                             vOutVSet: value / 1000, // mV to V
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -61,11 +61,11 @@ export default (
                         {
                             vOutSoftware: value / 1000, // mV to V
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -74,21 +74,21 @@ export default (
                     'npm2100 boost voutsel',
                     true,
                     undefined,
-                    toValueRegex(BoostVOutSelValues)
+                    toValueRegex(BoostVOutSelValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
                         {
                             vOutSelect: parseColonBasedAnswer(
-                                res
+                                res,
                             ) as BoostVOutSel,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -97,21 +97,21 @@ export default (
                     'npm2100 boost mode',
                     true,
                     undefined,
-                    toValueRegex(BoostModeControlValues)
+                    toValueRegex(BoostModeControlValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Boost>(
                         'onBoostUpdate',
                         {
                             modeControl: parseColonBasedAnswer(
-                                res
+                                res,
                             ) as BoostModeControl,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -120,11 +120,11 @@ export default (
                     'npm2100 boost pinsel',
                     true,
                     undefined,
-                    toValueRegex(BoostPinSelectionValues)
+                    toValueRegex(BoostPinSelectionValues),
                 ),
                 res => {
                     const pinSelection = parseColonBasedAnswer(
-                        res
+                        res,
                     ) as BoostPinSelection;
                     const pinModeEnabled = pinSelection !== 'OFF';
                     eventEmitter.emitPartialEvent<Boost>(
@@ -133,11 +133,11 @@ export default (
                             pinSelection,
                             pinModeEnabled,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -146,7 +146,7 @@ export default (
                     'npm2100 boost pinmode',
                     true,
                     undefined,
-                    toValueRegex(BoostPinModeValues)
+                    toValueRegex(BoostPinModeValues),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Boost>(
@@ -154,11 +154,11 @@ export default (
                         {
                             pinMode: parseColonBasedAnswer(res) as BoostPinMode,
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -170,11 +170,11 @@ export default (
                         {
                             overCurrentProtection: parseOnOff(res),
                         },
-                        0
+                        0,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

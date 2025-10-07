@@ -83,7 +83,7 @@ describe('PMIC 2100 - Boost Setters Offline tests', () => {
                 data: { pinSelection, pinModeEnabled: pinSelection !== 'OFF' },
                 index: 0,
             });
-        }
+        },
     );
 
     test.each(BoostPinModeValues)('Set pinMode', async pinMode => {

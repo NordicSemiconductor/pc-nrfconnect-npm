@@ -49,8 +49,8 @@ export default ({ npmDevice, leds, disabled }: GPIOProperties) => (
                         Math.max(
                             0,
                             ledModeValuesItems.findIndex(
-                                item => item.value === led.mode
-                            )
+                                item => item.value === led.mode,
+                            ),
                         ) ?? 0
                     ]
                 }

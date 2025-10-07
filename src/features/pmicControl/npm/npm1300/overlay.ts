@@ -78,7 +78,7 @@ ${deviceType}_ek_charger: charger {
 const generateBuck = (
     buck: BuckExport,
     buckModule: BuckModule,
-    deviceType: string
+    deviceType: string,
 ) => `
 ${deviceType}_ek_buck${buckModule.index + 1}: BUCK${buckModule.index + 1} {
     regulator-min-microvolt = <${toMicro(buckModule.ranges.voltage.min)}>;
@@ -92,21 +92,21 @@ ${deviceType}_ek_buck${buckModule.index + 1}: BUCK${buckModule.index + 1} {
     ${
         buck.onOffControl !== 'Off'
             ? `enable-gpios = <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
-                  v => v === buck.onOffControl
+                  v => v === buck.onOffControl,
               )} GPIO_ACTIVE_HIGH>;`
             : ''
     }
     ${
         buck.retentionControl !== 'Off'
             ? `retention-gpios = <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
-                  v => v === buck.retentionControl
+                  v => v === buck.retentionControl,
               )} GPIO_ACTIVE_HIGH>;`
             : ''
     }
     ${
         buck.modeControl.startsWith('GPIO')
             ? `pwm-gpios= <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
-                  v => v === buck.modeControl
+                  v => v === buck.modeControl,
               )} GPIO_ACTIVE_HIGH>;`
             : ''
     }
@@ -127,7 +127,7 @@ ${deviceType}_ek_buck${buckModule.index + 1}: BUCK${buckModule.index + 1} {
 const generateLDO = (
     ldo: LdoExport,
     ldoModule: LdoModule,
-    deviceType: string
+    deviceType: string,
 ) => `
 ${deviceType}_ek_ldo${ldoModule.index + 1}: LDO${ldoModule.index + 1} {
     regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;
@@ -143,7 +143,7 @@ ${deviceType}_ek_ldo${ldoModule.index + 1}: LDO${ldoModule.index + 1} {
     ${
         ldo.onOffControl !== 'SW'
             ? `enable-gpios = <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
-                  v => v === ldo.onOffControl
+                  v => v === ldo.onOffControl,
               )} GPIO_ACTIVE_HIGH>;`
             : ''
     }
@@ -157,7 +157,7 @@ ${deviceType}_ek_leds: leds {
     ${leds
         .map(
             (led, index) =>
-                `nordic,led${index}-mode = "${ledModeToOverlay(led.mode)}";`
+                `nordic,led${index}-mode = "${ledModeToOverlay(led.mode)}";`,
         )
         .join('    \n')}
 };
@@ -210,8 +210,8 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
                        generateBuck(
                            buck,
                            npmDevice.buckModule[index],
-                           npmDevice.deviceType
-                       )
+                           npmDevice.deviceType,
+                       ),
                    )
                    .join('\n\n')
            }
@@ -221,8 +221,8 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
                     generateLDO(
                         ldos,
                         npmDevice.ldoModule[index],
-                        npmDevice.deviceType
-                    )
+                        npmDevice.deviceType,
+                    ),
                 )
                 .join('\n\n')}
        };

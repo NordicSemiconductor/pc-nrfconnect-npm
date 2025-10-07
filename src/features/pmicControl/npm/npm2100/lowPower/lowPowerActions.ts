@@ -7,14 +7,13 @@
 import { PmicDialog } from '../../types';
 
 export class LowPowerActions {
-    // eslint-disable-next-line no-useless-constructor
     constructor(
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private dialogHandler: ((pmicDialog: PmicDialog) => void) | null
+        private dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
     ) {}
 
     enterShipMode() {
@@ -26,7 +25,7 @@ export class LowPowerActions {
 
     enterHibernatePtMode() {
         this.sendCommand(
-            `npm2100 low_power_control hibernate_pt_mode set ENABLE`
+            `npm2100 low_power_control hibernate_pt_mode set ENABLE`,
         );
     }
 
@@ -37,16 +36,16 @@ export class LowPowerActions {
                 () => {
                     const action = () => {
                         this.sendCommand(
-                            'npm2100 low_power_control ship_mode_configure resistor set NONE'
+                            'npm2100 low_power_control ship_mode_configure resistor set NONE',
                         );
                         this.sendCommand(
-                            'npm2100 low_power_control wakeup_configure edge_polarity set RISING'
+                            'npm2100 low_power_control wakeup_configure edge_polarity set RISING',
                         );
                         this.sendCommand(
-                            'npm2100 low_power_control ship_mode_configure current set LOW'
+                            'npm2100 low_power_control ship_mode_configure current set LOW',
                         );
                         this.sendCommand(
-                            'npm2100 low_power_control ship_mode set ENABLE'
+                            'npm2100 low_power_control ship_mode set ENABLE',
                         );
                     };
 
@@ -65,7 +64,7 @@ export class LowPowerActions {
                                 this.sendCommand(
                                     'npm2100 low_power_control pwr_btn set ON',
                                     () => resolve(),
-                                    reject
+                                    reject,
                                 );
                             },
                         });
@@ -75,9 +74,9 @@ export class LowPowerActions {
                 },
                 () => {
                     this.sendCommand(
-                        'npm2100 low_power_control pwr_btn set ON'
+                        'npm2100 low_power_control pwr_btn set ON',
                     );
-                }
+                },
             );
         });
     }

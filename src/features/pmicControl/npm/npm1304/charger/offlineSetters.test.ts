@@ -30,7 +30,7 @@ describe('PMIC 1304 - Setters Offline tests', () => {
 
     test('Set setChargerVTrickleFast ', async () => {
         await pmic.chargerModule?.set.vTrickleFast(2.5);
-        7;
+
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({ vTrickleFast: 2.5 });
     });

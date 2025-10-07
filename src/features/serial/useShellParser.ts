@@ -35,7 +35,7 @@ export default () => {
                 const shellParser = await ShellParser(
                     serialPort,
                     xTerminalShellParserWrapper(
-                        new Terminal({ allowProposedApi: true, cols: 999 })
+                        new Terminal({ allowProposedApi: true, cols: 999 }),
                     ),
                     {
                         shellPromptUart: 'shell:~$ ',
@@ -44,13 +44,13 @@ export default () => {
                         errorRegex: /Error: /,
                         timeout: 5000,
                         columnWidth: 80,
-                    }
+                    },
                 );
 
                 const releaseOnUnknownCommand = shellParser.onUnknownCommand(
                     data => {
                         console.warn(`Unknown Command:\r\n${data}`);
-                    }
+                    },
                 );
 
                 const onClosedRelease = serialPort.onClosed(() => {
@@ -75,6 +75,6 @@ export default () => {
             shellParserO?.onPausedChange(state => {
                 dispatch(setIsPaused(state));
             }) ?? noop,
-        [dispatch, shellParserO]
+        [dispatch, shellParserO],
     );
 };

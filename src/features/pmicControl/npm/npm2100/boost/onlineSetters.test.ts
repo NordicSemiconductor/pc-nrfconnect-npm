@@ -23,7 +23,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -36,14 +36,14 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost voutsel set Software`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
                 `npm2100 boost vout SOFTWARE set 2700`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -59,7 +59,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost voutsel set ${vSelect}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             if (vSelect === 'Software') {
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -67,7 +67,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost vout SOFTWARE get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
             } else {
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -75,7 +75,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost vout VSET get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
             }
 
@@ -95,21 +95,21 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                         `npm2100 boost voutsel set Software`,
                         expect.anything(),
                         undefined,
-                        true
+                        true,
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         2,
                         `npm2100 boost vout SOFTWARE set 1800`,
                         expect.anything(),
                         undefined,
-                        true
+                        true,
                     );
                     expect(mockEnqueueRequest).nthCalledWith(
                         3,
                         `npm2100 boost mode set ${modeControl}`,
                         expect.anything(),
                         undefined,
-                        true
+                        true,
                     );
 
                     // Updates should only be emitted when we get response
@@ -120,13 +120,13 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                         `npm2100 boost mode set ${modeControl}`,
                         expect.anything(),
                         undefined,
-                        true
+                        true,
                     );
 
                     // Updates should only be emitted when we get response
                     expect(mockOnBoostUpdate).toBeCalledTimes(0);
                 }
-            }
+            },
         );
 
         test.each(BoostPinSelectionValues)(
@@ -139,12 +139,12 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost pinsel set ${pinSelect}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBoostUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(BoostPinModeValues)('Set pinMode: %p', async pinMode => {
@@ -155,7 +155,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost pinmode set ${pinMode}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -170,7 +170,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost ocp set ${enabled ? 'ON' : 'OFF'}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -183,13 +183,13 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
         test('Set vOut - Fail immediately', async () => {
             await expect(
-                pmic.boostModule[0].set.vOut(2.7)
+                pmic.boostModule[0].set.vOut(2.7),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -197,7 +197,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost voutsel set Software`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -206,7 +206,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost voutsel get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -223,11 +223,11 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     (_command: string, callback?: ShellParserCallbacks) => {
                         callback?.onError('Error: Error case', command);
                         return Promise.resolve();
-                    }
+                    },
                 );
 
             await expect(
-                pmic.boostModule[0].set.vOut(value)
+                pmic.boostModule[0].set.vOut(value),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);
@@ -235,7 +235,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost voutsel set Software`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // set the vout as needed
@@ -244,7 +244,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost vout SOFTWARE set 2700`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -253,7 +253,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost vout SOFTWARE get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -264,7 +264,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
             'Set vOutSel - Fail immediately',
             async vSelect => {
                 await expect(
-                    pmic.boostModule[0].set.vOutSel(vSelect)
+                    pmic.boostModule[0].set.vOutSel(vSelect),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -272,7 +272,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost voutsel set ${vSelect}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -281,19 +281,19 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost voutsel get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBoostUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(BoostModeControlValues)(
             'Set modeControl - Fail immediately',
             async modeControl => {
                 await expect(
-                    pmic.boostModule[0].set.modeControl(modeControl)
+                    pmic.boostModule[0].set.modeControl(modeControl),
                 ).rejects.toBeUndefined();
 
                 if (modeControl === 'PASS') {
@@ -302,7 +302,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                         `npm2100 boost voutsel set Software`,
                         expect.anything(),
                         undefined,
-                        true
+                        true,
                     );
 
                     // Refresh data due to error
@@ -311,7 +311,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                         `npm2100 boost voutsel get`,
                         expect.anything(),
                         undefined,
-                        true
+                        true,
                     );
                 } else {
                     expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -319,7 +319,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                         `npm2100 boost mode set ${modeControl}`,
                         expect.anything(),
                         undefined,
-                        true
+                        true,
                     );
 
                     // Refresh data due to error
@@ -328,13 +328,13 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                         `npm2100 boost mode get`,
                         expect.anything(),
                         undefined,
-                        true
+                        true,
                     );
                 }
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBoostUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set modeControl - Fail on 2nd Call', async () => {
@@ -347,11 +347,11 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     (_command: string, callback?: ShellParserCallbacks) => {
                         callback?.onError('Error: Error case', command);
                         return Promise.resolve();
-                    }
+                    },
                 );
 
             await expect(
-                pmic.boostModule[0].set.modeControl(modeControl)
+                pmic.boostModule[0].set.modeControl(modeControl),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);
@@ -359,7 +359,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost voutsel set Software`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             expect(mockEnqueueRequest).nthCalledWith(
@@ -367,7 +367,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost vout SOFTWARE set 1800`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -376,7 +376,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost vout SOFTWARE get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -394,11 +394,11 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     (_command: string, callback?: ShellParserCallbacks) => {
                         callback?.onError('Error: Error case', command);
                         return Promise.resolve();
-                    }
+                    },
                 );
 
             await expect(
-                pmic.boostModule[0].set.modeControl(modeControl)
+                pmic.boostModule[0].set.modeControl(modeControl),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(4);
@@ -406,7 +406,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost voutsel set Software`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             expect(mockEnqueueRequest).nthCalledWith(
@@ -414,7 +414,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost vout SOFTWARE set 1800`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             expect(mockEnqueueRequest).nthCalledWith(
@@ -422,7 +422,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost mode set PASS`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -431,7 +431,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                 `npm2100 boost mode get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -442,7 +442,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
             'Set pinSelection - Fail immediately',
             async pinSelection => {
                 await expect(
-                    pmic.boostModule[0].set.pinSelection(pinSelection)
+                    pmic.boostModule[0].set.pinSelection(pinSelection),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -450,7 +450,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost pinsel set ${pinSelection}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -459,19 +459,19 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost pinsel get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBoostUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each(BoostPinModeValues)(
             'Set pinSelection - Fail immediately',
             async pinMode => {
                 await expect(
-                    pmic.boostModule[0].set.pinMode(pinMode)
+                    pmic.boostModule[0].set.pinMode(pinMode),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -479,7 +479,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost pinmode set ${pinMode}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -488,19 +488,19 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost pinmode get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBoostUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each([true, false])(
             'Set overCurrent - Fail immediately',
             async overCurrent => {
                 await expect(
-                    pmic.boostModule[0].set.overCurrent(overCurrent)
+                    pmic.boostModule[0].set.overCurrent(overCurrent),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -508,7 +508,7 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost ocp set ${overCurrent ? 'ON' : 'OFF'}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -517,12 +517,12 @@ describe('PMIC 2100 - Boost Setters Online tests', () => {
                     `npm2100 boost ocp get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnBoostUpdate).toBeCalledTimes(0);
-            }
+            },
         );
     });
 });

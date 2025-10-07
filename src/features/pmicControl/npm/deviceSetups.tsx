@@ -94,7 +94,7 @@ const getNpmDeviceObject = async (comName: string) => {
             path: comName,
             baudRate: 115200,
         },
-        { overwrite: true, settingsLocked: true }
+        { overwrite: true, settingsLocked: true },
     );
 
     const shellParserO = await shellParser(
@@ -103,7 +103,7 @@ const getNpmDeviceObject = async (comName: string) => {
             new Terminal({
                 allowProposedApi: true,
                 cols: 999,
-            })
+            }),
         ),
         {
             shellPromptUart: 'shell:~$ ',
@@ -112,7 +112,7 @@ const getNpmDeviceObject = async (comName: string) => {
             errorRegex: /Error: /,
             timeout: 5000,
             columnWidth: 80,
-        }
+        },
     );
 
     try {
@@ -152,7 +152,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 programmedDevice.traits.mcuBoot === true &&
                                 programmedDevice.traits.serialPorts === true &&
                                 isNpm1300SerialApplicationMode(
-                                    programmedDevice
+                                    programmedDevice,
                                 ),
                             once: true,
                             onSuccess: dev => {
@@ -160,18 +160,18 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 resolve(dev);
                             },
                             onFail: reject,
-                        })
+                        }),
                     );
                     NrfutilDeviceLib.program(device, firmware.hex, progress => {
                         onProgress(
                             progress.stepProgressPercentage,
-                            progress.message
+                            progress.message,
                         );
                     })
                         .then(() => {
                             onProgress(
                                 100,
-                                'Programming upload complete. Waiting for device to apply firmware and restart. This can take a minute.'
+                                'Programming upload complete. Waiting for device to apply firmware and restart. This can take a minute.',
                             );
                         })
                         .catch(err => {
@@ -185,7 +185,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
     ],
     isExpectedFirmware:
         (
-            device: Device
+            device: Device,
         ): AppThunk<
             RootState,
             Promise<{
@@ -206,7 +206,7 @@ export const npm1300DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
             }
 
             const { npmDevice, dispose } = await getNpmDeviceObject(
-                device.serialPorts[0].comName
+                device.serialPorts[0].comName,
             );
 
             try {
@@ -288,7 +288,7 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 programmedDevice.traits.mcuBoot === true &&
                                 programmedDevice.traits.serialPorts === true &&
                                 isNpm1304SerialApplicationMode(
-                                    programmedDevice
+                                    programmedDevice,
                                 ),
                             once: true,
                             onSuccess: dev => {
@@ -296,18 +296,18 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 resolve(dev);
                             },
                             onFail: reject,
-                        })
+                        }),
                     );
                     NrfutilDeviceLib.program(device, firmware.hex, progress => {
                         onProgress(
                             progress.stepProgressPercentage,
-                            progress.message
+                            progress.message,
                         );
                     })
                         .then(() => {
                             onProgress(
                                 100,
-                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.'
+                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.',
                             );
                         })
                         .catch(err => {
@@ -321,7 +321,7 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
     ],
     isExpectedFirmware:
         (
-            device: Device
+            device: Device,
         ): AppThunk<
             RootState,
             Promise<{
@@ -342,7 +342,7 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
             }
 
             const { npmDevice, dispose } = await getNpmDeviceObject(
-                device.serialPorts[0].comName
+                device.serialPorts[0].comName,
             );
 
             try {
@@ -420,7 +420,7 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 programmedDevice.traits.mcuBoot === true &&
                                 programmedDevice.traits.serialPorts === true &&
                                 isNpm2100SerialApplicationMode(
-                                    programmedDevice
+                                    programmedDevice,
                                 ),
                             once: true,
                             onSuccess: async dev => {
@@ -431,13 +431,13 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                     )
                                 ) {
                                     throw new Error(
-                                        'device does not have a serial port'
+                                        'device does not have a serial port',
                                     );
                                 }
 
                                 const { npmDevice, dispose } =
                                     await getNpmDeviceObject(
-                                        dev.serialPorts[0].comName
+                                        dev.serialPorts[0].comName,
                                     );
 
                                 const hwVersion =
@@ -450,7 +450,7 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                     (hwVersion.version &&
                                         semver.lt(
                                             hwVersion.version,
-                                            minimumHWVersionNpm2100
+                                            minimumHWVersionNpm2100,
                                         ))
                                 ) {
                                     await new Promise<void>(r => {
@@ -460,11 +460,11 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                                     r();
                                                     reject(
                                                         new Error(
-                                                            'Hardware is too old.'
-                                                        )
+                                                            'Hardware is too old.',
+                                                        ),
                                                     );
-                                                })
-                                            )
+                                                }),
+                                            ),
                                         );
                                     });
 
@@ -475,18 +475,18 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                                 resolve(dev);
                             },
                             onFail: reject,
-                        })
+                        }),
                     );
                     NrfutilDeviceLib.program(device, firmware.hex, progress => {
                         onProgress(
                             progress.stepProgressPercentage,
-                            progress.message
+                            progress.message,
                         );
                     })
                         .then(() => {
                             onProgress(
                                 100,
-                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.'
+                                'Programming upload complete. Waiting for device to apply firmware and reboot. This will take around a minute.',
                             );
                         })
                         .catch(err => {
@@ -500,7 +500,7 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
     ],
     isExpectedFirmware:
         (
-            device: Device
+            device: Device,
         ): AppThunk<
             RootState,
             Promise<{
@@ -521,7 +521,7 @@ export const npm2100DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
             }
 
             const { npmDevice, dispose } = await getNpmDeviceObject(
-                device.serialPorts[0].comName
+                device.serialPorts[0].comName,
             );
 
             try {

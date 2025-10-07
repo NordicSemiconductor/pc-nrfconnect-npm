@@ -28,10 +28,10 @@ export default ({
     onClose: () => void;
 }) => {
     const [temperature, setTemperature] = useState<number>(
-        profile?.temperature ?? 25
+        profile?.temperature ?? 25,
     );
     const [csvPath, setCsvPath] = useState<string | undefined>(
-        profile?.csvPath
+        profile?.csvPath,
     );
 
     const dispatch = useDispatch();
@@ -86,8 +86,8 @@ export default ({
                                             });
                                         }
                                         return project;
-                                    }
-                                )
+                                    },
+                                ),
                             );
                             onClose();
                         }}
@@ -138,7 +138,7 @@ export default ({
                                 if (!result.canceled && result.filePaths[0]) {
                                     const newPath = path.relative(
                                         projectSettingsPath,
-                                        result.filePaths[0]
+                                        result.filePaths[0],
                                     );
                                     setCsvPath(newPath);
                                 }

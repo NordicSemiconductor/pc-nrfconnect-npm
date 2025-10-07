@@ -43,7 +43,7 @@ export const isModuleDataPair = (module: string) =>
 
 export const parseLogData = (
     logMessage: string,
-    callback: (loggingEvent: LoggingEvent) => void
+    callback: (loggingEvent: LoggingEvent) => void,
 ) => {
     const endOfTimestamp = logMessage.indexOf(']');
 
@@ -53,11 +53,11 @@ export const parseLogData = (
 
     const logLevel = logMessage.substring(
         logMessage.indexOf('<') + 1,
-        endOfLogLevel
+        endOfLogLevel,
     );
     const module = logMessage.substring(
         endOfLogLevel + 2,
-        logMessage.indexOf(':', endOfLogLevel)
+        logMessage.indexOf(':', endOfLogLevel),
     );
     const message = logMessage
         .substring(logMessage.indexOf(':', endOfLogLevel) + 2)
@@ -98,11 +98,11 @@ export const parseOnOff = (message: string): boolean =>
 // (search for 'ldo' in ['LDO','Load_switch] and find 'LDO')
 export const selectFromTypeValues = (
     value: string,
-    typeValues: readonly string[]
+    typeValues: readonly string[],
 ): string | undefined => {
     const lowerCaseValue = value.toLowerCase();
     return typeValues.find(
-        typeValue => typeValue.toLowerCase() === lowerCaseValue
+        typeValue => typeValue.toLowerCase() === lowerCaseValue,
     );
 };
 
@@ -113,7 +113,7 @@ export const parseBatteryModel = (message: string) => {
     if (slot) {
         slotIndex = Number.parseInt(
             message.split(':')[0].replace('Slot ', ''),
-            10
+            10,
         );
         message = slot;
     }
@@ -178,7 +178,7 @@ export const toRegex = (
     command: string,
     getSet?: boolean,
     index?: number,
-    valueRegex: string | RegExp = '[0-9]+'
+    valueRegex: string | RegExp = '[0-9]+',
 ) => {
     const indexRegex = index !== undefined ? ` ${index}` : '';
     if (getSet)
@@ -203,7 +203,7 @@ export const caseIgnorantRegexString = (str: string): string =>
         .map(chr =>
             chr.match(/[a-zA-Z]/)
                 ? `[${chr.toLowerCase()}${chr.toUpperCase()}]`
-                : chr
+                : chr,
         )
         .join('');
 
@@ -212,12 +212,12 @@ export const onOffRegex = '([Oo][Nn]|[Oo][Ff][Ff])';
 export const dialogHandler =
     (pmicDialog: PmicDialog): AppThunk =>
     dispatch => {
-        if (!pmicDialog.uuid) pmicDialog.uuid === uuid();
+        if (!pmicDialog.uuid) pmicDialog.uuid = uuid();
 
         if (
             pmicDialog.doNotAskAgainStoreID !== undefined &&
             getPersistentStore().get(
-                `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`
+                `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`,
             )?.doNotShowAgain === true
         ) {
             pmicDialog.onConfirm();
@@ -244,7 +244,7 @@ export const dialogHandler =
                 }
                 getPersistentStore().set(
                     `pmicDialogs:${pmicDialog.doNotAskAgainStoreID}`,
-                    { doNotShowAgain: true }
+                    { doNotShowAgain: true },
                 );
             };
         }
@@ -281,8 +281,8 @@ export const updateNpm1300AdcTimings =
             reportInterval ??
                 getState().app.pmicControl.fuelGaugeSettings.reportingRate,
             getState().app.pmicControl.charger?.enabled
-                ? chargingSamplingRate ?? stateChargingSamplingRate
-                : samplingRate ?? stateNotChargingSamplingRate
+                ? (chargingSamplingRate ?? stateChargingSamplingRate)
+                : (samplingRate ?? stateNotChargingSamplingRate),
         );
     };
 
@@ -323,7 +323,7 @@ export class NpmEventEmitter extends EventEmitter {
                       index,
                       data,
                   } as PartialUpdate<T>)
-                : data
+                : data,
         );
     }
 }
@@ -331,7 +331,7 @@ export class NpmEventEmitter extends EventEmitter {
 export const SupportsErrorLogs = (npmDevice: BaseNpmDevice): boolean =>
     npmDevice.supportedErrorLogs !== undefined &&
     Object.keys(npmDevice.supportedErrorLogs).some(
-        k => npmDevice.supportedErrorLogs?.[k as keyof SupportedErrorLogs]
+        k => npmDevice.supportedErrorLogs?.[k as keyof SupportedErrorLogs],
     );
 
 export const parseHwVersion = (hwVersion: string) => {
@@ -348,7 +348,7 @@ export const parseHwVersion = (hwVersion: string) => {
             ...res,
             [label]: checkAndReplace(label),
         }),
-        {}
+        {},
     ) as {
         hw_version: string;
         pca?: string;

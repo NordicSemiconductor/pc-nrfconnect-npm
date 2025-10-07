@@ -49,7 +49,7 @@ export const useProfilingProjects = () => {
                             prog.cancel();
                         });
                     },
-                })
+                }),
             );
             return () => {
                 dispatch(clearConfirmBeforeClose('NRF_UTIL_PROCESSING'));
@@ -66,12 +66,12 @@ export const useProfilingProjects = () => {
             setProfilingProjects(
                 recentProjects.map(recentProject => ({
                     ...readProjectSettingsFromFile(recentProject),
-                }))
-            )
+                })),
+            ),
         );
 
         recentProjects.forEach(recentProject =>
-            dispatch(readAndUpdateProjectSettings(recentProject))
+            dispatch(readAndUpdateProjectSettings(recentProject)),
         );
     }, [dispatch, recentProjects, npmDevice]);
 };

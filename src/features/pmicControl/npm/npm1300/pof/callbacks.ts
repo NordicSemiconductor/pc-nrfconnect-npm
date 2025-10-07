@@ -17,7 +17,7 @@ import { POF, POFPolarityValues } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
 
@@ -30,8 +30,8 @@ export default (
                         enable: parseToBoolean(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -42,8 +42,8 @@ export default (
                         polarity: POFPolarityValues[parseToNumber(res)],
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -54,8 +54,8 @@ export default (
                         threshold: parseToNumber(res) / 1000, // mV to V
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
     return cleanupCallbacks;

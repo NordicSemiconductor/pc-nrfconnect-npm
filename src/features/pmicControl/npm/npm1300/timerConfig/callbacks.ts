@@ -16,7 +16,7 @@ import { TimerConfig, TimerPrescalerValues } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
 
@@ -31,11 +31,11 @@ export default (
                         'onTimerConfigUpdate',
                         {
                             mode: value,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -44,18 +44,18 @@ export default (
                     'npmx timer config prescaler',
                     true,
                     undefined,
-                    '[0-1]'
+                    '[0-1]',
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<TimerConfig>(
                         'onTimerConfigUpdate',
                         {
                             prescaler: TimerPrescalerValues[parseToNumber(res)],
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -66,11 +66,11 @@ export default (
                         'onTimerConfigUpdate',
                         {
                             period: parseToNumber(res),
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

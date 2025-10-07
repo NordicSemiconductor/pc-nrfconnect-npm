@@ -16,9 +16,9 @@ export class UsbCurrentLimiterSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new UsbCurrentLimiterGet(sendCommand);
     }
@@ -43,7 +43,7 @@ export class UsbCurrentLimiterSet {
                     () => {
                         this.get.vBusInCurrentLimiter();
                         reject();
-                    }
+                    },
                 );
             }
         });

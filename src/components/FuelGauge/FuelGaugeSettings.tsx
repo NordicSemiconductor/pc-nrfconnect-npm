@@ -48,13 +48,13 @@ export default ({ disabled }: { disabled: boolean }) => {
 
     const getClosest = (
         batteryModel: BatteryModel | undefined,
-        temperature: number
+        temperature: number,
     ) =>
         batteryModel?.characterizations.reduce((prev, curr) =>
             Math.abs(curr.temperature ?? 0 - temperature) <
             Math.abs(prev.temperature ?? 0 - temperature)
                 ? curr
-                : prev
+                : prev,
         ) ?? undefined;
 
     const batteryModelItems: DropdownItem[] = useMemo(() => {
@@ -76,17 +76,17 @@ export default ({ disabled }: { disabled: boolean }) => {
     const selectedActiveItemBatteryMode = useMemo(
         () =>
             batteryModelItems.find(
-                item => item.value === activeBatteryModel?.name
+                item => item.value === activeBatteryModel?.name,
             ) ?? {
                 label: 'N/A',
                 value: '',
             },
-        [activeBatteryModel, batteryModelItems]
+        [activeBatteryModel, batteryModelItems],
     );
 
     const bundledBatteries = useMemo(
         () => getBundledBatteries(npmDevice?.deviceType ?? 'npm1300'),
-        [npmDevice]
+        [npmDevice],
     );
 
     const brandsItems: DropdownItem<string>[] = [
@@ -105,13 +105,13 @@ export default ({ disabled }: { disabled: boolean }) => {
     ];
 
     const [selectedBrandsItem, setSelectedBrandsItem] = useState(
-        brandsItems[0]
+        brandsItems[0],
     );
 
     const brandsBatteryItems: DropdownItem<string>[] = useMemo(() => {
         const getModelBatteryList = () => {
             const model = bundledBatteries.find(
-                batt => batt.brandName === selectedBrandsItem.value
+                batt => batt.brandName === selectedBrandsItem.value,
             );
             return (
                 model?.fileNames
@@ -156,7 +156,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                 items={batteryModelItems}
                 onSelect={(item: DropdownItem) => {
                     npmDevice?.fuelGaugeModule?.set.activeBatteryModel(
-                        item.value
+                        item.value,
                     );
                 }}
                 selectedItem={selectedActiveItemBatteryMode}
@@ -181,7 +181,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                                     showDialog({
                                         buffer: result.buffer,
                                         name: path.parse(result.filePath).name,
-                                    })
+                                    }),
                                 );
                             })
                             .catch(res => {
@@ -207,7 +207,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                                         title: 'Write',
                                         onConfirm: () => {},
                                         onCancel: () => {},
-                                    })
+                                    }),
                                 );
                             })
                             .finally(() => {
@@ -228,7 +228,7 @@ export default ({ disabled }: { disabled: boolean }) => {
                             showDialog({
                                 buffer,
                                 name: path.parse(item.value).name,
-                            })
+                            }),
                         );
                     });
                 }}

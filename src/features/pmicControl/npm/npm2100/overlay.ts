@@ -77,7 +77,7 @@ const generateBoostRegulatorInitialModeProperty = (boost: BoostExport) => {
 
 const generateModeGpiosProperty = (
     pinSelection: BoostPinSelection,
-    gpios: GPIOExport[]
+    gpios: GPIOExport[],
 ) => {
     if (pinSelection === 'OFF') {
         return '';
@@ -99,20 +99,20 @@ const generateModeGpiosProperty = (
 const generateBoost = (
     boost: BoostExport,
     boostModule: BoostModule,
-    gpios: GPIOExport[]
+    gpios: GPIOExport[],
 ) => `npm2100_boost: BOOST {
                 regulator-always-on;
                 regulator-min-microvolt = <${toMicro(
-                    boostModule.ranges.voltage.min
+                    boostModule.ranges.voltage.min,
                 )}>;
                 regulator-max-microvolt = <${toMicro(
-                    boostModule.ranges.voltage.max
+                    boostModule.ranges.voltage.max,
                 )}>;
 
                 ${
                     boost.vOutSelect === 'Software'
                         ? `regulator-init-microvolt = <${toMicro(
-                              boost.vOutSoftware
+                              boost.vOutSoftware,
                           )}>;`
                         : ''
                 }
@@ -177,21 +177,21 @@ const generateLDORegulatorInitialModeProperty = (ldo: LdoExport) => {
 const generateLDOSW = (
     ldo: LdoExport,
     ldoModule: LdoModule,
-    gpios: GPIOExport[]
+    gpios: GPIOExport[],
 ) =>
     `npm2100_ldosw: LDOSW {
                 regulator-min-microvolt = <${toMicro(
-                    ldoModule.ranges.voltage.min
+                    ldoModule.ranges.voltage.min,
                 )}>;
                 regulator-max-microvolt = <${toMicro(
-                    ldoModule.ranges.voltage.max
+                    ldoModule.ranges.voltage.max,
                 )}>;
  
                 ${ldo.enabled ? 'regulator-boot-on;' : ''}
                 ${
                     ldo.mode === 'LDO'
                         ? `regulator-init-microvolt = <${toMicro(
-                              ldo.voltage
+                              ldo.voltage,
                           )}>;`
                         : ''
                 }
@@ -203,8 +203,8 @@ const generateLDOSW = (
                                       ? ldo.ldoSoftStart
                                       : ldo.softStart
                                   ).toString(),
-                                  10
-                              )
+                                  10,
+                              ),
                           )}>;`
                         : ''
                 }
@@ -219,7 +219,7 @@ const generateLDOSW = (
 
 const generateShipHoldLongPressProperty = (
     reset: npm2100ResetConfig,
-    lowPower: npm2100LowPowerConfig
+    lowPower: npm2100LowPowerConfig,
 ) => {
     if (reset.longPressResetEnable && reset.resetPinSelection === 'SHPHLD') {
         return 'shiphold-longpress = "reset";';
@@ -269,7 +269,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
     }, 0);
 
     const interruptPin = npmConfig.gpios.findIndex(gpio =>
-        isInterruptPin(gpio.mode)
+        isInterruptPin(gpio.mode),
     );
 
     if (numberOfGPIOInterrupts > 1) {
@@ -312,7 +312,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
 
         ${generateShipHoldLongPressProperty(
             npmConfig.reset as npm2100ResetConfig,
-            npmConfig.lowPower as npm2100LowPowerConfig
+            npmConfig.lowPower as npm2100LowPowerConfig,
         )}
         
 
@@ -331,8 +331,8 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
                     generateBoost(
                         boost,
                         npmDevice.boostModule[index],
-                        npmConfig.gpios
-                    )
+                        npmConfig.gpios,
+                    ),
                 )
                 .join('\n\n')}
 
@@ -341,8 +341,8 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
                     generateLDOSW(
                         ldos,
                         npmDevice.ldoModule[index],
-                        npmConfig.gpios
-                    )
+                        npmConfig.gpios,
+                    ),
                 )
                 .join('\n\n')}
         };

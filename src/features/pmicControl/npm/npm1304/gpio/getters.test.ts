@@ -21,7 +21,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `npmx gpio config mode get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -33,7 +33,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `npmx gpio config pull get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -45,7 +45,7 @@ describe('PMIC 1304 - Request update commands', () => {
             `npmx gpio config drive get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -59,9 +59,9 @@ describe('PMIC 1304 - Request update commands', () => {
                 `npmx gpio config debounce get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1304_GPIOS)(
@@ -74,9 +74,9 @@ describe('PMIC 1304 - Request update commands', () => {
                 `npmx gpio config open_drain get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 });
 

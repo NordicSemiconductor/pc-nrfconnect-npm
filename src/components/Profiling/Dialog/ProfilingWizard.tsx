@@ -66,14 +66,14 @@ const generateCSVFileNamePath = (profile: Profile, index: number) => {
     const baseDirectory = path.join(
         profile.baseDirectory,
         profile.name,
-        `${PROFILE_FOLDER_PREFIX}${index + 1}`
+        `${PROFILE_FOLDER_PREFIX}${index + 1}`,
     );
 
     return path.join(
         baseDirectory,
         `${profile.name}_${profile.capacity}mAh_T${
             profile.temperatures[index] < 0 ? 'n' : 'p'
-        }${profile.temperatures[index]}.csv`
+        }${profile.temperatures[index]}.csv`,
     );
 };
 
@@ -115,7 +115,7 @@ export default () => {
                     onClose() {
                         dispatch(closeProfiling());
                     },
-                })
+                }),
             );
             return () => {
                 dispatch(clearConfirmBeforeClose('PROFILING_WIZARD'));
@@ -129,27 +129,29 @@ export default () => {
                 dispatch(
                     setBatteryConnected(
                         event.data.vLoad >
-                            npmDevice.batteryConnectedVoltageThreshold
-                    )
+                            npmDevice.batteryConnectedVoltageThreshold,
+                    ),
                 );
                 dispatch(
-                    setLatestTBat(Number.parseFloat(event.data.tBat.toFixed(2)))
+                    setLatestTBat(
+                        Number.parseFloat(event.data.tBat.toFixed(2)),
+                    ),
                 );
                 dispatch(
                     setLatestVLoad(
-                        Number.parseFloat(event.data.vLoad.toFixed(2))
-                    )
+                        Number.parseFloat(event.data.vLoad.toFixed(2)),
+                    ),
                 );
                 if (event.data.seq === 1 && profilingStage === 'Resting') {
                     const profilingCsvPath = generateCSVFileNamePath(
                         profile,
-                        index
+                        index,
                     );
 
                     const projectFilePath = generateDefaultProjectPath(profile);
                     writeFileSync(
                         profilingCsvPath,
-                        `Seconds,Current(A),Voltage(V),Temperature(C)\r\n`
+                        `Seconds,Current(A),Voltage(V),Temperature(C)\r\n`,
                     );
 
                     dispatch(
@@ -161,11 +163,11 @@ export default () => {
                                 profileSettings.profiles[index].csvPath =
                                     path.relative(
                                         projectFilePath,
-                                        profilingCsvPath
+                                        profilingCsvPath,
                                     );
                                 return profileSettings;
-                            }
-                        )
+                            },
+                        ),
                     );
 
                     dispatch(setProfilingStage('Profiling'));
@@ -181,7 +183,7 @@ export default () => {
                     if (!Number.isNaN(deltaT)) {
                         const profilingCsvPath = generateCSVFileNamePath(
                             profile,
-                            index
+                            index,
                         );
 
                         const data = `${
@@ -200,7 +202,7 @@ export default () => {
                     }
                 }
             }),
-        [dispatch, index, npmDevice, profile, profilingStage]
+        [dispatch, index, npmDevice, profile, profilingStage],
     );
 
     useEffect(() => {
@@ -242,7 +244,7 @@ export default () => {
                     setCompleteStep({
                         level: 'danger',
                         message: ` The profiling process was interrupted, as USB PMIC was connected while ${profilingStage}.`,
-                    })
+                    }),
                 );
             } else if (fuelGauge) {
                 npmDevice?.setAutoRebootDevice(true);
@@ -251,7 +253,7 @@ export default () => {
                     setCompleteStep({
                         level: 'danger',
                         message: ` The profiling process was interrupted, as Fuel Gauge was turned on while ${profilingStage}.`,
-                    })
+                    }),
                 );
             } else if (!batteryConnected) {
                 npmDevice?.setAutoRebootDevice(true);
@@ -261,7 +263,7 @@ export default () => {
                         level:
                             profilingStage === 'Resting' ? 'danger' : 'warning',
                         message: `  The profiling process was interrupted, as battery was disconnected while ${profilingStage}.`,
-                    })
+                    }),
                 );
             } else if (ldos.filter(ldo => ldo.enabled).length > 0) {
                 npmDevice?.setAutoRebootDevice(true);
@@ -270,7 +272,7 @@ export default () => {
                     setCompleteStep({
                         level: 'danger',
                         message: ` The profiling process was interrupted, as LDO was enabled while ${profilingStage}.`,
-                    })
+                    }),
                 );
             } else if (bucks.length && bucks[0].enabled) {
                 npmDevice?.setAutoRebootDevice(true);
@@ -279,7 +281,7 @@ export default () => {
                     setCompleteStep({
                         level: 'danger',
                         message: ` The profiling process was interrupted, as Buck was enabled while ${profilingStage}.`,
-                    })
+                    }),
                 );
             }
         }
@@ -304,7 +306,7 @@ export default () => {
                         message:
                             'Profiling is ready. All profiling cycles complete.',
                         level: 'success',
-                    })
+                    }),
                 );
                 dispatch(markProfilersAsReady());
                 break;
@@ -313,7 +315,7 @@ export default () => {
                     setCompleteStep({
                         level: 'danger',
                         message: 'Profiling was stopped due to thermal error.',
-                    })
+                    }),
                 );
                 break;
             case 'vCutOff':
@@ -321,7 +323,7 @@ export default () => {
                     setCompleteStep({
                         level: 'success',
                         message: 'Profiling is ready. vCutOff was reached.',
-                    })
+                    }),
                 );
                 dispatch(markProfilersAsReady());
                 break;
@@ -332,7 +334,7 @@ export default () => {
                             level: 'warning',
                             message:
                                 'Profiling POF event occurred before reaching vCutOff.',
-                        })
+                        }),
                     );
                 } else if (profilingStage === 'Resting') {
                     dispatch(
@@ -340,7 +342,7 @@ export default () => {
                             level: 'danger',
                             message:
                                 'Profiling POF event occurred before reaching vCutOff.',
-                        })
+                        }),
                     );
                 }
                 break;
@@ -350,7 +352,7 @@ export default () => {
                         level: 'danger',
                         message:
                             'Profiling stopped. The Active Load switch is no longer set to VSYS.',
-                    })
+                    }),
                 );
                 break;
         }
@@ -385,7 +387,7 @@ export default () => {
                             dispatch(openDevice(device));
                             t = setTimeout(() => setInitializing(false), 10000);
                         },
-                    })
+                    }),
                 );
             };
 

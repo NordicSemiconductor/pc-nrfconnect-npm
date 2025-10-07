@@ -32,9 +32,9 @@ describe('PMIC 2100 - Request update commands', () => {
                     `npmx ldsw ldo_voltage get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
-            }
+            },
         );
 
         test.each(PMIC_2100_LDOS)(
@@ -47,9 +47,9 @@ describe('PMIC 2100 - Request update commands', () => {
                     `npmx ldsw status get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
-            }
+            },
         );
 
         test.each(PMIC_2100_LDOS)('Request update ldoMode index: %p', index => {
@@ -60,7 +60,7 @@ describe('PMIC 2100 - Request update commands', () => {
                 `npmx ldsw mode get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
         });
     });
@@ -73,7 +73,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `npm2100 gpio mode get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -85,7 +85,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `npm2100 gpio pull get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -97,7 +97,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `npm2100 gpio drive get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -111,9 +111,9 @@ describe('PMIC 2100 - Request update commands', () => {
                 `npm2100 gpio debounce get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_2100_GPIOS)(
@@ -126,9 +126,9 @@ describe('PMIC 2100 - Request update commands', () => {
                 `npm2100 gpio opendrain get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test('Request update fuelGauge', () => {
@@ -139,7 +139,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `fuel_gauge get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -151,7 +151,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `fuel_gauge model get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -163,7 +163,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `fuel_gauge model list`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -175,7 +175,7 @@ describe('PMIC 2100 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _timeout?: number,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean
+                _unique?: boolean,
             ) => {
                 callbacks?.onSuccess(
                     `Currently active battery model:
@@ -187,10 +187,10 @@ describe('PMIC 2100 - Request update commands', () => {
                             Slot 0: Empty
                             Slot 1: Empty
                             Slot 2: Empty`,
-                    'fuel_gauge model list'
+                    'fuel_gauge model list',
                 );
                 return Promise.resolve();
-            }
+            },
         );
 
         await expect(pmic.getHardcodedBatteryModels()).resolves.toStrictEqual([
@@ -229,7 +229,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `fuel_gauge model list`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -241,7 +241,7 @@ describe('PMIC 2100 - Request update commands', () => {
             'npm_adc sample 1000 2000',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -253,7 +253,7 @@ describe('PMIC 2100 - Request update commands', () => {
             'npm_adc sample 0',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -265,11 +265,11 @@ describe('PMIC 2100 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _timeout?: number,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean
+                _unique?: boolean,
             ) => {
                 callbacks?.onSuccess('Uptime: 2945165 ms', command);
                 return Promise.resolve();
-            }
+            },
         );
 
         await expect(pmic.getKernelUptime()).resolves.toBe(2945165);
@@ -279,7 +279,7 @@ describe('PMIC 2100 - Request update commands', () => {
             'kernel uptime',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -291,14 +291,14 @@ describe('PMIC 2100 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _timeout?: number,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean
+                _unique?: boolean,
             ) => {
                 callbacks?.onSuccess(
                     `app_version=${npm2100FWVersion}`,
-                    command
+                    command,
                 );
                 return Promise.resolve();
-            }
+            },
         );
 
         await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
@@ -311,7 +311,7 @@ describe('PMIC 2100 - Request update commands', () => {
             'app_version',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -323,11 +323,11 @@ describe('PMIC 2100 - Request update commands', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 _timeout?: number,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean
+                _unique?: boolean,
             ) => {
                 callbacks?.onSuccess('app_version=0.0.0+9', command);
                 return Promise.resolve();
-            }
+            },
         );
 
         await expect(pmic.isSupportedVersion()).resolves.toStrictEqual({
@@ -340,7 +340,7 @@ describe('PMIC 2100 - Request update commands', () => {
             'app_version',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

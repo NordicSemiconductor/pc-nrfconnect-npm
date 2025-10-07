@@ -27,7 +27,7 @@ describe('PMIC 1304 - Logging', () => {
         const verifyLogging = (
             logLevel: 'err' | 'inf',
             command: string,
-            response: string
+            response: string,
         ) => {
             expect(mockOnLoggingEvent).toBeCalledTimes(1);
             expect(mockOnLoggingEvent).toBeCalledWith({
@@ -47,7 +47,7 @@ describe('PMIC 1304 - Logging', () => {
                     command: 'command',
                     response: 'response',
                     error: true,
-                })
+                }),
             );
 
             verifyLogging('err', 'command', 'response');
@@ -59,7 +59,7 @@ describe('PMIC 1304 - Logging', () => {
                     command: 'command',
                     response: 'response',
                     error: false,
-                })
+                }),
             );
 
             verifyLogging('inf', 'command', 'response');
@@ -93,7 +93,7 @@ describe('PMIC 1304 - Logging', () => {
 
         test('Reboot when device PMIC is available', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
+                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.',
             );
 
             expect(mockOnBeforeReboot).toBeCalledTimes(1);
@@ -102,7 +102,7 @@ describe('PMIC 1304 - Logging', () => {
         test('Does not Reboot if auto reboot is off PMIC is available', async () => {
             pmic.setAutoRebootDevice(false);
             await eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
+                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.',
             );
 
             expect(mockOnBeforeReboot).toBeCalledTimes(0);
@@ -114,7 +114,7 @@ describe('PMIC 1304 - Logging', () => {
 
         test('Adc Sample Logging event once', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:17.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:17.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514',
             );
 
             expect(mockOnAdcSample).toBeCalledTimes(1);
@@ -131,15 +131,15 @@ describe('PMIC 1304 - Logging', () => {
 
         test('Adc Sample Logging event - overflow 1193.046471111111 hrs +', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514',
             );
 
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:10.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:10.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514',
             );
 
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:8.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:8.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tbat=26.656051,soc=98.705001,tte=312,ttf=514',
             );
 
             expect(mockOnAdcSample).toBeCalledTimes(3);
@@ -180,10 +180,10 @@ describe('PMIC 1304 - Logging', () => {
                 'Default USB 100/500mA',
                 '1.5A High Power',
                 '3A High Power',
-            ].map((value, index) => ({ value, index }))
+            ].map((value, index) => ({ value, index })),
         )('USB Power events', ({ value, index }) => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                `[00:00:17.525,000] <inf> module_pmic: ${value}`
+                `[00:00:17.525,000] <inf> module_pmic: ${value}`,
             );
 
             expect(mockOnUsbPower).toBeCalledTimes(1);
@@ -196,7 +196,7 @@ describe('PMIC 1304 - Logging', () => {
             'Charging status event %p',
             value => {
                 eventHandlers.mockOnShellLoggingEventHandler(
-                    `[00:28:48.730,346] <inf> module_pmic_charger: charger status=${value}`
+                    `[00:28:48.730,346] <inf> module_pmic_charger: charger status=${value}`,
                 );
 
                 expect(mockOnChargingStatusUpdate).toBeCalledTimes(1);
@@ -218,12 +218,12 @@ describe('PMIC 1304 - Logging', () => {
                     // eslint-disable-next-line no-bitwise
                     supplementModeActive: (value & 0x80) > 0,
                 } as PmicChargingState);
-            }
+            },
         );
 
         test('Reset Cause Reason', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                `[00:00:00.038,238] <inf> module_pmic_irq: type=RSTCAUSE,bit=SWRESET`
+                `[00:00:00.038,238] <inf> module_pmic_irq: type=RSTCAUSE,bit=SWRESET`,
             );
 
             expect(mockOnErrorLogs).toBeCalledTimes(1);
@@ -243,7 +243,7 @@ describe('PMIC 1304 - Logging', () => {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     _timeout?: number,
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    _unique?: boolean
+                    _unique?: boolean,
                 ) => {
                     expect(command).toBe('npmx errlog get');
                     callbacks?.onSuccess(
@@ -255,14 +255,14 @@ describe('PMIC 1304 - Logging', () => {
                         SENSOR_ERROR:
                         NTC sensor error 2
                         VBAT Sensor Error 2`,
-                        command
+                        command,
                     );
                     return Promise.resolve();
-                }
+                },
             );
 
             eventHandlers.mockOnShellLoggingEventHandler(
-                `[00:00:06.189,514] <inf> module_pmic_irq: type=EVENTSBCHARGER1SET,bit=EVENTCHGERROR`
+                `[00:00:06.189,514] <inf> module_pmic_irq: type=EVENTSBCHARGER1SET,bit=EVENTCHGERROR`,
             );
 
             expect(mockOnErrorLogs).toBeCalledTimes(4);

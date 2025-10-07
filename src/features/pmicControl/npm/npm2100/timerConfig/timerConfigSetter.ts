@@ -17,9 +17,9 @@ export class TimerConfigSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new TimerConfigGet(sendCommand);
     }
@@ -39,7 +39,7 @@ export class TimerConfigSet {
                     'onTimerConfigUpdate',
                     {
                         mode,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -49,7 +49,7 @@ export class TimerConfigSet {
                     () => {
                         this.get.mode();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -62,7 +62,7 @@ export class TimerConfigSet {
                     'onTimerConfigUpdate',
                     {
                         enabled,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -72,7 +72,7 @@ export class TimerConfigSet {
                     () => {
                         this.get.state();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -85,7 +85,7 @@ export class TimerConfigSet {
                     'onTimerConfigUpdate',
                     {
                         period: period / 1000,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -95,7 +95,7 @@ export class TimerConfigSet {
                     () => {
                         this.get.period();
                         reject();
-                    }
+                    },
                 );
             }
         });

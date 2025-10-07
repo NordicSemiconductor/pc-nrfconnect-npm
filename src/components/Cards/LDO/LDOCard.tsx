@@ -49,7 +49,7 @@ const findSelectedIndex = <T,>(items: DropdownItem<T>[], value: T) =>
     items[
         Math.max(
             0,
-            items.findIndex(item => item.value === value)
+            items.findIndex(item => item.value === value),
         ) ?? 0
     ];
 
@@ -95,7 +95,7 @@ export default ({
                             className={classNames(
                                 'show-more-toggle mdi',
                                 summary && 'mdi-chevron-down',
-                                !summary && 'mdi-chevron-up'
+                                !summary && 'mdi-chevron-up',
                             )}
                             role="button"
                             tabIndex={0}
@@ -249,7 +249,7 @@ const LdoSoftstart = ({ disabled, ldoModule, ldo, card }: LdoSoftstartAttr) => (
                 onSelect={item => ldoModule.set.ldoSoftstart?.(item.value)}
                 selectedItem={
                     ldoModule.values.ldoSoftstart?.find(
-                        item => item.value === ldo.ldoSoftStart
+                        item => item.value === ldo.ldoSoftStart,
                     ) ?? ldoModule.values.ldoSoftstart[0]
                 }
                 disabled={disabled}
@@ -269,7 +269,7 @@ const LdoSoftstart = ({ disabled, ldoModule, ldo, card }: LdoSoftstartAttr) => (
                 onSelect={item => ldoModule.set.softStart(item.value)}
                 selectedItem={
                     ldoModule.values.softstart.find(
-                        item => item.value === ldo.softStart
+                        item => item.value === ldo.softStart,
                     ) ?? ldoModule.values.softstart[0]
                 }
                 disabled={
@@ -315,12 +315,12 @@ const OnOffControl = ({
                     items={ldoOnOffControlItems}
                     onSelect={item => {
                         ldoModule.set.onOffControl?.(
-                            item.value as LdoOnOffControl
+                            item.value as LdoOnOffControl,
                         );
                     }}
                     selectedItem={findSelectedIndex(
                         ldoOnOffControlItems,
-                        ldo.onOffControl
+                        ldo.onOffControl,
                     )}
                     disabled={disabled}
                 />
@@ -336,12 +336,12 @@ const OnOffControl = ({
                     items={ldoModeControllItems}
                     onSelect={item =>
                         ldoModule.set.modeControl?.(
-                            item.value as nPM2100LdoModeControl
+                            item.value as nPM2100LdoModeControl,
                         )
                     }
                     selectedItem={findSelectedIndex(
                         ldoModeControllItems,
-                        ldo.modeControl
+                        ldo.modeControl,
                     )}
                     disabled={disabled}
                 />
@@ -356,12 +356,12 @@ const OnOffControl = ({
                     items={ldoModePinModeItems}
                     onSelect={item =>
                         ldoModule.set.pinMode?.(
-                            item.value as nPM2100GPIOControlMode
+                            item.value as nPM2100GPIOControlMode,
                         )
                     }
                     selectedItem={findSelectedIndex(
                         ldoModePinModeItems,
-                        ldo.pinMode
+                        ldo.pinMode,
                     )}
                     disabled={disabled}
                 />
@@ -376,12 +376,12 @@ const OnOffControl = ({
                     items={ldoModePinSelectItems}
                     onSelect={item =>
                         ldoModule.set.pinSel?.(
-                            item.value as nPM2100GPIOControlPinSelect
+                            item.value as nPM2100GPIOControlPinSelect,
                         )
                     }
                     selectedItem={findSelectedIndex(
                         ldoModePinSelectItems,
-                        ldo.pinSel
+                        ldo.pinSel,
                     )}
                     disabled={disabled}
                 />

@@ -65,7 +65,7 @@ export default ({
                 onSelect={item => gpioModule.set.mode(item.value as GPIOMode)}
                 selectedItem={
                     gpioModule.values.mode.find(
-                        item => item.value === gpio.mode
+                        item => item.value === gpio.mode,
                     ) ?? gpioModule.values.mode[0]
                 }
                 disabled={disabled}
@@ -78,17 +78,17 @@ export default ({
                         <StateSelector
                             disabled={disabled}
                             items={gpioModule.values.state.map(
-                                item => item.label
+                                item => item.label,
                             )}
                             onSelect={i =>
                                 gpioModule.set.state?.(
                                     gpioModule.values.state?.[i]
-                                        .value as GPIOState
+                                        .value as GPIOState,
                                 )
                             }
                             selectedItem={
                                 gpioModule.values.state.find(
-                                    item => item.value === gpio.state
+                                    item => item.value === gpio.state,
                                 )?.label ?? gpioModule.values.state[0].label
                             }
                         />
@@ -104,7 +104,7 @@ export default ({
                 onSelect={item => gpioModule.set.pull(item.value as GPIOPull)}
                 selectedItem={
                     gpioModule.values.pull.find(
-                        item => item.value === gpio.pull
+                        item => item.value === gpio.pull,
                     ) ?? gpioModule.values.pull[0]
                 }
                 disabled={disabled || !gpio.pullEnabled}
@@ -119,7 +119,7 @@ export default ({
                 onSelect={item => gpioModule.set.drive(item.value)}
                 selectedItem={
                     gpioModule.values.drive.find(
-                        item => item.value === gpio.drive
+                        item => item.value === gpio.drive,
                     ) ?? gpioModule.values.drive[0]
                 }
                 disabled={disabled || !gpio.driveEnabled}
