@@ -5,12 +5,14 @@
  */
 
 import { helpers } from '../../tests/helpers';
+import { PmicDialog } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 2100 - Setters Online tests', () => {
     describe('Setters and effects state - success', () => {
         const {
             eventHandlers,
+            mockDialogHandler,
             mockOnActiveBatteryModelUpdate,
             mockOnFuelGaugeUpdate,
             mockEnqueueRequest,
@@ -42,6 +44,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
         test.each([true, false])(
             'Set fuel_gauge discard_positive_deltaz enabled: false',
             async enabled => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
                 await pmic.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(enabled);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -198,6 +206,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
 
     describe('Setters and effects state - error', () => {
         const {
+            mockDialogHandler,
             mockOnActiveBatteryModelUpdate,
             mockOnFuelGaugeUpdate,
             mockEnqueueRequest,
@@ -214,6 +223,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
         test.each([true, false])(
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',
             async enabled => {
+                mockDialogHandler.mockImplementationOnce(
+                    (dialog: PmicDialog) => {
+                        dialog.onConfirm();
+                    }
+                );
+
                 await expect(
                     pmic.fuelGaugeModule?.set.enabled(enabled)
                 ).rejects.toBeUndefined();
