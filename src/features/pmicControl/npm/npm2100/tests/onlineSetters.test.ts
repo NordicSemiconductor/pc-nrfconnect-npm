@@ -34,9 +34,11 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 })),
             ).flat(),
         )('Set setGpioMode index: %p', async ({ index, mode }) => {
-            mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
-                dialog.onConfirm();
-            });
+            if (index === 0) {
+                mockDialogHandler.mockImplementation((dialog: PmicDialog) => {
+                    dialog.onConfirm();
+                });
+            }
 
             await pmic.gpioModule[index].set.mode(mode);
 
@@ -72,9 +74,11 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 })),
             ).flat(),
         )('Set setGpioPull index: %p', async ({ index, pull }) => {
-            mockDialogHandler.mockImplementation((dialog: PmicDialog) => {
-                dialog.onConfirm();
-            });
+            if (index === 0) {
+                mockDialogHandler.mockImplementation((dialog: PmicDialog) => {
+                    dialog.onConfirm();
+                });
+            }
 
             await pmic.gpioModule[index].set.pull(pull);
 
