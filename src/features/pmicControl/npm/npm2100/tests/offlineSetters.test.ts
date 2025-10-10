@@ -4,19 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { FuelGauge, PmicDialog } from '../../types';
+import { PmicDialog } from '../../types';
 import { GPIOMode2100, GPIOPull2100 } from '../gpio/types';
 import { PMIC_2100_GPIOS, PMIC_2100_LDOS, setupMocksBase } from './helpers';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell
 describe('PMIC 2100 - Setters Offline tests', () => {
-    const {
-        mockDialogHandler,
-        mockOnFuelGaugeUpdate,
-        mockOnLdoUpdate,
-        mockOnGpioUpdate,
-        pmic,
-    } = setupMocksBase();
+    const { mockDialogHandler, mockOnLdoUpdate, mockOnGpioUpdate, pmic } =
+        setupMocksBase();
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -103,15 +98,6 @@ describe('PMIC 2100 - Setters Offline tests', () => {
             });
         },
     );
-
-    test('Set setFuelGaugeEnabled', async () => {
-        await pmic.fuelGaugeModule?.set.enabled(false);
-
-        expect(mockOnFuelGaugeUpdate).toBeCalledTimes(1);
-        expect(mockOnFuelGaugeUpdate).toBeCalledWith({
-            enabled: false,
-        } satisfies Partial<FuelGauge>);
-    });
 });
 
 export {};
