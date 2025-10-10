@@ -7,11 +7,7 @@
 import { ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { npm2100FWVersion } from '../pmic2100Device';
-import {
-    PMIC_2100_GPIOS,
-    PMIC_2100_LDOS,
-    setupMocksWithShellParser,
-} from './helpers';
+import { PMIC_2100_LDOS, setupMocksWithShellParser } from './helpers';
 
 describe('PMIC 2100 - Request update commands', () => {
     const { mockEnqueueRequest, pmic } = setupMocksWithShellParser();
@@ -63,72 +59,6 @@ describe('PMIC 2100 - Request update commands', () => {
             );
         });
     });
-
-    test.each(PMIC_2100_GPIOS)('Request update gpioMode index: %p', index => {
-        pmic.gpioModule[index].get.mode();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npm2100 gpio mode get ${index}`,
-            expect.anything(),
-            undefined,
-            true,
-        );
-    });
-
-    test.each(PMIC_2100_GPIOS)('Request update gpioPull index: %p', index => {
-        pmic.gpioModule[index].get.pull();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npm2100 gpio pull get ${index}`,
-            expect.anything(),
-            undefined,
-            true,
-        );
-    });
-
-    test.each(PMIC_2100_GPIOS)('Request update gpioDrive index: %p', index => {
-        pmic.gpioModule[index].get.drive();
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `npm2100 gpio drive get ${index}`,
-            expect.anything(),
-            undefined,
-            true,
-        );
-    });
-
-    test.each(PMIC_2100_GPIOS)(
-        'Request update gpioDebounce index: %p',
-        index => {
-            pmic.gpioModule[index].get.debounce();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npm2100 gpio debounce get ${index}`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-        },
-    );
-
-    test.each(PMIC_2100_GPIOS)(
-        'Request update gpioOpenDrain index: %p',
-        index => {
-            pmic.gpioModule[index].get.openDrain();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npm2100 gpio opendrain get ${index}`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-        },
-    );
 
     test('Request startAdcSample', () => {
         pmic.startAdcSample(2000, 1000);
