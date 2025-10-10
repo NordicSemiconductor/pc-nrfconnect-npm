@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2023 Nordic Semiconductor ASA
+ * Copyright (c) 2025 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { helpers } from '../../../tests/helpers';
-import { LdoMode, PmicDialog } from '../../../types';
-import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../helpers';
+import { helpers } from '../../tests/helpers';
+import { LdoMode, PmicDialog } from '../../types';
+import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../tests/helpers';
 
-describe('PMIC 2100 - Setters Online tests - LDO', () => {
+describe('PMIC 2100 - Setters Online tests', () => {
     const { mockDialogHandler, mockOnLdoUpdate, mockEnqueueRequest, pmic } =
         setupMocksWithShellParser();
 
@@ -20,6 +20,7 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
                 helpers.registerCommandCallbackSuccess,
             );
         });
+
         test.each(PMIC_2100_LDOS)(
             'Set setLdoVoltage index: %p',
             async index => {
@@ -116,8 +117,6 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
             // Updates should only be emitted when we get response
             expect(mockOnLdoUpdate).toBeCalledTimes(0);
         });
-
-        //
     });
 
     describe('Setters and effects state - error', () => {
@@ -346,3 +345,5 @@ describe('PMIC 2100 - Setters Online tests - LDO', () => {
         );
     });
 });
+
+export {};
