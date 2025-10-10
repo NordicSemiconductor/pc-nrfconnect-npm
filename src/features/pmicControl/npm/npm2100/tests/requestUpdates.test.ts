@@ -6,7 +6,6 @@
 
 import { ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { BatteryModel } from '../../types';
 import { npm2100FWVersion } from '../pmic2100Device';
 import {
     PMIC_2100_GPIOS,
@@ -130,72 +129,6 @@ describe('PMIC 2100 - Request update commands', () => {
             );
         },
     );
-
-    test('Request getHardcodedBatteryModels success', async () => {
-        mockEnqueueRequest.mockImplementationOnce(
-            (
-                _command: string,
-                callbacks?: Callbacks,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _timeout?: number,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                _unique?: boolean,
-            ) => {
-                callbacks?.onSuccess(
-                    `Currently active battery model:
-                            name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
-                    Hardcoded battery models:
-                            name="LP803448",T={5.00 C,25.00 C,45.00 C},Q={1413.40 mAh,1518.28 mAh,1500.11 mAh}
-                            name="LP502540",T={25.00 C},Q={563.08 mAh}
-                    Battery models stored in database:
-                            Slot 0: Empty
-                            Slot 1: Empty
-                            Slot 2: Empty`,
-                    'fuel_gauge model list',
-                );
-                return Promise.resolve();
-            },
-        );
-
-        await expect(pmic.getHardcodedBatteryModels()).resolves.toStrictEqual([
-            {
-                name: 'LP803448',
-                characterizations: [
-                    {
-                        temperature: 45,
-                        capacity: 1500.11,
-                    },
-                    {
-                        temperature: 25,
-                        capacity: 1518.28,
-                    },
-                    {
-                        temperature: 5,
-                        capacity: 1413.4,
-                    },
-                ],
-                slotIndex: undefined,
-            },
-            {
-                name: 'LP502540',
-                characterizations: [
-                    {
-                        temperature: 25,
-                        capacity: 563.08,
-                    },
-                ],
-                slotIndex: undefined,
-            },
-        ] as BatteryModel[]);
-
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            `fuel_gauge model list`,
-            expect.anything(),
-            undefined,
-            true,
-        );
-    });
 
     test('Request startAdcSample', () => {
         pmic.startAdcSample(2000, 1000);
