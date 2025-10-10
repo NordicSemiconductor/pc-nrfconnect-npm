@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2023 Nordic Semiconductor ASA
+ * Copyright (c) 2025 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../tests/helpers';
 import {
     nPM2100GPIOControlPinSelectValues,
     nPM2100LdoModeControlValues,
     nPM2100SoftStartValues,
-} from '../../types';
-import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../helpers';
+} from '../types';
 
-describe('PMIC 2100 - Command callbacks - LDO', () => {
+describe('PMIC 2100 - Command callbacks', () => {
     const { eventHandlers, mockOnLdoUpdate } = setupMocksWithShellParser();
 
     beforeEach(() => {
@@ -366,3 +366,5 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
         });
     });
 });
+
+export {};
