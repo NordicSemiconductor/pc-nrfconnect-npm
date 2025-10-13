@@ -20,7 +20,7 @@ import { ITermValues } from './types';
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    ITermAllowedValues: number[] = ITermValues
+    ITermAllowedValues: number[] = ITermValues,
 ) => {
     const cleanupCallbacks = [];
 
@@ -54,7 +54,7 @@ export default (
                         emitOnChargingStatusUpdate(value);
                     }
                 });
-            })
+            }),
         );
 
         cleanupCallbacks.push(
@@ -66,8 +66,8 @@ export default (
                         vTerm: value / 1000, // mv to V
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -79,8 +79,8 @@ export default (
                         vTermR: value / 1000, // mv to V
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -92,8 +92,8 @@ export default (
                         iChg: value / 1000, // uA to mA
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -103,8 +103,8 @@ export default (
                     const value = parseToNumber(res);
                     emitOnChargingStatusUpdate(value);
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -113,15 +113,15 @@ export default (
                     'npmx charger module recharge',
                     true,
                     undefined,
-                    '(1|0)'
+                    '(1|0)',
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         enableRecharging: parseToBoolean(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -132,8 +132,8 @@ export default (
                         enableVBatLow: parseToBoolean(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -142,15 +142,15 @@ export default (
                     'npmx charger module charger',
                     true,
                     undefined,
-                    '(1|0)'
+                    '(1|0)',
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         enabled: parseToBoolean(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -159,7 +159,7 @@ export default (
                     'npmx charger trickle_voltage',
                     true,
                     undefined,
-                    '(2500|2900)'
+                    '(2500|2900)',
                 ),
                 res => {
                     const result = parseToNumber(res) / 1000;
@@ -169,12 +169,12 @@ export default (
                             'onChargerUpdate',
                             {
                                 vTrickleFast: result,
-                            }
+                            },
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -183,7 +183,7 @@ export default (
                     'npmx charger termination_current',
                     true,
                     undefined,
-                    `(${ITermAllowedValues.map(v => v.toString()).join('|')})`
+                    `(${ITermAllowedValues.map(v => v.toString()).join('|')})`,
                 ),
                 res => {
                     const result = parseToNumber(res);
@@ -192,8 +192,8 @@ export default (
                         iTerm: result,
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -210,7 +210,7 @@ export default (
 
                         if (!requested) {
                             console.error(
-                                'Unable to parse response. UI might be out of sync.'
+                                'Unable to parse response. UI might be out of sync.',
                             );
                             return;
                         }
@@ -221,8 +221,8 @@ export default (
                         iBatLim,
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -233,8 +233,8 @@ export default (
                         tChgStop: parseToNumber(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -245,8 +245,8 @@ export default (
                         tChgResume: parseToNumber(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -255,15 +255,15 @@ export default (
                     'npmx charger ntc_temperature cold',
                     true,
                     undefined,
-                    '-?[0-9]+'
+                    '-?[0-9]+',
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tCold: parseToNumber(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -274,8 +274,8 @@ export default (
                         tCool: parseToNumber(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -286,8 +286,8 @@ export default (
                         tWarm: parseToNumber(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -298,8 +298,8 @@ export default (
                         tHot: parseToNumber(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -308,7 +308,7 @@ export default (
                     'npmx adc ntc type',
                     true,
                     undefined,
-                    '(0|10000|47000|100000)'
+                    '(0|10000|47000|100000)',
                 ),
                 res => {
                     const result = parseToNumber(res);
@@ -334,12 +334,12 @@ export default (
                             'onChargerUpdate',
                             {
                                 ntcThermistor: mode,
-                            }
+                            },
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -350,8 +350,8 @@ export default (
                         ntcBeta: parseToNumber(res),
                     });
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

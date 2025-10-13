@@ -50,7 +50,7 @@ export default class Module implements GpioModule {
             sendCommand,
             offlineMode,
             dialogHandler,
-            index
+            index,
         );
         this._callbacks = gpioCallbacks(shellParser, eventEmitter, index);
     }

@@ -122,7 +122,7 @@ const pmicControlSlice = createSlice({
         },
         setLatestAdcSample(
             state,
-            action: PayloadAction<AdcSample | undefined>
+            action: PayloadAction<AdcSample | undefined>,
         ) {
             state.latestAdcSample = action.payload;
         },
@@ -224,13 +224,13 @@ const pmicControlSlice = createSlice({
         },
         setLowPowerConfig(
             state,
-            action: PayloadAction<LowPowerConfig | undefined>
+            action: PayloadAction<LowPowerConfig | undefined>,
         ) {
             state.lowPower = action.payload;
         },
         updateLowPowerConfig(
             state,
-            action: PayloadAction<Partial<LowPowerConfig | undefined>>
+            action: PayloadAction<Partial<LowPowerConfig | undefined>>,
         ) {
             if (state.npmDevice?.lowPowerModule) {
                 state.lowPower = {
@@ -245,7 +245,7 @@ const pmicControlSlice = createSlice({
         },
         updateResetConfig(
             state,
-            action: PayloadAction<Partial<ResetConfig | undefined>>
+            action: PayloadAction<Partial<ResetConfig | undefined>>,
         ) {
             if (state.npmDevice?.resetModule) {
                 state.reset = {
@@ -280,7 +280,7 @@ const pmicControlSlice = createSlice({
         },
         requestDialog(state, action: PayloadAction<PmicDialog>) {
             const dialogIndex = state.dialog.findIndex(
-                dialog => dialog.uuid === action.payload.uuid
+                dialog => dialog.uuid === action.payload.uuid,
             );
 
             if (dialogIndex !== -1) {
@@ -319,7 +319,7 @@ const pmicControlSlice = createSlice({
 const parseConnectedState = <T>(
     state: PmicState,
     connectedValue: T,
-    fallback: T
+    fallback: T,
 ) => (state === 'pmic-connected' ? connectedValue : fallback);
 
 export const getNpmDevice = (state: RootState) =>
@@ -334,7 +334,7 @@ export const getLatestAdcSample = (state: RootState) => {
     return parseConnectedState(
         pmicState,
         latestAdcSample,
-        initialState.latestAdcSample
+        initialState.latestAdcSample,
     );
 };
 export const getPmicChargingState = (state: RootState) => {
@@ -342,7 +342,7 @@ export const getPmicChargingState = (state: RootState) => {
     return parseConnectedState(
         pmicState,
         pmicChargingState,
-        initialState.pmicChargingState
+        initialState.pmicChargingState,
     );
 };
 
@@ -369,7 +369,7 @@ export const isBatteryConnected = (state: RootState) => {
             batteryModuleConnected &&
             batteryConnected) ||
             (batteryConnected && !supportsBatteryModules),
-        initialState.batteryConnected
+        initialState.batteryConnected,
     );
 };
 export const getPowerId = (state: RootState) => state.app.pmicControl.powerid;

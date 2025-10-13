@@ -58,7 +58,7 @@ const getLdoVoltageRange = () =>
         max: 3,
         decimals: 1,
         step: 0.1,
-    } as RangeType);
+    }) as RangeType;
 
 export default class Module implements LdoModule {
     index: number;
@@ -79,7 +79,7 @@ export default class Module implements LdoModule {
             eventEmitter,
             sendCommand,
             dialogHandler,
-            offlineMode
+            offlineMode,
         );
         this._callbacks = ldoCallbacks(shellParser, eventEmitter);
     }

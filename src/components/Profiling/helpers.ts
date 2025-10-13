@@ -37,7 +37,7 @@ export const generateDefaultProjectPath = (profile: Profile) =>
 
 export const isProfileReadyForProcessing = (
     projectSettingsPath: string,
-    profile: ProfilingProjectProfile
+    profile: ProfilingProjectProfile,
 ) =>
     !(
         !profile.csvPath ||
@@ -50,9 +50,9 @@ const guaranteeValidPath = (somePath?: string) =>
         ? somePath.replace(
               new RegExp(
                   [`\\${path.win32.sep}`, path.posix.sep].join('|'),
-                  'g'
+                  'g',
               ),
-              path.sep
+              path.sep,
           )
         : undefined;
 
@@ -68,7 +68,7 @@ const updateSettingsWithValidPath = (project?: ProfilingProject) =>
         : undefined;
 
 export const readProjectSettingsFromFile = (
-    filePath: string
+    filePath: string,
 ): ProjectPathPair => {
     if (!fs.existsSync(filePath)) {
         return { path: filePath, settings: undefined, error: 'fileMissing' };
@@ -76,18 +76,18 @@ export const readProjectSettingsFromFile = (
 
     try {
         const profilingProject = JSON.parse(
-            fs.readFileSync(filePath).toString()
+            fs.readFileSync(filePath).toString(),
         ) as ProfilingProject;
 
         const project = updateSettingsWithValidPath(
-            zodProfilingProject.parse(profilingProject)
+            zodProfilingProject.parse(profilingProject),
         );
 
         return {
             path: filePath,
             settings: project,
         };
-    } catch (error) {
+    } catch {
         return { path: filePath, settings: undefined, error: 'fileCorrupted' };
     }
 };
@@ -95,7 +95,7 @@ export const readProjectSettingsFromFile = (
 export const readAndUpdateProjectSettings =
     (
         filePath: string,
-        updateProject?: (currentProject: ProfilingProject) => ProfilingProject
+        updateProject?: (currentProject: ProfilingProject) => ProfilingProject,
     ): AppThunk =>
     (dispatch, getState) => {
         const project = readProjectSettingsFromFile(filePath);
@@ -113,7 +113,7 @@ export const readAndUpdateProjectSettings =
                 newSettings.appVersion = packageJsons.version;
                 fs.writeFileSync(
                     filePath,
-                    JSON.stringify(newSettings, null, 2)
+                    JSON.stringify(newSettings, null, 2),
                 );
                 project.settings = newSettings;
             } catch (error) {
@@ -129,14 +129,14 @@ export const readAndUpdateProjectSettings =
                     project.settings?.deviceType
                         ? undefined
                         : 'unsupportedDevice',
-            })
+            }),
         );
     };
 
 export const saveProjectSettings =
     (
         filePath: string,
-        projectToSave: Omit<ProfilingProject, 'appVersion'>
+        projectToSave: Omit<ProfilingProject, 'appVersion'>,
     ): AppThunk<RootState> =>
     (dispatch, getState) => {
         const project: ProfilingProject = {
@@ -150,7 +150,7 @@ export const saveProjectSettings =
         // Abort any ongoing processes with the same project file name
         getState()
             .app.profilingProjects.profilingCSVProgress.filter(
-                progress => progress.path === filePath
+                progress => progress.path === filePath,
             )
             .forEach(progress => progress.cancel());
 

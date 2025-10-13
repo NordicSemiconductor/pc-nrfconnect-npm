@@ -7,15 +7,14 @@
 import { NpmEventEmitter } from '../../pmicHelpers';
 
 export class LowPowerActions {
-    // eslint-disable-next-line no-useless-constructor
     constructor(
         private eventEmitter: NpmEventEmitter,
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {}
 
     enterShipMode() {

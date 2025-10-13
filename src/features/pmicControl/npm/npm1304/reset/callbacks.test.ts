@@ -22,7 +22,7 @@ describe('PMIC 1304 - Command callbacks', () => {
         LongPressResetValues.map(value => [
             { append: `get`, value },
             { append: `set ${value}`, value },
-        ])
+        ]),
     )('powerup_ship longpress %p', ({ append, value }) => {
         const command = `powerup_ship longpress ${append}`;
         const callback =

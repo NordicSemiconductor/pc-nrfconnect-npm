@@ -37,7 +37,7 @@ export const WelcomeSidePanel = () => {
                 className="tw-w-full"
                 onClick={() =>
                     openUrl(
-                        'https://www.nordicsemi.com/Products/Power-Management-ICs'
+                        'https://www.nordicsemi.com/Products/Power-Management-ICs',
                     )
                 }
             >
@@ -67,7 +67,7 @@ const BuyModal = ({
                 className="tw-w-32"
                 onClick={() =>
                     openUrl(
-                        'https://www.nordicsemi.com/About-us/BuyOnline?search_token=NPM1300EK'
+                        'https://www.nordicsemi.com/About-us/BuyOnline?search_token=NPM1300EK',
                     )
                 }
             >
@@ -78,7 +78,7 @@ const BuyModal = ({
                 className="tw-w-32"
                 onClick={() =>
                     openUrl(
-                        'https://www.nordicsemi.com/About-us/BuyOnline?search_token=NPM1300EK'
+                        'https://www.nordicsemi.com/About-us/BuyOnline?search_token=NPM1300EK',
                     )
                 }
             >

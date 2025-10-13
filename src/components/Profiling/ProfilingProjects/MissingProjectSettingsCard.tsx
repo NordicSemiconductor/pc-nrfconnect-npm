@@ -52,7 +52,7 @@ export default ({ project }: { project: ProjectPathPair }) => {
                         {project.settings?.deviceType
                             ? `(supports ${project.settings.deviceType.replace(
                                   'npm',
-                                  'nPM'
+                                  'nPM',
                               )})`
                             : ''}
                     </Alert>

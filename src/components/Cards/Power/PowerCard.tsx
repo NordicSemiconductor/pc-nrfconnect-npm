@@ -71,7 +71,7 @@ const IBatLimUI = ({
                               {
                                   value: charger.iBatLim,
                                   label: chargerIBatLimRange.toLabel(
-                                      charger.iBatLim
+                                      charger.iBatLim,
                                   ),
                               },
                           ]
@@ -157,7 +157,7 @@ export default ({
                             className={classNames(
                                 'show-more-toggle mdi',
                                 summary && 'mdi-chevron-down',
-                                !summary && 'mdi-chevron-up'
+                                !summary && 'mdi-chevron-up',
                             )}
                             role="button"
                             tabIndex={0}
@@ -217,7 +217,7 @@ export default ({
                 onSelect={item => chargerModule.set.iTerm(item.value as ITerm)}
                 selectedItem={
                     chargerModule.values.iTerm.find(
-                        item => item.value === charger.iTerm
+                        item => item.value === charger.iTerm,
                     ) ?? chargerModule.values.iTerm[0]
                 }
                 disabled={disabled}
@@ -280,12 +280,12 @@ export default ({
                         items={chargerModule.values.vTrickleFast}
                         onSelect={item =>
                             chargerModule.set.vTrickleFast(
-                                item.value as VTrickleFast
+                                item.value as VTrickleFast,
                             )
                         }
                         selectedItem={
                             chargerModule.values.vTrickleFast.find(
-                                item => item.value === charger.vTrickleFast
+                                item => item.value === charger.vTrickleFast,
                             ) ?? chargerModule.values.vTrickleFast[0]
                         }
                         disabled={disabled}

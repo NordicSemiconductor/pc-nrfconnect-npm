@@ -16,9 +16,9 @@ export class ResetSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
-        private offlineMode: boolean
+        private offlineMode: boolean,
     ) {
         this.get = new ResetGet(sendCommand);
     }
@@ -36,7 +36,7 @@ export class ResetSet {
                     'onResetUpdate',
                     {
                         longPressReset,
-                    }
+                    },
                 );
                 resolve();
             } else {
@@ -46,7 +46,7 @@ export class ResetSet {
                     () => {
                         this.get.longPressReset();
                         reject();
-                    }
+                    },
                 );
             }
         });

@@ -26,11 +26,11 @@ export class BuckSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
         private dialogHandler: ((dialog: PmicDialog) => void) | null,
         private offlineMode: boolean,
-        private index: number
+        private index: number,
     ) {
         this.get = new BuckGet(sendCommand, index);
     }
@@ -57,7 +57,7 @@ export class BuckSet {
                         {
                             vOutNormal: value,
                         },
-                        this.index
+                        this.index,
                     );
 
                     this.eventEmitter.emitPartialEvent<Buck>(
@@ -65,7 +65,7 @@ export class BuckSet {
                         {
                             mode: 'software',
                         },
-                        this.index
+                        this.index,
                     );
 
                     resolve();
@@ -81,12 +81,12 @@ export class BuckSet {
                                 () => {
                                     this.get.mode();
                                     reject();
-                                }
+                                },
                             ),
                         () => {
                             this.get.vOutNormal();
                             reject();
-                        }
+                        },
                     );
                 }
             });
@@ -131,7 +131,7 @@ export class BuckSet {
                     {
                         vOutRetention: value,
                     },
-                    this.index
+                    this.index,
                 );
 
                 resolve();
@@ -144,7 +144,7 @@ export class BuckSet {
                     () => {
                         this.get.vOutRetention();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -159,7 +159,7 @@ export class BuckSet {
                         {
                             mode,
                         },
-                        this.index
+                        this.index,
                     );
                     resolve();
                 } else {
@@ -174,7 +174,7 @@ export class BuckSet {
                         () => {
                             this.get.mode();
                             reject();
-                        }
+                        },
                     );
                 }
             });
@@ -216,7 +216,7 @@ export class BuckSet {
                     {
                         modeControl,
                     },
-                    this.index
+                    this.index,
                 );
 
                 resolve();
@@ -227,7 +227,7 @@ export class BuckSet {
                     () => {
                         this.get.modeControl();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -243,7 +243,7 @@ export class BuckSet {
                         onOffSoftwareControlEnabled:
                             onOffControl === BuckOnOffControlValues[0],
                     },
-                    this.index
+                    this.index,
                 );
 
                 resolve();
@@ -256,7 +256,7 @@ export class BuckSet {
                     () => {
                         this.get.onOffControl();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -270,7 +270,7 @@ export class BuckSet {
                     {
                         retentionControl,
                     },
-                    this.index
+                    this.index,
                 );
 
                 resolve();
@@ -283,7 +283,7 @@ export class BuckSet {
                     () => {
                         this.get.retentionControl();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -298,7 +298,7 @@ export class BuckSet {
                         {
                             enabled,
                         },
-                        this.index
+                        this.index,
                     );
                     resolve();
                 } else {
@@ -310,7 +310,7 @@ export class BuckSet {
                         () => {
                             this.get.enabled();
                             reject();
-                        }
+                        },
                     );
                 }
             });
@@ -352,7 +352,7 @@ export class BuckSet {
                     {
                         activeDischarge: activeDischargeEnabled,
                     },
-                    this.index
+                    this.index,
                 );
 
                 resolve();
@@ -365,7 +365,7 @@ export class BuckSet {
                     () => {
                         this.get.activeDischarge();
                         reject();
-                    }
+                    },
                 );
             }
         });

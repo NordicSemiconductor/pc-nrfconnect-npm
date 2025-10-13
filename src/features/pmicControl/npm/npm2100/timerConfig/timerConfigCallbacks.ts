@@ -20,7 +20,7 @@ import { npm2100TimerMode } from '../types';
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
 
@@ -37,9 +37,9 @@ export default (
                             key =>
                                 npm2100TimerMode[
                                     key as keyof typeof npm2100TimerMode
-                                ]
-                        )
-                    )
+                                ],
+                        ),
+                    ),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<TimerConfig>(
@@ -47,13 +47,13 @@ export default (
                         {
                             mode: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                Object.values(npm2100TimerMode)
+                                Object.values(npm2100TimerMode),
                             ) as npm2100TimerMode,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // State (enabled)
@@ -63,7 +63,7 @@ export default (
                     'npm2100 timer state',
                     true,
                     undefined,
-                    toValueRegexString(['ENABLE', 'DISABLE', 'BUSY', 'IDLE'])
+                    toValueRegexString(['ENABLE', 'DISABLE', 'BUSY', 'IDLE']),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<TimerConfig>(
@@ -74,11 +74,11 @@ export default (
                                     'ENABLE' ||
                                 parseColonBasedAnswer(res).toUpperCase() ===
                                     'BUSY',
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Period
@@ -90,11 +90,11 @@ export default (
                         'onTimerConfigUpdate',
                         {
                             period: parseToFloat(res) * 1000,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

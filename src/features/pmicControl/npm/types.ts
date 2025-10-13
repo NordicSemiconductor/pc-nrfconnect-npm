@@ -435,11 +435,11 @@ export type FixedListRangeWithLabel = number[] & {
 export type RangeOrFixedListRange = RangeType | FixedListRange;
 
 export const isFixedListRange = (
-    range: RangeOrFixedListRange
+    range: RangeOrFixedListRange,
 ): range is FixedListRange => Array.isArray(range);
 
 export const isFixedListRangeWithLabel = (
-    range: RangeOrFixedListRange
+    range: RangeOrFixedListRange,
 ): range is FixedListRangeWithLabel =>
     Array.isArray(range) &&
     (range as FixedListRangeWithLabel).toLabel !== undefined;
@@ -467,7 +467,7 @@ export interface FuelGaugeModule {
         applyDownloadFuelGaugeProfile: (slot?: number) => Promise<void>;
         downloadFuelGaugeProfile: (
             profile: Buffer,
-            slot?: number
+            slot?: number,
         ) => Promise<void>;
         reset: () => Promise<void>;
     };
@@ -482,7 +482,7 @@ export type ModuleParams = {
     sendCommand: (
         command: string,
         onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
+        onError?: (response: string, command: string) => void,
     ) => void;
     dialogHandler: ((dialog: PmicDialog) => void) | null;
     offlineMode: boolean;
@@ -498,23 +498,22 @@ export type ChargerModuleSet = new (
     sendCommand: (
         command: string,
         onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
+        onError?: (response: string, command: string) => void,
     ) => void,
     offlineMode: boolean,
-    get: ChargerModuleGetBase
+    get: ChargerModuleGetBase,
 ) => ChargerModuleSetBase;
 
 export abstract class ChargerModuleSetBase {
-    // eslint-disable-next-line no-useless-constructor
     constructor(
         protected eventEmitter: NpmEventEmitter,
         protected sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
         protected offlineMode: boolean,
-        protected get: ChargerModuleGetBase
+        protected get: ChargerModuleGetBase,
     ) {}
 
     abstract all(charger: Charger): Promise<void>;
@@ -528,7 +527,7 @@ export abstract class ChargerModuleSetBase {
     abstract enabledVBatLow(value: boolean): Promise<void>;
     abstract nTCThermistor(
         mode: NTCThermistor,
-        autoSetBeta?: boolean
+        autoSetBeta?: boolean,
     ): Promise<void>;
     abstract nTCBeta(value: number): Promise<void>;
     abstract tChgStop(value: number): Promise<void>;
@@ -544,18 +543,17 @@ export type ChargerModuleGet = new (
     sendCommand: (
         command: string,
         onSuccess?: (response: string, command: string) => void,
-        onError?: (response: string, command: string) => void
-    ) => void
+        onError?: (response: string, command: string) => void,
+    ) => void,
 ) => ChargerModuleGetBase;
 
 export abstract class ChargerModuleGetBase {
-    // eslint-disable-next-line no-useless-constructor
     constructor(
         protected sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
-        ) => void
+            onError?: (response: string, command: string) => void,
+        ) => void,
     ) {}
 
     abstract all(): void;
@@ -652,7 +650,7 @@ export interface BuckModule {
         modeControl: (modeControl: BuckModeControl) => Promise<void>;
         onOffControl: (onOffControl: BuckOnOffControl) => Promise<void>;
         retentionControl: (
-            retentionControl: BuckRetentionControl
+            retentionControl: BuckRetentionControl,
         ) => Promise<void>;
         enabled: (enabled: boolean) => Promise<void>;
         activeDischarge: (activeDischarge: boolean) => Promise<void>;
@@ -850,7 +848,7 @@ export type ResetModule = {
         // npm2100
         longPressResetEnable?: (longPressResetEnable: boolean) => Promise<void>;
         longPressResetDebounce?: (
-            longPressResetDebounce: npm2100LongPressResetDebounce
+            longPressResetDebounce: npm2100LongPressResetDebounce,
         ) => Promise<void>;
         selectResetPin?: (resetPin: npm2100ResetPinSelection) => Promise<void>;
     };
@@ -1011,7 +1009,7 @@ export type BatteryProfiler = {
         reportIntervalCc: number,
         reportIntervalNtc: number,
         vCutoff: number,
-        profiles: CCProfile[]
+        profiles: CCProfile[],
     ) => Promise<void>;
     canProfile: () => Promise<true | 'MissingSyncBoard' | 'ActiveLoadNotVSYS'>;
     startProfiling: () => Promise<void>;
@@ -1019,10 +1017,10 @@ export type BatteryProfiler = {
     isProfiling: () => Promise<boolean>;
     getProfilingState: () => CCProfilingState;
     onProfilingStateChange: (
-        handler: (state: CCProfilingState, error?: string) => void
+        handler: (state: CCProfilingState, error?: string) => void,
     ) => () => void;
     onProfilingEvent: (
-        handler: (state: ProfilingEvent, error?: string) => void
+        handler: (state: ProfilingEvent, error?: string) => void,
     ) => () => void;
     pofError: () => void;
     restingProfile(): RestingCCProfile[];
@@ -1030,7 +1028,7 @@ export type BatteryProfiler = {
         capacity: number,
         vUpperCutOff: number,
         vLowerCutOff: number,
-        vTerm: number
+        vTerm: number,
     ): CCProfile[];
 };
 

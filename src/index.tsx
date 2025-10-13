@@ -77,5 +77,5 @@ render(
                 Main: Graph,
             },
         ]}
-    />
+    />,
 );

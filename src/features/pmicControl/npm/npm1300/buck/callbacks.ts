@@ -19,7 +19,7 @@ import { Buck, BuckModeControl, GPIOValues } from '../../types';
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    index: number
+    index: number,
 ) => {
     const cleanupCallbacks = [];
     if (shellParser) {
@@ -33,11 +33,11 @@ export default (
                         {
                             vOutNormal: value / 1000, // mV to V
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -50,11 +50,11 @@ export default (
                         {
                             vOutRetention: value / 1000, // mV to V
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -67,11 +67,11 @@ export default (
                         {
                             mode: value === 0 ? 'vSet' : 'software',
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -83,11 +83,11 @@ export default (
                         {
                             enabled: parseToBoolean(res),
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -96,7 +96,7 @@ export default (
                     'npmx buck gpio on_off index',
                     true,
                     index,
-                    '(-1|[0-4])'
+                    '(-1|[0-4])',
                 ),
                 res => {
                     const result = parseToNumber(res);
@@ -107,11 +107,11 @@ export default (
                                 result === -1 ? 'Off' : GPIOValues[result],
                             onOffSoftwareControlEnabled: result === -1, // Disable on GPIO control, enable on SW control
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -120,7 +120,7 @@ export default (
                     'npmx buck gpio retention index',
                     true,
                     index,
-                    '(-1|[0-4])'
+                    '(-1|[0-4])',
                 ),
                 res => {
                     const result = parseToNumber(res);
@@ -130,11 +130,11 @@ export default (
                             retentionControl:
                                 result === -1 ? 'Off' : GPIOValues[result],
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -147,11 +147,11 @@ export default (
                         {
                             modeControl: result as BuckModeControl,
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         cleanupCallbacks.push(
@@ -163,11 +163,11 @@ export default (
                         {
                             activeDischarge: parseToBoolean(res),
                         },
-                        index
+                        index,
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

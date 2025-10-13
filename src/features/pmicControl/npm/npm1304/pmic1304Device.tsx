@@ -26,7 +26,7 @@ export default class Npm1304 extends nPM1300Device {
     constructor(
         shellParser: ShellParser | undefined,
         dialogHandler: ((dialog: PmicDialog) => void) | null,
-        hardwareVersion?: string
+        hardwareVersion?: string,
     ) {
         super(
             shellParser,
@@ -38,7 +38,7 @@ export default class Npm1304 extends nPM1300Device {
             },
             hardwareVersion,
             'npm1304',
-            npm1304FWVersion
+            npm1304FWVersion,
         );
 
         if (shellParser) {
@@ -51,7 +51,7 @@ export default class Npm1304 extends nPM1300Device {
                                 break;
                         }
                     });
-                })
+                }),
             );
         }
     }
@@ -68,7 +68,7 @@ export default class Npm1304 extends nPM1300Device {
     generateExport(
         getState: () => RootState & {
             app: { pmicControl: { npmDevice: BaseNpmDevice } };
-        }
+        },
     ) {
         const currentState = getState().app.pmicControl;
 
@@ -85,7 +85,7 @@ export default class Npm1304 extends nPM1300Device {
     }
 
     protected set onBoardLoadModule(
-        onBoardLoadModule: OnBoardLoadModuleBase | undefined
+        onBoardLoadModule: OnBoardLoadModuleBase | undefined,
     ) {
         super.onBoardLoadModule = onBoardLoadModule;
     }

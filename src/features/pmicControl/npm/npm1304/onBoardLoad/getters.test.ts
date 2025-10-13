@@ -21,7 +21,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `cc_sink level get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

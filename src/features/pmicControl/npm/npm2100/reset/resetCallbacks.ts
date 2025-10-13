@@ -24,7 +24,7 @@ import {
 
 export default (
     shellParser: ShellParser | undefined,
-    eventEmitter: NpmEventEmitter
+    eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
 
@@ -36,7 +36,7 @@ export default (
                     'npm2100 reset_ctrl long_press_reset',
                     true,
                     undefined,
-                    '(\\w+)'
+                    '(\\w+)',
                 ),
                 res => {
                     const result = parseEnabled(res);
@@ -44,11 +44,11 @@ export default (
                         'onResetUpdate',
                         {
                             longPressResetEnable: result,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Reset Pin Selection
@@ -63,9 +63,9 @@ export default (
                             key =>
                                 npm2100ResetPinSelection[
                                     key as keyof typeof npm2100ResetPinSelection
-                                ]
-                        )
-                    )
+                                ],
+                        ),
+                    ),
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<ResetConfig>(
@@ -73,13 +73,13 @@ export default (
                         {
                             resetPinSelection: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                Object.values(npm2100ResetPinSelection)
+                                Object.values(npm2100ResetPinSelection),
                             ) as npm2100ResetPinSelection,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Long Press Reset Debounce
@@ -89,7 +89,7 @@ export default (
                     'npm2100 reset_ctrl long_press_reset_debounce',
                     true,
                     undefined,
-                    toValueRegexString(npm2100LongPressResetDebounceValues)
+                    toValueRegexString(npm2100LongPressResetDebounceValues),
                 ),
                 res => {
                     // const result = parseColonBasedAnswer(res);
@@ -98,13 +98,13 @@ export default (
                         {
                             longPressResetDebounce: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                npm2100LongPressResetDebounceValues
+                                npm2100LongPressResetDebounceValues,
                             ) as npm2100LongPressResetDebounce,
-                        }
+                        },
                     );
                 },
-                noop
-            )
+                noop,
+            ),
         );
 
         // Reset Reason
@@ -115,7 +115,7 @@ export default (
                     'npm2100 reset_ctrl reset_reason',
                     true,
                     undefined,
-                    resetReasonPattern
+                    resetReasonPattern,
                 ),
                 res => {
                     const data = parseColonBasedAnswer(res);
@@ -133,12 +133,12 @@ export default (
                             'onResetUpdate',
                             {
                                 resetReason,
-                            }
+                            },
                         );
                     }
                 },
-                noop
-            )
+                noop,
+            ),
         );
     }
 

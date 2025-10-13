@@ -15,5 +15,5 @@ export const TimerModeValues = Object.keys(npm1300TimerMode)
     .filter(key => !Number.isNaN(Number(key)))
     .map(Number);
 export const TimerModeKeys = Object.values(npm1300TimerMode).filter(key =>
-    Number.isNaN(Number(key))
+    Number.isNaN(Number(key)),
 );

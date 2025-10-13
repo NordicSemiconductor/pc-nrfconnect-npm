@@ -24,7 +24,7 @@ describe('PMIC 1300 - Command callbacks', () => {
                 index,
                 append: `set ${index} 2300`,
             },
-        ]).flat()
+        ]).flat(),
     )('npmx buck voltage normal %p', ({ index, append }) => {
         const command = `npmx buck voltage normal ${append}`;
         const callback =
@@ -49,7 +49,7 @@ describe('PMIC 1300 - Command callbacks', () => {
                 index,
                 append: `set ${index} 2300`,
             },
-        ]).flat()
+        ]).flat(),
     )('npmx buck voltage retention %p', ({ index, append }) => {
         const command = `npmx buck voltage retention ${append}`;
         const callback =
@@ -78,9 +78,9 @@ describe('PMIC 1300 - Command callbacks', () => {
                         append: `set ${index} ${value} `,
                         value,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx buck vout select %p', ({ index, append, value }) => {
         const command = `npmx buck vout_select ${append}`;
         const callback =
@@ -109,9 +109,9 @@ describe('PMIC 1300 - Command callbacks', () => {
                         append: `set ${index} ${enabled ? '1' : '0'} `,
                         enabled,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx buck enable %p', ({ index, append, enabled }) => {
         const command = `npmx buck status ${append}`;
         const callback =
@@ -149,9 +149,9 @@ describe('PMIC 1300 - Command callbacks', () => {
                         append: `set ${index} ${value}`,
                         value,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx buck mode control %p', ({ index, append, value }) => {
         const command = `powerup_buck mode ${append}`;
         const callback =
@@ -182,9 +182,9 @@ describe('PMIC 1300 - Command callbacks', () => {
                         append: `set ${index} ${value} 0`,
                         value,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx buck on/off control %p', ({ index, append, value }) => {
         const command = `npmx buck gpio on_off index ${append}`;
         const callback =
@@ -219,9 +219,9 @@ describe('PMIC 1300 - Command callbacks', () => {
                         append: `set ${index} ${value} 0`,
                         value,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx buck retention control %p', ({ index, append, value }) => {
         const command = `npmx buck gpio retention index ${append}`;
         const callback =
@@ -255,9 +255,9 @@ describe('PMIC 1300 - Command callbacks', () => {
                         append: `set ${index} ${activeDischarge ? '1' : '0'} `,
                         activeDischarge,
                     },
-                ].flat()
+                ].flat(),
             ),
-        ]).flat()
+        ]).flat(),
     )('npmx buck active_discharge %p', ({ index, append, activeDischarge }) => {
         const command = `npmx buck active_discharge ${append}`;
         const callback =

@@ -31,7 +31,7 @@ export const getBundledBatteries = (npmModel: NpmModel) => {
         getAppDir(),
         'resources',
         'batteryModels',
-        npmModel
+        npmModel,
     );
 
     if (!fs.existsSync(modelsPath)) {

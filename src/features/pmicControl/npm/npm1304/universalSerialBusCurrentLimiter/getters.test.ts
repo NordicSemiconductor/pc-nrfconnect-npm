@@ -21,7 +21,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx vbusin current_limit get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -33,7 +33,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `powerup_vbusin status get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

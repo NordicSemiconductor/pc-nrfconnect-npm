@@ -20,13 +20,13 @@ describe('PMIC 1304 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
         test('Set ship config time %p', async () => {
             await pmic.lowPowerModule?.set.timeToActive(
-                npm1300TimeToActive['16ms']
+                npm1300TimeToActive['16ms'],
             );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -34,7 +34,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx ship config time set 16`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -46,7 +46,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -57,8 +57,8 @@ describe('PMIC 1304 - Setters Online tests', () => {
 
             await expect(
                 pmic.lowPowerModule?.set.timeToActive(
-                    npm1300TimeToActive['16ms']
-                )
+                    npm1300TimeToActive['16ms'],
+                ),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -66,7 +66,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx ship config time set 16`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -75,7 +75,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 `npmx ship config time get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response

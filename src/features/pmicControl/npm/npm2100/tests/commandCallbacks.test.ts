@@ -64,7 +64,7 @@ describe('PMIC 2100 - Command callbacks', () => {
                     append: `set ${enabled ? '1' : '0'}`,
                 },
             ])
-            .flat()
+            .flat(),
     )('fuel_gauge %p', ({ enabled, append }) => {
         const command = `fuel_gauge ${append}`;
         const callback =
@@ -90,7 +90,7 @@ describe('PMIC 2100 - Command callbacks', () => {
                     append: `set ${enabled ? '1' : '0'}`,
                 },
             ])
-            .flat()
+            .flat(),
     )(
         'fuel_gauge params runtime discard_positive_deltaz %p',
         ({ enabled, append }) => {
@@ -104,7 +104,7 @@ describe('PMIC 2100 - Command callbacks', () => {
             expect(mockOnFuelGaugeUpdate).toBeCalledWith({
                 discardPosiiveDeltaZ: enabled,
             } satisfies Partial<FuelGauge>);
-        }
+        },
     );
 
     test.each(['get', 'set "Generic_AA"'])('fuel_gauge model %p', append => {
@@ -114,7 +114,7 @@ describe('PMIC 2100 - Command callbacks', () => {
 
         callback?.onSuccess(
             `value: name="Generic_AA",Q={2000.00 mAh}`,
-            command
+            command,
         );
 
         expect(mockOnActiveBatteryModelUpdate).toBeCalledTimes(1);
@@ -136,7 +136,7 @@ describe('PMIC 2100 - Command callbacks', () => {
 
         callback?.onSuccess(
             'Success: Model stored to persistent memory.',
-            command
+            command,
         );
 
         expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -145,14 +145,14 @@ describe('PMIC 2100 - Command callbacks', () => {
             'fuel_gauge model list',
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             2,
             'fuel_gauge model get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -220,8 +220,8 @@ Battery models stored in database:
                     append: `set ${index} ${mode}`,
                     mode,
                 },
-            ]).flat()
-        ).flat()
+            ]).flat(),
+        ).flat(),
     )('npm2100 gpio mode %p', ({ index, append, mode }) => {
         const command = `npm2100 gpio mode ${append}`;
         const callback =
@@ -256,8 +256,8 @@ Battery models stored in database:
                     append: `set ${index} ${pull}`,
                     pull,
                 },
-            ]).flat()
-        ).flat()
+            ]).flat(),
+        ).flat(),
     )('npm2100 gpio pull %p', ({ index, append, pull }) => {
         const command = `npm2100 gpio pull ${append}`;
         const callback =
@@ -285,8 +285,8 @@ Battery models stored in database:
                     append: `set ${index} ${drive}`,
                     drive,
                 },
-            ]).flat()
-        ).flat()
+            ]).flat(),
+        ).flat(),
     )('npm2100 gpio drive %p', ({ index, append, drive }) => {
         const command = `npm2100 gpio drive ${append}`;
         const callback =
@@ -316,8 +316,8 @@ Battery models stored in database:
                         debounce,
                     },
                 ])
-                .flat()
-        ).flat()
+                .flat(),
+        ).flat(),
     )('npm2100 gpio debounce %p', ({ index, append, debounce }) => {
         const command = `npm2100 gpio debounce ${append}`;
         const callback =
@@ -347,8 +347,8 @@ Battery models stored in database:
                         openDrain,
                     },
                 ])
-                .flat()
-        ).flat()
+                .flat(),
+        ).flat(),
     )('npm2100 gpio opendrain %p', ({ index, append, openDrain }) => {
         const command = `npm2100 gpio opendrain ${append}`;
         const callback =
@@ -377,7 +377,7 @@ Battery models stored in database:
                     mode,
                 },
             ])
-            .flat()
+            .flat(),
     )('npm2100 timer mode %p', ({ append, mode }) => {
         const command = `npm2100 timer mode ${append}`;
         const callback =
@@ -387,7 +387,7 @@ Battery models stored in database:
             `${append === 'get' ? 'Value:' : 'Value:'} ${
                 npm2100TimerMode[mode as keyof typeof npm2100TimerMode]
             }.`,
-            command
+            command,
         );
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);

@@ -22,10 +22,10 @@ const CustomLegend: FC<CustomLegendProps> = ({ charts }) => {
                 ?.map(
                     chart =>
                         chart?.data.datasets.map((_, index) =>
-                            chart.isDatasetVisible(index)
-                        ) ?? false
+                            chart.isDatasetVisible(index),
+                        ) ?? false,
                 )
-                .flat()
+                .flat(),
         );
     }, [charts]);
 
@@ -36,7 +36,7 @@ const CustomLegend: FC<CustomLegendProps> = ({ charts }) => {
             chart.update();
             updateLegendsState();
         },
-        [updateLegendsState]
+        [updateLegendsState],
     );
 
     useEffect(() => {
@@ -91,12 +91,12 @@ const CustomLegend: FC<CustomLegendProps> = ({ charts }) => {
                                         }}
                                     />
                                 </div>
-                            ))
+                            )),
                         )
                         .flat()}
             </div>
         ),
-        [charts, legendsState, toggleState]
+        [charts, legendsState, toggleState],
     );
 
     return items;

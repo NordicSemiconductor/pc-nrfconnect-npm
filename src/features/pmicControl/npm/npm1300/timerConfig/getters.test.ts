@@ -21,7 +21,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx timer config mode get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -33,7 +33,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx timer config prescaler get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -45,7 +45,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx timer config compare get`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 });

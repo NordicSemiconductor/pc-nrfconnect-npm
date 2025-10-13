@@ -38,7 +38,7 @@ const getLdoVoltageRange = () =>
         max: 3.3,
         decimals: 1,
         step: 0.1,
-    } as RangeType);
+    }) as RangeType;
 
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
@@ -63,7 +63,7 @@ export default class Module implements LdoModule {
             sendCommand,
             dialogHandler,
             offlineMode,
-            index
+            index,
         );
         this._callbacks = ldoCallbacks(shellParser, eventEmitter, index);
     }

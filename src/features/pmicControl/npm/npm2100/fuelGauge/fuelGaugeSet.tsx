@@ -19,11 +19,11 @@ export class FuelGaugeSet {
             command: string,
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void,
-            unique?: boolean
+            unique?: boolean,
         ) => void,
         private offlineMode: boolean,
         private initializeFuelGauge: () => Promise<void>,
-        private dialogHandler?: ((dialog: PmicDialog) => void) | null
+        private dialogHandler?: ((dialog: PmicDialog) => void) | null,
     ) {
         this.get = new FuelGaugeGet(sendCommand);
     }
@@ -33,7 +33,7 @@ export class FuelGaugeSet {
 
         if (fuelGauge.discardPosiiveDeltaZ !== undefined) {
             promises.push(
-                this.discardPosiiveDeltaZ(fuelGauge.discardPosiiveDeltaZ)
+                this.discardPosiiveDeltaZ(fuelGauge.discardPosiiveDeltaZ),
             );
         }
 
@@ -59,7 +59,7 @@ export class FuelGaugeSet {
                     () => {
                         this.get.enabled();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -74,7 +74,7 @@ export class FuelGaugeSet {
                     () => {
                         this.get.activeBatteryModel();
                         reject();
-                    }
+                    },
                 );
             });
 
@@ -120,7 +120,7 @@ export class FuelGaugeSet {
                     () => {
                         this.get.discardPosiiveDeltaZ();
                         reject();
-                    }
+                    },
                 );
             }
         });

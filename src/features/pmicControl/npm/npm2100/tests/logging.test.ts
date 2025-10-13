@@ -24,7 +24,7 @@ describe('PMIC 2100 - Logging', () => {
         const verifyLogging = (
             logLevel: 'err' | 'inf',
             command: string,
-            response: string
+            response: string,
         ) => {
             expect(mockOnLoggingEvent).toBeCalledTimes(1);
             expect(mockOnLoggingEvent).toBeCalledWith({
@@ -44,7 +44,7 @@ describe('PMIC 2100 - Logging', () => {
                     command: 'command',
                     response: 'response',
                     error: true,
-                })
+                }),
             );
 
             verifyLogging('err', 'command', 'response');
@@ -56,7 +56,7 @@ describe('PMIC 2100 - Logging', () => {
                     command: 'command',
                     response: 'response',
                     error: false,
-                })
+                }),
             );
 
             verifyLogging('inf', 'command', 'response');
@@ -78,7 +78,7 @@ describe('PMIC 2100 - Logging', () => {
 
         test('Reboot when device PMIC is available', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
+                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.',
             );
 
             expect(mockOnBeforeReboot).toBeCalledTimes(1);
@@ -87,7 +87,7 @@ describe('PMIC 2100 - Logging', () => {
         test('Does not Reboot if auto reboot is off PMIC is available', async () => {
             pmic.setAutoRebootDevice(false);
             await eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.'
+                '[00:00:02.019,531] <wrn> module_pmic: PMIC available. Application can be restarted.',
             );
 
             expect(mockOnBeforeReboot).toBeCalledTimes(0);
@@ -99,7 +99,7 @@ describe('PMIC 2100 - Logging', () => {
 
         test('Adc Sample Logging event once', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:17.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001,tte=312,ttf=514'
+                '[00:00:17.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001,tte=312,ttf=514',
             );
 
             expect(mockOnAdcSample).toBeCalledTimes(1);
@@ -113,15 +113,15 @@ describe('PMIC 2100 - Logging', () => {
 
         test('Adc Sample Logging event - overflow 1193.046471111111 hrs +', () => {
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
             );
 
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:10.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                '[00:00:10.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
             );
 
             eventHandlers.mockOnShellLoggingEventHandler(
-                '[00:00:8.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                '[00:00:8.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
             );
 
             expect(mockOnAdcSample).toBeCalledTimes(3);

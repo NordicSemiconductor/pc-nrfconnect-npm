@@ -36,10 +36,10 @@ export default ({
     const [name, setName] = useState(projectSettings?.project.name ?? '');
 
     const [vLowerCutOff, setLowerVCutOff] = useState(
-        projectSettings?.project.vLowerCutOff ?? 3
+        projectSettings?.project.vLowerCutOff ?? 3,
     );
     const [vUpperCutOff, setUpperVCutOff] = useState(
-        projectSettings?.project.vUpperCutOff ?? 4.2
+        projectSettings?.project.vUpperCutOff ?? 4.2,
     );
 
     const [capacity, setCapacity] = useState(800);
@@ -74,8 +74,8 @@ export default ({
                                             capacity,
                                             vLowerCutOff,
                                             vUpperCutOff,
-                                        })
-                                    )
+                                        }),
+                                    ),
                                 );
                             } else {
                                 showSaveDialog({
@@ -101,8 +101,8 @@ export default ({
                                                         vLowerCutOff,
                                                         vUpperCutOff,
                                                         profiles: [],
-                                                    }
-                                                )
+                                                    },
+                                                ),
                                             );
                                     }
                                 });
@@ -121,7 +121,7 @@ export default ({
                 <div
                     className={classNames(
                         'name-input',
-                        !validName && 'invalid'
+                        !validName && 'invalid',
                     )}
                 >
                     <div className="max-length">{`${name.length}/${maxLength}`}</div>

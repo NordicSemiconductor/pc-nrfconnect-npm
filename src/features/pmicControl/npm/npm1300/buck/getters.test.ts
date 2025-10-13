@@ -21,7 +21,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx buck voltage normal get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -35,9 +35,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx buck voltage retention get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1300_BUCKS)('Request update buckMode index: %p', index => {
@@ -48,7 +48,7 @@ describe('PMIC 1300 - Request update commands', () => {
             `npmx buck vout_select get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -62,9 +62,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `powerup_buck mode get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1300_BUCKS)(
@@ -77,9 +77,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx buck gpio on_off index get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1300_BUCKS)(
@@ -92,9 +92,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx buck gpio retention index get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1300_BUCKS)(
@@ -107,9 +107,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx buck active_discharge get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_1300_BUCKS)(
@@ -122,9 +122,9 @@ describe('PMIC 1300 - Request update commands', () => {
                 `npmx buck status get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 });
 

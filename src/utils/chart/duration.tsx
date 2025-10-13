@@ -14,7 +14,7 @@ const format = (milliseconds: number): string | null => {
 
     return `${d > 0 ? `${d} day${d > 1 ? 's ' : ' '} ` : ''}${h.padStart(
         2,
-        '0'
+        '0',
     )}:${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
 };
 

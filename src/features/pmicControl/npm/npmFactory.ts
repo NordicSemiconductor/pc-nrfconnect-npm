@@ -15,7 +15,7 @@ import { PmicDialog } from './types';
 
 export const getNpmDevice = (
     shellParser: ShellParser,
-    dialogHandler: ((pmicDialog: PmicDialog) => void) | null
+    dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
 ): Promise<BaseNpmDevice> =>
     new Promise<BaseNpmDevice>((resolve, reject) => {
         shellParser.enqueueRequest('hw_version', {
@@ -29,8 +29,8 @@ export const getNpmDevice = (
                         new Npm1304(
                             shellParser,
                             dialogHandler,
-                            parsedHwVersion.version
-                        )
+                            parsedHwVersion.version,
+                        ),
                     );
                 } else if (hwVersion?.startsWith('npm2100ek')) {
                     resolve(new Npm2100(shellParser, dialogHandler));

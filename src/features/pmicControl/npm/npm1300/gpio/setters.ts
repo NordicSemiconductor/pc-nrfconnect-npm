@@ -22,10 +22,10 @@ export class GpioSet {
         private sendCommand: (
             command: string,
             onSuccess?: (response: string, command: string) => void,
-            onError?: (response: string, command: string) => void
+            onError?: (response: string, command: string) => void,
         ) => void,
         private offlineMode: boolean,
-        private index: number
+        private index: number,
     ) {
         this.get = new GpioGet(sendCommand, index);
     }
@@ -55,7 +55,7 @@ export class GpioSet {
                         driveEnabled: !isInput,
                         debounceEnabled: isInput,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -65,7 +65,7 @@ export class GpioSet {
                     () => {
                         this.get.mode();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -79,7 +79,7 @@ export class GpioSet {
                     {
                         pull,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -89,7 +89,7 @@ export class GpioSet {
                     () => {
                         this.get.pull();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -103,7 +103,7 @@ export class GpioSet {
                     {
                         drive,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -113,7 +113,7 @@ export class GpioSet {
                     () => {
                         this.get.drive();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -127,7 +127,7 @@ export class GpioSet {
                     {
                         openDrain,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -139,7 +139,7 @@ export class GpioSet {
                     () => {
                         this.get.openDrain();
                         reject();
-                    }
+                    },
                 );
             }
         });
@@ -153,7 +153,7 @@ export class GpioSet {
                     {
                         debounce,
                     },
-                    this.index
+                    this.index,
                 );
                 resolve();
             } else {
@@ -165,7 +165,7 @@ export class GpioSet {
                     () => {
                         this.get.debounce();
                         reject();
-                    }
+                    },
                 );
             }
         });

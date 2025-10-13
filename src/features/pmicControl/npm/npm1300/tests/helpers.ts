@@ -19,20 +19,20 @@ export const PMIC_1300_GPIOS = [0, 1, 2, 3, 4];
 export const PMIC_1300_LEDS = [0, 1, 2];
 
 export const setupMocksBase = (
-    shellParser: ShellParser | undefined = undefined
+    shellParser: ShellParser | undefined = undefined,
 ) =>
     GenericsetupMocksBase(
         (
             sp: ShellParser | undefined,
-            dialogHandler: ((dialog: PmicDialog) => void) | null
+            dialogHandler: ((dialog: PmicDialog) => void) | null,
         ) => new Npm1300(sp, dialogHandler),
-        shellParser
+        shellParser,
     );
 
 export const setupMocksWithShellParser = () =>
     GenericSetupMocksWithShellParser(
         (
             sp: ShellParser | undefined,
-            dialogHandler: ((dialog: PmicDialog) => void) | null
-        ) => new Npm1300(sp, dialogHandler)
+            dialogHandler: ((dialog: PmicDialog) => void) | null,
+        ) => new Npm1300(sp, dialogHandler),
     );
