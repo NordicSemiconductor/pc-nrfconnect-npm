@@ -16,7 +16,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -28,7 +28,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 low_power_control pwr_btn set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
                 dialog.onConfirm();
             });
@@ -41,28 +41,28 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm2100 low_power_control ship_mode_configure resistor set NONE`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
                 `npm2100 low_power_control wakeup_configure edge_polarity set RISING`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 4,
                 `npm2100 low_power_control ship_mode_configure current set LOW`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 5,
                 `npm2100 low_power_control ship_mode set ENABLE`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
         });
 
@@ -74,7 +74,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `npm2100 low_power_control pwr_btn set OFF`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 dialog.onCancel?.();
@@ -88,7 +88,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm2100 low_power_control pwr_btn set ON`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
         });
     });

@@ -29,7 +29,7 @@ describe('PMIC 2100 - Command callbacks', () => {
                     mode,
                 },
             ])
-            .flat()
+            .flat(),
     )('npm2100 timer mode %p', ({ append, mode }) => {
         const command = `npm2100 timer mode ${append}`;
         const callback =
@@ -39,7 +39,7 @@ describe('PMIC 2100 - Command callbacks', () => {
             `${append === 'get' ? 'Value:' : 'Value:'} ${
                 npm2100TimerMode[mode as keyof typeof npm2100TimerMode]
             }.`,
-            command
+            command,
         );
 
         expect(mockOnTimerConfigUpdate).toBeCalledTimes(1);

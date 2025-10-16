@@ -23,7 +23,7 @@ describe('PMIC 2100 - Setters Offline tests', () => {
             expect(mockOnFuelGaugeUpdate).toBeCalledWith({
                 enabled,
             } satisfies Partial<FuelGauge>);
-        }
+        },
     );
 });
 

@@ -22,7 +22,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackSuccess
+                helpers.registerCommandCallbackSuccess,
             );
         });
 
@@ -34,7 +34,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `fuel_gauge set 0`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -53,12 +53,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     }`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setFuelGaugeEnabled enabled: true', async () => {
@@ -72,7 +72,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                             `fuel_gauge set 1`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
                         // init fuel gauge with some load NCD-1074
                         expect(mockEnqueueRequest).nthCalledWith(
@@ -80,14 +80,14 @@ describe('PMIC 2100 - Setters Online tests', () => {
                             `npm_adc sample 500 1000`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
                         expect(mockEnqueueRequest).nthCalledWith(
                             3,
                             `npm2100 boost mode set HP`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
 
                         resolve();
@@ -96,16 +96,16 @@ describe('PMIC 2100 - Setters Online tests', () => {
                                 command,
                                 callbacks,
                                 timeout,
-                                unique
+                                unique,
                             )
                             .then(() => {
                                 process.nextTick(() => {
                                     eventHandlers.mockOnShellLoggingEventHandler(
-                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
                                     );
                                 });
                             });
-                    }
+                    },
                 );
             });
 
@@ -117,7 +117,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                             `fuel_gauge reset`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
 
                         resolve();
@@ -126,16 +126,16 @@ describe('PMIC 2100 - Setters Online tests', () => {
                                 command,
                                 callbacks,
                                 timeout,
-                                unique
+                                unique,
                             )
                             .then(() => {
                                 process.nextTick(() => {
                                     eventHandlers.mockOnShellLoggingEventHandler(
-                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
                                     );
                                 });
                             });
-                    }
+                    },
                 );
             });
 
@@ -147,24 +147,24 @@ describe('PMIC 2100 - Setters Online tests', () => {
                             `npm2100 boost mode set AUTO`,
                             expect.anything(),
                             undefined,
-                            true
+                            true,
                         );
                         return helpers
                             .registerCommandCallbackSuccess(
                                 command,
                                 callbacks,
                                 timeout,
-                                unique
+                                unique,
                             )
                             .then(() => {
                                 process.nextTick(() => {
                                     eventHandlers.mockOnShellLoggingEventHandler(
-                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001'
+                                        '[00:00:16.525,000] <inf> module_pmic_adc: ibat=0.000617,vbat=4.248000,tdie=26.656051,soc=98.705001',
                                     );
                                 });
                                 resolve();
                             });
-                    }
+                    },
                 );
             });
 
@@ -173,7 +173,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `npm_adc sample 500 2000`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -186,7 +186,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             });
 
             await pmic.fuelGaugeModule?.set.activeBatteryModel(
-                'someProfileName'
+                'someProfileName',
             );
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
@@ -194,7 +194,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `fuel_gauge model set "someProfileName"`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
@@ -214,7 +214,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             jest.clearAllMocks();
 
             mockEnqueueRequest.mockImplementation(
-                helpers.registerCommandCallbackError
+                helpers.registerCommandCallbackError,
             );
         });
 
@@ -222,7 +222,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             'Set setFuelGaugeEnabled - Fail immediately - enabled: %p',
             async enabled => {
                 await expect(
-                    pmic.fuelGaugeModule?.set.enabled(enabled)
+                    pmic.fuelGaugeModule?.set.enabled(enabled),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -230,7 +230,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `fuel_gauge set ${enabled ? '1' : '0'}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -239,19 +239,19 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `fuel_gauge get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test.each([true, false])(
             'Set discard_positive_deltaz - Fail immediately: %p',
             async enabled => {
                 await expect(
-                    pmic.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(enabled)
+                    pmic.fuelGaugeModule?.set.discardPosiiveDeltaZ?.(enabled),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -261,7 +261,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     }`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Refresh data due to error
@@ -270,12 +270,12 @@ describe('PMIC 2100 - Setters Online tests', () => {
                     `fuel_gauge params runtime discard_positive_deltaz get`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
 
                 // Updates should only be emitted when we get response
                 expect(mockOnFuelGaugeUpdate).toBeCalledTimes(0);
-            }
+            },
         );
 
         test('Set setActiveBatteryModel - Fail immediately', async () => {
@@ -284,7 +284,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.fuelGaugeModule?.set.activeBatteryModel('someProfileName')
+                pmic.fuelGaugeModule?.set.activeBatteryModel('someProfileName'),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -292,7 +292,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `fuel_gauge model set "someProfileName"`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Refresh data due to error
@@ -301,7 +301,7 @@ describe('PMIC 2100 - Setters Online tests', () => {
                 `fuel_gauge model get`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
 
             // Updates should only be emitted when we get response
