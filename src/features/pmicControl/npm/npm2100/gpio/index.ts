@@ -7,6 +7,7 @@
 import {
     GPIO,
     GPIODrive,
+    GPIOExport,
     GPIOMode,
     type GpioModule,
     GPIOPull,
@@ -29,6 +30,15 @@ import {
 
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
+
+export const toGPIOExport = (gpio: GPIO): GPIOExport => ({
+    mode: gpio.mode,
+    state: gpio.state,
+    pull: gpio.pull,
+    drive: gpio.drive,
+    openDrain: gpio.openDrain,
+    debounce: gpio.debounce,
+});
 
 export default class Module implements GpioModule {
     readonly index: number;
@@ -102,6 +112,7 @@ export default class Module implements GpioModule {
             openDrainEnabled: false,
             debounce: false,
             debounceEnabled: true,
+            stateShown: false,
         };
     }
 }

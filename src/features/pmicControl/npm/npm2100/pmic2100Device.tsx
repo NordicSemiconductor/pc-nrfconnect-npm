@@ -25,7 +25,7 @@ import {
 import BatteryModule, { PowerID2100 } from './battery';
 import BoostModule from './boost';
 import FuelGaugeModule from './fuelGauge';
-import GpioModule from './gpio';
+import GpioModule, { toGPIOExport } from './gpio';
 import LdoModule, { toLdoExport } from './ldo';
 import LowPowerModule from './lowPower';
 import overlay from './overlay';
@@ -320,7 +320,7 @@ export default class Npm2100 extends BaseNpmDevice {
         return {
             boosts: [...currentState.boosts],
             ldos: [...currentState.ldos.map(toLdoExport)],
-            gpios: [...currentState.gpios],
+            gpios: [...currentState.gpios.map(toGPIOExport)],
             leds: [...currentState.leds],
             lowPower: currentState.lowPower,
             reset: currentState.reset,

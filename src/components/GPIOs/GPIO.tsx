@@ -13,7 +13,6 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
-import { GPIOMode2100 } from '../../features/pmicControl/npm/npm2100/gpio/types';
 import {
     GPIO,
     GPIOMode,
@@ -70,7 +69,7 @@ export default ({
                 }
                 disabled={disabled}
             />
-            {gpio.mode === GPIOMode2100.Output &&
+            {gpio.stateShown &&
                 gpioModule.set.state &&
                 gpioModule.values.state && (
                     <div>
