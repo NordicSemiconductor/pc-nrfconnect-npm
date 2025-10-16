@@ -32,7 +32,7 @@ describe('PMIC 2100 - Command callbacks', () => {
                     append: `set ${enabled ? '1' : '0'}`,
                 },
             ])
-            .flat()
+            .flat(),
     )('fuel_gauge %p', ({ enabled, append }) => {
         const command = `fuel_gauge ${append}`;
         const callback =
@@ -58,7 +58,7 @@ describe('PMIC 2100 - Command callbacks', () => {
                     append: `set ${enabled ? '1' : '0'}`,
                 },
             ])
-            .flat()
+            .flat(),
     )(
         'fuel_gauge params runtime discard_positive_deltaz %p',
         ({ enabled, append }) => {
@@ -72,7 +72,7 @@ describe('PMIC 2100 - Command callbacks', () => {
             expect(mockOnFuelGaugeUpdate).toBeCalledWith({
                 discardPosiiveDeltaZ: enabled,
             } satisfies Partial<FuelGauge>);
-        }
+        },
     );
 
     test.each(['get', 'set "Generic_AA"'])('fuel_gauge model %p', append => {
@@ -82,7 +82,7 @@ describe('PMIC 2100 - Command callbacks', () => {
 
         callback?.onSuccess(
             `value: name="Generic_AA",Q={2000.00 mAh}`,
-            command
+            command,
         );
 
         expect(mockOnActiveBatteryModelUpdate).toBeCalledTimes(1);
@@ -104,7 +104,7 @@ describe('PMIC 2100 - Command callbacks', () => {
 
         callback?.onSuccess(
             'Success: Model stored to persistent memory.',
-            command
+            command,
         );
 
         expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -113,14 +113,14 @@ describe('PMIC 2100 - Command callbacks', () => {
             'fuel_gauge model list',
             expect.anything(),
             undefined,
-            true
+            true,
         );
         expect(mockEnqueueRequest).nthCalledWith(
             2,
             'fuel_gauge model get',
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 

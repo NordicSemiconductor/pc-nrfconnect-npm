@@ -21,7 +21,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `npm2100 gpio mode get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -33,7 +33,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `npm2100 gpio pull get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -45,7 +45,7 @@ describe('PMIC 2100 - Request update commands', () => {
             `npm2100 gpio drive get ${index}`,
             expect.anything(),
             undefined,
-            true
+            true,
         );
     });
 
@@ -59,9 +59,9 @@ describe('PMIC 2100 - Request update commands', () => {
                 `npm2100 gpio debounce get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 
     test.each(PMIC_2100_GPIOS)(
@@ -74,9 +74,9 @@ describe('PMIC 2100 - Request update commands', () => {
                 `npm2100 gpio opendrain get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
-        }
+        },
     );
 });
 

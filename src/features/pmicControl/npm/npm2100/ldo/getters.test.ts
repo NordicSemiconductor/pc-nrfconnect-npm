@@ -24,9 +24,9 @@ describe('PMIC 2100 - Request update commands', () => {
                     `npmx ldsw ldo_voltage get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
-            }
+            },
         );
 
         test.each(PMIC_2100_LDOS)(
@@ -39,9 +39,9 @@ describe('PMIC 2100 - Request update commands', () => {
                     `npmx ldsw status get ${index}`,
                     expect.anything(),
                     undefined,
-                    true
+                    true,
                 );
-            }
+            },
         );
 
         test.each(PMIC_2100_LDOS)('Request update ldoMode index: %p', index => {
@@ -52,7 +52,7 @@ describe('PMIC 2100 - Request update commands', () => {
                 `npmx ldsw mode get ${index}`,
                 expect.anything(),
                 undefined,
-                true
+                true,
             );
         });
     });
