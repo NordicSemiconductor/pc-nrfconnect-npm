@@ -1262,7 +1262,9 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         range for the specific battery used. The result of the
                         battery profiling is a battery model. To evaluate the
                         custom battery model in nPM PowerUP, select the battery
-                        model in <p>Add New Active Battery Model</p> and write
+                        model in `}
+                            <b>Add New Active Battery Model</b>
+                            {` and write
                         its JSON file to the selected battery model slot. To
                         continue development and implementation on your own
                         design, use the battery model INC file. See the `}
