@@ -57,9 +57,6 @@
         "semver": "^7.6.3",
         "zod": "^3.22.2"
     },
-    "eslintConfig": {
-        "extends": "./node_modules/@nordicsemiconductor/pc-nrfconnect-shared/config/eslintrc"
-    },
     "prettier": "@nordicsemiconductor/pc-nrfconnect-shared/config/prettier.config.js",
     "bundleDependencies": []
 }
