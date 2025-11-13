@@ -105,9 +105,9 @@ export default (
                     toValueRegexString(nPM2100LdoModeControlValues),
                 ),
                 res => {
-                    const modeControl = parseColonBasedAnswer(
-                        res,
-                    ) as nPM2100LdoModeControl;
+                    // const modeControl = parseColonBasedAnswer(
+                    //     res,
+                    // ) as nPM2100LdoModeControl;
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
@@ -115,7 +115,7 @@ export default (
                                 parseColonBasedAnswer(res),
                                 nPM2100LdoModeControlValues,
                             ) as nPM2100LdoModeControl,
-                            onOffSoftwareControlEnabled: modeControl !== 'gpio',
+                            onOffSoftwareControlEnabled: true, // modeControl !== 'gpio',
                         },
                         0,
                     );
