@@ -145,7 +145,6 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
             expect(mockOnLdoUpdate).toBeCalledWith({
                 data: {
                     modeControl,
-                    onOffSoftwareControlEnabled: modeControl !== 'gpio',
                 },
                 index,
             });
