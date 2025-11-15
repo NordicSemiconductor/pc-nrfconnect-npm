@@ -253,6 +253,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 delete partialUpdate.data.debounceEnabled;
                 delete partialUpdate.data.driveEnabled;
                 delete partialUpdate.data.openDrainEnabled;
+                delete partialUpdate.data.stateShown;
 
                 gpios[partialUpdate.index] = {
                     ...(gpios[partialUpdate.index] ?? initGPIO),
