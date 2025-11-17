@@ -1,3 +1,10 @@
+## Unreleased
+
+### Changed
+
+- nPM2100: The enable toggle for Load switch/LDO is no longer disabled when the
+  GPIO mode control is selected.
+
 ## 2.2.3 - 2025-09-30
 
 ### Added
