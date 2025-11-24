@@ -286,6 +286,14 @@ export const updateNpm1300AdcTimings =
         );
     };
 
+export const isNpm1012SerialApplicationMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ab && // TODO: update
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
+export const isNpm1012SerialRecoverMode = (device: Device) =>
+    device.usb?.device.descriptor.idProduct === 0x53ac && // TODO: update
+    device.usb?.device.descriptor.idVendor === 0x1915;
+
 export const isNpm1300SerialApplicationMode = (device: Device) =>
     device.usb?.device.descriptor.idProduct === 0x53ab &&
     device.usb?.device.descriptor.idVendor === 0x1915;

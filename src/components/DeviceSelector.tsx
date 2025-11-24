@@ -16,10 +16,14 @@ import path from 'path';
 
 import { closeDevice, openDevice } from '../actions/deviceActions';
 import {
+    npm1012DeviceSetup,
     npm1300DeviceSetup,
     npm1304DeviceSetup,
     npm2100DeviceSetup,
 } from '../features/pmicControl/npm/deviceSetups';
+import Npm1012, {
+    npm1012FWVersion,
+} from '../features/pmicControl/npm/npm1012/pmic1012Device';
 import Npm1300, {
     npm1300FWVersion,
 } from '../features/pmicControl/npm/npm1300/pmic1300Device';
@@ -56,6 +60,13 @@ const deviceListing: DeviceTraits = {
 
 const deviceSetupConfig: DeviceSetupConfig = {
     deviceSetups: [
+        npm1012DeviceSetup({
+            key: 'nPM1012',
+            description: '',
+            hex: getAppFile(
+                path.join('fw', `app_signed_nPM1012_${npm1012FWVersion}.hex`),
+            ),
+        }),
         npm1300DeviceSetup({
             key: 'nPM1300',
             description: '',
@@ -123,9 +134,17 @@ export default () => {
                 isNpm2100SerialApplicationMode(device) ||
                 isNpm2100SerialRecoverMode(device)
             }
-            virtualDevices={['nPM1300', 'nPM1304', 'nPM2100']}
+            virtualDevices={['nPM1012', 'nPM1300', 'nPM1304', 'nPM2100']}
             onVirtualDeviceSelected={device => {
-                if (device === 'nPM1300') {
+                if (device === 'nPM1012') {
+                    dispatch(
+                        setNpmDevice(
+                            new Npm1012(undefined, pmicDialog =>
+                                dispatch(dialogHandler(pmicDialog)),
+                            ),
+                        ),
+                    );
+                } else if (device === 'nPM1300') {
                     dispatch(
                         setNpmDevice(
                             new Npm1300(undefined, pmicDialog =>

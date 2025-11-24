@@ -903,6 +903,7 @@ export interface PmicDialog {
 }
 
 export const zodSchemaNpmMode = z.union([
+    z.literal('npm1012'),
     z.literal('npm1300'),
     z.literal('npm1304'),
     z.literal('npm2100'),
