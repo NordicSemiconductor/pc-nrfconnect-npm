@@ -22,6 +22,7 @@ import {
     NpmExportV2,
     PmicDialog,
 } from '../types';
+import ChargerModule from './charger';
 import overlay from './overlay';
 
 export const npm1012FWVersion = '0.7.2+0';
@@ -40,6 +41,7 @@ export default class Npm1012 extends BaseNpmDevice {
             dialogHandler,
             new NpmEventEmitter(),
             {
+                ChargerModule,
                 maxEnergyExtraction: true,
                 noOfLEDs: 0,
                 noOfBatterySlots: 3,
@@ -47,7 +49,7 @@ export default class Npm1012 extends BaseNpmDevice {
             0,
             {
                 reset: false,
-                charger: false,
+                charger: true,
                 sensor: false,
             },
         );
@@ -234,6 +236,7 @@ export default class Npm1012 extends BaseNpmDevice {
 
         return {
             boosts: [...currentState.boosts],
+            charger: currentState.charger,
             ldos: [...currentState.ldos],
             gpios: [...currentState.gpios],
             leds: [...currentState.leds],
