@@ -12,8 +12,9 @@ export class ChargerGet extends ChargerModuleGetBase {
         this.vTerm();
         this.iChg();
         this.enabled();
-        this.vTrickleFast();
         this.iTerm();
+        this.iTrickle?.();
+        this.vTrickleFast();
         this.batLim?.();
         this.enabledRecharging();
         this.enabledVBatLow();
@@ -46,6 +47,9 @@ export class ChargerGet extends ChargerModuleGetBase {
     }
     iTerm() {
         this.sendCommand('npmx charger termination_current get');
+    }
+    iTrickle() {
+        this.sendCommand('npmx charger trickle_current get');
     }
     batLim: (() => void) | undefined = () => {
         this.sendCommand('npm_adc fullscale get');

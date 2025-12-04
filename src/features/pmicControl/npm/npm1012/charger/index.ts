@@ -19,6 +19,7 @@ import {
     ChargerModuleSetBase,
     FixedListRange,
     ITerm,
+    ITrickle,
     ModuleParams,
     VTrickleFast,
 } from '../../types';
@@ -28,6 +29,8 @@ import { ChargerSet } from './setters';
 import {
     ITermKeys,
     ITermValues,
+    ITrickleKeys,
+    ITrickleValues,
     VTrickleFastKeys,
     VTrickleFastValues,
 } from './types';
@@ -70,6 +73,7 @@ export default class Module implements ChargerModuleBase {
             iChg: this.ranges.current.min,
             enabled: false,
             iTerm: 10,
+            iTrickle: 12.5,
             iBatLim: 1000,
             enableRecharging: false,
             enableVBatLow: false,
@@ -160,11 +164,16 @@ export default class Module implements ChargerModuleBase {
     // eslint-disable-next-line class-methods-use-this
     get values(): {
         iTerm: { label: string; value: ITerm }[];
+        iTrickle: { label: string; value: ITrickle }[];
         vTrickleFast: { label: string; value: VTrickleFast }[];
     } {
         return {
             iTerm: [...ITermValues].map((item, i) => ({
                 label: `${ITermKeys[i]}`,
+                value: item,
+            })),
+            iTrickle: [...ITrickleValues].map((item, i) => ({
+                label: `${ITrickleKeys[i]}`,
                 value: item,
             })),
             vTrickleFast: [...VTrickleFastValues].map((item, i) => ({

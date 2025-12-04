@@ -8,6 +8,7 @@ import {
     Charger,
     ChargerModuleSetBase,
     ITerm,
+    ITrickle,
     NTCThermistor,
     VTrickleFast,
 } from '../../types';
@@ -23,16 +24,19 @@ export class ChargerSet extends ChargerModuleSetBase {
         if (charger.iBatLim && this.batLim) {
             promises.push(this.batLim(charger.iBatLim));
         }
+        if (charger.iTrickle && this.iTrickle) {
+            promises.push(this.iTrickle(charger.iTrickle));
+        }
 
         promises.push(
             this.enabledRecharging(charger.enableRecharging),
             this.enabledVBatLow(charger.enableVBatLow),
-            this.vTrickleFast(charger.vTrickleFast),
             this.nTCThermistor(charger.ntcThermistor),
             this.nTCBeta(charger.ntcBeta),
             this.tChgResume(charger.tChgResume),
             this.tChgStop(charger.tChgStop),
             this.vTermR(charger.vTermR),
+            this.vTrickleFast(charger.vTrickleFast),
             this.tCold(charger.tCold),
             this.tCool(charger.tCool),
             this.tWarm(charger.tWarm),
@@ -173,6 +177,34 @@ export class ChargerSet extends ChargerModuleSetBase {
                     })
                     .catch(() => {
                         this.get.iTerm();
+                        reject();
+                    });
+            }
+        });
+    }
+
+    iTrickle(iTrickle: ITrickle) {
+        return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                iTrickle,
+            });
+
+            if (this.offlineMode) {
+                resolve();
+            } else {
+                this.enabled(false)
+                    .then(() => {
+                        this.sendCommand(
+                            `npmx charger trickle_current set ${iTrickle}`,
+                            () => resolve(),
+                            () => {
+                                this.get.iTrickle?.();
+                                reject();
+                            },
+                        );
+                    })
+                    .catch(() => {
+                        this.get.iTrickle?.();
                         reject();
                     });
             }
