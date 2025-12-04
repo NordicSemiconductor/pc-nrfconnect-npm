@@ -14,6 +14,11 @@ import { z } from 'zod';
 
 import { RangeType } from '../../../utils/helpers';
 import type BaseNpmDevice from './basePmicDevice';
+import {
+    ITerm1012,
+    ITrickle1012,
+    VTrickleFast1012,
+} from './npm1012/charger/types';
 import { ITermNpm1300, VTrickleFast1300 } from './npm1300/charger/types';
 import type {
     GPIODrive1300,
@@ -102,10 +107,11 @@ export type BuckRetentionControl =
     | (typeof BuckRetentionControlValues)[number]
     | GPIONames;
 
-export type ITerm = ITermNpm1300 | ITermNpm1304;
+export type ITerm = ITerm1012 | ITermNpm1300 | ITermNpm1304;
+export type ITrickle = ITrickle1012;
 
 export const NTCValues = ['Ignore NTC', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
-export type VTrickleFast = VTrickleFast1300;
+export type VTrickleFast = VTrickleFast1012 | VTrickleFast1300;
 export type NTCThermistor = (typeof NTCValues)[number];
 
 export type ModuleSettings = {
@@ -161,6 +167,7 @@ export type FuelGauge = {
 
 export type Charger = {
     vTerm: number;
+    iTrickle?: ITrickle;
     vTrickleFast: VTrickleFast;
     iChg: number;
     enabled: boolean;
@@ -520,6 +527,7 @@ export abstract class ChargerModuleSetBase {
     abstract vTerm(value: number): Promise<void>;
     abstract iChg(value: number): Promise<void>;
     abstract enabled(value: boolean): Promise<void>;
+    iTrickle?(value: ITrickle): Promise<void>;
     abstract vTrickleFast(value: VTrickleFast): Promise<void>;
     abstract iTerm(iTerm: ITerm): Promise<void>;
     abstract batLim?(value: number): Promise<void>;
@@ -561,6 +569,7 @@ export abstract class ChargerModuleGetBase {
     abstract vTerm(): void;
     abstract iChg(): void;
     abstract enabled(): void;
+    iTrickle?(): void;
     abstract vTrickleFast(): void;
     abstract iTerm(): void;
     abstract batLim?(): void;
@@ -597,6 +606,7 @@ export interface ChargerModule {
     defaults: Charger;
     values: {
         iTerm: { label: string; value: ITerm }[];
+        iTrickle?: { label: string; value: ITrickle }[];
         vTrickleFast: { label: string; value: VTrickleFast }[];
     };
 }
