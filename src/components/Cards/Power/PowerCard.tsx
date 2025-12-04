@@ -19,6 +19,7 @@ import {
     ChargerModule,
     isFixedListRangeWithLabel,
     ITerm,
+    ITrickle,
     VTrickleFast,
 } from '../../../features/pmicControl/npm/types';
 
@@ -116,6 +117,50 @@ const IBatLimUI = ({
             onChange={setInternalBatLim}
             onChangeComplete={v => setBatLim(v)}
             showSlider
+        />
+    );
+};
+
+const ITrickleUI = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalITrickle] = useState(charger.iTrickle);
+
+    if (
+        !chargerModule.set.iTrickle ||
+        charger.iTrickle === undefined ||
+        internalITrickle === undefined ||
+        chargerModule.values.iTrickle === undefined
+    ) {
+        return null;
+    }
+
+    return (
+        <Dropdown
+            label={
+                <DocumentationTooltip card={card} item="ITrickle">
+                    <>
+                        <span>I</span>
+                        <span className="subscript">TRICKLE</span>
+                    </>
+                </DocumentationTooltip>
+            }
+            items={chargerModule.values.iTrickle}
+            onSelect={item =>
+                chargerModule.set.iTrickle?.(item.value as ITrickle)
+            }
+            selectedItem={
+                chargerModule.values.iTrickle.find(
+                    item => item.value === charger.iTrickle,
+                ) ?? chargerModule.values.iTrickle[0]
+            }
+            disabled={disabled}
         />
     );
 };
@@ -288,6 +333,11 @@ export default ({
                                 item => item.value === charger.vTrickleFast,
                             ) ?? chargerModule.values.vTrickleFast[0]
                         }
+                        disabled={disabled}
+                    />
+                    <ITrickleUI
+                        charger={charger}
+                        chargerModule={chargerModule}
                         disabled={disabled}
                     />
                 </>
