@@ -219,8 +219,6 @@ export const npm1012DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                     validFirmware: result.supported,
                 });
 
-                // TODO: check hw/fw version?
-
                 await dispose();
 
                 return action();
