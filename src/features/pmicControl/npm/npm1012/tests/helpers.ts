@@ -15,7 +15,7 @@ import Npm1012 from '../pmic1012Device';
 
 export const PMIC_1012_BUCKS = [0, 1];
 export const PMIC_1012_LDOS = [0, 1];
-export const PMIC_1012_GPIOS = [0, 1, 2, 3, 4];
+export const PMIC_1012_GPIOS = [0, 1, 2];
 export const PMIC_1012_LEDS = [0, 1, 2];
 
 export const setupMocksBase = (
