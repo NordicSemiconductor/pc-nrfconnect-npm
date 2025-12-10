@@ -527,10 +527,8 @@ export abstract class ChargerModuleSetBase {
     abstract vTerm(value: number): Promise<void>;
     abstract iChg(value: number): Promise<void>;
     abstract enabled(value: boolean): Promise<void>;
-    iTrickle?(value: ITrickle): Promise<void>;
     abstract vTrickleFast(value: VTrickleFast): Promise<void>;
     abstract iTerm(iTerm: ITerm): Promise<void>;
-    abstract batLim?(value: number): Promise<void>;
     abstract enabledRecharging(value: boolean): Promise<void>;
     abstract enabledVBatLow(value: boolean): Promise<void>;
     abstract nTCThermistor(
@@ -545,6 +543,9 @@ export abstract class ChargerModuleSetBase {
     abstract tCool(value: number): Promise<void>;
     abstract tWarm(value: number): Promise<void>;
     abstract tHot(value: number): Promise<void>;
+
+    batLim?(value: number): Promise<void>;
+    iTrickle?(value: ITrickle): Promise<void>;
 }
 
 export type ChargerModuleGet = new (
@@ -569,10 +570,8 @@ export abstract class ChargerModuleGetBase {
     abstract vTerm(): void;
     abstract iChg(): void;
     abstract enabled(): void;
-    iTrickle?(): void;
     abstract vTrickleFast(): void;
     abstract iTerm(): void;
-    abstract batLim?(): void;
     abstract enabledRecharging(): void;
     abstract enabledVBatLow(): void;
     abstract nTCThermistor(): void;
@@ -584,6 +583,9 @@ export abstract class ChargerModuleGetBase {
     abstract tCool(): void;
     abstract tWarm(): void;
     abstract tHot(): void;
+
+    batLim?(): void;
+    iTrickle?(): void;
 }
 
 export type ChargerModuleRanges = {
