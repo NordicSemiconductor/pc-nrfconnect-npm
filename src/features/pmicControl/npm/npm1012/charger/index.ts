@@ -162,13 +162,9 @@ export default class Module implements ChargerModuleBase {
         return getRange([
             {
                 min: 3.5,
-                max: 3.65,
-                step: 0.05,
-            },
-            {
-                min: 4.0,
-                max: 4.45,
-                step: 0.05,
+                max: 4.65,
+                step: 0.01,
+                decimals: 2,
             },
         ]).map(v => Number(v.toFixed(2)));
     }
