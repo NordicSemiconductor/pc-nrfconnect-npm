@@ -41,7 +41,7 @@ export default class Module extends nPM1300Charger {
         return {
             vTerm: this.ranges.voltage[0],
             vTrickleFast: 2.5,
-            iChg: this.ranges.current.min,
+            iChg: this.ranges.current[0],
             enabled: false,
             iTerm: 5,
             enableRecharging: false,
@@ -70,12 +70,7 @@ export default class Module extends nPM1300Charger {
                 min: 50,
                 max: 110,
             },
-            current: {
-                min: 4,
-                max: 100,
-                decimals: 1,
-                step: 0.5,
-            },
+            current: Module.currentRange,
             nTCBeta: {
                 min: 0,
                 max: 4294967295,
@@ -93,6 +88,17 @@ export default class Module extends nPM1300Charger {
                 max: 500,
             },
         };
+    }
+
+    protected static get currentRange() {
+        return getRange([
+            {
+                min: 4,
+                max: 100,
+                decimals: 1,
+                step: 0.5,
+            },
+        ]).map(v => Number(v.toFixed(1)));
     }
 
     // eslint-disable-next-line class-methods-use-this

@@ -52,7 +52,9 @@ export default ({
     const [showValidationError, setShowValidationError] = useState(false);
 
     const [capacity, setCapacity] = useState(
-        npmDevice.chargerModule?.ranges.current.max ?? 800,
+        npmDevice.chargerModule?.ranges.current[
+            (npmDevice.chargerModule?.ranges.current.length ?? 0) - 1
+        ] ?? 800,
     );
     const [ntcThermistor, setNTCThermistor] = useState<NTCThermistor>('10 kΩ');
     const [temperatures, setTemperatures] = useState<number[]>([25]);
