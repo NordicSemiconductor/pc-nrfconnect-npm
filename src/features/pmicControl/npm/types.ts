@@ -12,7 +12,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { z } from 'zod';
 
-import { RangeType } from '../../../utils/helpers';
+import { RangeOrNumberArray, RangeType } from '../../../utils/helpers';
 import type BaseNpmDevice from './basePmicDevice';
 import {
     ITerm1012,
@@ -593,7 +593,7 @@ export type ChargerModuleRanges = {
     vTermR: number[];
     jeita: RangeType;
     chipThermal: RangeType;
-    current: RangeType;
+    current: RangeOrNumberArray;
     nTCBeta: RangeType;
     iBatLim?: FixedListRange;
     vLowerCutOff: RangeType;
