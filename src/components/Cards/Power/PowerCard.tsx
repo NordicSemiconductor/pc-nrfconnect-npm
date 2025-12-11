@@ -165,6 +165,47 @@ const ITrickleUI = ({
     );
 };
 
+const WeakBatteryChargingUI = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalWeakBatChg, setInternalWeakBatChg] = useState(
+        charger.enableWeakBatteryCharging,
+    );
+
+    if (
+        !chargerModule.set.enabledWeakBatteryCharging ||
+        charger.enableWeakBatteryCharging === undefined ||
+        internalWeakBatChg === undefined
+    ) {
+        return null;
+    }
+
+    return (
+        <Toggle
+            label={
+                <DocumentationTooltip
+                    card={card}
+                    item="EnableWeakBatteryCharging"
+                >
+                    Enable Weak Battery Charging
+                </DocumentationTooltip>
+            }
+            isToggled={internalWeakBatChg}
+            onToggle={value => {
+                setInternalWeakBatChg(value);
+                chargerModule.set.enabledWeakBatteryCharging?.(value);
+            }}
+            disabled={disabled}
+        />
+    );
+};
+
 export default ({
     chargerModule,
     charger,
@@ -336,6 +377,11 @@ export default ({
                         disabled={disabled}
                     />
                     <ITrickleUI
+                        charger={charger}
+                        chargerModule={chargerModule}
+                        disabled={disabled}
+                    />
+                    <WeakBatteryChargingUI
                         charger={charger}
                         chargerModule={chargerModule}
                         disabled={disabled}
