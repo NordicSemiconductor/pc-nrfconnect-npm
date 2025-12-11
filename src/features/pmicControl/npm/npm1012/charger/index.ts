@@ -20,7 +20,6 @@ import {
     ChargerModuleRanges,
     ChargerModuleSet,
     ChargerModuleSetBase,
-    FixedListRange,
     ITerm,
     ITrickle,
     ModuleParams,
@@ -77,8 +76,8 @@ export default class Module implements ChargerModuleBase {
             enabled: false,
             iTerm: 10,
             iTrickle: 12.5,
-            iBatLim: 1000,
             enableRecharging: false,
+            enableWeakBatteryCharging: false,
             enableVBatLow: false,
             ntcThermistor: '10 kΩ',
             ntcBeta: 3380,
@@ -111,7 +110,6 @@ export default class Module implements ChargerModuleBase {
                 decimals: 0,
                 step: 1,
             },
-            iBatLim: Module.iBatRange(),
             vLowerCutOff: {
                 min: 2.7,
                 max: 3.6,
@@ -123,24 +121,6 @@ export default class Module implements ChargerModuleBase {
                 max: 3000,
             },
         };
-    }
-
-    static iBatRange(): FixedListRange {
-        const result: number[] & { toLabel?: (v: number) => string } = [
-            1000, 200,
-        ];
-        result.toLabel = (v: number) => {
-            switch (v) {
-                case 1000:
-                    return 'High';
-                case 200:
-                    return 'Low';
-                default:
-                    return `Manual (${v} mA)`;
-            }
-        };
-
-        return result;
     }
 
     protected static get currentRange() {

@@ -27,6 +27,16 @@ export class ChargerSet extends ChargerModuleSetBase {
         if (charger.iTrickle && this.iTrickle) {
             promises.push(this.iTrickle(charger.iTrickle));
         }
+        if (
+            charger.enableWeakBatteryCharging !== undefined &&
+            this.enabledWeakBatteryCharging
+        ) {
+            promises.push(
+                this.enabledWeakBatteryCharging(
+                    charger.enableWeakBatteryCharging,
+                ),
+            );
+        }
 
         promises.push(
             this.enabledRecharging(charger.enableRecharging),
@@ -211,35 +221,6 @@ export class ChargerSet extends ChargerModuleSetBase {
         });
     }
 
-    batLim: ((iBatLim: number) => Promise<void>) | undefined = (
-        iBatLim: number,
-    ) =>
-        new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                iBatLim,
-            });
-
-            if (this.offlineMode) {
-                resolve();
-            } else {
-                this.enabled(false)
-                    .then(() => {
-                        this.sendCommand(
-                            `npm_adc fullscale set ${iBatLim}`,
-                            () => resolve(),
-                            () => {
-                                this.get.batLim?.();
-                                reject();
-                            },
-                        );
-                    })
-                    .catch(() => {
-                        this.get.batLim?.();
-                        reject();
-                    });
-            }
-        });
-
     enabledRecharging(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
@@ -253,6 +234,26 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => resolve(),
                     () => {
                         this.get.enabledRecharging();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    enabledWeakBatteryCharging(enabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    enableWeakBatteryCharging: enabled,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger module weak_charge set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        this.get.enabledWeakBatteryCharging?.();
                         reject();
                     },
                 );
