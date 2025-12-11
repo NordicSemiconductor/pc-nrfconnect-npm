@@ -47,3 +47,29 @@ export const getRange = (ranges: RangeType[]): number[] => {
 
     return out;
 };
+
+export type RangeOrNumberArray = RangeType | number[];
+
+const getMaxNumDecimalsForNumberArray = (values: number[]): number =>
+    Math.max(...values.map(v => getDecimalPlaces(v)));
+
+export const getMaxNumDecimalsForRangeOrNumberArray = (
+    values: RangeOrNumberArray,
+): number =>
+    getMaxNumDecimalsForNumberArray(
+        Array.isArray(values) ? values : getRange([values]),
+    );
+
+export const getMaxValueOfRangeOrNumberArray = (
+    values: RangeOrNumberArray,
+): number =>
+    Array.isArray(values)
+        ? Math.max(...values)
+        : Math.max(...getRange([values]));
+
+export const getMinValueOfRangeOrNumberArray = (
+    values: RangeOrNumberArray,
+): number =>
+    Array.isArray(values)
+        ? Math.min(...values)
+        : Math.min(...getRange([values]));
