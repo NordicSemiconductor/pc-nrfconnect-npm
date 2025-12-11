@@ -67,7 +67,7 @@ export default class Module implements ChargerModuleBase {
         return {
             vTerm: this.ranges.voltage[0],
             vTrickleFast: 2.5,
-            iChg: this.ranges.current[0],
+            iChg: this.ranges.current.min,
             enabled: false,
             iTerm: 10,
             iBatLim: 1000,
@@ -97,7 +97,12 @@ export default class Module implements ChargerModuleBase {
                 min: 50,
                 max: 110,
             },
-            current: Module.currentRange,
+            current: {
+                min: 32,
+                max: 800,
+                decimals: 0,
+                step: 2,
+            },
             nTCBeta: {
                 min: 0,
                 max: 4294967295,
@@ -134,17 +139,6 @@ export default class Module implements ChargerModuleBase {
         };
 
         return result;
-    }
-
-    protected static get currentRange() {
-        return getRange([
-            {
-                min: 32,
-                max: 800,
-                decimals: 0,
-                step: 2,
-            },
-        ]).map(v => Number(v));
     }
 
     // eslint-disable-next-line class-methods-use-this

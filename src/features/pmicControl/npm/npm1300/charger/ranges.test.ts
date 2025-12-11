@@ -40,15 +40,13 @@ describe('PMIC 1300 - Static getters', () => {
             max: 60,
         }));
 
-    test('Charger Current Range', () => {
-        expect(pmic.chargerModule?.ranges.current[0]).toStrictEqual(32);
-        expect(
-            pmic.chargerModule?.ranges.current[
-                (pmic.chargerModule?.ranges.current.length ?? 0) - 1
-            ],
-        ).toStrictEqual(800);
-        expect(pmic.chargerModule?.ranges.current.length).toStrictEqual(385);
-    });
+    test('Charger Current Range', () =>
+        expect(pmic.chargerModule?.ranges.current).toStrictEqual({
+            min: 32,
+            max: 800,
+            decimals: 0,
+            step: 2,
+        }));
 
     test('Charger Current Range', () => {
         const range = pmic.chargerModule?.ranges.iBatLim;

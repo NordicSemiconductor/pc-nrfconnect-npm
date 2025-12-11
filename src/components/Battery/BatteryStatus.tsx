@@ -79,7 +79,10 @@ export default ({ disabled }: { disabled: boolean }) => {
                         !Number.isNaN(latestAdcSample?.iBat)
                             ? `${latestAdcSample.iBat < 0 ? '—' : ''}${Math.abs(
                                   latestAdcSample.iBat ?? 0,
-                              ).toFixed(2)} mA`
+                              ).toFixed(
+                                  npmDevice?.chargerModule?.ranges.current
+                                      .decimals ?? 0,
+                              )} mA`
                             : 'N/A'
                     }
                 />
