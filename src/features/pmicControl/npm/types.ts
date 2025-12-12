@@ -185,6 +185,7 @@ export type Charger = {
     tCool: number;
     tWarm: number;
     tHot: number;
+    vWeak?: number;
 };
 
 export type OnBoardLoad = {
@@ -548,6 +549,7 @@ export abstract class ChargerModuleSetBase {
     batLim?(value: number): Promise<void>;
     enabledWeakBatteryCharging?(value: boolean): Promise<void>;
     iTrickle?(value: ITrickle): Promise<void>;
+    vWeak?(value: number): Promise<void>;
 }
 
 export type ChargerModuleGet = new (
@@ -589,6 +591,7 @@ export abstract class ChargerModuleGetBase {
     batLim?(): void;
     enabledWeakBatteryCharging?(): void;
     iTrickle?(): void;
+    vWeak?(): void;
 }
 
 export type ChargerModuleRanges = {
@@ -601,6 +604,7 @@ export type ChargerModuleRanges = {
     iBatLim?: FixedListRange;
     vLowerCutOff: RangeType;
     batterySize: RangeType;
+    vWeak?: RangeType;
 };
 
 export interface ChargerModule {
