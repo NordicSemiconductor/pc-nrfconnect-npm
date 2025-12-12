@@ -353,6 +353,45 @@ export default (
                 noop,
             ),
         );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger trickle_current', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iTrickle: value,
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger weak_voltage', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        vWeak: value / 1000, // mV to V
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger module weak_charge', true),
+                res => {
+                    const value = parseToBoolean(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        enableWeakBatteryCharging: value,
+                    });
+                },
+                noop,
+            ),
+        );
     }
 
     return cleanupCallbacks;
