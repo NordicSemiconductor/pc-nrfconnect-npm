@@ -88,6 +88,7 @@ export default class Module implements ChargerModuleBase {
             tCool: 10,
             tWarm: 45,
             tHot: 60,
+            vWeak: 3.2,
         };
     }
 
@@ -119,6 +120,12 @@ export default class Module implements ChargerModuleBase {
             batterySize: {
                 min: 32,
                 max: 3000,
+            },
+            vWeak: {
+                min: 2.5,
+                max: 4.0,
+                step: 0.1,
+                decimals: 1,
             },
         };
     }

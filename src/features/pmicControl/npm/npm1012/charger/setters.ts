@@ -37,6 +37,9 @@ export class ChargerSet extends ChargerModuleSetBase {
                 ),
             );
         }
+        if (charger.vWeak && this.vWeak) {
+            promises.push(this.vWeak(charger.vWeak));
+        }
 
         promises.push(
             this.enabledRecharging(charger.enableRecharging),
@@ -506,6 +509,34 @@ export class ChargerSet extends ChargerModuleSetBase {
                         reject();
                     },
                 );
+            }
+        });
+    }
+
+    vWeak(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                vWeak: value,
+            });
+
+            if (this.offlineMode) {
+                resolve();
+            } else {
+                this.enabled(false)
+                    .then(() => {
+                        this.sendCommand(
+                            `npmx charger weak_voltage set ${value * 1000}`,
+                            () => resolve(),
+                            () => {
+                                this.get.vWeak?.();
+                                reject();
+                            },
+                        );
+                    })
+                    .catch(() => {
+                        this.get.vWeak?.();
+                        reject();
+                    });
             }
         });
     }

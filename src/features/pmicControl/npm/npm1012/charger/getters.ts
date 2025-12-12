@@ -87,4 +87,7 @@ export class ChargerGet extends ChargerModuleGetBase {
     tHot() {
         this.sendCommand('npmx charger ntc_temperature hot get');
     }
+    vWeak() {
+        this.sendCommand('npmx charger weak_voltage get');
+    }
 }
