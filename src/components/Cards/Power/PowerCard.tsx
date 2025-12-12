@@ -165,6 +165,51 @@ const ITrickleUI = ({
     );
 };
 
+const VWeakUI = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalVWeak, setInternalVWeak] = useState(charger.vWeak);
+
+    useEffect(() => {
+        setInternalVWeak(charger.vWeak);
+    }, [charger]);
+
+    if (
+        !chargerModule.set.vWeak ||
+        !chargerModule.ranges.vWeak ||
+        charger.vWeak === undefined ||
+        internalVWeak === undefined
+    ) {
+        return null;
+    }
+
+    return (
+        <NumberInput
+            label={
+                <DocumentationTooltip card={card} item="VWEAK">
+                    <div>
+                        <span>V</span>
+                        <span className="subscript">WEAK</span>
+                    </div>
+                </DocumentationTooltip>
+            }
+            unit="V"
+            disabled={disabled}
+            range={chargerModule.ranges.vWeak}
+            value={internalVWeak}
+            onChange={setInternalVWeak}
+            onChangeComplete={v => chargerModule.set.vWeak?.(v)}
+            showSlider
+        />
+    );
+};
+
 const WeakBatteryChargingUI = ({
     chargerModule,
     charger,
@@ -377,6 +422,11 @@ export default ({
                         disabled={disabled}
                     />
                     <ITrickleUI
+                        charger={charger}
+                        chargerModule={chargerModule}
+                        disabled={disabled}
+                    />
+                    <VWeakUI
                         charger={charger}
                         chargerModule={chargerModule}
                         disabled={disabled}
