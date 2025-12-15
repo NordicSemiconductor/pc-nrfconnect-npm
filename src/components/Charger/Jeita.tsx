@@ -19,6 +19,8 @@ import {
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     ChargerModule,
     NTCThermistor,
     NTCValues,
@@ -32,6 +34,96 @@ const ntcThermistorItems = [...NTCValues].map(item => ({
 }));
 
 const card = 'JEITA';
+
+const convertILabelToReactNode = (type: ChargerJeitaILabel) => {
+    switch (type) {
+        case ChargerJeitaILabel.coldIOff:
+            return <span>Off</span>;
+        case ChargerJeitaILabel.coolICool:
+            return (
+                <span>
+                    I<span className="subscript">COOL</span>
+                </span>
+            );
+        case ChargerJeitaILabel.coolIChg50percent:
+            return (
+                <span>
+                    50% I<span className="subscript">CHG</span>
+                </span>
+            );
+        case ChargerJeitaILabel.coolIChgCool:
+            return (
+                <span>
+                    I<span className="subscript">CHG_COOL</span>
+                </span>
+            );
+        case ChargerJeitaILabel.nominalIChg:
+            return (
+                <span>
+                    I<span className="subscript">CHG</span>
+                </span>
+            );
+        case ChargerJeitaILabel.warmIChg:
+            return (
+                <span>
+                    I<span className="subscript">CHG</span>
+                </span>
+            );
+        case ChargerJeitaILabel.warmIChgWarm:
+            return (
+                <span>
+                    I<span className="subscript">CHG_WARM</span>
+                </span>
+            );
+        case ChargerJeitaILabel.hotIOff:
+            return <span>Off</span>;
+    }
+};
+
+const convertVLabelToReactNode = (type: ChargerJeitaVLabel) => {
+    switch (type) {
+        case ChargerJeitaVLabel.coldVNA:
+            return <span>N/A</span>;
+        case ChargerJeitaVLabel.coolVTerm:
+            return (
+                <span>
+                    V<span className="subscript">TERM</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.coolVTermCool:
+            return (
+                <span>
+                    V<span className="subscript">TERM_COOL</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.nominalVTerm:
+            return (
+                <span>
+                    V<span className="subscript">TERM</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.warmVTerm100mVOff:
+            return (
+                <span>
+                    V<span className="subscript">TERM</span> - 100 mV
+                </span>
+            );
+        case ChargerJeitaVLabel.warmVTermR:
+            return (
+                <span>
+                    V<span className="subscript">TERMR</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.warmVTermWarm:
+            return (
+                <span>
+                    V<span className="subscript">TERM_WARM</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.hotVNA:
+            return <span>N/A</span>;
+    }
+};
 
 export default ({
     chargerModule,
@@ -133,7 +225,7 @@ export default ({
                         <Line />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat < internalJeitaTemps[0] &&
                                 'tw-bg-indigo-100',
@@ -142,8 +234,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Cold
                         </span>
-                        <span>Off</span>
-                        <span>N/A</span>
+                        {convertILabelToReactNode(charger.jeitaILabelCold)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelCold)}
                     </div>
                     <div>
                         <Arrow
@@ -158,7 +250,7 @@ export default ({
                         />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[0] &&
                                 latestAdcSample.tBat < internalJeitaTemps[1] &&
@@ -168,12 +260,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Cool
                         </span>
-                        <span>
-                            I<span className="subscript">COOL</span>
-                        </span>
-                        <span>
-                            V<span className="subscript">TERM</span>
-                        </span>
+                        {convertILabelToReactNode(charger.jeitaILabelCool)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelCool)}
                     </div>
                     <div>
                         <Arrow
@@ -188,7 +276,7 @@ export default ({
                         />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[1] &&
                                 latestAdcSample?.tBat < internalJeitaTemps[2] &&
@@ -198,12 +286,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Nominal
                         </span>
-                        <span>
-                            I<span className="subscript">CHG</span>
-                        </span>
-                        <span>
-                            V<span className="subscript">TERM</span>
-                        </span>
+                        {convertILabelToReactNode(charger.jeitaILabelNominal)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelNominal)}
                     </div>
                     <div>
                         <Arrow
@@ -218,7 +302,7 @@ export default ({
                         />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[2] &&
                                 latestAdcSample.tBat < internalJeitaTemps[3] &&
@@ -228,12 +312,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Warm
                         </span>
-                        <span>
-                            I<span className="subscript">CHG</span>
-                        </span>
-                        <span>
-                            V<span className="subscript">TERMR</span>
-                        </span>
+                        {convertILabelToReactNode(charger.jeitaILabelWarm)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelWarm)}
                     </div>
                     <div>
                         <Arrow
@@ -248,7 +328,7 @@ export default ({
                         />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[3] &&
                                 'tw-bg-red-100',
@@ -257,8 +337,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Hot
                         </span>
-                        <span>Off</span>
-                        <span>N/A</span>
+                        {convertILabelToReactNode(charger.jeitaILabelHot)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelHot)}
                     </div>
                 </div>
 
