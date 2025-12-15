@@ -14,6 +14,8 @@ import {
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     type ChargerModule as ChargerModuleBase,
     ChargerModuleGet,
     ChargerModuleGetBase,
@@ -97,6 +99,16 @@ export default class Module implements ChargerModuleBase {
             tWarm: 45,
             tHot: 60,
             vWeak: 3.2,
+            jeitaILabelCold: ChargerJeitaILabel.coldIOff,
+            jeitaILabelCool: ChargerJeitaILabel.coolIChg50percent,
+            jeitaILabelNominal: ChargerJeitaILabel.nominalIChg,
+            jeitaILabelWarm: ChargerJeitaILabel.warmIChg,
+            jeitaILabelHot: ChargerJeitaILabel.hotIOff,
+            jeitaVLabelCold: ChargerJeitaVLabel.coldVNA,
+            jeitaVLabelCool: ChargerJeitaVLabel.coolVTerm,
+            jeitaVLabelNominal: ChargerJeitaVLabel.nominalVTerm,
+            jeitaVLabelWarm: ChargerJeitaVLabel.warmVTerm100mVOff,
+            jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
         };
     }
 
