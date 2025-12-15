@@ -12,8 +12,13 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { z } from 'zod';
 
-import { RangeType } from '../../../utils/helpers';
+import { RangeOrNumberArray, RangeType } from '../../../utils/helpers';
 import type BaseNpmDevice from './basePmicDevice';
+import {
+    ITerm1012,
+    ITrickle1012,
+    VTrickleFast1012,
+} from './npm1012/charger/types';
 import { ITermNpm1300, VTrickleFast1300 } from './npm1300/charger/types';
 import type {
     GPIODrive1300,
@@ -102,10 +107,11 @@ export type BuckRetentionControl =
     | (typeof BuckRetentionControlValues)[number]
     | GPIONames;
 
-export type ITerm = ITermNpm1300 | ITermNpm1304;
+export type ITerm = ITerm1012 | ITermNpm1300 | ITermNpm1304;
+export type ITrickle = ITrickle1012;
 
 export const NTCValues = ['Ignore NTC', '10 kΩ', '47 kΩ', '100 kΩ'] as const;
-export type VTrickleFast = VTrickleFast1300;
+export type VTrickleFast = VTrickleFast1012 | VTrickleFast1300;
 export type NTCThermistor = (typeof NTCValues)[number];
 
 export type ModuleSettings = {
@@ -161,10 +167,12 @@ export type FuelGauge = {
 
 export type Charger = {
     vTerm: number;
+    iTrickle?: ITrickle;
     vTrickleFast: VTrickleFast;
     iChg: number;
     enabled: boolean;
     enableRecharging: boolean;
+    enableWeakBatteryCharging?: boolean;
     enableVBatLow: boolean;
     iTerm: ITerm;
     iBatLim?: number;
@@ -177,6 +185,7 @@ export type Charger = {
     tCool: number;
     tWarm: number;
     tHot: number;
+    vWeak?: number;
 };
 
 export type OnBoardLoad = {
@@ -523,7 +532,6 @@ export abstract class ChargerModuleSetBase {
     abstract enabled(value: boolean): Promise<void>;
     abstract vTrickleFast(value: VTrickleFast): Promise<void>;
     abstract iTerm(iTerm: ITerm): Promise<void>;
-    abstract batLim?(value: number): Promise<void>;
     abstract enabledRecharging(value: boolean): Promise<void>;
     abstract enabledVBatLow(value: boolean): Promise<void>;
     abstract nTCThermistor(
@@ -538,6 +546,11 @@ export abstract class ChargerModuleSetBase {
     abstract tCool(value: number): Promise<void>;
     abstract tWarm(value: number): Promise<void>;
     abstract tHot(value: number): Promise<void>;
+
+    batLim?(value: number): Promise<void>;
+    enabledWeakBatteryCharging?(value: boolean): Promise<void>;
+    iTrickle?(value: ITrickle): Promise<void>;
+    vWeak?(value: number): Promise<void>;
 }
 
 export type ChargerModuleGet = new (
@@ -564,7 +577,6 @@ export abstract class ChargerModuleGetBase {
     abstract enabled(): void;
     abstract vTrickleFast(): void;
     abstract iTerm(): void;
-    abstract batLim?(): void;
     abstract enabledRecharging(): void;
     abstract enabledVBatLow(): void;
     abstract nTCThermistor(): void;
@@ -576,6 +588,11 @@ export abstract class ChargerModuleGetBase {
     abstract tCool(): void;
     abstract tWarm(): void;
     abstract tHot(): void;
+
+    batLim?(): void;
+    enabledWeakBatteryCharging?(): void;
+    iTrickle?(): void;
+    vWeak?(): void;
 }
 
 export type ChargerModuleRanges = {
@@ -583,11 +600,12 @@ export type ChargerModuleRanges = {
     vTermR: number[];
     jeita: RangeType;
     chipThermal: RangeType;
-    current: RangeType;
+    current: RangeOrNumberArray;
     nTCBeta: RangeType;
     iBatLim?: FixedListRange;
     vLowerCutOff: RangeType;
     batterySize: RangeType;
+    vWeak?: RangeType;
 };
 
 export interface ChargerModule {
@@ -598,6 +616,7 @@ export interface ChargerModule {
     defaults: Charger;
     values: {
         iTerm: { label: string; value: ITerm }[];
+        iTrickle?: { label: string; value: ITrickle }[];
         vTrickleFast: { label: string; value: VTrickleFast }[];
     };
 }
@@ -904,6 +923,7 @@ export interface PmicDialog {
 }
 
 export const zodSchemaNpmMode = z.union([
+    z.literal('npm1012'),
     z.literal('npm1300'),
     z.literal('npm1304'),
     z.literal('npm2100'),

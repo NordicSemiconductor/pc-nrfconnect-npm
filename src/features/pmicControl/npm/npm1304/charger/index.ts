@@ -6,7 +6,10 @@
 
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { getRange } from '../../../../../utils/helpers';
+import {
+    getMinValueOfRangeOrNumberArray,
+    getRange,
+} from '../../../../../utils/helpers';
 import nPM1300Charger from '../../npm1300/charger';
 import chargerCallbacks from '../../npm1300/charger/callbacks';
 import {
@@ -41,7 +44,7 @@ export default class Module extends nPM1300Charger {
         return {
             vTerm: this.ranges.voltage[0],
             vTrickleFast: 2.5,
-            iChg: this.ranges.current.min,
+            iChg: getMinValueOfRangeOrNumberArray(this.ranges.current),
             enabled: false,
             iTerm: 5,
             enableRecharging: false,
