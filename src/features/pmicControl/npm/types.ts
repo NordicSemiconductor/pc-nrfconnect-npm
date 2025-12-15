@@ -186,6 +186,18 @@ export type Charger = {
     tWarm: number;
     tHot: number;
     vWeak?: number;
+
+    jeitaILabelCold: ChargerJeitaILabel;
+    jeitaILabelCool: ChargerJeitaILabel;
+    jeitaILabelNominal: ChargerJeitaILabel;
+    jeitaILabelWarm: ChargerJeitaILabel;
+    jeitaILabelHot: ChargerJeitaILabel;
+
+    jeitaVLabelCold: ChargerJeitaVLabel;
+    jeitaVLabelCool: ChargerJeitaVLabel;
+    jeitaVLabelNominal: ChargerJeitaVLabel;
+    jeitaVLabelWarm: ChargerJeitaVLabel;
+    jeitaVLabelHot: ChargerJeitaVLabel;
 };
 
 export type OnBoardLoad = {
@@ -311,6 +323,36 @@ export enum npm2100TimeToActive {
     '600ms' = '600',
     '1s' = '1000',
     '3s' = '3000',
+}
+
+export enum ChargerJeitaILabel {
+    coldIOff,
+
+    coolIChgCool,
+    coolIChg50percent,
+    coolICool,
+
+    nominalIChg,
+
+    warmIChg,
+    warmIChgWarm,
+
+    hotIOff,
+}
+
+export enum ChargerJeitaVLabel {
+    coldVNA,
+
+    coolVTerm,
+    coolVTermCool,
+
+    nominalVTerm,
+
+    warmVTermR,
+    warmVTermWarm,
+    warmVTerm100mVOff,
+
+    hotVNA,
 }
 
 export type TimeToActive = npm1300TimeToActive | npm2100TimeToActive;
