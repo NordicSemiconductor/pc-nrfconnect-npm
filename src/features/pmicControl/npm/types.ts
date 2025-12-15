@@ -232,6 +232,7 @@ export type GPIODrive = GPIODrive1300 | GPIODrive2100;
 export type GPIO = {
     mode: GPIOMode;
     state?: GPIOState;
+    stateShown?: boolean;
     pull: GPIOPull;
     pullEnabled: boolean;
     drive: GPIODrive;
@@ -918,7 +919,11 @@ export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
 export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
 export type GPIOExport = Omit<
     GPIO,
-    'pullEnabled' | 'driveEnabled' | 'openDrainEnabled' | 'debounceEnabled'
+    | 'pullEnabled'
+    | 'driveEnabled'
+    | 'openDrainEnabled'
+    | 'debounceEnabled'
+    | 'stateShown'
 >;
 export type USBPowerExport = Omit<USBPower, 'detectStatus'>;
 

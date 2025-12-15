@@ -72,6 +72,7 @@ describe('PMIC 2100 - Setters Offline tests', () => {
                 driveEnabled: false,
                 openDrainEnabled: false,
                 pullEnabled: true,
+                stateShown: false,
             },
             index,
         });
