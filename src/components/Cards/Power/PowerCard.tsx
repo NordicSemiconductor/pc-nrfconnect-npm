@@ -141,6 +141,8 @@ const ITrickleUI = ({
         return null;
     }
 
+    const iTrickleValues = chargerModule.values.iTrickle(charger.iChg);
+
     return (
         <Dropdown
             label={
@@ -151,14 +153,13 @@ const ITrickleUI = ({
                     </>
                 </DocumentationTooltip>
             }
-            items={chargerModule.values.iTrickle}
+            items={iTrickleValues}
             onSelect={item =>
                 chargerModule.set.iTrickle?.(item.value as ITrickle)
             }
             selectedItem={
-                chargerModule.values.iTrickle.find(
-                    item => item.value === charger.iTrickle,
-                ) ?? chargerModule.values.iTrickle[0]
+                iTrickleValues.find(item => item.value === charger.iTrickle) ??
+                iTrickleValues[0]
             }
             disabled={disabled}
         />
