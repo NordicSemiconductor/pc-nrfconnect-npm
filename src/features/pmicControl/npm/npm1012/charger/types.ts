@@ -31,6 +31,17 @@ const ITrickleKV = Object.entries(ITrickle1012).filter(
 export const ITrickleKeys = ITrickleKV.map(kv => kv[0]);
 export const ITrickleValues = ITrickleKV.map(kv => Number(kv[1]));
 
+// Disable options '0.78%' and '1.56%' when IChg > 8 mA
+const ITrickleKVWhenIChgBelow8mA = ITrickleKV.filter(
+    kv => Number(kv[1]) > 1.56,
+);
+export const ITrickleKeysWhenIChgBelow8mA = ITrickleKVWhenIChgBelow8mA.map(
+    kv => kv[0],
+);
+export const ITrickleValuesWhenIChgBelow8mA = ITrickleKVWhenIChgBelow8mA.map(
+    kv => Number(kv[1]),
+);
+
 export enum VTrickleFast1012 {
     '2.5 V' = 2.5,
     '2.7 V' = 2.7,
