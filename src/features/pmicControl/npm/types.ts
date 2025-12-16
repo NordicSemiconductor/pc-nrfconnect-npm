@@ -615,7 +615,7 @@ export interface ChargerModule {
     defaults: Charger;
     values: {
         iTerm: { label: string; value: ITerm }[];
-        iTrickle?: { label: string; value: ITrickle }[];
+        iTrickle?: (iChg: number) => { label: string; value: ITrickle }[];
         vTrickleFast: { label: string; value: VTrickleFast }[];
     };
 }
