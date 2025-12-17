@@ -183,6 +183,8 @@ export type Charger = {
     tWarm: number;
     tHot: number;
 
+    enableAdvancedChargingProfile?: boolean;
+    enableNtcMonitoring?: boolean;
     enableWeakBatteryCharging?: boolean;
     iBatLim?: number;
     iChgCool?: number;
@@ -594,6 +596,8 @@ export abstract class ChargerModuleSetBase {
     abstract tHot(value: number): Promise<void>;
 
     batLim?(value: number): Promise<void>;
+    enableAdvancedChargingProfile?(value: boolean): Promise<void>;
+    enableNtcMonitoring?(value: boolean): Promise<void>;
     enabledWeakBatteryCharging?(value: boolean): Promise<void>;
     iChgCool?(value: number): Promise<void>;
     iChgWarm?(value: number): Promise<void>;
