@@ -6,6 +6,8 @@
 
 import {
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     ChargerModuleSetBase,
     ITerm,
     ITrickle,
@@ -51,6 +53,24 @@ export class ChargerSet extends ChargerModuleSetBase {
         }
         if (charger.vTermWarm !== undefined && this.vTermWarm !== undefined) {
             promises.push(this.vTermWarm(charger.vTermWarm));
+        }
+        if (
+            charger.enableAdvancedChargingProfile !== undefined &&
+            this.enableAdvancedChargingProfile
+        ) {
+            promises.push(
+                this.enableAdvancedChargingProfile(
+                    charger.enableAdvancedChargingProfile,
+                ),
+            );
+        }
+        if (
+            charger.enableNtcMonitoring !== undefined &&
+            this.enableNtcMonitoring
+        ) {
+            promises.push(
+                this.enableNtcMonitoring(charger.enableNtcMonitoring),
+            );
         }
 
         promises.push(
@@ -550,6 +570,38 @@ export class ChargerSet extends ChargerModuleSetBase {
                         reject();
                     });
             }
+        });
+    }
+
+    enableAdvancedChargingProfile(enabled: boolean) {
+        return new Promise<void>(resolve => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                enableAdvancedChargingProfile: enabled,
+                jeitaILabelCool: enabled
+                    ? ChargerJeitaILabel.coolIChgCool
+                    : ChargerJeitaILabel.coolIChg50percent,
+                jeitaVLabelCool: enabled
+                    ? ChargerJeitaVLabel.coolVTermCool
+                    : ChargerJeitaVLabel.coolVTerm,
+                jeitaILabelWarm: enabled
+                    ? ChargerJeitaILabel.warmIChgWarm
+                    : ChargerJeitaILabel.warmIChg,
+                jeitaVLabelWarm: enabled
+                    ? ChargerJeitaVLabel.warmVTermWarm
+                    : ChargerJeitaVLabel.warmVTerm100mVOff,
+            });
+
+            resolve();
+        });
+    }
+
+    enableNtcMonitoring(enabled: boolean) {
+        return new Promise<void>(resolve => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                enableNtcMonitoring: enabled,
+            });
+
+            resolve();
         });
     }
 

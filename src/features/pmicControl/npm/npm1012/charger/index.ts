@@ -99,6 +99,8 @@ export default class Module implements ChargerModuleBase {
             tWarm: 45,
             tHot: 60,
             vWeak: 3.2,
+            enableNtcMonitoring: false,
+            enableAdvancedChargingProfile: false,
             iChgCool: getMinValueOfRangeOrNumberArray(this.ranges.current),
             vTermCool: this.ranges.voltage[0],
             iChgWarm: getMinValueOfRangeOrNumberArray(this.ranges.current),
