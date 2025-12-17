@@ -136,10 +136,6 @@ export default ({
 }) => {
     const latestAdcSample = useSelector(getLatestAdcSample);
 
-    const [internalVTermr, setInternalVTermr] = useState(charger.vTermR);
-    const [internalNTCBeta, setInternalNTCBeta] = useState(charger.ntcBeta);
-    const [autoNTCBeta, setAutoNTCBeta] = useState(true);
-
     const [internalJeitaTemps, setInternalJeitaTemps] = useState([
         charger.tCold,
         charger.tCool,
@@ -160,14 +156,12 @@ export default ({
 
     //  NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
-        setInternalVTermr(charger.vTermR);
         setInternalJeitaTemps([
             charger.tCold,
             charger.tCool,
             charger.tWarm,
             charger.tHot,
         ]);
-        setInternalNTCBeta(charger.ntcBeta);
     }, [charger]);
 
     const updateInternal = (index: number, value: number) => {
@@ -199,16 +193,45 @@ export default ({
         setInternalJeitaTemps(temp);
     };
 
+    const advancedChargingProfileSupport =
+        charger.enableNtcMonitoring !== undefined &&
+        charger.enableAdvancedChargingProfile !== undefined &&
+        charger.iChgCool !== undefined &&
+        charger.vTermCool !== undefined &&
+        charger.iChgWarm !== undefined &&
+        charger.vTermWarm !== undefined;
+
+    const advancedChargingProfileDisabled =
+        advancedChargingProfileSupport && !charger.enableNtcMonitoring;
+
     return (
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
                     <DocumentationTooltip card={card} item="JEITACompliance">
-                        <span>
-                            T<span className="subscript">BAT</span> Monitoring –
-                            JEITA Compliance
-                        </span>
+                        {advancedChargingProfileSupport ? (
+                            <span>
+                                T<span className="subscript">BAT</span>{' '}
+                                Monitoring – JEITA and Advanced Charging Profile
+                            </span>
+                        ) : (
+                            <span>
+                                T<span className="subscript">BAT</span>{' '}
+                                Monitoring – JEITA Compliance
+                            </span>
+                        )}
                     </DocumentationTooltip>
+                    {advancedChargingProfileSupport &&
+                        charger.enableNtcMonitoring !== undefined && (
+                            <Toggle
+                                label="Enable"
+                                isToggled={charger.enableNtcMonitoring}
+                                onToggle={v =>
+                                    chargerModule.set.enableNtcMonitoring?.(v)
+                                }
+                                disabled={disabled}
+                            />
+                        )}
                 </div>
             }
         >
@@ -352,12 +375,51 @@ export default ({
                                 i => v => updateInternal(i, v),
                             )}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
-                            disabled={disabled}
+                            disabled={
+                                disabled || advancedChargingProfileDisabled
+                            }
                         />
                     </div>
                     <span>{chargerModule.ranges.jeita.max}°C</span>
                 </div>
             </div>
+            {advancedChargingProfileSupport ? (
+                <AdvancedChargingProfile
+                    chargerModule={chargerModule}
+                    charger={charger}
+                    disabled={advancedChargingProfileDisabled}
+                />
+            ) : (
+                <Default
+                    chargerModule={chargerModule}
+                    charger={charger}
+                    disabled={disabled}
+                />
+            )}
+        </Card>
+    );
+};
+
+const Default = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalVTermr, setInternalVTermr] = useState(charger.vTermR);
+    const [internalNTCBeta, setInternalNTCBeta] = useState(charger.ntcBeta);
+    const [autoNTCBeta, setAutoNTCBeta] = useState(true);
+
+    useEffect(() => {
+        setInternalVTermr(charger.vTermR);
+        setInternalNTCBeta(charger.ntcBeta);
+    }, [charger]);
+
+    return (
+        <>
             <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="Vtermr">
@@ -431,7 +493,131 @@ export default ({
                     </div>
                 </div>
             )}
-        </Card>
+        </>
+    );
+};
+
+const AdvancedChargingProfile = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [
+        internalEnableAdvancedChargingProfile,
+        setInternalEnableAdvancedChargingProfile,
+    ] = useState(charger.enableAdvancedChargingProfile);
+    const [internalIChgCool, setInternalIChgCool] = useState(charger.iChgCool);
+    const [internalVTermCool, setInternalVTermCool] = useState(
+        charger.vTermCool,
+    );
+    const [internalIChgWarm, setInternalIChgWarm] = useState(charger.iChgWarm);
+    const [internalVTermWarm, setInternalVTermWarm] = useState(
+        charger.vTermWarm,
+    );
+
+    if (
+        internalEnableAdvancedChargingProfile === undefined ||
+        internalIChgCool === undefined ||
+        internalVTermCool === undefined ||
+        internalIChgWarm === undefined ||
+        internalVTermWarm === undefined
+    ) {
+        return null;
+    }
+
+    const contentDisabled = disabled || !internalEnableAdvancedChargingProfile;
+
+    return (
+        <>
+            <Toggle
+                isToggled={internalEnableAdvancedChargingProfile}
+                onToggle={v => {
+                    setInternalEnableAdvancedChargingProfile(v);
+                    chargerModule.set.enableAdvancedChargingProfile?.(v);
+                }}
+                label={
+                    <DocumentationTooltip
+                        card={card}
+                        item="enableAdvancedChargingProfile"
+                    >
+                        Enable Advanced Charging Profile
+                    </DocumentationTooltip>
+                }
+                disabled={disabled}
+            />
+            <NumberInput
+                label={
+                    <DocumentationTooltip card={card} item="iChgCool">
+                        <div>
+                            <span>I</span>
+                            <span className="subscript">CHG_COOL</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                unit="mA"
+                disabled={contentDisabled}
+                range={chargerModule.ranges.current}
+                value={internalIChgCool}
+                onChange={setInternalIChgCool}
+                onChangeComplete={v => chargerModule.set.iChgCool?.(v)}
+                showSlider
+            />
+            <NumberInput
+                label={
+                    <DocumentationTooltip card={card} item="vTermCool">
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">TERM_COOL</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                unit="V"
+                disabled={contentDisabled}
+                range={chargerModule.ranges.voltage}
+                value={internalVTermCool}
+                onChange={setInternalVTermCool}
+                onChangeComplete={v => chargerModule.set.vTermCool?.(v)}
+                showSlider
+            />
+            <NumberInput
+                label={
+                    <DocumentationTooltip card={card} item="iChgWarm">
+                        <div>
+                            <span>I</span>
+                            <span className="subscript">CHG_WARM</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                unit="mA"
+                disabled={contentDisabled}
+                range={chargerModule.ranges.current}
+                value={internalIChgWarm}
+                onChange={setInternalIChgWarm}
+                onChangeComplete={v => chargerModule.set.iChgWarm?.(v)}
+                showSlider
+            />
+            <NumberInput
+                label={
+                    <DocumentationTooltip card={card} item="vTermWarm">
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">TERM_WARM</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                unit="V"
+                disabled={contentDisabled}
+                range={chargerModule.ranges.voltage}
+                value={internalVTermWarm}
+                onChange={setInternalVTermWarm}
+                onChangeComplete={v => chargerModule.set.vTermWarm?.(v)}
+                showSlider
+            />
+        </>
     );
 };
 
