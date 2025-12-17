@@ -28,6 +28,10 @@ export class ChargerGet extends ChargerModuleGetBase {
         this.tWarm();
         this.tHot();
         this.vWeak();
+        this.iChgCool();
+        this.iChgWarm();
+        this.vTermCool();
+        this.vTermWarm();
     }
 
     state() {
@@ -90,5 +94,17 @@ export class ChargerGet extends ChargerModuleGetBase {
     }
     vWeak() {
         this.sendCommand('npmx charger weak_voltage get');
+    }
+    iChgCool() {
+        this.sendCommand('npmx charger charging_current cool get');
+    }
+    iChgWarm() {
+        this.sendCommand('npmx charger charging_current warm get');
+    }
+    vTermCool() {
+        this.sendCommand('npmx charger termination_voltage cool get');
+    }
+    vTermWarm() {
+        this.sendCommand('npmx charger termination_voltage warm get');
     }
 }

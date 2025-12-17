@@ -40,6 +40,18 @@ export class ChargerSet extends ChargerModuleSetBase {
         if (charger.vWeak && this.vWeak) {
             promises.push(this.vWeak(charger.vWeak));
         }
+        if (charger.iChgCool !== undefined && this.iChgCool !== undefined) {
+            promises.push(this.iChgCool(charger.iChgCool));
+        }
+        if (charger.iChgWarm !== undefined && this.iChgWarm !== undefined) {
+            promises.push(this.iChgWarm(charger.iChgWarm));
+        }
+        if (charger.vTermCool !== undefined && this.vTermCool !== undefined) {
+            promises.push(this.vTermCool(charger.vTermCool));
+        }
+        if (charger.vTermWarm !== undefined && this.vTermWarm !== undefined) {
+            promises.push(this.vTermWarm(charger.vTermWarm));
+        }
 
         promises.push(
             this.enabledRecharging(charger.enableRecharging),
@@ -537,6 +549,102 @@ export class ChargerSet extends ChargerModuleSetBase {
                         this.get.vWeak?.();
                         reject();
                     });
+            }
+        });
+    }
+
+    iChgCool(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                iChgCool: value,
+            });
+
+            if (this.offlineMode) {
+                resolve();
+            } else {
+                this.enabled(false)
+                    .then(() =>
+                        this.sendCommand(
+                            `npmx charger charging_current cool set ${value * 1000}`, // mA to uA
+                            () => resolve(),
+                            () => {
+                                this.get.iChgCool?.();
+                                reject();
+                            },
+                        ),
+                    )
+                    .catch(() => {
+                        this.get.iChgCool?.();
+                        reject();
+                    });
+            }
+        });
+    }
+
+    iChgWarm(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                iChgWarm: value,
+            });
+
+            if (this.offlineMode) {
+                resolve();
+            } else {
+                this.enabled(false)
+                    .then(() =>
+                        this.sendCommand(
+                            `npmx charger charging_current warm set ${value * 1000}`, // mA to uA
+                            () => resolve(),
+                            () => {
+                                this.get.iChgWarm?.();
+                                reject();
+                            },
+                        ),
+                    )
+                    .catch(() => {
+                        this.get.iChgWarm?.();
+                        reject();
+                    });
+            }
+        });
+    }
+
+    vTermCool(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTermCool: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger termination_voltage cool set ${value * 1000}`, // V to mV
+                    () => resolve(),
+                    () => {
+                        this.get.vTermCool?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    vTermWarm(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTermWarm: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger termination_voltage warm set ${value * 1000}`, // V to mV
+                    () => resolve(),
+                    () => {
+                        this.get.vTermWarm?.();
+                        reject();
+                    },
+                );
             }
         });
     }
