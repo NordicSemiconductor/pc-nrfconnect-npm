@@ -204,6 +204,9 @@ export default ({
     const advancedChargingProfileDisabled =
         advancedChargingProfileSupport && !charger.enableNtcMonitoring;
 
+    const arrowNumberInputDisabled =
+        advancedChargingProfileSupport && advancedChargingProfileDisabled;
+
     return (
         <Card
             title={
@@ -270,6 +273,7 @@ export default ({
                             }}
                             onChange={v => updateInternal(0, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={arrowNumberInputDisabled}
                         />
                     </div>
                     <div
@@ -296,6 +300,7 @@ export default ({
                             }}
                             onChange={v => updateInternal(1, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={arrowNumberInputDisabled}
                         />
                     </div>
                     <div
@@ -322,6 +327,7 @@ export default ({
                             }}
                             onChange={v => updateInternal(2, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={arrowNumberInputDisabled}
                         />
                     </div>
                     <div
@@ -348,6 +354,7 @@ export default ({
                             }}
                             onChange={v => updateInternal(3, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={arrowNumberInputDisabled}
                         />
                     </div>
                     <div
@@ -635,12 +642,14 @@ const Arrow = ({
     range,
     onChange,
     onChangeComplete,
+    disabled,
 }: {
     type: 'COLD' | 'COOL' | 'WARM' | 'HOT';
     temperature: number;
     range: RangeType;
     onChange: (value: number) => void;
     onChangeComplete: () => void;
+    disabled: boolean;
 }) => (
     <>
         <span className="tw-absolute tw--top-5 tw--translate-x-1/2">
@@ -657,6 +666,7 @@ const Arrow = ({
                     range={range}
                     onChange={onChange}
                     onChangeComplete={onChangeComplete}
+                    disabled={disabled}
                 />
                 <span>°C</span>
             </div>
