@@ -161,34 +161,33 @@ export default class Module implements ChargerModuleBase {
         ]).map(v => Number(v.toFixed(2)));
     }
 
-    protected static getITrickleValues(
-        iChg: number,
-    ): { label: string; value: ITrickle }[] {
-        if (iChg < 8) {
-            return ITrickleValuesWhenIChgBelow8mA.map((item, i) => ({
-                label: `${ITrickleKeysWhenIChgBelow8mA[i]}`,
-                value: item,
-            }));
-        }
-
-        return ITrickleValues.map((item, i) => ({
-            label: `${ITrickleKeys[i]}`,
-            value: item,
-        }));
-    }
-
     // eslint-disable-next-line class-methods-use-this
     get values(): {
         iTerm: { label: string; value: ITerm }[];
         iTrickle?: (iChg: number) => { label: string; value: ITrickle }[];
         vTrickleFast: { label: string; value: VTrickleFast }[];
     } {
+        const getITrickleValues = (
+            iChg: number,
+        ): { label: string; value: ITrickle }[] => {
+            if (iChg < 8) {
+                return ITrickleValuesWhenIChgBelow8mA.map((item, i) => ({
+                    label: `${ITrickleKeysWhenIChgBelow8mA[i]}`,
+                    value: item,
+                }));
+            }
+            return ITrickleValues.map((item, i) => ({
+                label: `${ITrickleKeys[i]}`,
+                value: item,
+            }));
+        };
+
         return {
             iTerm: [...ITermValues].map((item, i) => ({
                 label: `${ITermKeys[i]}`,
                 value: item,
             })),
-            iTrickle: Module.getITrickleValues,
+            iTrickle: getITrickleValues,
             vTrickleFast: [...VTrickleFastValues].map((item, i) => ({
                 label: `${VTrickleFastKeys[i]}`,
                 value: item,
