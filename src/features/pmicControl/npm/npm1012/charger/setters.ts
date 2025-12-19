@@ -72,6 +72,45 @@ export class ChargerSet extends ChargerModuleSetBase {
             );
         }
 
+        if (
+            charger.enableChargeCurrentThrottling !== undefined &&
+            this.enableChargeCurrentThrottling !== undefined
+        ) {
+            promises.push(
+                this.enableChargeCurrentThrottling(
+                    charger.enableChargeCurrentThrottling,
+                ),
+            );
+        }
+        if (
+            charger.enableBatteryDischargeCurrentLimit !== undefined &&
+            this.enableBatteryDischargeCurrentLimit !== undefined
+        ) {
+            promises.push(
+                this.enableBatteryDischargeCurrentLimit(
+                    charger.enableBatteryDischargeCurrentLimit,
+                ),
+            );
+        }
+        if (charger.iThrottle !== undefined && this.iThrottle !== undefined) {
+            promises.push(this.iThrottle(charger.iThrottle));
+        }
+        if (charger.tOutCharge !== undefined && this.tOutCharge !== undefined) {
+            promises.push(this.tOutCharge(charger.tOutCharge));
+        }
+        if (
+            charger.tOutTrickle !== undefined &&
+            this.tOutTrickle !== undefined
+        ) {
+            promises.push(this.tOutTrickle(charger.tOutTrickle));
+        }
+        if (charger.vBatLow !== undefined && this.vBatLow !== undefined) {
+            promises.push(this.vBatLow(charger.vBatLow));
+        }
+        if (charger.vThrottle !== undefined && this.vThrottle !== undefined) {
+            promises.push(this.vThrottle(charger.vThrottle));
+        }
+
         promises.push(
             this.enabledRecharging(charger.enableRecharging),
             this.enabledVBatLow(charger.enableVBatLow),
@@ -611,6 +650,146 @@ export class ChargerSet extends ChargerModuleSetBase {
                     () => resolve(),
                     () => {
                         this.get.vTermWarm?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    enableBatteryDischargeCurrentLimit(enabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    enableBatteryDischargeCurrentLimit: enabled,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger battery_discharge_current_limit set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        this.get.enabledBatteryDischargeCurrentLimit?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    enableChargeCurrentThrottling(enabled: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    enableChargeCurrentThrottling: enabled,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger charge_current_throttling set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        this.get.enabledChargeCurrentThrottling?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    iThrottle(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    iThrottle: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger throttle_current set ${value}`,
+                    () => resolve(),
+                    () => {
+                        this.get.iThrottle?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    tOutCharge(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    tOutCharge: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger timeout_charge set ${value}`,
+                    () => resolve(),
+                    () => {
+                        this.get.tOutCharge?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    tOutTrickle(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    tOutTrickle: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger timeout_trickle set ${value}`,
+                    () => resolve(),
+                    () => {
+                        this.get.tOutTrickle?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    vThrottle(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vThrottle: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger throttle_voltage set ${value}`,
+                    () => resolve(),
+                    () => {
+                        this.get.vThrottle?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    vBatLow(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vBatLow: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger v_batlow set ${value}`,
+                    () => resolve(),
+                    () => {
+                        this.get.vBatLow?.();
                         reject();
                     },
                 );

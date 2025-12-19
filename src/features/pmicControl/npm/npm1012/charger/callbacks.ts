@@ -444,6 +444,97 @@ export default (
                 noop,
             ),
         );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger battery_discharge_current_limit', true),
+                res => {
+                    const value = parseToBoolean(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        enableBatteryDischargeCurrentLimit: value,
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger charge_current_throttling', true),
+                res => {
+                    const value = parseToBoolean(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        enableChargeCurrentThrottling: value,
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger throttle_current', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iThrottle: value,
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger timeout_charge', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        tOutCharge: value,
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger timeout_trickle', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        tOutTrickle: value,
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger throttle_voltage', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        vThrottle: value,
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger v_batlow', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        vBatLow: value,
+                    });
+                },
+                noop,
+            ),
+        );
     }
 
     return cleanupCallbacks;
