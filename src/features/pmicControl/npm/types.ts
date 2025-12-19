@@ -191,18 +191,25 @@ export type Charger = {
     tHot: number;
 
     enableAdvancedChargingProfile?: boolean;
+    enableBatteryDischargeCurrentLimit?: boolean;
+    enableChargeCurrentThrottling?: boolean;
     enableNtcMonitoring?: boolean;
     enableWeakBatteryCharging?: boolean;
     iBatLim?: number;
     iChgCool?: number;
     iChgWarm?: number;
+    iThrottle?: number;
     iTrickle?: ITrickle;
     ntcBeta?: number;
     ntcThermistor?: NTCThermistor;
     tChgReduce?: number;
     tChgStop?: number;
+    tOutCharge?: number;
+    tOutTrickle?: number;
+    vBatLow?: number;
     vTermCool?: number;
     vTermWarm?: number;
+    vThrottle?: number;
     vWeak?: number;
 };
 
@@ -590,17 +597,26 @@ export abstract class ChargerModuleSetBase {
 
     batLim?(value: number): Promise<void>;
     enableAdvancedChargingProfile?(value: boolean): Promise<void>;
+    enableBatteryDischargeCurrentLimit?(value: boolean): Promise<void>;
+    enableChargeCurrentThrottling?(value: boolean): Promise<void>;
     enableNtcMonitoring?(value: boolean): Promise<void>;
+    enabledWeakBatteryCharging?(value: boolean): Promise<void>;
     enabledWeakBatteryCharging?(value: boolean): Promise<void>;
     iChgCool?(value: number): Promise<void>;
     iChgWarm?(value: number): Promise<void>;
+    iThrottle?(value: number): Promise<void>;
+    iTrickle?(value: ITrickle): Promise<void>;
     iTrickle?(value: ITrickle): Promise<void>;
     nTCBeta?(value: number): Promise<void>;
     nTCThermistor?(mode: NTCThermistor, autoSetBeta?: boolean): Promise<void>;
     tChgReduce?(value: number): Promise<void>;
     tChgStop?(value: number): Promise<void>;
+    tOutCharge?(value: number): Promise<void>;
+    tOutTrickle?(value: number): Promise<void>;
+    vBatLow?(value: number): Promise<void>;
     vTermCool?(value: number): Promise<void>;
     vTermWarm?(value: number): Promise<void>;
+    vThrottle?(value: number): Promise<void>;
     vWeak?(value: number): Promise<void>;
 }
 
@@ -639,17 +655,26 @@ export abstract class ChargerModuleGetBase {
 
     batLim?(): void;
     enabledAdvancedChargingProfile?(): void;
+    enabledBatteryDischargeCurrentLimit?(): void;
+    enabledChargeCurrentThrottling?(): void;
     enabledNtcMonitoring?(): void;
+    enabledWeakBatteryCharging?(): void;
     enabledWeakBatteryCharging?(): void;
     iChgCool?(): void;
     iChgWarm?(): void;
+    iThrottle?(): void;
+    iTrickle?(): void;
     iTrickle?(): void;
     nTCBeta?(): void;
     nTCThermistor?(): void;
     tChgReduce?(): void;
     tChgStop?(): void;
+    tOutCharge?(): void;
+    tOutTrickle?(): void;
+    vBatLow?(): void;
     vTermCool?(): void;
     vTermWarm?(): void;
+    vThrottle?(): void;
     vWeak?(): void;
 }
 
@@ -660,16 +685,23 @@ export type ChargerModuleRanges = {
     chipThermal: RangeType;
     current: RangeOrNumberArray;
     nTCBeta: RangeType;
-    iBatLim?: FixedListRange;
     vLowerCutOff: RangeType;
     batterySize: RangeType;
+
+    iBatLim?: FixedListRange;
     vWeak?: RangeType;
 };
 
 export type ChargerModuleValues = {
     iTerm: (iChg: number) => { label: string; value: ITerm }[];
-    iTrickle?: (iChg: number) => { label: string; value: ITrickle }[];
     vTrickleFast: { label: string; value: VTrickleFast }[];
+
+    iThrottle?: { label: string; value: number }[];
+    iTrickle?: (iChg: number) => { label: string; value: ITrickle }[];
+    tOutCharge?: { label: string; value: number }[];
+    tOutTrickle?: { label: string; value: number }[];
+    vBatLow?: { label: string; value: number }[];
+    vThrottle?: { label: string; value: number }[];
 };
 
 export interface ChargerModule {
