@@ -19,6 +19,7 @@ import {
     ChargerModule,
     isFixedListRangeWithLabel,
     ITerm,
+    ITrickle,
     VTrickleFast,
 } from '../../../features/pmicControl/npm/types';
 
@@ -116,6 +117,136 @@ const IBatLimUI = ({
             onChange={setInternalBatLim}
             onChangeComplete={v => setBatLim(v)}
             showSlider
+        />
+    );
+};
+
+const ITrickleUI = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalITrickle] = useState(charger.iTrickle);
+
+    if (
+        !chargerModule.set.iTrickle ||
+        charger.iTrickle === undefined ||
+        internalITrickle === undefined ||
+        chargerModule.values.iTrickle === undefined
+    ) {
+        return null;
+    }
+
+    return (
+        <Dropdown
+            label={
+                <DocumentationTooltip card={card} item="ITrickle">
+                    <>
+                        <span>I</span>
+                        <span className="subscript">TRICKLE</span>
+                    </>
+                </DocumentationTooltip>
+            }
+            items={chargerModule.values.iTrickle}
+            onSelect={item =>
+                chargerModule.set.iTrickle?.(item.value as ITrickle)
+            }
+            selectedItem={
+                chargerModule.values.iTrickle.find(
+                    item => item.value === charger.iTrickle,
+                ) ?? chargerModule.values.iTrickle[0]
+            }
+            disabled={disabled}
+        />
+    );
+};
+
+const VWeakUI = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalVWeak, setInternalVWeak] = useState(charger.vWeak);
+
+    useEffect(() => {
+        setInternalVWeak(charger.vWeak);
+    }, [charger]);
+
+    if (
+        !chargerModule.set.vWeak ||
+        !chargerModule.ranges.vWeak ||
+        charger.vWeak === undefined ||
+        internalVWeak === undefined
+    ) {
+        return null;
+    }
+
+    return (
+        <NumberInput
+            label={
+                <DocumentationTooltip card={card} item="VWEAK">
+                    <div>
+                        <span>V</span>
+                        <span className="subscript">WEAK</span>
+                    </div>
+                </DocumentationTooltip>
+            }
+            unit="V"
+            disabled={disabled}
+            range={chargerModule.ranges.vWeak}
+            value={internalVWeak}
+            onChange={setInternalVWeak}
+            onChangeComplete={v => chargerModule.set.vWeak?.(v)}
+            showSlider
+        />
+    );
+};
+
+const WeakBatteryChargingUI = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalWeakBatChg, setInternalWeakBatChg] = useState(
+        charger.enableWeakBatteryCharging,
+    );
+
+    if (
+        !chargerModule.set.enabledWeakBatteryCharging ||
+        charger.enableWeakBatteryCharging === undefined ||
+        internalWeakBatChg === undefined
+    ) {
+        return null;
+    }
+
+    return (
+        <Toggle
+            label={
+                <DocumentationTooltip
+                    card={card}
+                    item="EnableWeakBatteryCharging"
+                >
+                    Enable Weak Battery Charging
+                </DocumentationTooltip>
+            }
+            isToggled={internalWeakBatChg}
+            onToggle={value => {
+                setInternalWeakBatChg(value);
+                chargerModule.set.enabledWeakBatteryCharging?.(value);
+            }}
+            disabled={disabled}
         />
     );
 };
@@ -288,6 +419,21 @@ export default ({
                                 item => item.value === charger.vTrickleFast,
                             ) ?? chargerModule.values.vTrickleFast[0]
                         }
+                        disabled={disabled}
+                    />
+                    <ITrickleUI
+                        charger={charger}
+                        chargerModule={chargerModule}
+                        disabled={disabled}
+                    />
+                    <VWeakUI
+                        charger={charger}
+                        chargerModule={chargerModule}
+                        disabled={disabled}
+                    />
+                    <WeakBatteryChargingUI
+                        charger={charger}
+                        chargerModule={chargerModule}
                         disabled={disabled}
                     />
                 </>
