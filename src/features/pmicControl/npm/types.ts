@@ -607,17 +607,19 @@ export type ChargerModuleRanges = {
     vWeak?: RangeType;
 };
 
+export type ChargerModuleValues = {
+    iTerm: (iChg: number) => { label: string; value: ITerm }[];
+    iTrickle?: (iChg: number) => { label: string; value: ITrickle }[];
+    vTrickleFast: { label: string; value: VTrickleFast }[];
+};
+
 export interface ChargerModule {
     get: ChargerModuleGetBase;
     set: ChargerModuleSetBase;
     callbacks: (() => void)[];
     ranges: ChargerModuleRanges;
     defaults: Charger;
-    values: {
-        iTerm: { label: string; value: ITerm }[];
-        iTrickle?: (iChg: number) => { label: string; value: ITrickle }[];
-        vTrickleFast: { label: string; value: VTrickleFast }[];
-    };
+    values: ChargerModuleValues;
 }
 
 export interface BoostModule {
