@@ -6,6 +6,8 @@
 
 import {
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     ChargerModuleSetBase,
     ITerm,
     ITrickle,
@@ -39,6 +41,36 @@ export class ChargerSet extends ChargerModuleSetBase {
         }
         if (charger.vWeak && this.vWeak) {
             promises.push(this.vWeak(charger.vWeak));
+        }
+        if (charger.iChgCool !== undefined && this.iChgCool !== undefined) {
+            promises.push(this.iChgCool(charger.iChgCool));
+        }
+        if (charger.iChgWarm !== undefined && this.iChgWarm !== undefined) {
+            promises.push(this.iChgWarm(charger.iChgWarm));
+        }
+        if (charger.vTermCool !== undefined && this.vTermCool !== undefined) {
+            promises.push(this.vTermCool(charger.vTermCool));
+        }
+        if (charger.vTermWarm !== undefined && this.vTermWarm !== undefined) {
+            promises.push(this.vTermWarm(charger.vTermWarm));
+        }
+        if (
+            charger.enableAdvancedChargingProfile !== undefined &&
+            this.enableAdvancedChargingProfile
+        ) {
+            promises.push(
+                this.enableAdvancedChargingProfile(
+                    charger.enableAdvancedChargingProfile,
+                ),
+            );
+        }
+        if (
+            charger.enableNtcMonitoring !== undefined &&
+            this.enableNtcMonitoring
+        ) {
+            promises.push(
+                this.enableNtcMonitoring(charger.enableNtcMonitoring),
+            );
         }
 
         promises.push(
@@ -537,6 +569,134 @@ export class ChargerSet extends ChargerModuleSetBase {
                         this.get.vWeak?.();
                         reject();
                     });
+            }
+        });
+    }
+
+    enableAdvancedChargingProfile(enabled: boolean) {
+        return new Promise<void>(resolve => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                enableAdvancedChargingProfile: enabled,
+                jeitaILabelCool: enabled
+                    ? ChargerJeitaILabel.coolIChgCool
+                    : ChargerJeitaILabel.coolIChg50percent,
+                jeitaVLabelCool: enabled
+                    ? ChargerJeitaVLabel.coolVTermCool
+                    : ChargerJeitaVLabel.coolVTerm,
+                jeitaILabelWarm: enabled
+                    ? ChargerJeitaILabel.warmIChgWarm
+                    : ChargerJeitaILabel.warmIChg,
+                jeitaVLabelWarm: enabled
+                    ? ChargerJeitaVLabel.warmVTermWarm
+                    : ChargerJeitaVLabel.warmVTerm100mVOff,
+            });
+
+            resolve();
+        });
+    }
+
+    enableNtcMonitoring(enabled: boolean) {
+        return new Promise<void>(resolve => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                enableNtcMonitoring: enabled,
+            });
+
+            resolve();
+        });
+    }
+
+    iChgCool(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                iChgCool: value,
+            });
+
+            if (this.offlineMode) {
+                resolve();
+            } else {
+                this.enabled(false)
+                    .then(() =>
+                        this.sendCommand(
+                            `npmx charger charging_current cool set ${value * 1000}`, // mA to uA
+                            () => resolve(),
+                            () => {
+                                this.get.iChgCool?.();
+                                reject();
+                            },
+                        ),
+                    )
+                    .catch(() => {
+                        this.get.iChgCool?.();
+                        reject();
+                    });
+            }
+        });
+    }
+
+    iChgWarm(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                iChgWarm: value,
+            });
+
+            if (this.offlineMode) {
+                resolve();
+            } else {
+                this.enabled(false)
+                    .then(() =>
+                        this.sendCommand(
+                            `npmx charger charging_current warm set ${value * 1000}`, // mA to uA
+                            () => resolve(),
+                            () => {
+                                this.get.iChgWarm?.();
+                                reject();
+                            },
+                        ),
+                    )
+                    .catch(() => {
+                        this.get.iChgWarm?.();
+                        reject();
+                    });
+            }
+        });
+    }
+
+    vTermCool(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTermCool: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger termination_voltage cool set ${value * 1000}`, // V to mV
+                    () => resolve(),
+                    () => {
+                        this.get.vTermCool?.();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    vTermWarm(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTermWarm: value,
+                });
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger termination_voltage warm set ${value * 1000}`, // V to mV
+                    () => resolve(),
+                    () => {
+                        this.get.vTermWarm?.();
+                        reject();
+                    },
+                );
             }
         });
     }

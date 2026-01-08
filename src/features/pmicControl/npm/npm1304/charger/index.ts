@@ -19,6 +19,8 @@ import {
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     ChargerModuleRanges,
     ModuleParams,
     VTrickleFast,
@@ -58,6 +60,16 @@ export default class Module extends nPM1300Charger {
             tCool: 10,
             tWarm: 45,
             tHot: 60,
+            jeitaILabelCold: ChargerJeitaILabel.coldIOff,
+            jeitaILabelCool: ChargerJeitaILabel.coolICool,
+            jeitaILabelNominal: ChargerJeitaILabel.nominalIChg,
+            jeitaILabelWarm: ChargerJeitaILabel.warmIChg,
+            jeitaILabelHot: ChargerJeitaILabel.hotIOff,
+            jeitaVLabelCold: ChargerJeitaVLabel.coldVNA,
+            jeitaVLabelCool: ChargerJeitaVLabel.coolVTerm,
+            jeitaVLabelNominal: ChargerJeitaVLabel.nominalVTerm,
+            jeitaVLabelWarm: ChargerJeitaVLabel.warmVTermR,
+            jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
         };
     }
 

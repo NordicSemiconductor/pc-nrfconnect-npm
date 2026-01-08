@@ -30,7 +30,7 @@ export default ({ active }: PaneProps) => {
     return active && npmDevice?.chargerModule && charger ? (
         <MasonryLayout
             className="masonry-layout min-height-cards"
-            minWidth={422}
+            minWidth={450}
         >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />

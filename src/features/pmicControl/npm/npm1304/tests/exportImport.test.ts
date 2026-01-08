@@ -11,6 +11,8 @@ import { npm1300TimerMode } from '../../npm1300/timerConfig/types';
 import {
     Buck,
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     FuelGauge,
     GPIO,
     GPIOExport,
@@ -67,6 +69,16 @@ describe('PMIC 1304 - Apply Config ', () => {
         tCool: 12,
         tWarm: 47,
         tHot: 69,
+        jeitaILabelCold: ChargerJeitaILabel.coldIOff,
+        jeitaILabelCool: ChargerJeitaILabel.coolIChg50percent,
+        jeitaILabelNominal: ChargerJeitaILabel.nominalIChg,
+        jeitaILabelWarm: ChargerJeitaILabel.warmIChg,
+        jeitaILabelHot: ChargerJeitaILabel.hotIOff,
+        jeitaVLabelCold: ChargerJeitaVLabel.coldVNA,
+        jeitaVLabelCool: ChargerJeitaVLabel.coolVTerm,
+        jeitaVLabelNominal: ChargerJeitaVLabel.nominalVTerm,
+        jeitaVLabelWarm: ChargerJeitaVLabel.warmVTerm100mVOff,
+        jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
     };
 
     const initOnBoardLoad: OnBoardLoad = {
@@ -143,6 +155,16 @@ describe('PMIC 1304 - Apply Config ', () => {
             tCool: 20,
             tWarm: 50,
             tHot: 80,
+            jeitaILabelCold: ChargerJeitaILabel.coldIOff,
+            jeitaILabelCool: ChargerJeitaILabel.coolIChg50percent,
+            jeitaILabelNominal: ChargerJeitaILabel.nominalIChg,
+            jeitaILabelWarm: ChargerJeitaILabel.warmIChg,
+            jeitaILabelHot: ChargerJeitaILabel.hotIOff,
+            jeitaVLabelCold: ChargerJeitaVLabel.coldVNA,
+            jeitaVLabelCool: ChargerJeitaVLabel.coolVTerm,
+            jeitaVLabelNominal: ChargerJeitaVLabel.nominalVTerm,
+            jeitaVLabelWarm: ChargerJeitaVLabel.warmVTerm100mVOff,
+            jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
         },
         onBoardLoad: {
             iLoad: 10,

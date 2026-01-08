@@ -392,6 +392,58 @@ export default (
                 noop,
             ),
         );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger charging_current cool', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iChgCool: value / 1000, // uA to mA
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger charging_current warm', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iChgWarm: value / 1000, // uA to mA
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger termination_voltage cool', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        vTermCool: value / 1000, // mv to V
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npmx charger termination_voltage warm', true),
+                res => {
+                    const value = parseToNumber(res);
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        vTermWarm: value / 1000, // mv to V
+                    });
+                },
+                noop,
+            ),
+        );
     }
 
     return cleanupCallbacks;

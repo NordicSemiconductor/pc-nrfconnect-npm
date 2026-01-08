@@ -167,15 +167,12 @@ export type FuelGauge = {
 
 export type Charger = {
     vTerm: number;
-    iTrickle?: ITrickle;
     vTrickleFast: VTrickleFast;
     iChg: number;
     enabled: boolean;
     enableRecharging: boolean;
-    enableWeakBatteryCharging?: boolean;
     enableVBatLow: boolean;
     iTerm: ITerm;
-    iBatLim?: number;
     ntcThermistor: NTCThermistor;
     ntcBeta: number;
     tChgStop: number;
@@ -185,7 +182,29 @@ export type Charger = {
     tCool: number;
     tWarm: number;
     tHot: number;
+
+    enableAdvancedChargingProfile?: boolean;
+    enableNtcMonitoring?: boolean;
+    enableWeakBatteryCharging?: boolean;
+    iBatLim?: number;
+    iChgCool?: number;
+    iChgWarm?: number;
+    iTrickle?: ITrickle;
+    vTermCool?: number;
+    vTermWarm?: number;
     vWeak?: number;
+
+    jeitaILabelCold: ChargerJeitaILabel;
+    jeitaILabelCool: ChargerJeitaILabel;
+    jeitaILabelNominal: ChargerJeitaILabel;
+    jeitaILabelWarm: ChargerJeitaILabel;
+    jeitaILabelHot: ChargerJeitaILabel;
+
+    jeitaVLabelCold: ChargerJeitaVLabel;
+    jeitaVLabelCool: ChargerJeitaVLabel;
+    jeitaVLabelNominal: ChargerJeitaVLabel;
+    jeitaVLabelWarm: ChargerJeitaVLabel;
+    jeitaVLabelHot: ChargerJeitaVLabel;
 };
 
 export type OnBoardLoad = {
@@ -311,6 +330,36 @@ export enum npm2100TimeToActive {
     '600ms' = '600',
     '1s' = '1000',
     '3s' = '3000',
+}
+
+export enum ChargerJeitaILabel {
+    coldIOff,
+
+    coolIChgCool,
+    coolIChg50percent,
+    coolICool,
+
+    nominalIChg,
+
+    warmIChg,
+    warmIChgWarm,
+
+    hotIOff,
+}
+
+export enum ChargerJeitaVLabel {
+    coldVNA,
+
+    coolVTerm,
+    coolVTermCool,
+
+    nominalVTerm,
+
+    warmVTermR,
+    warmVTermWarm,
+    warmVTerm100mVOff,
+
+    hotVNA,
 }
 
 export type TimeToActive = npm1300TimeToActive | npm2100TimeToActive;
@@ -547,8 +596,14 @@ export abstract class ChargerModuleSetBase {
     abstract tHot(value: number): Promise<void>;
 
     batLim?(value: number): Promise<void>;
+    enableAdvancedChargingProfile?(value: boolean): Promise<void>;
+    enableNtcMonitoring?(value: boolean): Promise<void>;
     enabledWeakBatteryCharging?(value: boolean): Promise<void>;
+    iChgCool?(value: number): Promise<void>;
+    iChgWarm?(value: number): Promise<void>;
     iTrickle?(value: ITrickle): Promise<void>;
+    vTermCool?(value: number): Promise<void>;
+    vTermWarm?(value: number): Promise<void>;
     vWeak?(value: number): Promise<void>;
 }
 
@@ -590,7 +645,11 @@ export abstract class ChargerModuleGetBase {
 
     batLim?(): void;
     enabledWeakBatteryCharging?(): void;
+    iChgCool?(): void;
+    iChgWarm?(): void;
     iTrickle?(): void;
+    vTermCool?(): void;
+    vTermWarm?(): void;
     vWeak?(): void;
 }
 
