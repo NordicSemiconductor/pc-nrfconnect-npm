@@ -27,6 +27,7 @@ export class ChargerGet extends ChargerModuleGetBase {
         this.tCool();
         this.tWarm();
         this.tHot();
+        this.vWeak();
     }
 
     state() {
