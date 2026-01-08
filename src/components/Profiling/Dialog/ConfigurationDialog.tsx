@@ -33,6 +33,7 @@ import {
     setProfile,
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
+import { getMaxValueOfRangeOrNumberArray } from '../../../utils/helpers';
 import { generateDefaultProjectPath, saveProjectSettings } from '../helpers';
 import { ProfilingProject } from '../types';
 
@@ -52,7 +53,11 @@ export default ({
     const [showValidationError, setShowValidationError] = useState(false);
 
     const [capacity, setCapacity] = useState(
-        npmDevice.chargerModule?.ranges.current.max ?? 800,
+        npmDevice.chargerModule?.ranges.current
+            ? getMaxValueOfRangeOrNumberArray(
+                  npmDevice.chargerModule?.ranges.current,
+              )
+            : 800,
     );
     const [ntcThermistor, setNTCThermistor] = useState<NTCThermistor>('10 kΩ');
     const [temperatures, setTemperatures] = useState<number[]>([25]);
@@ -61,14 +66,15 @@ export default ({
     );
     const charger = useSelector(getCharger);
 
-    if (!npmDevice.chargerModule) {
+    if (!npmDevice.chargerModule || !charger) {
         return null;
     }
 
     const vTerm = Math.max(...npmDevice.chargerModule.ranges.voltage);
 
     const [iTerm, setITerm] = useState<ITerm>(
-        charger?.iTerm ?? npmDevice.chargerModule.values.iTerm[0].value,
+        charger.iTerm ??
+            npmDevice.chargerModule.values.iTerm(charger.iChg)[0].value,
     );
     const dispatch = useDispatch();
     const maxLength = 20;
@@ -257,12 +263,13 @@ export default ({
                             </>
                         </DocumentationTooltip>
                     }
-                    items={npmDevice.chargerModule.values.iTerm}
+                    items={npmDevice.chargerModule.values.iTerm(charger.iChg)}
                     onSelect={item => setITerm(item.value as ITerm)}
                     selectedItem={
-                        npmDevice.chargerModule.values.iTerm.find(
-                            item => item.value === iTerm,
-                        ) ?? npmDevice.chargerModule.values.iTerm[0]
+                        npmDevice.chargerModule.values
+                            .iTerm(charger.iChg)
+                            .find(item => item.value === iTerm) ??
+                        npmDevice.chargerModule.values.iTerm(charger.iChg)[0]
                     }
                 />
 
