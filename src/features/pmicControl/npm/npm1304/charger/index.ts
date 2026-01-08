@@ -116,14 +116,15 @@ export default class Module extends nPM1300Charger {
 
     // eslint-disable-next-line class-methods-use-this
     get values(): {
-        iTerm: { label: string; value: ITermNpm1304 }[];
+        iTerm: (iChg: number) => { label: string; value: ITermNpm1304 }[];
         vTrickleFast: { label: string; value: VTrickleFast }[];
     } {
         return {
-            iTerm: [...ITermValues].map((item, i) => ({
-                label: `${ITermKeys[i]}`,
-                value: item,
-            })),
+            iTerm: () =>
+                [...ITermValues].map((item, i) => ({
+                    label: `${ITermKeys[i]}`,
+                    value: item,
+                })),
             vTrickleFast: [...VTrickleFastValues].map((item, i) => ({
                 label: `${VTrickleFastKeys[i]}`,
                 value: item,
