@@ -270,6 +270,8 @@ export default ({
         setInternalIChg(charger.iChg);
     }, [charger]);
 
+    const iTermValues = chargerModule.values.iTerm(charger.iChg);
+
     return (
         <Card
             title={
@@ -345,12 +347,11 @@ export default ({
                         </>
                     </DocumentationTooltip>
                 }
-                items={chargerModule.values.iTerm}
+                items={iTermValues}
                 onSelect={item => chargerModule.set.iTerm(item.value as ITerm)}
                 selectedItem={
-                    chargerModule.values.iTerm.find(
-                        item => item.value === charger.iTerm,
-                    ) ?? chargerModule.values.iTerm[0]
+                    iTermValues.find(item => item.value === charger.iTerm) ??
+                    iTermValues[0]
                 }
                 disabled={disabled}
             />
