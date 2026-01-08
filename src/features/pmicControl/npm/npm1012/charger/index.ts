@@ -20,17 +20,19 @@ import {
     ChargerModuleRanges,
     ChargerModuleSet,
     ChargerModuleSetBase,
+    ChargerModuleValues,
     ITerm,
     ITrickle,
     ModuleParams,
-    VTrickleFast,
 } from '../../types';
 import chargerCallbacks from './callbacks';
 import { ChargerGet } from './getters';
 import { ChargerSet } from './setters';
 import {
     ITermKeys,
+    ITermKeysWhenIChgBelow8mA,
     ITermValues,
+    ITermValuesWhenIChgBelow8mA,
     ITrickleKeys,
     ITrickleKeysWhenIChgBelow8mA,
     ITrickleValues,
@@ -43,6 +45,8 @@ export default class Module implements ChargerModuleBase {
     private _get: ChargerModuleGetBase;
     private _set: ChargerModuleSetBase;
     private _callbacks: (() => void)[];
+    private _ranges: ChargerModuleRanges;
+    private _values: ChargerModuleValues;
 
     constructor(
         { sendCommand, eventEmitter, offlineMode, shellParser }: ModuleParams,
@@ -56,6 +60,8 @@ export default class Module implements ChargerModuleBase {
         this._get = new Get(sendCommand);
         this._set = new Set(eventEmitter, sendCommand, offlineMode, this._get);
         this._callbacks = callbacks(shellParser, eventEmitter);
+        this._ranges = Module.getRanges();
+        this._values = Module.getValues();
     }
 
     get get() {
@@ -76,8 +82,8 @@ export default class Module implements ChargerModuleBase {
             vTrickleFast: 2.5,
             iChg: getMinValueOfRangeOrNumberArray(this.ranges.current),
             enabled: false,
-            iTerm: 10,
-            iTrickle: 12.5,
+            iTerm: ITermValues[ITermValues.length / 2],
+            iTrickle: ITrickleValues[ITrickleValues.length / 2],
             enableRecharging: false,
             enableWeakBatteryCharging: false,
             enableVBatLow: false,
@@ -94,10 +100,18 @@ export default class Module implements ChargerModuleBase {
         };
     }
 
+    get values(): ChargerModuleValues {
+        return this._values;
+    }
+
     get ranges(): ChargerModuleRanges {
+        return this._ranges;
+    }
+
+    protected static getRanges(): ChargerModuleRanges {
         return {
-            voltage: this.voltageRange,
-            vTermR: this.voltageRange,
+            voltage: Module.voltageRange,
+            vTermR: Module.voltageRange,
             jeita: {
                 min: -20,
                 max: 60,
@@ -132,6 +146,47 @@ export default class Module implements ChargerModuleBase {
         };
     }
 
+    protected static getValues(): ChargerModuleValues {
+        const getITermValues = (
+            iChg: number,
+        ): { label: string; value: ITerm }[] => {
+            if (iChg < 8) {
+                return ITermValuesWhenIChgBelow8mA.map((item, i) => ({
+                    label: `${ITermKeysWhenIChgBelow8mA[i]}`,
+                    value: item,
+                }));
+            }
+            return ITermValues.map((item, i) => ({
+                label: `${ITermKeys[i]}`,
+                value: item,
+            }));
+        };
+
+        const getITrickleValues = (
+            iChg: number,
+        ): { label: string; value: ITrickle }[] => {
+            if (iChg < 8) {
+                return ITrickleValuesWhenIChgBelow8mA.map((item, i) => ({
+                    label: `${ITrickleKeysWhenIChgBelow8mA[i]}`,
+                    value: item,
+                }));
+            }
+            return ITrickleValues.map((item, i) => ({
+                label: `${ITrickleKeys[i]}`,
+                value: item,
+            }));
+        };
+
+        return {
+            iTerm: getITermValues,
+            iTrickle: getITrickleValues,
+            vTrickleFast: [...VTrickleFastValues].map((item, i) => ({
+                label: `${VTrickleFastKeys[i]}`,
+                value: item,
+            })),
+        };
+    }
+
     protected static get currentRange() {
         return getRange([
             {
@@ -149,8 +204,7 @@ export default class Module implements ChargerModuleBase {
         ]).map(v => Number(v.toFixed(1)));
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    protected get voltageRange() {
+    protected static get voltageRange() {
         return getRange([
             {
                 min: 3.5,
@@ -159,39 +213,5 @@ export default class Module implements ChargerModuleBase {
                 decimals: 2,
             },
         ]).map(v => Number(v.toFixed(2)));
-    }
-
-    // eslint-disable-next-line class-methods-use-this
-    get values(): {
-        iTerm: { label: string; value: ITerm }[];
-        iTrickle?: (iChg: number) => { label: string; value: ITrickle }[];
-        vTrickleFast: { label: string; value: VTrickleFast }[];
-    } {
-        const getITrickleValues = (
-            iChg: number,
-        ): { label: string; value: ITrickle }[] => {
-            if (iChg < 8) {
-                return ITrickleValuesWhenIChgBelow8mA.map((item, i) => ({
-                    label: `${ITrickleKeysWhenIChgBelow8mA[i]}`,
-                    value: item,
-                }));
-            }
-            return ITrickleValues.map((item, i) => ({
-                label: `${ITrickleKeys[i]}`,
-                value: item,
-            }));
-        };
-
-        return {
-            iTerm: [...ITermValues].map((item, i) => ({
-                label: `${ITermKeys[i]}`,
-                value: item,
-            })),
-            iTrickle: getITrickleValues,
-            vTrickleFast: [...VTrickleFastValues].map((item, i) => ({
-                label: `${VTrickleFastKeys[i]}`,
-                value: item,
-            })),
-        };
     }
 }
