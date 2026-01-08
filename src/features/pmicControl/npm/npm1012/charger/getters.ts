@@ -28,6 +28,13 @@ export class ChargerGet extends ChargerModuleGetBase {
         this.tWarm();
         this.tHot();
         this.vWeak();
+        this.enabledBatteryDischargeCurrentLimit();
+        this.enabledChargeCurrentThrottling();
+        this.iThrottle();
+        this.tOutCharge();
+        this.tOutTrickle();
+        this.vThrottle();
+        this.vBatLow();
     }
 
     state() {
@@ -90,5 +97,26 @@ export class ChargerGet extends ChargerModuleGetBase {
     }
     vWeak() {
         this.sendCommand('npmx charger weak_voltage get');
+    }
+    enabledBatteryDischargeCurrentLimit() {
+        this.sendCommand('npmx charger battery_discharge_current_limit get');
+    }
+    enabledChargeCurrentThrottling() {
+        this.sendCommand('npmx charger charge_current_throttling get');
+    }
+    iThrottle() {
+        this.sendCommand('npmx charger throttle_current get');
+    }
+    tOutCharge() {
+        this.sendCommand('npmx charger timeout_charge get');
+    }
+    tOutTrickle() {
+        this.sendCommand('npmx charger timeout_trickle get');
+    }
+    vThrottle() {
+        this.sendCommand('npmx charger throttle_voltage get');
+    }
+    vBatLow() {
+        this.sendCommand('npmx charger v_batlow get');
     }
 }
