@@ -16,7 +16,7 @@ const ldoDefaults = (): Ldo => ({
     mode: 'Load_switch',
     enabled: false,
     softStartEnabled: true,
-    softStart: 20,
+    softStart: 25,
     activeDischarge: false,
     onOffControl: 'SW',
     onOffSoftwareControlEnabled: true,
