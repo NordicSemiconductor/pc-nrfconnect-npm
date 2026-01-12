@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import { ChargerModuleGetBase } from '../../types';
 
 export class ChargerGet extends ChargerModuleGetBase {
@@ -104,5 +106,16 @@ export class ChargerGet extends ChargerModuleGetBase {
     }
     enabledNtcMonitoring() {
         this.sendCommand('npmx charger ntc_monitoring enable get');
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    iChgAndITermValid(iChg: number, iTerm: number): boolean {
+        if (iChg < 8 && iTerm <= 1.56) {
+            logger.error(
+                `iChg must be at least 8 mA when iTerm is 1.56% or less`,
+            );
+            return false;
+        }
+        return true;
     }
 }
