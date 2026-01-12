@@ -482,7 +482,7 @@ export class ChargerSet extends ChargerModuleSetBase {
     }
 
     enableAdvancedChargingProfile(enabled: boolean) {
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve, reject) => {
             this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 enableAdvancedChargingProfile: enabled,
                 jeitaILabelCool: enabled
@@ -499,17 +499,39 @@ export class ChargerSet extends ChargerModuleSetBase {
                     : ChargerJeitaVLabel.warmVTerm100mVOff,
             });
 
-            resolve();
+            if (this.offlineMode) {
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger advanced_charging_profile enable set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        this.get.enabledAdvancedChargingProfile?.();
+                        reject();
+                    },
+                );
+            }
         });
     }
 
     enableNtcMonitoring(enabled: boolean) {
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve, reject) => {
             this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                 enableNtcMonitoring: enabled,
             });
 
-            resolve();
+            if (this.offlineMode) {
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npmx charger ntc_monitoring enable set ${enabled ? '1' : '0'}`,
+                    () => resolve(),
+                    () => {
+                        this.get.enabledNtcMonitoring?.();
+                        reject();
+                    },
+                );
+            }
         });
     }
 

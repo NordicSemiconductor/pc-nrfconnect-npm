@@ -99,4 +99,10 @@ export class ChargerGet extends ChargerModuleGetBase {
     vTermWarm() {
         this.sendCommand('npmx charger termination_voltage warm get');
     }
+    enabledAdvancedChargingProfile() {
+        this.sendCommand('npmx charger advanced_charging_profile enable get');
+    }
+    enabledNtcMonitoring() {
+        this.sendCommand('npmx charger ntc_monitoring enable get');
+    }
 }
