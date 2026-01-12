@@ -544,21 +544,14 @@ export class ChargerSet extends ChargerModuleSetBase {
             if (this.offlineMode) {
                 resolve();
             } else {
-                this.enabled(false)
-                    .then(() =>
-                        this.sendCommand(
-                            `npmx charger charging_current cool set ${value * 1000}`, // mA to uA
-                            () => resolve(),
-                            () => {
-                                this.get.iChgCool?.();
-                                reject();
-                            },
-                        ),
-                    )
-                    .catch(() => {
+                this.sendCommand(
+                    `npmx charger charging_current cool set ${value * 1000}`, // mA to uA
+                    () => resolve(),
+                    () => {
                         this.get.iChgCool?.();
                         reject();
-                    });
+                    },
+                );
             }
         });
     }
@@ -572,31 +565,25 @@ export class ChargerSet extends ChargerModuleSetBase {
             if (this.offlineMode) {
                 resolve();
             } else {
-                this.enabled(false)
-                    .then(() =>
-                        this.sendCommand(
-                            `npmx charger charging_current warm set ${value * 1000}`, // mA to uA
-                            () => resolve(),
-                            () => {
-                                this.get.iChgWarm?.();
-                                reject();
-                            },
-                        ),
-                    )
-                    .catch(() => {
+                this.sendCommand(
+                    `npmx charger charging_current warm set ${value * 1000}`, // mA to uA
+                    () => resolve(),
+                    () => {
                         this.get.iChgWarm?.();
                         reject();
-                    });
+                    },
+                );
             }
         });
     }
 
     vTermCool(value: number) {
         return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                vTermCool: value,
+            });
+
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    vTermCool: value,
-                });
                 resolve();
             } else {
                 this.sendCommand(
@@ -613,10 +600,11 @@ export class ChargerSet extends ChargerModuleSetBase {
 
     vTermWarm(value: number) {
         return new Promise<void>((resolve, reject) => {
+            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                vTermWarm: value,
+            });
+
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    vTermWarm: value,
-                });
                 resolve();
             } else {
                 this.sendCommand(
