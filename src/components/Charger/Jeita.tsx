@@ -396,13 +396,12 @@ export default ({
                     charger={charger}
                     disabled={advancedChargingProfileDisabled}
                 />
-            ) : (
-                <Default
-                    chargerModule={chargerModule}
-                    charger={charger}
-                    disabled={disabled}
-                />
-            )}
+            ) : null}
+            <Default
+                chargerModule={chargerModule}
+                charger={charger}
+                disabled={disabled}
+            />
         </Card>
     );
 };
@@ -424,6 +423,14 @@ const Default = ({
         setInternalVTermr(charger.vTermR);
         setInternalNTCBeta(charger.ntcBeta);
     }, [charger]);
+
+    if (
+        internalNTCBeta === undefined ||
+        charger.ntcBeta === undefined ||
+        charger.ntcThermistor === undefined
+    ) {
+        return null;
+    }
 
     return (
         <>
@@ -452,7 +459,7 @@ const Default = ({
                 }
                 items={ntcThermistorItems}
                 onSelect={item =>
-                    chargerModule.set.nTCThermistor(
+                    chargerModule.set.nTCThermistor?.(
                         item.value as NTCThermistor,
                         autoNTCBeta,
                     )
@@ -474,7 +481,8 @@ const Default = ({
                 onToggle={v => {
                     setAutoNTCBeta(v);
                     if (!v) return;
-                    chargerModule.set.nTCThermistor(
+                    if (!charger.ntcThermistor) return;
+                    chargerModule.set.nTCThermistor?.(
                         charger.ntcThermistor,
                         true,
                     );
@@ -495,7 +503,9 @@ const Default = ({
                             range={chargerModule.ranges.nTCBeta}
                             value={internalNTCBeta}
                             onChange={setInternalNTCBeta}
-                            onChangeComplete={v => chargerModule.set.nTCBeta(v)}
+                            onChangeComplete={v =>
+                                chargerModule.set.nTCBeta?.(v)
+                            }
                         />
                     </div>
                 </div>
