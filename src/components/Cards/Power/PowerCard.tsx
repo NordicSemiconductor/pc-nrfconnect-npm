@@ -335,7 +335,18 @@ export default ({
                 range={chargerModule.ranges.current}
                 value={internalIChg}
                 onChange={setInternalIChg}
-                onChangeComplete={v => chargerModule.set.iChg(v)}
+                onChangeComplete={v => {
+                    const valid = chargerModule.get.iChgAndITermValid?.(
+                        v,
+                        charger.iTerm,
+                    );
+                    const newVal = valid === false ? charger.iChg : v;
+
+                    setInternalIChg(newVal);
+                    if (newVal !== charger.iChg) {
+                        chargerModule.set.iChg(newVal);
+                    }
+                }}
                 showSlider
             />
             <Dropdown
