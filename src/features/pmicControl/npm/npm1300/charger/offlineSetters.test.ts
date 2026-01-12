@@ -124,7 +124,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set setChargerNTCBeta', async () => {
-        await pmic.chargerModule?.set.nTCBeta(3380);
+        await pmic.chargerModule?.set.nTCBeta?.(3380);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({
@@ -133,7 +133,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set setChargerNTCThermistor', async () => {
-        await pmic.chargerModule?.set.nTCThermistor('100 kΩ');
+        await pmic.chargerModule?.set.nTCThermistor?.('100 kΩ');
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({

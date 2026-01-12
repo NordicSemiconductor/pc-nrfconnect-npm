@@ -186,7 +186,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         ] as { mode: NTCThermistor; cliMode: number; beta: number }[])(
             'Set setChargerNTCThermistor - auto beta - %p',
             async ({ mode, cliMode, beta }) => {
-                await pmic.chargerModule?.set.nTCThermistor(mode, true);
+                await pmic.chargerModule?.set.nTCThermistor?.(mode, true);
 
                 // turn off charging
                 expect(mockEnqueueRequest).toBeCalledTimes(4);
@@ -241,7 +241,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         ] as { mode: NTCThermistor; cliMode: number; beta: number }[])(
             'Set setChargerNTCThermistor - manual beta %p',
             async ({ mode, cliMode }) => {
-                await pmic.chargerModule?.set.nTCThermistor(mode, false);
+                await pmic.chargerModule?.set.nTCThermistor?.(mode, false);
 
                 // turn off charging
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -263,7 +263,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         );
 
         test('Set setChargerNTCBeta', async () => {
-            await pmic.chargerModule?.set.nTCBeta(3380);
+            await pmic.chargerModule?.set.nTCBeta?.(3380);
 
             // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -817,7 +817,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.chargerModule?.set.nTCThermistor(mode),
+                    pmic.chargerModule?.set.nTCThermistor?.(mode),
                 ).rejects.toBeUndefined();
 
                 // turn chance ntc thermistor
@@ -852,7 +852,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setChargerNTCThermistor - Fail immediately - mode: %p',
             async mode => {
                 await expect(
-                    pmic.chargerModule?.set.nTCThermistor(mode),
+                    pmic.chargerModule?.set.nTCThermistor?.(mode),
                 ).rejects.toBeUndefined();
 
                 // turn chance ntc thermistor
@@ -886,7 +886,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setChargerNTCBeta - Fail immediately : %p', async () => {
             await expect(
-                pmic.chargerModule?.set.nTCBeta(3380),
+                pmic.chargerModule?.set.nTCBeta?.(3380),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -914,7 +914,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
 
             await expect(
-                pmic.chargerModule?.set.nTCBeta(3380),
+                pmic.chargerModule?.set.nTCBeta?.(3380),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);

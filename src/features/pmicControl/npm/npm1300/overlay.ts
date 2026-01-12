@@ -67,7 +67,11 @@ ${deviceType}_ek_charger: charger {
             : ''
     }
     vbus-limit-microamp = <500000>;
-    thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
+    ${
+        charger.ntcThermistor
+            ? `thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>`
+            : ''
+    }
     thermistor-beta = <${charger.ntcBeta}>;
     ${charger.enableRecharging ? '' : '// disable-recharge;'}
     ${charger.enabled ? 'charging-enable;' : ''}

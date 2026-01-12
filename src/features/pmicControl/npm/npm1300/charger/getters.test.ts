@@ -121,7 +121,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerNTCThermistor', () => {
-        pmic.chargerModule?.get.nTCThermistor();
+        pmic.chargerModule?.get.nTCThermistor?.();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -133,7 +133,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerNTCBeta', () => {
-        pmic.chargerModule?.get.nTCBeta();
+        pmic.chargerModule?.get.nTCBeta?.();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

@@ -28,8 +28,6 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.enabledRecharging(charger.enableRecharging),
             this.enabledVBatLow(charger.enableVBatLow),
             this.vTrickleFast(charger.vTrickleFast),
-            this.nTCThermistor(charger.ntcThermistor),
-            this.nTCBeta(charger.ntcBeta),
             this.tChgResume(charger.tChgResume),
             this.tChgStop(charger.tChgStop),
             this.vTermR(charger.vTermR),
@@ -39,6 +37,13 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.tHot(charger.tHot),
             this.enabled(charger.enabled),
         );
+
+        if (charger.ntcBeta && this.nTCBeta) {
+            promises.push(this.nTCBeta(charger.ntcBeta));
+        }
+        if (charger.ntcThermistor && this.nTCThermistor) {
+            promises.push(this.nTCThermistor(charger.ntcThermistor));
+        }
 
         await Promise.allSettled(promises);
     }
@@ -297,13 +302,13 @@ export class ChargerSet extends ChargerModuleSetBase {
                                 }
                             },
                             () => {
-                                this.get.nTCThermistor();
+                                this.get.nTCThermistor?.();
                                 reject();
                             },
                         );
                     })
                     .catch(() => {
-                        this.get.nTCThermistor();
+                        this.get.nTCThermistor?.();
                         reject();
                     });
             }
@@ -327,7 +332,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                                 resolve();
                             },
                             () => {
-                                this.get.nTCBeta();
+                                this.get.nTCBeta?.();
                                 reject();
                             },
                         ),
