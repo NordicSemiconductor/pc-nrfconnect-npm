@@ -20,6 +20,7 @@ const ldoDefaults = (): Ldo => ({
     activeDischarge: false,
     onOffControl: 'SW',
     onOffSoftwareControlEnabled: true,
+    ldoSoftStartEnable: true,
 });
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
@@ -48,6 +49,8 @@ export default class Module implements LdoModule {
     private _get: LdoGet;
     private _set: LdoSet;
     private _callbacks: (() => void)[];
+    protected hardwareRevision: string | undefined;
+
     constructor({
         index,
         sendCommand,
@@ -55,6 +58,7 @@ export default class Module implements LdoModule {
         offlineMode,
         shellParser,
         dialogHandler,
+        hardwareRevision,
     }: ModuleParams) {
         this.index = index;
         this._get = new LdoGet(sendCommand, index);
@@ -66,6 +70,7 @@ export default class Module implements LdoModule {
             index,
         );
         this._callbacks = ldoCallbacks(shellParser, eventEmitter, index);
+        this.hardwareRevision = hardwareRevision;
     }
 
     get get() {

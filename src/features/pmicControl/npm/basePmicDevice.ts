@@ -280,6 +280,7 @@ export default abstract class BaseNpmDevice {
             offlineMode: this.offlineMode,
             dialogHandler: this.dialogHandler,
             npmDevice: this,
+            hardwareRevision: this.hardwareVersion,
         };
         if (this.peripherals.ChargerModule) {
             this.chargerModule = new this.peripherals.ChargerModule({
