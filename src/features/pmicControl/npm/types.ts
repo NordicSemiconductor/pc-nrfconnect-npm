@@ -637,6 +637,8 @@ export abstract class ChargerModuleGetBase {
     abstract tHot(): void;
 
     batLim?(): void;
+    enabledAdvancedChargingProfile?(): void;
+    enabledNtcMonitoring?(): void;
     enabledWeakBatteryCharging?(): void;
     iChgCool?(): void;
     iChgWarm?(): void;
