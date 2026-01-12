@@ -89,8 +89,6 @@ export default class Module implements ChargerModuleBase {
             enableRecharging: false,
             enableWeakBatteryCharging: false,
             enableVBatLow: false,
-            ntcThermistor: '10 kΩ',
-            ntcBeta: 3380,
             tChgStop: 110,
             tChgResume: 100,
             vTermR: 3.6,

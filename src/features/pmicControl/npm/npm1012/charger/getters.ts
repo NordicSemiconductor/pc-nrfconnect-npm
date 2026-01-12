@@ -18,8 +18,6 @@ export class ChargerGet extends ChargerModuleGetBase {
         this.enabledRecharging();
         this.enabledWeakBatteryCharging();
         this.enabledVBatLow();
-        this.nTCThermistor();
-        this.nTCBeta();
         this.tChgStop();
         this.tChgResume();
         this.vTermR();
@@ -64,12 +62,6 @@ export class ChargerGet extends ChargerModuleGetBase {
     }
     enabledVBatLow() {
         this.sendCommand('powerup_charger vbatlow get');
-    }
-    nTCThermistor() {
-        this.sendCommand('npmx adc ntc type get');
-    }
-    nTCBeta() {
-        this.sendCommand('npmx adc ntc beta get');
     }
     tChgStop() {
         this.sendCommand('npmx charger die_temp stop get');

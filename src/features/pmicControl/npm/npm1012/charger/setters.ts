@@ -11,7 +11,6 @@ import {
     ChargerModuleSetBase,
     ITerm,
     ITrickle,
-    NTCThermistor,
     VTrickleFast,
 } from '../../types';
 
@@ -76,8 +75,6 @@ export class ChargerSet extends ChargerModuleSetBase {
         promises.push(
             this.enabledRecharging(charger.enableRecharging),
             this.enabledVBatLow(charger.enableVBatLow),
-            this.nTCThermistor(charger.ntcThermistor),
-            this.nTCBeta(charger.ntcBeta),
             this.tChgResume(charger.tChgResume),
             this.tChgStop(charger.tChgStop),
             this.vTermR(charger.vTermR),
@@ -312,95 +309,6 @@ export class ChargerSet extends ChargerModuleSetBase {
                         reject();
                     },
                 );
-            }
-        });
-    }
-
-    nTCThermistor(mode: NTCThermistor, autoSetBeta?: boolean) {
-        return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                ntcThermistor: mode,
-            });
-
-            let value = 0;
-            let ntcBeta = 0;
-            switch (mode) {
-                case '100 kΩ':
-                    value = 100000;
-                    ntcBeta = 4250;
-                    break;
-                case '47 kΩ':
-                    value = 47000;
-                    ntcBeta = 4050;
-                    break;
-                case '10 kΩ':
-                    value = 10000;
-                    ntcBeta = 3380;
-                    break;
-                case 'Ignore NTC':
-                    value = 0;
-                    break;
-            }
-
-            if (autoSetBeta && mode !== 'Ignore NTC') {
-                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    ntcBeta,
-                });
-            }
-
-            if (this.offlineMode) {
-                resolve();
-            } else {
-                this.enabled(false)
-                    .then(() => {
-                        this.sendCommand(
-                            `npmx adc ntc type set ${value}`,
-                            () => {
-                                if (autoSetBeta && mode !== 'Ignore NTC') {
-                                    this.nTCBeta(ntcBeta)
-                                        .then(resolve)
-                                        .catch(reject);
-                                } else {
-                                    resolve();
-                                }
-                            },
-                            () => {
-                                this.get.nTCThermistor();
-                                reject();
-                            },
-                        );
-                    })
-                    .catch(() => {
-                        this.get.nTCThermistor();
-                        reject();
-                    });
-            }
-        });
-    }
-
-    nTCBeta(ntcBeta: number) {
-        return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                ntcBeta,
-            });
-
-            if (this.offlineMode) {
-                resolve();
-            } else {
-                this.enabled(false)
-                    .then(() =>
-                        this.sendCommand(
-                            `npmx adc ntc beta set ${ntcBeta}`,
-                            () => {
-                                resolve();
-                            },
-                            () => {
-                                this.get.nTCBeta();
-                                reject();
-                            },
-                        ),
-                    )
-                    .catch(reject);
             }
         });
     }
