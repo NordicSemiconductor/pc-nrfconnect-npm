@@ -42,16 +42,16 @@ export class ChargerSet extends ChargerModuleSetBase {
         if (charger.vWeak && this.vWeak) {
             promises.push(this.vWeak(charger.vWeak));
         }
-        if (charger.iChgCool !== undefined && this.iChgCool !== undefined) {
+        if (charger.iChgCool !== undefined && this.iChgCool) {
             promises.push(this.iChgCool(charger.iChgCool));
         }
-        if (charger.iChgWarm !== undefined && this.iChgWarm !== undefined) {
+        if (charger.iChgWarm !== undefined && this.iChgWarm) {
             promises.push(this.iChgWarm(charger.iChgWarm));
         }
-        if (charger.vTermCool !== undefined && this.vTermCool !== undefined) {
+        if (charger.vTermCool !== undefined && this.vTermCool) {
             promises.push(this.vTermCool(charger.vTermCool));
         }
-        if (charger.vTermWarm !== undefined && this.vTermWarm !== undefined) {
+        if (charger.vTermWarm !== undefined && this.vTermWarm) {
             promises.push(this.vTermWarm(charger.vTermWarm));
         }
         if (
