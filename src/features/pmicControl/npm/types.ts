@@ -640,6 +640,7 @@ export abstract class ChargerModuleGetBase {
     enabledAdvancedChargingProfile?(): void;
     enabledNtcMonitoring?(): void;
     enabledWeakBatteryCharging?(): void;
+    iChgAndITermValid?(iChg: number, iTerm: number): boolean;
     iChgCool?(): void;
     iChgWarm?(): void;
     iTrickle?(): void;
