@@ -74,7 +74,7 @@ export class ChargerSet extends ChargerModuleSetBase {
 
         if (
             charger.enableChargeCurrentThrottling !== undefined &&
-            this.enableChargeCurrentThrottling !== undefined
+            this.enableChargeCurrentThrottling
         ) {
             promises.push(
                 this.enableChargeCurrentThrottling(
@@ -84,7 +84,7 @@ export class ChargerSet extends ChargerModuleSetBase {
         }
         if (
             charger.enableBatteryDischargeCurrentLimit !== undefined &&
-            this.enableBatteryDischargeCurrentLimit !== undefined
+            this.enableBatteryDischargeCurrentLimit
         ) {
             promises.push(
                 this.enableBatteryDischargeCurrentLimit(
@@ -92,22 +92,19 @@ export class ChargerSet extends ChargerModuleSetBase {
                 ),
             );
         }
-        if (charger.iThrottle !== undefined && this.iThrottle !== undefined) {
+        if (charger.iThrottle !== undefined && this.iThrottle) {
             promises.push(this.iThrottle(charger.iThrottle));
         }
-        if (charger.tOutCharge !== undefined && this.tOutCharge !== undefined) {
+        if (charger.tOutCharge !== undefined && this.tOutCharge) {
             promises.push(this.tOutCharge(charger.tOutCharge));
         }
-        if (
-            charger.tOutTrickle !== undefined &&
-            this.tOutTrickle !== undefined
-        ) {
+        if (charger.tOutTrickle !== undefined && this.tOutTrickle) {
             promises.push(this.tOutTrickle(charger.tOutTrickle));
         }
-        if (charger.vBatLow !== undefined && this.vBatLow !== undefined) {
+        if (charger.vBatLow !== undefined && this.vBatLow) {
             promises.push(this.vBatLow(charger.vBatLow));
         }
-        if (charger.vThrottle !== undefined && this.vThrottle !== undefined) {
+        if (charger.vThrottle !== undefined && this.vThrottle) {
             promises.push(this.vThrottle(charger.vThrottle));
         }
 
