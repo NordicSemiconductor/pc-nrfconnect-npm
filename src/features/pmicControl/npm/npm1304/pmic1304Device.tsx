@@ -18,6 +18,7 @@ import {
 } from '../types';
 import { BatteryProfiler } from './batteryProfiler';
 import ChargerModule from './charger';
+import LdoModule from './ldo';
 import OnBoardLoadModule from './onBoardLoad';
 
 export const npm1304FWVersion = '0.2.6+0';
@@ -27,6 +28,7 @@ export default class Npm1304 extends nPM1300Device {
         shellParser: ShellParser | undefined,
         dialogHandler: ((dialog: PmicDialog) => void) | null,
         hardwareVersion?: string,
+        pmicVersion?: number,
     ) {
         super(
             shellParser,
@@ -35,8 +37,13 @@ export default class Npm1304 extends nPM1300Device {
                 ChargerModule,
                 BatteryProfiler,
                 OnBoardLoadModule,
+                ldos: {
+                    Module: LdoModule,
+                    count: 2,
+                },
             },
             hardwareVersion,
+            pmicVersion,
             'npm1304',
             npm1304FWVersion,
         );

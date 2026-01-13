@@ -274,8 +274,9 @@ const LdoSoftstart = ({ disabled, ldoModule, ldo, card }: LdoSoftstartAttr) => (
                 }
                 disabled={
                     disabled ||
-                    !ldo.ldoSoftStartEnable ||
-                    !ldoModule.set.ldoSoftstart
+                    (ldo.mode === 'LDO' &&
+                        !ldo.ldoSoftStartEnable &&
+                        !ldoModule.set.ldoSoftstart)
                 }
             />
         )}

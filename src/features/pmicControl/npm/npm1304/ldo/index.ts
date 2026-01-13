@@ -16,7 +16,7 @@ const getLdoVoltageRange = () =>
         step: 0.1,
     }) as RangeType;
 
-const ldoDefaults = (hardwareRevision: string | undefined): Ldo => ({
+const ldoDefaults = (pmicRevision: number | undefined): Ldo => ({
     voltage: getLdoVoltageRange().min,
     mode: 'Load_switch',
     enabled: false,
@@ -25,11 +25,12 @@ const ldoDefaults = (hardwareRevision: string | undefined): Ldo => ({
     activeDischarge: false,
     onOffControl: 'SW',
     onOffSoftwareControlEnabled: true,
-    ldoSoftStartEnable: hardwareRevision === 'FOO', // npm 1304
+    ldoSoftStartEnable: pmicRevision !== undefined && pmicRevision >= 1.1, // npm 1304
 });
 
 export default class Module extends nPM1300LdoModule {
     get defaults(): Ldo {
-        return ldoDefaults(this.hardwareRevision);
+        console.log('pmicRevision in npm1304 ldo', this.pmicRevision);
+        return ldoDefaults(this.pmicRevision);
     }
 }

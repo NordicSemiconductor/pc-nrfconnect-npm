@@ -489,7 +489,7 @@ export type ModuleParams = {
     dialogHandler: ((dialog: PmicDialog) => void) | null;
     offlineMode: boolean;
     npmDevice: BaseNpmDevice;
-    hardwareRevision: string | undefined;
+    pmicRevision: number | undefined;
 };
 
 export interface IModule<T> {
