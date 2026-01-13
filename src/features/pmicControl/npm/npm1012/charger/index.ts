@@ -10,6 +10,7 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     getMinValueOfRangeOrNumberArray,
     getRange,
+    RangeType,
 } from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
@@ -50,40 +51,36 @@ export default class Module implements ChargerModuleBase {
     private _ranges: ChargerModuleRanges;
     private _values: ChargerModuleValues;
 
-    private static iThrottleValues: number[] = getRange([
-        {
-            min: 12.5, // % of IChg
-            max: 87.5,
-            step: 12.5,
-            decimals: 1,
-        },
-    ]);
-    private static tOutChargeValues: number[] = getRange([
-        {
-            min: 1, // hours
-            max: 10,
-            step: 1,
-            decimals: 0,
-        },
-    ]);
-
-    private static tOutTrickleValues: number[] = getRange([
-        {
-            min: 10, // minutes
-            max: 120,
-            step: 10,
-            decimals: 0,
-        },
-    ]);
-    private static vBatLowValues: number[] = [1.1, 2.1];
-    private static vThrottleValues: number[] = getRange([
-        {
-            min: 25, // mV
-            max: 400,
-            step: 25,
-            decimals: 0,
-        },
-    ]);
+    private static iThrottleValueRange: RangeType = {
+        min: 12.5, // % of IChg
+        max: 87.5,
+        step: 12.5,
+        decimals: 1,
+    };
+    private static tOutChargeValueRange: RangeType = {
+        min: 1, // hours
+        max: 10,
+        step: 1,
+        decimals: 0,
+    };
+    private static tOutTrickleValueRange: RangeType = {
+        min: 10, // minutes
+        max: 120,
+        step: 10,
+        decimals: 0,
+    };
+    private static vBatLowValueRange: RangeType = {
+        min: 1.1, // voltage
+        max: 2.1,
+        step: 1.0,
+        decimals: 1,
+    };
+    private static vThrottleValueRange: RangeType = {
+        min: 25, // mV
+        max: 400,
+        step: 25,
+        decimals: 0,
+    };
 
     constructor(
         { sendCommand, eventEmitter, offlineMode, shellParser }: ModuleParams,
@@ -150,11 +147,11 @@ export default class Module implements ChargerModuleBase {
             jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
             enableBatteryDischargeCurrentLimit: false,
             enableChargeCurrentThrottling: false,
-            iThrottle: Module.iThrottleValues[0],
-            tOutCharge: Module.tOutChargeValues[0],
-            tOutTrickle: Module.tOutTrickleValues[0],
-            vThrottle: Module.vThrottleValues[0],
-            vBatLow: Module.vBatLowValues[0],
+            iThrottle: Module.iThrottleValueRange.min,
+            tOutCharge: Module.tOutChargeValueRange.min,
+            tOutTrickle: Module.tOutTrickleValueRange.min,
+            vThrottle: Module.vThrottleValueRange.min,
+            vBatLow: Module.vBatLowValueRange.min,
         };
     }
 
@@ -235,27 +232,33 @@ export default class Module implements ChargerModuleBase {
             }));
         };
 
+        const iThrottleValues = getRange([Module.iThrottleValueRange]);
+        const tOutChargeValues = getRange([Module.tOutChargeValueRange]);
+        const tOutTrickleValues = getRange([Module.tOutTrickleValueRange]);
+        const vBatLowValues = getRange([Module.vBatLowValueRange]);
+        const vThrottleValues = getRange([Module.vThrottleValueRange]);
+
         return {
             iTerm: getITermValues,
-            iThrottle: Module.iThrottleValues.map((item, i) => ({
-                label: `${Module.iThrottleValues[i]}%`,
+            iThrottle: iThrottleValues.map((item, i) => ({
+                label: `${iThrottleValues[i]}%`,
                 value: item,
             })),
             iTrickle: getITrickleValues,
-            tOutCharge: Module.tOutChargeValues.map((item, i) => ({
-                label: `${Module.tOutChargeValues[i]} hours`,
+            tOutCharge: tOutChargeValues.map((item, i) => ({
+                label: `${tOutChargeValues[i]} hours`,
                 value: item,
             })),
-            tOutTrickle: Module.tOutTrickleValues.map((item, i) => ({
-                label: `${Module.tOutTrickleValues[i]} minutes`,
+            tOutTrickle: tOutTrickleValues.map((item, i) => ({
+                label: `${tOutTrickleValues[i]} minutes`,
                 value: item,
             })),
-            vBatLow: Module.vBatLowValues.map((item, i) => ({
-                label: `${Module.vBatLowValues[i]} V`,
+            vBatLow: vBatLowValues.map((item, i) => ({
+                label: `${vBatLowValues[i]} V`,
                 value: item,
             })),
-            vThrottle: Module.vThrottleValues.map((item, i) => ({
-                label: `${Module.vThrottleValues[i]} mV`,
+            vThrottle: vThrottleValues.map((item, i) => ({
+                label: `${vThrottleValues[i]} mV`,
                 value: item,
             })),
             vTrickleFast: VTrickleFastValues.map((item, i) => ({
