@@ -21,6 +21,7 @@ import {
     NpmExportLatest,
     PmicDialog,
 } from '../types';
+import BuckModule from './buck';
 import ChargerModule from './charger';
 
 export const npm1012FWVersion = '0.7.2+0';
@@ -39,6 +40,7 @@ export default class Npm1012 extends BaseNpmDevice {
             dialogHandler,
             new NpmEventEmitter(),
             {
+                bucks: { Module: BuckModule, count: 1 },
                 ChargerModule,
                 maxEnergyExtraction: true,
                 noOfLEDs: 0,
