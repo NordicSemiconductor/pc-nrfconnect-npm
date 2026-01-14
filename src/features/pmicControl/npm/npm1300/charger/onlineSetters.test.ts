@@ -295,7 +295,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set setChargerTChgStop', async () => {
-            await pmic.chargerModule?.set.tChgStop(90);
+            await pmic.chargerModule?.set.tChgStop?.(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger die_temp stop set 90`,
@@ -1003,7 +1003,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setChargerTChgStop - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.tChgStop(90),
+                pmic.chargerModule?.set.tChgStop?.(90),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

@@ -29,7 +29,6 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.enabledVBatLow(charger.enableVBatLow),
             this.vTrickleFast(charger.vTrickleFast),
             this.tChgResume(charger.tChgResume),
-            this.tChgStop(charger.tChgStop),
             this.vTermR(charger.vTermR),
             this.tCold(charger.tCold),
             this.tCool(charger.tCool),
@@ -43,6 +42,9 @@ export class ChargerSet extends ChargerModuleSetBase {
         }
         if (charger.ntcThermistor && this.nTCThermistor) {
             promises.push(this.nTCThermistor(charger.ntcThermistor));
+        }
+        if (charger.tChgStop && this.tChgStop) {
+            promises.push(this.tChgStop(charger.tChgStop));
         }
 
         await Promise.allSettled(promises);
@@ -354,7 +356,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     `npmx charger die_temp stop set ${value}`,
                     () => resolve(),
                     () => {
-                        this.get.tChgStop();
+                        this.get.tChgStop?.();
                         reject();
                     },
                 );
