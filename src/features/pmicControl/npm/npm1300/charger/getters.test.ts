@@ -157,7 +157,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test('Request update chargerTChgStop', () => {
-        pmic.chargerModule?.get.tChgStop();
+        pmic.chargerModule?.get.tChgStop?.();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

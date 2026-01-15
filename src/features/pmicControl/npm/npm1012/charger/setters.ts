@@ -76,7 +76,6 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.enabledRecharging(charger.enableRecharging),
             this.enabledVBatLow(charger.enableVBatLow),
             this.tChgResume(charger.tChgResume),
-            this.tChgStop(charger.tChgStop),
             this.vTermR(charger.vTermR),
             this.vTrickleFast(charger.vTrickleFast),
             this.tCold(charger.tCold),
@@ -313,19 +312,19 @@ export class ChargerSet extends ChargerModuleSetBase {
         });
     }
 
-    tChgStop(value: number) {
+    tChgReduce(value: number) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    tChgStop: value,
+                    tChgReduce: value,
                 });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger die_temp stop set ${value}`,
+                    `npmx charger die_temp reduce set ${value}`,
                     () => resolve(),
                     () => {
-                        this.get.tChgStop();
+                        this.get.tChgReduce?.();
                         reject();
                     },
                 );

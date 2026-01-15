@@ -227,10 +227,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger die_temp stop', true),
+                toRegex('npmx charger die_temp reduce', true),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tChgStop: parseToNumber(res),
+                        tChgReduce: parseToNumber(res),
                     });
                 },
                 noop,

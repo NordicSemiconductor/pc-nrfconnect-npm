@@ -12,6 +12,7 @@ import {
     NumberInlineInput,
     Slider,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { RangeOrValues } from '@nordicsemiconductor/pc-nrfconnect-shared/typings/generated/src/Slider/range';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { Charger, ChargerModule } from '../../features/pmicControl/npm/types';
@@ -30,29 +31,6 @@ export default ({
 }) => {
     const pmicChargingState = useSelector(getPmicChargingState);
 
-    const [internalChipThermal, setInternalChipThermal] = useState([
-        charger.tChgResume,
-        charger.tChgStop,
-    ]);
-
-    // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
-    useEffect(() => {
-        setInternalChipThermal([charger.tChgResume, charger.tChgStop]);
-    }, [charger]);
-
-    const updateInternal = (index: number, value: number) => {
-        if (index === 0 && value >= internalChipThermal[1]) {
-            return;
-        }
-        if (index === 1 && internalChipThermal[0] >= value) {
-            return;
-        }
-
-        const temp = [...internalChipThermal];
-        temp[index] = value;
-        setInternalChipThermal(temp);
-    };
-
     return (
         <Card
             title={
@@ -67,59 +45,14 @@ export default ({
             }
         >
             <div className="tw-flex tw-flex-col tw-justify-between tw-gap-1">
-                <div className="tw-flex tw-flex-row tw-justify-between">
-                    <DocumentationTooltip card={card} item="Tchgresume">
-                        <div>
-                            <span>T</span>
-                            <span className="subscript">CHGRESUME</span>
-                        </div>
-                    </DocumentationTooltip>
-
-                    <div className="tw-flex tw-flex-row">
-                        <NumberInlineInput
-                            value={internalChipThermal[0]}
-                            range={chargerModule.ranges.chipThermal}
-                            onChange={v => updateInternal(0, v)}
-                            onChangeComplete={v =>
-                                chargerModule.set.tChgResume(v)
-                            }
-                            disabled={disabled}
-                        />
-                        °C
-                    </div>
-                </div>
-                <div className="tw-flex tw-justify-between">
-                    <DocumentationTooltip card={card} item="Tchgstop">
-                        <div>
-                            <span>T</span>
-                            <span className="subscript">CHGSTOP</span>
-                        </div>
-                    </DocumentationTooltip>
-                    <div className="tw-flex tw-flex-row">
-                        <NumberInlineInput
-                            value={internalChipThermal[1]}
-                            range={chargerModule.ranges.chipThermal}
-                            onChange={v => updateInternal(1, v)}
-                            onChangeComplete={v =>
-                                chargerModule.set.tChgStop(v)
-                            }
-                            disabled={disabled}
-                        />
-                        °C
-                    </div>
-                </div>
-                <Slider
-                    values={internalChipThermal}
-                    range={chargerModule.ranges.chipThermal}
-                    onChange={[0, 1].map(i => v => updateInternal(i, v))}
-                    onChangeComplete={() => {
-                        if (internalChipThermal[1] !== charger.tChgStop)
-                            chargerModule.set.tChgStop(internalChipThermal[1]);
-                        if (internalChipThermal[0] !== charger.tChgResume)
-                            chargerModule.set.tChgResume(
-                                internalChipThermal[0],
-                            );
-                    }}
+                <TChgResumeAndTChgStop
+                    charger={charger}
+                    chargerModule={chargerModule}
+                    disabled={disabled}
+                />
+                <TChgResumeAndTChgReduce
+                    charger={charger}
+                    chargerModule={chargerModule}
                     disabled={disabled}
                 />
             </div>
@@ -140,5 +73,213 @@ export default ({
                 />
             </div>
         </Card>
+    );
+};
+
+const TChgResume = ({
+    value,
+    range,
+    onChange,
+    onChangeComplete,
+    disabled,
+}: {
+    value: number;
+    range: RangeOrValues;
+    onChange: (value: number) => void;
+    onChangeComplete?: (value: number) => void;
+    disabled: boolean;
+}) => (
+    <div className="tw-flex tw-flex-row tw-justify-between">
+        <DocumentationTooltip card={card} item="Tchgresume">
+            <div>
+                <span>T</span>
+                <span className="subscript">CHGRESUME</span>
+            </div>
+        </DocumentationTooltip>
+
+        <div className="tw-flex tw-flex-row">
+            <NumberInlineInput
+                value={value}
+                range={range}
+                onChange={onChange}
+                onChangeComplete={onChangeComplete}
+                disabled={disabled}
+            />
+            °C
+        </div>
+    </div>
+);
+
+const TChgResumeAndTChgStop = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalTChgResume, setInternalTChgResume] = useState(
+        charger.tChgResume,
+    );
+    const [internalTChgStop, setInternalTChgStop] = useState(charger.tChgStop);
+
+    useEffect(() => {
+        setInternalTChgResume(charger.tChgResume);
+        setInternalTChgStop(charger.tChgStop);
+    }, [charger]);
+
+    if (
+        !chargerModule.set.tChgStop ||
+        charger.tChgStop === undefined ||
+        internalTChgStop === undefined
+    ) {
+        return null;
+    }
+
+    const updateTChgResume = (value: number) => {
+        if (value >= internalTChgStop) {
+            return;
+        }
+        setInternalTChgResume(value);
+    };
+    const updateTChgStop = (value: number) => {
+        if (value <= internalTChgResume) {
+            return;
+        }
+        setInternalTChgStop(value);
+    };
+
+    return (
+        <>
+            <TChgResume
+                value={internalTChgResume}
+                range={chargerModule.ranges.chipThermal}
+                onChange={v => updateTChgResume(v)}
+                onChangeComplete={v => chargerModule.set.tChgResume(v)}
+                disabled={disabled}
+            />
+            <div className="tw-flex tw-justify-between">
+                <DocumentationTooltip card={card} item="Tchgstop">
+                    <div>
+                        <span>T</span>
+                        <span className="subscript">CHGSTOP</span>
+                    </div>
+                </DocumentationTooltip>
+                <div className="tw-flex tw-flex-row">
+                    <NumberInlineInput
+                        value={internalTChgStop}
+                        range={chargerModule.ranges.chipThermal}
+                        onChange={v => updateTChgStop(v)}
+                        onChangeComplete={v => chargerModule.set.tChgStop?.(v)}
+                        disabled={disabled}
+                    />
+                    °C
+                </div>
+            </div>
+            <Slider
+                values={[internalTChgResume, internalTChgStop]}
+                range={chargerModule.ranges.chipThermal}
+                onChange={[v => updateTChgResume(v), v => updateTChgStop(v)]}
+                onChangeComplete={() => {
+                    if (charger.tChgResume !== internalTChgResume) {
+                        chargerModule.set.tChgResume(internalTChgResume);
+                    }
+                    if (charger.tChgStop !== internalTChgStop) {
+                        chargerModule.set.tChgStop?.(internalTChgStop);
+                    }
+                }}
+                disabled={disabled}
+            />
+        </>
+    );
+};
+
+const TChgResumeAndTChgReduce = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalTChgResume, setInternalTChgResume] = useState(
+        charger.tChgResume,
+    );
+    const [internalTChgReduce, setInternalTChgReduce] = useState(
+        charger.tChgReduce,
+    );
+
+    useEffect(() => {
+        setInternalTChgResume(charger.tChgResume);
+        setInternalTChgReduce(charger.tChgReduce);
+    }, [charger]);
+
+    if (
+        !chargerModule.set.tChgReduce ||
+        charger.tChgReduce === undefined ||
+        internalTChgReduce === undefined
+    ) {
+        return null;
+    }
+
+    const updateTChgResume = (value: number) => {
+        if (value >= internalTChgReduce) {
+            return;
+        }
+        setInternalTChgResume(value);
+    };
+    const updateTChgReduce = (value: number) => {
+        if (value <= internalTChgResume) {
+            return;
+        }
+        setInternalTChgReduce(value);
+    };
+
+    return (
+        <>
+            <TChgResume
+                value={internalTChgResume}
+                range={chargerModule.ranges.chipThermal}
+                onChange={v => updateTChgResume(v)}
+                onChangeComplete={v => chargerModule.set.tChgResume(v)}
+                disabled={disabled}
+            />
+            <div className="tw-flex tw-justify-between">
+                <DocumentationTooltip card={card} item="Tchgreduce">
+                    <div>
+                        <span>T</span>
+                        <span className="subscript">CHGREDUCE</span>
+                    </div>
+                </DocumentationTooltip>
+                <div className="tw-flex tw-flex-row">
+                    <NumberInlineInput
+                        value={internalTChgReduce}
+                        range={chargerModule.ranges.chipThermal}
+                        onChange={v => updateTChgReduce(v)}
+                        onChangeComplete={v =>
+                            chargerModule.set.tChgReduce?.(v)
+                        }
+                        disabled={disabled}
+                    />
+                    °C
+                </div>
+            </div>
+            <Slider
+                values={[internalTChgResume, internalTChgReduce]}
+                range={chargerModule.ranges.chipThermal}
+                onChange={[v => updateTChgResume(v), v => updateTChgReduce(v)]}
+                onChangeComplete={() => {
+                    if (charger.tChgResume !== internalTChgResume) {
+                        chargerModule.set.tChgResume(internalTChgResume);
+                    }
+                    if (charger.tChgReduce !== internalTChgReduce) {
+                        chargerModule.set.tChgReduce?.(internalTChgReduce);
+                    }
+                }}
+                disabled={disabled}
+            />
+        </>
     );
 };

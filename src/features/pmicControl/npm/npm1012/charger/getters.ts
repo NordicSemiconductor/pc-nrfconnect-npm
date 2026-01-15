@@ -18,7 +18,7 @@ export class ChargerGet extends ChargerModuleGetBase {
         this.enabledRecharging();
         this.enabledWeakBatteryCharging();
         this.enabledVBatLow();
-        this.tChgStop();
+        this.tChgReduce();
         this.tChgResume();
         this.vTermR();
         this.tCold();
@@ -63,8 +63,8 @@ export class ChargerGet extends ChargerModuleGetBase {
     enabledVBatLow() {
         this.sendCommand('powerup_charger vbatlow get');
     }
-    tChgStop() {
-        this.sendCommand('npmx charger die_temp stop get');
+    tChgReduce() {
+        this.sendCommand('npmx charger die_temp reduce get');
     }
     tChgResume() {
         this.sendCommand('npmx charger die_temp resume get');
