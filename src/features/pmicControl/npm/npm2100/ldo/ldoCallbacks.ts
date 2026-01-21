@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     noop,
-    NpmEventEmitter,
+    type NpmEventEmitter,
     onOffRegex,
     parseColonBasedAnswer,
     parseOnOff,
@@ -17,17 +17,17 @@ import {
     toRegex,
     toValueRegexString,
 } from '../../pmicHelpers';
-import { Ldo, LdoMode, LdoModeValues } from '../../types';
+import { type Ldo, type LdoMode, LdoModeValues } from '../../types';
 import {
-    nPM2100GPIOControlMode,
+    type nPM2100GPIOControlMode,
     nPM2100GPIOControlModeValues,
-    nPM2100GPIOControlPinSelect,
+    type nPM2100GPIOControlPinSelect,
     nPM2100GPIOControlPinSelectValues,
-    nPM2100LdoModeControl,
+    type nPM2100LdoModeControl,
     nPM2100LdoModeControlValues,
-    nPM2100LDOSoftStart,
+    type nPM2100LDOSoftStart,
     nPM2100LDOSoftStartValues,
-    nPM2100SoftStart,
+    type nPM2100SoftStart,
     nPM2100SoftStartValues,
 } from '../types';
 

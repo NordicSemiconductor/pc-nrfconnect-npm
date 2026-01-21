@@ -4,12 +4,17 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
-import { Ldo, LdoExport, LdoModule, ModuleParams } from '../../types';
+import { type RangeType } from '../../../../../utils/helpers';
+import {
+    type Ldo,
+    type LdoExport,
+    type LdoModule,
+    type ModuleParams,
+} from '../../types';
 import ldoCallbacks from './callbacks';
 import { LdoGet } from './getters';
 import { LdoSet } from './setters';
-import { SoftStart, SoftStartValues } from './types';
+import { type SoftStart, SoftStartValues } from './types';
 
 const ldoDefaults = (): Ldo => ({
     voltage: getLdoVoltageRange().min,

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
-import { ModuleParams, POF, PofModule } from '../../types';
+import { type RangeType } from '../../../../../utils/helpers';
+import { type ModuleParams, type POF, type PofModule } from '../../types';
 import pofCallbacks from './callbacks';
 import { PofGet } from './getters';
 import { PofSet } from './setter';

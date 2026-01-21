@@ -5,7 +5,7 @@
  */
 
 import { helpers } from '../../tests/helpers';
-import { LEDModeValues, PmicDialog } from '../../types';
+import { LEDModeValues, type PmicDialog } from '../../types';
 import { PMIC_1304_LEDS, setupMocksWithShellParser } from './helpers';
 
 describe('PMIC 1304 - Setters Online tests', () => {

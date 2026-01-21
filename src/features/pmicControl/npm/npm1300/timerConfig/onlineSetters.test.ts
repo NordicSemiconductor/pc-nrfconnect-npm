@@ -5,7 +5,7 @@
  */
 
 import { helpers } from '../../tests/helpers';
-import { PmicDialog, TimerPrescalerValues } from '../../types';
+import { type PmicDialog, TimerPrescalerValues } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 import { TimerModeValues } from './types';
 

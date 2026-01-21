@@ -6,7 +6,7 @@
 
 import {
     getModule,
-    Progress,
+    type Progress,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 export default async (

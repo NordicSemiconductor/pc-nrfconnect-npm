@@ -14,10 +14,10 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    TimerConfig,
-    TimerConfigModule,
-    TimerMode,
-    TimerPrescaler,
+    type TimerConfig,
+    type TimerConfigModule,
+    type TimerMode,
+    type TimerPrescaler,
     TimerPrescalerValues,
 } from '../../features/pmicControl/npm/types';
 import { splitMS } from '../Profiling/TimeComponent';

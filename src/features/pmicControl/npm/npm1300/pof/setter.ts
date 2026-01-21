@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { POF, POFPolarity, POFPolarityValues } from '../../types';
+import { type NpmEventEmitter } from '../../pmicHelpers';
+import { type POF, type POFPolarity, POFPolarityValues } from '../../types';
 import { PofGet } from './getters';
 
 export class PofSet {

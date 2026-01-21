@@ -13,8 +13,8 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    UsbCurrentLimiterModule,
-    USBPower,
+    type UsbCurrentLimiterModule,
+    type USBPower,
 } from '../../features/pmicControl/npm/types';
 
 interface VBusProperties {

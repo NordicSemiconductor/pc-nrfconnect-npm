@@ -4,8 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
-import { Buck, BuckExport, BuckModule, ModuleParams } from '../../types';
+import { type RangeType } from '../../../../../utils/helpers';
+import {
+    type Buck,
+    type BuckExport,
+    type BuckModule,
+    type ModuleParams,
+} from '../../types';
 import buckCallbacks from './callbacks';
 import { BuckGet } from './getters';
 import { BuckSet } from './setters';

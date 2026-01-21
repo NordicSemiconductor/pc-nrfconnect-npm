@@ -8,7 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
-    AppDispatch,
+    type AppDispatch,
     clearWaitForDevice,
     describeError,
     logger,
@@ -23,7 +23,7 @@ import { appendFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
-import { RootState } from '../../../appReducer';
+import { type RootState } from '../../../appReducer';
 import { PROFILE_FOLDER_PREFIX } from '../../../components/Profiling/helpers';
 import { getShellParser } from '../../serial/serialSlice';
 import {
@@ -84,7 +84,7 @@ import {
     noop,
     SupportsErrorLogs,
 } from './pmicHelpers';
-import { PmicDialog } from './types';
+import { type PmicDialog } from './types';
 
 export default () => {
     const [isPMICPowered, setPMICPowered] = useState(false);

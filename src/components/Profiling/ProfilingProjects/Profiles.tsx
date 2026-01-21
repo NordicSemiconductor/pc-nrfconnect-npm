@@ -7,7 +7,7 @@
 import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Group } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { OpenDialogReturnValue } from 'electron';
+import { type OpenDialogReturnValue } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
@@ -168,7 +168,7 @@ const BundledBatteryList = ({
             heading={bundledBattery.brandName}
             defaultCollapsed={false}
         >
-            <div className=" tw-flex tw-flex-col tw-gap-0.5">
+            <div className="tw-flex tw-flex-col tw-gap-0.5">
                 {models.map(model => (
                     <BundledBatteryItem
                         rootFolder={bundledBattery.folder}
@@ -267,7 +267,7 @@ export default () => {
                 )}
             </Group>
             <Group collapsible heading="Bundled Profiles">
-                <div className=" tw-flex tw-flex-col tw-gap-4 tw-bg-white tw-p-4">
+                <div className="tw-flex tw-flex-col tw-gap-4 tw-bg-white tw-p-4">
                     {bundledBatteries.map(bundledBattery => (
                         <BundledBatteryList
                             bundledBattery={bundledBattery}

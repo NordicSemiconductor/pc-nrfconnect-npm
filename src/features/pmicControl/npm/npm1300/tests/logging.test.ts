@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared/typings/generated/src/Parsers/shellParser';
+import { type Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared/typings/generated/src/Parsers/shellParser';
 
-import { PmicChargingState, USBDetectStatusValues } from '../../types';
+import { type PmicChargingState, USBDetectStatusValues } from '../../types';
 import { setupMocksWithShellParser } from './helpers';
 
 jest.useFakeTimers();
@@ -240,9 +240,9 @@ describe('PMIC 1300 - Logging', () => {
                 (
                     command: string,
                     callbacks?: Callbacks,
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                     _timeout?: number,
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                     _unique?: boolean,
                 ) => {
                     expect(command).toBe('npmx errlog get');

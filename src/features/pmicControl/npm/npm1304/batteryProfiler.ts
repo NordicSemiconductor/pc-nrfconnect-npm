@@ -7,10 +7,10 @@
 import { BatteryProfiler as nPM1300BatteryProfiler } from '../npm1300/batteryProfiler';
 import { parseColonBasedAnswer, parseLogData } from '../pmicHelpers';
 import {
-    CCProfile,
-    LoggingEvent,
-    ModuleParams,
-    RestingCCProfile,
+    type CCProfile,
+    type LoggingEvent,
+    type ModuleParams,
+    type RestingCCProfile,
 } from '../types';
 
 export class BatteryProfiler extends nPM1300BatteryProfiler {

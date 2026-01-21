@@ -4,8 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
-import { ModuleParams, OnBoardLoad, OnBoardLoadModule } from '../../types';
+import { type RangeType } from '../../../../../utils/helpers';
+import {
+    type ModuleParams,
+    type OnBoardLoad,
+    type OnBoardLoadModule,
+} from '../../types';
 import ldoCallbacks from './callbacks';
 import { OnBoardLoadGet } from './getters';
 import { OnBoardLoadSet } from './setters';

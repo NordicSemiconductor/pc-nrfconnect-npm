@@ -10,7 +10,7 @@ import {
     Alert,
     Button,
     Dropdown,
-    DropdownItem,
+    type DropdownItem,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import path from 'path';
 
@@ -25,7 +25,7 @@ import {
     dialogHandler,
     DOWNLOAD_BATTERY_PROFILE_DIALOG_ID,
 } from '../../features/pmicControl/npm/pmicHelpers';
-import { BatteryModel } from '../../features/pmicControl/npm/types';
+import { type BatteryModel } from '../../features/pmicControl/npm/types';
 import {
     canProfile,
     getActiveBatterModel,

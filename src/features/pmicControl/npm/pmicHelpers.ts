@@ -5,8 +5,8 @@
  */
 
 import {
-    AppThunk,
-    Device,
+    type AppThunk,
+    type Device,
     getPersistentStore,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import EventEmitter from 'events';

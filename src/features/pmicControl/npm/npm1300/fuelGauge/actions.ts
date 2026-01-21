@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
-import { ProfileDownload } from '../../types';
+import { type NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
+import { type ProfileDownload } from '../../types';
 import type FuelGaugeModule from '.';
 import { FuelGaugeGet } from './getters';
 

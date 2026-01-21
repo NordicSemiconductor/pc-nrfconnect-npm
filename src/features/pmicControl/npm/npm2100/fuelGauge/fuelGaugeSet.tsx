@@ -6,8 +6,12 @@
 
 import React from 'react';
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { FuelGauge, FuelGaugeExport, PmicDialog } from '../../types';
+import { type NpmEventEmitter } from '../../pmicHelpers';
+import {
+    type FuelGauge,
+    type FuelGaugeExport,
+    type PmicDialog,
+} from '../../types';
 import { FuelGaugeGet } from './fuelGaugeGet';
 
 export class FuelGaugeSet {

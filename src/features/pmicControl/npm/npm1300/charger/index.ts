@@ -5,22 +5,22 @@
  */
 
 /* eslint-disable no-underscore-dangle */
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getRange } from '../../../../../utils/helpers';
-import { NpmEventEmitter } from '../../pmicHelpers';
+import { type NpmEventEmitter } from '../../pmicHelpers';
 import {
-    Charger,
+    type Charger,
     type ChargerModule as ChargerModuleBase,
-    ChargerModuleGet,
-    ChargerModuleGetBase,
-    ChargerModuleRanges,
-    ChargerModuleSet,
-    ChargerModuleSetBase,
-    FixedListRange,
-    ITerm,
-    ModuleParams,
-    VTrickleFast,
+    type ChargerModuleGet,
+    type ChargerModuleGetBase,
+    type ChargerModuleRanges,
+    type ChargerModuleSet,
+    type ChargerModuleSetBase,
+    type FixedListRange,
+    type ITerm,
+    type ModuleParams,
+    type VTrickleFast,
 } from '../../types';
 import chargerCallbacks from './callbacks';
 import { ChargerGet } from './getters';

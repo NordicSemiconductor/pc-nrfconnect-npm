@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
-import { Boost, BoostModule, ModuleParams } from '../../types';
+import { type RangeType } from '../../../../../utils/helpers';
+import { type Boost, type BoostModule, type ModuleParams } from '../../types';
 import boostCallbacks from './callbacks';
 import { BoostGet } from './getters';
 import { BoostSet } from './setters';

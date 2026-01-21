@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { OnBoardLoad } from '../../types';
+import { type OnBoardLoad } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1304 - onBordLoad  Command callbacks', () => {

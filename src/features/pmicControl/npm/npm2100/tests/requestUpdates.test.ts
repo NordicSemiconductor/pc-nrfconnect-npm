@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { BatteryModel } from '../../types';
+import { type BatteryModel } from '../../types';
 import { npm2100FWVersion } from '../pmic2100Device';
 import {
     PMIC_2100_GPIOS,
@@ -172,9 +172,9 @@ describe('PMIC 2100 - Request update commands', () => {
             (
                 _command: string,
                 callbacks?: Callbacks,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _timeout?: number,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _unique?: boolean,
             ) => {
                 callbacks?.onSuccess(
@@ -262,9 +262,9 @@ describe('PMIC 2100 - Request update commands', () => {
             (
                 command: string,
                 callbacks?: Callbacks,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _timeout?: number,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _unique?: boolean,
             ) => {
                 callbacks?.onSuccess('Uptime: 2945165 ms', command);
@@ -288,9 +288,9 @@ describe('PMIC 2100 - Request update commands', () => {
             (
                 command: string,
                 callbacks?: Callbacks,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _timeout?: number,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _unique?: boolean,
             ) => {
                 callbacks?.onSuccess(
@@ -320,9 +320,9 @@ describe('PMIC 2100 - Request update commands', () => {
             (
                 command: string,
                 callbacks?: Callbacks,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _timeout?: number,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _unique?: boolean,
             ) => {
                 callbacks?.onSuccess('app_version=0.0.0+9', command);

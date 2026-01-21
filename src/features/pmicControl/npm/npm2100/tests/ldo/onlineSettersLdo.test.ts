@@ -5,7 +5,7 @@
  */
 
 import { helpers } from '../../../tests/helpers';
-import { LdoMode, PmicDialog } from '../../../types';
+import { type LdoMode, type PmicDialog } from '../../../types';
 import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../helpers';
 
 describe('PMIC 2100 - Setters Online tests - LDO', () => {

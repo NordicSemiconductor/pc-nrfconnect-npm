@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import {
     apps,
     Button,
-    Device,
+    type Device,
     openWindow,
     selectedDevice,
     telemetry,

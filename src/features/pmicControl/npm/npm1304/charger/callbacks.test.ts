@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NTCThermistor, PmicChargingState } from '../../types';
+import { type NTCThermistor, type PmicChargingState } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 import { ITermValues } from './types';
 

@@ -5,13 +5,13 @@
  */
 
 import { getPersistentStore } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import path from 'path';
 
 import type { RootState } from '../../appReducer';
 import {
-    ProfilingCSVProgress,
-    ProjectPathPair,
+    type ProfilingCSVProgress,
+    type ProjectPathPair,
 } from '../../components/Profiling/types';
 
 export const loadRecentProject = (): string[] =>

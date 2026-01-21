@@ -5,7 +5,7 @@
  */
 
 import {
-    AppThunk,
+    type AppThunk,
     describeError,
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -13,8 +13,8 @@ import fs from 'fs';
 import path from 'path';
 
 import packageJsons from '../../../package.json';
-import { RootState } from '../../appReducer';
-import { Profile } from '../../features/pmicControl/npm/types';
+import { type RootState } from '../../appReducer';
+import { type Profile } from '../../features/pmicControl/npm/types';
 import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import {
     addRecentProject,
@@ -23,9 +23,9 @@ import {
     updateProfilingProject,
 } from '../../features/pmicControl/profilingProjectsSlice.';
 import {
-    ProfilingProject,
-    ProfilingProjectProfile,
-    ProjectPathPair,
+    type ProfilingProject,
+    type ProfilingProjectProfile,
+    type ProjectPathPair,
     zodProfilingProject,
 } from './types';
 

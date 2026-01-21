@@ -7,7 +7,7 @@
 import React from 'react';
 import { Alert } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { NTCThermistor } from '../../../features/pmicControl/npm/types';
+import { type NTCThermistor } from '../../../features/pmicControl/npm/types';
 
 export const RestingProfilingAlerts = () => (
     <>

@@ -4,13 +4,19 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
-import { Ldo, LdoExport, LdoMode, PmicDialog, SoftStart } from '../../types';
+import { type NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
 import {
-    nPM2100GPIOControlMode,
-    nPM2100GPIOControlPinSelect,
-    nPM2100LdoModeControl,
-    nPM2100LDOSoftStart,
+    type Ldo,
+    type LdoExport,
+    type LdoMode,
+    type PmicDialog,
+    type SoftStart,
+} from '../../types';
+import {
+    type nPM2100GPIOControlMode,
+    type nPM2100GPIOControlPinSelect,
+    type nPM2100LdoModeControl,
+    type nPM2100LDOSoftStart,
 } from '../types';
 import { LdoGet } from './ldoGet';
 

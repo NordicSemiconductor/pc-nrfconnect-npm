@@ -6,18 +6,18 @@
 
 import type Npm1304 from '../npm1304/pmic1304Device';
 import {
-    BuckExport,
-    BuckModule,
-    Charger,
+    type BuckExport,
+    type BuckModule,
+    type Charger,
     GPIOValues,
-    LdoExport,
-    LdoModule,
-    LED,
-    LEDMode,
-    LowPowerConfig,
-    npm1300ResetConfig,
-    NpmExportLatest,
-    NTCThermistor,
+    type LdoExport,
+    type LdoModule,
+    type LED,
+    type LEDMode,
+    type LowPowerConfig,
+    type npm1300ResetConfig,
+    type NpmExportLatest,
+    type NTCThermistor,
 } from '../types';
 import type Npm1300 from './pmic1300Device';
 

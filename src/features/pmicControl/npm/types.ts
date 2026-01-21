@@ -7,22 +7,25 @@
 /* eslint-disable max-classes-per-file */
 
 import {
-    DropdownItem,
-    ShellParser,
+    type DropdownItem,
+    type ShellParser,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { z } from 'zod';
 
-import { RangeType } from '../../../utils/helpers';
+import { type RangeType } from '../../../utils/helpers';
 import type BaseNpmDevice from './basePmicDevice';
-import { ITermNpm1300, VTrickleFast1300 } from './npm1300/charger/types';
+import {
+    type ITermNpm1300,
+    type VTrickleFast1300,
+} from './npm1300/charger/types';
 import type {
     GPIODrive1300,
     GPIOMode1300,
     GPIOPull1300,
 } from './npm1300/gpio/types';
 import type { SoftStart as SoftStart1300 } from './npm1300/ldo/types';
-import { npm1300TimerMode } from './npm1300/timerConfig/types';
-import { ITermNpm1304 } from './npm1304/charger/types';
+import { type npm1300TimerMode } from './npm1300/timerConfig/types';
+import { type ITermNpm1304 } from './npm1304/charger/types';
 import type { PowerID2100 } from './npm2100/battery';
 import type {
     GPIODrive2100,
@@ -31,16 +34,16 @@ import type {
     GPIOState2100,
 } from './npm2100/gpio/types';
 import {
-    nPM2100GPIOControlMode,
-    nPM2100GPIOControlPinSelect,
-    nPM2100LdoModeControl,
-    nPM2100LDOSoftStart,
-    npm2100LongPressResetDebounce,
-    npm2100ResetPinSelection,
-    nPM2100SoftStart,
-    npm2100TimerMode,
+    type nPM2100GPIOControlMode,
+    type nPM2100GPIOControlPinSelect,
+    type nPM2100LdoModeControl,
+    type nPM2100LDOSoftStart,
+    type npm2100LongPressResetDebounce,
+    type npm2100ResetPinSelection,
+    type nPM2100SoftStart,
+    type npm2100TimerMode,
 } from './npm2100/types';
-import { NpmEventEmitter } from './pmicHelpers';
+import { type NpmEventEmitter } from './pmicHelpers';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
 

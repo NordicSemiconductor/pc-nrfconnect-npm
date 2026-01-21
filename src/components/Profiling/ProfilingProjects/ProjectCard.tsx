@@ -7,7 +7,7 @@
 import React from 'react';
 import { Alert, Card } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { ProfilingProject } from '../types';
+import { type ProfilingProject } from '../types';
 import ProfileComponent from './ProfileComponent';
 import ProjectCardMenu from './ProjectCardMenu';
 

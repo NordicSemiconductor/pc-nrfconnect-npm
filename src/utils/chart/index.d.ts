@@ -5,10 +5,10 @@
  */
 
 import {
-    ChartArea,
-    ChartType,
-    ChartTypeRegistry,
-    ScatterDataPoint,
+    type ChartArea,
+    type ChartType,
+    type ChartTypeRegistry,
+    type ScatterDataPoint,
 } from 'chart.js';
 
 declare module 'chart.js' {

@@ -9,8 +9,8 @@ import { useSelector } from 'react-redux';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    AdcSample,
-    PmicChargingState,
+    type AdcSample,
+    type PmicChargingState,
 } from '../../features/pmicControl/npm/types';
 import {
     getFuelGaugeEnabled,

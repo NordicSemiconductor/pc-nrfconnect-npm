@@ -5,11 +5,11 @@
  */
 
 import {
-    LowPowerConfig,
-    LowPowerModule,
-    ModuleParams,
+    type LowPowerConfig,
+    type LowPowerModule,
+    type ModuleParams,
     npm2100TimeToActive,
-    TimeToActive,
+    type TimeToActive,
 } from '../../types';
 import { LowPowerActions } from './lowPowerActions';
 import shipModeCallbacks from './lowPowerCallbacks';

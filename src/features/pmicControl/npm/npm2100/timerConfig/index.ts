@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
+import { type RangeType } from '../../../../../utils/helpers';
 import {
-    ModuleParams,
-    TimerConfig,
-    TimerConfigModule,
-    TimerMode,
+    type ModuleParams,
+    type TimerConfig,
+    type TimerConfigModule,
+    type TimerMode,
 } from '../../types';
 import { npm2100TimerMode } from '../types';
 import timerCallbacks from './timerConfigCallbacks';

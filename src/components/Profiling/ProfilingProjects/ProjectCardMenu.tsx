@@ -30,7 +30,7 @@ import {
 } from '../../../features/pmicControl/profilingProjectsSlice.';
 import useIsUIDisabled from '../../../features/useIsUIDisabled';
 import { isProfileReadyForProcessing } from '../helpers';
-import { ProfilingProject } from '../types';
+import { type ProfilingProject } from '../types';
 import AddEditProfileDialog from './AddEditProfileDialog';
 import AddEditProjectDialog from './AddEditProjectDialog';
 
