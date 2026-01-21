@@ -20,7 +20,7 @@ const ldoDefaults = (pmicVersion: number | undefined): Ldo => ({
     activeDischarge: false,
     onOffControl: 'SW',
     onOffSoftwareControlEnabled: true,
-    ldoSoftStartEnable: pmicVersion !== undefined && pmicVersion >= 2.3, // npm 1300
+    ldoSoftStartEnable: pmicVersion !== undefined && pmicVersion >= 2.3,
 });
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({

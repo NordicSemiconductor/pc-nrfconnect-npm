@@ -5,6 +5,7 @@
 - nPM2100: When the GPIO mode control is selected, the toggle for Load
   switch/LDO is now correctly enabled.
 - Updated nPM130X SoftStart currents.
+- Enabled LDO SoftStart for compatible devices
 
 ## 2.2.3 - 2025-09-30
 

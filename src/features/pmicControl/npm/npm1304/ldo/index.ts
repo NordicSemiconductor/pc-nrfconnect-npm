@@ -25,12 +25,11 @@ const ldoDefaults = (pmicRevision: number | undefined): Ldo => ({
     activeDischarge: false,
     onOffControl: 'SW',
     onOffSoftwareControlEnabled: true,
-    ldoSoftStartEnable: pmicRevision !== undefined && pmicRevision >= 1.1, // npm 1304
+    ldoSoftStartEnable: pmicRevision !== undefined && pmicRevision >= 1.1,
 });
 
 export default class Module extends nPM1300LdoModule {
     get defaults(): Ldo {
-        console.log('pmicRevision in npm1304 ldo', this.pmicRevision);
         return ldoDefaults(this.pmicRevision);
     }
 }
