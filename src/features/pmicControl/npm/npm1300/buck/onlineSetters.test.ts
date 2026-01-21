@@ -132,7 +132,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckRetentionVOut index: %p',
             async index => {
-                await pmic.buckModule[index].set.vOutRetention(1.8);
+                await pmic.buckModule[index].set.vOutRetention?.(1.8);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -288,7 +288,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckRetentionControl index: %p',
             async index => {
-                await pmic.buckModule[index].set.retentionControl('GPIO2');
+                await pmic.buckModule[index].set.retentionControl?.('GPIO2');
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -325,7 +325,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(PMIC_1300_BUCKS)(
             'Set setBuckActiveDischargeEnabled index: %p',
             async index => {
-                await pmic.buckModule[index].set.activeDischarge(true);
+                await pmic.buckModule[index].set.activeDischarge?.(true);
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).nthCalledWith(
@@ -489,7 +489,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckRetentionVOut - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.vOutRetention(1.7),
+                    pmic.buckModule[index].set.vOutRetention?.(1.7),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -609,7 +609,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckRetentionControl - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.retentionControl('GPIO2'),
+                    pmic.buckModule[index].set.retentionControl?.('GPIO2'),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -668,7 +668,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             'Set setBuckActiveDischargeEnabled - Fail immediately - index: %p',
             async index => {
                 await expect(
-                    pmic.buckModule[index].set.activeDischarge(true),
+                    pmic.buckModule[index].set.activeDischarge?.(true),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
