@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { BuckOnOffControlValues, GPIOValues } from '../../types';
 import { PMIC_1012_BUCKS, setupMocksWithShellParser } from '../tests/helpers';
+import {
+    BuckModeControlValues1012,
+    BuckVOutRippleControlValues1012,
+} from './types';
 
 describe('PMIC 1012 - Command callbacks', () => {
     const { eventHandlers, mockOnBuckUpdate } = setupMocksWithShellParser();
@@ -18,23 +21,23 @@ describe('PMIC 1012 - Command callbacks', () => {
         PMIC_1012_BUCKS.map(index => [
             {
                 index,
-                append: `get ${index}`,
+                append: `get 0`,
             },
             {
                 index,
-                append: `set ${index} 2300`,
+                append: `set 0 2.35V`,
             },
         ]).flat(),
-    )('npmx buck voltage normal %p', ({ index, append }) => {
-        const command = `npmx buck voltage normal ${append}`;
+    )('npm1012 buck software %p', ({ index, append }) => {
+        const command = `npm1012 buck vout software ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess('Value: 2300 mv', command);
+        callback?.onSuccess('Value: 2.35V', command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { vOutNormal: 2.3 },
+            data: { vOutNormal: 2.35 },
             index,
         });
     });
@@ -43,117 +46,96 @@ describe('PMIC 1012 - Command callbacks', () => {
         PMIC_1012_BUCKS.map(index => [
             {
                 index,
-                append: `get ${index}`,
+                append: `get 1`,
             },
             {
                 index,
-                append: `set ${index} 2300`,
+                append: `set 1 2.35V`,
             },
         ]).flat(),
-    )('npmx buck voltage retention %p', ({ index, append }) => {
-        const command = `npmx buck voltage retention ${append}`;
+    )('npm1012 buck software %p', ({ index, append }) => {
+        const command = `npm1012 buck vout software ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess('Value: 2300 mv', command);
+        callback?.onSuccess('Value: 2.35V', command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { vOutRetention: 2.3 },
+            data: { alternateVOut: 2.35 },
             index,
         });
     });
 
     test.each(
         PMIC_1012_BUCKS.map(index => [
-            ...[0, 1].map(value =>
-                [
-                    {
-                        index,
-                        append: `get ${index}`,
-                        value,
-                    },
-                    {
-                        index,
-                        append: `set ${index} ${value} `,
-                        value,
-                    },
-                ].flat(),
-            ),
+            {
+                index,
+                append: `get`,
+            },
+            {
+                index,
+                append: `set VOUT2`,
+            },
         ]).flat(),
-    )('npmx buck vout select %p', ({ index, append, value }) => {
-        const command = `npmx buck vout_select ${append}`;
+    )('npm1012 buck voutsel %p', ({ index, append }) => {
+        const command = `npm1012 buck voutsel ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${value}`, command);
+        callback?.onSuccess(`Value: VOUT2`, command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { mode: value === 0 ? 'vSet' : 'software' },
+            data: { alternateVOutControl: 'Software' },
             index,
         });
     });
 
     test.each(
         PMIC_1012_BUCKS.map(index => [
-            ...[true, false].map(enabled =>
-                [
-                    {
-                        index,
-                        append: `get ${index}`,
-                        enabled,
-                    },
-                    {
-                        index,
-                        append: `set ${index} ${enabled ? '1' : '0'} `,
-                        enabled,
-                    },
-                ].flat(),
-            ),
+            {
+                index,
+                append: `get`,
+            },
+            {
+                index,
+                append: `set ON`,
+            },
         ]).flat(),
-    )('npmx buck enable %p', ({ index, append, enabled }) => {
-        const command = `npmx buck status ${append}`;
+    )('npm1012 buck enable %p', ({ index, append }) => {
+        const command = `npm1012 buck enable ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${enabled ? '1' : '0'}`, command);
+        callback?.onSuccess(`Value: ON`, command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { enabled },
+            data: { enabled: true, onOffControl: 'Software' },
             index,
         });
     });
 
     test.each(
-        PMIC_1012_BUCKS.map(index => [
-            ...[
-                'Auto',
-                'PWM',
-                'PFM',
-                'GPIO0',
-                'GPIO1',
-                'GPIO2',
-                'GPIO3',
-                'GPIO4',
-            ].map(value =>
+        PMIC_1012_BUCKS.map(index =>
+            BuckModeControlValues1012.map(value =>
                 [
                     {
                         index,
-                        append: `get ${index}`,
+                        append: `get`,
                         value,
                     },
                     {
                         index,
-                        append: `set ${index} ${value}`,
+                        append: `set ${value}`,
                         value,
                     },
                 ].flat(),
-            ),
-        ]).flat(),
-    )('npmx buck mode control %p', ({ index, append, value }) => {
-        const command = `powerup_buck mode ${append}`;
+            ).flat(),
+        ).flat(),
+    )('npm1012 buck pwrmode %p', ({ index, append, value }) => {
+        const command = `npm1012 buck pwrmode ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
@@ -169,37 +151,38 @@ describe('PMIC 1012 - Command callbacks', () => {
     });
 
     test.each(
-        PMIC_1012_BUCKS.map(index => [
-            ...[-1, 0, 1, 2, 3, 4].map(value =>
-                [
-                    {
-                        index,
-                        append: `get ${index}`,
-                        value,
-                    },
-                    {
-                        index,
-                        append: `set ${index} ${value} 0`,
-                        value,
-                    },
-                ].flat(),
-            ),
-        ]).flat(),
-    )('npmx buck on/off control %p', ({ index, append, value }) => {
-        const command = `npmx buck gpio on_off index ${append}`;
+        PMIC_1012_BUCKS.map(index =>
+            [
+                { in: 'DISABLE', out: 0 },
+                { in: 250, out: 250 },
+            ]
+                .map(value =>
+                    [
+                        {
+                            index,
+                            append: `get`,
+                            value,
+                        },
+                        {
+                            index,
+                            append: `set ${value.in}`,
+                            value,
+                        },
+                    ].flat(),
+                )
+                .flat(),
+        ).flat(),
+    )('npm1012 buck pulldown %p', ({ index, append, value }) => {
+        const command = `npm1012 buck pulldown ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${value} 0.`, command);
+        callback?.onSuccess(`Value: ${value.in}`, command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
             data: {
-                onOffControl:
-                    value === -1
-                        ? BuckOnOffControlValues[0]
-                        : GPIOValues[value],
-                onOffSoftwareControlEnabled: value === -1,
+                activeDischargeResistance: value.out,
             },
             index,
         });
@@ -207,69 +190,94 @@ describe('PMIC 1012 - Command callbacks', () => {
 
     test.each(
         PMIC_1012_BUCKS.map(index => [
-            ...[-1, 0, 1, 2, 3, 4].map(value =>
-                [
-                    {
-                        index,
-                        append: `get ${index}`,
-                        value,
-                    },
-                    {
-                        index,
-                        append: `set ${index} ${value} 0`,
-                        value,
-                    },
-                ].flat(),
-            ),
+            {
+                index,
+                append: `get`,
+            },
+            {
+                index,
+                append: `set ON`,
+            },
         ]).flat(),
-    )('npmx buck retention control %p', ({ index, append, value }) => {
-        const command = `npmx buck gpio retention index ${append}`;
+    )('npm1012 buck passthrough %p', ({ index, append }) => {
+        const command = `npm1012 buck passthrough ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${value} 0.`, command);
+        callback?.onSuccess('Value: ON', command);
+
+        expect(mockOnBuckUpdate).toBeCalledTimes(1);
+        expect(mockOnBuckUpdate).toBeCalledWith({
+            data: { automaticPassthrough: true },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1012_BUCKS.map(index =>
+            ['lp', 'ulp']
+                .map(mode =>
+                    [
+                        {
+                            index,
+                            append: `${mode} get`,
+                        },
+                        {
+                            index,
+                            append: `${mode} set 2.5`,
+                        },
+                    ].flat(),
+                )
+                .flat(),
+        ).flat(),
+    )('npm1012 buck bias %p', ({ index, append }) => {
+        const command = `npm1012 buck bias ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: 2.5`, command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
             data: {
-                retentionControl:
-                    value === -1
-                        ? BuckOnOffControlValues[0]
-                        : GPIOValues[value],
+                vOutComparatorBiasCurrent: 2.5,
             },
             index,
         });
     });
 
     test.each(
-        PMIC_1012_BUCKS.map(index => [
-            ...[true, false].map(activeDischarge =>
+        PMIC_1012_BUCKS.map(index =>
+            BuckVOutRippleControlValues1012.map(value =>
                 [
                     {
                         index,
-                        append: `get ${index}`,
-                        activeDischarge,
+                        append: `get`,
+                        value,
                     },
                     {
                         index,
-                        append: `set ${index} ${activeDischarge ? '1' : '0'} `,
-                        activeDischarge,
+                        append: `set ${value}`,
+                        value,
                     },
                 ].flat(),
-            ),
-        ]).flat(),
-    )('npmx buck active_discharge %p', ({ index, append, activeDischarge }) => {
-        const command = `npmx buck active_discharge ${append}`;
+            ).flat(),
+        ).flat(),
+    )('npm1012 buck ripple %p', ({ index, append, value }) => {
+        const command = `npm1012 buck ripple ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${activeDischarge ? '1' : '0'}`, command);
+        callback?.onSuccess(`Value: ${value}`, command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { activeDischarge },
+            data: {
+                vOutRippleControl: value,
+            },
             index,
         });
     });
 });
+
 export {};

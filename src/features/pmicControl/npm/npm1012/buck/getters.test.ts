@@ -18,7 +18,7 @@ describe('PMIC 1012 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx buck voltage normal get ${index}`,
+            `npm1012 buck vout software get 0`,
             expect.anything(),
             undefined,
             true,
@@ -26,13 +26,13 @@ describe('PMIC 1012 - Request update commands', () => {
     });
 
     test.each(PMIC_1012_BUCKS)(
-        'Request update buckVOutRetention index: %p',
+        'Request update buckAlternateVOut index: %p',
         index => {
-            pmic.buckModule[index].get.vOutRetention();
+            pmic.buckModule[index].get.alternateVOut?.();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck voltage retention get ${index}`,
+                `npm1012 buck vout software get 1`,
                 expect.anything(),
                 undefined,
                 true,
@@ -45,7 +45,7 @@ describe('PMIC 1012 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npmx buck vout_select get ${index}`,
+            `npm1012 buck enable get`,
             expect.anything(),
             undefined,
             true,
@@ -59,7 +59,7 @@ describe('PMIC 1012 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `powerup_buck mode get ${index}`,
+                `npm1012 buck pwrmode get`,
                 expect.anything(),
                 undefined,
                 true,
@@ -74,37 +74,7 @@ describe('PMIC 1012 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio on_off index get ${index}`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-        },
-    );
-
-    test.each(PMIC_1012_BUCKS)(
-        'Request update buckRetentionControl index: %p',
-        index => {
-            pmic.buckModule[index].get.retentionControl();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck gpio retention index get ${index}`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-        },
-    );
-
-    test.each(PMIC_1012_BUCKS)(
-        'Request update buckActiveDischargeEnabled index: %p',
-        index => {
-            pmic.buckModule[index].get.activeDischarge();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(1);
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck active_discharge get ${index}`,
+                `npm1012 buck enable get`,
                 expect.anything(),
                 undefined,
                 true,
@@ -119,7 +89,7 @@ describe('PMIC 1012 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx buck status get ${index}`,
+                `npm1012 buck enable get`,
                 expect.anything(),
                 undefined,
                 true,
