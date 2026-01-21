@@ -9,12 +9,20 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     noop,
     NpmEventEmitter,
+    onOffRegex,
     parseColonBasedAnswer,
-    parseToBoolean,
+    parseOnOff,
+    parseToFloat,
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { Buck, BuckModeControl, GPIOValues } from '../../types';
+import { Buck } from '../../types';
+import {
+    BuckAlternateVOutControl1012,
+    BuckModeControlValues1012,
+    BuckOnOffControl1012,
+    BuckVOutRippleControlValues1012,
+} from './types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -25,13 +33,12 @@ export default (
     if (shellParser) {
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx buck voltage normal', true, index),
+                toRegex('npm1012 buck vout software', true, 0),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
-                            vOutNormal: value / 1000, // mV to V
+                            vOutNormal: parseToFloat(res),
                         },
                         index,
                     );
@@ -42,13 +49,15 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx buck voltage retention', true, index),
+                toRegex('npm1012 buck pulldown', true, undefined, '(\\w+)'),
                 res => {
-                    const value = parseToNumber(res);
+                    const result = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
-                            vOutRetention: value / 1000, // mV to V
+                            activeDischargeResistance: !Number.isNaN(result)
+                                ? result
+                                : 0,
                         },
                         index,
                     );
@@ -59,13 +68,12 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx buck vout_select', true, index),
+                toRegex('npm1012 buck vout software', true, 1),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
-                            mode: value === 0 ? 'vSet' : 'software',
+                            alternateVOut: parseToFloat(res),
                         },
                         index,
                     );
@@ -76,12 +84,32 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx buck status', true, index),
+                toRegex('npm1012 buck voutsel', true, undefined, '(\\w+)'),
                 res => {
+                    let alternateVOutControl: BuckAlternateVOutControl1012 =
+                        'Off';
+
+                    switch (parseColonBasedAnswer(res)) {
+                        case 'GPIO':
+                            alternateVOutControl = 'GPIO';
+                            break;
+                        case 'VOUT1':
+                            alternateVOutControl = 'Off';
+                            break;
+                        case 'VOUT2':
+                            alternateVOutControl = 'Software';
+                            break;
+                        case 'VSET':
+                            alternateVOutControl = 'Off';
+                            break;
+                        default:
+                            return;
+                    }
+
                     eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
-                            enabled: parseToBoolean(res),
+                            alternateVOutControl,
                         },
                         index,
                     );
@@ -93,19 +121,16 @@ export default (
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
                 toRegex(
-                    'npmx buck gpio on_off index',
+                    'npm1012 buck passthrough',
                     true,
-                    index,
-                    '(-1|[0-4])',
+                    undefined,
+                    onOffRegex,
                 ),
                 res => {
-                    const result = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
-                            onOffControl:
-                                result === -1 ? 'Off' : GPIOValues[result],
-                            onOffSoftwareControlEnabled: result === -1, // Disable on GPIO control, enable on SW control
+                            automaticPassthrough: parseOnOff(res),
                         },
                         index,
                     );
@@ -116,19 +141,22 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx buck gpio retention index',
-                    true,
-                    index,
-                    '(-1|[0-4])',
-                ),
+                toRegex('npm1012 buck pwrmode', true, undefined, '(\\w+)'),
                 res => {
-                    const result = parseToNumber(res);
+                    const result = parseColonBasedAnswer(res).toUpperCase();
+
+                    const modeControl = BuckModeControlValues1012.find(
+                        elem => elem === result,
+                    );
+
+                    if (modeControl === undefined) {
+                        return;
+                    }
+
                     eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
-                            retentionControl:
-                                result === -1 ? 'Off' : GPIOValues[result],
+                            modeControl,
                         },
                         index,
                     );
@@ -139,13 +167,40 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('powerup_buck mode', true, index, '(\\w+)'),
+                toRegex('npm1012 buck enable', true, undefined, '(\\w+)'),
                 res => {
-                    const result = parseColonBasedAnswer(res);
+                    const result = parseColonBasedAnswer(res).toLowerCase();
+                    if (result === 'off') {
+                        eventEmitter.emitPartialEvent<Buck>(
+                            'onBuckUpdate',
+                            {
+                                enabled: false,
+                            },
+                            index,
+                        );
+                        return;
+                    }
+
+                    let onOffControl: BuckOnOffControl1012 = 'Software';
+                    switch (result) {
+                        case 'gpio':
+                            onOffControl = 'GPIO';
+                            break;
+                        case 'on':
+                            onOffControl = 'Software';
+                            break;
+                        case 'vset':
+                            onOffControl = 'VSET';
+                            break;
+                        default:
+                            return;
+                    }
+
                     eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
-                            modeControl: result as BuckModeControl,
+                            enabled: true,
+                            onOffControl,
                         },
                         index,
                     );
@@ -156,12 +211,103 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx buck active_discharge', true, index, '(0|1)'),
+                toRegex('npm1012 buck peakilim', true),
                 res => {
                     eventEmitter.emitPartialEvent<Buck>(
                         'onBuckUpdate',
                         {
-                            activeDischarge: parseToBoolean(res),
+                            peakCurrentLimit: parseToNumber(res),
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 buck autopull', true, undefined, onOffRegex),
+                res => {
+                    eventEmitter.emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            quickVOutDischarge: parseOnOff(res),
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 buck scprotect', true, undefined, onOffRegex),
+                res => {
+                    eventEmitter.emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            shortCircuitProtection: parseOnOff(res),
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 buck softstartilim', true),
+                res => {
+                    eventEmitter.emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            softStartPeakCurrentLimit: parseToNumber(res),
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 buck bias (lp|ulp)', true),
+                res => {
+                    eventEmitter.emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            vOutComparatorBiasCurrent: parseToFloat(res),
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 buck ripple', true, undefined, '(\\w+)'),
+                res => {
+                    const result = parseColonBasedAnswer(res).toLowerCase();
+
+                    const vOutRippleControl =
+                        BuckVOutRippleControlValues1012.find(
+                            elem => elem.toLowerCase() === result,
+                        );
+
+                    if (vOutRippleControl === undefined) {
+                        return;
+                    }
+
+                    eventEmitter.emitPartialEvent<Buck>(
+                        'onBuckUpdate',
+                        {
+                            vOutRippleControl,
                         },
                         index,
                     );

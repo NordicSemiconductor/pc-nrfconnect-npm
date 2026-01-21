@@ -5,50 +5,98 @@
  */
 
 import { RangeType } from '../../../../../utils/helpers';
-import { Buck, BuckExport, BuckModule, ModuleParams } from '../../types';
+import {
+    Buck,
+    BuckExport,
+    BuckMode,
+    BuckModeControl,
+    BuckModule,
+    ModuleParams,
+} from '../../types';
 import buckCallbacks from './callbacks';
 import { BuckGet } from './getters';
 import { BuckSet } from './setters';
+import {
+    BuckAlternateVOutControlValues1012,
+    BuckModeControl1012,
+    BuckModeControlValues1012,
+    BuckOnOffControlValues1012,
+    BuckVOutRippleControlValues1012,
+} from './types';
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
 
 const buckDefaults = (): Buck => ({
     vOutNormal: buckVoltageRange().min,
-    vOutRetention: 1,
     mode: 'vSet',
     enabled: true,
-    modeControl: 'Auto',
+    modeControl: 'LP' as BuckModeControl1012,
     onOffControl: 'Off',
     onOffSoftwareControlEnabled: true,
     retentionControl: 'Off',
     activeDischarge: false,
+
+    activeDischargeResistance: 0,
+    alternateVOut: buckVoltageRange().min,
+    alternateVOutControl: 'Off',
+    automaticPassthrough: false,
+    peakCurrentLimit: peakCurrentLimitValues[0],
+    quickVOutDischarge: false,
+    shortCircuitProtection: false,
+    softStartPeakCurrentLimit: softStartPeakCurrentLimitValues[0],
+    vOutComparatorBiasCurrent: vOutComparatorBiasCurrentLPModeValues[0],
+    vOutRippleControl: 'Nominal',
 });
 
 export const toBuckExport = (buck: Buck): BuckExport => ({
     vOutNormal: buck.vOutNormal,
-    vOutRetention: buck.vOutRetention,
     mode: buck.mode,
     modeControl: buck.modeControl,
     onOffControl: buck.onOffControl,
     retentionControl: buck.retentionControl,
     enabled: buck.enabled,
     activeDischarge: buck.activeDischarge,
+
+    activeDischargeResistance: buck.activeDischargeResistance,
+    alternateVOut: buck.alternateVOut,
+    alternateVOutControl: buck.alternateVOutControl,
+    automaticPassthrough: buck.automaticPassthrough,
+    peakCurrentLimit: buck.peakCurrentLimit,
+    quickVOutDischarge: buck.quickVOutDischarge,
+    shortCircuitProtection: buck.shortCircuitProtection,
+    softStartPeakCurrentLimit: buck.softStartPeakCurrentLimit,
+    vOutComparatorBiasCurrent: buck.vOutComparatorBiasCurrent,
+    vOutRippleControl: buck.vOutRippleControl,
 });
 
 const buckVoltageRange = () =>
     ({
-        min: 1,
+        decimals: 2,
         max: 3.3,
-        decimals: 1,
+        min: 1,
+        step: 0.05,
     }) as RangeType;
 
-const buckRetVOutRange = () =>
-    ({
-        min: 1,
-        max: 3,
-        decimals: 1,
-    }) as RangeType;
+const activeDischargeResistanceValues = [
+    0, 250, 500, 1000, 2000,
+] as readonly number[];
+
+const peakCurrentLimitValues = [
+    66, 91, 117, 142, 167, 192, 217, 291,
+] as readonly number[];
+
+const softStartPeakCurrentLimitValues = [
+    66, 91, 117, 142, 167, 192, 217, 291,
+] as readonly number[];
+
+const vOutComparatorBiasCurrentLPModeValues = [
+    0.8, 1.4, 2.5, 3.0,
+] as readonly number[];
+
+const vOutComparatorBiasCurrentULPModeValues = [
+    28, 35, 50, 95,
+] as readonly number[];
 
 export default class Module implements BuckModule {
     readonly index: number;
@@ -61,17 +109,10 @@ export default class Module implements BuckModule {
         eventEmitter,
         offlineMode,
         shellParser,
-        dialogHandler,
     }: ModuleParams) {
         this.index = index;
-        this._get = new BuckGet(sendCommand, index);
-        this._set = new BuckSet(
-            eventEmitter,
-            sendCommand,
-            dialogHandler,
-            offlineMode,
-            index,
-        );
+        this._get = new BuckGet(sendCommand);
+        this._set = new BuckSet(eventEmitter, sendCommand, offlineMode, index);
         this._callbacks = buckCallbacks(shellParser, eventEmitter, index);
     }
     get get() {
@@ -86,15 +127,100 @@ export default class Module implements BuckModule {
         return this._callbacks;
     }
 
-    get ranges(): {
-        voltage: RangeType;
-        retVOut: RangeType;
-    } {
+    get ranges(): BuckModule['ranges'] {
         return {
             voltage: buckVoltageRange(),
-            retVOut: buckRetVOutRange(),
+            alternateVOut: buckVoltageRange(),
         };
     }
+
+    get values(): BuckModule['values'] {
+        const onOffControlValues = (mode: BuckMode) => {
+            let values = [];
+            switch (mode) {
+                case 'software': {
+                    values = BuckOnOffControlValues1012.filter(
+                        value => value !== 'VSET',
+                    );
+                    break;
+                }
+                case 'vSet': {
+                    values = BuckOnOffControlValues1012.filter(
+                        value => value !== 'Software',
+                    );
+                    break;
+                }
+            }
+
+            return values.map(val => ({
+                label: `${val}`,
+                value: val,
+            }));
+        };
+
+        const vOutComparatorBiasCurrentValues = (mode: BuckModeControl) => {
+            const lpModeValues = vOutComparatorBiasCurrentLPModeValues.map(
+                val => ({
+                    label: `${val} uA`,
+                    value: val,
+                }),
+            );
+            const ulpModeValues = vOutComparatorBiasCurrentULPModeValues.map(
+                val => ({
+                    label: `${val} nA`,
+                    value: val,
+                }),
+            );
+
+            switch (mode) {
+                case 'LP': {
+                    return lpModeValues;
+                }
+                case 'ULP': {
+                    return ulpModeValues;
+                }
+                default: {
+                    return lpModeValues;
+                }
+            }
+        };
+
+        return {
+            activeDischargeResistance: activeDischargeResistanceValues.map(
+                val => ({
+                    label: val === 0 ? 'Off' : `${val} Ohm`,
+                    value: val,
+                }),
+            ),
+            alternateVOutControl: BuckAlternateVOutControlValues1012.map(
+                val => ({
+                    label: val,
+                    value: val,
+                }),
+            ),
+            modeControl: BuckModeControlValues1012.map(val => ({
+                label: `${val}`,
+                value: val,
+            })),
+            onOffControl: onOffControlValues,
+            peakCurrentLimit: peakCurrentLimitValues.map(val => ({
+                label: `${val} mA`,
+                value: val,
+            })),
+            softStartPeakCurrentLimit: softStartPeakCurrentLimitValues.map(
+                val => ({
+                    label: `${val} mA`,
+                    value: val,
+                }),
+            ),
+            vOutComparatorBiasCurrent: vOutComparatorBiasCurrentValues,
+            vOutRippleControl: BuckVOutRippleControlValues1012.map(val => ({
+                label: val,
+                value: val,
+            })),
+        };
+    }
+
     get defaults(): Buck {
         return buckDefaults();
     }

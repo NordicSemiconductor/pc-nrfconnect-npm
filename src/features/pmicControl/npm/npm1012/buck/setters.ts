@@ -7,16 +7,20 @@
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Buck,
+    BuckAlternateVOutControl,
     BuckExport,
     BuckMode,
     BuckModeControl,
     BuckOnOffControl,
-    BuckOnOffControlValues,
-    BuckRetentionControl,
-    GPIOValues,
-    PmicDialog,
+    BuckVOutRippleControl,
 } from '../../types';
 import { BuckGet } from './getters';
+import {
+    BuckModeControl1012,
+    BuckModeControlValues1012,
+    BuckOnOffControl1012,
+    BuckOnOffControlValues1012,
+} from './types';
 
 export class BuckSet {
     private get: BuckGet;
@@ -28,108 +32,88 @@ export class BuckSet {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void,
         ) => void,
-        private dialogHandler: ((dialog: PmicDialog) => void) | null,
         private offlineMode: boolean,
         private index: number,
     ) {
-        this.get = new BuckGet(sendCommand, index);
+        this.get = new BuckGet(sendCommand);
     }
 
     async all(config: BuckExport) {
-        await Promise.allSettled([
+        const promises = [
             this.vOutNormal(config.vOutNormal),
             this.enabled(config.enabled),
             this.modeControl(config.modeControl),
-            this.vOutRetention(config.vOutRetention),
-            this.retentionControl(config.retentionControl),
             this.onOffControl(config.onOffControl),
-            this.activeDischarge(config.activeDischarge),
             this.mode(config.mode),
-        ]);
+        ];
+        if (config.activeDischargeResistance !== undefined) {
+            promises.push(
+                this.activeDischargeResistance(
+                    config.activeDischargeResistance,
+                ),
+            );
+        }
+        if (config.alternateVOut !== undefined) {
+            promises.push(this.alternateVOut(config.alternateVOut));
+        }
+        if (config.alternateVOutControl !== undefined) {
+            promises.push(
+                this.alternateVOutControl(config.alternateVOutControl),
+            );
+        }
+        if (config.automaticPassthrough) {
+            promises.push(
+                this.automaticPassthrough(config.automaticPassthrough),
+            );
+        }
+        if (config.peakCurrentLimit !== undefined) {
+            promises.push(this.peakCurrentLimit(config.peakCurrentLimit));
+        }
+        if (config.quickVOutDischarge !== undefined) {
+            promises.push(this.quickVOutDischarge(config.quickVOutDischarge));
+        }
+        if (config.shortCircuitProtection) {
+            promises.push(
+                this.shortCircuitProtection(config.shortCircuitProtection),
+            );
+        }
+        if (config.softStartPeakCurrentLimit !== undefined) {
+            promises.push(
+                this.softStartPeakCurrentLimit(
+                    config.softStartPeakCurrentLimit,
+                ),
+            );
+        }
+        if (config.vOutComparatorBiasCurrent !== undefined) {
+            promises.push(
+                this.vOutComparatorBiasCurrent(
+                    config.modeControl,
+                    config.vOutComparatorBiasCurrent,
+                ),
+            );
+        }
+        if (config.vOutRippleControl !== undefined) {
+            promises.push(this.vOutRippleControl(config.vOutRippleControl));
+        }
+
+        await Promise.allSettled(promises);
     }
 
     vOutNormal(value: number) {
-        const action = () =>
-            new Promise<void>((resolve, reject) => {
-                if (this.offlineMode) {
-                    this.eventEmitter.emitPartialEvent<Buck>(
-                        'onBuckUpdate',
-                        {
-                            vOutNormal: value,
-                        },
-                        this.index,
-                    );
-
-                    this.eventEmitter.emitPartialEvent<Buck>(
-                        'onBuckUpdate',
-                        {
-                            mode: 'software',
-                        },
-                        this.index,
-                    );
-
-                    resolve();
-                } else {
-                    this.sendCommand(
-                        `npmx buck voltage normal set ${this.index} ${
-                            value * 1000
-                        }`,
-                        () =>
-                            this.sendCommand(
-                                `npmx buck vout_select set ${this.index} 1`,
-                                () => resolve(),
-                                () => {
-                                    this.get.mode();
-                                    reject();
-                                },
-                            ),
-                        () => {
-                            this.get.vOutNormal();
-                            reject();
-                        },
-                    );
-                }
-            });
-
-        const dialogHandler = this.dialogHandler;
-        if (
-            dialogHandler &&
-            !this.offlineMode &&
-            this.index === 1 &&
-            value <= 1.6
-        ) {
-            return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicDialog = {
-                    type: 'alert',
-                    doNotAskAgainStoreID: 'pmic1012-setBuckVOut-1',
-                    message: `Buck 2 powers the I2C communication required by this app. A voltage lower than 1.6 V might cause issues with the app connection.
-                        Are you sure you want to continue?`,
-                    confirmLabel: 'Yes',
-                    optionalLabel: "Yes, don't ask again",
-                    cancelLabel: 'No',
-                    title: 'Warning',
-                    onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: () => {
-                        this.get.vOutNormal();
-                        reject();
-                    },
-                    onOptional: () => action().then(resolve).catch(reject),
-                };
-
-                dialogHandler(warningDialog);
-            });
-        }
-
-        return action();
-    }
-
-    vOutRetention(value: number) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
-                        vOutRetention: value,
+                        vOutNormal: value,
+                    },
+                    this.index,
+                );
+
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        mode: 'software',
                     },
                     this.index,
                 );
@@ -137,12 +121,18 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx buck voltage retention set ${this.index} ${
-                        value * 1000
-                    }`,
-                    () => resolve(),
+                    `npm1012 buck vout software set 0 ${value}V`,
+                    () =>
+                        this.sendCommand(
+                            `npm1012 buck voutsel set VOUT1`,
+                            () => resolve(),
+                            () => {
+                                this.get.mode();
+                                reject();
+                            },
+                        ),
                     () => {
-                        this.get.vOutRetention();
+                        this.get.vOutNormal();
                         reject();
                     },
                 );
@@ -151,65 +141,44 @@ export class BuckSet {
     }
 
     mode(mode: BuckMode) {
-        const action = () =>
-            new Promise<void>((resolve, reject) => {
-                if (this.offlineMode) {
-                    this.eventEmitter.emitPartialEvent<Buck>(
-                        'onBuckUpdate',
-                        {
-                            mode,
-                        },
-                        this.index,
-                    );
-                    resolve();
-                } else {
-                    this.sendCommand(
-                        `npmx buck vout_select set ${this.index} ${
-                            mode === 'software' ? 1 : 0
-                        }`,
-                        () => {
-                            this.get.vOutNormal();
-                            resolve();
-                        },
-                        () => {
-                            this.get.mode();
-                            reject();
-                        },
-                    );
-                }
-            });
-
-        // TODO Check software voltage as well
-        const dialogHandler = this.dialogHandler;
-        if (
-            dialogHandler &&
-            !this.offlineMode &&
-            this.index === 1 &&
-            mode === 'software'
-        ) {
-            return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicDialog = {
-                    type: 'alert',
-                    doNotAskAgainStoreID: 'pmic1012-setBuckVOut-0',
-                    message: `Buck 2 powers the I2C communication required by this app. A software voltage might be already set to less then 1.6 V . Are you sure you want to continue?`,
-                    confirmLabel: 'Yes',
-                    optionalLabel: "Yes, don't ask again",
-                    cancelLabel: 'No',
-                    title: 'Warning',
-                    onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: reject,
-                    onOptional: () => action().then(resolve).catch(reject),
-                };
-
-                dialogHandler(warningDialog);
-            });
-        }
-
-        return action();
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        mode,
+                    },
+                    this.index,
+                );
+                resolve();
+            } else {
+                const value = mode === 'software' ? 'ON' : 'VSET';
+                this.sendCommand(
+                    `npm1012 buck enable set ${value}`,
+                    () => {
+                        this.get.vOutNormal();
+                        resolve();
+                    },
+                    () => {
+                        this.get.mode();
+                        reject();
+                    },
+                );
+            }
+        });
     }
 
     modeControl(modeControl: BuckModeControl) {
         return new Promise<void>((resolve, reject) => {
+            if (
+                !BuckModeControlValues1012.includes(
+                    modeControl as BuckModeControl1012,
+                )
+            ) {
+                reject();
+                return;
+            }
+
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
@@ -222,7 +191,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `powerup_buck mode set ${this.index} ${modeControl}`,
+                    `npm1012 buck pwrmode set ${modeControl}`,
                     () => resolve(),
                     () => {
                         this.get.modeControl();
@@ -235,23 +204,29 @@ export class BuckSet {
 
     onOffControl(onOffControl: BuckOnOffControl) {
         return new Promise<void>((resolve, reject) => {
+            if (
+                !BuckOnOffControlValues1012.includes(
+                    onOffControl as BuckOnOffControl1012,
+                )
+            ) {
+                reject();
+                return;
+            }
+
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
                         onOffControl,
-                        onOffSoftwareControlEnabled:
-                            onOffControl === BuckOnOffControlValues[0],
                     },
                     this.index,
                 );
 
                 resolve();
             } else {
+                const value = onOffControl === 'Software' ? 'ON' : onOffControl;
                 this.sendCommand(
-                    `npmx buck gpio on_off index set ${
-                        this.index
-                    } ${GPIOValues.findIndex(v => v === onOffControl)}`,
+                    `npm1012 buck enable set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.onOffControl();
@@ -262,26 +237,23 @@ export class BuckSet {
         });
     }
 
-    retentionControl(retentionControl: BuckRetentionControl) {
+    enabled(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
-                        retentionControl,
+                        enabled,
                     },
                     this.index,
                 );
-
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx buck gpio retention index set ${
-                        this.index
-                    } ${GPIOValues.findIndex(v => v === retentionControl)}`,
+                    `npm1012 buck enable set ${enabled ? 'ON' : 'OFF'}`,
                     () => resolve(),
                     () => {
-                        this.get.retentionControl();
+                        this.get.enabled();
                         reject();
                     },
                 );
@@ -289,68 +261,13 @@ export class BuckSet {
         });
     }
 
-    enabled(enabled: boolean) {
-        const action = () =>
-            new Promise<void>((resolve, reject) => {
-                if (this.offlineMode) {
-                    this.eventEmitter.emitPartialEvent<Buck>(
-                        'onBuckUpdate',
-                        {
-                            enabled,
-                        },
-                        this.index,
-                    );
-                    resolve();
-                } else {
-                    this.sendCommand(
-                        `npmx buck status set ${this.index} ${
-                            enabled ? '1' : '0'
-                        }`,
-                        () => resolve(),
-                        () => {
-                            this.get.enabled();
-                            reject();
-                        },
-                    );
-                }
-            });
-
-        const dialogHandler = this.dialogHandler;
-        if (
-            dialogHandler &&
-            !this.offlineMode &&
-            this.index === 1 &&
-            !enabled
-        ) {
-            return new Promise<void>((resolve, reject) => {
-                const warningDialog: PmicDialog = {
-                    type: 'alert',
-                    doNotAskAgainStoreID: 'pmic1012-setBuckEnabled-1',
-                    message: `Disabling the buck 2 might effect I2C communications to the PMIC chip and hance you might get
-                    disconnected from the app. Are you sure you want to continue?`,
-                    confirmLabel: 'Yes',
-                    optionalLabel: "Yes, don't ask again",
-                    cancelLabel: 'No',
-                    title: 'Warning',
-                    onConfirm: () => action().then(resolve).catch(reject),
-                    onCancel: reject,
-                    onOptional: () => action().then(resolve).catch(reject),
-                };
-
-                dialogHandler(warningDialog);
-            });
-        }
-
-        return action();
-    }
-
-    activeDischarge(activeDischargeEnabled: boolean) {
+    activeDischargeResistance(value: number) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
-                        activeDischarge: activeDischargeEnabled,
+                        activeDischargeResistance: value,
                     },
                     this.index,
                 );
@@ -358,12 +275,263 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx buck active_discharge set ${this.index} ${
-                        activeDischargeEnabled ? '1' : '0'
-                    }`,
+                    `npm1012 buck pulldown set ${value === 0 ? 'DISABLE' : `${value}Ohm`}`,
                     () => resolve(),
                     () => {
-                        this.get.activeDischarge();
+                        this.get.activeDischargeResistance();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    alternateVOut(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        mode: 'software',
+                        alternateVOut: value,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm1012 buck vout software set 1 ${value}V`,
+                    () => resolve(),
+                    () => {
+                        this.get.alternateVOut();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    alternateVOutControl(modeControl: BuckAlternateVOutControl) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        alternateVOutControl: modeControl,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                let cmd = '';
+                switch (modeControl) {
+                    case 'GPIO': {
+                        cmd = 'GPIO';
+                        break;
+                    }
+                    case 'Off': {
+                        cmd = 'VSET';
+                        break;
+                    }
+                    case 'Software': {
+                        cmd = 'VOUT2';
+                        break;
+                    }
+                }
+
+                this.sendCommand(
+                    `npm1012 buck voutsel set ${cmd}`,
+                    () => resolve(),
+                    () => {
+                        this.get.alternateVOutControl();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    automaticPassthrough(value: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        automaticPassthrough: value,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm1012 buck passthrough set ${value ? 'on' : 'off'}`,
+                    () => resolve(),
+                    () => {
+                        this.get.automaticPassthrough();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    quickVOutDischarge(value: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        quickVOutDischarge: value,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm1012 buck autopull set ${value ? 'on' : 'off'}`,
+                    () => resolve(),
+                    () => {
+                        this.get.quickVOutDischarge();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    peakCurrentLimit(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        peakCurrentLimit: value,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm1012 buck peakilim set ${value}mA`,
+                    () => resolve(),
+                    () => {
+                        this.get.peakCurrentLimit();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    shortCircuitProtection(value: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        shortCircuitProtection: value,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm1012 buck scprotect set ${value ? 'on' : 'off'}`,
+                    () => resolve(),
+                    () => {
+                        this.get.shortCircuitProtection();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    softStartPeakCurrentLimit(value: number) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        softStartPeakCurrentLimit: value,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm1012 buck softstartilim set ${value}mA`,
+                    () => resolve(),
+                    () => {
+                        this.get.softStartPeakCurrentLimit();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    vOutComparatorBiasCurrent(mode: BuckModeControl, value: number) {
+        return new Promise<void>((resolve, reject) => {
+            switch (mode) {
+                case 'LP':
+                    break;
+                case 'ULP':
+                    break;
+                default:
+                    reject();
+                    return;
+            }
+
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        vOutComparatorBiasCurrent: value,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                const unitPrefix = mode === 'LP' ? 'u' : 'n';
+                this.sendCommand(
+                    `npm1012 buck bias ${mode.toLowerCase()} set ${value}${unitPrefix}A`,
+                    () => resolve(),
+                    () => {
+                        this.get.vOutComparatorBiasCurrent(mode);
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
+    vOutRippleControl(value: BuckVOutRippleControl) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Buck>(
+                    'onBuckUpdate',
+                    {
+                        vOutRippleControl: value,
+                    },
+                    this.index,
+                );
+
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm1012 buck ripple set ${value}`,
+                    () => resolve(),
+                    () => {
+                        this.get.vOutRippleControl();
                         reject();
                     },
                 );
