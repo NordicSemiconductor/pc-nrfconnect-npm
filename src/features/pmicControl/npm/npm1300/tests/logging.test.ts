@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { type Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared/typings/generated/src/Parsers/shellParser';
+import { type ShellParserCallbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { type PmicChargingState, USBDetectStatusValues } from '../../types';
 import { setupMocksWithShellParser } from './helpers';
@@ -239,7 +239,7 @@ describe('PMIC 1300 - Logging', () => {
             mockEnqueueRequest.mockImplementationOnce(
                 (
                     command: string,
-                    callbacks?: Callbacks,
+                    callbacks?: ShellParserCallbacks,
 
                     _timeout?: number,
 
