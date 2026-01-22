@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { type RangeType } from '../../../../../utils/helpers';
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import {
     type Buck,
     type BuckExport,
@@ -46,14 +47,14 @@ const buckVoltageRange = () =>
         min: 1,
         max: 3.3,
         decimals: 1,
-    }) as RangeType;
+    }) as Range;
 
 const buckRetVOutRange = () =>
     ({
         min: 1,
         max: 3,
         decimals: 1,
-    }) as RangeType;
+    }) as Range;
 
 export default class Module implements BuckModule {
     readonly index: number;
@@ -92,8 +93,8 @@ export default class Module implements BuckModule {
     }
 
     get ranges(): {
-        voltage: RangeType;
-        retVOut: RangeType;
+        voltage: Range;
+        retVOut: Range;
     } {
         return {
             voltage: buckVoltageRange(),

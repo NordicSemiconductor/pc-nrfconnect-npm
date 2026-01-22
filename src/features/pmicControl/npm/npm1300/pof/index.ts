@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { type RangeType } from '../../../../../utils/helpers';
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import { type ModuleParams, type POF, type PofModule } from '../../types';
 import pofCallbacks from './callbacks';
 import { PofGet } from './getters';
@@ -36,7 +37,7 @@ export default class Module implements PofModule {
     get callbacks() {
         return this._callbacks;
     }
-    get ranges(): { threshold: RangeType } {
+    get ranges(): { threshold: Range } {
         return {
             threshold: {
                 min: 2.6,

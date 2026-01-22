@@ -15,6 +15,7 @@ import {
     Slider,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
@@ -24,7 +25,6 @@ import {
     NTCValues,
 } from '../../features/pmicControl/npm/types';
 import { getLatestAdcSample } from '../../features/pmicControl/pmicControlSlice';
-import { type RangeType } from '../../utils/helpers';
 
 const ntcThermistorItems = [...NTCValues].map(item => ({
     label: `${item}`,
@@ -372,7 +372,7 @@ const Arrow = ({
 }: {
     type: 'COLD' | 'COOL' | 'WARM' | 'HOT';
     temperature: number;
-    range: RangeType;
+    range: Range;
     onChange: (value: number) => void;
     onChangeComplete: () => void;
 }) => (
