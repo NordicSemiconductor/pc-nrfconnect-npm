@@ -28,7 +28,7 @@ export const getNpmDevice = (
 
         // eslint-disable-next-line @typescript-eslint/no-shadow
         const pmicVersionPromise = new Promise<number>((resolve, reject) => {
-            shellParser.enqueueRequest('pmic_version', {
+            shellParser.enqueueRequest('pmic_revision', {
                 onSuccess: result => {
                     result = result.replace('pmic_revision=', '');
                     resolve(Number.parseFloat(result));
