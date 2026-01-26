@@ -1,6 +1,6 @@
 # Overview and user interface
 
-After starting the {{app_name}}, the main application window is displayed.
+After starting the nPM PowerUP app, the main application window is displayed.
 
 !!! info "Tip"
       This page provides only a general overview of the application UI. For detailed information, see each option's tooltip.
@@ -20,7 +20,7 @@ The available options and information change after you **Select Device**.
 Dropdown to list the PMIC devices attached to the computer.
 
 !!! note "Note"
-      If you are using the nPM1300 EK, read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use this device with the {{app_name}}.
+      If you are using the nPM1300 EK, read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use this device with the nPM PowerUP app.
 
 #### Virtual device selection and offline mode actions
 

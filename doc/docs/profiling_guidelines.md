@@ -3,7 +3,7 @@
 !!! note "Note"
      Battery profiling is available for the nPM1300 EK and the nPM1304 EK.
 
-The guidelines in this section optimize the use of the {{app_name}} for [battery profiling](profiling_battery.md).
+The guidelines in this section optimize the use of the nPM PowerUP app for [battery profiling](profiling_battery.md).
 
 - Before starting battery profiling, refer to the battery datasheet and ensure that the parameters are set correctly. This includes specification of the battery capacity, termination voltages, and any other relevant parameters provided in the datasheet.
 - Ensure a solid, low-resistance battery connection to the EK. Make sure to use stable connectors. Poor contacts can cause profiling or model errors (or both).

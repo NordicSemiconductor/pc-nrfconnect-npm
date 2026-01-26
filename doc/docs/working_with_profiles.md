@@ -1,6 +1,6 @@
 # Working with profiles
 
-The {{app_name}} comes with the [**Profiles**](overview.md#npm1300-and-npm1304-profiles-tab) tab, where you can interact with the battery profiles you create as well as with pre-profiled and generic battery models.
+The nPM PowerUP app comes with the [**Profiles**](overview.md#npm1300-and-npm1304-profiles-tab) tab, where you can interact with the battery profiles you create as well as with pre-profiled and generic battery models.
 
 !!! note "Note"
      - This feature is available for the nPM1300 EK and the nPM1304 EK.
@@ -8,12 +8,12 @@ The {{app_name}} comes with the [**Profiles**](overview.md#npm1300-and-npm1304-p
 
 ## Merging temperature profiles
 
-If you [profile the battery](profiling_battery.md) at each temperature individually, the {{app_name}} creates distinct CSV files for each temperature session. You can then combine these CSV files to create a comprehensive battery model that covers all individual temperature ranges.
+If you [profile the battery](profiling_battery.md) at each temperature individually, the nPM PowerUP app creates distinct CSV files for each temperature session. You can then combine these CSV files to create a comprehensive battery model that covers all individual temperature ranges.
 
 Complete the following steps to merge individual temperature profiles into a single battery model:
 
 1. Make sure you have the CSV files for the temperature profiles you want to merge.
-1. Open the **Profiles** tab in the {{app_name}}.
+1. Open the **Profiles** tab in the nPM PowerUP app.
 1. Click the **Create New Project** button from the custom profiles section.
 
     ![Create New Project option in the Profiles tab](./screenshots/npm_profiles_tab_custom_create_new.png "Create New Project option")
@@ -42,7 +42,7 @@ Complete the following steps to merge individual temperature profiles into a sin
 
     ![Include toggle](./screenshots/npm_profiles_tab_custom_include.png "Include toggle")
 
-1. In the [**Project** drop-down menu](overview.md#project-section), click the **Process Included Data** button. The {{app_name}} will analyze the data from the individual profiles and generate a single battery model by merging the profiles for each included temperature.
+1. In the [**Project** drop-down menu](overview.md#project-section), click the **Process Included Data** button. The nPM PowerUP app will analyze the data from the individual profiles and generate a single battery model by merging the profiles for each included temperature.
 
     ![Processing started](./screenshots/npm_profiles_tab_custom_processing.png "Processing started")
 
@@ -50,11 +50,11 @@ Complete the following steps to merge individual temperature profiles into a sin
 
 ## Using pre-profiled battery models
 
-The {{app_name}} includes bundled profiles from selected vendors that have been profiled by Nordic Semiconductor. These pre-profiled battery models provide ready-to-use configurations for common battery types.
+The nPM PowerUP app includes bundled profiles from selected vendors that have been profiled by Nordic Semiconductor. These pre-profiled battery models provide ready-to-use configurations for common battery types.
 
 Complete the following steps to use a pre-profiled battery model:
 
-1. Open the [**Profiles**](overview.md#npm1300-and-npm1304-profiles-tab) tab in the {{app_name}}.
+1. Open the [**Profiles**](overview.md#npm1300-and-npm1304-profiles-tab) tab in the nPM PowerUP app.
 1. Expand the **Bundled profiles** section.
 
     ![Bundled profiles section](./screenshots/npm_profiles_tab_bundled.png "Bundled profiles section")
