@@ -6,6 +6,10 @@ Once connected to an Evaluation Kit (EK), the app gives full control over the ad
 
 The nPM PowerUP app is installed and updated using [nRF Connect for Desktop](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/index.html).
 
+## Installing the nPM PowerUP app
+
+For installation instructions, see [Installing nRF Connect for Desktop apps](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/installing_apps.html) in the nRF Connect for Desktop documentation.
+
 ## Supported devices
 
 The nPM PowerUP app supports the following Power Management IC devices from Nordic Semiconductor:
