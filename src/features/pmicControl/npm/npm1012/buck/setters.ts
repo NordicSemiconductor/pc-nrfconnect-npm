@@ -61,7 +61,7 @@ export class BuckSet {
                 this.alternateVOutControl(config.alternateVOutControl),
             );
         }
-        if (config.automaticPassthrough) {
+        if (config.automaticPassthrough !== undefined) {
             promises.push(
                 this.automaticPassthrough(config.automaticPassthrough),
             );
@@ -72,7 +72,7 @@ export class BuckSet {
         if (config.quickVOutDischarge !== undefined) {
             promises.push(this.quickVOutDischarge(config.quickVOutDischarge));
         }
-        if (config.shortCircuitProtection) {
+        if (config.shortCircuitProtection !== undefined) {
             promises.push(
                 this.shortCircuitProtection(config.shortCircuitProtection),
             );
