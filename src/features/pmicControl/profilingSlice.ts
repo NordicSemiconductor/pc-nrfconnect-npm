@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../appReducer';
-import { CCProfilingState, Profile } from './npm/types';
+import { type CCProfilingState, type Profile } from './npm/types';
 
 type ProfileStage =
     | 'ActiveLoadNotVSYS'

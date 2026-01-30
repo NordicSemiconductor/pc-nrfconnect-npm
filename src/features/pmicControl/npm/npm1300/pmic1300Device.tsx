@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { logger, ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    logger,
+    type ShellParser,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { RootState } from '../../../../appReducer';
+import { type RootState } from '../../../../appReducer';
 import BaseNpmDevice from '../basePmicDevice';
 import {
     isModuleDataPair,
@@ -15,13 +18,13 @@ import {
     parseLogData,
 } from '../pmicHelpers';
 import {
-    AdcSample,
-    IrqEvent,
-    LoggingEvent,
-    NpmExportV2,
-    NpmPeripherals,
-    PmicDialog,
-    USBPower,
+    type AdcSample,
+    type IrqEvent,
+    type LoggingEvent,
+    type NpmExportV2,
+    type NpmPeripherals,
+    type PmicDialog,
+    type USBPower,
 } from '../types';
 import { BatteryProfiler } from './batteryProfiler';
 import BuckModule, { toBuckExport } from './buck';

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { PmicDialog } from '../../types';
+import { type PmicDialog } from '../../types';
 import { PMIC_1300_LDOS, setupMocksBase } from '../tests/helpers';
 
 // UI should get update events immediately and not wait for feedback from shell responses when offline as there is no shell

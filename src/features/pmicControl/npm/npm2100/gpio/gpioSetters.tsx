@@ -5,15 +5,15 @@
  */
 import React from 'react';
 
-import { NpmEventEmitter } from '../../pmicHelpers';
+import { type NpmEventEmitter } from '../../pmicHelpers';
 import {
-    GPIO,
-    GPIODrive,
-    GPIOExport,
-    GPIOMode,
-    GPIOPull,
-    GPIOState,
-    PmicDialog,
+    type GPIO,
+    type GPIODrive,
+    type GPIOExport,
+    type GPIOMode,
+    type GPIOPull,
+    type GPIOState,
+    type PmicDialog,
 } from '../../types';
 import { GpioGet } from './gpioGetters';
 import { GPIOMode2100 } from './types';

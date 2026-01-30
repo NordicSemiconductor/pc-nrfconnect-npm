@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { FC } from 'react';
-import { ChartArea } from 'chart.js';
+import React, { type FC } from 'react';
+import { type ChartArea } from 'chart.js';
 
 import { formatDuration } from './duration';
-import { XAxisRange } from './state';
+import { type XAxisRange } from './state';
 
 import './timeSpanDeltaLine.scss';
 

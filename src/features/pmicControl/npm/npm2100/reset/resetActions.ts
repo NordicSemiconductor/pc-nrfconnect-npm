@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
+import { type NpmEventEmitter } from '../../pmicHelpers';
 
 export class ResetActions {
     constructor(

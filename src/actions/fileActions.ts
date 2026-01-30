@@ -5,21 +5,24 @@
  */
 
 import { dialog, getCurrentWindow } from '@electron/remote';
-import { AppThunk, telemetry } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
-    OpenDialogOptions,
-    OpenDialogReturnValue,
-    SaveDialogOptions,
+    type AppThunk,
+    telemetry,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    type OpenDialogOptions,
+    type OpenDialogReturnValue,
+    type SaveDialogOptions,
 } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
-import { RootState } from '../appReducer';
+import { type RootState } from '../appReducer';
 import {
-    AnyNpmExport,
-    FuelGaugeExport,
-    NpmExportLatest,
-    NpmExportV1,
+    type AnyNpmExport,
+    type FuelGaugeExport,
+    type NpmExportLatest,
+    type NpmExportV1,
 } from '../features/pmicControl/npm/types';
 import { getNpmDevice } from '../features/pmicControl/pmicControlSlice';
 

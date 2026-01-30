@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     PMIC_1300_BUCKS,
@@ -16,7 +16,7 @@ import {
     setupMocksBase as GenericsetupMocksBase,
     setupMocksWithShellParser as GenericSetupMocksWithShellParser,
 } from '../../tests/helpers';
-import { PmicDialog } from '../../types';
+import { type PmicDialog } from '../../types';
 import Npm1304 from '../pmic1304Device';
 
 export const PMIC_1304_BUCKS = PMIC_1300_BUCKS;

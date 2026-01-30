@@ -6,9 +6,9 @@
 
 /* eslint-disable no-underscore-dangle */
 import {
-    FuelGauge,
-    FuelGaugeModule as FuelGaugeModuleBase,
-    ModuleParams,
+    type FuelGauge,
+    type FuelGaugeModule as FuelGaugeModuleBase,
+    type ModuleParams,
 } from '../../types';
 import { FuelGaugeActions } from './actions';
 import fuelGaugeCallbacks from './callbacks';

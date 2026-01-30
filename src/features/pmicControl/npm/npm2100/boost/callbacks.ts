@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     noop,
-    NpmEventEmitter,
+    type NpmEventEmitter,
     onOffRegex,
     parseColonBasedAnswer,
     parseOnOff,
@@ -17,14 +17,14 @@ import {
     toValueRegex,
 } from '../../pmicHelpers';
 import {
-    Boost,
-    BoostModeControl,
+    type Boost,
+    type BoostModeControl,
     BoostModeControlValues,
-    BoostPinMode,
+    type BoostPinMode,
     BoostPinModeValues,
-    BoostPinSelection,
+    type BoostPinSelection,
     BoostPinSelectionValues,
-    BoostVOutSel,
+    type BoostVOutSel,
     BoostVOutSelValues,
 } from '../../types';
 

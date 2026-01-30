@@ -12,7 +12,7 @@ import {
     describeError,
     DialogButton,
     GenericDialog,
-    Step,
+    type Step,
     useStopwatch,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 

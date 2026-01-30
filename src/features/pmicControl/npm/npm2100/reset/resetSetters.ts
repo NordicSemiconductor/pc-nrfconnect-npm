@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { npm2100ResetConfig, ResetConfig } from '../../types';
+import { type NpmEventEmitter } from '../../pmicHelpers';
+import { type npm2100ResetConfig, type ResetConfig } from '../../types';
 import {
-    npm2100LongPressResetDebounce,
-    npm2100ResetPinSelection,
+    type npm2100LongPressResetDebounce,
+    type npm2100ResetPinSelection,
 } from '../types';
 import { ResetGet } from './resetGetters';
 

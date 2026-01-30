@@ -14,8 +14,8 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    LowPowerConfig,
-    LowPowerModule,
+    type LowPowerConfig,
+    type LowPowerModule,
 } from '../../features/pmicControl/npm/types';
 
 const card = 'lowPowerControl';

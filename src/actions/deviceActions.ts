@@ -5,15 +5,15 @@
  */
 
 import {
-    AppThunk,
+    type AppThunk,
     createSerialPort,
     describeError,
-    Device,
+    type Device,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import type { AutoDetectTypes } from '@serialport/bindings-cpp';
 import type { SerialPortOpenOptions } from 'serialport';
 
-import { RootState } from '../appReducer';
+import { type RootState } from '../appReducer';
 import { setSerialPort } from '../features/serial/serialSlice';
 
 export const closeDevice =

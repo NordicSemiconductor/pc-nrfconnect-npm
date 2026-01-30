@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { Overlay } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getNpmDevice } from '../../pmicControlSlice';
-import BaseNpmDevice from '../basePmicDevice';
+import type BaseNpmDevice from '../basePmicDevice';
 import { documentation as pmic1300Documentation } from '../npm1300/documentationPmic1300';
 import Npm1300 from '../npm1300/pmic1300Device';
 import { documentation as pmic1304Documentation } from '../npm1304/documentationPmic1304';

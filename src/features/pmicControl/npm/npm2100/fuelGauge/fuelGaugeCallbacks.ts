@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     noop,
-    NpmEventEmitter,
+    type NpmEventEmitter,
     parseBatteryModel,
     parseColonBasedAnswer,
     parseLogData,
@@ -16,13 +16,13 @@ import {
     toRegex,
 } from '../../pmicHelpers';
 import {
-    BatteryModel,
-    BatteryModelCharacterization,
-    FuelGauge,
-    ProfileDownload,
+    type BatteryModel,
+    type BatteryModelCharacterization,
+    type FuelGauge,
+    type ProfileDownload,
 } from '../../types';
 import type FuelGaugeModule from '.';
-import { FuelGaugeGet } from './fuelGaugeGet';
+import { type FuelGaugeGet } from './fuelGaugeGet';
 
 export default (
     shellParser: ShellParser | undefined,

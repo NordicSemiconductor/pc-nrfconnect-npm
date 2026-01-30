@@ -14,7 +14,10 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
-import { Charger, ChargerModule } from '../../features/pmicControl/npm/types';
+import {
+    type Charger,
+    type ChargerModule,
+} from '../../features/pmicControl/npm/types';
 import { getPmicChargingState } from '../../features/pmicControl/pmicControlSlice';
 
 const card = 'chipThermalRegulation';
@@ -132,7 +135,7 @@ export default ({
                     <div className="tw-text-xs">Thermal Regulation Active</div>
                 </DocumentationTooltip>
                 <div
-                    className={` tw-h-4 tw-w-4 tw-rounded-full tw-border tw-border-solid tw-border-gray-200 ${classNames(
+                    className={`tw-h-4 tw-w-4 tw-rounded-full tw-border tw-border-solid tw-border-gray-200 ${classNames(
                         pmicChargingState.dieTempHigh
                             ? 'tw-bg-red'
                             : 'tw-bg-green',

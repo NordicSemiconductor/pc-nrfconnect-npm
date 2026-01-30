@@ -4,12 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
 import {
-    ModuleParams,
-    TimerConfig,
-    TimerConfigModule,
-    TimerMode,
+    type ModuleParams,
+    type TimerConfig,
+    type TimerConfigModule,
+    type TimerMode,
 } from '../../types';
 import { npm2100TimerMode } from '../types';
 import timerCallbacks from './timerConfigCallbacks';
@@ -53,7 +54,7 @@ export default class Module implements TimerConfigModule {
         };
     }
     get ranges(): {
-        periodRange: (prescalerMultiplier: number) => RangeType;
+        periodRange: (prescalerMultiplier: number) => Range;
     } {
         return {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars

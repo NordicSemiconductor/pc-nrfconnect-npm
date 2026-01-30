@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { OnBoardLoad } from '../../types';
+import { type NpmEventEmitter } from '../../pmicHelpers';
+import { type OnBoardLoad } from '../../types';
 import { OnBoardLoadGet } from './getters';
 
 export class OnBoardLoadSet {

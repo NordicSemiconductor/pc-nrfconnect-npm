@@ -8,8 +8,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
-    AppThunk,
-    ButtonVariants,
+    type AppThunk,
+    type ButtonVariants,
     clearWaitForDevice,
     DialogButton,
     GenericDialog,
@@ -18,7 +18,7 @@ import {
 import { existsSync, mkdirSync, rmSync } from 'fs';
 import path from 'path';
 
-import { RootState } from '../../../appReducer';
+import { type RootState } from '../../../appReducer';
 import { stringToFile } from '../../../features/helpers';
 import {
     mergeBatteryParams,

@@ -5,8 +5,8 @@
  */
 
 import {
-    Boost,
-    BoostExport,
+    type Boost,
+    type BoostExport,
     BoostModeControlValues,
     BoostPinModeValues,
     BoostPinSelectionValues,

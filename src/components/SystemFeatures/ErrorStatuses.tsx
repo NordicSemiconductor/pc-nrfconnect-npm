@@ -13,7 +13,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
-import { SupportedErrorLogs } from '../../features/pmicControl/npm/types';
+import { type SupportedErrorLogs } from '../../features/pmicControl/npm/types';
 import {
     getErrorLogs,
     getNpmDevice,
