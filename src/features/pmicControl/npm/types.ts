@@ -25,6 +25,7 @@ import {
     ITrickle1012,
     VTrickleFast1012,
 } from './npm1012/charger/types';
+import { LdoOnOffControl1012 } from './npm1012/ldo/types';
 import { ITermNpm1300, VTrickleFast1300 } from './npm1300/charger/types';
 import type {
     GPIODrive1300,
@@ -93,10 +94,17 @@ export type RebootMode = 'cold' | 'warm';
 export const LdoModeValues = ['Load_switch', 'LDO'] as const;
 export type LdoMode = (typeof LdoModeValues)[number];
 export type SoftStart = SoftStart1300 | nPM2100SoftStart;
+export type LdoGPIOControlPinSelect = nPM2100GPIOControlPinSelect;
+export type LdoGPIOControlMode = nPM2100GPIOControlMode;
 export type LdoSoftStart = nPM2100LDOSoftStart;
+export type LdoModeControl = nPM2100LdoModeControl;
 export type LdoOnOffControl =
     | (typeof LdoOnOffControlValues)[number]
-    | GPIONames;
+    | GPIONames
+    | LdoOnOffControl1012;
+
+export const LdoVOutSelValues = ['Software', 'Vset'] as const;
+export type LdoVOutSel = (typeof LdoVOutSelValues)[number];
 
 export const BoostVOutSelValues = ['Vset', 'Software'] as const;
 export type BoostVOutSel = (typeof BoostVOutSelValues)[number];
@@ -271,18 +279,24 @@ export type Ldo = {
     voltage: number;
     enabled: boolean;
     mode: LdoMode;
-    modeControl?: nPM2100LdoModeControl;
-    pinSel?: nPM2100GPIOControlPinSelect;
-    pinMode?: nPM2100GPIOControlMode;
+    modeControl?: LdoModeControl;
+    pinSel?: LdoGPIOControlPinSelect;
+    pinMode?: LdoGPIOControlMode;
     ocpEnabled?: boolean;
     rampEnabled?: boolean;
     haltEnabled?: boolean;
-    softStartEnabled: boolean;
-    softStart: SoftStart;
     ldoSoftStart?: LdoSoftStart;
     activeDischarge: boolean;
     onOffControl: LdoOnOffControl;
     onOffSoftwareControlEnabled: boolean;
+    cardLabel: string;
+
+    softStart?: SoftStart;
+    softStartCurrentLimit?: number;
+    softStartEnabled?: boolean;
+    softStartTime?: number;
+    vOutSel?: LdoVOutSel;
+    weakPullDown?: boolean;
 };
 
 export type GPIOState = GPIOState2100;
@@ -856,8 +870,6 @@ export interface LdoModule {
         voltage: () => void;
         enabled: () => void;
         mode: () => void;
-        softStartEnabled?: () => void;
-        softStart: () => void;
         activeDischarge?: () => void;
         onOffControl?: () => void;
         modeCtrl?: () => void;
@@ -867,31 +879,49 @@ export interface LdoModule {
         ocp?: () => void;
         ramp?: () => void;
         halt?: () => void;
+        vOutSel?: () => void;
+
+        softStart?: () => void;
+        softStartCurrentLimit?: () => void;
+        softStartEnabled?: () => void;
+        softStartTime?: () => void;
+        weakPullDown?: () => void;
     };
     set: {
         all: (config: LdoExport) => Promise<void>;
         voltage: (value: number) => Promise<void>;
         enabled: (enabled: boolean) => Promise<void>;
         mode: (mode: LdoMode) => Promise<void>;
-        softStartEnabled?: (enabled: boolean) => Promise<void>;
-        softStart: (softStart: SoftStart) => Promise<void>;
         activeDischarge?: (activeDischarge: boolean) => Promise<void>;
         onOffControl?: (onOffControl: LdoOnOffControl) => Promise<void>;
-        modeControl?: (modeCtrl: nPM2100LdoModeControl) => Promise<void>;
-        pinSel?: (pinSel: nPM2100GPIOControlPinSelect) => Promise<void>;
+        modeControl?: (modeCtrl: LdoModeControl) => Promise<void>;
+        pinSel?: (pinSel: LdoGPIOControlPinSelect) => Promise<void>;
         ldoSoftstart?: (softStartLdo: LdoSoftStart) => Promise<void>;
-        pinMode?: (pinMode: nPM2100GPIOControlMode) => Promise<void>;
+        pinMode?: (pinMode: LdoGPIOControlMode) => Promise<void>;
         ocpEnabled?: (ocp: boolean) => Promise<void>;
         rampEnabled?: (ramp: boolean) => Promise<void>;
         haltEnabled?: (halt: boolean) => Promise<void>;
+        vOutSel?: (mode: LdoVOutSel) => Promise<void>;
+
+        softStart?: (softStart: SoftStart) => Promise<void>;
+        softStartCurrentLimit?: (value: number) => Promise<void>;
+        softStartEnabled?: (enabled: boolean) => Promise<void>;
+        softStartTime?: (value: number) => Promise<void>;
+        weakPullDown?: (enable: boolean) => Promise<void>;
     };
     callbacks: (() => void)[];
     ranges: {
         voltage: RangeType;
     };
     values: {
-        softstart: { label: string; value: SoftStart }[];
         ldoSoftstart?: { label: string; value: LdoSoftStart }[];
+        modeControl?: { label: string; value: LdoModeControl }[];
+        onOffControl?: { label: string; value: LdoOnOffControl }[];
+        pinMode?: { label: string; value: LdoGPIOControlMode }[];
+        pinSel?: { label: string; value: LdoGPIOControlPinSelect }[];
+        softstart?: { label: string; value: SoftStart }[];
+        softStartCurrentLimit?: { label: string; value: number }[];
+        softStartTime?: { label: string; value: number }[];
     };
     defaults: Ldo;
 }
@@ -1101,7 +1131,7 @@ export type FuelGaugeExport = Omit<
     'notChargingSamplingRate' | 'reportingRate' | 'activeBatterModel'
 >;
 export type BoostExport = Omit<Boost, 'pinModeEnabled' | 'vOutVSet'>;
-export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
+export type LdoExport = Omit<Ldo, 'cardLabel' | 'onOffSoftwareControlEnabled'>;
 export type BuckExport = Omit<
     Buck,
     'onOffSoftwareControlEnabled' | 'cardLabel' | 'vSetLabel'
