@@ -52,7 +52,7 @@ This side panel area contains the following buttons:
 | **Reset Device**         | Reset the PMIC device and the nPM Controller. The PMIC default device configuration is restored.  |
 | **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory.<br/>You can share these files with Nordic Semiconductor if you encounter issues.<br/><br/>Recording events is automatically started when you [profile a battery](profiling_battery.md). |
 
-### Fuel Gauge
+### nPM1300 and nPM1304: Fuel Gauge
 
 !!! note "Note"
      The **Profile Battery** option is only available for the nPM1300 EK and the nPM1304 EK.
