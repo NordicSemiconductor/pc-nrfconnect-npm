@@ -95,6 +95,11 @@ export default class Module implements BuckModule {
             retVOut: buckRetVOutRange(),
         };
     }
+
+    get values() {
+        return {};
+    }
+
     get defaults(): Buck {
         return buckDefaults();
     }

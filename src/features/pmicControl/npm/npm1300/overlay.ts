@@ -92,7 +92,7 @@ ${deviceType}_ek_buck${buckModule.index + 1}: BUCK${buckModule.index + 1} {
             ? `regulator-init-microvolt =  <${toMicro(buck.vOutNormal)}>;`
             : ''
     }
-    retention-microvolt = <${toMicro(buck.vOutRetention)}>;
+    ${buck.vOutRetention !== undefined ? `retention-microvolt = <${toMicro(buck.vOutRetention)}>;` : ''}
     ${
         buck.onOffControl !== 'Off'
             ? `enable-gpios = <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
