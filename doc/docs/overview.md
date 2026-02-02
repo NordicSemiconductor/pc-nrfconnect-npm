@@ -129,7 +129,7 @@ Some devices also allow you to configure **Power Failure** and **Vbus input curr
      - This feature is available for the nPM1300 EK and the nPM1304 EK.
      - You cannot use profiles for the nPM1300 EK with the nPM1304 EK and vice-versa.
 
-The **Profiles** tab provides an overview of all battery profiles that you can select using the [Fuel Gauge drop-down menus](#fuel-gauge).
+The **Profiles** tab provides an overview of all battery profiles that you can select using the [Fuel Gauge drop-down menus](#npm1300-and-npm1304-fuel-gauge).
 
 ![Profiles tab](./screenshots/npm_profiles_tab.png "Profiles tab")
 
@@ -140,7 +140,7 @@ Here you can make changes to the generated battery model settings, make edits to
 
 ### Custom profiles
 
-Here you can find all the custom profiles you have added with the [**Profile Battery** option](#fuel-gauge).
+Here you can find all the custom profiles you have added with the [**Profile Battery** option](#npm1300-and-npm1304-fuel-gauge).
 
 ![Custom profiles in the Profiles tab](./screenshots/npm_profiles_tab_custom.png "Custom profiles in the Profiles tab")
 
@@ -150,7 +150,7 @@ The following options are available for the custom profiles:
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Reload Projects**      | Refresh the list of projects and profiles.                                                                                             |
 | **Add Existing Project** | Add a new project to the list from a JSON file.                                                                                        |
-| **Create New Project**   | Create a new custom project template. This option includes some of the fields present when using the [**Profile Battery** option](#fuel-gauge), but without collecting data. |
+| **Create New Project**   | Create a new custom project template. This option includes some of the fields present when using the [**Profile Battery** option](#npm1300-and-npm1304-fuel-gauge), but without collecting data. |
 
 #### Project section
 
@@ -163,7 +163,7 @@ The following drop-down menu options are available for the project section:
 | **Process Included Data**| If your project includes multiple temperature profiles, you can include a selection of them with the **Include** toggle. Using this option processes only the included temperature profiles. |
 | **Save Battery Model**   | Save the battery model for the entire project to a JSON or an INC file. This only saves the temperature profiles you have selected with the **Include** toggle. |
 | **Write Battery Model**  | Write the battery model for the entire project to the nPM Controller on the EK. This only writes the temperature profiles you have selected with the **Include** toggle. |
-| **Add Profile**          | Add a new battery profile with a specific temperature and a CSV data file. Data files are generated when you use the [**Profile Battery** option](#fuel-gauge). |
+| **Add Profile**          | Add a new battery profile with a specific temperature and a CSV data file. Data files are generated when you use the [**Profile Battery** option](#npm1300-and-npm1304-fuel-gauge). |
 | **Open Folder**          | Open the project directory in the **File Explorer**. |
 | **Edit Project**         | Edit the project settings.  |
 | **Remove Project**       | Remove the current project, including all battery profiles. |
@@ -190,7 +190,7 @@ Here you can write and save battery models from selected vendors that have been 
 ![Bundled profiles in the Profiles tab](./screenshots/npm_profiles_tab_bundled.png "Bundled profiles in the Profiles tab")
 
 When you **Write Model**, you are going to write new battery model on the nPM Controller to one of its available battery model slots.
-This can overwrite the [**Active Battery Model**](#fuel-gauge).
+This can overwrite the [**Active Battery Model**](#npm1300-and-npm1304-fuel-gauge).
 
 When you **Save Model**, the battery model is saved in the selected directory either to a JSON file that can be downloaded to the nPM Controller or to an INC file. The INC file format is meant for integrating the battery model into your final application with a Nordic System on Chip (SoC).
 

@@ -25,7 +25,7 @@ Depending on the EK you are using:
 
 Complete the following steps to profile a battery and use the generated battery model to initialize and run the fuel gauge in the nPM PowerUP app:
 
-1. Click the [**Profile Battery**](overview.md#fuel-gauge) button in the side panel.
+1. Click the [**Profile Battery**](overview.md#npm1300-and-npm1304-fuel-gauge) button in the side panel.
 1. Enter the battery data and one or more temperatures for the profiling test. Provide the generic information about the selected battery. Refer to the battery datasheet for information. For further information on profiling, see [Guidelines for battery profiling](profiling_guidelines.md).
 
     ![Profile Battery test configuration](./screenshots/battery_profiling.PNG "Profile Battery test configuration")
