@@ -29,7 +29,8 @@ export class BuckGet {
         this.quickVOutDischarge();
         this.shortCircuitProtection();
         this.softStartPeakCurrentLimit();
-        // this.vOutComparatorBiasCurrent(mode); TODO: buckMode needed as parameter
+        this.vOutComparatorBiasCurrent('LP');
+        this.vOutComparatorBiasCurrent('ULP');
         this.vOutRippleControl();
     }
 
@@ -38,7 +39,7 @@ export class BuckGet {
     }
 
     mode() {
-        this.sendCommand(`npm1012 buck enable get`);
+        this.sendCommand(`npm1012 buck voutselctrl get`);
     }
 
     modeControl() {
@@ -46,7 +47,7 @@ export class BuckGet {
     }
 
     onOffControl() {
-        this.sendCommand(`npm1012 buck enable get`);
+        this.sendCommand(`npm1012 buck enablectrl get`);
     }
 
     enabled() {
@@ -62,7 +63,7 @@ export class BuckGet {
     }
 
     alternateVOutControl() {
-        this.sendCommand(`npm1012 buck voutsel get`);
+        this.sendCommand(`npm1012 buck voutselctrl get`);
     }
 
     automaticPassthrough() {
@@ -86,15 +87,6 @@ export class BuckGet {
     }
 
     vOutComparatorBiasCurrent(mode: BuckModeControl) {
-        switch (mode) {
-            case 'LP':
-                break;
-            case 'ULP':
-                break;
-            default:
-                return;
-        }
-
         this.sendCommand(`npm1012 buck bias ${mode.toLowerCase()} get`);
     }
 
