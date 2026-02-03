@@ -15,12 +15,6 @@ import {
     BuckVOutRippleControl,
 } from '../../types';
 import { BuckGet } from './getters';
-import {
-    BuckModeControl1012,
-    BuckModeControlValues1012,
-    BuckOnOffControl1012,
-    BuckOnOffControlValues1012,
-} from './types';
 
 export class BuckSet {
     private get: BuckGet;
@@ -84,11 +78,19 @@ export class BuckSet {
                 ),
             );
         }
-        if (config.vOutComparatorBiasCurrent !== undefined) {
+        if (config.vOutComparatorBiasCurrentLPMode !== undefined) {
             promises.push(
                 this.vOutComparatorBiasCurrent(
-                    config.modeControl,
-                    config.vOutComparatorBiasCurrent,
+                    'LP',
+                    config.vOutComparatorBiasCurrentLPMode,
+                ),
+            );
+        }
+        if (config.vOutComparatorBiasCurrentULPMode !== undefined) {
+            promises.push(
+                this.vOutComparatorBiasCurrent(
+                    'ULP',
+                    config.vOutComparatorBiasCurrentULPMode,
                 ),
             );
         }
@@ -110,27 +112,11 @@ export class BuckSet {
                     this.index,
                 );
 
-                this.eventEmitter.emitPartialEvent<Buck>(
-                    'onBuckUpdate',
-                    {
-                        mode: 'software',
-                    },
-                    this.index,
-                );
-
                 resolve();
             } else {
                 this.sendCommand(
                     `npm1012 buck vout software set 0 ${value}V`,
-                    () =>
-                        this.sendCommand(
-                            `npm1012 buck voutsel set VOUT1`,
-                            () => resolve(),
-                            () => {
-                                this.get.mode();
-                                reject();
-                            },
-                        ),
+                    () => resolve(),
                     () => {
                         this.get.vOutNormal();
                         reject();
@@ -152,13 +138,9 @@ export class BuckSet {
                 );
                 resolve();
             } else {
-                const value = mode === 'software' ? 'ON' : 'VSET';
                 this.sendCommand(
-                    `npm1012 buck enable set ${value}`,
-                    () => {
-                        this.get.vOutNormal();
-                        resolve();
-                    },
+                    `npm1012 buck voutselctrl set ${mode.toUpperCase()}`,
+                    () => resolve(),
                     () => {
                         this.get.mode();
                         reject();
@@ -170,15 +152,6 @@ export class BuckSet {
 
     modeControl(modeControl: BuckModeControl) {
         return new Promise<void>((resolve, reject) => {
-            if (
-                !BuckModeControlValues1012.includes(
-                    modeControl as BuckModeControl1012,
-                )
-            ) {
-                reject();
-                return;
-            }
-
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
@@ -204,15 +177,6 @@ export class BuckSet {
 
     onOffControl(onOffControl: BuckOnOffControl) {
         return new Promise<void>((resolve, reject) => {
-            if (
-                !BuckOnOffControlValues1012.includes(
-                    onOffControl as BuckOnOffControl1012,
-                )
-            ) {
-                reject();
-                return;
-            }
-
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
@@ -224,9 +188,8 @@ export class BuckSet {
 
                 resolve();
             } else {
-                const value = onOffControl === 'Software' ? 'ON' : onOffControl;
                 this.sendCommand(
-                    `npm1012 buck enable set ${value}`,
+                    `npm1012 buck enablectrl set ${onOffControl.toUpperCase()}`,
                     () => resolve(),
                     () => {
                         this.get.onOffControl();
@@ -292,7 +255,6 @@ export class BuckSet {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
                     {
-                        mode: 'software',
                         alternateVOut: value,
                     },
                     this.index,
@@ -328,21 +290,21 @@ export class BuckSet {
                 let cmd = '';
                 switch (modeControl) {
                     case 'GPIO': {
-                        cmd = 'GPIO';
+                        cmd = 'voutselctrl set GPIO';
                         break;
                     }
                     case 'Off': {
-                        cmd = 'VSET';
+                        cmd = 'voutsel set VOUT1';
                         break;
                     }
                     case 'Software': {
-                        cmd = 'VOUT2';
+                        cmd = 'voutsel set VOUT2';
                         break;
                     }
                 }
 
                 this.sendCommand(
-                    `npm1012 buck voutsel set ${cmd}`,
+                    `npm1012 buck ${cmd}`,
                     () => resolve(),
                     () => {
                         this.get.alternateVOutControl();
@@ -480,10 +442,17 @@ export class BuckSet {
 
     vOutComparatorBiasCurrent(mode: BuckModeControl, value: number) {
         return new Promise<void>((resolve, reject) => {
+            let unitPrefix = '';
+            let update: Partial<Buck> = {};
+
             switch (mode) {
                 case 'LP':
+                    unitPrefix = 'u';
+                    update = { vOutComparatorBiasCurrentLPMode: value };
                     break;
                 case 'ULP':
+                    unitPrefix = 'n';
+                    update = { vOutComparatorBiasCurrentULPMode: value };
                     break;
                 default:
                     reject();
@@ -493,15 +462,12 @@ export class BuckSet {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Buck>(
                     'onBuckUpdate',
-                    {
-                        vOutComparatorBiasCurrent: value,
-                    },
+                    update,
                     this.index,
                 );
 
                 resolve();
             } else {
-                const unitPrefix = mode === 'LP' ? 'u' : 'n';
                 this.sendCommand(
                     `npm1012 buck bias ${mode.toLowerCase()} set ${value}${unitPrefix}A`,
                     () => resolve(),

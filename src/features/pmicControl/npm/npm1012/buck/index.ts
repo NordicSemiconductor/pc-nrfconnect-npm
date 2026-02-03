@@ -36,6 +36,8 @@ const buckDefaults = (): Buck => ({
     onOffSoftwareControlEnabled: true,
     retentionControl: 'Off',
     activeDischarge: false,
+    cardLabel: 'BUCK',
+    vSetLabel: 'Vset',
 
     activeDischargeResistance: 0,
     alternateVOut: buckVoltageRange().min,
@@ -45,7 +47,8 @@ const buckDefaults = (): Buck => ({
     quickVOutDischarge: false,
     shortCircuitProtection: false,
     softStartPeakCurrentLimit: softStartPeakCurrentLimitValues[0],
-    vOutComparatorBiasCurrent: vOutComparatorBiasCurrentLPModeValues[0],
+    vOutComparatorBiasCurrentLPMode: vOutComparatorBiasCurrentLPModeValues[0],
+    vOutComparatorBiasCurrentULPMode: vOutComparatorBiasCurrentULPModeValues[0],
     vOutRippleControl: 'Nominal',
 });
 
@@ -66,7 +69,8 @@ export const toBuckExport = (buck: Buck): BuckExport => ({
     quickVOutDischarge: buck.quickVOutDischarge,
     shortCircuitProtection: buck.shortCircuitProtection,
     softStartPeakCurrentLimit: buck.softStartPeakCurrentLimit,
-    vOutComparatorBiasCurrent: buck.vOutComparatorBiasCurrent,
+    vOutComparatorBiasCurrentLPMode: buck.vOutComparatorBiasCurrentLPMode,
+    vOutComparatorBiasCurrentULPMode: buck.vOutComparatorBiasCurrentULPMode,
     vOutRippleControl: buck.vOutRippleControl,
 });
 
@@ -180,7 +184,7 @@ export default class Module implements BuckModule {
                     return ulpModeValues;
                 }
                 default: {
-                    return lpModeValues;
+                    return [{ label: 'N/A', value: 0 }];
                 }
             }
         };
