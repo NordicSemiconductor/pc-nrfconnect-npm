@@ -45,7 +45,7 @@ describe('PMIC 1012 - Request update commands', () => {
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
-            `npm1012 buck enable get`,
+            `npm1012 buck voutselctrl get`,
             expect.anything(),
             undefined,
             true,
@@ -74,7 +74,7 @@ describe('PMIC 1012 - Request update commands', () => {
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npm1012 buck enable get`,
+                `npm1012 buck enablectrl get`,
                 expect.anything(),
                 undefined,
                 true,

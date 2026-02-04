@@ -17,13 +17,9 @@ describe('PMIC 1012 - Setters Offline tests', () => {
     test.each(PMIC_1012_BUCKS)('Set setBuckVOut index: %p', async index => {
         await pmic.buckModule[index].set.vOutNormal(1.2);
 
-        expect(mockOnBuckUpdate).toBeCalledTimes(2);
-        expect(mockOnBuckUpdate).nthCalledWith(1, {
+        expect(mockOnBuckUpdate).toBeCalledTimes(1);
+        expect(mockOnBuckUpdate).toBeCalledWith({
             data: { vOutNormal: 1.2 },
-            index,
-        });
-        expect(mockOnBuckUpdate).nthCalledWith(2, {
-            data: { mode: 'software' },
             index,
         });
     });
@@ -33,7 +29,7 @@ describe('PMIC 1012 - Setters Offline tests', () => {
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).nthCalledWith(1, {
-            data: { alternateVOut: 1.2, mode: 'software' },
+            data: { alternateVOut: 1.2 },
             index,
         });
     });
