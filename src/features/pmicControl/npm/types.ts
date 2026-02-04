@@ -82,6 +82,8 @@ export const BoostPinSelectionValues = [
     'GPIO1HI',
 ] as const;
 
+export const VSETValues = ['VSET1', 'VSET2'] as const;
+
 export const BuckModeControlValues = ['Auto', 'PWM', 'PFM'] as const;
 export const BuckOnOffControlValues = ['Off'] as const;
 export const BuckRetentionControlValues = ['Off'] as const;
@@ -110,6 +112,7 @@ export type BuckModeControl =
 export type BuckOnOffControl =
     | (typeof BuckOnOffControlValues)[number]
     | GPIONames
+    | (typeof VSETValues)[number]
     | BuckOnOffControl1012;
 export type BuckRetentionControl =
     | (typeof BuckRetentionControlValues)[number]
@@ -245,6 +248,8 @@ export type Buck = {
     onOffControl: BuckOnOffControl;
     onOffSoftwareControlEnabled: boolean;
     enabled: boolean;
+    cardLabel: string;
+    vSetLabel: string;
 
     activeDischarge?: boolean;
     activeDischargeResistance?: number;
@@ -256,7 +261,8 @@ export type Buck = {
     retentionControl?: BuckRetentionControl;
     shortCircuitProtection?: boolean;
     softStartPeakCurrentLimit?: number;
-    vOutComparatorBiasCurrent?: number;
+    vOutComparatorBiasCurrentLPMode?: number;
+    vOutComparatorBiasCurrentULPMode?: number;
     vOutRetention?: number;
     vOutRippleControl?: BuckVOutRippleControl;
 };
@@ -828,11 +834,12 @@ export interface BuckModule {
             label: string;
             value: BuckAlternateVOutControl;
         }[];
-        modeControl?: { label: string; value: BuckModeControl }[];
-        onOffControl?: (
+        modeControl: { label: string; value: BuckModeControl }[];
+        onOffControl: (
             mode: BuckMode,
         ) => { label: string; value: BuckOnOffControl }[];
         peakCurrentLimit?: { label: string; value: number }[];
+        retentionControl?: { label: string; value: BuckRetentionControl }[];
         softStartPeakCurrentLimit?: { label: string; value: number }[];
         vOutComparatorBiasCurrent?: (
             mode: BuckModeControl,
@@ -1095,7 +1102,10 @@ export type FuelGaugeExport = Omit<
 >;
 export type BoostExport = Omit<Boost, 'pinModeEnabled' | 'vOutVSet'>;
 export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
-export type BuckExport = Omit<Buck, 'onOffSoftwareControlEnabled'>;
+export type BuckExport = Omit<
+    Buck,
+    'onOffSoftwareControlEnabled' | 'cardLabel' | 'vSetLabel'
+>;
 export type GPIOExport = Omit<
     GPIO,
     'pullEnabled' | 'driveEnabled' | 'openDrainEnabled' | 'debounceEnabled'
