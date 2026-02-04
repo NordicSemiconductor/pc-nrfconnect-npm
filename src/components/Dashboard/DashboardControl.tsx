@@ -85,7 +85,6 @@ export default ({ active }: PaneProps) => {
                         key={`Buck${1 + index}`}
                         disabled={disabled}
                         defaultSummary
-                        numberOfGPIOs={npmDevice.gpioModule.length}
                     />
                 ))}
             {npmDevice &&
