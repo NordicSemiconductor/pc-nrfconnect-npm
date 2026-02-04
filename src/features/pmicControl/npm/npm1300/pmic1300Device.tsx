@@ -28,6 +28,7 @@ import BuckModule, { toBuckExport } from './buck';
 import ChargerModule from './charger';
 import FuelGaugeModule from './fuelGauge';
 import GpioModule from './gpio';
+import { numGPIOs } from './gpio/types';
 import LdoModule, { toLdoExport } from './ldo';
 import LowPowerModule from './lowPower';
 import overlay from './overlay';
@@ -68,7 +69,7 @@ export default class Npm1300 extends BaseNpmDevice {
                 },
                 gpios: {
                     Module: GpioModule,
-                    count: 5,
+                    count: numGPIOs,
                 },
                 BatteryProfiler,
                 PofModule,
