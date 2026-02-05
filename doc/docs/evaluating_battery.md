@@ -10,7 +10,7 @@ To start fuel gauge evaluations using a battery model, complete the following st
     * Use the **Active Battery Model** for a preloaded battery model
     * Add a custom battery model by completing the following steps:
 
-        1. Select [**Add New Active Battery Model**](./overview.md#npm1300-and-nPM1304-fuel-gauge) in the side panel.</br>
+        1. Select [**Add New Active Battery Model**](./overview.md#fuel-gauge) in the side panel.</br>
           A drop-down menu appears.
         1. Select **Custom Model** to load the generated JSON battery model file to the host System on Chip (SoC) of the PMIC EK.
 
