@@ -84,7 +84,7 @@ export class TimerConfigSet {
                 this.eventEmitter.emitPartialEvent<TimerConfig>(
                     'onTimerConfigUpdate',
                     {
-                        period: period / 1000,
+                        period,
                     },
                 );
                 resolve();

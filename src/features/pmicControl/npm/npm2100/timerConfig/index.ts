@@ -57,12 +57,10 @@ export default class Module implements TimerConfigModule {
     } {
         return {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            periodRange: prescalerMultiplier => ({
-                min: 0,
-                // max: 16777215 * prescalerMultiplier,
-                max: 262143 * 1000,
+            periodRange: _prescalerMultiplier => ({
+                min: 15, // (1 / 64) * 1000
+                max: 262143985, // (max_reg_value / 64) * 1000
                 decimals: 3,
-                // step: 1 * prescalerMultiplier,
                 step: 1,
             }),
         };
