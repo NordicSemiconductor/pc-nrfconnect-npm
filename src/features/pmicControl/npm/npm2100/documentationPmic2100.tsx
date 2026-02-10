@@ -6,7 +6,7 @@
 
 import React from 'react';
 
-import { Documentation } from '../types';
+import { type Documentation } from '../types';
 
 const boostDoc = () => ({
     Boost: [

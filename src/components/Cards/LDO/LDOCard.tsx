@@ -9,7 +9,7 @@ import {
     Card,
     classNames,
     Dropdown,
-    DropdownItem,
+    type DropdownItem,
     NumberInput,
     StateSelector,
     Toggle,
@@ -17,17 +17,17 @@ import {
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    nPM2100GPIOControlMode,
+    type nPM2100GPIOControlMode,
     nPM2100GPIOControlModeValues,
-    nPM2100GPIOControlPinSelect,
+    type nPM2100GPIOControlPinSelect,
     nPM2100GPIOControlPinSelectValues,
-    nPM2100LdoModeControl,
+    type nPM2100LdoModeControl,
     nPM2100LdoModeControlValues,
 } from '../../../features/pmicControl/npm/npm2100/types';
 import {
-    Ldo,
-    LdoModule,
-    LdoOnOffControl,
+    type Ldo,
+    type LdoModule,
+    type LdoOnOffControl,
     LdoOnOffControlValues,
 } from '../../../features/pmicControl/npm/types';
 

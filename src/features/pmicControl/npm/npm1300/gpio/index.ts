@@ -5,12 +5,12 @@
  */
 
 import {
-    GPIO,
-    GPIODrive,
-    GPIOMode,
-    GpioModule,
-    GPIOPull,
-    ModuleParams,
+    type GPIO,
+    type GPIODrive,
+    type GPIOMode,
+    type GpioModule,
+    type GPIOPull,
+    type ModuleParams,
 } from '../../types';
 import gpioCallbacks from './callbacks';
 import { GpioGet } from './getters';

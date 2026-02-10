@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { FuelGauge, PmicDialog } from '../../types';
+import { type FuelGauge, type PmicDialog } from '../../types';
 import { GPIOMode2100, GPIOPull2100 } from '../gpio/types';
 import { PMIC_2100_GPIOS, PMIC_2100_LDOS, setupMocksBase } from './helpers';
 

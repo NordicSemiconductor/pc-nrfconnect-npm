@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { npm2100TimerConfig, TimerConfig } from '../../types';
-import { npm2100TimerMode } from '../types';
+import { type NpmEventEmitter } from '../../pmicHelpers';
+import { type npm2100TimerConfig, type TimerConfig } from '../../types';
+import { type npm2100TimerMode } from '../types';
 import { TimerConfigGet } from './timerConfigGetter';
 
 export class TimerConfigSet {

@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import {
     apps,
     Button,
-    Device,
+    type Device,
     openWindow,
     selectedDevice,
     telemetry,
@@ -57,7 +57,7 @@ export default () => {
     );
 };
 
-const openSerialTerminal = (device: Device, serialPortPath: string) => {
+const openSerialTerminal = (_device: Device, serialPortPath: string) => {
     telemetry.sendEvent(EventAction.OPEN_SERIAL_TERMINAL);
     openWindow.openApp(
         { name: 'pc-nrfconnect-serial-terminal', source: 'official' },

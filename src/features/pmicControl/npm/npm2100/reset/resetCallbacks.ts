@@ -4,20 +4,20 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     noop,
-    NpmEventEmitter,
+    type NpmEventEmitter,
     parseColonBasedAnswer,
     parseEnabled,
     selectFromTypeValues,
     toRegex,
     toValueRegexString,
 } from '../../pmicHelpers';
-import { npm2100ResetReason, ResetConfig } from '../../types';
+import { type npm2100ResetReason, type ResetConfig } from '../../types';
 import {
-    npm2100LongPressResetDebounce,
+    type npm2100LongPressResetDebounce,
     npm2100LongPressResetDebounceValues,
     npm2100ResetPinSelection,
 } from '../types';

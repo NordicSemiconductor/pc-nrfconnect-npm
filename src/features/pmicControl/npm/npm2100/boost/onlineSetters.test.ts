@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParserCallbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParserCallbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { helpers } from '../../tests/helpers';
 import {

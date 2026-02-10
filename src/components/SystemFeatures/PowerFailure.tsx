@@ -14,9 +14,9 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    POF,
-    PofModule,
-    POFPolarity,
+    type POF,
+    type PofModule,
+    type POFPolarity,
     POFPolarityValues,
 } from '../../features/pmicControl/npm/types';
 

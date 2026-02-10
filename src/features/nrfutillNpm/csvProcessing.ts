@@ -4,26 +4,29 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { AppThunk, logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    type AppThunk,
+    logger,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { getModule } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 import fs from 'fs';
 import path from 'path';
 
-import { RootState } from '../../appReducer';
+import { type RootState } from '../../appReducer';
 import {
     generateDefaultProjectPath,
     readAndUpdateProjectSettings,
     readProjectSettingsFromFile,
 } from '../../components/Profiling/helpers';
 import {
-    ProfilingProject,
-    ProfilingProjectProfile,
+    type ProfilingProject,
+    type ProfilingProjectProfile,
 } from '../../components/Profiling/types';
 import { generateTempFolder, stringToFile } from '../helpers';
 import generate from '../nrfutil/npm/generate';
 import merge from '../nrfutil/npm/merge';
-import { Profile } from '../pmicControl/npm/types';
+import { type Profile } from '../pmicControl/npm/types';
 import {
     addProjectProfileProgress,
     removeProjectProfileProgress,

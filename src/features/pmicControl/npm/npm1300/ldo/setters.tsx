@@ -6,16 +6,16 @@
 
 import React from 'react';
 
-import { NpmEventEmitter } from '../../pmicHelpers';
+import { type NpmEventEmitter } from '../../pmicHelpers';
 import {
     GPIOValues,
-    Ldo,
-    LdoExport,
-    LdoMode,
-    LdoOnOffControl,
+    type Ldo,
+    type LdoExport,
+    type LdoMode,
+    type LdoOnOffControl,
     LdoOnOffControlValues,
-    PmicDialog,
-    SoftStart,
+    type PmicDialog,
+    type SoftStart,
 } from '../../types';
 import { LdoGet } from './getters';
 

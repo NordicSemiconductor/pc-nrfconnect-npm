@@ -14,11 +14,11 @@ import {
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    GPIO,
-    GPIOMode,
-    GpioModule,
-    GPIOPull,
-    GPIOState,
+    type GPIO,
+    type GPIOMode,
+    type GpioModule,
+    type GPIOPull,
+    type GPIOState,
 } from '../../features/pmicControl/npm/types';
 
 interface GPIOProperties {

@@ -7,23 +7,26 @@
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
-    BoostExport,
-    BoostModeControl,
-    BoostModule,
-    BoostPinMode,
-    BoostPinSelection,
-    GPIOExport,
-    GPIOMode,
-    GPIOPull,
-    LdoExport,
-    LdoModule,
-    npm2100LowPowerConfig,
-    npm2100ResetConfig,
-    NpmExportLatest,
+    type BoostExport,
+    type BoostModeControl,
+    type BoostModule,
+    type BoostPinMode,
+    type BoostPinSelection,
+    type GPIOExport,
+    type GPIOMode,
+    type GPIOPull,
+    type LdoExport,
+    type LdoModule,
+    type npm2100LowPowerConfig,
+    type npm2100ResetConfig,
+    type NpmExportLatest,
 } from '../types';
 import { GPIOMode2100 } from './gpio/types';
 import type Npm2100 from './pmic2100Device';
-import { nPM2100GPIOControlMode, nPM2100LdoModeControl } from './types';
+import {
+    type nPM2100GPIOControlMode,
+    type nPM2100LdoModeControl,
+} from './types';
 
 const toMicro = (value: number) => value * 1000000;
 const milliToMicro = (value: number) => value * 1000;

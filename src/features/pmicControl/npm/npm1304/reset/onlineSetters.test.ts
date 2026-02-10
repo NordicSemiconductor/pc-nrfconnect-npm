@@ -5,7 +5,7 @@
  */
 
 import { helpers } from '../../tests/helpers';
-import { PmicDialog } from '../../types';
+import { type PmicDialog } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1300 - Setters Online tests', () => {

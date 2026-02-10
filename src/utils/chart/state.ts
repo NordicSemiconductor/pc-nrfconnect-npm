@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { Chart, ScatterDataPoint } from 'chart.js';
+import { type Chart, type ScatterDataPoint } from 'chart.js';
 
 export interface XAxisRange {
     xMin: number;

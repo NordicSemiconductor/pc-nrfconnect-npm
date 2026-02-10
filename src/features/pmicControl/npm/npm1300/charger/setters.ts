@@ -5,11 +5,11 @@
  */
 
 import {
-    Charger,
+    type Charger,
     ChargerModuleSetBase,
-    ITerm,
-    NTCThermistor,
-    VTrickleFast,
+    type ITerm,
+    type NTCThermistor,
+    type VTrickleFast,
 } from '../../types';
 
 export class ChargerSet extends ChargerModuleSetBase {

@@ -15,16 +15,16 @@ import {
     Slider,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
-    Charger,
-    ChargerModule,
-    NTCThermistor,
+    type Charger,
+    type ChargerModule,
+    type NTCThermistor,
     NTCValues,
 } from '../../features/pmicControl/npm/types';
 import { getLatestAdcSample } from '../../features/pmicControl/pmicControlSlice';
-import { RangeType } from '../../utils/helpers';
 
 const ntcThermistorItems = [...NTCValues].map(item => ({
     label: `${item}`,
@@ -372,7 +372,7 @@ const Arrow = ({
 }: {
     type: 'COLD' | 'COOL' | 'WARM' | 'HOT';
     temperature: number;
-    range: RangeType;
+    range: Range;
     onChange: (value: number) => void;
     onChangeComplete: () => void;
 }) => (
@@ -380,10 +380,7 @@ const Arrow = ({
         <span className="tw-absolute tw--top-5 tw--translate-x-1/2">
             T<span className="subscript">{type}</span>
         </span>
-        <Line
-            className="before:tw-absolute before:tw-bottom-0 before:tw-right-[2px] before:tw-h-3 before:tw--translate-x-1/2 before:tw--rotate-[30deg] before:tw-border-l before:tw-border-l-gray-300
-        after:tw-absolute after:tw-bottom-0 after:tw-left-[3px] after:tw-h-3 after:tw-translate-x-1/2 after:tw-rotate-[30deg] after:tw-border-r after:tw-border-r-gray-300"
-        />
+        <Line className="before:tw-absolute before:tw-bottom-0 before:tw-right-[2px] before:tw-h-3 before:tw--translate-x-1/2 before:tw--rotate-[30deg] before:tw-border-l before:tw-border-l-gray-300 after:tw-absolute after:tw-bottom-0 after:tw-left-[3px] after:tw-h-3 after:tw-translate-x-1/2 after:tw-rotate-[30deg] after:tw-border-r after:tw-border-r-gray-300" />
         <div className="tw-absolute tw--bottom-5 tw--translate-x-1/2">
             <div className="tw-flex tw-flex-row">
                 <NumberInlineInput

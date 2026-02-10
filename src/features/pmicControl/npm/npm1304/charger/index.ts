@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getRange } from '../../../../../utils/helpers';
 import nPM1300Charger from '../../npm1300/charger';
@@ -13,16 +13,16 @@ import {
     VTrickleFastKeys,
     VTrickleFastValues,
 } from '../../npm1300/charger/types';
-import { NpmEventEmitter } from '../../pmicHelpers';
+import { type NpmEventEmitter } from '../../pmicHelpers';
 import {
-    Charger,
-    ChargerModuleRanges,
-    ModuleParams,
-    VTrickleFast,
+    type Charger,
+    type ChargerModuleRanges,
+    type ModuleParams,
+    type VTrickleFast,
 } from '../../types';
 import { ChargerGet } from './getters';
 import { ChargerSet } from './setters';
-import { ITermKeys, ITermNpm1304, ITermValues } from './types';
+import { ITermKeys, type ITermNpm1304, ITermValues } from './types';
 
 export default class Module extends nPM1300Charger {
     constructor(parms: ModuleParams) {

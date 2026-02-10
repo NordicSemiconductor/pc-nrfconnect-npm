@@ -6,10 +6,10 @@
 
 import React from 'react';
 import {
-    AppThunk,
+    type AppThunk,
     createSerialPort,
-    Device,
-    DeviceSetup,
+    type Device,
+    type DeviceSetup,
     getAppDir,
     logger,
     setWaitForDevice,
@@ -20,7 +20,7 @@ import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfu
 import { Terminal } from '@xterm/headless';
 import semver from 'semver';
 
-import { RootState } from '../../../appReducer';
+import { type RootState } from '../../../appReducer';
 import { minimumHWVersion as minimumHWVersionNpm2100 } from './npm2100/pmic2100Device';
 import { getNpmDevice } from './npmFactory';
 import {
@@ -32,7 +32,7 @@ import {
     isNpm2100SerialApplicationMode,
     isNpm2100SerialRecoverMode,
 } from './pmicHelpers';
-import { PmicDialog } from './types';
+import { type PmicDialog } from './types';
 
 type NpmFirmware = {
     key: string;

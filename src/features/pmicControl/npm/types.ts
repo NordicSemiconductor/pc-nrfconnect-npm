@@ -7,22 +7,25 @@
 /* eslint-disable max-classes-per-file */
 
 import {
-    DropdownItem,
-    ShellParser,
+    type DropdownItem,
+    type Range,
+    type ShellParser,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { z } from 'zod';
 
-import { RangeType } from '../../../utils/helpers';
 import type BaseNpmDevice from './basePmicDevice';
-import { ITermNpm1300, VTrickleFast1300 } from './npm1300/charger/types';
+import {
+    type ITermNpm1300,
+    type VTrickleFast1300,
+} from './npm1300/charger/types';
 import type {
     GPIODrive1300,
     GPIOMode1300,
     GPIOPull1300,
 } from './npm1300/gpio/types';
 import type { SoftStart as SoftStart1300 } from './npm1300/ldo/types';
-import { npm1300TimerMode } from './npm1300/timerConfig/types';
-import { ITermNpm1304 } from './npm1304/charger/types';
+import { type npm1300TimerMode } from './npm1300/timerConfig/types';
+import { type ITermNpm1304 } from './npm1304/charger/types';
 import type { PowerID2100 } from './npm2100/battery';
 import type {
     GPIODrive2100,
@@ -31,16 +34,16 @@ import type {
     GPIOState2100,
 } from './npm2100/gpio/types';
 import {
-    nPM2100GPIOControlMode,
-    nPM2100GPIOControlPinSelect,
-    nPM2100LdoModeControl,
-    nPM2100LDOSoftStart,
-    npm2100LongPressResetDebounce,
-    npm2100ResetPinSelection,
-    nPM2100SoftStart,
-    npm2100TimerMode,
+    type nPM2100GPIOControlMode,
+    type nPM2100GPIOControlPinSelect,
+    type nPM2100LdoModeControl,
+    type nPM2100LDOSoftStart,
+    type npm2100LongPressResetDebounce,
+    type npm2100ResetPinSelection,
+    type nPM2100SoftStart,
+    type npm2100TimerMode,
 } from './npm2100/types';
-import { NpmEventEmitter } from './pmicHelpers';
+import { type NpmEventEmitter } from './pmicHelpers';
 
 export type PartialUpdate<T> = { index: number; data: Partial<T> };
 
@@ -433,7 +436,7 @@ export type FixedListRangeWithLabel = number[] & {
     toLabel: (value: number) => string;
 };
 
-export type RangeOrFixedListRange = RangeType | FixedListRange;
+export type RangeOrFixedListRange = Range | FixedListRange;
 
 export const isFixedListRange = (
     range: RangeOrFixedListRange,
@@ -445,7 +448,7 @@ export const isFixedListRangeWithLabel = (
     Array.isArray(range) &&
     (range as FixedListRangeWithLabel).toLabel !== undefined;
 
-export const isRangeType = (range: RangeOrFixedListRange): range is RangeType =>
+export const isRangeType = (range: RangeOrFixedListRange): range is Range =>
     !Array.isArray(range);
 
 export interface FuelGaugeModule {
@@ -581,13 +584,13 @@ export abstract class ChargerModuleGetBase {
 export type ChargerModuleRanges = {
     voltage: number[];
     vTermR: number[];
-    jeita: RangeType;
-    chipThermal: RangeType;
-    current: RangeType;
-    nTCBeta: RangeType;
+    jeita: Range;
+    chipThermal: Range;
+    current: Range;
+    nTCBeta: Range;
     iBatLim?: FixedListRange;
-    vLowerCutOff: RangeType;
-    batterySize: RangeType;
+    vLowerCutOff: Range;
+    batterySize: Range;
 };
 
 export interface ChargerModule {
@@ -625,7 +628,7 @@ export interface BoostModule {
     };
     callbacks: (() => void)[];
     ranges: {
-        voltage: RangeType;
+        voltage: Range;
     };
     defaults: Boost;
 }
@@ -658,8 +661,8 @@ export interface BuckModule {
     };
     callbacks: (() => void)[];
     ranges: {
-        voltage: RangeType;
-        retVOut: RangeType;
+        voltage: Range;
+        retVOut: Range;
     };
     defaults: Buck;
 }
@@ -702,7 +705,7 @@ export interface LdoModule {
     };
     callbacks: (() => void)[];
     ranges: {
-        voltage: RangeType;
+        voltage: Range;
     };
     values: {
         softstart: { label: string; value: SoftStart }[];
@@ -722,7 +725,7 @@ export interface OnBoardLoadModule {
     };
     callbacks: (() => void)[];
     ranges: {
-        iLoad: RangeType;
+        iLoad: Range;
     };
     defaults: OnBoardLoad;
 }
@@ -772,7 +775,7 @@ export interface PofModule {
     };
     callbacks: (() => void)[];
     ranges: {
-        threshold: RangeType;
+        threshold: Range;
     };
     defaults: POF;
 }
@@ -797,7 +800,7 @@ export type TimerConfigModule = {
     };
     callbacks: (() => void)[];
     ranges: {
-        periodRange: (prescalerMultiplier: number) => RangeType;
+        periodRange: (prescalerMultiplier: number) => Range;
     };
     defaults: TimerConfig;
     getPrescalerMultiplier?: (timerConfig: TimerConfig) => number;

@@ -5,7 +5,7 @@
  */
 
 import { helpers } from '../../tests/helpers';
-import { npm1300TimeToActive, PmicDialog } from '../../types';
+import { npm1300TimeToActive, type PmicDialog } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1300 - Setters Online tests', () => {

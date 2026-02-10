@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
+import { type NpmEventEmitter } from '../../pmicHelpers';
 import {
-    GPIO,
-    GPIODrive,
-    GPIOExport,
-    GPIOMode as GPIOModeBase,
-    GPIOPull as GPIOPullModeBase,
+    type GPIO,
+    type GPIODrive,
+    type GPIOExport,
+    type GPIOMode as GPIOModeBase,
+    type GPIOPull as GPIOPullModeBase,
 } from '../../types';
 import { GpioGet } from './getters';
-import { GPIOMode1300, GPIOModeKeys, GPIOModeValues } from './types';
+import { type GPIOMode1300, GPIOModeKeys, GPIOModeValues } from './types';
 
 export class GpioSet {
     private get: GpioGet;

@@ -8,7 +8,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import {
     MasonryLayout,
-    PaneProps,
+    type PaneProps,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {

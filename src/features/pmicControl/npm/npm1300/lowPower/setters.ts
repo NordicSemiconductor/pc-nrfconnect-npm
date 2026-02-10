@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { npm1300LowPowerConfig, npm1300TimeToActive } from '../../types';
+import { type NpmEventEmitter } from '../../pmicHelpers';
+import {
+    type npm1300LowPowerConfig,
+    type npm1300TimeToActive,
+} from '../../types';
 import { LowPowerGet } from './getters';
 
 export class LowPowerSet {

@@ -5,22 +5,22 @@
  */
 
 import {
-    Charger,
-    GPIO,
-    GPIOExport,
-    Ldo,
-    LED,
-    LowPowerConfig,
-    npm2100LowPowerConfig,
-    npm2100TimerConfig,
+    type Charger,
+    type GPIO,
+    type GPIOExport,
+    type Ldo,
+    type LED,
+    type LowPowerConfig,
+    type npm2100LowPowerConfig,
+    type npm2100TimerConfig,
     npm2100TimeToActive,
-    NpmExportLatest,
-    PartialUpdate,
-    PmicDialog,
-    POF,
-    ResetConfig,
-    TimerConfig,
-    USBPower,
+    type NpmExportLatest,
+    type PartialUpdate,
+    type PmicDialog,
+    type POF,
+    type ResetConfig,
+    type TimerConfig,
+    type USBPower,
 } from '../../types';
 import { GPIOMode2100, GPIOPull2100, GPIOState2100 } from '../gpio/types';
 import { toLdoExport } from '../ldo';

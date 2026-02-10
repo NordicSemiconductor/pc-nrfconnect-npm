@@ -15,11 +15,11 @@ import {
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    Charger,
-    ChargerModule,
+    type Charger,
+    type ChargerModule,
     isFixedListRangeWithLabel,
-    ITerm,
-    VTrickleFast,
+    type ITerm,
+    type VTrickleFast,
 } from '../../../features/pmicControl/npm/types';
 
 interface PowerCardProperties {

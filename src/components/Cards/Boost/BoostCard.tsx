@@ -16,11 +16,11 @@ import {
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    Boost,
-    BoostModeControl,
-    BoostModule,
-    BoostPinMode,
-    BoostPinSelection,
+    type Boost,
+    type BoostModeControl,
+    type BoostModule,
+    type BoostPinMode,
+    type BoostPinSelection,
 } from '../../../features/pmicControl/npm/types';
 
 export default ({

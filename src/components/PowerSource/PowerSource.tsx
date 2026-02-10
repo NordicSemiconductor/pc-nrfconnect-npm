@@ -8,12 +8,12 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import {
     Dropdown,
-    DropdownItem,
+    type DropdownItem,
     StateSelector,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getBatteryAddonBoard } from '../../features/pmicControl/npm/npm2100/battery/BatteryAddonBoard';
-import { BatteryModel } from '../../features/pmicControl/npm/types';
+import { type BatteryModel } from '../../features/pmicControl/npm/types';
 import {
     getActiveBatterModel,
     getBatteryAddonBoardId,

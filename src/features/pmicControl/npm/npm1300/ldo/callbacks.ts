@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     noop,
-    NpmEventEmitter,
+    type NpmEventEmitter,
     parseToBoolean,
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { GPIOValues, Ldo, SoftStart } from '../../types';
+import { GPIOValues, type Ldo, type SoftStart } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,

@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+    type FC,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import type { Chart } from 'chart.js';
 
 import './customLegend.scss';

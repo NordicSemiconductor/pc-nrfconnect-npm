@@ -17,15 +17,15 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { selectDirectoryDialog } from '../../../actions/fileActions';
-import BaseNpmDevice from '../../../features/pmicControl/npm/basePmicDevice';
+import type BaseNpmDevice from '../../../features/pmicControl/npm/basePmicDevice';
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    CCProfile,
-    ITerm,
-    NTCThermistor,
+    type CCProfile,
+    type ITerm,
+    type NTCThermistor,
     NTCValues,
-    Profile,
-    RestingCCProfile,
+    type Profile,
+    type RestingCCProfile,
 } from '../../../features/pmicControl/npm/types';
 import { getCharger } from '../../../features/pmicControl/pmicControlSlice';
 import {
@@ -34,7 +34,7 @@ import {
     setProfilingStage,
 } from '../../../features/pmicControl/profilingSlice';
 import { generateDefaultProjectPath, saveProjectSettings } from '../helpers';
-import { ProfilingProject } from '../types';
+import { type ProfilingProject } from '../types';
 
 import '../profiling.scss';
 

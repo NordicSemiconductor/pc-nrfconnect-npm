@@ -6,7 +6,7 @@
 
 import { TimerModeValues } from '../../npm1300/timerConfig/types';
 import { helpers } from '../../tests/helpers';
-import { PmicDialog, TimerPrescalerValues } from '../../types';
+import { type PmicDialog, TimerPrescalerValues } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1304 - Setters Online tests', () => {

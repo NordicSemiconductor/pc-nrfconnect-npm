@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParserCallbacks as Callbacks } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { BatteryModel } from '../../types';
+import { type BatteryModel } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1304 - Request update commands', () => {
@@ -57,9 +57,9 @@ describe('PMIC 1304 - Request update commands', () => {
             (
                 _command: string,
                 callbacks?: Callbacks,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _timeout?: number,
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
                 _unique?: boolean,
             ) => {
                 callbacks?.onSuccess(

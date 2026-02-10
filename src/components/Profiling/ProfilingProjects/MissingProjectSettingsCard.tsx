@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { Alert, Button, Card } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { removeRecentProject } from '../../../features/pmicControl/profilingProjectsSlice.';
-import { ProjectPathPair } from '../types';
+import { type ProjectPathPair } from '../types';
 
 export default ({ project }: { project: ProjectPathPair }) => {
     const dispatch = useDispatch();

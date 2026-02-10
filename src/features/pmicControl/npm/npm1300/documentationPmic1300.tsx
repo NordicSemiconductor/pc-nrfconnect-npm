@@ -7,9 +7,9 @@
 import React from 'react';
 import { ExternalLink } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import Npm1304 from '../npm1304/pmic1304Device';
-import { Documentation } from '../types';
-import Npm1300 from './pmic1300Device';
+import type Npm1304 from '../npm1304/pmic1304Device';
+import { type Documentation } from '../types';
+import type Npm1300 from './pmic1300Device';
 
 const buckDoc = (n: number) => ({
     Buck: [

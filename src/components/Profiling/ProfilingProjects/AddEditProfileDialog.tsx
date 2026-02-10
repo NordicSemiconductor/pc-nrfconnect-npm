@@ -16,7 +16,7 @@ import path from 'path';
 
 import { showOpenDialog } from '../../../actions/fileActions';
 import { readAndUpdateProjectSettings } from '../helpers';
-import { ProfilingProjectProfile } from '../types';
+import { type ProfilingProjectProfile } from '../types';
 
 export default ({
     projectSettingsPath,
