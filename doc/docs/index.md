@@ -1,4 +1,4 @@
-# nPM PowerUP app
+# Get started
 
 The nPM PowerUP app is a desktop application intended to work with the Power Management Integrated Circuit (PMIC) devices from Nordic Semiconductor to allow customers to quickly and efficiently evaluate the PMIC for their projects.
 
