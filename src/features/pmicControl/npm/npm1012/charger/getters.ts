@@ -20,7 +20,7 @@ export class ChargerGet extends ChargerModuleGetBase {
         this.enabledVBatLow();
         this.tChgReduce();
         this.tChgResume();
-        this.vTermR();
+        this.tChgStatus();
         this.tCold();
         this.tCool();
         this.tWarm();
@@ -40,97 +40,97 @@ export class ChargerGet extends ChargerModuleGetBase {
     }
 
     state() {
-        this.sendCommand('npmx charger status all get');
+        this.sendCommand('npm1012 charger state get');
     }
 
     vTerm() {
-        this.sendCommand('npmx charger termination_voltage normal get');
+        this.sendCommand('npm1012 charger voltage termination get');
     }
     iChg() {
-        this.sendCommand('npmx charger charging_current get');
+        this.sendCommand('npm1012 charger current charge get');
     }
     enabled() {
-        this.sendCommand('npmx charger module charger get');
+        this.sendCommand('npm1012 charger enable get');
     }
     vTrickleFast() {
-        this.sendCommand('npmx charger trickle_voltage get');
+        this.sendCommand('npm1012 charger voltage trickle get');
     }
     iTerm() {
-        this.sendCommand('npmx charger termination_current get');
+        this.sendCommand('npm1012 charger current termination get');
     }
     iTrickle() {
-        this.sendCommand('npmx charger trickle_current get');
+        this.sendCommand('npm1012 charger current trickle get');
     }
     enabledRecharging() {
-        this.sendCommand('npmx charger module recharge get');
+        this.sendCommand('npm1012 charger recharge get');
     }
     enabledWeakBatteryCharging() {
-        this.sendCommand('npmx charger module weak_charge get');
+        this.sendCommand('npm1012 charger weakbat_charging get');
     }
     enabledVBatLow() {
-        this.sendCommand('powerup_charger vbatlow get');
+        this.sendCommand('npm1012 charger lowbat_charging get');
     }
     tChgReduce() {
-        this.sendCommand('npmx charger die_temp reduce get');
+        this.sendCommand('npm1012 charger dietemp reduce get');
     }
     tChgResume() {
-        this.sendCommand('npmx charger die_temp resume get');
+        this.sendCommand('npm1012 charger dietemp resume get');
     }
-    vTermR() {
-        this.sendCommand('npmx charger termination_voltage warm get');
+    tChgStatus() {
+        this.sendCommand('npm1012 charger dietemp status get'); // TODO: Add callback
     }
     tCold() {
-        this.sendCommand('npmx charger ntc_temperature cold get');
+        this.sendCommand('npm1012 charger ntc cold get');
     }
     tCool() {
-        this.sendCommand('npmx charger ntc_temperature cool get');
+        this.sendCommand('npm1012 charger ntc cool get');
     }
     tWarm() {
-        this.sendCommand('npmx charger ntc_temperature warm get');
+        this.sendCommand('npm1012 charger ntc warm get');
     }
     tHot() {
-        this.sendCommand('npmx charger ntc_temperature hot get');
+        this.sendCommand('npm1012 charger ntc hot get');
     }
     vWeak() {
-        this.sendCommand('npmx charger weak_voltage get');
+        this.sendCommand('npm1012 charger voltage weak get');
     }
     iChgCool() {
-        this.sendCommand('npmx charger charging_current cool get');
+        this.sendCommand('npm1012 charger current charge_cool get');
     }
     iChgWarm() {
-        this.sendCommand('npmx charger charging_current warm get');
+        this.sendCommand('npm1012 charger current charge_warm get');
     }
     vTermCool() {
-        this.sendCommand('npmx charger termination_voltage cool get');
+        this.sendCommand('npm1012 charger voltage termination_cool get');
     }
     vTermWarm() {
-        this.sendCommand('npmx charger termination_voltage warm get');
+        this.sendCommand('npm1012 charger voltage termination_warm get');
     }
     enabledAdvancedChargingProfile() {
-        this.sendCommand('npmx charger advanced_charging_profile enable get');
+        this.sendCommand('npm1012 charger jeita_charging get');
     }
     enabledNtcMonitoring() {
-        this.sendCommand('npmx charger ntc_monitoring enable get');
+        this.sendCommand('npm1012 charger ntc monitoring get');
     }
     enabledBatteryDischargeCurrentLimit() {
-        this.sendCommand('npmx charger battery_discharge_current_limit get');
+        this.sendCommand('npm1012 charger discharge_limit get');
     }
     enabledChargeCurrentThrottling() {
-        this.sendCommand('npmx charger charge_current_throttling get');
+        this.sendCommand('npm1012 charger throttling get');
     }
     iThrottle() {
-        this.sendCommand('npmx charger throttle_current get');
+        this.sendCommand('npm1012 charger current throttle get');
     }
     tOutCharge() {
-        this.sendCommand('npmx charger timeout_charge get');
+        this.sendCommand('npm1012 charger timeout charging get');
     }
     tOutTrickle() {
-        this.sendCommand('npmx charger timeout_trickle get');
+        this.sendCommand('npm1012 charger timeout trickle get');
     }
     vThrottle() {
-        this.sendCommand('npmx charger throttle_voltage get');
+        this.sendCommand('npm1012 charger voltage throttle get');
     }
     vBatLow() {
-        this.sendCommand('npmx charger v_batlow get');
+        this.sendCommand('npm1012 charger voltage batlow get');
     }
 }

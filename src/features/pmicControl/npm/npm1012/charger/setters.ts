@@ -6,13 +6,12 @@
 
 import {
     Charger,
-    ChargerJeitaILabel,
-    ChargerJeitaVLabel,
     ChargerModuleSetBase,
     ITerm,
     ITrickle,
     VTrickleFast,
 } from '../../types';
+import { advancedChargingProfileOnUpdate } from './helpers';
 
 export class ChargerSet extends ChargerModuleSetBase {
     async all(charger: Charger) {
@@ -22,10 +21,7 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.iTerm(charger.iTerm),
         ];
 
-        if (charger.iBatLim && this.batLim) {
-            promises.push(this.batLim(charger.iBatLim));
-        }
-        if (charger.iTrickle && this.iTrickle) {
+        if (charger.iTrickle !== undefined && this.iTrickle) {
             promises.push(this.iTrickle(charger.iTrickle));
         }
         if (
@@ -38,7 +34,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 ),
             );
         }
-        if (charger.vWeak && this.vWeak) {
+        if (charger.vWeak !== undefined && this.vWeak) {
             promises.push(this.vWeak(charger.vWeak));
         }
         if (charger.iChgCool !== undefined && this.iChgCool) {
@@ -112,7 +108,6 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.enabledRecharging(charger.enableRecharging),
             this.enabledVBatLow(charger.enableVBatLow),
             this.tChgResume(charger.tChgResume),
-            this.vTermR(charger.vTermR),
             this.vTrickleFast(charger.vTrickleFast),
             this.tCold(charger.tCold),
             this.tCool(charger.tCool),
@@ -133,7 +128,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger module charger set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger enable set ${enabled ? 'on' : 'off'}`,
                     () => {
                         resolve();
                     },
@@ -148,142 +143,132 @@ export class ChargerSet extends ChargerModuleSetBase {
 
     vTerm(value: number) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                vTerm: value,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTerm: value,
+                });
                 resolve();
-            } else {
-                this.enabled(false)
-                    .then(() => {
-                        this.sendCommand(
-                            `npmx charger termination_voltage normal set ${
-                                value * 1000
-                            }`, // mv to V
-                            () => resolve(),
-                            () => {
-                                this.get.vTerm();
-                                reject();
-                            },
-                        );
-                    })
-                    .catch(() => {
-                        this.get.vTerm();
-                        reject();
-                    });
+                return;
             }
+
+            this.enabled(false)
+                .then(() => {
+                    this.sendCommand(
+                        `npm1012 charger voltage termination set ${value}`,
+                        () => resolve(),
+                        () => {
+                            this.get.vTerm();
+                            reject();
+                        },
+                    );
+                })
+                .catch(() => {
+                    this.get.vTerm();
+                    reject();
+                });
         });
     }
 
     iChg(value: number) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                iChg: value,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    iChg: value,
+                });
                 resolve();
-            } else {
-                this.enabled(false)
-                    .then(() =>
-                        this.sendCommand(
-                            `npmx charger charging_current set ${value * 1000}`, // mA to uA
-                            () => resolve(),
-                            () => {
-                                this.get.iChg();
-                                reject();
-                            },
-                        ),
-                    )
-                    .catch(() => {
-                        this.get.iChg();
-                        reject();
-                    });
+                return;
             }
+
+            this.enabled(false)
+                .then(() =>
+                    this.sendCommand(
+                        `npm1012 charger current charge set ${value}`,
+                        () => resolve(),
+                        () => {
+                            this.get.iChg();
+                            reject();
+                        },
+                    ),
+                )
+                .catch(() => {
+                    this.get.iChg();
+                    reject();
+                });
         });
     }
 
     vTrickleFast(value: VTrickleFast) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                vTrickleFast: value,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTrickleFast: value,
+                });
                 resolve();
-            } else {
-                this.enabled(false)
-                    .then(() => {
-                        this.sendCommand(
-                            `npmx charger trickle_voltage set ${value * 1000}`,
-                            () => resolve(),
-                            () => {
-                                this.get.vTrickleFast();
-                                reject();
-                            },
-                        );
-                    })
-                    .catch(() => {
-                        this.get.vTrickleFast();
-                        reject();
-                    });
+                return;
             }
+
+            this.enabled(false)
+                .then(() => {
+                    this.sendCommand(
+                        `npm1012 charger voltage trickle set ${value}`,
+                        () => resolve(),
+                        () => {
+                            this.get.vTrickleFast();
+                            reject();
+                        },
+                    );
+                })
+                .catch(() => {
+                    this.get.vTrickleFast();
+                    reject();
+                });
         });
     }
 
     iTerm(iTerm: ITerm) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                iTerm,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    iTerm,
+                });
                 resolve();
-            } else {
-                this.enabled(false)
-                    .then(() => {
-                        this.sendCommand(
-                            `npmx charger termination_current set ${iTerm}`,
-                            () => resolve(),
-                            () => {
-                                this.get.iTerm();
-                                reject();
-                            },
-                        );
-                    })
-                    .catch(() => {
-                        this.get.iTerm();
-                        reject();
-                    });
+                return;
             }
+
+            this.enabled(false)
+                .then(() => {
+                    this.sendCommand(
+                        `npm1012 charger current termination set ${iTerm}`,
+                        () => resolve(),
+                        () => {
+                            this.get.iTerm();
+                            reject();
+                        },
+                    );
+                })
+                .catch(() => {
+                    this.get.iTerm();
+                    reject();
+                });
         });
     }
 
     iTrickle(iTrickle: ITrickle) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                iTrickle,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    iTrickle,
+                });
                 resolve();
             } else {
-                this.enabled(false)
-                    .then(() => {
-                        this.sendCommand(
-                            `npmx charger trickle_current set ${iTrickle}`,
-                            () => resolve(),
-                            () => {
-                                this.get.iTrickle?.();
-                                reject();
-                            },
-                        );
-                    })
-                    .catch(() => {
+                this.sendCommand(
+                    `npm1012 charger current trickle set ${iTrickle}`,
+                    () => resolve(),
+                    () => {
                         this.get.iTrickle?.();
                         reject();
-                    });
+                    },
+                );
             }
         });
     }
@@ -297,7 +282,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger module recharge set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger recharge set ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabledRecharging();
@@ -317,7 +302,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger module weak_charge set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger weakbat_charging set ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabledWeakBatteryCharging?.();
@@ -337,7 +322,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `powerup_charger vbatlow set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger lowbat_charging set ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabledVBatLow();
@@ -357,7 +342,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger die_temp reduce set ${value}`,
+                    `npm1012 charger dietemp reduce set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.tChgReduce?.();
@@ -377,30 +362,10 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger die_temp resume set ${value}`,
+                    `npm1012 charger dietemp resume set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.tChgResume();
-                        reject();
-                    },
-                );
-            }
-        });
-    }
-
-    vTermR(value: number) {
-        return new Promise<void>((resolve, reject) => {
-            if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                    vTermR: value,
-                });
-                resolve();
-            } else {
-                this.sendCommand(
-                    `npmx charger termination_voltage warm set ${value * 1000}`,
-                    () => resolve(),
-                    () => {
-                        this.get.vTermR();
                         reject();
                     },
                 );
@@ -417,7 +382,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger ntc_temperature cold set ${value}`,
+                    `npm1012 charger ntc cold set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.tCold();
@@ -437,7 +402,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger ntc_temperature cool set ${value}`,
+                    `npm1012 charger ntc cool set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.tCool();
@@ -457,7 +422,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger ntc_temperature warm set ${value}`,
+                    `npm1012 charger ntc warm set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.tWarm();
@@ -477,7 +442,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger ntc_temperature hot set ${value}`,
+                    `npm1012 charger ntc hot set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.tHot();
@@ -490,55 +455,35 @@ export class ChargerSet extends ChargerModuleSetBase {
 
     vWeak(value: number) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                vWeak: value,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vWeak: value,
+                });
                 resolve();
             } else {
-                this.enabled(false)
-                    .then(() => {
-                        this.sendCommand(
-                            `npmx charger weak_voltage set ${value * 1000}`,
-                            () => resolve(),
-                            () => {
-                                this.get.vWeak?.();
-                                reject();
-                            },
-                        );
-                    })
-                    .catch(() => {
+                this.sendCommand(
+                    `npm1012 charger voltage weak set ${value}`,
+                    () => resolve(),
+                    () => {
                         this.get.vWeak?.();
                         reject();
-                    });
+                    },
+                );
             }
         });
     }
 
     enableAdvancedChargingProfile(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                enableAdvancedChargingProfile: enabled,
-                jeitaILabelCool: enabled
-                    ? ChargerJeitaILabel.coolIChgCool
-                    : ChargerJeitaILabel.coolIChg50percent,
-                jeitaVLabelCool: enabled
-                    ? ChargerJeitaVLabel.coolVTermCool
-                    : ChargerJeitaVLabel.coolVTerm,
-                jeitaILabelWarm: enabled
-                    ? ChargerJeitaILabel.warmIChgWarm
-                    : ChargerJeitaILabel.warmIChg,
-                jeitaVLabelWarm: enabled
-                    ? ChargerJeitaVLabel.warmVTermWarm
-                    : ChargerJeitaVLabel.warmVTerm100mVOff,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>(
+                    'onChargerUpdate',
+                    advancedChargingProfileOnUpdate(enabled),
+                );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger advanced_charging_profile enable set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger jeita_charging set ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabledAdvancedChargingProfile?.();
@@ -551,15 +496,14 @@ export class ChargerSet extends ChargerModuleSetBase {
 
     enableNtcMonitoring(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                enableNtcMonitoring: enabled,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    enableNtcMonitoring: enabled,
+                });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger ntc_monitoring enable set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger ntc monitoring set ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabledNtcMonitoring?.();
@@ -572,15 +516,14 @@ export class ChargerSet extends ChargerModuleSetBase {
 
     iChgCool(value: number) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                iChgCool: value,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    iChgCool: value,
+                });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger charging_current cool set ${value * 1000}`, // mA to uA
+                    `npm1012 charger current charge_cool set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.iChgCool?.();
@@ -593,15 +536,14 @@ export class ChargerSet extends ChargerModuleSetBase {
 
     iChgWarm(value: number) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                iChgWarm: value,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    iChgWarm: value,
+                });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger charging_current warm set ${value * 1000}`, // mA to uA
+                    `npm1012 charger current charge_warm set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.iChgWarm?.();
@@ -614,15 +556,14 @@ export class ChargerSet extends ChargerModuleSetBase {
 
     vTermCool(value: number) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                vTermCool: value,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTermCool: value,
+                });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger termination_voltage cool set ${value * 1000}`, // V to mV
+                    `npm1012 charger voltage termination_cool set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.vTermCool?.();
@@ -635,15 +576,14 @@ export class ChargerSet extends ChargerModuleSetBase {
 
     vTermWarm(value: number) {
         return new Promise<void>((resolve, reject) => {
-            this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                vTermWarm: value,
-            });
-
             if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                    vTermWarm: value,
+                });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger termination_voltage warm set ${value * 1000}`, // V to mV
+                    `npm1012 charger voltage termination_warm set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.vTermWarm?.();
@@ -663,7 +603,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger battery_discharge_current_limit set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger discharge_limit set ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabledBatteryDischargeCurrentLimit?.();
@@ -683,7 +623,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger charge_current_throttling set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger throttling set ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabledChargeCurrentThrottling?.();
@@ -703,7 +643,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger throttle_current set ${value}`,
+                    `npm1012 charger current throttle set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.iThrottle?.();
@@ -723,7 +663,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger timeout_charge set ${value}`,
+                    `npm1012 charger timeout charging set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.tOutCharge?.();
@@ -743,7 +683,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger timeout_trickle set ${value}`,
+                    `npm1012 charger timeout trickle set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.tOutTrickle?.();
@@ -763,7 +703,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger throttle_voltage set ${value}`,
+                    `npm1012 charger voltage throttle set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.vThrottle?.();
@@ -783,7 +723,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx charger v_batlow set ${value}`,
+                    `npm1012 charger voltage batlow set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.vBatLow?.();

@@ -9,61 +9,28 @@ import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     noop,
     NpmEventEmitter,
-    parseLogData,
-    parseToBoolean,
+    onOffRegex,
+    parseOnOff,
+    parseToFloat,
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { Charger, NTCThermistor, PmicChargingState } from '../../types';
-import { ITermValues } from './types';
+import { Charger } from '../../types';
+import { advancedChargingProfileOnUpdate } from './helpers';
 
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
-    ITermAllowedValues: number[] = ITermValues,
 ) => {
     const cleanupCallbacks = [];
 
-    const emitOnChargingStatusUpdate = (value: number) =>
-        eventEmitter.emit('onChargingStatusUpdate', {
-            // eslint-disable-next-line no-bitwise
-            batteryDetected: (value & 0x01) > 0,
-            // eslint-disable-next-line no-bitwise
-            batteryFull: (value & 0x02) > 0,
-            // eslint-disable-next-line no-bitwise
-            trickleCharge: (value & 0x04) > 0,
-            // eslint-disable-next-line no-bitwise
-            constantCurrentCharging: (value & 0x08) > 0,
-            // eslint-disable-next-line no-bitwise
-            constantVoltageCharging: (value & 0x10) > 0,
-            // eslint-disable-next-line no-bitwise
-            batteryRechargeNeeded: (value & 0x20) > 0,
-            // eslint-disable-next-line no-bitwise
-            dieTempHigh: (value & 0x40) > 0,
-            // eslint-disable-next-line no-bitwise
-            supplementModeActive: (value & 0x80) > 0,
-        } as PmicChargingState);
-
     if (shellParser) {
         cleanupCallbacks.push(
-            shellParser.onShellLoggingEvent(logEvent => {
-                parseLogData(logEvent, loggingEvent => {
-                    if (loggingEvent.module === 'module_pmic_charger') {
-                        const messageParts = loggingEvent.message.split('=');
-                        const value = Number.parseInt(messageParts[1], 10);
-                        emitOnChargingStatusUpdate(value);
-                    }
-                });
-            }),
-        );
-
-        cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger termination_voltage normal', true),
+                toRegex('npm1012 charger voltage termination', true),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vTerm: value / 1000, // mv to V
+                        vTerm: parseToFloat(res),
                     });
                 },
                 noop,
@@ -72,64 +39,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger termination_voltage warm', true),
-                res => {
-                    const value = parseToNumber(res);
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vTermR: value / 1000, // mv to V
-                    });
-                },
-                noop,
-            ),
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger charging_current', true),
-                res => {
-                    const value = parseToNumber(res);
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iChg: value / 1000, // uA to mA
-                    });
-                },
-                noop,
-            ),
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger status all get', false),
-                res => {
-                    const value = parseToNumber(res);
-                    emitOnChargingStatusUpdate(value);
-                },
-                noop,
-            ),
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx charger module recharge',
-                    true,
-                    undefined,
-                    '(1|0)',
-                ),
+                toRegex('npm1012 charger current charge', true),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        enableRecharging: parseToBoolean(res),
-                    });
-                },
-                noop,
-            ),
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('powerup_charger vbatlow', true, undefined, '(1|0)'),
-                res => {
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        enableVBatLow: parseToBoolean(res),
+                        iChg: parseToFloat(res),
                     });
                 },
                 noop,
@@ -139,14 +52,14 @@ export default (
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
                 toRegex(
-                    'npmx charger module charger',
+                    'npm1012 charger recharge',
                     true,
                     undefined,
-                    '(1|0)',
+                    onOffRegex,
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        enabled: parseToBoolean(res),
+                        enableRecharging: parseOnOff(res),
                     });
                 },
                 noop,
@@ -156,40 +69,14 @@ export default (
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
                 toRegex(
-                    'npmx charger trickle_voltage',
+                    'npm1012 charger lowbat_charging',
                     true,
                     undefined,
-                    '(2500|2900)',
+                    onOffRegex,
                 ),
                 res => {
-                    const result = parseToNumber(res) / 1000;
-
-                    if (result === 2.5 || result === 2.9) {
-                        eventEmitter.emitPartialEvent<Charger>(
-                            'onChargerUpdate',
-                            {
-                                vTrickleFast: result,
-                            },
-                        );
-                    }
-                },
-                noop,
-            ),
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npmx charger termination_current',
-                    true,
-                    undefined,
-                    `(${ITermAllowedValues.map(v => v.toString()).join('|')})`,
-                ),
-                res => {
-                    const result = parseToNumber(res);
-
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iTerm: result,
+                        enableVBatLow: parseOnOff(res),
                     });
                 },
                 noop,
@@ -198,27 +85,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm_adc fullscale', true),
+                toRegex('npm1012 charger enable', true, undefined, onOffRegex),
                 res => {
-                    let iBatLim: number = parseToNumber(res);
-
-                    // this command will approximate and given we
-                    // only have high and low of no error was thrown
-                    //  we can assume that what was requeued was set
-                    if (Number.isNaN(iBatLim)) {
-                        const requested = res.match(/\d+/)?.[0];
-
-                        if (!requested) {
-                            console.error(
-                                'Unable to parse response. UI might be out of sync.',
-                            );
-                            return;
-                        }
-                        iBatLim = Number.parseInt(requested, 10);
-                    }
-
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iBatLim,
+                        enabled: parseOnOff(res),
                     });
                 },
                 noop,
@@ -227,7 +97,39 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger die_temp reduce', true),
+                toRegex('npm1012 charger state', true, undefined, '(\\w+)'),
+                () => {}, // TODO: Update
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 charger voltage trickle', true),
+                res => {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        vTrickleFast: parseToFloat(res),
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 charger current termination', true),
+                res => {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iTerm: parseToFloat(res),
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 charger dietemp reduce', true),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tChgReduce: parseToNumber(res),
@@ -239,7 +141,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger die_temp resume', true),
+                toRegex('npm1012 charger dietemp resume', true),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tChgResume: parseToNumber(res),
@@ -252,7 +154,20 @@ export default (
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
                 toRegex(
-                    'npmx charger ntc_temperature cold',
+                    'npm1012 charger dietemp status',
+                    true,
+                    undefined,
+                    '(\\w+)',
+                ),
+                () => {}, // TODO: Update
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex(
+                    'npm1012 charger ntc cold',
                     true,
                     undefined,
                     '-?[0-9]+',
@@ -268,7 +183,12 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger ntc_temperature cool', true),
+                toRegex(
+                    'npm1012 charger ntc cool',
+                    true,
+                    undefined,
+                    '-?[0-9]+',
+                ),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tCool: parseToNumber(res),
@@ -280,7 +200,12 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger ntc_temperature warm', true),
+                toRegex(
+                    'npm1012 charger ntc warm',
+                    true,
+                    undefined,
+                    '-?[0-9]+',
+                ),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tWarm: parseToNumber(res),
@@ -292,7 +217,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger ntc_temperature hot', true),
+                toRegex('npm1012 charger ntc hot', true, undefined, '-?[0-9]+'),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         tHot: parseToNumber(res),
@@ -304,39 +229,42 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
+                toRegex('npm1012 charger current trickle', true),
+                res => {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        iTrickle: parseToFloat(res),
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 charger voltage weak', true),
+                res => {
+                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
+                        vWeak: parseToFloat(res),
+                    });
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
                 toRegex(
-                    'npmx adc ntc type',
+                    'npm1012 charger jeita_charging',
                     true,
                     undefined,
-                    '(0|10000|47000|100000)',
+                    onOffRegex,
                 ),
                 res => {
-                    const result = parseToNumber(res);
-
-                    let mode: NTCThermistor | null = null;
-                    switch (result) {
-                        case 10000:
-                            mode = '10 kΩ';
-                            break;
-                        case 47000:
-                            mode = '47 kΩ';
-                            break;
-                        case 100000:
-                            mode = '100 kΩ';
-                            break;
-                        case 0:
-                            mode = 'Ignore NTC';
-                            break;
-                    }
-
-                    if (mode) {
-                        eventEmitter.emitPartialEvent<Charger>(
-                            'onChargerUpdate',
-                            {
-                                ntcThermistor: mode,
-                            },
-                        );
-                    }
+                    const enabled = parseOnOff(res);
+                    eventEmitter.emitPartialEvent<Charger>(
+                        'onChargerUpdate',
+                        advancedChargingProfileOnUpdate(enabled),
+                    );
                 },
                 noop,
             ),
@@ -344,10 +272,15 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx adc ntc beta', true),
+                toRegex(
+                    'npm1012 charger ntc monitoring',
+                    true,
+                    undefined,
+                    onOffRegex,
+                ),
                 res => {
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        ntcBeta: parseToNumber(res),
+                        enableNtcMonitoring: parseOnOff(res),
                     });
                 },
                 noop,
@@ -356,11 +289,15 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger trickle_current', true),
+                toRegex(
+                    'npm1012 charger weakbat_charging',
+                    true,
+                    undefined,
+                    onOffRegex,
+                ),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iTrickle: value,
+                        enableWeakBatteryCharging: parseOnOff(res),
                     });
                 },
                 noop,
@@ -369,11 +306,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger weak_voltage', true),
+                toRegex('npm1012 charger current charge_cool', true),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vWeak: value / 1000, // mV to V
+                        iChgCool: parseToFloat(res),
                     });
                 },
                 noop,
@@ -382,11 +318,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger module weak_charge', true),
+                toRegex('npm1012 charger current charge_warm', true),
                 res => {
-                    const value = parseToBoolean(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        enableWeakBatteryCharging: value,
+                        iChgWarm: parseToFloat(res),
                     });
                 },
                 noop,
@@ -395,11 +330,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger charging_current cool', true),
+                toRegex('npm1012 charger voltage termination_cool', true),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iChgCool: value / 1000, // uA to mA
+                        vTermCool: parseToFloat(res),
                     });
                 },
                 noop,
@@ -408,11 +342,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger charging_current warm', true),
+                toRegex('npm1012 charger voltage termination_warm', true),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iChgWarm: value / 1000, // uA to mA
+                        vTermWarm: parseToFloat(res),
                     });
                 },
                 noop,
@@ -421,35 +354,14 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger termination_voltage cool', true),
+                toRegex(
+                    'npm1012 charger discharge_limit',
+                    true,
+                    undefined,
+                    onOffRegex,
+                ),
                 res => {
-                    const value = parseToNumber(res);
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vTermCool: value / 1000, // mv to V
-                    });
-                },
-                noop,
-            ),
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger termination_voltage warm', true),
-                res => {
-                    const value = parseToNumber(res);
-                    eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vTermWarm: value / 1000, // mv to V
-                    });
-                },
-                noop,
-            ),
-        );
-
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx charger battery_discharge_current_limit', true),
-                res => {
-                    const value = parseToBoolean(res);
+                    const value = parseOnOff(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
                         enableBatteryDischargeCurrentLimit: value,
                     });
@@ -460,11 +372,15 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger charge_current_throttling', true),
+                toRegex(
+                    'npm1012 charger throttling',
+                    true,
+                    undefined,
+                    onOffRegex,
+                ),
                 res => {
-                    const value = parseToBoolean(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        enableChargeCurrentThrottling: value,
+                        enableChargeCurrentThrottling: parseOnOff(res),
                     });
                 },
                 noop,
@@ -473,11 +389,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger throttle_current', true),
+                toRegex('npm1012 charger current throttle', true, undefined),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        iThrottle: value,
+                        iThrottle: parseToFloat(res),
                     });
                 },
                 noop,
@@ -486,11 +401,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger timeout_charge', true),
+                toRegex('npm1012 charger timeout charging', true, undefined),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tOutCharge: value,
+                        tOutCharge: parseToNumber(res),
                     });
                 },
                 noop,
@@ -499,11 +413,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger timeout_trickle', true),
+                toRegex('npm1012 charger timeout trickle', true, undefined),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        tOutTrickle: value,
+                        tOutTrickle: parseToNumber(res),
                     });
                 },
                 noop,
@@ -512,11 +425,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger throttle_voltage', true),
+                toRegex('npm1012 charger voltage throttle', true, undefined),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vThrottle: value,
+                        vThrottle: parseToNumber(res),
                     });
                 },
                 noop,
@@ -525,11 +437,10 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npmx charger v_batlow', true),
+                toRegex('npm1012 charger voltage batlow', true, undefined),
                 res => {
-                    const value = parseToNumber(res);
                     eventEmitter.emitPartialEvent<Charger>('onChargerUpdate', {
-                        vBatLow: value,
+                        vBatLow: parseToFloat(res),
                     });
                 },
                 noop,
