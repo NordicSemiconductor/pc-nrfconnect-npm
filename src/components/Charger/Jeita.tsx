@@ -426,8 +426,10 @@ const Default = ({
 
     if (
         internalNTCBeta === undefined ||
+        internalVTermr === undefined ||
         charger.ntcBeta === undefined ||
-        charger.ntcThermistor === undefined
+        charger.ntcThermistor === undefined ||
+        chargerModule.ranges.vTermR === undefined
     ) {
         return null;
     }
@@ -447,7 +449,7 @@ const Default = ({
                 value={internalVTermr}
                 range={chargerModule.ranges.vTermR}
                 onChange={value => setInternalVTermr(value)}
-                onChangeComplete={v => chargerModule.set.vTermR(v)}
+                onChangeComplete={v => chargerModule.set.vTermR?.(v)}
                 disabled={disabled}
                 showSlider
             />
