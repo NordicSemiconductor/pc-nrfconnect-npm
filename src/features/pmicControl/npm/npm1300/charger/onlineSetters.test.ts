@@ -350,7 +350,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set chargerVTermR', async () => {
-            await pmic.chargerModule?.set.vTermR(3.55);
+            await pmic.chargerModule?.set.vTermR?.(3.55);
 
             expect(mockEnqueueRequest).toBeCalledWith(
                 `npmx charger termination_voltage warm set 3550`,
@@ -1138,7 +1138,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
 
         test('Set setChargerVTermR - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.vTermR(3.55),
+                pmic.chargerModule?.set.vTermR?.(3.55),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

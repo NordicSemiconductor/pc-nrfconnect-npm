@@ -206,7 +206,7 @@ describe('PMIC 1304 - Request update commands', () => {
     });
 
     test('Request update chargerVTermR', () => {
-        pmic.chargerModule?.get.vTermR();
+        pmic.chargerModule?.get.vTermR?.();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

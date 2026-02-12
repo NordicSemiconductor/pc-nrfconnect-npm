@@ -117,7 +117,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set setChargerVTermR', async () => {
-        await pmic.chargerModule?.set.vTermR(3.55);
+        await pmic.chargerModule?.set.vTermR?.(3.55);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({ vTermR: 3.55 });

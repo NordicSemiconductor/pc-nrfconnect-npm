@@ -29,7 +29,6 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.enabledVBatLow(charger.enableVBatLow),
             this.vTrickleFast(charger.vTrickleFast),
             this.tChgResume(charger.tChgResume),
-            this.vTermR(charger.vTermR),
             this.tCold(charger.tCold),
             this.tCool(charger.tCool),
             this.tWarm(charger.tWarm),
@@ -45,6 +44,9 @@ export class ChargerSet extends ChargerModuleSetBase {
         }
         if (charger.tChgStop && this.tChgStop) {
             promises.push(this.tChgStop(charger.tChgStop));
+        }
+        if (charger.vTermR !== undefined && this.vTermR) {
+            promises.push(this.vTermR(charger.vTermR));
         }
 
         await Promise.allSettled(promises);
@@ -396,7 +398,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     `npmx charger termination_voltage warm set ${value * 1000}`,
                     () => resolve(),
                     () => {
-                        this.get.vTermR();
+                        this.get.vTermR?.();
                         reject();
                     },
                 );
