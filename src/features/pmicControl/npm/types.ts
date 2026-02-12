@@ -184,7 +184,6 @@ export type Charger = {
     jeitaVLabelWarm: ChargerJeitaVLabel;
     jeitaVLabelHot: ChargerJeitaVLabel;
     tChgResume: number;
-    vTermR: number;
     tCold: number;
     tCool: number;
     tWarm: number;
@@ -208,6 +207,7 @@ export type Charger = {
     tOutTrickle?: number;
     vBatLow?: number;
     vTermCool?: number;
+    vTermR?: number;
     vTermWarm?: number;
     vThrottle?: number;
     vWeak?: number;
@@ -589,7 +589,6 @@ export abstract class ChargerModuleSetBase {
     abstract enabledRecharging(value: boolean): Promise<void>;
     abstract enabledVBatLow(value: boolean): Promise<void>;
     abstract tChgResume(value: number): Promise<void>;
-    abstract vTermR(value: number): Promise<void>;
     abstract tCold(value: number): Promise<void>;
     abstract tCool(value: number): Promise<void>;
     abstract tWarm(value: number): Promise<void>;
@@ -615,6 +614,7 @@ export abstract class ChargerModuleSetBase {
     tOutTrickle?(value: number): Promise<void>;
     vBatLow?(value: number): Promise<void>;
     vTermCool?(value: number): Promise<void>;
+    vTermR?(value: number): Promise<void>;
     vTermWarm?(value: number): Promise<void>;
     vThrottle?(value: number): Promise<void>;
     vWeak?(value: number): Promise<void>;
@@ -647,7 +647,6 @@ export abstract class ChargerModuleGetBase {
     abstract enabledRecharging(): void;
     abstract enabledVBatLow(): void;
     abstract tChgResume(): void;
-    abstract vTermR(): void;
     abstract tCold(): void;
     abstract tCool(): void;
     abstract tWarm(): void;
@@ -673,6 +672,7 @@ export abstract class ChargerModuleGetBase {
     tOutTrickle?(): void;
     vBatLow?(): void;
     vTermCool?(): void;
+    vTermR?(): void;
     vTermWarm?(): void;
     vThrottle?(): void;
     vWeak?(): void;
@@ -680,7 +680,6 @@ export abstract class ChargerModuleGetBase {
 
 export type ChargerModuleRanges = {
     voltage: number[];
-    vTermR: number[];
     jeita: RangeType;
     chipThermal: RangeType;
     current: RangeOrNumberArray;
@@ -689,6 +688,7 @@ export type ChargerModuleRanges = {
     batterySize: RangeType;
 
     iBatLim?: FixedListRange;
+    vTermR?: number[];
     vWeak?: RangeType;
 };
 
