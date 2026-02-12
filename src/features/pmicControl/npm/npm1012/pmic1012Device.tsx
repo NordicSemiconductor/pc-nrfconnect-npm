@@ -23,7 +23,7 @@ import {
 } from '../types';
 import ChargerModule from './charger';
 
-export const npm1012FWVersion = '0.7.2+0';
+export const npm1012FWVersion = '0.0.1+0';
 
 export default class Npm1012 extends BaseNpmDevice {
     private waitingForReset = false;
