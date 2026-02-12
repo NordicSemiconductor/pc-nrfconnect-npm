@@ -35,6 +35,8 @@ import Npm2100, {
 } from '../features/pmicControl/npm/npm2100/pmic2100Device';
 import {
     dialogHandler,
+    isNpm1012SerialApplicationMode,
+    isNpm1012SerialRecoverMode,
     isNpm1300SerialApplicationMode,
     isNpm1300SerialRecoverMode,
     isNpm1304SerialApplicationMode,
@@ -127,6 +129,8 @@ export default () => {
                 dispatch(stopEventRecording());
             }}
             deviceFilter={device =>
+                isNpm1012SerialApplicationMode(device) ||
+                isNpm1012SerialRecoverMode(device) ||
                 isNpm1300SerialRecoverMode(device) ||
                 isNpm1300SerialApplicationMode(device) ||
                 isNpm1304SerialRecoverMode(device) ||
