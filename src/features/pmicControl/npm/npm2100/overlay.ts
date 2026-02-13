@@ -186,7 +186,7 @@ const generateLDOSW = (
                 regulator-max-microvolt = <${toMicro(
                     ldoModule.ranges.voltage.max,
                 )}>;
- 
+
                 ${ldo.enabled ? 'regulator-boot-on;' : ''}
                 ${
                     ldo.mode === 'LDO'
@@ -196,7 +196,9 @@ const generateLDOSW = (
                         : ''
                 }
                 ${
-                    ldo.ocpEnabled
+                    ldo.ocpEnabled &&
+                    ldo.ldoSoftStart !== undefined &&
+                    ldo.softStart !== undefined
                         ? `regulator-init-microamp = <${milliToMicro(
                               parseInt(
                                   (ldo.ldoSoftStart && ldo.mode === 'LDO'
@@ -308,13 +310,13 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
             `
                 : ''
         }
-        
+
 
         ${generateShipHoldLongPressProperty(
             npmConfig.reset as npm2100ResetConfig,
             npmConfig.lowPower as npm2100LowPowerConfig,
         )}
-        
+
 
         npm2100_gpio: gpio-controller {
             compatible = "nordic,npm2100-gpio";
