@@ -37,15 +37,21 @@ export class LdoSet {
     }
 
     async all(ldo: LdoExport) {
-        await Promise.allSettled([
+        const promises = [
             this.voltage(ldo.voltage),
             this.enabled(ldo.enabled),
-            this.softStartEnabled(ldo.softStartEnabled),
-            this.softStart(ldo.softStart),
             this.activeDischarge(ldo.activeDischarge),
             this.onOffControl(ldo.onOffControl),
             this.mode(ldo.mode),
-        ]);
+        ];
+        if (ldo.softStartEnabled !== undefined && this.softStartEnabled) {
+            promises.push(this.softStartEnabled(ldo.softStartEnabled));
+        }
+        if (ldo.softStart !== undefined && this.softStart) {
+            promises.push(this.softStart(ldo.softStart));
+        }
+
+        await Promise.allSettled(promises);
     }
 
     mode(mode: LdoMode) {
