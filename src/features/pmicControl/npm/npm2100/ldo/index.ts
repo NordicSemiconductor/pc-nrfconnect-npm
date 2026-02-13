@@ -5,14 +5,22 @@
  */
 
 import { RangeType } from '../../../../../utils/helpers';
-import { Ldo, LdoExport, LdoModule, ModuleParams } from '../../types';
 import {
-    nPM2100LDOSoftStart,
-    nPM2100LDOSoftStartKeys,
-    nPM2100LDOSoftStartValues,
-    nPM2100SoftStart,
-    nPM2100SoftStartKeys,
-    nPM2100SoftStartValues,
+    Ldo,
+    LdoExport,
+    LdoMode,
+    LdoModule,
+    LdoSoftStartCurrent,
+    ModuleParams,
+} from '../../types';
+import {
+    nPM2100GPIOControlModeValues,
+    nPM2100GPIOControlPinSelectValues,
+    nPM2100LdoModeControlValues,
+    softStartCurrentLDOModeKeys,
+    softStartCurrentLDOModeValues,
+    softStartCurrentLoadSwitchModeKeys,
+    softStartCurrentLoadSwitchModeValues,
 } from '../types';
 import ldoCallbacks from './ldoCallbacks';
 import { LdoGet } from './ldoGet';
@@ -21,18 +29,19 @@ import { LdoSet } from './ldoSet';
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
 
-const ldoDefaults = (): Ldo => ({
+const ldoDefaults = (index: number): Ldo => ({
     voltage: getLdoVoltageRange().min,
     mode: 'Load_switch',
     enabled: false,
-    softStartEnabled: true,
-    softStart: 20,
+    softStartCurrentLDOMode: 75,
+    softStartCurrentLoadSwitchMode: 75,
     modeControl: 'auto',
     pinMode: 'HP/OFF',
     pinSel: 'GPIO0HI',
     activeDischarge: false,
     onOffControl: 'SW',
     onOffSoftwareControlEnabled: true,
+    cardLabel: `Load Switch/LDO ${index + 1}`,
 });
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
@@ -42,14 +51,13 @@ export const toLdoExport = (ldo: Ldo): LdoExport => ({
     modeControl: ldo.modeControl,
     pinMode: ldo.pinMode,
     pinSel: ldo.pinSel,
-    softStartEnabled: ldo.softStartEnabled,
-    softStart: ldo.softStart,
-    ldoSoftStart: ldo.ldoSoftStart,
+    softStartCurrentLDOMode: ldo.softStartCurrentLDOMode,
+    softStartCurrentLoadSwitchMode: ldo.softStartCurrentLoadSwitchMode,
     activeDischarge: ldo.activeDischarge,
     onOffControl: ldo.onOffControl,
-    haltEnabled: ldo.haltEnabled,
-    rampEnabled: ldo.rampEnabled,
-    ocpEnabled: ldo.ocpEnabled,
+    halt: ldo.halt,
+    ramp: ldo.ramp,
+    overcurrentProtection: ldo.overcurrentProtection,
 });
 
 const getLdoVoltageRange = () =>
@@ -98,22 +106,41 @@ export default class Module implements LdoModule {
             voltage: getLdoVoltageRange(),
         };
     }
-    get values(): {
-        softstart: { label: string; value: nPM2100SoftStart }[];
-        ldoSoftstart: { label: string; value: nPM2100LDOSoftStart }[];
-    } {
+    get values(): LdoModule['values'] {
+        const getSoftStartCurrentValues = (mode?: LdoMode) => {
+            if (mode === undefined) {
+                return [{ label: 'n/a', value: 0 }];
+            }
+
+            if (mode === 'LDO') {
+                return softStartCurrentLDOModeValues.map((item, i) => ({
+                    label: `${softStartCurrentLDOModeKeys[i]}`,
+                    value: item as LdoSoftStartCurrent,
+                }));
+            }
+
+            return softStartCurrentLoadSwitchModeValues.map((item, i) => ({
+                label: `${softStartCurrentLoadSwitchModeKeys[i]}`,
+                value: item as LdoSoftStartCurrent,
+            }));
+        };
         return {
-            softstart: [...nPM2100SoftStartValues].map((item, i) => ({
-                label: `${nPM2100SoftStartKeys[i]}`,
+            modeControl: nPM2100LdoModeControlValues.map(item => ({
+                label: item,
                 value: item,
             })),
-            ldoSoftstart: [...nPM2100LDOSoftStartValues].map((item, i) => ({
-                label: `${nPM2100LDOSoftStartKeys[i]}`,
+            pinMode: nPM2100GPIOControlModeValues.map(item => ({
+                label: item,
                 value: item,
             })),
+            pinSel: nPM2100GPIOControlPinSelectValues.map(item => ({
+                label: item,
+                value: item,
+            })),
+            softStartCurrent: getSoftStartCurrentValues,
         };
     }
     get defaults(): Ldo {
-        return ldoDefaults();
+        return ldoDefaults(this.index);
     }
 }

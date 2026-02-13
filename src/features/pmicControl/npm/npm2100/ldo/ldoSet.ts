@@ -5,12 +5,17 @@
  */
 
 import { NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
-import { Ldo, LdoExport, LdoMode, PmicDialog, SoftStart } from '../../types';
+import {
+    Ldo,
+    LdoExport,
+    LdoMode,
+    LdoSoftStartCurrent,
+    PmicDialog,
+} from '../../types';
 import {
     nPM2100GPIOControlMode,
     nPM2100GPIOControlPinSelect,
     nPM2100LdoModeControl,
-    nPM2100LDOSoftStart,
 } from '../types';
 import { LdoGet } from './ldoGet';
 
@@ -30,25 +35,24 @@ export class LdoSet {
     }
 
     async all(config: LdoExport) {
-        const promises = [
-            this.voltage(config.voltage),
-            this.enabled(config.enabled),
-            this.mode(config.mode),
-        ];
+        const promises = [this.enabled(config.enabled)];
 
+        if (config.mode) promises.push(this.mode(config.mode));
         if (config.modeControl)
             promises.push(this.modeControl(config.modeControl));
         if (config.pinSel) promises.push(this.pinSel(config.pinSel));
-        if (config.ldoSoftStart)
-            promises.push(this.ldoSoftstart(config.ldoSoftStart));
-        if (config.softStart) promises.push(this.softStart(config.softStart));
+        if (config.softStartCurrent)
+            promises.push(
+                this.softStartCurrent(config.softStartCurrent, config.mode),
+            );
         if (config.pinMode) promises.push(this.pinMode(config.pinMode));
-        if (config.ocpEnabled)
-            promises.push(this.ocpEnabled(config.ocpEnabled));
-        if (config.rampEnabled)
-            promises.push(this.rampEnabled(config.rampEnabled));
-        if (config.haltEnabled)
-            promises.push(this.haltEnabled(config.haltEnabled));
+        if (config.overcurrentProtection)
+            promises.push(
+                this.overcurrentProtection(config.overcurrentProtection),
+            );
+        if (config.ramp) promises.push(this.ramp(config.ramp));
+        if (config.halt) promises.push(this.halt(config.halt));
+        if (config.voltage) promises.push(this.voltage(config.voltage));
 
         await Promise.allSettled(promises);
     }
@@ -151,47 +155,28 @@ export class LdoSet {
         });
     }
 
-    ldoSoftstart(ldoSoftStart: nPM2100LDOSoftStart) {
+    softStartCurrent(value: LdoSoftStartCurrent, mode?: LdoMode) {
         return new Promise<void>((resolve, reject) => {
-            if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<Ldo>(
-                    'onLdoUpdate',
-                    {
-                        ldoSoftStart,
-                    },
-                    0,
-                );
+            if (mode === undefined) {
                 resolve();
-            } else {
-                this.sendCommand(
-                    `npm2100 ldosw softstart LDO set ${ldoSoftStart}`,
-                    () => resolve(),
-                    () => {
-                        this.get.softStartLdo();
-                        reject();
-                    },
-                );
+                return;
             }
-        });
-    }
 
-    softStart(softStart: SoftStart) {
-        return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
-                    {
-                        softStart,
-                    },
+                    mode === 'LDO'
+                        ? { softStartCurrentLDOMode: value }
+                        : { softStartCurrentLoadSwitchMode: value },
                     0,
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm2100 ldosw softstart LOADSW set ${softStart}`,
+                    `npm2100 ldosw softstart ${mode === 'LDO' ? 'LDO' : 'LOADSW'} set ${value}mA`,
                     () => resolve(),
                     () => {
-                        this.get.softStart();
+                        this.get.softStartCurrent(mode);
                         reject();
                     },
                 );
@@ -271,20 +256,20 @@ export class LdoSet {
         });
     }
 
-    ocpEnabled(ocpEnabled: boolean) {
+    overcurrentProtection(ocp: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        ocpEnabled,
+                        overcurrentProtection: ocp,
                     },
                     0,
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm2100 ldosw ocp set ${ocpEnabled ? 'ON' : 'OFF'}`,
+                    `npm2100 ldosw ocp set ${ocp ? 'ON' : 'OFF'}`,
                     () => resolve(),
                     () => {
                         this.get.ocp();
@@ -295,22 +280,20 @@ export class LdoSet {
         });
     }
 
-    rampEnabled(ldoRampEnabled: boolean) {
+    ramp(enable: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        rampEnabled: ldoRampEnabled,
+                        ramp: enable,
                     },
                     0,
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm2100 ldosw ldoramp set ${
-                        ldoRampEnabled ? 'ON' : 'OFF'
-                    }`,
+                    `npm2100 ldosw ldoramp set ${enable ? 'ON' : 'OFF'}`,
                     () => resolve(),
                     () => {
                         this.get.ramp();
@@ -321,22 +304,20 @@ export class LdoSet {
         });
     }
 
-    haltEnabled(ldoHaltEnabled: boolean) {
+    halt(enable: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        haltEnabled: ldoHaltEnabled,
+                        halt: enable,
                     },
                     0,
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm2100 ldosw ldohalt set ${
-                        ldoHaltEnabled ? 'ON' : 'OFF'
-                    }`,
+                    `npm2100 ldosw ldohalt set ${enable ? 'ON' : 'OFF'}`,
                     () => resolve(),
                     () => {
                         this.get.halt();
