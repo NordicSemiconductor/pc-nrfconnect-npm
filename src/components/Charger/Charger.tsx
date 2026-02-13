@@ -17,6 +17,7 @@ import {
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import BatteryCard from '../Cards/Battery/BatteryCard';
+import BatteryLifeAndSafety from '../Cards/Battery/BatteryLifeAndSafety';
 import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import PowerCard from '../Cards/Power/PowerCard';
 import Jeita from './Jeita';
@@ -51,6 +52,13 @@ export default ({ active }: PaneProps) => {
             )}
             {npmDevice && charger && (
                 <ThermalRegulation
+                    chargerModule={npmDevice.chargerModule}
+                    charger={charger}
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice && charger && (
+                <BatteryLifeAndSafety
                     chargerModule={npmDevice.chargerModule}
                     charger={charger}
                     disabled={disabled}
