@@ -75,7 +75,7 @@ describe('PMIC 1304 - Setters Offline tests', () => {
     });
 
     test('Set setChargerTChgStop', async () => {
-        await pmic.chargerModule?.set.tChgStop(90);
+        await pmic.chargerModule?.set.tChgStop?.(90);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({ tChgStop: 90 });
