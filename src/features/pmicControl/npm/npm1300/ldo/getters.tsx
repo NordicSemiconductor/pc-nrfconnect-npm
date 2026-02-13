@@ -18,8 +18,8 @@ export class LdoGet {
         this.voltage();
         this.mode();
         this.enabled();
-        this.softStartEnabled();
         this.softStart();
+        this.softStartCurrent();
         this.activeDischarge();
         this.onOffControl();
     }
@@ -33,10 +33,10 @@ export class LdoGet {
     mode() {
         this.sendCommand(`npmx ldsw mode get ${this.index}`);
     }
-    softStartEnabled() {
+    softStart() {
         this.sendCommand(`npmx ldsw soft_start enable get ${this.index}`);
     }
-    softStart() {
+    softStartCurrent() {
         this.sendCommand(`npmx ldsw soft_start current get ${this.index}`);
     }
     activeDischarge() {
