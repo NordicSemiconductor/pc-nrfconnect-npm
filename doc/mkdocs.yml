@@ -13,8 +13,9 @@ theme:
       toggle:
         icon: material/lightbulb
         name: Switch to light mode
-  # logo: assets/logo.png
-  # favicon: assets/logo.png
+   # logo: assets/logo.png
+   # favicon: assets/logo.png
+
   features:
     - content.code.annotate
     - content.tooltips
@@ -30,7 +31,7 @@ extra_css:
   - stylesheets/style.css
 
 copyright:
-  Copyright &copy; 2023-2024
+  Copyright &copy; 2023-2026
 
 markdown_extensions:
   - abbr
@@ -50,18 +51,14 @@ plugins:
   - macros
   - search
 
-
 extra:
   test: This is a test abbreviation snippet
-  app_name: nPM PowerUP app
 
 nav:
-  - Home: index.md
-  - Installing the nPM PowerUP app: installing.md
+  - Get started: index.md
   - Overview and user interface: overview.md
   - Profiling a battery: profiling_battery.md
   - Evaluating a battery: evaluating_battery.md
   - Working with profiles: working_with_profiles.md
   - Guidelines for battery profiling: profiling_guidelines.md
   - Revision history: revision_history.md
-

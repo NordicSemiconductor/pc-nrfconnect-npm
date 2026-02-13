@@ -3,7 +3,7 @@
 !!! note "Note"
      This feature is available for the nPM1300 EK and the nPM1304 EK.
 
-Use the {{app_name}} together with the [nPM1300 Evaluation Kit (EK)](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/intro.html) or the nPM1304 Evaluation Kit (EK) to profile your battery and generate a battery model.
+Use the nPM PowerUP app together with the [nPM1300 Evaluation Kit (EK)](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/intro.html) or the nPM1304 Evaluation Kit (EK) to profile your battery and generate a battery model.
 
 Once the battery model is extracted, you only need the PMIC and the SoC (or SiP) in your application to do fuel gauging.
 
@@ -21,9 +21,9 @@ Depending on the EK you are using:
     * The nPM Fuel Gauge Board is not required.
     * Connect the nPM1304 EK and download the software as described in [Connect the nPM1304 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1304_ek/page/UG/nPM1304_EK/use_ek_power_up.html).
 
-## Profiling a battery in the {{app_name}}
+## Profiling a battery in the nPM PowerUP app
 
-Complete the following steps to profile a battery and use the generated battery model to initialize and run the fuel gauge in the {{app_name}}:
+Complete the following steps to profile a battery and use the generated battery model to initialize and run the fuel gauge in the nPM PowerUP app:
 
 1. Click the [**Profile Battery**](overview.md#fuel-gauge) button in the side panel.
 1. Enter the battery data and one or more temperatures for the profiling test. Provide the generic information about the selected battery. Refer to the battery datasheet for information. For further information on profiling, see [Guidelines for battery profiling](profiling_guidelines.md).
@@ -48,11 +48,11 @@ To start fuel gauge evaluations using a battery model, see [Evaluating a battery
 
 All or some of the following files are generated as the result of profiling a battery:
 
-* A JSON file for the combined temperature model, used for fuel gauge evaluations in the {{app_name}}
+* A JSON file for the combined temperature model, used for fuel gauge evaluations in the nPM PowerUP app
 * An INC file that you can use to integrate the battery model into your application
-* `profileSettings.json` that contains the {{app_name}} settings for the profiling process
+* `profileSettings.json` that contains the nPM PowerUP app settings for the profiling process
 * Directory for each battery profile, which includes the following files:
 
     * CSV data file for the given profile and temperature, which can be used to [merge temperature profiles](./working_with_profiles.md)
     * Debug directory that includes debugging files with information about the profiling process, such as profiling commands and logs, and about the functioning of the app.<br/>
-      You can share these files with Nordic Semiconductor if you encounter issues while profiling. You can also manually create these files with the [**Record Events**](overview.md#record-events) button in the side panel, but the contents might be different when not profiling.
+      You can share these files with Nordic Semiconductor if you encounter issues while profiling. You can also manually create these files with the [**Record Events**](overview.md#actions) button in the side panel, but the contents might be different when not profiling.
