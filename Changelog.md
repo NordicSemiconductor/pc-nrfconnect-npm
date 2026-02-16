@@ -6,7 +6,7 @@
 
 ### Fixed
 
-- nPM2100: Fix setting the timer period value from the UI.
+- nPM2100: Issue with setting the timer period value from the UI.
 - nPM2100: When the GPIO mode control is selected, the toggle for Load
   switch/LDO is now correctly enabled.
 - nPM1300 and nPM1304: Updated SoftStart currents.
