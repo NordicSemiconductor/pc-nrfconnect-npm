@@ -114,6 +114,18 @@ You can use the options in the **Regulators** tab to enable or disable specific 
 
 Here you can also set the output and retention voltage for each regulator and monitor its status.
 
+### nPM1300 and nPM1304: LDO and Load Switch
+
+!!! note "Note"
+     This feature is available for the nPM1300 EK and the nPM1304 EK.
+
+Each **Load Switch/LDO** card lets you choose **LDO** or **Load Switch** mode, set the output voltage (VOUTLDO), and configure options such as **Active Discharge** and **On/Off Control**. See the tooltips on each control for details.
+
+The **LDO Soft Start** mode limits how quickly the LDO output current ramps up when the regulator is enabled, which reduces stress on the supply and load. When supported by the PMIC, the **Soft Start Current** drop-down (for example 25, 50, 75, or 100 mA) is available on the card.
+
+!!! note "Note"
+    LDO Soft Start is only available on PMICs that support it. The app reads the PMIC revision when the device is connected. For **nPM1304**, support starts at hardware rev. 1.1. On older nPM1304 revisions, the **Soft Start Current** control is disabled in LDO mode.
+
 ## GPIOs tab
 
 You can use the options in the **GPIOs** tab to configure the GPIO and LED pins available on the PMIC device.
