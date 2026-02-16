@@ -44,6 +44,7 @@ export default class Npm1300 extends BaseNpmDevice {
         dialogHandler: ((dialog: PmicDialog) => void) | null,
         peripherals?: Partial<NpmPeripherals>,
         hardwareVersion?: string,
+        pmicVersion?: number,
         type: 'npm1300' | 'npm1304' = 'npm1300',
         fw: string = npm1300FWVersion,
     ) {
@@ -86,6 +87,7 @@ export default class Npm1300 extends BaseNpmDevice {
                 sensor: true,
             },
             hardwareVersion,
+            pmicVersion,
         );
 
         if (shellParser) {

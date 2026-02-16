@@ -280,6 +280,7 @@ export default abstract class BaseNpmDevice {
             offlineMode: this.offlineMode,
             dialogHandler: this.dialogHandler,
             npmDevice: this,
+            pmicRevision: this.pmicRevision,
         };
         if (this.peripherals.ChargerModule) {
             this.chargerModule = new this.peripherals.ChargerModule({
@@ -398,6 +399,7 @@ export default abstract class BaseNpmDevice {
         readonly batteryConnectedVoltageThreshold: number,
         private readonly _supportedErrorLogs: SupportedErrorLogs,
         protected hardwareVersion?: string,
+        protected pmicRevision?: number,
     ) {
         this.#pmicState = shellParser ? 'pmic-connected' : 'ek-disconnected';
         this.offlineMode = !shellParser;

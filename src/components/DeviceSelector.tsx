@@ -136,8 +136,12 @@ export default () => {
                 } else if (device === 'nPM1304') {
                     dispatch(
                         setNpmDevice(
-                            new Npm1304(undefined, pmicDialog =>
-                                dispatch(dialogHandler(pmicDialog)),
+                            new Npm1304(
+                                undefined,
+                                pmicDialog =>
+                                    dispatch(dialogHandler(pmicDialog)),
+                                undefined,
+                                1.0,
                             ),
                         ),
                     );
