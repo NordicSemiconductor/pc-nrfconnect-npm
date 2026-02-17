@@ -16,6 +16,7 @@ import {
     getBucks,
     getCharger,
     getLdos,
+    getLoadSwitches,
     getNpmDevice,
     getOnBoardLoad,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -25,6 +26,7 @@ import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
+import LoadSwitchCard from '../Cards/LoadSwitch/LoadSwitchCard';
 import OnBoardLoadCard from '../Cards/OnBoardLoad/OnBoardLoadCard';
 import PowerCard from '../Cards/Power/PowerCard';
 
@@ -36,6 +38,7 @@ export default ({ active }: PaneProps) => {
     const bucks = useSelector(getBucks);
     const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
+    const loadSwitches = useSelector(getLoadSwitches);
 
     return active ? (
         <MasonryLayout
@@ -96,6 +99,16 @@ export default ({ active }: PaneProps) => {
                             ldos.length === 1 ? `Load Switch/LDO` : undefined
                         }
                         key={`Ldo${1 + index}`}
+                        disabled={disabled}
+                        defaultSummary
+                    />
+                ))}
+            {npmDevice &&
+                loadSwitches.map((loadSwitch, index) => (
+                    <LoadSwitchCard
+                        loadSwitch={loadSwitch}
+                        loadSwitchModule={npmDevice.loadSwitchModule[index]}
+                        key={`LoadSwitch${1 + index}`}
                         disabled={disabled}
                         defaultSummary
                     />
