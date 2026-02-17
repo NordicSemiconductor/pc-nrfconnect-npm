@@ -25,6 +25,7 @@ import {
     ITrickle1012,
     VTrickleFast1012,
 } from './npm1012/charger/types';
+import { OnOffControl as LoadSwitchOnOffControl1012 } from './npm1012/loadswitch/types';
 import { ITermNpm1300, VTrickleFast1300 } from './npm1300/charger/types';
 import type {
     GPIODrive1300,
@@ -97,6 +98,8 @@ export type LdoSoftStart = nPM2100LDOSoftStart;
 export type LdoOnOffControl =
     | (typeof LdoOnOffControlValues)[number]
     | GPIONames;
+
+export type LoadSwitchOnOffControl = LoadSwitchOnOffControl1012;
 
 export const BoostVOutSelValues = ['Vset', 'Software'] as const;
 export type BoostVOutSel = (typeof BoostVOutSelValues)[number];
@@ -283,6 +286,16 @@ export type Ldo = {
     activeDischarge: boolean;
     onOffControl: LdoOnOffControl;
     onOffSoftwareControlEnabled: boolean;
+};
+
+export type LoadSwitch = {
+    activeDischarge: boolean;
+    cardLabel: string;
+    enable: boolean;
+    onOffControl: LoadSwitchOnOffControl;
+    overCurrentProtection: boolean;
+    softStartCurrentLimit: number;
+    softStartTime: number;
 };
 
 export type GPIOState = GPIOState2100;
@@ -896,6 +909,35 @@ export interface LdoModule {
     defaults: Ldo;
 }
 
+export interface LoadSwitchModule {
+    index: number;
+    get: {
+        activeDischarge: () => void;
+        all: () => void;
+        enable: () => void;
+        onOffControl: () => void;
+        overCurrentProtection: () => void;
+        softStartCurrentLimit: () => void;
+        softStartTime: () => void;
+    };
+    set: {
+        activeDischarge: (value: boolean) => Promise<void>;
+        all: (value: LoadSwitchExport) => Promise<void>;
+        enable: (value: boolean) => Promise<void>;
+        overCurrentProtection: (value: boolean) => Promise<void>;
+        onOffControl: (value: LoadSwitchOnOffControl) => Promise<void>;
+        softStartCurrentLimit: (value: number) => Promise<void>;
+        softStartTime: (value: number) => Promise<void>;
+    };
+    callbacks: (() => void)[];
+    values: {
+        onOffControl: { label: string; value: LoadSwitchOnOffControl }[];
+        softStartCurrentLimit: { label: string; value: number }[];
+        softStartTime: { label: string; value: number }[];
+    };
+    defaults: LoadSwitch;
+}
+
 export interface OnBoardLoadModule {
     get: {
         all: () => void;
@@ -1102,6 +1144,7 @@ export type FuelGaugeExport = Omit<
 >;
 export type BoostExport = Omit<Boost, 'pinModeEnabled' | 'vOutVSet'>;
 export type LdoExport = Omit<Ldo, 'onOffSoftwareControlEnabled'>;
+export type LoadSwitchExport = Omit<LoadSwitch, 'cardLabel'>;
 export type BuckExport = Omit<
     Buck,
     'onOffSoftwareControlEnabled' | 'cardLabel' | 'vSetLabel'
@@ -1136,6 +1179,7 @@ export interface NpmExportV2 {
     charger?: Charger;
     bucks?: BuckExport[];
     ldos: LdoExport[];
+    loadSwitches?: LoadSwitchExport[];
     gpios: GPIOExport[];
     leds: LED[];
     pof?: POF;
@@ -1240,6 +1284,10 @@ export type NpmPeripherals = {
     noOfBatterySlots: number;
     ldos?: {
         Module: IModule<LdoModule>;
+        count: number;
+    };
+    loadSwitches?: {
+        Module: IModule<LoadSwitchModule>;
         count: number;
     };
     bucks?: {
