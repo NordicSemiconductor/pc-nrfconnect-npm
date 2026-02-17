@@ -39,6 +39,8 @@ import {
     LED,
     LEDMode,
     LEDModeValues,
+    LoadSwitch,
+    LoadSwitchModule,
     LoggingEvent,
     LowPowerModule,
     ModuleParams,
@@ -141,6 +143,17 @@ export default abstract class BaseNpmDevice {
     protected set ldoModule(ldoModule: LdoModule[]) {
         this.releaseAll.push(...ldoModule.map(ldo => ldo.callbacks).flat());
         this.#ldoModule = ldoModule;
+    }
+
+    #loadSwitchModule: LoadSwitchModule[] = [];
+    get loadSwitchModule() {
+        return [...this.#loadSwitchModule];
+    }
+    protected set loadSwitchModule(loadSwitchModule: LoadSwitchModule[]) {
+        this.releaseAll.push(
+            ...loadSwitchModule.map(loadSwitch => loadSwitch.callbacks).flat(),
+        );
+        this.#loadSwitchModule = loadSwitchModule;
     }
 
     #gpioModule: GpioModule[] = [];
@@ -292,6 +305,17 @@ export default abstract class BaseNpmDevice {
             this.ldoModule = [...Array(ldo.count).keys()].map(
                 index =>
                     new ldo.Module({
+                        ...args,
+                        index,
+                    }),
+            );
+        }
+
+        if (this.peripherals.loadSwitches) {
+            const loadSwitch = this.peripherals.loadSwitches;
+            this.loadSwitchModule = [...Array(loadSwitch.count).keys()].map(
+                index =>
+                    new loadSwitch.Module({
                         ...args,
                         index,
                     }),
@@ -591,6 +615,7 @@ export default abstract class BaseNpmDevice {
 
         this.buckModule.forEach(buck => buck.get.all());
         this.ldoModule.forEach(ldo => ldo.get.all());
+        this.loadSwitchModule.forEach(loadSwitch => loadSwitch.get.all());
         this.gpioModule.forEach(module => module.get.all());
         this.boostModule.forEach(boost => boost.get.all());
 
@@ -777,6 +802,13 @@ export default abstract class BaseNpmDevice {
         return this.setupHandler<PartialUpdate<Ldo>, true>('onLdoUpdate')(
             handler,
         );
+    }
+    onLoadSwitchUpdate(
+        handler: (payload: PartialUpdate<LoadSwitch>, error: string) => void,
+    ) {
+        return this.setupHandler<PartialUpdate<LoadSwitch>, true>(
+            'onLoadSwitchUpdate',
+        )(handler);
     }
     onGPIOUpdate(
         handler: (payload: PartialUpdate<GPIO>, error: string) => void,
@@ -1015,6 +1047,18 @@ export default abstract class BaseNpmDevice {
                             })(),
                         ),
                     );
+
+                    if (config.loadSwitches) {
+                        await Promise.all(
+                            config.loadSwitches.map((loadSwitches, index) =>
+                                (() => {
+                                    this.loadSwitchModule[index].set
+                                        .all(loadSwitches)
+                                        .catch(() => {});
+                                })(),
+                            ),
+                        );
+                    }
 
                     await Promise.all(
                         config.gpios.map((gpio, index) =>
