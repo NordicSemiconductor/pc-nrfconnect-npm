@@ -45,6 +45,7 @@ import {
     setLatestAdcSample,
     setLdos,
     setLEDs,
+    setLoadSwitches,
     setLowPowerConfig,
     setNpmDevice,
     setOnBoardLoad,
@@ -64,6 +65,7 @@ import {
     updateGPIOs,
     updateLdo,
     updateLEDs,
+    updateLoadSwitch,
     updateLowPowerConfig,
     updateOnBoardLoad,
     updatePOFs,
@@ -262,6 +264,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onLdoUpdate(payload => {
                     dispatch(updateLdo(payload));
+                }),
+            );
+
+            releaseAll.push(
+                npmDevice.onLoadSwitchUpdate(payload => {
+                    dispatch(updateLoadSwitch(payload));
                 }),
             );
 
@@ -556,6 +564,11 @@ export default () => {
                 setLdos(npmDevice.ldoModule.map(module => module.defaults)),
             );
             dispatch(
+                setLoadSwitches(
+                    npmDevice.loadSwitchModule.map(module => module.defaults),
+                ),
+            );
+            dispatch(
                 setGPIOs(npmDevice.gpioModule.map(module => module.defaults)),
             );
             dispatch(setLEDs(npmDevice.ledDefaults()));
@@ -703,6 +716,7 @@ export default () => {
                         !npmDevice?.boostModule?.length &&
                         !npmDevice?.buckModule?.length &&
                         !npmDevice?.ldoModule?.length &&
+                        !npmDevice?.loadSwitchModule?.length &&
                         !npmDevice?.hasMaxEnergyExtraction?.(),
                 }),
             );
@@ -724,7 +738,8 @@ export default () => {
                     hidden:
                         !npmDevice?.boostModule?.length &&
                         !npmDevice?.buckModule?.length &&
-                        !npmDevice?.ldoModule?.length, // TODO change to use ldoModule
+                        !npmDevice?.ldoModule?.length &&
+                        !npmDevice?.loadSwitchModule?.length,
                 }),
             );
             dispatch(
