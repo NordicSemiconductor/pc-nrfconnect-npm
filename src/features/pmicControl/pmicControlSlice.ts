@@ -19,6 +19,7 @@ import type {
     GPIO,
     Ldo,
     LED,
+    LoadSwitch,
     LowPowerConfig,
     OnBoardLoad,
     PartialUpdate,
@@ -39,6 +40,7 @@ interface pmicControlState {
     bucks: Buck[];
     onBoardLoad?: OnBoardLoad;
     ldos: Ldo[];
+    loadSwitches: LoadSwitch[];
     gpios: GPIO[];
     leds: LED[];
     pof?: POF;
@@ -65,6 +67,7 @@ const initialState: pmicControlState = {
     boosts: [],
     bucks: [],
     ldos: [],
+    loadSwitches: [],
     gpios: [],
     leds: [],
     pmicChargingState: {
@@ -172,6 +175,20 @@ const pmicControlSlice = createSlice({
             if (state.ldos.length >= action.payload.index) {
                 state.ldos[action.payload.index] = {
                     ...state.ldos[action.payload.index],
+                    ...action.payload.data,
+                };
+            }
+        },
+        setLoadSwitches(state, action: PayloadAction<LoadSwitch[]>) {
+            state.loadSwitches = action.payload;
+        },
+        updateLoadSwitch(
+            state,
+            action: PayloadAction<PartialUpdate<LoadSwitch>>,
+        ) {
+            if (state.loadSwitches.length > action.payload.index) {
+                state.loadSwitches[action.payload.index] = {
+                    ...state.loadSwitches[action.payload.index],
                     ...action.payload.data,
                 };
             }
@@ -349,6 +366,8 @@ export const getPmicChargingState = (state: RootState) => {
 export const getBoosts = (state: RootState) => state.app.pmicControl.boosts;
 export const getBucks = (state: RootState) => state.app.pmicControl.bucks;
 export const getLdos = (state: RootState) => state.app.pmicControl.ldos;
+export const getLoadSwitches = (state: RootState) =>
+    state.app.pmicControl.loadSwitches;
 export const getGPIOs = (state: RootState) => state.app.pmicControl.gpios;
 export const getLEDs = (state: RootState) => state.app.pmicControl.leds;
 export const getPOF = (state: RootState) => state.app.pmicControl.pof;
@@ -431,6 +450,8 @@ export const {
     updateOnBoardLoad,
     setLdos,
     updateLdo,
+    setLoadSwitches,
+    updateLoadSwitch,
     setGPIOs,
     updateGPIOs,
     setLEDs,
