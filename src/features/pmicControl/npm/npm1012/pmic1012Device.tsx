@@ -23,6 +23,7 @@ import {
 } from '../types';
 import BuckModule from './buck';
 import ChargerModule from './charger';
+import LoadSwitchModule from './loadswitch';
 
 export const npm1012FWVersion = '0.0.1+0';
 
@@ -41,6 +42,7 @@ export default class Npm1012 extends BaseNpmDevice {
             new NpmEventEmitter(),
             {
                 bucks: { Module: BuckModule, count: 1 },
+                loadSwitches: { Module: LoadSwitchModule, count: 1 },
                 ChargerModule,
                 maxEnergyExtraction: true,
                 noOfLEDs: 0,
@@ -238,6 +240,7 @@ export default class Npm1012 extends BaseNpmDevice {
             boosts: [...currentState.boosts],
             charger: currentState.charger,
             ldos: [...currentState.ldos],
+            loadSwitches: [...currentState.loadSwitches],
             gpios: [...currentState.gpios],
             leds: [...currentState.leds],
             lowPower: currentState.lowPower,
