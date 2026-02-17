@@ -15,12 +15,14 @@ import {
     getBoosts,
     getBucks,
     getLdos,
+    getLoadSwitches,
     getNpmDevice,
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import BoostCard from '../Cards/Boost/BoostCard';
 import BuckCard from '../Cards/Buck/BuckCard';
 import LDOCard from '../Cards/LDO/LDOCard';
+import LoadSwitchCard from '../Cards/LoadSwitch/LoadSwitchCard';
 
 export default ({ active }: PaneProps) => {
     const disabled = useIsUIDisabled();
@@ -28,6 +30,7 @@ export default ({ active }: PaneProps) => {
     const bucks = useSelector(getBucks);
     const boosts = useSelector(getBoosts);
     const ldos = useSelector(getLdos);
+    const loadSwitches = useSelector(getLoadSwitches);
 
     return active ? (
         <MasonryLayout
@@ -61,6 +64,15 @@ export default ({ active }: PaneProps) => {
                             ldos.length === 1 ? `Load Switch/LDO` : undefined
                         }
                         key={`Buck${1 + index}`}
+                        disabled={disabled}
+                    />
+                ))}
+            {npmDevice &&
+                loadSwitches.map((loadSwitch, index) => (
+                    <LoadSwitchCard
+                        loadSwitch={loadSwitch}
+                        loadSwitchModule={npmDevice.loadSwitchModule[index]}
+                        key={`LoadSwitch${1 + index}`}
                         disabled={disabled}
                     />
                 ))}
