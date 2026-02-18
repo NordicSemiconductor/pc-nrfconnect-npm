@@ -44,6 +44,25 @@ export default ({
                 charger={charger}
                 disabled={disabled}
             />
+            {charger.enableBatteryDischargeCurrentLimit !== undefined && (
+                <Toggle
+                    label={
+                        <DocumentationTooltip
+                            card="battery"
+                            item="BatteryDischargeCurrentLimit"
+                        >
+                            <span>Enable Battery Discharge Current Limit</span>
+                        </DocumentationTooltip>
+                    }
+                    isToggled={charger.enableBatteryDischargeCurrentLimit}
+                    disabled={disabled}
+                    onToggle={enabled =>
+                        chargerModule.set.enableBatteryDischargeCurrentLimit?.(
+                            enabled,
+                        )
+                    }
+                />
+            )}
             <VBatLow
                 chargerModule={chargerModule}
                 charger={charger}
