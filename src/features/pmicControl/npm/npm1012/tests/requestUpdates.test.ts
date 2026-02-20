@@ -19,13 +19,8 @@ describe('PMIC 1012 - Request update commands', () => {
     test('Request startAdcSample', () => {
         pmic.startAdcSample(2000, 1000);
 
-        expect(mockEnqueueRequest).toBeCalledTimes(1);
-        expect(mockEnqueueRequest).toBeCalledWith(
-            'npm_adc sample 1000 2000',
-            expect.anything(),
-            undefined,
-            true,
-        );
+        // TODO: Update when shell command is available
+        expect(mockEnqueueRequest).toBeCalledTimes(0);
     });
 
     test('Request stopAdcSample', () => {
