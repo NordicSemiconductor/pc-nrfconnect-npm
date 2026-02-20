@@ -266,4 +266,12 @@ export default class Npm1012 extends BaseNpmDevice {
     // generateOverlay(npmExport: NpmExportV2) {
     //     return overlay(npmExport, this);
     // }
+
+    // TODO: Update/remove when shell command is available
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
+    startAdcSample(_intervalMs: number, _samplingRate: number) {
+        return new Promise<void>(resolve => {
+            resolve();
+        });
+    }
 }
