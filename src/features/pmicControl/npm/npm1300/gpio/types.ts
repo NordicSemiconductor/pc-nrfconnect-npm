@@ -45,3 +45,5 @@ export const GPIODriveValues = Object.keys(GPIODrive1300)
 export const GPIODriveKeys = Object.values(GPIODrive1300).filter(key =>
     Number.isNaN(Number(key)),
 );
+
+export const numGPIOs = 5;
