@@ -28,17 +28,26 @@ export class ChargerSet extends ChargerModuleSetBase {
             this.enabledRecharging(charger.enableRecharging),
             this.enabledVBatLow(charger.enableVBatLow),
             this.vTrickleFast(charger.vTrickleFast),
-            this.nTCThermistor(charger.ntcThermistor),
-            this.nTCBeta(charger.ntcBeta),
             this.tChgResume(charger.tChgResume),
-            this.tChgStop(charger.tChgStop),
-            this.vTermR(charger.vTermR),
             this.tCold(charger.tCold),
             this.tCool(charger.tCool),
             this.tWarm(charger.tWarm),
             this.tHot(charger.tHot),
             this.enabled(charger.enabled),
         );
+
+        if (charger.ntcBeta && this.nTCBeta) {
+            promises.push(this.nTCBeta(charger.ntcBeta));
+        }
+        if (charger.ntcThermistor && this.nTCThermistor) {
+            promises.push(this.nTCThermistor(charger.ntcThermistor));
+        }
+        if (charger.tChgStop && this.tChgStop) {
+            promises.push(this.tChgStop(charger.tChgStop));
+        }
+        if (charger.vTermR !== undefined && this.vTermR) {
+            promises.push(this.vTermR(charger.vTermR));
+        }
 
         await Promise.allSettled(promises);
     }
@@ -297,13 +306,13 @@ export class ChargerSet extends ChargerModuleSetBase {
                                 }
                             },
                             () => {
-                                this.get.nTCThermistor();
+                                this.get.nTCThermistor?.();
                                 reject();
                             },
                         );
                     })
                     .catch(() => {
-                        this.get.nTCThermistor();
+                        this.get.nTCThermistor?.();
                         reject();
                     });
             }
@@ -327,7 +336,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                                 resolve();
                             },
                             () => {
-                                this.get.nTCBeta();
+                                this.get.nTCBeta?.();
                                 reject();
                             },
                         ),
@@ -349,7 +358,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     `npmx charger die_temp stop set ${value}`,
                     () => resolve(),
                     () => {
-                        this.get.tChgStop();
+                        this.get.tChgStop?.();
                         reject();
                     },
                 );
@@ -389,7 +398,7 @@ export class ChargerSet extends ChargerModuleSetBase {
                     `npmx charger termination_voltage warm set ${value * 1000}`,
                     () => resolve(),
                     () => {
-                        this.get.vTermR();
+                        this.get.vTermR?.();
                         reject();
                     },
                 );

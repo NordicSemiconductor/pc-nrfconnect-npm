@@ -19,6 +19,8 @@ import {
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import {
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     ChargerModule,
     NTCThermistor,
     NTCValues,
@@ -33,6 +35,96 @@ const ntcThermistorItems = [...NTCValues].map(item => ({
 
 const card = 'JEITA';
 
+const convertILabelToReactNode = (type: ChargerJeitaILabel) => {
+    switch (type) {
+        case ChargerJeitaILabel.coldIOff:
+            return <span>Off</span>;
+        case ChargerJeitaILabel.coolICool:
+            return (
+                <span>
+                    I<span className="subscript">COOL</span>
+                </span>
+            );
+        case ChargerJeitaILabel.coolIChg50percent:
+            return (
+                <span>
+                    50% I<span className="subscript">CHG</span>
+                </span>
+            );
+        case ChargerJeitaILabel.coolIChgCool:
+            return (
+                <span>
+                    I<span className="subscript">CHG_COOL</span>
+                </span>
+            );
+        case ChargerJeitaILabel.nominalIChg:
+            return (
+                <span>
+                    I<span className="subscript">CHG</span>
+                </span>
+            );
+        case ChargerJeitaILabel.warmIChg:
+            return (
+                <span>
+                    I<span className="subscript">CHG</span>
+                </span>
+            );
+        case ChargerJeitaILabel.warmIChgWarm:
+            return (
+                <span>
+                    I<span className="subscript">CHG_WARM</span>
+                </span>
+            );
+        case ChargerJeitaILabel.hotIOff:
+            return <span>Off</span>;
+    }
+};
+
+const convertVLabelToReactNode = (type: ChargerJeitaVLabel) => {
+    switch (type) {
+        case ChargerJeitaVLabel.coldVNA:
+            return <span>N/A</span>;
+        case ChargerJeitaVLabel.coolVTerm:
+            return (
+                <span>
+                    V<span className="subscript">TERM</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.coolVTermCool:
+            return (
+                <span>
+                    V<span className="subscript">TERM_COOL</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.nominalVTerm:
+            return (
+                <span>
+                    V<span className="subscript">TERM</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.warmVTerm100mVOff:
+            return (
+                <span>
+                    V<span className="subscript">TERM</span> - 100 mV
+                </span>
+            );
+        case ChargerJeitaVLabel.warmVTermR:
+            return (
+                <span>
+                    V<span className="subscript">TERMR</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.warmVTermWarm:
+            return (
+                <span>
+                    V<span className="subscript">TERM_WARM</span>
+                </span>
+            );
+        case ChargerJeitaVLabel.hotVNA:
+            return <span>N/A</span>;
+    }
+};
+
 export default ({
     chargerModule,
     charger,
@@ -43,10 +135,6 @@ export default ({
     disabled: boolean;
 }) => {
     const latestAdcSample = useSelector(getLatestAdcSample);
-
-    const [internalVTermr, setInternalVTermr] = useState(charger.vTermR);
-    const [internalNTCBeta, setInternalNTCBeta] = useState(charger.ntcBeta);
-    const [autoNTCBeta, setAutoNTCBeta] = useState(true);
 
     const [internalJeitaTemps, setInternalJeitaTemps] = useState([
         charger.tCold,
@@ -68,14 +156,12 @@ export default ({
 
     //  NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
-        setInternalVTermr(charger.vTermR);
         setInternalJeitaTemps([
             charger.tCold,
             charger.tCool,
             charger.tWarm,
             charger.tHot,
         ]);
-        setInternalNTCBeta(charger.ntcBeta);
     }, [charger]);
 
     const updateInternal = (index: number, value: number) => {
@@ -107,16 +193,48 @@ export default ({
         setInternalJeitaTemps(temp);
     };
 
+    const advancedChargingProfileSupport =
+        charger.enableNtcMonitoring !== undefined &&
+        charger.enableAdvancedChargingProfile !== undefined &&
+        charger.iChgCool !== undefined &&
+        charger.vTermCool !== undefined &&
+        charger.iChgWarm !== undefined &&
+        charger.vTermWarm !== undefined;
+
+    const advancedChargingProfileDisabled =
+        advancedChargingProfileSupport && !charger.enableNtcMonitoring;
+
+    const arrowNumberInputDisabled =
+        advancedChargingProfileSupport && advancedChargingProfileDisabled;
+
     return (
         <Card
             title={
                 <div className="tw-flex tw-justify-between">
                     <DocumentationTooltip card={card} item="JEITACompliance">
-                        <span>
-                            T<span className="subscript">BAT</span> Monitoring –
-                            JEITA Compliance
-                        </span>
+                        {advancedChargingProfileSupport ? (
+                            <span>
+                                T<span className="subscript">BAT</span>{' '}
+                                Monitoring – JEITA and Advanced Charging Profile
+                            </span>
+                        ) : (
+                            <span>
+                                T<span className="subscript">BAT</span>{' '}
+                                Monitoring – JEITA Compliance
+                            </span>
+                        )}
                     </DocumentationTooltip>
+                    {advancedChargingProfileSupport &&
+                        charger.enableNtcMonitoring !== undefined && (
+                            <Toggle
+                                label="Enable"
+                                isToggled={charger.enableNtcMonitoring}
+                                onToggle={v =>
+                                    chargerModule.set.enableNtcMonitoring?.(v)
+                                }
+                                disabled={disabled}
+                            />
+                        )}
                 </div>
             }
         >
@@ -133,7 +251,7 @@ export default ({
                         <Line />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat < internalJeitaTemps[0] &&
                                 'tw-bg-indigo-100',
@@ -142,8 +260,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Cold
                         </span>
-                        <span>Off</span>
-                        <span>N/A</span>
+                        {convertILabelToReactNode(charger.jeitaILabelCold)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelCold)}
                     </div>
                     <div>
                         <Arrow
@@ -155,10 +273,11 @@ export default ({
                             }}
                             onChange={v => updateInternal(0, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={arrowNumberInputDisabled}
                         />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[0] &&
                                 latestAdcSample.tBat < internalJeitaTemps[1] &&
@@ -168,12 +287,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Cool
                         </span>
-                        <span>
-                            I<span className="subscript">COOL</span>
-                        </span>
-                        <span>
-                            V<span className="subscript">TERM</span>
-                        </span>
+                        {convertILabelToReactNode(charger.jeitaILabelCool)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelCool)}
                     </div>
                     <div>
                         <Arrow
@@ -185,10 +300,11 @@ export default ({
                             }}
                             onChange={v => updateInternal(1, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={arrowNumberInputDisabled}
                         />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[1] &&
                                 latestAdcSample?.tBat < internalJeitaTemps[2] &&
@@ -198,12 +314,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Nominal
                         </span>
-                        <span>
-                            I<span className="subscript">CHG</span>
-                        </span>
-                        <span>
-                            V<span className="subscript">TERM</span>
-                        </span>
+                        {convertILabelToReactNode(charger.jeitaILabelNominal)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelNominal)}
                     </div>
                     <div>
                         <Arrow
@@ -215,10 +327,11 @@ export default ({
                             }}
                             onChange={v => updateInternal(2, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={arrowNumberInputDisabled}
                         />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[2] &&
                                 latestAdcSample.tBat < internalJeitaTemps[3] &&
@@ -228,12 +341,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Warm
                         </span>
-                        <span>
-                            I<span className="subscript">CHG</span>
-                        </span>
-                        <span>
-                            V<span className="subscript">TERMR</span>
-                        </span>
+                        {convertILabelToReactNode(charger.jeitaILabelWarm)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelWarm)}
                     </div>
                     <div>
                         <Arrow
@@ -245,10 +354,11 @@ export default ({
                             }}
                             onChange={v => updateInternal(3, v)}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
+                            disabled={arrowNumberInputDisabled}
                         />
                     </div>
                     <div
-                        className={`tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
+                        className={`tw-min-w-fit tw-flex tw-flex-grow tw-flex-col tw-rounded tw-p-1 tw-text-center ${classNames(
                             latestAdcSample?.tBat &&
                                 latestAdcSample.tBat >= internalJeitaTemps[3] &&
                                 'tw-bg-red-100',
@@ -257,8 +367,8 @@ export default ({
                         <span className="tw-border-b tw-border-b-gray-200 tw-font-medium">
                             Hot
                         </span>
-                        <span>Off</span>
-                        <span>N/A</span>
+                        {convertILabelToReactNode(charger.jeitaILabelHot)}
+                        {convertVLabelToReactNode(charger.jeitaVLabelHot)}
                     </div>
                 </div>
 
@@ -272,12 +382,60 @@ export default ({
                                 i => v => updateInternal(i, v),
                             )}
                             onChangeComplete={updateNpmDeviceJeitaTemps}
-                            disabled={disabled}
+                            disabled={
+                                disabled || advancedChargingProfileDisabled
+                            }
                         />
                     </div>
                     <span>{chargerModule.ranges.jeita.max}°C</span>
                 </div>
             </div>
+            {advancedChargingProfileSupport ? (
+                <AdvancedChargingProfile
+                    chargerModule={chargerModule}
+                    charger={charger}
+                    disabled={advancedChargingProfileDisabled}
+                />
+            ) : null}
+            <Default
+                chargerModule={chargerModule}
+                charger={charger}
+                disabled={disabled}
+            />
+        </Card>
+    );
+};
+
+const Default = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [internalVTermr, setInternalVTermr] = useState(charger.vTermR);
+    const [internalNTCBeta, setInternalNTCBeta] = useState(charger.ntcBeta);
+    const [autoNTCBeta, setAutoNTCBeta] = useState(true);
+
+    useEffect(() => {
+        setInternalVTermr(charger.vTermR);
+        setInternalNTCBeta(charger.ntcBeta);
+    }, [charger]);
+
+    if (
+        internalNTCBeta === undefined ||
+        internalVTermr === undefined ||
+        charger.ntcBeta === undefined ||
+        charger.ntcThermistor === undefined ||
+        chargerModule.ranges.vTermR === undefined
+    ) {
+        return null;
+    }
+
+    return (
+        <>
             <NumberInput
                 label={
                     <DocumentationTooltip card={card} item="Vtermr">
@@ -291,7 +449,7 @@ export default ({
                 value={internalVTermr}
                 range={chargerModule.ranges.vTermR}
                 onChange={value => setInternalVTermr(value)}
-                onChangeComplete={v => chargerModule.set.vTermR(v)}
+                onChangeComplete={v => chargerModule.set.vTermR?.(v)}
                 disabled={disabled}
                 showSlider
             />
@@ -303,7 +461,7 @@ export default ({
                 }
                 items={ntcThermistorItems}
                 onSelect={item =>
-                    chargerModule.set.nTCThermistor(
+                    chargerModule.set.nTCThermistor?.(
                         item.value as NTCThermistor,
                         autoNTCBeta,
                     )
@@ -325,7 +483,8 @@ export default ({
                 onToggle={v => {
                     setAutoNTCBeta(v);
                     if (!v) return;
-                    chargerModule.set.nTCThermistor(
+                    if (!charger.ntcThermistor) return;
+                    chargerModule.set.nTCThermistor?.(
                         charger.ntcThermistor,
                         true,
                     );
@@ -346,12 +505,138 @@ export default ({
                             range={chargerModule.ranges.nTCBeta}
                             value={internalNTCBeta}
                             onChange={setInternalNTCBeta}
-                            onChangeComplete={v => chargerModule.set.nTCBeta(v)}
+                            onChangeComplete={v =>
+                                chargerModule.set.nTCBeta?.(v)
+                            }
                         />
                     </div>
                 </div>
             )}
-        </Card>
+        </>
+    );
+};
+
+const AdvancedChargingProfile = ({
+    chargerModule,
+    charger,
+    disabled,
+}: {
+    chargerModule: ChargerModule;
+    charger: Charger;
+    disabled: boolean;
+}) => {
+    const [
+        internalEnableAdvancedChargingProfile,
+        setInternalEnableAdvancedChargingProfile,
+    ] = useState(charger.enableAdvancedChargingProfile);
+    const [internalIChgCool, setInternalIChgCool] = useState(charger.iChgCool);
+    const [internalVTermCool, setInternalVTermCool] = useState(
+        charger.vTermCool,
+    );
+    const [internalIChgWarm, setInternalIChgWarm] = useState(charger.iChgWarm);
+    const [internalVTermWarm, setInternalVTermWarm] = useState(
+        charger.vTermWarm,
+    );
+
+    if (
+        internalEnableAdvancedChargingProfile === undefined ||
+        internalIChgCool === undefined ||
+        internalVTermCool === undefined ||
+        internalIChgWarm === undefined ||
+        internalVTermWarm === undefined
+    ) {
+        return null;
+    }
+
+    const contentDisabled = disabled || !internalEnableAdvancedChargingProfile;
+
+    return (
+        <>
+            <Toggle
+                isToggled={internalEnableAdvancedChargingProfile}
+                onToggle={v => {
+                    setInternalEnableAdvancedChargingProfile(v);
+                    chargerModule.set.enableAdvancedChargingProfile?.(v);
+                }}
+                label={
+                    <DocumentationTooltip
+                        card={card}
+                        item="enableAdvancedChargingProfile"
+                    >
+                        Enable Advanced Charging Profile
+                    </DocumentationTooltip>
+                }
+                disabled={disabled}
+            />
+            <NumberInput
+                label={
+                    <DocumentationTooltip card={card} item="iChgCool">
+                        <div>
+                            <span>I</span>
+                            <span className="subscript">CHG_COOL</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                unit="mA"
+                disabled={contentDisabled}
+                range={chargerModule.ranges.current}
+                value={internalIChgCool}
+                onChange={setInternalIChgCool}
+                onChangeComplete={v => chargerModule.set.iChgCool?.(v)}
+                showSlider
+            />
+            <NumberInput
+                label={
+                    <DocumentationTooltip card={card} item="vTermCool">
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">TERM_COOL</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                unit="V"
+                disabled={contentDisabled}
+                range={chargerModule.ranges.voltage}
+                value={internalVTermCool}
+                onChange={setInternalVTermCool}
+                onChangeComplete={v => chargerModule.set.vTermCool?.(v)}
+                showSlider
+            />
+            <NumberInput
+                label={
+                    <DocumentationTooltip card={card} item="iChgWarm">
+                        <div>
+                            <span>I</span>
+                            <span className="subscript">CHG_WARM</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                unit="mA"
+                disabled={contentDisabled}
+                range={chargerModule.ranges.current}
+                value={internalIChgWarm}
+                onChange={setInternalIChgWarm}
+                onChangeComplete={v => chargerModule.set.iChgWarm?.(v)}
+                showSlider
+            />
+            <NumberInput
+                label={
+                    <DocumentationTooltip card={card} item="vTermWarm">
+                        <div>
+                            <span>V</span>
+                            <span className="subscript">TERM_WARM</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                unit="V"
+                disabled={contentDisabled}
+                range={chargerModule.ranges.voltage}
+                value={internalVTermWarm}
+                onChange={setInternalVTermWarm}
+                onChangeComplete={v => chargerModule.set.vTermWarm?.(v)}
+                showSlider
+            />
+        </>
     );
 };
 
@@ -369,12 +654,14 @@ const Arrow = ({
     range,
     onChange,
     onChangeComplete,
+    disabled,
 }: {
     type: 'COLD' | 'COOL' | 'WARM' | 'HOT';
     temperature: number;
     range: RangeType;
     onChange: (value: number) => void;
     onChangeComplete: () => void;
+    disabled: boolean;
 }) => (
     <>
         <span className="tw-absolute tw--top-5 tw--translate-x-1/2">
@@ -391,6 +678,7 @@ const Arrow = ({
                     range={range}
                     onChange={onChange}
                     onChangeComplete={onChangeComplete}
+                    disabled={disabled}
                 />
                 <span>°C</span>
             </div>

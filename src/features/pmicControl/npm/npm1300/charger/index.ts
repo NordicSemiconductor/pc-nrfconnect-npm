@@ -7,10 +7,15 @@
 /* eslint-disable no-underscore-dangle */
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { getRange } from '../../../../../utils/helpers';
+import {
+    getMinValueOfRangeOrNumberArray,
+    getRange,
+} from '../../../../../utils/helpers';
 import { NpmEventEmitter } from '../../pmicHelpers';
 import {
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     type ChargerModule as ChargerModuleBase,
     ChargerModuleGet,
     ChargerModuleGetBase,
@@ -67,7 +72,7 @@ export default class Module implements ChargerModuleBase {
         return {
             vTerm: this.ranges.voltage[0],
             vTrickleFast: 2.5,
-            iChg: this.ranges.current.min,
+            iChg: getMinValueOfRangeOrNumberArray(this.ranges.current),
             enabled: false,
             iTerm: 10,
             iBatLim: 1000,
@@ -82,6 +87,16 @@ export default class Module implements ChargerModuleBase {
             tCool: 10,
             tWarm: 45,
             tHot: 60,
+            jeitaILabelCold: ChargerJeitaILabel.coldIOff,
+            jeitaILabelCool: ChargerJeitaILabel.coolICool,
+            jeitaILabelNominal: ChargerJeitaILabel.nominalIChg,
+            jeitaILabelWarm: ChargerJeitaILabel.warmIChg,
+            jeitaILabelHot: ChargerJeitaILabel.hotIOff,
+            jeitaVLabelCold: ChargerJeitaVLabel.coldVNA,
+            jeitaVLabelCool: ChargerJeitaVLabel.coolVTerm,
+            jeitaVLabelNominal: ChargerJeitaVLabel.nominalVTerm,
+            jeitaVLabelWarm: ChargerJeitaVLabel.warmVTermR,
+            jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
         };
     }
 
@@ -159,14 +174,15 @@ export default class Module implements ChargerModuleBase {
 
     // eslint-disable-next-line class-methods-use-this
     get values(): {
-        iTerm: { label: string; value: ITerm }[];
+        iTerm: (iChg: number) => { label: string; value: ITerm }[];
         vTrickleFast: { label: string; value: VTrickleFast }[];
     } {
         return {
-            iTerm: [...ITermValues].map((item, i) => ({
-                label: `${ITermKeys[i]}`,
-                value: item,
-            })),
+            iTerm: () =>
+                [...ITermValues].map((item, i) => ({
+                    label: `${ITermKeys[i]}`,
+                    value: item,
+                })),
             vTrickleFast: [...VTrickleFastValues].map((item, i) => ({
                 label: `${VTrickleFastKeys[i]}`,
                 value: item,
