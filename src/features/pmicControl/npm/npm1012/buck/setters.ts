@@ -115,7 +115,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 buck vout software set 0 ${value}V`,
+                    `npm1012 buck vout software set 0 ${value}`,
                     () => resolve(),
                     () => {
                         this.get.vOutNormal();
@@ -213,7 +213,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 buck enable set ${enabled ? 'ON' : 'OFF'}`,
+                    `npm1012 buck enable set ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabled();
@@ -238,7 +238,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 buck pulldown set ${value === 0 ? 'DISABLE' : `${value}Ohm`}`,
+                    `npm1012 buck pulldown set ${value === 0 ? 'disable' : `${value}`}`,
                     () => resolve(),
                     () => {
                         this.get.activeDischargeResistance();
@@ -263,7 +263,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 buck vout software set 1 ${value}V`,
+                    `npm1012 buck vout software set 1 ${value}`,
                     () => resolve(),
                     () => {
                         this.get.alternateVOut();
@@ -379,7 +379,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 buck peakilim set ${value}mA`,
+                    `npm1012 buck peakilim set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.peakCurrentLimit();
@@ -429,7 +429,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 buck softstartilim set ${value}mA`,
+                    `npm1012 buck softstartilim set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.softStartPeakCurrentLimit();
@@ -442,16 +442,13 @@ export class BuckSet {
 
     vOutComparatorBiasCurrent(mode: BuckModeControl, value: number) {
         return new Promise<void>((resolve, reject) => {
-            let unitPrefix = '';
             let update: Partial<Buck> = {};
 
             switch (mode) {
                 case 'LP':
-                    unitPrefix = 'u';
                     update = { vOutComparatorBiasCurrentLPMode: value };
                     break;
                 case 'ULP':
-                    unitPrefix = 'n';
                     update = { vOutComparatorBiasCurrentULPMode: value };
                     break;
                 default:
@@ -469,7 +466,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 buck bias ${mode.toLowerCase()} set ${value}${unitPrefix}A`,
+                    `npm1012 buck bias ${mode.toLowerCase()} set ${value}`,
                     () => resolve(),
                     () => {
                         this.get.vOutComparatorBiasCurrent(mode);

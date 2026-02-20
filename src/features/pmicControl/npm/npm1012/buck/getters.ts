@@ -67,7 +67,7 @@ export class BuckGet {
     }
 
     automaticPassthrough() {
-        this.sendCommand(`npm1012 buck passtrough get`);
+        this.sendCommand(`npm1012 buck passthrough get`);
     }
 
     peakCurrentLimit() {
