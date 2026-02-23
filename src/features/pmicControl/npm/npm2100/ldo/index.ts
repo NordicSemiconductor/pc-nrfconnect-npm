@@ -7,10 +7,11 @@
 import { RangeType } from '../../../../../utils/helpers';
 import { Ldo, LdoExport, LdoModule, ModuleParams } from '../../types';
 import {
-    nPM2100LDOSoftStart,
+    nPM2100GPIOControlModeValues,
+    nPM2100GPIOControlPinSelectValues,
+    nPM2100LdoModeControlValues,
     nPM2100LDOSoftStartKeys,
     nPM2100LDOSoftStartValues,
-    nPM2100SoftStart,
     nPM2100SoftStartKeys,
     nPM2100SoftStartValues,
 } from '../types';
@@ -21,7 +22,7 @@ import { LdoSet } from './ldoSet';
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
 
-const ldoDefaults = (): Ldo => ({
+const ldoDefaults = (index: number): Ldo => ({
     voltage: getLdoVoltageRange().min,
     mode: 'Load_switch',
     enabled: false,
@@ -33,6 +34,7 @@ const ldoDefaults = (): Ldo => ({
     activeDischarge: false,
     onOffControl: 'SW',
     onOffSoftwareControlEnabled: true,
+    cardLabel: `Load Switch/LDO ${index + 1}`,
 });
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
@@ -98,22 +100,31 @@ export default class Module implements LdoModule {
             voltage: getLdoVoltageRange(),
         };
     }
-    get values(): {
-        softstart: { label: string; value: nPM2100SoftStart }[];
-        ldoSoftstart: { label: string; value: nPM2100LDOSoftStart }[];
-    } {
+    get values(): LdoModule['values'] {
         return {
-            softstart: [...nPM2100SoftStartValues].map((item, i) => ({
-                label: `${nPM2100SoftStartKeys[i]}`,
-                value: item,
-            })),
             ldoSoftstart: [...nPM2100LDOSoftStartValues].map((item, i) => ({
                 label: `${nPM2100LDOSoftStartKeys[i]}`,
+                value: item,
+            })),
+            modeControl: nPM2100LdoModeControlValues.map(item => ({
+                label: item,
+                value: item,
+            })),
+            pinMode: nPM2100GPIOControlModeValues.map(item => ({
+                label: item,
+                value: item,
+            })),
+            pinSel: nPM2100GPIOControlPinSelectValues.map(item => ({
+                label: item,
+                value: item,
+            })),
+            softstart: [...nPM2100SoftStartValues].map((item, i) => ({
+                label: `${nPM2100SoftStartKeys[i]}`,
                 value: item,
             })),
         };
     }
     get defaults(): Ldo {
-        return ldoDefaults();
+        return ldoDefaults(this.index);
     }
 }
