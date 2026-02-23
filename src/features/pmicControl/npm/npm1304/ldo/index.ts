@@ -16,20 +16,19 @@ const getLdoVoltageRange = () =>
         step: 0.1,
     }) as RangeType;
 
-const ldoDefaults = (pmicRevision: number | undefined): Ldo => ({
-    voltage: getLdoVoltageRange().min,
-    mode: 'Load_switch',
-    enabled: false,
-    softStartEnabled: true,
-    softStart: 25,
-    activeDischarge: false,
-    onOffControl: 'SW',
-    onOffSoftwareControlEnabled: true,
-    ldoSoftStartEnable: pmicRevision !== undefined && pmicRevision >= 1.1,
-});
-
 export default class Module extends nPM1300LdoModule {
     get defaults(): Ldo {
-        return ldoDefaults(this.pmicRevision);
+        return {
+            voltage: getLdoVoltageRange().min,
+            mode: 'Load_switch',
+            enabled: false,
+            softStartEnabled: true,
+            softStart: 25,
+            activeDischarge: false,
+            onOffControl: 'SW',
+            onOffSoftwareControlEnabled: true,
+            ldoSoftStartEnable:
+                this.pmicRevision !== undefined && this.pmicRevision >= 1.1,
+        };
     }
 }

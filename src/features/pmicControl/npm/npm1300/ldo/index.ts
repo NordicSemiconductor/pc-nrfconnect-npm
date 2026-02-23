@@ -11,18 +11,6 @@ import { LdoGet } from './getters';
 import { LdoSet } from './setters';
 import { SoftStart, SoftStartValues } from './types';
 
-const ldoDefaults = (pmicVersion: number | undefined): Ldo => ({
-    voltage: getLdoVoltageRange().min,
-    mode: 'Load_switch',
-    enabled: false,
-    softStartEnabled: true,
-    softStart: 25,
-    activeDischarge: false,
-    onOffControl: 'SW',
-    onOffSoftwareControlEnabled: true,
-    ldoSoftStartEnable: pmicVersion !== undefined && pmicVersion >= 2.3,
-});
-
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
     voltage: ldo.voltage,
     enabled: ldo.enabled,
@@ -101,7 +89,19 @@ export default class Module implements LdoModule {
             voltage: getLdoVoltageRange(),
         };
     }
+
     get defaults(): Ldo {
-        return ldoDefaults(this.pmicRevision);
+        return {
+            voltage: getLdoVoltageRange().min,
+            mode: 'Load_switch',
+            enabled: false,
+            softStartEnabled: true,
+            softStart: 25,
+            activeDischarge: false,
+            onOffControl: 'SW',
+            onOffSoftwareControlEnabled: true,
+            ldoSoftStartEnable:
+                this.pmicRevision !== undefined && this.pmicRevision >= 2.3,
+        };
     }
 }
