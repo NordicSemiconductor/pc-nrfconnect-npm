@@ -141,7 +141,7 @@ export default () => {
                                 pmicDialog =>
                                     dispatch(dialogHandler(pmicDialog)),
                                 undefined,
-                                1.0,
+                                1.1,
                             ),
                         ),
                     );
