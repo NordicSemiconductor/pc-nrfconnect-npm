@@ -108,6 +108,7 @@ describe('PMIC 1304 - Apply Config ', () => {
         activeDischarge: false,
         onOffControl: 'GPIO0',
         onOffSoftwareControlEnabled: false,
+        cardLabel: 'Ldo',
     };
 
     const initLed: LED = {
