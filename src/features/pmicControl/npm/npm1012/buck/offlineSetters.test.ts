@@ -81,6 +81,177 @@ describe('PMIC 1012 - Setters Offline tests', () => {
             index,
         });
     });
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckActiveDischargeResistance index: %p',
+        async index => {
+            await pmic.buckModule[index].set.activeDischargeResistance?.(250);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    activeDischargeResistance: 250,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckAlternateVOut index: %p',
+        async index => {
+            await pmic.buckModule[index].set.alternateVOut?.(1.55);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    alternateVOut: 1.55,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckAlternateVOutControl index: %p',
+        async index => {
+            await pmic.buckModule[index].set.alternateVOutControl?.('GPIO');
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    alternateVOutControl: 'GPIO',
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckAutomaticPassthrough index: %p',
+        async index => {
+            await pmic.buckModule[index].set.automaticPassthrough?.(true);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    automaticPassthrough: true,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckQuickVOutDischarge index: %p',
+        async index => {
+            await pmic.buckModule[index].set.quickVOutDischarge?.(true);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    quickVOutDischarge: true,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckPeakCurrentLimit index: %p',
+        async index => {
+            await pmic.buckModule[index].set.peakCurrentLimit?.(142);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    peakCurrentLimit: 142,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckShortCircuitProtection index: %p',
+        async index => {
+            await pmic.buckModule[index].set.shortCircuitProtection?.(true);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    shortCircuitProtection: true,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckSoftStartPeakCurrentLimit index: %p',
+        async index => {
+            await pmic.buckModule[index].set.softStartPeakCurrentLimit?.(142);
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    softStartPeakCurrentLimit: 142,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckVOutComparatorBiasCurrent LP mode index: %p',
+        async index => {
+            await pmic.buckModule[index].set.vOutComparatorBiasCurrent?.(
+                'LP',
+                1.4,
+            );
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    vOutComparatorBiasCurrentLPMode: 1.4,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckVOutComparatorBiasCurrent ULP mode index: %p',
+        async index => {
+            await pmic.buckModule[index].set.vOutComparatorBiasCurrent?.(
+                'ULP',
+                28,
+            );
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    vOutComparatorBiasCurrentULPMode: 28,
+                },
+                index,
+            });
+        },
+    );
+
+    test.each(PMIC_1012_BUCKS)(
+        'Set setBuckVOutRippleControl index: %p',
+        async index => {
+            await pmic.buckModule[index].set.vOutRippleControl?.('High');
+
+            expect(mockOnBuckUpdate).toBeCalledTimes(1);
+            expect(mockOnBuckUpdate).toBeCalledWith({
+                data: {
+                    vOutRippleControl: 'High',
+                },
+                index,
+            });
+        },
+    );
 });
 
 export {};

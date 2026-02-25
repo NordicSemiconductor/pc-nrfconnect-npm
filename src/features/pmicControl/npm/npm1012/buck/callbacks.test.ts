@@ -100,6 +100,31 @@ describe('PMIC 1012 - Command callbacks', () => {
             },
             {
                 index,
+                append: `set software`,
+            },
+        ]).flat(),
+    )('npm1012 buck voutselctrl %p', ({ index, append }) => {
+        const command = `npm1012 buck voutselctrl ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: SOFTWARE`, command);
+
+        expect(mockOnBuckUpdate).toBeCalledTimes(1);
+        expect(mockOnBuckUpdate).toBeCalledWith({
+            data: { mode: 'software' },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1012_BUCKS.map(index => [
+            {
+                index,
+                append: `get`,
+            },
+            {
+                index,
                 append: `set ON`,
             },
         ]).flat(),
@@ -246,19 +271,19 @@ describe('PMIC 1012 - Command callbacks', () => {
             },
             {
                 index,
-                append: `set 2.5uA`,
+                append: `set 142mA`,
             },
         ]).flat(),
-    )('npm1012 buck bias lp %p', ({ index, append }) => {
-        const command = `npm1012 buck bias lp ${append}`;
+    )('npm1012 buck peakilim %p', ({ index, append }) => {
+        const command = `npm1012 buck peakilim ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess('Value: 2.5uA', command);
+        callback?.onSuccess('Value: 142mA', command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { vOutComparatorBiasCurrentLPMode: 2.5 },
+            data: { peakCurrentLimit: 142 },
             index,
         });
     });
@@ -271,19 +296,119 @@ describe('PMIC 1012 - Command callbacks', () => {
             },
             {
                 index,
-                append: `set 35nA`,
+                append: `set ON`,
             },
         ]).flat(),
-    )('npm1012 buck bias ulp %p', ({ index, append }) => {
-        const command = `npm1012 buck bias ulp ${append}`;
+    )('npm1012 buck autopull %p', ({ index, append }) => {
+        const command = `npm1012 buck autopull ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess('Value: 35nA', command);
+        callback?.onSuccess('Value: ON', command);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).toBeCalledWith({
-            data: { vOutComparatorBiasCurrentULPMode: 35 },
+            data: { quickVOutDischarge: true },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1012_BUCKS.map(index => [
+            {
+                index,
+                append: `get`,
+            },
+            {
+                index,
+                append: `set ON`,
+            },
+        ]).flat(),
+    )('npm1012 buck scprotect %p', ({ index, append }) => {
+        const command = `npm1012 buck scprotect ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess('Value: ON', command);
+
+        expect(mockOnBuckUpdate).toBeCalledTimes(1);
+        expect(mockOnBuckUpdate).toBeCalledWith({
+            data: { shortCircuitProtection: true },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1012_BUCKS.map(index => [
+            {
+                index,
+                append: `get`,
+            },
+            {
+                index,
+                append: `set 142mA`,
+            },
+        ]).flat(),
+    )('npm1012 buck softstartilim %p', ({ index, append }) => {
+        const command = `npm1012 buck softstartilim ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess('Value: 142mA', command);
+
+        expect(mockOnBuckUpdate).toBeCalledTimes(1);
+        expect(mockOnBuckUpdate).toBeCalledWith({
+            data: { softStartPeakCurrentLimit: 142 },
+            index,
+        });
+    });
+
+    const vOutComparatorBiasCurrentTestArgs = [
+        {
+            mode: 'LP',
+            value: 1.4,
+            expected: { vOutComparatorBiasCurrentLPMode: 1.4 },
+        },
+        {
+            mode: 'ULP',
+            value: 28,
+            expected: { vOutComparatorBiasCurrentULPMode: 28 },
+        },
+    ]
+        .map(args => [
+            {
+                cmd: 'get',
+                mode: args.mode,
+                value: args.value,
+                expected: args.expected,
+            },
+            {
+                cmd: `set ${args.value}`,
+                mode: args.mode,
+                value: args.value,
+                expected: args.expected,
+            },
+        ])
+        .flat();
+
+    test.each(
+        PMIC_1012_BUCKS.map(index =>
+            vOutComparatorBiasCurrentTestArgs.map(test => ({
+                index,
+                test,
+            })),
+        ).flat(),
+    )('npm1012 buck bias %p', ({ index, test }) => {
+        const command = `npm1012 buck bias ${test.mode.toLowerCase()} ${test.cmd}`;
+
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${test.value}mA`, command);
+
+        expect(mockOnBuckUpdate).toBeCalledTimes(1);
+        expect(mockOnBuckUpdate).toBeCalledWith({
+            data: test.expected,
             index,
         });
     });
