@@ -1,14 +1,12 @@
-# nPM PowerUP app
+# Get started
 
 The nPM PowerUP app is a desktop application intended to work with the Power Management Integrated Circuit (PMIC) devices from Nordic Semiconductor to allow customers to quickly and efficiently evaluate the PMIC for their projects.
 
 Once connected to an Evaluation Kit (EK), the app gives full control over the adjustable settings of the PMIC. Using the included battery models, you can also get an estimated time-to-full and time-to-empty when charging or discharging a battery connected to the EK.
 
-The nPM PowerUP app is installed and updated using [nRF Connect for Desktop](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/index.html).
-
 ## Installing the nPM PowerUP app
 
-For installation instructions, see [Installing nRF Connect for Desktop apps](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/installing_apps.html) in the nRF Connect for Desktop documentation.
+For installation instructions, see [Installing nRF Connect for Desktop apps](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/installing_apps.html).
 
 ## Supported devices
 
