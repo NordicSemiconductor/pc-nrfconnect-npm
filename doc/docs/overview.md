@@ -83,7 +83,7 @@ This side panel area lets you configure the reporting rate. This can affect the 
 
 ### Connection Status
 
-You can check the connection status to the [device you selected](#select-device).
+You can check the connection status to the [device you selected](https://docs.nordicsemi.com/bundle/swtools_docs/page/common_interface.html#select-device).
 
 If no device is connected, the application works in the [Offline Mode](#virtual-device-selection-and-offline-mode-actions).
 
