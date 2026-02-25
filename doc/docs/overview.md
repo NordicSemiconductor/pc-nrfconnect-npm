@@ -7,24 +7,24 @@ After starting the nPM PowerUP app, the main application window is displayed.
 
        ![Example of a tooltip in nPM PowerUP](./screenshots/npm_tooltip_example.png "Example of a tooltip in nPM PowerUP")
 
+## Common interface
+
+This app uses the nRF Connect for Desktop UI framework. Shared UI elements such as **Select device**, **About** tab, and **Log** panel are described in the [Common user interface](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/common_interface.html) documentation.
+
 ## Before selection
 
 Before a device is selected, you can use the links in the **Instructions** to [buy a PMIC Evaluation Kit](https://www.nordicsemi.com/About-us/BuyOnline) or [read more about PMIC products from Nordic Semiconductor](https://www.nordicsemi.com/Products/Power-Management-ICs).
 
 ![nPM PowerUP application window](./screenshots/npm_overview_app.png "nPM PowerUP application window")
 
-The available options and information change after you **Select Device**.
-
-### Select Device
-
-Dropdown to list the PMIC devices attached to the computer.
+The available options and information change after you select a device.
 
 !!! note "Note"
       If you are using the nPM1300 EK, read [Connect the nPM1300 EK with nPM PowerUP](https://docs.nordicsemi.com/bundle/ug_npm1300_ek/page/UG/nPM1300_EK/use_ek_power_up.html) for information about the hardware setup required to use this device with the nPM PowerUP app.
 
-#### Virtual device selection and offline mode actions
+### Virtual device selection and offline mode actions
 
-In **Select Device**, you can also select a virtual device.
+In **Select device**, you can also select a virtual device.
 
 ![Select Devices with virtual devices listed](./screenshots/npm_select_device_virtual_menu.png "Select Devices with virtual devices listed")
 
@@ -50,7 +50,7 @@ This side panel area contains the following buttons:
 | **Load Configuration**   | Load the PMIC configuration from a JSON file and update all configurations accordingly.</br></br>You can also load a configuration before you select a device ([Offline Mode](#virtual-device-selection-and-offline-mode-actions)).  |
 | **Open Serial Terminal** | Open the [Serial Terminal app](https://docs.nordicsemi.com/bundle/nrf-connect-serial-terminal/page/index.html) application in a separate window. Make sure to first [install the application](). |
 | **Reset Device**         | Reset the PMIC device and the nPM Controller. The PMIC default device configuration is restored.  |
-| **Record Events**        | Record all terminal [log](#log) events to CSV files in a selected directory.<br/>You can share these files with Nordic Semiconductor if you encounter issues.<br/><br/>Recording events is automatically started when you [profile a battery](profiling_battery.md). |
+| **Record Events**        | Record all terminal [log](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/common_interface.html#log) events to CSV files in a selected directory.<br/>You can share these files with Nordic Semiconductor if you encounter issues.<br/><br/>Recording events is automatically started when you [profile a battery](profiling_battery.md). |
 
 ### Fuel Gauge
 
@@ -201,16 +201,3 @@ Here you can monitor the state of the PMIC, including voltage, current, system t
 The monitoring can happen in real time after [profiling a battery](profiling_battery.md). You can use the **Live** toggle to enable or disable real time monitoring.
 
 ![nPM PowerUP graph example](./screenshots/npm_graph_example.png "nPM PowerUP graph example")
-
-## Log
-
-The Log panel allows you to view the most important log events, tagged with a timestamp. Each time you open the app, a new session log file is created. You can find the Log panel and its controls, below the main application Window.
-
-- When troubleshooting, to view more detailed information than shown in the Log panel, use **Open log file** to open the current log file in a text editor.
-- To clear the information currently displayed in the Log panel, use **Clear Log**. The contents of the log file are not affected.
-- To hide or display the Log panel in the user interface, use **Show Log**.
-- To freeze Log panel scrolling, use **Autoscroll Log**.
-
-## About tab
-
-You can view application information, restore defaults, access source code and documentation. You also can find information on the selected device, access support tools, send feedback, and enable verbose logging.
