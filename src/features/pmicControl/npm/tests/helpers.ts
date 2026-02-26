@@ -18,6 +18,7 @@ import {
     GPIO,
     Ldo,
     LED,
+    LoadSwitch,
     LowPowerConfig,
     OnBoardLoad,
     PartialUpdate,
@@ -65,6 +66,10 @@ export const setupMocksBase = (
     const mockOnFuelGaugeUpdate = jest.fn(() => {});
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const mockOnLdoUpdate = jest.fn((_partialUpdate: PartialUpdate<Ldo>) => {});
+    const mockOnLoadSwitchUpdate = jest.fn(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (_partialUpdate: PartialUpdate<LoadSwitch>) => {},
+    );
     const mockOnGpioUpdate = jest.fn(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (_partialUpdate: PartialUpdate<GPIO>) => {},
@@ -125,6 +130,7 @@ export const setupMocksBase = (
     pmic.onChargingStatusUpdate(mockOnChargingStatusUpdate);
     pmic.onFuelGaugeUpdate(mockOnFuelGaugeUpdate);
     pmic.onLdoUpdate(mockOnLdoUpdate);
+    pmic.onLoadSwitchUpdate(mockOnLoadSwitchUpdate);
     pmic.onLoggingEvent(mockOnLoggingEvent);
     pmic.onPmicStateChange(mockOnPmicStateChange);
     pmic.onReboot(mockOnReboot);
@@ -144,6 +150,7 @@ export const setupMocksBase = (
         mockOnBoardLoadUpdate,
         mockOnFuelGaugeUpdate,
         mockOnLdoUpdate,
+        mockOnLoadSwitchUpdate,
         mockOnGpioUpdate,
         mockOnLEDUpdate,
         mockOnPOFUpdate,
