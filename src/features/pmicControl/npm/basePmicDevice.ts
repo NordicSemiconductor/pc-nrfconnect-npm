@@ -399,7 +399,7 @@ export default abstract class BaseNpmDevice {
         readonly batteryConnectedVoltageThreshold: number,
         private readonly _supportedErrorLogs: SupportedErrorLogs,
         protected hardwareVersion?: string,
-        protected pmicRevision?: number,
+        readonly pmicRevision?: number,
     ) {
         this.#pmicState = shellParser ? 'pmic-connected' : 'ek-disconnected';
         this.offlineMode = !shellParser;

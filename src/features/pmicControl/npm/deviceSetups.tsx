@@ -64,12 +64,19 @@ const npm1300EngineeringCMessage = (
     </>
 );
 
-const npm1304EngineeringCMessage = (
+const npm1304EngineeringMessage = (
     <p>
         You have connected an nPM1304 EK version 0.1.0. This EK version does not
         support custom battery profiling and the on-board active load. Fuel
         gauging is only available with preset profiles. If you want to use any
         of these features, contact Nordic Semiconductor to request a new EK.
+    </p>
+);
+
+const npm1304OlderPmicMessage = (
+    <p>
+        You have connected an nPM1304-EK v0.9.0 or older, which has limited LDO
+        functionality. Please contact Nordic if you wish to receive a new kit.
     </p>
 );
 
@@ -356,6 +363,31 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
                 await dispose();
 
+                if (
+                    npmDevice.pmicRevision !== undefined &&
+                    !(npmDevice.pmicRevision >= 1.1)
+                ) {
+                    await new Promise<void>(resolve => {
+                        const information: PmicDialog = {
+                            type: 'alert',
+                            doNotAskAgainStoreID:
+                                'pmic1304-0.9.0-old-EK-warning',
+                            message: npm1304OlderPmicMessage,
+                            confirmLabel: 'Yes',
+                            optionalLabel: "Yes, don't ask again",
+                            title: 'Important notice!',
+                            onConfirm: () => {
+                                resolve();
+                            },
+                            onOptional: () => {
+                                resolve();
+                            },
+                        };
+
+                        dispatch(dialogHandler(information));
+                    });
+                }
+
                 if (hwVersion === '0.1.0') {
                     const p = new Promise<{
                         device: Device;
@@ -364,7 +396,7 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
                         const information: PmicDialog = {
                             type: 'alert',
                             doNotAskAgainStoreID: 'pmic1304-hw0.1.0-issues',
-                            message: npm1304EngineeringCMessage,
+                            message: npm1304EngineeringMessage,
                             confirmLabel: 'Yes',
                             cancelLabel: 'No',
                             optionalLabel: "Yes, don't ask again",
