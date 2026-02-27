@@ -10,6 +10,7 @@ import {
     createSerialPort,
     Device,
     DeviceSetup,
+    ExternalLink,
     getAppDir,
     logger,
     setWaitForDevice,
@@ -76,7 +77,12 @@ const npm1304EngineeringMessage = (
 const npm1304OlderPmicMessage = (
     <p>
         You have connected an nPM1304-EK v0.9.0 or older, which has limited LDO
-        functionality. Please contact Nordic if you wish to receive a new kit.
+        functionality. Please{' '}
+        <ExternalLink
+            href="https://www.nordicsemi.com/About-us/Contact-Us"
+            label="contact Nordic"
+        />{' '}
+        if you wish to receive a new kit.
     </p>
 );
 
