@@ -369,10 +369,7 @@ export const npm1304DeviceSetup = (firmware: NpmFirmware): DeviceSetup => ({
 
                 await dispose();
 
-                if (
-                    npmDevice.pmicRevision !== undefined &&
-                    !(npmDevice.pmicRevision >= 1.1)
-                ) {
+                if (hwVersion !== undefined && semver.lte(hwVersion, '0.9.0')) {
                     await new Promise<void>(resolve => {
                         const information: PmicDialog = {
                             type: 'alert',
