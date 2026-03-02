@@ -18,9 +18,28 @@ export const getNpmDevice = (
     dialogHandler: ((pmicDialog: PmicDialog) => void) | null,
 ): Promise<BaseNpmDevice> =>
     new Promise<BaseNpmDevice>((resolve, reject) => {
-        shellParser.enqueueRequest('hw_version', {
-            onSuccess: response => {
-                const parsedHwVersion = parseHwVersion(response);
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        const hwVersionPromise = new Promise<string>((resolve, reject) => {
+            shellParser.enqueueRequest('hw_version', {
+                onSuccess: resolve,
+                onError: reject,
+            });
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        const pmicVersionPromise = new Promise<number>((resolve, reject) => {
+            shellParser.enqueueRequest('pmic_revision', {
+                onSuccess: result => {
+                    result = result.replace('pmic_revision=', '');
+                    resolve(Number.parseFloat(result));
+                },
+                onError: reject,
+            });
+        });
+
+        Promise.all([hwVersionPromise, pmicVersionPromise])
+            .then(([hwResponse, pmicResponse]) => {
+                const parsedHwVersion = parseHwVersion(hwResponse);
                 const hwVersion = parsedHwVersion.hw_version;
                 if (hwVersion?.startsWith('npm1300ek')) {
                     resolve(new Npm1300(shellParser, dialogHandler));
@@ -29,7 +48,8 @@ export const getNpmDevice = (
                         new Npm1304(
                             shellParser,
                             dialogHandler,
-                            parsedHwVersion.version,
+                            hwVersion,
+                            pmicResponse,
                         ),
                     );
                 } else if (hwVersion?.startsWith('npm2100ek')) {
@@ -37,7 +57,6 @@ export const getNpmDevice = (
                 } else {
                     reject(new Error('Unknown hardware'));
                 }
-            },
-            onError: reject,
-        });
+            })
+            .catch(reject);
     });

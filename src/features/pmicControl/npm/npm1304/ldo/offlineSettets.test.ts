@@ -53,11 +53,11 @@ describe('PMIC 1304 - Setters Offline tests', () => {
     );
 
     test.each(PMIC_1304_LDOS)('Set setLdoSoftStart index: %p', async index => {
-        await pmic.ldoModule[index].set.softStart?.(20);
+        await pmic.ldoModule[index].set.softStart?.(25);
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
-            data: { softStart: 20 },
+            data: { softStart: 25 },
             index,
         });
     });

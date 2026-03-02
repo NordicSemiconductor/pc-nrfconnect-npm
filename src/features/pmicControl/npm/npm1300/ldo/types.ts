@@ -5,10 +5,10 @@
  */
 
 export enum SoftStart {
-    '10 mA' = 10,
-    '20 mA' = 20,
-    '35 mA' = 35,
+    '25 mA' = 25,
     '50 mA' = 50,
+    '75 mA' = 75,
+    '100 mA' = 100,
 }
 
 export const SoftStartValues = Object.keys(SoftStart)

@@ -219,6 +219,7 @@ export type Ldo = {
     softStartEnabled: boolean;
     softStart: SoftStart;
     ldoSoftStart?: LdoSoftStart;
+    ldoSoftStartEnable?: boolean;
     activeDischarge: boolean;
     onOffControl: LdoOnOffControl;
     onOffSoftwareControlEnabled: boolean;
@@ -488,6 +489,7 @@ export type ModuleParams = {
     dialogHandler: ((dialog: PmicDialog) => void) | null;
     offlineMode: boolean;
     npmDevice: BaseNpmDevice;
+    pmicRevision: number | undefined;
 };
 
 export interface IModule<T> {

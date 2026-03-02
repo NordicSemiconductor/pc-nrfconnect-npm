@@ -11,17 +11,6 @@ import { LdoGet } from './getters';
 import { LdoSet } from './setters';
 import { SoftStart, SoftStartValues } from './types';
 
-const ldoDefaults = (): Ldo => ({
-    voltage: getLdoVoltageRange().min,
-    mode: 'Load_switch',
-    enabled: false,
-    softStartEnabled: true,
-    softStart: 20,
-    activeDischarge: false,
-    onOffControl: 'SW',
-    onOffSoftwareControlEnabled: true,
-});
-
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
     voltage: ldo.voltage,
     enabled: ldo.enabled,
@@ -48,6 +37,8 @@ export default class Module implements LdoModule {
     private _get: LdoGet;
     private _set: LdoSet;
     private _callbacks: (() => void)[];
+    protected pmicRevision: number | undefined;
+
     constructor({
         index,
         sendCommand,
@@ -55,6 +46,7 @@ export default class Module implements LdoModule {
         offlineMode,
         shellParser,
         dialogHandler,
+        pmicRevision,
     }: ModuleParams) {
         this.index = index;
         this._get = new LdoGet(sendCommand, index);
@@ -66,6 +58,7 @@ export default class Module implements LdoModule {
             index,
         );
         this._callbacks = ldoCallbacks(shellParser, eventEmitter, index);
+        this.pmicRevision = pmicRevision;
     }
 
     get get() {
@@ -96,7 +89,19 @@ export default class Module implements LdoModule {
             voltage: getLdoVoltageRange(),
         };
     }
+
     get defaults(): Ldo {
-        return ldoDefaults();
+        return {
+            voltage: getLdoVoltageRange().min,
+            mode: 'Load_switch',
+            enabled: false,
+            softStartEnabled: true,
+            softStart: 25,
+            activeDischarge: false,
+            onOffControl: 'SW',
+            onOffSoftwareControlEnabled: true,
+            ldoSoftStartEnable:
+                this.pmicRevision !== undefined && this.pmicRevision >= 2.3,
+        };
     }
 }

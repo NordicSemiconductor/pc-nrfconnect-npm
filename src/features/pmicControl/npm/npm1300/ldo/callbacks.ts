@@ -14,6 +14,7 @@ import {
     toRegex,
 } from '../../pmicHelpers';
 import { GPIOValues, Ldo, SoftStart } from '../../types';
+import { SoftStartValues } from './types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -95,7 +96,7 @@ export default (
                     'npmx ldsw soft_start current',
                     true,
                     index,
-                    '(10|20|35|50)',
+                    `(${SoftStartValues.join('|')})`,
                 ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(

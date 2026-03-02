@@ -26,7 +26,7 @@ const ldoDefaults = (): Ldo => ({
     mode: 'Load_switch',
     enabled: false,
     softStartEnabled: true,
-    softStart: 20,
+    softStart: 25,
     modeControl: 'auto',
     pinMode: 'HP/OFF',
     pinSel: 'GPIO0HI',

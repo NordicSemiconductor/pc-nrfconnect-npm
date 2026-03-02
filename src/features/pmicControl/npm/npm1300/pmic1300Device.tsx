@@ -36,7 +36,7 @@ import ResetModule from './reset';
 import TimerConfigModule from './timerConfig';
 import UsbCurrentLimiterModule from './universalSerialBusCurrentLimiter';
 
-export const npm1300FWVersion = '1.3.5+0';
+export const npm1300FWVersion = '1.3.6+0';
 
 export default class Npm1300 extends BaseNpmDevice {
     constructor(
@@ -44,6 +44,7 @@ export default class Npm1300 extends BaseNpmDevice {
         dialogHandler: ((dialog: PmicDialog) => void) | null,
         peripherals?: Partial<NpmPeripherals>,
         hardwareVersion?: string,
+        pmicVersion?: number,
         type: 'npm1300' | 'npm1304' = 'npm1300',
         fw: string = npm1300FWVersion,
     ) {
@@ -86,6 +87,7 @@ export default class Npm1300 extends BaseNpmDevice {
                 sensor: true,
             },
             hardwareVersion,
+            pmicVersion,
         );
 
         if (shellParser) {
