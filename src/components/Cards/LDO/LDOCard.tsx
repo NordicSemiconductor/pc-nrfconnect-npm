@@ -25,6 +25,7 @@ import {
     nPM2100LdoModeControlValues,
 } from '../../../features/pmicControl/npm/npm2100/types';
 import {
+    GPIOValues,
     Ldo,
     LdoModule,
     LdoOnOffControl,
@@ -36,6 +37,7 @@ interface LdoCardProperties {
     ldoModule: LdoModule;
     cardLabel?: string;
     disabled: boolean;
+    numberOfGPIOs: number;
     defaultSummary?: boolean;
 }
 
@@ -59,6 +61,7 @@ export default ({
     cardLabel = `Load Switch/LDO ${ldoModule.index + 1}`,
     defaultSummary = false,
     disabled,
+    numberOfGPIOs,
 }: LdoCardProperties) => {
     const [summary, setSummary] = useState(defaultSummary);
 
@@ -170,6 +173,7 @@ export default ({
                         disabled={disabled}
                         ldo={ldo}
                         card={card}
+                        numberOfGPIOs={numberOfGPIOs}
                     />
 
                     {ldoModule.set.ocpEnabled && (
@@ -288,16 +292,23 @@ interface OnOffControlAttrs {
     disabled: boolean;
     ldo: Ldo;
     card: string;
+    numberOfGPIOs: number;
 }
 const OnOffControl = ({
     ldoModule,
     disabled,
     ldo,
     card,
+    numberOfGPIOs,
 }: OnOffControlAttrs) => {
-    const ldoOnOffControlItems = genDropdownItems([...LdoOnOffControlValues]);
+    const gpioNames = GPIOValues.slice(0, numberOfGPIOs);
+    console.log('numberOfGPIOs', numberOfGPIOs);
+    const ldoOnOffControlItems = genDropdownItems([
+        ...LdoOnOffControlValues,
+        ...gpioNames,
+    ]);
 
-    const ldoModeControllItems = genDropdownItems([
+    const ldoModeControlItems = genDropdownItems([
         ...nPM2100LdoModeControlValues,
     ]);
 
@@ -335,14 +346,14 @@ const OnOffControl = ({
                             Mode Control
                         </DocumentationTooltip>
                     }
-                    items={ldoModeControllItems}
+                    items={ldoModeControlItems}
                     onSelect={item =>
                         ldoModule.set.modeControl?.(
                             item.value as nPM2100LdoModeControl,
                         )
                     }
                     selectedItem={findSelectedIndex(
-                        ldoModeControllItems,
+                        ldoModeControlItems,
                         ldo.modeControl,
                     )}
                     disabled={disabled}

@@ -43,7 +43,7 @@ export default ({
     cardLabel = `BUCK ${buckModule.index + 1}`,
     disabled,
     defaultSummary = false,
-    numberOfGPIOs = 0,
+    numberOfGPIOs,
 }: BuckCardProperties) => {
     const card = `buck${buckModule.index + 1}`;
     const [summary, setSummary] = useState(defaultSummary);

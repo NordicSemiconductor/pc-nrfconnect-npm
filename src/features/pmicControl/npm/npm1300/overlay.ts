@@ -9,6 +9,7 @@ import {
     BuckExport,
     BuckModule,
     Charger,
+    ChargerModule,
     GPIOValues,
     LdoExport,
     LdoModule,
@@ -36,7 +37,7 @@ const thermistorTypeToOverlay = (value: NTCThermistor) => {
             return 47000;
             break;
         case 'Ignore NTC':
-            return 10000; // TODO: get confirmation from Andy Sinclair
+            return 0;
     }
 };
 
@@ -48,17 +49,28 @@ const ledModeToOverlay = (mode: LEDMode) => {
             return 'charging';
         case 'Host':
             return 'host';
+        case 'Not used':
+            return 'host';
     }
 };
+
+const generateJeita = (
+    charger: Charger,
+    chargerModule: ChargerModule,
+) => `${chargerModule.defaults.tCold !== charger.tCold ? `thermistor-cold-millidegrees = <${toMilli(charger.tCold)}>` : ''};
+    ${chargerModule.defaults.tCool !== charger.tCool ? `thermistor-cool-millidegrees = <${toMilli(charger.tCool)}>` : ''};
+    ${chargerModule.defaults.tWarm !== charger.tWarm ? `thermistor-warm-millidegrees = <${toMilli(charger.tWarm)}>` : ''};
+    ${chargerModule.defaults.tHot !== charger.tHot ? `thermistor-hot-millidegrees = <${toMilli(charger.tHot)}>` : ''};`;
 
 const generateCharger = (
     deviceType: string,
     charger: Charger,
     vbus: USBPowerExport,
+    chargerModule: ChargerModule,
 ) =>
     charger
         ? `
-${deviceType}_ek_charger: charger {
+${deviceType}_charger: charger {
     compatible = "nordic,${deviceType}-charger";
     
     vbus-limit-microamp = <${
@@ -68,10 +80,7 @@ ${deviceType}_ek_charger: charger {
     thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
     thermistor-beta = <${charger.ntcThermistor === 'Ignore NTC' ? '0' : charger.ntcBeta}>;
 
-    thermistor-cold-millidegrees = <${toMilli(charger.tCold)}>;
-    thermistor-cool-millidegrees = <${toMilli(charger.tCool)}>;
-    thermistor-warm-millidegrees = <${toMilli(charger.tWarm)}>;
-    thermistor-hot-millidegrees = <${toMilli(charger.tHot)}>;
+    ${charger.ntcThermistor !== 'Ignore NTC' ? generateJeita(charger, chargerModule) : ''}
 
     ${charger.enabled ? 'charging-enable;' : ''}
     trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
@@ -95,9 +104,8 @@ ${deviceType}_ek_charger: charger {
         : '';
 
 const buckInitialMode = (buck: BuckExport) => {
-    switch (buck.modeControl) {
-        case 'Auto':
-            return `regulator-initial-mode = <NPM13XX_BUCK_MODE_${buck.modeControl.toUpperCase()}>;`;
+    if (!buck.modeControl.startsWith('GPIO')) {
+        return `regulator-initial-mode = <NPM13XX_BUCK_MODE_${buck.modeControl.toUpperCase()}>;`;
     }
 };
 
@@ -248,14 +256,15 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
            npmConfig.charger!,
            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
            npmConfig.usbPower!,
+           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+           npmDevice.chargerModule!,
        )}
 
        ${generateLEDs(npmConfig.leds, npmDevice.deviceType)}
 
        
        ${npmDevice.deviceType}_wdt: watchdog {
-           compatible = "nordic,${npmDevice.deviceType}-wtd";
-           reset-gpios = <&npm1300_gpio 3 GPIO_ACTIVE_LOW>;
+           compatible = "nordic,${npmDevice.deviceType}-wdt";
             ${
                 npmConfig.gpios.some(
                     g => g.mode === GPIOMode1300['Output reset'],
@@ -263,7 +272,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
                     ? `reset-gpios = ${npmConfig.gpios
                           .map((g, i) =>
                               g.mode === GPIOMode1300['Output reset']
-                                  ? `<&npm1300_gpio ${i} GPIO_ACTIVE_LOW>`
+                                  ? `<&${npmDevice.deviceType}_gpio ${i} GPIO_ACTIVE_LOW>`
                                   : '',
                           )
                           .join(', ')};` // to sure i got this right
