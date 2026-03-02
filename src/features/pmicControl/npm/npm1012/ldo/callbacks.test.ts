@@ -6,7 +6,7 @@
 
 import { LdoVOutSelValues } from '../../types';
 import { PMIC_1012_LDOS, setupMocksWithShellParser } from '../tests/helpers';
-import { LdoOnOffControlValues1012 } from './types';
+import { onOffControlValues } from './types';
 
 describe('PMIC 1012 - Command callbacks', () => {
     const { eventHandlers, mockOnLdoUpdate } = setupMocksWithShellParser();
@@ -126,7 +126,7 @@ describe('PMIC 1012 - Command callbacks', () => {
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
-            data: { softStartCurrentLimit: 10 },
+            data: { softStartCurrent: 10 },
             index,
         });
     });
@@ -197,38 +197,38 @@ describe('PMIC 1012 - Command callbacks', () => {
 
     test.each(
         PMIC_1012_LDOS.map(index => [
-            ...[true, false].map(ocpEnabled =>
+            ...[true, false].map(ocp =>
                 [
                     {
                         index,
                         append: `get ${index}`,
-                        ocpEnabled,
+                        ocp,
                     },
                     {
                         index,
-                        append: `set ${index} ${ocpEnabled ? 'on' : 'off'} `,
-                        ocpEnabled,
+                        append: `set ${index} ${ocp ? 'on' : 'off'} `,
+                        ocp,
                     },
                 ].flat(),
             ),
         ]).flat(),
-    )('npm1012 ldosw ocp %p', ({ index, append, ocpEnabled }) => {
+    )('npm1012 ldosw ocp %p', ({ index, append, ocp }) => {
         const command = `npm1012 ldosw ocp ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${ocpEnabled ? 'on' : 'off'}`, command);
+        callback?.onSuccess(`Value: ${ocp ? 'on' : 'off'}`, command);
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
-            data: { ocpEnabled },
+            data: { overcurrentProtection: ocp },
             index,
         });
     });
 
     test.each(
         PMIC_1012_LDOS.map(index => [
-            ...LdoOnOffControlValues1012.map(value =>
+            ...onOffControlValues.map(value =>
                 [
                     {
                         index,

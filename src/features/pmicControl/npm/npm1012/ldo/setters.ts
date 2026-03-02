@@ -10,6 +10,7 @@ import {
     LdoExport,
     LdoMode,
     LdoOnOffControl,
+    LdoSoftStartCurrent,
     LdoVOutSel,
 } from '../../types';
 import { LdoGet } from './getters';
@@ -27,31 +28,35 @@ export class LdoSet {
         private offlineMode: boolean,
         private index: number,
     ) {
-        this.get = new LdoGet(sendCommand);
+        this.get = new LdoGet(sendCommand, index);
     }
 
     async all(ldo: LdoExport) {
         const promises = [
             this.activeDischarge(ldo.activeDischarge),
             this.enabled(ldo.enabled),
-            this.mode(ldo.mode),
             this.onOffControl(ldo.onOffControl),
-            this.voltage(ldo.voltage),
         ];
 
-        if (ldo.ocpEnabled !== undefined) {
-            promises.push(this.ocpEnabled(ldo.ocpEnabled));
+        if (ldo.mode !== undefined) {
+            promises.push(this.mode(ldo.mode));
+        }
+        if (ldo.overcurrentProtection !== undefined) {
+            promises.push(
+                this.overcurrentProtection(ldo.overcurrentProtection),
+            );
         }
         if (ldo.softStartTime !== undefined) {
             promises.push(this.softStartTime(ldo.softStartTime));
         }
-        if (ldo.softStartCurrentLimit !== undefined) {
-            promises.push(
-                this.softStartCurrentLimit(ldo.softStartCurrentLimit),
-            );
+        if (ldo.softStartCurrent !== undefined) {
+            promises.push(this.softStartCurrent(ldo.softStartCurrent));
         }
         if (ldo.vOutSel !== undefined) {
             promises.push(this.vOutSel(ldo.vOutSel));
+        }
+        if (ldo.voltage !== undefined) {
+            promises.push(this.voltage(ldo.voltage));
         }
         if (ldo.weakPullDown !== undefined) {
             promises.push(this.weakPullDown(ldo.weakPullDown));
@@ -73,7 +78,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw mode set 0 ${mode}`,
+                    `npm1012 ldosw mode set ${this.index} ${mode}`,
                     () => resolve(),
                     () => {
                         this.get.mode();
@@ -101,7 +106,7 @@ export class LdoSet {
             this.mode('LDO')
                 .then(() => {
                     this.sendCommand(
-                        `npm1012 ldosw vout software set 0 ${voltage}`,
+                        `npm1012 ldosw vout software set ${this.index} ${voltage}`,
                         () => resolve(),
                         () => {
                             this.get.voltage();
@@ -129,7 +134,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw enable set 0 ${enabled ? 'on' : 'off'}`,
+                    `npm1012 ldosw enable set ${this.index} ${enabled ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.enabled();
@@ -153,7 +158,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw activedischarge set 0 ${activeDischarge ? 'on' : 'off'}`,
+                    `npm1012 ldosw activedischarge set ${this.index} ${activeDischarge ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.activeDischarge();
@@ -164,23 +169,23 @@ export class LdoSet {
         });
     }
 
-    ocpEnabled(ocpEnabled: boolean) {
+    overcurrentProtection(ocp: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        ocpEnabled,
+                        overcurrentProtection: ocp,
                     },
                     this.index,
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw ocp set 0 ${ocpEnabled ? 'on' : 'off'}`,
+                    `npm1012 ldosw ocp set ${this.index} ${ocp ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
-                        this.get.ocp();
+                        this.get.overcurrentProtection();
                         reject();
                     },
                 );
@@ -201,7 +206,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw enablectrl set 0 ${onOffControl}`,
+                    `npm1012 ldosw enablectrl set ${this.index} ${onOffControl}`,
                     () => resolve(),
                     () => {
                         this.get.onOffControl();
@@ -212,23 +217,23 @@ export class LdoSet {
         });
     }
 
-    softStartCurrentLimit(value: number) {
+    softStartCurrent(value: LdoSoftStartCurrent) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        softStartCurrentLimit: value,
+                        softStartCurrent: value,
                     },
                     this.index,
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw softstartilim set 0 ${value === 0 ? 'DISABLE' : `${value}`}`,
+                    `npm1012 ldosw softstartilim set ${this.index} ${value === 0 ? 'DISABLE' : `${value}`}`,
                     () => resolve(),
                     () => {
-                        this.get.softStartCurrentLimit();
+                        this.get.softStartCurrent();
                         reject();
                     },
                 );
@@ -249,7 +254,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw softstarttime set 0 ${value === 0 ? 'DISABLE' : `${value}`}`,
+                    `npm1012 ldosw softstarttime set ${this.index} ${value === 0 ? 'DISABLE' : `${value}`}`,
                     () => resolve(),
                     () => {
                         this.get.softStartTime();
@@ -273,7 +278,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw voutsel set 0 ${mode.toUpperCase()}`,
+                    `npm1012 ldosw voutsel set ${this.index} ${mode.toUpperCase()}`,
                     () => resolve(),
                     () => {
                         this.get.vOutSel();
@@ -297,7 +302,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw weakpull set 0 ${enable ? 'on' : 'off'}`,
+                    `npm1012 ldosw weakpull set ${this.index} ${enable ? 'on' : 'off'}`,
                     () => resolve(),
                     () => {
                         this.get.weakPullDown();

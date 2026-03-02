@@ -9,33 +9,43 @@ import { Ldo, LdoExport, LdoModule, ModuleParams } from '../../types';
 import ldoCallbacks from './callbacks';
 import { LdoGet } from './getters';
 import { LdoSet } from './setters';
-import { LdoOnOffControlValues1012 } from './types';
+import { OnOffControl, onOffControlValues } from './types';
 
-const ldoDefaults = (): Ldo => ({
-    activeDischarge: false,
-    enabled: false,
-    mode: 'Load_switch',
-    ocpEnabled: false,
-    onOffControl: 'Software',
-    onOffSoftwareControlEnabled: true,
-    voltage: voltageRange.min,
-    cardLabel: 'Load Switch/LDO 1',
+const ldoDefaults = (index: number): Ldo => {
+    const common: Ldo = {
+        activeDischarge: false,
+        cardLabel: `Load Switch/LDO ${index + 1}`,
+        enabled: false,
+        onOffControl: 'Software',
+        onOffSoftwareControlEnabled: true,
+        overcurrentProtection: false,
+        softStartCurrent: softStartCurrentValues[0],
+        softStartTime: 4.5,
+    };
 
-    softStartCurrentLimit: 20,
-    softStartTime: 4.5,
-    vOutSel: 'Vset',
-    weakPullDown: false,
-});
+    if (index === 1) {
+        return Object.assign(common, {
+            cardLabel: 'Load Switch 2',
+        });
+    }
+
+    return Object.assign(common, {
+        mode: 'Load_switch',
+        vOutSel: 'Vset',
+        voltage: voltageRange.min,
+        weakPullDown: false,
+    });
+};
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
     activeDischarge: ldo.activeDischarge,
     enabled: ldo.enabled,
     mode: ldo.mode,
-    ocpEnabled: ldo.ocpEnabled,
+    overcurrentProtection: ldo.overcurrentProtection,
     onOffControl: ldo.onOffControl,
     voltage: ldo.voltage,
 
-    softStartCurrentLimit: ldo.softStartCurrentLimit,
+    softStartCurrent: ldo.softStartCurrent,
     softStartTime: ldo.softStartTime,
     vOutSel: ldo.vOutSel,
     weakPullDown: ldo.weakPullDown,
@@ -48,7 +58,7 @@ const voltageRange: RangeType = {
     step: 0.05,
 };
 
-const softStartCurrentLimitValues = [0, 10, 20, 35, 50] as readonly number[];
+const softStartCurrentValues = [0, 10, 20, 35, 50] as readonly number[];
 const softStartTimeValues = [0, 1.5, 4.5, 7.5, 10.5] as readonly number[];
 
 /* eslint-disable no-underscore-dangle */
@@ -67,7 +77,7 @@ export default class Module implements LdoModule {
         shellParser,
     }: ModuleParams) {
         this.index = index;
-        this._get = new LdoGet(sendCommand);
+        this._get = new LdoGet(sendCommand, index);
         this._set = new LdoSet(eventEmitter, sendCommand, offlineMode, index);
         this._callbacks = ldoCallbacks(shellParser, eventEmitter, index);
     }
@@ -86,14 +96,18 @@ export default class Module implements LdoModule {
 
     get values(): LdoModule['values'] {
         return {
-            onOffControl: LdoOnOffControlValues1012.map(val => ({
+            onOffControl: (this.index === 1
+                ? ['GPIO', 'Software']
+                : onOffControlValues
+            ).map(val => ({
                 label: val,
-                value: val,
+                value: val as OnOffControl,
             })),
-            softStartCurrentLimit: softStartCurrentLimitValues.map(val => ({
-                label: val === 0 ? 'Off' : `${val} mA`,
-                value: val,
-            })),
+            softStartCurrent: () =>
+                softStartCurrentValues.map(val => ({
+                    label: val === 0 ? 'Off' : `${val} mA`,
+                    value: val,
+                })),
             softStartTime: softStartTimeValues.map(val => ({
                 label: val === 0 ? 'Off' : `${val} ms`,
                 value: val,
@@ -108,6 +122,6 @@ export default class Module implements LdoModule {
     }
 
     get defaults(): Ldo {
-        return ldoDefaults();
+        return ldoDefaults(this.index);
     }
 }

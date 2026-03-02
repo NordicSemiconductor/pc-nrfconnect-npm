@@ -4,5 +4,5 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-export const LdoOnOffControlValues1012 = ['GPIO', 'Software', 'VSET'] as const;
-export type LdoOnOffControl1012 = (typeof LdoOnOffControlValues1012)[number];
+export const onOffControlValues = ['GPIO', 'Software', 'VSET'] as const;
+export type OnOffControl = (typeof onOffControlValues)[number];

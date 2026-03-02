@@ -13,7 +13,7 @@ describe('PMIC 1012 - Static getters', () => {
         jest.clearAllMocks();
     });
 
-    test('Number of LDOs', () => expect(pmic.ldoModule.length).toBe(1));
+    test('Number of LDOs', () => expect(pmic.ldoModule.length).toBe(2));
 
     test.each(PMIC_1012_LDOS)('LDO Voltage Range index: %p', index =>
         expect(pmic.ldoModule[index].ranges.voltage).toStrictEqual({

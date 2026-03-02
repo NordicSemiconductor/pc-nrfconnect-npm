@@ -17,7 +17,7 @@ import {
     toRegex,
 } from '../../pmicHelpers';
 import { Ldo, LdoModeValues, LdoVOutSelValues } from '../../types';
-import { LdoOnOffControlValues1012 } from './types';
+import { onOffControlValues } from './types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -29,7 +29,12 @@ export default (
     if (shellParser) {
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw activedischarge', true, 0, onOffRegex),
+                toRegex(
+                    'npm1012 ldosw activedischarge',
+                    true,
+                    index,
+                    onOffRegex,
+                ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
@@ -45,7 +50,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw enable', true, 0, onOffRegex),
+                toRegex('npm1012 ldosw enable', true, index, onOffRegex),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
@@ -61,12 +66,12 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw ocp', true, 0, onOffRegex),
+                toRegex('npm1012 ldosw ocp', true, index, onOffRegex),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            ocpEnabled: parseOnOff(res),
+                            overcurrentProtection: parseOnOff(res),
                         },
                         index,
                     );
@@ -77,11 +82,11 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw enablectrl', true, 0, '(\\w+)'),
+                toRegex('npm1012 ldosw enablectrl', true, index, '(\\w+)'),
                 res => {
                     const result = parseColonBasedAnswer(res).toLowerCase();
 
-                    const onOffControl = LdoOnOffControlValues1012.find(
+                    const onOffControl = onOffControlValues.find(
                         elem => elem.toLowerCase() === result,
                     );
 
@@ -103,7 +108,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw mode', true, 0, '(\\w+)'),
+                toRegex('npm1012 ldosw mode', true, index, '(\\w+)'),
                 res => {
                     const result = parseColonBasedAnswer(res).toLowerCase();
 
@@ -128,16 +133,14 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw softstartilim', true, 0, '(\\w+)'),
+                toRegex('npm1012 ldosw softstartilim', true, index, '(\\w+)'),
                 res => {
                     const result = parseToNumber(res);
 
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            softStartCurrentLimit: Number.isNaN(result)
-                                ? 0
-                                : result,
+                            softStartCurrent: Number.isNaN(result) ? 0 : result,
                         },
                         index,
                     );
@@ -148,7 +151,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw softstarttime', true, 0, '(\\w+)'),
+                toRegex('npm1012 ldosw softstarttime', true, index, '(\\w+)'),
                 res => {
                     const result = parseToFloat(res);
 
@@ -166,7 +169,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw voutsel', true, 0, '(\\w+)'),
+                toRegex('npm1012 ldosw voutsel', true, index, '(\\w+)'),
                 res => {
                     const result = parseColonBasedAnswer(res).toLowerCase();
 
@@ -192,7 +195,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw vout software', true, 0),
+                toRegex('npm1012 ldosw vout software', true, index),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
@@ -208,7 +211,7 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm1012 ldosw weakpull', true, 0, onOffRegex),
+                toRegex('npm1012 ldosw weakpull', true, index, onOffRegex),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',

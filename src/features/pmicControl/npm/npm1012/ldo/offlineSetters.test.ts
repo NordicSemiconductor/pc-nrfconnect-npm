@@ -15,7 +15,7 @@ describe('PMIC 1012 - Setters Offline tests', () => {
     });
 
     test.each(PMIC_1012_LDOS)('Set setLdoVoltage index: %p', async index => {
-        await pmic.ldoModule[index].set.voltage(1.2);
+        await pmic.ldoModule[index].set.voltage?.(1.2);
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
@@ -37,11 +37,15 @@ describe('PMIC 1012 - Setters Offline tests', () => {
     test.each(PMIC_1012_LDOS)(
         'Set setLdoSoftStartCurrentLimit index: %p',
         async index => {
-            await pmic.ldoModule[index].set.softStartCurrentLimit?.(10);
+            await pmic.ldoModule[index].set.softStartCurrent?.(10, 'LDO');
+            await pmic.ldoModule[index].set.softStartCurrent?.(
+                10,
+                'Load_switch',
+            );
 
-            expect(mockOnLdoUpdate).toBeCalledTimes(1);
+            expect(mockOnLdoUpdate).toBeCalledTimes(2);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { softStartCurrentLimit: 10 },
+                data: { softStartCurrent: 10 },
                 index,
             });
         },
@@ -74,13 +78,13 @@ describe('PMIC 1012 - Setters Offline tests', () => {
     );
 
     test.each(PMIC_1012_LDOS)(
-        'Set setLdoActiveOcpEnable index: %p',
+        'Set setLdoOvercurrentProtection index: %p',
         async index => {
-            await pmic.ldoModule[index].set.ocpEnabled?.(true);
+            await pmic.ldoModule[index].set.overcurrentProtection?.(true);
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { ocpEnabled: true },
+                data: { overcurrentProtection: true },
                 index,
             });
         },

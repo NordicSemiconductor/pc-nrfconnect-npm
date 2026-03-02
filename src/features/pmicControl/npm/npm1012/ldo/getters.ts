@@ -11,15 +11,16 @@ export class LdoGet {
             onSuccess?: (response: string, command: string) => void,
             onError?: (response: string, command: string) => void,
         ) => void,
+        private index: number,
     ) {}
 
     all() {
         this.activeDischarge();
         this.enabled();
         this.mode();
-        this.ocp();
+        this.overcurrentProtection();
         this.onOffControl();
-        this.softStartCurrentLimit();
+        this.softStartCurrent();
         this.softStartTime();
         this.vOutSel();
         this.voltage();
@@ -27,33 +28,33 @@ export class LdoGet {
     }
 
     activeDischarge() {
-        this.sendCommand('npm1012 ldosw activedischarge get 0');
+        this.sendCommand(`npm1012 ldosw activedischarge get ${this.index}`);
     }
     enabled() {
-        this.sendCommand('npm1012 ldosw enable get 0');
+        this.sendCommand(`npm1012 ldosw enable get ${this.index}`);
     }
     mode() {
-        this.sendCommand('npm1012 ldosw mode get 0');
+        this.sendCommand(`npm1012 ldosw mode get ${this.index}`);
     }
-    ocp() {
-        this.sendCommand('npm1012 ldosw ocp get 0');
+    overcurrentProtection() {
+        this.sendCommand(`npm1012 ldosw ocp get ${this.index}`);
     }
     onOffControl() {
-        this.sendCommand('npm1012 ldosw enablectrl get 0');
+        this.sendCommand(`npm1012 ldosw enablectrl get ${this.index}`);
     }
-    softStartCurrentLimit() {
-        this.sendCommand('npm1012 ldosw softstartilim get 0');
+    softStartCurrent() {
+        this.sendCommand(`npm1012 ldosw softstartilim get ${this.index}`);
     }
     softStartTime() {
-        this.sendCommand('npm1012 ldosw softstarttime get 0');
+        this.sendCommand(`npm1012 ldosw softstarttime get ${this.index}`);
     }
     vOutSel() {
-        this.sendCommand('npm1012 ldosw voutsel get 0');
+        this.sendCommand(`npm1012 ldosw voutsel get ${this.index}`);
     }
     voltage() {
-        this.sendCommand('npm1012 ldosw vout software get 0');
+        this.sendCommand(`npm1012 ldosw vout software get ${this.index}`);
     }
     weakPullDown() {
-        this.sendCommand('npm1012 ldosw weakpull get 0');
+        this.sendCommand(`npm1012 ldosw weakpull get ${this.index}`);
     }
 }

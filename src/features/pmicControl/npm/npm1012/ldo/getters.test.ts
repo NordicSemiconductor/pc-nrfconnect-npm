@@ -14,7 +14,7 @@ describe('PMIC 1012 - Request update commands', () => {
     });
 
     test.each(PMIC_1012_LDOS)('Request update ldoVoltage index: %p', index => {
-        pmic.ldoModule[index].get.voltage();
+        pmic.ldoModule[index].get.voltage?.();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -38,7 +38,7 @@ describe('PMIC 1012 - Request update commands', () => {
     });
 
     test.each(PMIC_1012_LDOS)('Request update ldoMode index: %p', index => {
-        pmic.ldoModule[index].get.mode();
+        pmic.ldoModule[index].get.mode?.();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -52,7 +52,7 @@ describe('PMIC 1012 - Request update commands', () => {
     test.each(PMIC_1012_LDOS)(
         'Request update ldoSoftStartCurrentLimit index: %p',
         index => {
-            pmic.ldoModule[index].get.softStartCurrentLimit?.();
+            pmic.ldoModule[index].get.softStartCurrent?.();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -95,9 +95,9 @@ describe('PMIC 1012 - Request update commands', () => {
     );
 
     test.each(PMIC_1012_LDOS)(
-        'Request update ldoOcpEnabled index: %p',
+        'Request update ldoOvercurrentProtection index: %p',
         index => {
-            pmic.ldoModule[index].get.ocp?.();
+            pmic.ldoModule[index].get.overcurrentProtection?.();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
