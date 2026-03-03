@@ -14,8 +14,8 @@ import {
     LdoMode,
     LdoOnOffControl,
     LdoOnOffControlValues,
+    LdoSoftStartCurrent,
     PmicDialog,
-    SoftStart,
 } from '../../types';
 import { LdoGet } from './getters';
 
@@ -38,17 +38,21 @@ export class LdoSet {
 
     async all(ldo: LdoExport) {
         const promises = [
-            this.voltage(ldo.voltage),
             this.enabled(ldo.enabled),
             this.activeDischarge(ldo.activeDischarge),
             this.onOffControl(ldo.onOffControl),
-            this.mode(ldo.mode),
         ];
-        if (ldo.softStartEnabled !== undefined && this.softStartEnabled) {
-            promises.push(this.softStartEnabled(ldo.softStartEnabled));
+        if (ldo.mode !== undefined && this.mode) {
+            promises.push(this.mode(ldo.mode));
         }
         if (ldo.softStart !== undefined && this.softStart) {
             promises.push(this.softStart(ldo.softStart));
+        }
+        if (ldo.softStart !== undefined && this.softStart) {
+            promises.push(this.softStart(ldo.softStart));
+        }
+        if (ldo.voltage !== undefined && this.voltage) {
+            promises.push(this.voltage(ldo.voltage));
         }
 
         await Promise.allSettled(promises);
@@ -213,13 +217,13 @@ export class LdoSet {
         });
     }
 
-    softStartEnabled(enabled: boolean) {
+    softStart(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        softStartEnabled: enabled,
+                        softStart: enabled,
                     },
                     this.index,
                 );
@@ -231,7 +235,7 @@ export class LdoSet {
                     }`,
                     () => resolve(),
                     () => {
-                        this.get.softStartEnabled();
+                        this.get.softStart();
                         reject();
                     },
                 );
@@ -239,23 +243,23 @@ export class LdoSet {
         });
     }
 
-    softStart(softStart: SoftStart) {
+    softStartCurrent(value: LdoSoftStartCurrent) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<Ldo>(
                     'onLdoUpdate',
                     {
-                        softStart,
+                        softStartCurrentLoadSwitchMode: value,
                     },
                     this.index,
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx ldsw soft_start current set ${this.index} ${softStart}`,
+                    `npmx ldsw soft_start current set ${this.index} ${value}`,
                     () => resolve(),
                     () => {
-                        this.get.softStart();
+                        this.get.softStartCurrent();
                         reject();
                     },
                 );

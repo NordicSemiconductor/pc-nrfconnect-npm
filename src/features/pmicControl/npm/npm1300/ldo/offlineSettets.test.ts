@@ -20,7 +20,7 @@ describe('PMIC 1300 - Setters Offline tests', () => {
             dialog.onConfirm();
         });
 
-        await pmic.ldoModule[index].set.voltage(1.2);
+        await pmic.ldoModule[index].set.voltage?.(1.2);
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
@@ -39,28 +39,28 @@ describe('PMIC 1300 - Setters Offline tests', () => {
         });
     });
 
+    test.each(PMIC_1300_LDOS)('Set setLdoSoftStart index: %p', async index => {
+        await pmic.ldoModule[index].set.softStart?.(true);
+
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: { softStart: true },
+            index,
+        });
+    });
+
     test.each(PMIC_1300_LDOS)(
-        'Set setLdoSoftStartEnabled index: %p',
+        'Set setLdoSoftStartCurrent index: %p',
         async index => {
-            await pmic.ldoModule[index].set.softStartEnabled?.(true);
+            await pmic.ldoModule[index].set.softStartCurrent?.(20);
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { softStartEnabled: true },
+                data: { softStartCurrentLoadSwitchMode: 20 },
                 index,
             });
         },
     );
-
-    test.each(PMIC_1300_LDOS)('Set setLdoSoftStart index: %p', async index => {
-        await pmic.ldoModule[index].set.softStart?.(20);
-
-        expect(mockOnLdoUpdate).toBeCalledTimes(1);
-        expect(mockOnLdoUpdate).toBeCalledWith({
-            data: { softStart: 20 },
-            index,
-        });
-    });
 
     test.each(PMIC_1300_LDOS)(
         'Set setLdoActiveDischarge index: %p',

@@ -9,14 +9,14 @@ import { Ldo, LdoExport, LdoModule, ModuleParams } from '../../types';
 import ldoCallbacks from './callbacks';
 import { LdoGet } from './getters';
 import { LdoSet } from './setters';
-import { SoftStartValues } from './types';
+import { SoftStartCurrentValues } from './types';
 
 const ldoDefaults = (index: number): Ldo => ({
     voltage: getLdoVoltageRange().min,
     mode: 'Load_switch',
     enabled: false,
-    softStartEnabled: true,
-    softStart: 20,
+    softStart: true,
+    softStartCurrentLoadSwitchMode: 20,
     activeDischarge: false,
     onOffControl: 'SW',
     onOffSoftwareControlEnabled: true,
@@ -27,8 +27,8 @@ export const toLdoExport = (ldo: Ldo): LdoExport => ({
     voltage: ldo.voltage,
     enabled: ldo.enabled,
     mode: ldo.mode,
-    softStartEnabled: ldo.softStartEnabled,
     softStart: ldo.softStart,
+    softStartCurrentLoadSwitchMode: ldo.softStartCurrentLoadSwitchMode,
     activeDischarge: ldo.activeDischarge,
     onOffControl: ldo.onOffControl,
 });
@@ -84,10 +84,11 @@ export default class Module implements LdoModule {
     get values(): LdoModule['values'] {
         return {
             onOffControl: [{ label: 'SW', value: 'SW' }],
-            softstart: [...SoftStartValues].map((item, i) => ({
-                label: `${SoftStartValues[i]} mA`,
-                value: item,
-            })),
+            softStartCurrent: () =>
+                SoftStartCurrentValues.map((item, i) => ({
+                    label: `${SoftStartCurrentValues[i]} mA`,
+                    value: item,
+                })),
         };
     }
 
