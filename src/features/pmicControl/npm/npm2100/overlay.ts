@@ -180,33 +180,30 @@ const generateLDOSW = (
     gpios: GPIOExport[],
 ) =>
     `npm2100_ldosw: LDOSW {
-                regulator-min-microvolt = <${toMicro(
-                    ldoModule.ranges.voltage.min,
-                )}>;
-                regulator-max-microvolt = <${toMicro(
-                    ldoModule.ranges.voltage.max,
-                )}>;
-
-                ${ldo.enabled ? 'regulator-boot-on;' : ''}
                 ${
-                    ldo.mode === 'LDO'
-                        ? `regulator-init-microvolt = <${toMicro(
-                              ldo.voltage,
-                          )}>;`
+                    ldoModule.ranges.voltage
+                        ? `regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;`
                         : ''
                 }
                 ${
-                    ldo.ocpEnabled &&
-                    ldo.ldoSoftStart !== undefined &&
-                    ldo.softStart !== undefined
+                    ldoModule.ranges.voltage
+                        ? `regulator-max-microvolt = <${toMicro(ldoModule.ranges.voltage.max)}>;`
+                        : ''
+                }
+                ${ldo.enabled ? 'regulator-boot-on;' : ''}
+                ${
+                    ldo.mode === 'LDO' && ldo.voltage !== undefined
+                        ? `regulator-init-microvolt = <${toMicro(ldo.voltage)}>;`
+                        : ''
+                }
+                ${
+                    ldo.overcurrentProtection &&
+                    ldo.softStartCurrentLDOMode !== undefined &&
+                    ldo.softStartCurrentLoadSwitchMode !== undefined
                         ? `regulator-init-microamp = <${milliToMicro(
-                              parseInt(
-                                  (ldo.ldoSoftStart && ldo.mode === 'LDO'
-                                      ? ldo.ldoSoftStart
-                                      : ldo.softStart
-                                  ).toString(),
-                                  10,
-                              ),
+                              ldo.mode === 'LDO'
+                                  ? ldo.softStartCurrentLDOMode
+                                  : ldo.softStartCurrentLoadSwitchMode,
                           )}>;`
                         : ''
                 }
