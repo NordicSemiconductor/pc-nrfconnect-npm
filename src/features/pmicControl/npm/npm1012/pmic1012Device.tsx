@@ -42,7 +42,7 @@ export default class Npm1012 extends BaseNpmDevice {
             new NpmEventEmitter(),
             {
                 bucks: { Module: BuckModule, count: 1 },
-                ldos: { Module: LdoModule, count: 1 },
+                ldos: { Module: LdoModule, count: 2 },
                 ChargerModule,
                 maxEnergyExtraction: true,
                 noOfLEDs: 0,
