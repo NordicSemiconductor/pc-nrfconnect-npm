@@ -106,6 +106,37 @@ describe('PMIC 1012 - Command callbacks', () => {
 
     test.each(
         PMIC_1012_LDOS.map(index => [
+            ...[true, false].map(enabled =>
+                [
+                    {
+                        index,
+                        append: `get ${index}`,
+                        enabled,
+                    },
+                    {
+                        index,
+                        append: `set ${index} ${enabled ? 'on' : 'off'} `,
+                        enabled,
+                    },
+                ].flat(),
+            ),
+        ]).flat(),
+    )('npm1012 ldosw softstart %p', ({ index, append, enabled }) => {
+        const command = `npm1012 ldosw softstart ${append}`;
+        const callback =
+            eventHandlers.mockRegisterCommandCallbackHandler(command);
+
+        callback?.onSuccess(`Value: ${enabled ? 'on' : 'off'}`, command);
+
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: { softStart: enabled },
+            index,
+        });
+    });
+
+    test.each(
+        PMIC_1012_LDOS.map(index => [
             [
                 {
                     index,

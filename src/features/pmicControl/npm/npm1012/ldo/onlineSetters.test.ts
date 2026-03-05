@@ -82,6 +82,27 @@ describe('PMIC 1012 - Setters Online tests', () => {
             expect(mockOnLdoUpdate).toBeCalledTimes(0);
         });
 
+        test.each(
+            PMIC_1012_LDOS.map(index =>
+                [true, false].map(enabled => ({
+                    index,
+                    enabled,
+                })),
+            ).flat(),
+        )('Set setLdoSoftStart %p', async ({ index, enabled }) => {
+            await pmic.ldoModule[index].set.softStart?.(enabled);
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npm1012 ldosw softstart set ${index} ${enabled ? 'on' : 'off'}`,
+                expect.anything(),
+                undefined,
+                true,
+            );
+
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+        });
+
         test.each(PMIC_1012_LDOS)(
             'Set setLdoSoftStartCurrentLimit index: %p',
             async index => {
@@ -335,6 +356,40 @@ describe('PMIC 1012 - Setters Online tests', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(0);
         });
+
+        test.each(
+            PMIC_1012_LDOS.map(index =>
+                [true, false].map(enabled => ({
+                    index,
+                    enabled,
+                })),
+            ).flat(),
+        )(
+            'Set setLdoSoftStart - Fail immediately - %p',
+            async ({ index, enabled }) => {
+                await expect(
+                    pmic.ldoModule[index].set.softStart?.(enabled),
+                ).rejects.toBeUndefined();
+
+                expect(mockEnqueueRequest).toBeCalledTimes(2);
+                expect(mockEnqueueRequest).toBeCalledWith(
+                    `npm1012 ldosw softstart set ${index} ${enabled ? 'on' : 'off'}`,
+                    expect.anything(),
+                    undefined,
+                    true,
+                );
+
+                expect(mockEnqueueRequest).nthCalledWith(
+                    2,
+                    `npm1012 ldosw softstart get ${index}`,
+                    expect.anything(),
+                    undefined,
+                    true,
+                );
+
+                expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            },
+        );
 
         test.each(PMIC_1012_LDOS)(
             'Set setLdoSoftStartCurrentLimit index: %p',

@@ -50,6 +50,21 @@ describe('PMIC 1012 - Request update commands', () => {
     });
 
     test.each(PMIC_1012_LDOS)(
+        'Request update ldoSoftStart index: %p',
+        index => {
+            pmic.ldoModule[index].get.softStart?.();
+
+            expect(mockEnqueueRequest).toBeCalledTimes(1);
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npm1012 ldosw softstart get ${index}`,
+                expect.anything(),
+                undefined,
+                true,
+            );
+        },
+    );
+
+    test.each(PMIC_1012_LDOS)(
         'Request update ldoSoftStartCurrentLimit index: %p',
         index => {
             pmic.ldoModule[index].get.softStartCurrent?.();

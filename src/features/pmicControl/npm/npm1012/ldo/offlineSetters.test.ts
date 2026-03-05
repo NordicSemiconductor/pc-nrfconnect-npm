@@ -34,6 +34,16 @@ describe('PMIC 1012 - Setters Offline tests', () => {
         });
     });
 
+    test.each(PMIC_1012_LDOS)('Set setLdoSoftStart index: %p', async index => {
+        await pmic.ldoModule[index].set.softStart?.(true);
+
+        expect(mockOnLdoUpdate).toBeCalledTimes(1);
+        expect(mockOnLdoUpdate).toBeCalledWith({
+            data: { softStart: true },
+            index,
+        });
+    });
+
     test.each(PMIC_1012_LDOS)(
         'Set setLdoSoftStartCurrentLimit index: %p',
         async index => {
