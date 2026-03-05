@@ -35,7 +35,6 @@ const buckDefaults = (): Buck => ({
     onOffControl: 'Off',
     onOffSoftwareControlEnabled: true,
     retentionControl: 'Off',
-    activeDischarge: false,
     cardLabel: 'BUCK',
     vSetLabel: 'Vset',
 
@@ -59,7 +58,6 @@ export const toBuckExport = (buck: Buck): BuckExport => ({
     onOffControl: buck.onOffControl,
     retentionControl: buck.retentionControl,
     enabled: buck.enabled,
-    activeDischarge: buck.activeDischarge,
 
     activeDischargeResistance: buck.activeDischargeResistance,
     alternateVOut: buck.alternateVOut,
