@@ -238,7 +238,7 @@ export class BuckSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 buck pulldown set ${value === 0 ? 'disable' : `${value}`}`,
+                    `npm1012 buck pulldown set ${value === 0 ? 'off' : `${value}`}`,
                     () => resolve(),
                     () => {
                         this.get.activeDischargeResistance();

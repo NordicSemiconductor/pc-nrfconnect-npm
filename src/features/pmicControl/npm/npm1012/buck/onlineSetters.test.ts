@@ -161,7 +161,7 @@ describe('PMIC 1012 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npm1012 buck pulldown set disable`,
+                    `npm1012 buck pulldown set off`,
                     expect.anything(),
                     undefined,
                     true,
