@@ -46,6 +46,9 @@ export class LdoSet {
                 this.overcurrentProtection(ldo.overcurrentProtection),
             );
         }
+        if (ldo.softStart !== undefined) {
+            promises.push(this.softStart(ldo.softStart));
+        }
         if (ldo.softStartTime !== undefined) {
             promises.push(this.softStartTime(ldo.softStartTime));
         }
@@ -217,6 +220,32 @@ export class LdoSet {
         });
     }
 
+    softStart(enable: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<Ldo>(
+                    'onLdoUpdate',
+                    {
+                        softStart: enable,
+                    },
+                    this.index,
+                );
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm1012 ldosw softstart set ${this.index} ${
+                        enable ? 'on' : 'off'
+                    }`,
+                    () => resolve(),
+                    () => {
+                        this.get.softStart();
+                        reject();
+                    },
+                );
+            }
+        });
+    }
+
     softStartCurrent(value: LdoSoftStartCurrent) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
@@ -230,7 +259,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw softstartilim set ${this.index} ${value === 0 ? 'DISABLE' : `${value}`}`,
+                    `npm1012 ldosw softstartilim set ${this.index} ${value}`,
                     () => resolve(),
                     () => {
                         this.get.softStartCurrent();
@@ -254,7 +283,7 @@ export class LdoSet {
                 resolve();
             } else {
                 this.sendCommand(
-                    `npm1012 ldosw softstarttime set ${this.index} ${value === 0 ? 'DISABLE' : `${value}`}`,
+                    `npm1012 ldosw softstarttime set ${this.index} ${value}`,
                     () => resolve(),
                     () => {
                         this.get.softStartTime();

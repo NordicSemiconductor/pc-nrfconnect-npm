@@ -20,6 +20,7 @@ export class LdoGet {
         this.mode();
         this.overcurrentProtection();
         this.onOffControl();
+        this.softStart();
         this.softStartCurrent();
         this.softStartTime();
         this.vOutSel();
@@ -41,6 +42,9 @@ export class LdoGet {
     }
     onOffControl() {
         this.sendCommand(`npm1012 ldosw enablectrl get ${this.index}`);
+    }
+    softStart() {
+        this.sendCommand(`npm1012 ldosw softstart get ${this.index}`);
     }
     softStartCurrent() {
         this.sendCommand(`npm1012 ldosw softstartilim get ${this.index}`);

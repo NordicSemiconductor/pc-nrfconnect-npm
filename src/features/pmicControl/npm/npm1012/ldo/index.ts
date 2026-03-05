@@ -19,7 +19,8 @@ const ldoDefaults = (index: number): Ldo => {
         onOffControl: 'Software',
         onOffSoftwareControlEnabled: true,
         overcurrentProtection: false,
-        softStartCurrent: softStartCurrentValues[0],
+        softStart: true,
+        softStartCurrent: 20,
         softStartTime: 4.5,
     };
 
@@ -58,8 +59,8 @@ const voltageRange: RangeType = {
     step: 0.05,
 };
 
-const softStartCurrentValues = [0, 10, 20, 35, 50] as readonly number[];
-const softStartTimeValues = [0, 1.5, 4.5, 7.5, 10.5] as readonly number[];
+const softStartCurrentValues = [10, 20, 35, 50] as readonly number[];
+const softStartTimeValues = [1.5, 4.5, 7.5, 10.5] as readonly number[];
 
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
@@ -105,11 +106,11 @@ export default class Module implements LdoModule {
             })),
             softStartCurrent: () =>
                 softStartCurrentValues.map(val => ({
-                    label: val === 0 ? 'Off' : `${val} mA`,
+                    label: `${val} mA`,
                     value: val,
                 })),
             softStartTime: softStartTimeValues.map(val => ({
-                label: val === 0 ? 'Off' : `${val} ms`,
+                label: `${val} ms`,
                 value: val,
             })),
         };

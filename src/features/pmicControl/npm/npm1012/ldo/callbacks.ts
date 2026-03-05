@@ -133,6 +133,22 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
+                toRegex('npm1012 ldosw softstart', true, index, onOffRegex),
+                res => {
+                    eventEmitter.emitPartialEvent<Ldo>(
+                        'onLdoUpdate',
+                        {
+                            softStart: parseOnOff(res),
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
                 toRegex('npm1012 ldosw softstartilim', true, index, '(\\w+)'),
                 res => {
                     const result = parseToNumber(res);
