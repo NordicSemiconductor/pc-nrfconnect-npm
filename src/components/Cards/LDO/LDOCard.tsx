@@ -141,6 +141,21 @@ export default ({
 
             {!summary && (
                 <>
+                    {ldo.softStart !== undefined && (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="SoftStartEnable"
+                                >
+                                    Soft Start
+                                </DocumentationTooltip>
+                            }
+                            isToggled={ldo.softStart === true}
+                            onToggle={value => ldoModule.set.softStart?.(value)}
+                            disabled={disabled}
+                        />
+                    )}
                     {ldoModule.values.softStartCurrent &&
                         ldo.softStartCurrent !== undefined && (
                             <Dropdown
