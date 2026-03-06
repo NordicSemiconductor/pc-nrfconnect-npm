@@ -693,11 +693,11 @@ export type ChargerModuleRanges = {
 };
 
 export type ChargerModuleValues = {
-    iTerm: (iChg: number) => { label: string; value: ITerm }[];
+    iTerm: { label: string; value: ITerm }[];
     vTrickleFast: { label: string; value: VTrickleFast }[];
 
     iThrottle?: { label: string; value: number }[];
-    iTrickle?: (iChg: number) => { label: string; value: ITrickle }[];
+    iTrickle?: { label: string; value: ITrickle }[];
     tOutCharge?: { label: string; value: number }[];
     tOutTrickle?: { label: string; value: number }[];
     vBatLow?: { label: string; value: number }[];
