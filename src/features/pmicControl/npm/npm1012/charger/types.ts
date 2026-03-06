@@ -20,15 +20,6 @@ const ITermKV = Object.entries(ITerm1012).filter(
 export const ITermKeys = ITermKV.map(kv => kv[0]);
 export const ITermValues = ITermKV.map(kv => Number(kv[1]));
 
-// Disable options '0.78%' and '1.56%' when IChg < 8 mA
-const ITermKVWhenIChgBelow8mA = ITermKV.filter(kv => Number(kv[1]) > 1.56);
-export const ITermKeysWhenIChgBelow8mA = ITermKVWhenIChgBelow8mA.map(
-    kv => kv[0],
-);
-export const ITermValuesWhenIChgBelow8mA = ITermKVWhenIChgBelow8mA.map(kv =>
-    Number(kv[1]),
-);
-
 export enum ITrickle1012 {
     '0.78%' = 0.78,
     '1.56%' = 1.56,
@@ -44,17 +35,6 @@ const ITrickleKV = Object.entries(ITrickle1012).filter(
 );
 export const ITrickleKeys = ITrickleKV.map(kv => kv[0]);
 export const ITrickleValues = ITrickleKV.map(kv => Number(kv[1]));
-
-// Disable options '0.78%' and '1.56%' when IChg < 8 mA
-const ITrickleKVWhenIChgBelow8mA = ITrickleKV.filter(
-    kv => Number(kv[1]) > 1.56,
-);
-export const ITrickleKeysWhenIChgBelow8mA = ITrickleKVWhenIChgBelow8mA.map(
-    kv => kv[0],
-);
-export const ITrickleValuesWhenIChgBelow8mA = ITrickleKVWhenIChgBelow8mA.map(
-    kv => Number(kv[1]),
-);
 
 export enum VTrickleFast1012 {
     '2.5 V' = 2.5,

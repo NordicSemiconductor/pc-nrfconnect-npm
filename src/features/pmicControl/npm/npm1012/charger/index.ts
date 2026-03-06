@@ -24,8 +24,6 @@ import {
     ChargerModuleSet,
     ChargerModuleSetBase,
     ChargerModuleValues,
-    ITerm,
-    ITrickle,
     ModuleParams,
 } from '../../types';
 import chargerCallbacks from './callbacks';
@@ -33,13 +31,9 @@ import { ChargerGet } from './getters';
 import { ChargerSet } from './setters';
 import {
     ITermKeys,
-    ITermKeysWhenIChgBelow8mA,
     ITermValues,
-    ITermValuesWhenIChgBelow8mA,
     ITrickleKeys,
-    ITrickleKeysWhenIChgBelow8mA,
     ITrickleValues,
-    ITrickleValuesWhenIChgBelow8mA,
     VTrickleFastKeys,
     VTrickleFastValues,
 } from './types';
@@ -200,36 +194,6 @@ export default class Module implements ChargerModuleBase {
     }
 
     protected static getValues(): ChargerModuleValues {
-        const getITermValues = (
-            iChg: number,
-        ): { label: string; value: ITerm }[] => {
-            if (iChg < 8) {
-                return ITermValuesWhenIChgBelow8mA.map((item, i) => ({
-                    label: `${ITermKeysWhenIChgBelow8mA[i]}`,
-                    value: item,
-                }));
-            }
-            return ITermValues.map((item, i) => ({
-                label: `${ITermKeys[i]}`,
-                value: item,
-            }));
-        };
-
-        const getITrickleValues = (
-            iChg: number,
-        ): { label: string; value: ITrickle }[] => {
-            if (iChg < 8) {
-                return ITrickleValuesWhenIChgBelow8mA.map((item, i) => ({
-                    label: `${ITrickleKeysWhenIChgBelow8mA[i]}`,
-                    value: item,
-                }));
-            }
-            return ITrickleValues.map((item, i) => ({
-                label: `${ITrickleKeys[i]}`,
-                value: item,
-            }));
-        };
-
         const iThrottleValues = getRange([Module.iThrottleValueRange]);
         const tOutChargeValues = getRange([Module.tOutChargeValueRange]);
         const tOutTrickleValues = getRange([Module.tOutTrickleValueRange]);
@@ -237,12 +201,18 @@ export default class Module implements ChargerModuleBase {
         const vThrottleValues = getRange([Module.vThrottleValueRange]);
 
         return {
-            iTerm: getITermValues,
+            iTerm: ITermValues.map((item, i) => ({
+                label: `${ITermKeys[i]}`,
+                value: item,
+            })),
             iThrottle: iThrottleValues.map((item, i) => ({
                 label: `${iThrottleValues[i]}%`,
                 value: item,
             })),
-            iTrickle: getITrickleValues,
+            iTrickle: ITrickleValues.map((item, i) => ({
+                label: `${ITrickleKeys[i]}`,
+                value: item,
+            })),
             tOutCharge: tOutChargeValues.map((item, i) => ({
                 label: `${tOutChargeValues[i]} hours`,
                 value: item,
