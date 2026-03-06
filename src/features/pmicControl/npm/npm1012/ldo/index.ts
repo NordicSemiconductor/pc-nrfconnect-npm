@@ -24,18 +24,18 @@ const ldoDefaults = (index: number): Ldo => {
         softStartTime: 4.5,
     };
 
+    // Load Switch 2
     if (index === 1) {
-        return Object.assign(common, {
-            cardLabel: 'Load Switch 2',
-        });
+        return { ...common, cardLabel: 'Load Switch 2' };
     }
 
-    return Object.assign(common, {
+    return {
+        ...common,
         mode: 'Load_switch',
         vOutSel: 'Vset',
         voltage: voltageRange.min,
         weakPullDown: false,
-    });
+    };
 };
 
 export const toLdoExport = (ldo: Ldo): LdoExport => ({
