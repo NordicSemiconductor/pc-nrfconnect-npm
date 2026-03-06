@@ -22,12 +22,12 @@ import {
     ChargerJeitaILabel,
     ChargerJeitaVLabel,
     ChargerModuleRanges,
+    ChargerModuleValues,
     ModuleParams,
-    VTrickleFast,
 } from '../../types';
 import { ChargerGet } from './getters';
 import { ChargerSet } from './setters';
-import { ITermKeys, ITermNpm1304, ITermValues } from './types';
+import { ITermKeys, ITermValues } from './types';
 
 export default class Module extends nPM1300Charger {
     constructor(parms: ModuleParams) {
@@ -127,17 +127,13 @@ export default class Module extends nPM1300Charger {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    get values(): {
-        iTerm: (iChg: number) => { label: string; value: ITermNpm1304 }[];
-        vTrickleFast: { label: string; value: VTrickleFast }[];
-    } {
+    get values(): ChargerModuleValues {
         return {
-            iTerm: () =>
-                [...ITermValues].map((item, i) => ({
-                    label: `${ITermKeys[i]}`,
-                    value: item,
-                })),
-            vTrickleFast: [...VTrickleFastValues].map((item, i) => ({
+            iTerm: ITermValues.map((item, i) => ({
+                label: `${ITermKeys[i]}`,
+                value: item,
+            })),
+            vTrickleFast: VTrickleFastValues.map((item, i) => ({
                 label: `${VTrickleFastKeys[i]}`,
                 value: item,
             })),
