@@ -18,7 +18,6 @@ import { BuckGet } from './getters';
 import { BuckSet } from './setters';
 import {
     BuckAlternateVOutControlValues1012,
-    BuckModeControl1012,
     BuckModeControlValues1012,
     BuckOnOffControlValues1012,
     BuckVOutRippleControlValues1012,
@@ -31,10 +30,9 @@ const buckDefaults = (): Buck => ({
     vOutNormal: buckVoltageRange().min,
     mode: 'vSet',
     enabled: true,
-    modeControl: 'LP' as BuckModeControl1012,
-    onOffControl: 'Off',
+    modeControl: 'LP',
+    onOffControl: 'VSET',
     onOffSoftwareControlEnabled: true,
-    retentionControl: 'Off',
     cardLabel: 'BUCK',
     vSetLabel: 'Vset',
 
