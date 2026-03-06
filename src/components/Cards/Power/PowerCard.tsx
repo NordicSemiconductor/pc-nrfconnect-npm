@@ -141,9 +141,6 @@ export default ({
         setInternalVWeak(charger.vWeak);
     }, [charger]);
 
-    const iTermValues = chargerModule.values.iTerm(charger.iChg);
-    const iTrickleValues = chargerModule.values.iTrickle?.(charger.iChg);
-
     return (
         <Card
             title={
@@ -219,11 +216,12 @@ export default ({
                         </>
                     </DocumentationTooltip>
                 }
-                items={iTermValues}
+                items={chargerModule.values.iTerm}
                 onSelect={item => chargerModule.set.iTerm(item.value as ITerm)}
                 selectedItem={
-                    iTermValues.find(item => item.value === charger.iTerm) ??
-                    iTermValues[0]
+                    chargerModule.values.iTerm.find(
+                        item => item.value === charger.iTerm,
+                    ) ?? chargerModule.values.iTerm[0]
                 }
                 disabled={disabled}
             />
@@ -277,7 +275,7 @@ export default ({
                         }
                         disabled={disabled}
                     />
-                    {iTrickleValues && (
+                    {chargerModule.values.iTrickle && (
                         <Dropdown
                             label={
                                 <DocumentationTooltip
@@ -292,16 +290,16 @@ export default ({
                                     </>
                                 </DocumentationTooltip>
                             }
-                            items={iTrickleValues}
+                            items={chargerModule.values.iTrickle}
                             onSelect={item =>
                                 chargerModule.set.iTrickle?.(
                                     item.value as ITrickle,
                                 )
                             }
                             selectedItem={
-                                iTrickleValues.find(
+                                chargerModule.values.iTrickle.find(
                                     item => item.value === charger.iTrickle,
-                                ) ?? iTrickleValues[0]
+                                ) ?? chargerModule.values.iTrickle[0]
                             }
                             disabled={disabled}
                         />
