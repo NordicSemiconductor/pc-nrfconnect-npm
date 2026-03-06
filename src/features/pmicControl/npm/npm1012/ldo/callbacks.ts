@@ -110,6 +110,10 @@ export default (
             shellParser.registerCommandCallback(
                 toRegex('npm1012 ldosw mode', true, index, '(\\w+)'),
                 res => {
+                    if (index === 1) {
+                        return; // Disabled for Load Switch 2
+                    }
+
                     const result = parseColonBasedAnswer(res).toLowerCase();
 
                     const mode = LdoModeValues.find(
@@ -187,6 +191,10 @@ export default (
             shellParser.registerCommandCallback(
                 toRegex('npm1012 ldosw voutsel', true, index, '(\\w+)'),
                 res => {
+                    if (index === 1) {
+                        return; // Disabled for Load Switch 2
+                    }
+
                     const result = parseColonBasedAnswer(res).toLowerCase();
 
                     const vOutSel = LdoVOutSelValues.find(
@@ -213,6 +221,10 @@ export default (
             shellParser.registerCommandCallback(
                 toRegex('npm1012 ldosw vout software', true, index),
                 res => {
+                    if (index === 1) {
+                        return; // Disabled for Load Switch 2
+                    }
+
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
@@ -229,6 +241,10 @@ export default (
             shellParser.registerCommandCallback(
                 toRegex('npm1012 ldosw weakpull', true, index, onOffRegex),
                 res => {
+                    if (index === 1) {
+                        return; // Disabled for Load Switch 2
+                    }
+
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {

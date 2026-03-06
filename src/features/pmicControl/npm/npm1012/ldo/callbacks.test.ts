@@ -66,6 +66,12 @@ describe('PMIC 1012 - Command callbacks', () => {
 
         callback?.onSuccess(`Value: 1.5V`, command);
 
+        // Load Switch 2
+        if (index === 1) {
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            return;
+        }
+
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
             data: { voltage: 1.5 },
@@ -96,6 +102,12 @@ describe('PMIC 1012 - Command callbacks', () => {
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
         callback?.onSuccess(`Value:  ${mode}.`, command);
+
+        // Load Switch 2
+        if (index === 1) {
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            return;
+        }
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
@@ -314,6 +326,12 @@ describe('PMIC 1012 - Command callbacks', () => {
 
         callback?.onSuccess(`Value: ${value}`, command);
 
+        // Load Switch 2
+        if (index === 1) {
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            return;
+        }
+
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
             data: {
@@ -346,6 +364,12 @@ describe('PMIC 1012 - Command callbacks', () => {
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
         callback?.onSuccess(`Value: ${weakPullDown ? 'on' : 'off'}`, command);
+
+        // Load Switch 2
+        if (index === 1) {
+            expect(mockOnLdoUpdate).toBeCalledTimes(0);
+            return;
+        }
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
