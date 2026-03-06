@@ -29,7 +29,7 @@ describe('PMIC 1304 - Setters Offline tests', () => {
     });
 
     test.each(PMIC_1304_BUCKS)('Set setBuckRetentionVOut  index: %p', index => {
-        pmic.buckModule[index].set.vOutRetention(1.2);
+        pmic.buckModule[index].set.vOutRetention?.(1.2);
 
         expect(mockOnBuckUpdate).toBeCalledTimes(1);
         expect(mockOnBuckUpdate).nthCalledWith(1, {
@@ -80,7 +80,7 @@ describe('PMIC 1304 - Setters Offline tests', () => {
     test.each(PMIC_1304_BUCKS)(
         'Set setBuckRetentionControl index: %p',
         async index => {
-            await pmic.buckModule[index].set.retentionControl('Off');
+            await pmic.buckModule[index].set.retentionControl?.('Off');
 
             expect(mockOnBuckUpdate).toBeCalledTimes(1);
             expect(mockOnBuckUpdate).toBeCalledWith({
@@ -103,7 +103,7 @@ describe('PMIC 1304 - Setters Offline tests', () => {
     test.each(PMIC_1304_BUCKS)(
         'Set setBuckActiveDischargeEnabled index: %p',
         async index => {
-            await pmic.buckModule[index].set.activeDischarge(false);
+            await pmic.buckModule[index].set.activeDischarge?.(false);
 
             expect(mockOnBuckUpdate).toBeCalledTimes(1);
             expect(mockOnBuckUpdate).toBeCalledWith({
