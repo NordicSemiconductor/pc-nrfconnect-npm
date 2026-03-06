@@ -134,10 +134,18 @@ const generateLDO = (
     deviceType: string,
 ) => `
 ${deviceType}_ek_ldo${ldoModule.index + 1}: LDO${ldoModule.index + 1} {
-    regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;
-    regulator-max-microvolt = <${toMicro(ldoModule.ranges.voltage.max)}>;
     ${
-        ldo.mode === 'LDO'
+        ldoModule.ranges.voltage
+            ? `regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;`
+            : ''
+    }
+    ${
+        ldoModule.ranges.voltage
+            ? `regulator-max-microvolt = <${toMicro(ldoModule.ranges.voltage.max)}>;`
+            : ''
+    }
+    ${
+        ldo.mode === 'LDO' && ldo.voltage !== undefined
             ? `regulator-init-microvolt = <${toMicro(ldo.voltage)}>;`
             : ''
     }

@@ -6,7 +6,7 @@
 
 import { GPIOValues, LdoOnOffControlValues } from '../../types';
 import { PMIC_1300_LDOS, setupMocksWithShellParser } from '../tests/helpers';
-import { SoftStartValues } from './types';
+import { SoftStartCurrentValues } from './types';
 
 describe('PMIC 1300 - Command callbacks', () => {
     const { eventHandlers, mockOnLdoUpdate } = setupMocksWithShellParser();
@@ -128,7 +128,7 @@ describe('PMIC 1300 - Command callbacks', () => {
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
-            data: { softStartEnabled: enabled },
+            data: { softStart: enabled },
             index,
         });
     });
@@ -136,7 +136,7 @@ describe('PMIC 1300 - Command callbacks', () => {
     test.skip('Need to fix tests for undefined vs NaN', () => {
         test.each(
             PMIC_1300_LDOS.map(index => [
-                ...SoftStartValues.map(value => [
+                ...SoftStartCurrentValues.map(value => [
                     {
                         index,
                         append: `get ${index}`,
@@ -158,7 +158,7 @@ describe('PMIC 1300 - Command callbacks', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { softStart: value },
+                data: { softStartCurrentLoadSwitchMode: value },
                 index,
             });
         });

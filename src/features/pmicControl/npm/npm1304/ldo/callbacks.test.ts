@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { SoftStartValues } from '../../npm1300/ldo/types';
+import { SoftStartCurrentValues } from '../../npm1300/ldo/types';
 import { GPIOValues, LdoOnOffControlValues } from '../../types';
 import { PMIC_1304_LDOS, setupMocksWithShellParser } from '../tests/helpers';
 
@@ -128,7 +128,7 @@ describe('PMIC 1304 - Command callbacks', () => {
 
         expect(mockOnLdoUpdate).toBeCalledTimes(1);
         expect(mockOnLdoUpdate).toBeCalledWith({
-            data: { softStartEnabled: enabled },
+            data: { softStart: enabled },
             index,
         });
     });
@@ -136,7 +136,7 @@ describe('PMIC 1304 - Command callbacks', () => {
     test.skip('Need to fix tests for undefined vs NaN', () => {
         test.each(
             PMIC_1304_LDOS.map(index => [
-                ...SoftStartValues.map(value => [
+                ...SoftStartCurrentValues.map(value => [
                     {
                         index,
                         append: `get ${index}`,
@@ -158,7 +158,7 @@ describe('PMIC 1304 - Command callbacks', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { softStart: value },
+                data: { softStartCurrentLoadSwitchMode: value },
                 index,
             });
         });

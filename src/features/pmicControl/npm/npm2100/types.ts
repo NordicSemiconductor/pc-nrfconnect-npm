@@ -30,26 +30,37 @@ export const nPM2100GPIOControlModeValues = [
 export type nPM2100GPIOControlMode =
     (typeof nPM2100GPIOControlModeValues)[number];
 
-export enum nPM2100LDOSoftStart {
-    '25 mA' = '25mA',
-    '38 mA' = '38mA',
-    '50 mA' = '50mA',
-    '75 mA' = '75mA',
-    '150 mA' = '150mA',
+export enum SoftStartCurrentLDOMode {
+    '25 mA' = 25,
+    '38 mA' = 38,
+    '50 mA' = 50,
+    '75 mA' = 75,
+    '150 mA' = 150,
 } // Default 75
+export const softStartCurrentLDOModeKV = Object.entries(
+    SoftStartCurrentLDOMode,
+).filter(entry => !Number.isNaN(Number(entry[1])));
+export const softStartCurrentLDOModeKeys = softStartCurrentLDOModeKV.map(
+    kv => kv[0],
+);
+export const softStartCurrentLDOModeValues = softStartCurrentLDOModeKV.map(kv =>
+    Number(kv[1]),
+);
 
-export const nPM2100LDOSoftStartValues = Object.values(nPM2100LDOSoftStart);
-export const nPM2100LDOSoftStartKeys = Object.keys(nPM2100LDOSoftStart);
-export enum nPM2100SoftStart {
-    '40 mA' = '40mA',
-    '70 mA' = '70mA',
-    '75 mA' = '75mA',
-    '80 mA' = '80mA',
-    '110 mA' = '110mA',
+export enum SoftStartCurrentLoadSwitchMode {
+    '40 mA' = 40,
+    '70 mA' = 70,
+    '75 mA' = 75,
+    '80 mA' = 80,
+    '110 mA' = 110,
 } // Default 75
-
-export const nPM2100SoftStartValues = Object.values(nPM2100SoftStart);
-export const nPM2100SoftStartKeys = Object.keys(nPM2100SoftStart);
+export const softStartCurrentLoadSwitchModeKV = Object.entries(
+    SoftStartCurrentLoadSwitchMode,
+).filter(entry => !Number.isNaN(Number(entry[1])));
+export const softStartCurrentLoadSwitchModeKeys =
+    softStartCurrentLoadSwitchModeKV.map(kv => kv[0]);
+export const softStartCurrentLoadSwitchModeValues =
+    softStartCurrentLoadSwitchModeKV.map(kv => Number(kv[1]));
 
 export enum npm2100TimerMode {
     'General Purpose' = 'GENERAL_PURPOSE',
