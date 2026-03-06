@@ -141,6 +141,21 @@ export default ({
 
             {!summary && (
                 <>
+                    {ldoModule.values.onOffControl && (
+                        <Dropdown
+                            label="On/Off Control"
+                            items={ldoModule.values.onOffControl}
+                            onSelect={item => {
+                                ldoModule.set.onOffControl?.(item.value);
+                            }}
+                            selectedItem={
+                                ldoModule.values.onOffControl.find(
+                                    item => item.value === ldo.onOffControl,
+                                ) ?? ldoModule.values.onOffControl[0]
+                            }
+                            disabled={disabled}
+                        />
+                    )}
                     {ldo.softStart !== undefined && (
                         <Toggle
                             label={
@@ -148,7 +163,7 @@ export default ({
                                     card={card}
                                     item="SoftStartEnable"
                                 >
-                                    Soft Start
+                                    Enable Soft Start
                                 </DocumentationTooltip>
                             }
                             isToggled={ldo.softStart === true}
@@ -273,24 +288,6 @@ export default ({
                             disabled={disabled}
                         />
                     )}
-                    {ldoModule.set.activeDischarge && (
-                        <Toggle
-                            label={
-                                <DocumentationTooltip
-                                    card={card}
-                                    item="ActiveDischarge"
-                                >
-                                    Active Discharge
-                                </DocumentationTooltip>
-                            }
-                            isToggled={ldo.activeDischarge}
-                            onToggle={value => {
-                                ldoModule.set.activeDischarge?.(value);
-                            }}
-                            disabled={disabled}
-                        />
-                    )}
-
                     {ldoModule.values.modeControl && (
                         <Dropdown
                             label={
@@ -310,6 +307,57 @@ export default ({
                                     item => item.value === ldo.modeControl,
                                 ) ?? ldoModule.values.modeControl[0]
                             }
+                            disabled={disabled}
+                        />
+                    )}
+                    {ldoModule.set.activeDischarge && (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="ActiveDischarge"
+                                >
+                                    Enable Active Discharge
+                                </DocumentationTooltip>
+                            }
+                            isToggled={ldo.activeDischarge}
+                            onToggle={value => {
+                                ldoModule.set.activeDischarge?.(value);
+                            }}
+                            disabled={disabled}
+                        />
+                    )}
+                    {ldoModule.set.overcurrentProtection && (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="OcpEnabled"
+                                >
+                                    Enable Overcurrent Protection
+                                </DocumentationTooltip>
+                            }
+                            isToggled={ldo.overcurrentProtection === true}
+                            onToggle={value =>
+                                ldoModule.set.overcurrentProtection?.(value)
+                            }
+                            disabled={disabled}
+                        />
+                    )}
+                    {ldo.weakPullDown !== undefined && (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="WeakPullDown"
+                                >
+                                    Enable Weak Pull-Down
+                                </DocumentationTooltip>
+                            }
+                            isToggled={ldo.weakPullDown}
+                            onToggle={value => {
+                                ldoModule.set.weakPullDown?.(value);
+                            }}
                             disabled={disabled}
                         />
                     )}
@@ -357,40 +405,6 @@ export default ({
                             disabled={disabled}
                         />
                     )}
-
-                    {ldoModule.values.onOffControl && (
-                        <Dropdown
-                            label="On/Off Control"
-                            items={ldoModule.values.onOffControl}
-                            onSelect={item => {
-                                ldoModule.set.onOffControl?.(item.value);
-                            }}
-                            selectedItem={
-                                ldoModule.values.onOffControl.find(
-                                    item => item.value === ldo.onOffControl,
-                                ) ?? ldoModule.values.onOffControl[0]
-                            }
-                            disabled={disabled}
-                        />
-                    )}
-
-                    {ldoModule.set.overcurrentProtection && (
-                        <Toggle
-                            label={
-                                <DocumentationTooltip
-                                    card={card}
-                                    item="OcpEnabled"
-                                >
-                                    Overcurrent Protection
-                                </DocumentationTooltip>
-                            }
-                            isToggled={ldo.overcurrentProtection === true}
-                            onToggle={value =>
-                                ldoModule.set.overcurrentProtection?.(value)
-                            }
-                            disabled={disabled}
-                        />
-                    )}
                     {ldoModule.set.ramp && (
                         <Toggle
                             label={
@@ -418,23 +432,6 @@ export default ({
                             }
                             isToggled={ldo.halt === true}
                             onToggle={value => ldoModule.set.halt?.(value)}
-                            disabled={disabled}
-                        />
-                    )}
-                    {ldo.weakPullDown !== undefined && (
-                        <Toggle
-                            label={
-                                <DocumentationTooltip
-                                    card={card}
-                                    item="WeakPullDown"
-                                >
-                                    Weak Pull-Down
-                                </DocumentationTooltip>
-                            }
-                            isToggled={ldo.weakPullDown}
-                            onToggle={value => {
-                                ldoModule.set.weakPullDown?.(value);
-                            }}
                             disabled={disabled}
                         />
                     )}
