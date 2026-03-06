@@ -1,14 +1,13 @@
 /*
- * Copyright (c) 2025 Nordic Semiconductor ASA
+ * Copyright (c) 2026 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
 import { helpers } from '../../tests/helpers';
-import { NTCThermistor } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
-describe('PMIC 1304 - Setters Online tests', () => {
+describe('PMIC 1012 - Setters Online tests', () => {
     const { mockOnChargerUpdate, mockEnqueueRequest, pmic } =
         setupMocksWithShellParser();
     describe('Setters and effects state - success', () => {
@@ -19,24 +18,22 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 helpers.registerCommandCallbackSuccess,
             );
         });
+
         test('Set setChargerVTerm', async () => {
-            await pmic.chargerModule?.set.vTerm(3.2);
+            await pmic.chargerModule?.set.vTerm(3.55);
 
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
-
-            // turn off charging
+            // Expect charger to be turned off before changing the voltage
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger termination_voltage normal set 3200`,
+                'npm1012 charger voltage termination set 3.55',
                 expect.anything(),
                 undefined,
                 true,
@@ -44,23 +41,19 @@ describe('PMIC 1304 - Setters Online tests', () => {
         });
 
         test('Set setChargerIChg', async () => {
-            await pmic.chargerModule?.set.iChg(32);
+            await pmic.chargerModule?.set.iChg(1.5);
 
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
-
-            // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger charging_current set 32000`,
+                'npm1012 charger current charge set 1.5',
                 expect.anything(),
                 undefined,
                 true,
@@ -71,7 +64,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             await pmic.chargerModule?.set.vTrickleFast(2.5);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger trickle_voltage set 2500`,
+                'npm1012 charger voltage trickle set 2.5',
                 expect.anything(),
                 undefined,
                 true,
@@ -79,10 +72,10 @@ describe('PMIC 1304 - Setters Online tests', () => {
         });
 
         test('Set setChargerITerm', async () => {
-            await pmic.chargerModule?.set.iTerm(10);
+            await pmic.chargerModule?.set.iTerm(3.125);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger termination_current set 10`,
+                'npm1012 charger current termination set 3.125',
                 expect.anything(),
                 undefined,
                 true,
@@ -96,7 +89,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx charger module recharge set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger recharge set ${enabled ? 'on' : 'off'}`,
                     expect.anything(),
                     undefined,
                     true,
@@ -114,13 +107,12 @@ describe('PMIC 1304 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `powerup_charger vbatlow set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger lowbat_charging set ${enabled ? 'on' : 'off'}`,
                     expect.anything(),
                     undefined,
                     true,
                 );
 
-                // Updates should only be emitted when we get response
                 expect(mockOnChargerUpdate).toBeCalledTimes(0);
             },
         );
@@ -132,127 +124,21 @@ describe('PMIC 1304 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
-                    `npmx charger module charger set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger enable set ${enabled ? 'on' : 'off'}`,
                     expect.anything(),
                     undefined,
                     true,
                 );
 
-                // Updates should only be emitted when we get response
                 expect(mockOnChargerUpdate).toBeCalledTimes(0);
             },
         );
 
-        test.each([
-            {
-                mode: '100 kΩ',
-                cliMode: 100000,
-                beta: 4250,
-            },
-            {
-                mode: '10 kΩ',
-                cliMode: 10000,
-                beta: 3380,
-            },
-            {
-                mode: '47 kΩ',
-                cliMode: 47000,
-                beta: 4050,
-            },
-        ] as { mode: NTCThermistor; cliMode: number; beta: number }[])(
-            'Set setChargerNTCThermistor - auto beta - %p',
-            async ({ mode, cliMode, beta }) => {
-                await pmic.chargerModule?.set.nTCThermistor?.(mode, true);
+        test('Set setChargerTChgReduce', async () => {
+            await pmic.chargerModule?.set.tChgReduce?.(90);
 
-                // turn off charging
-                expect(mockEnqueueRequest).toBeCalledTimes(4);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx charger module charger set 0`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx adc ntc type set ${cliMode}`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-                expect(mockEnqueueRequest).nthCalledWith(
-                    3,
-                    `npmx charger module charger set 0`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-                expect(mockEnqueueRequest).nthCalledWith(
-                    4,
-                    `npmx adc ntc beta set ${beta}`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-            },
-        );
-
-        test.each([
-            {
-                mode: '100 kΩ',
-                cliMode: 100000,
-            },
-            {
-                mode: '10 kΩ',
-                cliMode: 10000,
-            },
-            {
-                mode: '47 kΩ',
-                cliMode: 47000,
-            },
-            {
-                mode: 'Ignore NTC',
-                cliMode: 0,
-            },
-        ] as { mode: NTCThermistor; cliMode: number; beta: number }[])(
-            'Set setChargerNTCThermistor - manual beta %p',
-            async ({ mode, cliMode }) => {
-                await pmic.chargerModule?.set.nTCThermistor?.(mode, false);
-
-                // turn off charging
-                expect(mockEnqueueRequest).toBeCalledTimes(2);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx charger module charger set 0`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx adc ntc type set ${cliMode}`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-            },
-        );
-
-        test('Set setChargerNTCBeta', async () => {
-            await pmic.chargerModule?.set.nTCBeta?.(3380);
-
-            // turn off charging
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx charger module charger set 0`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                `npmx adc ntc beta set 3380`,
+            expect(mockEnqueueRequest).toBeCalledWith(
+                'npm1012 charger dietemp reduce set 90',
                 expect.anything(),
                 undefined,
                 true,
@@ -263,18 +149,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             await pmic.chargerModule?.set.tChgResume(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger die_temp resume set 90`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-        });
-
-        test('Set setChargerTChgStop', async () => {
-            await pmic.chargerModule?.set.tChgStop?.(90);
-
-            expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger die_temp stop set 90`,
+                'npm1012 charger dietemp resume set 90',
                 expect.anything(),
                 undefined,
                 true,
@@ -282,10 +157,10 @@ describe('PMIC 1304 - Setters Online tests', () => {
         });
 
         test('Set setChargerTCold', async () => {
-            await pmic.chargerModule?.set.tCold(90);
+            await pmic.chargerModule?.set.tCold(-20);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger ntc_temperature cold set 90`,
+                'npm1012 charger ntc cold set -20',
                 expect.anything(),
                 undefined,
                 true,
@@ -296,7 +171,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             await pmic.chargerModule?.set.tCool(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger ntc_temperature cool set 90`,
+                'npm1012 charger ntc cool set 90',
                 expect.anything(),
                 undefined,
                 true,
@@ -307,7 +182,7 @@ describe('PMIC 1304 - Setters Online tests', () => {
             await pmic.chargerModule?.set.tWarm(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger ntc_temperature warm set 90`,
+                'npm1012 charger ntc warm set 90',
                 expect.anything(),
                 undefined,
                 true,
@@ -318,18 +193,29 @@ describe('PMIC 1304 - Setters Online tests', () => {
             await pmic.chargerModule?.set.tHot(90);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger ntc_temperature hot set 90`,
+                'npm1012 charger ntc hot set 90',
                 expect.anything(),
                 undefined,
                 true,
             );
         });
 
-        test('Set chargerVTermR', async () => {
-            await pmic.chargerModule?.set.vTermR?.(3.55);
+        test('Set chargerVTermCool', async () => {
+            await pmic.chargerModule?.set.vTermCool?.(3.55);
 
             expect(mockEnqueueRequest).toBeCalledWith(
-                `npmx charger termination_voltage warm set 3550`,
+                `npm1012 charger voltage termination_cool set 3.55`,
+                expect.anything(),
+                undefined,
+                true,
+            );
+        });
+
+        test('Set chargerVTermWarm', async () => {
+            await pmic.chargerModule?.set.vTermWarm?.(3.55);
+
+            expect(mockEnqueueRequest).toBeCalledWith(
+                `npm1012 charger voltage termination_warm set 3.55`,
                 expect.anything(),
                 undefined,
                 true,
@@ -345,34 +231,32 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 helpers.registerCommandCallbackError,
             );
         });
+
         test('Set setChargerVTerm onError case 1 - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.vTerm(3.2),
+                pmic.chargerModule?.set.vTerm(3.55),
             ).rejects.toBeUndefined();
-
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
+            // Request update on error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger module charger get`,
+                'npm1012 charger enable get',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger termination_voltage normal get`,
+                'npm1012 charger voltage termination get',
                 expect.anything(),
                 undefined,
                 true,
@@ -385,33 +269,29 @@ describe('PMIC 1304 - Setters Online tests', () => {
             );
 
             await expect(
-                pmic.chargerModule?.set.vTerm(3.2),
+                pmic.chargerModule?.set.vTerm(3.55),
             ).rejects.toBeUndefined();
 
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ vTerm: 3.2 });
-
-            // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger termination_voltage normal set 3200`,
+                'npm1012 charger voltage termination set 3.55',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
+            // Request update on error from the second command
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger termination_voltage normal get`,
+                'npm1012 charger voltage termination get',
                 expect.anything(),
                 undefined,
                 true,
@@ -420,32 +300,28 @@ describe('PMIC 1304 - Setters Online tests', () => {
 
         test('Set setChargerIChg onError case 1 - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.iChg(32),
+                pmic.chargerModule?.set.iChg(1.5),
             ).rejects.toBeUndefined();
-
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
 
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger module charger get`,
+                'npm1012 charger enable get',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger charging_current get`,
+                `npm1012 charger current charge get`,
                 expect.anything(),
                 undefined,
                 true,
@@ -458,33 +334,28 @@ describe('PMIC 1304 - Setters Online tests', () => {
             );
 
             await expect(
-                pmic.chargerModule?.set.iChg(32),
+                pmic.chargerModule?.set.iChg(1.5),
             ).rejects.toBeUndefined();
 
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iChg: 32 });
-
-            // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger charging_current set 32000`,
+                'npm1012 charger current charge set 1.5',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger charging_current get`,
+                'npm1012 charger current charge get',
                 expect.anything(),
                 undefined,
                 true,
@@ -496,30 +367,24 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 pmic.chargerModule?.set.vTrickleFast(2.5),
             ).rejects.toBeUndefined();
 
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({
-                vTrickleFast: 2.5,
-            });
-
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger module charger get`,
+                'npm1012 charger enable get',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger trickle_voltage get`,
+                'npm1012 charger voltage trickle get',
                 expect.anything(),
                 undefined,
                 true,
@@ -535,32 +400,25 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 pmic.chargerModule?.set.vTrickleFast(2.5),
             ).rejects.toBeUndefined();
 
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({
-                vTrickleFast: 2.5,
-            });
-
-            // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger trickle_voltage set 2500`,
+                'npm1012 charger voltage trickle set 2.5',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger trickle_voltage get`,
+                'npm1012 charger voltage trickle get',
                 expect.anything(),
                 undefined,
                 true,
@@ -569,15 +427,12 @@ describe('PMIC 1304 - Setters Online tests', () => {
 
         test('Set setChargerITerm  onError case 1 - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.iTerm(10),
+                pmic.chargerModule?.set.iTerm(3.125),
             ).rejects.toBeUndefined();
-
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: 10 });
 
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
@@ -586,14 +441,14 @@ describe('PMIC 1304 - Setters Online tests', () => {
             // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger module charger get`,
+                'npm1012 charger enable get',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger termination_current get`,
+                'npm1012 charger current termination get',
                 expect.anything(),
                 undefined,
                 true,
@@ -606,33 +461,28 @@ describe('PMIC 1304 - Setters Online tests', () => {
             );
 
             await expect(
-                pmic.chargerModule?.set.iTerm(10),
+                pmic.chargerModule?.set.iTerm(3.125),
             ).rejects.toBeUndefined();
 
-            expect(mockOnChargerUpdate).toBeCalledTimes(1);
-            expect(mockOnChargerUpdate).toBeCalledWith({ iTerm: 10 });
-
-            // turn off charging
             expect(mockEnqueueRequest).toBeCalledTimes(3);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger module charger set 0`,
+                'npm1012 charger enable set off',
                 expect.anything(),
                 undefined,
                 true,
             );
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                `npmx charger termination_current set 10`,
+                'npm1012 charger current termination set 3.125',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 3,
-                `npmx charger termination_current get`,
+                'npm1012 charger current termination get',
                 expect.anything(),
                 undefined,
                 true,
@@ -646,20 +496,18 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     pmic.chargerModule?.set.enabledRecharging(enabled),
                 ).rejects.toBeUndefined();
 
-                // turn off recharge
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx charger module recharge set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger recharge set ${enabled ? 'on' : 'off'}`,
                     expect.anything(),
                     undefined,
                     true,
                 );
 
-                // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx charger module recharge get`,
+                    'npm1012 charger recharge get',
                     expect.anything(),
                     undefined,
                     true,
@@ -674,95 +522,10 @@ describe('PMIC 1304 - Setters Online tests', () => {
                     pmic.chargerModule?.set.enabledVBatLow(enabled),
                 ).rejects.toBeUndefined();
 
-                // turn off vbatlow
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `powerup_charger vbatlow set ${enabled ? '1' : '0'}`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `powerup_charger vbatlow get`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-            },
-        );
-
-        test.each([
-            {
-                mode: '100 kΩ',
-                cliMode: '100000',
-            },
-            {
-                mode: '10 kΩ',
-                cliMode: '10000',
-            },
-            {
-                mode: '47 kΩ',
-                cliMode: '47000',
-            },
-            {
-                mode: 'Ignore NTC',
-                cliMode: '0',
-            },
-        ] as { mode: NTCThermistor; cliMode: string }[])(
-            'Set setChargerNTCThermistor - onError case 2 - Fail immediately -  %p',
-            async ({ mode, cliMode }) => {
-                mockEnqueueRequest.mockImplementationOnce(
-                    helpers.registerCommandCallbackSuccess,
-                );
-
-                await expect(
-                    pmic.chargerModule?.set.nTCThermistor?.(mode),
-                ).rejects.toBeUndefined();
-
-                // turn chance ntc thermistor
-                expect(mockEnqueueRequest).toBeCalledTimes(3);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx charger module charger set 0`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-                expect(mockEnqueueRequest).nthCalledWith(
-                    2,
-                    `npmx adc ntc type set ${cliMode}`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    3,
-                    `npmx adc ntc type get`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-            },
-        );
-
-        test.each(['100 kΩ', '10 kΩ', '47 kΩ'] as NTCThermistor[])(
-            'Set setChargerNTCThermistor - Fail immediately - mode: %p',
-            async mode => {
-                await expect(
-                    pmic.chargerModule?.set.nTCThermistor?.(mode),
-                ).rejects.toBeUndefined();
-
-                // turn chance ntc thermistor
-                expect(mockEnqueueRequest).toBeCalledTimes(3);
-                expect(mockEnqueueRequest).nthCalledWith(
-                    1,
-                    `npmx charger module charger set 0`,
+                    `npm1012 charger lowbat_charging set ${enabled ? 'on' : 'off'}`,
                     expect.anything(),
                     undefined,
                     true,
@@ -770,82 +533,13 @@ describe('PMIC 1304 - Setters Online tests', () => {
 
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    `npmx charger module charger get`,
-                    expect.anything(),
-                    undefined,
-                    true,
-                );
-
-                // Refresh data due to error
-                expect(mockEnqueueRequest).nthCalledWith(
-                    3,
-                    `npmx adc ntc type get`,
+                    'npm1012 charger lowbat_charging get',
                     expect.anything(),
                     undefined,
                     true,
                 );
             },
         );
-
-        test('Set setChargerNTCBeta - Fail immediately : %p', async () => {
-            await expect(
-                pmic.chargerModule?.set.nTCBeta?.(3380),
-            ).rejects.toBeUndefined();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx charger module charger set 0`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                'npmx charger module charger get',
-                expect.anything(),
-                undefined,
-                true,
-            );
-        });
-
-        test('Set setChargerNTCBeta - Fail immediately case 2: %p', async () => {
-            mockEnqueueRequest.mockImplementationOnce(
-                helpers.registerCommandCallbackSuccess,
-            );
-
-            await expect(
-                pmic.chargerModule?.set.nTCBeta?.(3380),
-            ).rejects.toBeUndefined();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(3);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx charger module charger set 0`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                'npmx adc ntc beta set 3380',
-                expect.anything(),
-                undefined,
-                true,
-            );
-
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                3,
-                'npmx adc ntc beta get',
-                expect.anything(),
-                undefined,
-                true,
-            );
-        });
 
         test.each([true, false])(
             'Set setChargerEnabled - Fail immediately - enabled: %p',
@@ -857,16 +551,15 @@ describe('PMIC 1304 - Setters Online tests', () => {
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
                 expect(mockEnqueueRequest).nthCalledWith(
                     1,
-                    `npmx charger module charger set ${enabled ? '1' : '0'}`,
+                    `npm1012 charger enable set ${enabled ? 'on' : 'off'}`,
                     expect.anything(),
                     undefined,
                     true,
                 );
 
-                // Refresh data due to error
                 expect(mockEnqueueRequest).nthCalledWith(
                     2,
-                    'npmx charger module charger get',
+                    'npm1012 charger enable get',
                     expect.anything(),
                     undefined,
                     true,
@@ -877,6 +570,31 @@ describe('PMIC 1304 - Setters Online tests', () => {
             },
         );
 
+        test('Set setChargerTChgReduce - Fail immediately', async () => {
+            await expect(
+                pmic.chargerModule?.set.tChgReduce?.(90),
+            ).rejects.toBeUndefined();
+
+            expect(mockEnqueueRequest).toBeCalledTimes(2);
+            expect(mockEnqueueRequest).nthCalledWith(
+                1,
+                `npm1012 charger dietemp reduce set 90`,
+                expect.anything(),
+                undefined,
+                true,
+            );
+
+            expect(mockEnqueueRequest).nthCalledWith(
+                2,
+                'npm1012 charger dietemp reduce get',
+                expect.anything(),
+                undefined,
+                true,
+            );
+
+            expect(mockOnChargerUpdate).toBeCalledTimes(0);
+        });
+
         test('Set setChargerTChgResume - Fail immediately', async () => {
             await expect(
                 pmic.chargerModule?.set.tChgResume(90),
@@ -885,76 +603,45 @@ describe('PMIC 1304 - Setters Online tests', () => {
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger die_temp resume set 90`,
+                `npm1012 charger dietemp resume set 90`,
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger die_temp resume get',
+                'npm1012 charger dietemp resume get',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Updates should only be emitted when we get response
-            expect(mockOnChargerUpdate).toBeCalledTimes(0);
-        });
-
-        test('Set setChargerTChgStop - Fail immediately', async () => {
-            await expect(
-                pmic.chargerModule?.set.tChgStop?.(90),
-            ).rejects.toBeUndefined();
-
-            expect(mockEnqueueRequest).toBeCalledTimes(2);
-            expect(mockEnqueueRequest).nthCalledWith(
-                1,
-                `npmx charger die_temp stop set 90`,
-                expect.anything(),
-                undefined,
-                true,
-            );
-
-            // Refresh data due to error
-            expect(mockEnqueueRequest).nthCalledWith(
-                2,
-                'npmx charger die_temp stop get',
-                expect.anything(),
-                undefined,
-                true,
-            );
-
-            // Updates should only be emitted when we get response
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
         test('Set setChargerTCold - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.tCold(90),
+                pmic.chargerModule?.set.tCold(-20),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger ntc_temperature cold set 90`,
+                `npm1012 charger ntc cold set -20`,
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger ntc_temperature cold get',
+                'npm1012 charger ntc cold get',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Updates should only be emitted when we get response
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
@@ -966,22 +653,20 @@ describe('PMIC 1304 - Setters Online tests', () => {
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger ntc_temperature cool set 90`,
+                'npm1012 charger ntc cool set 90',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger ntc_temperature cool get',
+                'npm1012 charger ntc cool get',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Updates should only be emitted when we get response
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
@@ -993,22 +678,20 @@ describe('PMIC 1304 - Setters Online tests', () => {
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger ntc_temperature warm set 90`,
+                'npm1012 charger ntc warm set 90',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger ntc_temperature warm get',
+                'npm1012 charger ntc warm get',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Updates should only be emitted when we get response
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
@@ -1020,49 +703,45 @@ describe('PMIC 1304 - Setters Online tests', () => {
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger ntc_temperature hot set 90`,
+                'npm1012 charger ntc hot set 90',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger ntc_temperature hot get',
+                'npm1012 charger ntc hot get',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Updates should only be emitted when we get response
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
 
-        test('Set setChargerVTermR - Fail immediately', async () => {
+        test('Set setChargerVTermWarm - Fail immediately', async () => {
             await expect(
-                pmic.chargerModule?.set.vTermR?.(3.55),
+                pmic.chargerModule?.set.vTermWarm?.(3.55),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);
             expect(mockEnqueueRequest).nthCalledWith(
                 1,
-                `npmx charger termination_voltage warm set 3550`,
+                'npm1012 charger voltage termination_warm set 3.55',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Refresh data due to error
             expect(mockEnqueueRequest).nthCalledWith(
                 2,
-                'npmx charger termination_voltage warm get',
+                'npm1012 charger voltage termination_warm get',
                 expect.anything(),
                 undefined,
                 true,
             );
 
-            // Updates should only be emitted when we get response
             expect(mockOnChargerUpdate).toBeCalledTimes(0);
         });
     });

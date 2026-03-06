@@ -7,6 +7,7 @@
 import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import BaseNpmDevice from './basePmicDevice';
+import Npm1012 from './npm1012/pmic1012Device';
 import Npm1300 from './npm1300/pmic1300Device';
 import Npm1304 from './npm1304/pmic1304Device';
 import Npm2100 from './npm2100/pmic2100Device';
@@ -22,7 +23,9 @@ export const getNpmDevice = (
             onSuccess: response => {
                 const parsedHwVersion = parseHwVersion(response);
                 const hwVersion = parsedHwVersion.hw_version;
-                if (hwVersion?.startsWith('npm1300ek')) {
+                if (hwVersion?.startsWith('npm1012ek')) {
+                    resolve(new Npm1012(shellParser, dialogHandler));
+                } else if (hwVersion?.startsWith('npm1300ek')) {
                     resolve(new Npm1300(shellParser, dialogHandler));
                 } else if (hwVersion?.startsWith('npm1304ek')) {
                     resolve(

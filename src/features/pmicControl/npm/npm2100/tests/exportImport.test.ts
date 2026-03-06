@@ -6,6 +6,8 @@
 
 import {
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     GPIO,
     GPIOExport,
     Ldo,
@@ -63,6 +65,16 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         tCool: 12,
         tWarm: 47,
         tHot: 69,
+        jeitaILabelCold: ChargerJeitaILabel.coldIOff,
+        jeitaILabelCool: ChargerJeitaILabel.coolIChg50percent,
+        jeitaILabelNominal: ChargerJeitaILabel.nominalIChg,
+        jeitaILabelWarm: ChargerJeitaILabel.warmIChg,
+        jeitaILabelHot: ChargerJeitaILabel.hotIOff,
+        jeitaVLabelCold: ChargerJeitaVLabel.coldVNA,
+        jeitaVLabelCool: ChargerJeitaVLabel.coolVTerm,
+        jeitaVLabelNominal: ChargerJeitaVLabel.nominalVTerm,
+        jeitaVLabelWarm: ChargerJeitaVLabel.warmVTerm100mVOff,
+        jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
     };
 
     const initLdo: Ldo = {

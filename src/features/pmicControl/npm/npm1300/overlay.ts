@@ -57,7 +57,7 @@ const generateCharger = (deviceType: string, charger?: Charger) =>
 ${deviceType}_ek_charger: charger {
     compatible = "nordic,${deviceType}-charger";
     term-microvolt = <${toMicro(charger.vTerm)}>;
-    term-warm-microvolt = <${toMicro(charger.vTermR)}>;
+    ${charger.vTermR !== undefined ? `term-warm-microvolt = <${toMicro(charger.vTermR)}>;` : ''}
     // term-current-percent = <${charger.iTerm}>;
     current-microamp = <${toMicro(charger.iChg / 1000)}>;
     // trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
@@ -67,7 +67,11 @@ ${deviceType}_ek_charger: charger {
             : ''
     }
     vbus-limit-microamp = <500000>;
-    thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
+    ${
+        charger.ntcThermistor
+            ? `thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>`
+            : ''
+    }
     thermistor-beta = <${charger.ntcBeta}>;
     ${charger.enableRecharging ? '' : '// disable-recharge;'}
     ${charger.enabled ? 'charging-enable;' : ''}
