@@ -57,10 +57,10 @@ const ledModeToOverlay = (mode: LEDMode) => {
 const generateJeita = (
     charger: Charger,
     chargerModule: ChargerModule,
-) => `${chargerModule.defaults.tCold !== charger.tCold ? `thermistor-cold-millidegrees = <${toMilli(charger.tCold)}>` : ''};
-    ${chargerModule.defaults.tCool !== charger.tCool ? `thermistor-cool-millidegrees = <${toMilli(charger.tCool)}>` : ''};
-    ${chargerModule.defaults.tWarm !== charger.tWarm ? `thermistor-warm-millidegrees = <${toMilli(charger.tWarm)}>` : ''};
-    ${chargerModule.defaults.tHot !== charger.tHot ? `thermistor-hot-millidegrees = <${toMilli(charger.tHot)}>` : ''};`;
+) => `${chargerModule.defaults.tCold !== charger.tCold ? `thermistor-cold-millidegrees = <${toMilli(charger.tCold)}>;` : ''}
+    ${chargerModule.defaults.tCool !== charger.tCool ? `thermistor-cool-millidegrees = <${toMilli(charger.tCool)}>;` : ''}
+    ${chargerModule.defaults.tWarm !== charger.tWarm ? `thermistor-warm-millidegrees = <${toMilli(charger.tWarm)}>;` : ''}
+    ${chargerModule.defaults.tHot !== charger.tHot ? `thermistor-hot-millidegrees = <${toMilli(charger.tHot)}>;` : ''}`;
 
 const generateCharger = (
     deviceType: string,
@@ -198,6 +198,22 @@ const longPressReset = (npmConfig: NpmExportLatest) =>
         ? `long-press-reset = "${npmConfig.reset.longPressReset.replaceAll('_', '-')}";`
         : '';
 
+const generateWatchdog = (
+    npmConfig: NpmExportLatest,
+    npmDevice: Npm1300 | Npm1304,
+) => {
+    const gpioIndex = npmConfig.gpios.findIndex(
+        g => g.mode === GPIOMode1300['Output reset'],
+    );
+    return `${npmDevice.deviceType}_wdt: watchdog {
+           compatible = "nordic,${npmDevice.deviceType}-wdt";
+            ${
+                gpioIndex !== -1
+                    ? `reset-gpios = <&${npmDevice.deviceType}_gpio ${gpioIndex} GPIO_ACTIVE_LOW>`
+                    : ''
+            };`;
+};
+
 export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
 * Copyright (C) 2023 Nordic Semiconductor ASA
 * SPDX-License-Identifier: Apache-2.0
@@ -211,7 +227,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
        compatible = "nordic,${npmDevice.deviceType}";
        reg = <0x6b>;
 
-        pmic-int-pin = <3>; // From what i gather we have not UI for this to this is something user has to fill in after generating? 
+        pmic-int-pin = <3>; // host-int-gpios must be set by the user for this to work
         ship-to-active-time-ms = <${npmConfig.lowPower?.timeToActive ?? npmDevice.lowPowerModule?.defaults.timeToActive}>;
        ${longPressReset(npmConfig)}
 
@@ -262,22 +278,6 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
 
        ${generateLEDs(npmConfig.leds, npmDevice.deviceType)}
 
-       
-       ${npmDevice.deviceType}_wdt: watchdog {
-           compatible = "nordic,${npmDevice.deviceType}-wdt";
-            ${
-                npmConfig.gpios.some(
-                    g => g.mode === GPIOMode1300['Output reset'],
-                )
-                    ? `reset-gpios = ${npmConfig.gpios
-                          .map((g, i) =>
-                              g.mode === GPIOMode1300['Output reset']
-                                  ? `<&${npmDevice.deviceType}_gpio ${i} GPIO_ACTIVE_LOW>`
-                                  : '',
-                          )
-                          .join(', ')};` // to sure i got this right
-                    : ''
-            }
-       };
+       ${generateWatchdog(npmConfig, npmDevice)}
    };
 };`;
