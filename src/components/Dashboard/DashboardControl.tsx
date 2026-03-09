@@ -99,6 +99,7 @@ export default ({ active }: PaneProps) => {
                         key={`Ldo${1 + index}`}
                         disabled={disabled}
                         defaultSummary
+                        numberOfGPIOs={npmDevice.gpioModule.length}
                     />
                 ))}
         </MasonryLayout>

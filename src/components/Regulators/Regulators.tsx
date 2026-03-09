@@ -63,6 +63,7 @@ export default ({ active }: PaneProps) => {
                         }
                         key={`Buck${1 + index}`}
                         disabled={disabled}
+                        numberOfGPIOs={npmDevice.gpioModule.length}
                     />
                 ))}
         </MasonryLayout>

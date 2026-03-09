@@ -9,20 +9,21 @@ import {
     BuckExport,
     BuckModule,
     Charger,
+    ChargerModule,
     GPIOValues,
     LdoExport,
     LdoModule,
     LED,
     LEDMode,
-    LowPowerConfig,
-    npm1300ResetConfig,
     NpmExportLatest,
     NTCThermistor,
+    USBPowerExport,
 } from '../types';
+import { GPIOMode1300 } from './gpio/types';
 import type Npm1300 from './pmic1300Device';
 
 const toMicro = (value: number) => value * 1000000;
-// const toMilli = (value: number) => value * 1000;
+const toMilli = (value: number) => value * 1000;
 
 const thermistorTypeToOverlay = (value: NTCThermistor) => {
     switch (value) {
@@ -36,7 +37,7 @@ const thermistorTypeToOverlay = (value: NTCThermistor) => {
             return 47000;
             break;
         case 'Ignore NTC':
-            return 10000; // TODO: get confirmation from Andy Sinclair
+            return 0;
     }
 };
 
@@ -48,79 +49,100 @@ const ledModeToOverlay = (mode: LEDMode) => {
             return 'charging';
         case 'Host':
             return 'host';
+        case 'Not used':
+            return 'host';
     }
 };
 
-const generateCharger = (deviceType: string, charger?: Charger) =>
+const generateJeita = (
+    charger: Charger,
+    chargerModule: ChargerModule,
+) => `${chargerModule.defaults.tCold !== charger.tCold ? `thermistor-cold-millidegrees = <${toMilli(charger.tCold)}>;` : ''}
+	${chargerModule.defaults.tCool !== charger.tCool ? `thermistor-cool-millidegrees = <${toMilli(charger.tCool)}>;` : ''}
+	${chargerModule.defaults.tWarm !== charger.tWarm ? `thermistor-warm-millidegrees = <${toMilli(charger.tWarm)}>;` : ''}
+	${chargerModule.defaults.tHot !== charger.tHot ? `thermistor-hot-millidegrees = <${toMilli(charger.tHot)}>;` : ''}`;
+
+const generateCharger = (
+    deviceType: string,
+    charger: Charger,
+    vbus: USBPowerExport,
+    chargerModule: ChargerModule,
+) =>
     charger
         ? `
-${deviceType}_ek_charger: charger {
-    compatible = "nordic,${deviceType}-charger";
-    term-microvolt = <${toMicro(charger.vTerm)}>;
-    term-warm-microvolt = <${toMicro(charger.vTermR)}>;
-    // term-current-percent = <${charger.iTerm}>;
-    current-microamp = <${toMicro(charger.iChg / 1000)}>;
-    // trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
-    ${
-        charger.iBatLim
-            ? `dischg-limit-microamp = <${toMicro(charger.iBatLim / 1000)}>;`
-            : ''
-    }
-    vbus-limit-microamp = <500000>;
-    thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
-    thermistor-beta = <${charger.ntcBeta}>;
-    ${charger.enableRecharging ? '' : '// disable-recharge;'}
-    ${charger.enabled ? 'charging-enable;' : ''}
-    ${charger.enableVBatLow ? 'vbatlow-charge-enable;' : ''}
-};`
+	${deviceType}_charger: charger {
+		compatible = "nordic,${deviceType}-charger";
+
+		vbus-limit-microamp = <${
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            toMicro(vbus.currentLimiter!)
+        }>; 
+		thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
+		thermistor-beta = <${charger.ntcThermistor === 'Ignore NTC' ? '0' : charger.ntcBeta}>;
+		${charger.ntcThermistor !== 'Ignore NTC' ? generateJeita(charger, chargerModule) : ''}
+		${charger.enabled ? 'charging-enable;' : ''}
+		trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
+		${charger.enableVBatLow ? 'vbatlow-charge-enable;' : ''}
+		${charger.enableRecharging ? '' : 'disable-recharge;'}
+		dietemp-resume-millidegrees = <${toMilli(charger.tChgResume)}>;
+		dietemp-stop-millidegrees = <${toMilli(charger.tChgStop)}>;
+		term-microvolt = <${toMicro(charger.vTerm)}>;
+		term-warm-microvolt = <${toMicro(charger.vTermR)}>;
+		current-microamp = <${toMicro(charger.iChg / 1000)}>;
+		${
+            charger.iBatLim
+                ? `dischg-limit-microamp = <${toMicro(charger.iBatLim / 1000)}>;`
+                : ''
+        } 
+		term-current-percent = <${charger.iTerm}>; 
+	};`
         : '';
+
+const buckInitialMode = (buck: BuckExport) => {
+    if (!buck.modeControl.startsWith('GPIO')) {
+        return `regulator-initial-mode = <NPM13XX_BUCK_MODE_${buck.modeControl.toUpperCase()}>;`;
+    }
+};
 
 const generateBuck = (
     buck: BuckExport,
     buckModule: BuckModule,
     deviceType: string,
 ) => `
-${deviceType}_ek_buck${buckModule.index + 1}: BUCK${buckModule.index + 1} {
-    regulator-min-microvolt = <${toMicro(buckModule.ranges.voltage.min)}>;
-    regulator-max-microvolt = <${toMicro(buckModule.ranges.voltage.max)}>;
-    ${
-        buck.mode !== 'vSet'
-            ? `regulator-init-microvolt =  <${toMicro(buck.vOutNormal)}>;`
-            : ''
-    }
-    retention-microvolt = <${toMicro(buck.vOutRetention)}>;
-    ${
-        buck.onOffControl !== 'Off'
-            ? `enable-gpios = <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
-                  v => v === buck.onOffControl,
-              )} GPIO_ACTIVE_HIGH>;`
-            : ''
-    }
-    ${
-        buck.retentionControl !== 'Off'
-            ? `retention-gpios = <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
-                  v => v === buck.retentionControl,
-              )} GPIO_ACTIVE_HIGH>;`
-            : ''
-    }
-    ${
-        buck.modeControl.startsWith('GPIO')
-            ? `pwm-gpios= <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
-                  v => v === buck.modeControl,
-              )} GPIO_ACTIVE_HIGH>;`
-            : ''
-    }
-    ${
-        buck.modeControl === 'PWM'
-            ? 'regulator-initial-mode = <NPM13XX_BUCK_MODE_PWM>;'
-            : ''
-    }
-    ${
-        buck.modeControl === 'PFM'
-            ? '// regulator-initial-mode = <NPM13XX_BUCK_MODE_PFM>;'
-            : ''
-    }
-};
+	${deviceType}_buck${buckModule.index + 1}: BUCK${buckModule.index + 1} {
+		${buck.enabled ? 'regulator-boot-on;' : ''}
+		regulator-min-microvolt = <${toMicro(buckModule.ranges.voltage.min)}>;
+		regulator-max-microvolt = <${toMicro(buckModule.ranges.voltage.max)}>;
+		${
+            buck.mode !== 'vSet'
+                ? `regulator-init-microvolt =  <${toMicro(buck.vOutNormal)}>;`
+                : ''
+        }
+		${buckInitialMode(buck)}
+		retention-microvolt = <${toMicro(buck.vOutRetention)}>;
+		${
+            buck.onOffControl !== 'Off'
+                ? `enable-gpio-config = <${GPIOValues.findIndex(
+                      v => v === buck.onOffControl,
+                  )} GPIO_ACTIVE_HIGH>;`
+                : ''
+        }
+		${
+            buck.modeControl.startsWith('GPIO')
+                ? ` pwm-gpio-config = <${GPIOValues.findIndex(
+                      v => v === buck.modeControl,
+                  )} GPIO_ACTIVE_HIGH>;`
+                : ''
+        }
+		${
+            buck.retentionControl !== 'Off'
+                ? `retention-gpio-config = <${GPIOValues.findIndex(
+                      v => v === buck.retentionControl,
+                  )} GPIO_ACTIVE_HIGH>;`
+                : ''
+        }   
+		${buck.activeDischarge ? 'active-discharge;' : ''}   
+	};
 `;
 
 // TODO: Reinstate // soft-start-microamp = <${toMilli(ldo.softStart)}>;
@@ -129,94 +151,106 @@ const generateLDO = (
     ldoModule: LdoModule,
     deviceType: string,
 ) => `
-${deviceType}_ek_ldo${ldoModule.index + 1}: LDO${ldoModule.index + 1} {
-    regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;
-    regulator-max-microvolt = <${toMicro(ldoModule.ranges.voltage.max)}>;
-    ${
-        ldo.mode === 'LDO'
-            ? `regulator-init-microvolt = <${toMicro(ldo.voltage)}>;`
-            : ''
-    }
-    regulator-initial-mode = <${
-        ldo.mode === 'LDO' ? 'NPM13XX_LDSW_MODE_LDO' : 'NPM13XX_LDSW_MODE_LDSW'
-    }>;
-    ${
-        ldo.onOffControl !== 'SW'
-            ? `enable-gpios = <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
-                  v => v === ldo.onOffControl,
-              )} GPIO_ACTIVE_HIGH>;`
-            : ''
-    }
-    ${ldo.enabled ? 'regulator-boot-on;' : ''}
-};
+	${deviceType}_ldo${ldoModule.index + 1}: LDO${ldoModule.index + 1} {
+		${ldo.enabled ? 'regulator-boot-on;' : ''}
+		regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;
+		regulator-max-microvolt = <${toMicro(ldoModule.ranges.voltage.max)}>;
+		${
+            ldo.mode === 'LDO'
+                ? `regulator-init-microvolt = <${toMicro(ldo.voltage)}>;`
+                : ''
+        }
+		regulator-initial-mode = <${
+            ldo.mode === 'LDO'
+                ? 'NPM13XX_LDSW_MODE_LDO'
+                : 'NPM13XX_LDSW_MODE_LDSW'
+        }>;
+
+		${
+            ldo.onOffControl !== 'SW'
+                ? `enable-gpios-config = <${GPIOValues.findIndex(
+                      v => v === ldo.onOffControl,
+                  )} GPIO_ACTIVE_HIGH>;` // Is this correct?
+                : ''
+        }
+		${ldo.ldoSoftStart ? `soft-start-microamp = <${toMicro(Number.parseInt(ldo.ldoSoftStart, 10))}>;` : ''}
+		${ldo.activeDischarge ? 'active-discharge;' : ''}
+	};
 `;
 
 const generateLEDs = (leds: LED[], deviceType: string) => `
-${deviceType}_ek_leds: leds {
-    compatible = "nordic,${deviceType}-led";
-    ${leds
-        .map(
-            (led, index) =>
-                `nordic,led${index}-mode = "${ledModeToOverlay(led.mode)}";`,
-        )
-        .join('    \n')}
-};
+	${deviceType}_leds: leds {
+		compatible = "nordic,${deviceType}-led";
+		${leds
+            .map(
+                (led, index) =>
+                    `nordic,led${index}-mode = "${ledModeToOverlay(led.mode)}";`,
+            )
+            .join('	\n')}
+	};
 `;
 
-const generateLowPower = (lowPower?: LowPowerConfig) =>
-    lowPower
-        ? `
-    // ship-to-active-time = <${lowPower.timeToActive}>;
-`
+const longPressReset = (npmConfig: NpmExportLatest) =>
+    npmConfig.reset && 'longPressReset' in npmConfig.reset
+        ? `long-press-reset = "${npmConfig.reset.longPressReset.replaceAll('_', '-')}";`
         : '';
 
-const generateReset = (reset?: npm1300ResetConfig) =>
-    reset
-        ? `
-    // long-press-reset = "${reset.longPressReset}";
-`
-        : '';
+const generateWatchdog = (
+    npmConfig: NpmExportLatest,
+    npmDevice: Npm1300 | Npm1304,
+) => {
+    const gpioIndex = npmConfig.gpios.findIndex(
+        g => g.mode === GPIOMode1300['Output reset'],
+    );
+    return `
+    ${npmDevice.deviceType}_wdt: watchdog {
+		compatible = "nordic,${npmDevice.deviceType}-wdt";
+		${
+            gpioIndex !== -1
+                ? `reset-gpios = <&${npmDevice.deviceType}_gpio ${gpioIndex} GPIO_ACTIVE_LOW>;`
+                : ''
+        }
+    };`;
+};
 
 export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
 * Copyright (C) 2023 Nordic Semiconductor ASA
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#include <dt-bindings/regulator/npm13xx.h>
-#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <zephyr/dt-bindings/regulator/npm13xx.h>
+#include <zephyr/dt-bindings/gpio/nordic-npm13xx-gpio.h>
 
 &arduino_i2c {
-   ${npmDevice.deviceType}_ek_pmic: pmic@6b {
-       compatible = "nordic,${npmDevice.deviceType}";
-       reg = <0x6b>;
+	${npmDevice.deviceType}_pmic: pmic@6b {
+		compatible = "nordic,${npmDevice.deviceType}";
+		reg = <0x6b>;
 
-       ${generateLowPower(npmConfig.lowPower)}
-       ${generateReset(npmConfig.reset as npm1300ResetConfig)}
+		pmic-int-pin = <3>; // host-int-gpios must be set by the user for this to work
+		ship-to-active-time-ms = <${npmConfig.lowPower?.timeToActive ?? npmDevice.lowPowerModule?.defaults.timeToActive}>;
+		${longPressReset(npmConfig)}
+		${npmDevice.deviceType}_gpio: gpio-controller {
+			compatible = "nordic,${npmDevice.deviceType}-gpio";
+			gpio-controller;
+			#gpio-cells = <2>;
+			ngpios = <5>;
+		};
 
-       ${npmDevice.deviceType}_ek_gpio: gpio-controller {
-           compatible = "nordic,${npmDevice.deviceType}-gpio";
-           gpio-controller;
-           #gpio-cells = <2>;
-           ngpios = <5>;
-       };
-
-       ${npmDevice.deviceType}_ek_regulators: regulators {
-           compatible = "nordic,${npmDevice.deviceType}-regulator";
-
-           ${
-               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-               npmConfig
-                   .bucks!.map((buck, index) =>
-                       generateBuck(
-                           buck,
-                           npmDevice.buckModule[index],
-                           npmDevice.deviceType,
-                       ),
-                   )
-                   .join('\n\n')
-           }
-
-            ${npmConfig.ldos
+		${npmDevice.deviceType}_regulators: regulators {
+			compatible = "nordic,${npmDevice.deviceType}-regulator";
+			${
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                npmConfig
+                    .bucks!.map((buck, index) =>
+                        generateBuck(
+                            buck,
+                            npmDevice.buckModule[index],
+                            npmDevice.deviceType,
+                        ),
+                    )
+                    .join('\n\n')
+            }
+			${npmConfig.ldos
                 .map((ldos, index) =>
                     generateLDO(
                         ldos,
@@ -225,10 +259,18 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm1300 | Npm1304) => `/*
                     ),
                 )
                 .join('\n\n')}
-       };
+	   };
 
-       ${generateCharger(npmDevice.deviceType, npmConfig.charger)}
-
-       ${generateLEDs(npmConfig.leds, npmDevice.deviceType)}
-   };
+		${generateCharger(
+            npmDevice.deviceType,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            npmConfig.charger!,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            npmConfig.usbPower!,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            npmDevice.chargerModule!,
+        )}
+	   ${generateLEDs(npmConfig.leds, npmDevice.deviceType)}
+	   ${generateWatchdog(npmConfig, npmDevice)}
+	};
 };`;
