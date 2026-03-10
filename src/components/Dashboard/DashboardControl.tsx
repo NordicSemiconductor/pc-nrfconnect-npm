@@ -92,9 +92,6 @@ export default ({ active }: PaneProps) => {
                     <LDOCard
                         ldo={ldo}
                         ldoModule={npmDevice.ldoModule[index]}
-                        cardLabel={
-                            ldos.length === 1 ? `Load Switch/LDO` : undefined
-                        }
                         key={`Ldo${1 + index}`}
                         disabled={disabled}
                         defaultSummary

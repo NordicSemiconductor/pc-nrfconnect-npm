@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { SoftStartValues } from '../../npm1300/ldo/types';
+import { SoftStartCurrentValues } from '../../npm1300/ldo/types';
 import { GPIOValues, LdoOnOffControlValues } from '../../types';
 import { PMIC_1304_LDOS, setupMocksWithShellParser } from '../tests/helpers';
 
@@ -104,39 +104,10 @@ describe('PMIC 1304 - Command callbacks', () => {
         });
     });
 
-    test.each(
-        PMIC_1304_LDOS.map(index => [
-            ...[true, false].map(enabled => [
-                {
-                    index,
-                    append: `get ${index}`,
-                    enabled,
-                },
-                {
-                    index,
-                    append: `set ${index} ${enabled} `,
-                    enabled,
-                },
-            ]),
-        ]).flat(),
-    )('npmx ldsw soft_start enable %p', ({ index, append, enabled }) => {
-        const command = `npmx ldsw soft_start enable ${append}`;
-        const callback =
-            eventHandlers.mockRegisterCommandCallbackHandler(command);
-
-        callback?.onSuccess(`Value: ${enabled ? '1' : '0'}.`, command);
-
-        expect(mockOnLdoUpdate).toBeCalledTimes(1);
-        expect(mockOnLdoUpdate).toBeCalledWith({
-            data: { softStartEnabled: enabled },
-            index,
-        });
-    });
-
     test.skip('Need to fix tests for undefined vs NaN', () => {
         test.each(
             PMIC_1304_LDOS.map(index => [
-                ...SoftStartValues.map(value => [
+                ...SoftStartCurrentValues.map(value => [
                     {
                         index,
                         append: `get ${index}`,
@@ -158,7 +129,7 @@ describe('PMIC 1304 - Command callbacks', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { softStart: value },
+                data: { softStartCurrentLoadSwitchMode: value },
                 index,
             });
         });

@@ -7,7 +7,8 @@
 import {
     nPM2100GPIOControlPinSelectValues,
     nPM2100LdoModeControlValues,
-    nPM2100SoftStartValues,
+    softStartCurrentLDOModeValues,
+    softStartCurrentLoadSwitchModeValues,
 } from '../../types';
 import { PMIC_2100_LDOS, setupMocksWithShellParser } from '../helpers';
 
@@ -189,7 +190,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
     describe('LDO soft start', () => {
         test.each(
             PMIC_2100_LDOS.map(index => [
-                ...['25mA', '38mA', '50mA', '75mA', '150mA'].map(current => [
+                ...softStartCurrentLDOModeValues.map(current => [
                     {
                         index,
                         append: `get `,
@@ -213,7 +214,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
                 expect(mockOnLdoUpdate).toBeCalledTimes(1);
                 expect(mockOnLdoUpdate).toBeCalledWith({
-                    data: { ldoSoftStart: current },
+                    data: { softStartCurrentLDOMode: current },
                     index,
                 });
             },
@@ -224,7 +225,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
     describe('Load Switch soft start', () => {
         test.each(
             PMIC_2100_LDOS.map(index => [
-                ...nPM2100SoftStartValues.map(value => [
+                ...softStartCurrentLoadSwitchModeValues.map(value => [
                     {
                         index,
                         append: `get `,
@@ -246,7 +247,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { softStart: value },
+                data: { softStartCurrentLoadSwitchMode: value },
                 index,
             });
         });
@@ -285,7 +286,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
                 expect(mockOnLdoUpdate).toBeCalledTimes(1);
                 expect(mockOnLdoUpdate).toBeCalledWith({
-                    data: { ocpEnabled },
+                    data: { overcurrentProtection: ocpEnabled },
                     index,
                 });
             },
@@ -323,7 +324,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { rampEnabled },
+                data: { ramp: rampEnabled },
                 index,
             });
         });
@@ -360,7 +361,7 @@ describe('PMIC 2100 - Command callbacks - LDO', () => {
 
             expect(mockOnLdoUpdate).toBeCalledTimes(1);
             expect(mockOnLdoUpdate).toBeCalledWith({
-                data: { haltEnabled },
+                data: { halt: haltEnabled },
                 index,
             });
         });
