@@ -15,6 +15,7 @@ import {
     getPmicChargingState,
     isReceivingBatteryVoltageAboveThreshold,
 } from '../../features/pmicControl/pmicControlSlice';
+import { getMaxNumDecimalsForRangeOrNumberArray } from '../../utils/helpers';
 
 import './battery.scss';
 
@@ -81,7 +82,11 @@ export default ({ disabled }: { disabled: boolean }) => {
                                   latestAdcSample.iBat ?? 0,
                               ).toFixed(
                                   npmDevice?.chargerModule?.ranges.current
-                                      .decimals ?? 0,
+                                      ? getMaxNumDecimalsForRangeOrNumberArray(
+                                            npmDevice?.chargerModule?.ranges
+                                                .current,
+                                        )
+                                      : 0,
                               )} mA`
                             : 'N/A'
                     }

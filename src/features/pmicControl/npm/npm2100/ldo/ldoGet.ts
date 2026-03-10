@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { LdoMode } from '../../types';
+
 export class LdoGet {
     constructor(
         private sendCommand: (
@@ -19,8 +21,8 @@ export class LdoGet {
         this.mode();
         this.modeCtrl();
         this.pinSel();
-        this.softStartLdo();
-        this.softStart();
+        this.softStartCurrent('LDO');
+        this.softStartCurrent('Load_switch');
         this.pinMode();
         this.ocp();
         this.ramp();
@@ -47,12 +49,13 @@ export class LdoGet {
         this.sendCommand(`npm2100 ldosw pinsel get`);
     }
 
-    softStartLdo() {
-        this.sendCommand(`npm2100 ldosw softstart LDO get`);
-    }
-
-    softStart() {
-        this.sendCommand(`npm2100 ldosw softstart LOADSW get`);
+    softStartCurrent(mode?: LdoMode) {
+        if (mode === undefined) {
+            return;
+        }
+        this.sendCommand(
+            `npm2100 ldosw softstart ${mode === 'LDO' ? 'LDO' : 'LOADSW'} get`,
+        );
     }
 
     pinMode() {

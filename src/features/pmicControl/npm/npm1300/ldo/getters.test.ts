@@ -14,7 +14,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test.each(PMIC_1300_LDOS)('Request update ldoVoltage index: %p', index => {
-        pmic.ldoModule[index].get.voltage();
+        pmic.ldoModule[index].get.voltage?.();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -38,7 +38,7 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test.each(PMIC_1300_LDOS)('Request update ldoMode index: %p', index => {
-        pmic.ldoModule[index].get.mode();
+        pmic.ldoModule[index].get.mode?.();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -50,9 +50,9 @@ describe('PMIC 1300 - Request update commands', () => {
     });
 
     test.each(PMIC_1300_LDOS)(
-        'Request update ldoSoftStartEnabled index: %p',
+        'Request update ldoSoftStart index: %p',
         index => {
-            pmic.ldoModule[index].get.softStartEnabled?.();
+            pmic.ldoModule[index].get.softStart?.();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -65,9 +65,9 @@ describe('PMIC 1300 - Request update commands', () => {
     );
 
     test.each(PMIC_1300_LDOS)(
-        'Request update ldoSoftStart index: %p',
+        'Request update ldoSoftStartCurrent index: %p',
         index => {
-            pmic.ldoModule[index].get.softStart?.();
+            pmic.ldoModule[index].get.softStartCurrent?.();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(

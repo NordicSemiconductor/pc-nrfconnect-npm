@@ -75,7 +75,7 @@ describe('PMIC 1304 - Setters Offline tests', () => {
     });
 
     test('Set setChargerTChgStop', async () => {
-        await pmic.chargerModule?.set.tChgStop(90);
+        await pmic.chargerModule?.set.tChgStop?.(90);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({ tChgStop: 90 });
@@ -110,14 +110,14 @@ describe('PMIC 1304 - Setters Offline tests', () => {
     });
 
     test('Set setChargerVTermR', async () => {
-        await pmic.chargerModule?.set.vTermR(3.55);
+        await pmic.chargerModule?.set.vTermR?.(3.55);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({ vTermR: 3.55 });
     });
 
     test('Set setChargerNTCBeta', async () => {
-        await pmic.chargerModule?.set.nTCBeta(3380);
+        await pmic.chargerModule?.set.nTCBeta?.(3380);
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({
@@ -126,7 +126,7 @@ describe('PMIC 1304 - Setters Offline tests', () => {
     });
 
     test('Set setChargerNTCThermistor', async () => {
-        await pmic.chargerModule?.set.nTCThermistor('100 kΩ');
+        await pmic.chargerModule?.set.nTCThermistor?.('100 kΩ');
 
         expect(mockOnChargerUpdate).toBeCalledTimes(1);
         expect(mockOnChargerUpdate).toBeCalledWith({

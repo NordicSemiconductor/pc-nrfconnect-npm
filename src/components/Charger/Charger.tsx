@@ -17,6 +17,7 @@ import {
 } from '../../features/pmicControl/pmicControlSlice';
 import useIsUIDisabled from '../../features/useIsUIDisabled';
 import BatteryCard from '../Cards/Battery/BatteryCard';
+import BatteryLifeAndSafety from '../Cards/Battery/BatteryLifeAndSafety';
 import BatteryStatusCard from '../Cards/Battery/BatteryStatusCard';
 import PowerCard from '../Cards/Power/PowerCard';
 import Jeita from './Jeita';
@@ -30,7 +31,7 @@ export default ({ active }: PaneProps) => {
     return active && npmDevice?.chargerModule && charger ? (
         <MasonryLayout
             className="masonry-layout min-height-cards"
-            minWidth={422}
+            minWidth={450}
         >
             <BatteryCard disabled={disabled} />
             <BatteryStatusCard disabled={disabled} />
@@ -51,6 +52,13 @@ export default ({ active }: PaneProps) => {
             )}
             {npmDevice && charger && (
                 <ThermalRegulation
+                    chargerModule={npmDevice.chargerModule}
+                    charger={charger}
+                    disabled={disabled}
+                />
+            )}
+            {npmDevice && charger && (
+                <BatteryLifeAndSafety
                     chargerModule={npmDevice.chargerModule}
                     charger={charger}
                     disabled={disabled}

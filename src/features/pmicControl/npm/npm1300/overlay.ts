@@ -57,7 +57,7 @@ const generateCharger = (deviceType: string, charger?: Charger) =>
 ${deviceType}_ek_charger: charger {
     compatible = "nordic,${deviceType}-charger";
     term-microvolt = <${toMicro(charger.vTerm)}>;
-    term-warm-microvolt = <${toMicro(charger.vTermR)}>;
+    ${charger.vTermR !== undefined ? `term-warm-microvolt = <${toMicro(charger.vTermR)}>;` : ''}
     // term-current-percent = <${charger.iTerm}>;
     current-microamp = <${toMicro(charger.iChg / 1000)}>;
     // trickle-microvolt = <${toMicro(charger.vTrickleFast)}>;
@@ -67,7 +67,11 @@ ${deviceType}_ek_charger: charger {
             : ''
     }
     vbus-limit-microamp = <500000>;
-    thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>;
+    ${
+        charger.ntcThermistor
+            ? `thermistor-ohms = <${thermistorTypeToOverlay(charger.ntcThermistor)}>`
+            : ''
+    }
     thermistor-beta = <${charger.ntcBeta}>;
     ${charger.enableRecharging ? '' : '// disable-recharge;'}
     ${charger.enabled ? 'charging-enable;' : ''}
@@ -88,7 +92,7 @@ ${deviceType}_ek_buck${buckModule.index + 1}: BUCK${buckModule.index + 1} {
             ? `regulator-init-microvolt =  <${toMicro(buck.vOutNormal)}>;`
             : ''
     }
-    retention-microvolt = <${toMicro(buck.vOutRetention)}>;
+    ${buck.vOutRetention !== undefined ? `retention-microvolt = <${toMicro(buck.vOutRetention)}>;` : ''}
     ${
         buck.onOffControl !== 'Off'
             ? `enable-gpios = <&${deviceType}_ek_gpio ${GPIOValues.findIndex(
@@ -130,10 +134,18 @@ const generateLDO = (
     deviceType: string,
 ) => `
 ${deviceType}_ek_ldo${ldoModule.index + 1}: LDO${ldoModule.index + 1} {
-    regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;
-    regulator-max-microvolt = <${toMicro(ldoModule.ranges.voltage.max)}>;
     ${
-        ldo.mode === 'LDO'
+        ldoModule.ranges.voltage
+            ? `regulator-min-microvolt = <${toMicro(ldoModule.ranges.voltage.min)}>;`
+            : ''
+    }
+    ${
+        ldoModule.ranges.voltage
+            ? `regulator-max-microvolt = <${toMicro(ldoModule.ranges.voltage.max)}>;`
+            : ''
+    }
+    ${
+        ldo.mode === 'LDO' && ldo.voltage !== undefined
             ? `regulator-init-microvolt = <${toMicro(ldo.voltage)}>;`
             : ''
     }

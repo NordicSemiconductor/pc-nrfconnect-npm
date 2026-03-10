@@ -7,6 +7,8 @@
 import {
     Buck,
     Charger,
+    ChargerJeitaILabel,
+    ChargerJeitaVLabel,
     FuelGauge,
     GPIO,
     GPIOExport,
@@ -66,6 +68,16 @@ describe('PMIC 1300 - Apply Config ', () => {
         tCool: 12,
         tWarm: 47,
         tHot: 69,
+        jeitaILabelCold: ChargerJeitaILabel.coldIOff,
+        jeitaILabelCool: ChargerJeitaILabel.coolIChg50percent,
+        jeitaILabelNominal: ChargerJeitaILabel.nominalIChg,
+        jeitaILabelWarm: ChargerJeitaILabel.warmIChg,
+        jeitaILabelHot: ChargerJeitaILabel.hotIOff,
+        jeitaVLabelCold: ChargerJeitaVLabel.coldVNA,
+        jeitaVLabelCool: ChargerJeitaVLabel.coolVTerm,
+        jeitaVLabelNominal: ChargerJeitaVLabel.nominalVTerm,
+        jeitaVLabelWarm: ChargerJeitaVLabel.warmVTerm100mVOff,
+        jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
     };
 
     const initBuck: Buck = {
@@ -78,17 +90,20 @@ describe('PMIC 1300 - Apply Config ', () => {
         onOffSoftwareControlEnabled: false,
         retentionControl: 'GPIO0',
         activeDischarge: false,
+        cardLabel: 'Buck',
+        vSetLabel: 'Vset',
     };
 
     const initLdo: Ldo = {
         voltage: -1,
         mode: 'LDO',
         enabled: true,
-        softStartEnabled: true,
-        softStart: 20,
+        softStart: true,
+        softStartCurrentLoadSwitchMode: 50,
         activeDischarge: false,
         onOffControl: 'GPIO0',
         onOffSoftwareControlEnabled: false,
+        cardLabel: 'Ldo',
     };
 
     const initLed: LED = {
@@ -139,6 +154,16 @@ describe('PMIC 1300 - Apply Config ', () => {
             tCool: 20,
             tWarm: 50,
             tHot: 80,
+            jeitaILabelCold: ChargerJeitaILabel.coldIOff,
+            jeitaILabelCool: ChargerJeitaILabel.coolIChg50percent,
+            jeitaILabelNominal: ChargerJeitaILabel.nominalIChg,
+            jeitaILabelWarm: ChargerJeitaILabel.warmIChg,
+            jeitaILabelHot: ChargerJeitaILabel.hotIOff,
+            jeitaVLabelCold: ChargerJeitaVLabel.coldVNA,
+            jeitaVLabelCool: ChargerJeitaVLabel.coolVTerm,
+            jeitaVLabelNominal: ChargerJeitaVLabel.nominalVTerm,
+            jeitaVLabelWarm: ChargerJeitaVLabel.warmVTerm100mVOff,
+            jeitaVLabelHot: ChargerJeitaVLabel.hotVNA,
         },
         bucks: [
             {
@@ -167,8 +192,8 @@ describe('PMIC 1300 - Apply Config ', () => {
                 voltage: 1,
                 mode: 'Load_switch',
                 enabled: false,
-                softStartEnabled: false,
-                softStart: 50,
+                softStart: false,
+                softStartCurrentLoadSwitchMode: 50,
                 activeDischarge: true,
                 onOffControl: 'GPIO1',
             },
@@ -176,8 +201,8 @@ describe('PMIC 1300 - Apply Config ', () => {
                 voltage: 2,
                 mode: 'Load_switch',
                 enabled: false,
-                softStartEnabled: false,
-                softStart: 50,
+                softStart: false,
+                softStartCurrentLoadSwitchMode: 50,
                 activeDischarge: false,
                 onOffControl: 'GPIO2',
             },

@@ -72,7 +72,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                             await npmDevice?.fuelGaugeModule?.set.enabled(
                                 false,
                             );
-                            await npmDevice?.chargerModule?.set.nTCThermistor(
+                            await npmDevice?.chargerModule?.set.nTCThermistor?.(
                                 profile.ntcThermistor,
                             );
                             await npmDevice?.chargerModule?.set

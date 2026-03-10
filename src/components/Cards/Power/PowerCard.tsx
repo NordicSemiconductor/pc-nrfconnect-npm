@@ -19,6 +19,7 @@ import {
     ChargerModule,
     isFixedListRangeWithLabel,
     ITerm,
+    ITrickle,
     VTrickleFast,
 } from '../../../features/pmicControl/npm/types';
 
@@ -131,11 +132,13 @@ export default ({
 
     const [internalVTerm, setInternalVTerm] = useState(charger.vTerm);
     const [internalIChg, setInternalIChg] = useState(charger.iChg);
+    const [internalVWeak, setInternalVWeak] = useState(charger.vWeak);
 
     // NumberInputSliderWithUnit do not use charger.<prop> as value as we send only at on change complete
     useEffect(() => {
         setInternalVTerm(charger.vTerm);
         setInternalIChg(charger.iChg);
+        setInternalVWeak(charger.vWeak);
     }, [charger]);
 
     return (
@@ -245,24 +248,6 @@ export default ({
                         }
                         disabled={disabled}
                     />
-                    <Toggle
-                        label={
-                            <DocumentationTooltip
-                                card={card}
-                                item="EnableVBatLow"
-                            >
-                                <>
-                                    <span>Charging Below V</span>
-                                    <span className="subscript">BATLOW</span>
-                                </>
-                            </DocumentationTooltip>
-                        }
-                        isToggled={charger.enableVBatLow}
-                        onToggle={value =>
-                            chargerModule.set.enabledVBatLow(value)
-                        }
-                        disabled={disabled}
-                    />
                     <Dropdown
                         label={
                             <DocumentationTooltip
@@ -290,6 +275,81 @@ export default ({
                         }
                         disabled={disabled}
                     />
+                    {chargerModule.values.iTrickle && (
+                        <Dropdown
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="ITrickle"
+                                >
+                                    <>
+                                        <span>I</span>
+                                        <span className="subscript">
+                                            TRICKLE
+                                        </span>
+                                    </>
+                                </DocumentationTooltip>
+                            }
+                            items={chargerModule.values.iTrickle}
+                            onSelect={item =>
+                                chargerModule.set.iTrickle?.(
+                                    item.value as ITrickle,
+                                )
+                            }
+                            selectedItem={
+                                chargerModule.values.iTrickle.find(
+                                    item => item.value === charger.iTrickle,
+                                ) ?? chargerModule.values.iTrickle[0]
+                            }
+                            disabled={disabled}
+                        />
+                    )}
+                    {internalVWeak !== undefined &&
+                        chargerModule.ranges.vWeak && (
+                            <NumberInput
+                                label={
+                                    <DocumentationTooltip
+                                        card={card}
+                                        item="VWEAK"
+                                    >
+                                        <div>
+                                            <span>V</span>
+                                            <span className="subscript">
+                                                WEAK
+                                            </span>
+                                        </div>
+                                    </DocumentationTooltip>
+                                }
+                                unit="V"
+                                disabled={disabled}
+                                range={chargerModule.ranges.vWeak}
+                                value={internalVWeak}
+                                onChange={setInternalVWeak}
+                                onChangeComplete={v =>
+                                    chargerModule.set.vWeak?.(v)
+                                }
+                                showSlider
+                            />
+                        )}
+                    {charger.enableWeakBatteryCharging !== undefined && (
+                        <Toggle
+                            label={
+                                <DocumentationTooltip
+                                    card={card}
+                                    item="EnableWeakBatteryCharging"
+                                >
+                                    Enable Weak Battery Charging
+                                </DocumentationTooltip>
+                            }
+                            isToggled={charger.enableWeakBatteryCharging}
+                            onToggle={value => {
+                                chargerModule.set.enabledWeakBatteryCharging?.(
+                                    value,
+                                );
+                            }}
+                            disabled={disabled}
+                        />
+                    )}
                 </>
             )}
         </Card>

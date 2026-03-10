@@ -25,7 +25,7 @@ describe('PMIC 2100 - Request update commands', () => {
         test.each(PMIC_2100_LDOS)(
             'Request update ldoVoltage index: %p',
             index => {
-                pmic.ldoModule[index].get.voltage();
+                pmic.ldoModule[index].get.voltage?.();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(1);
                 expect(mockEnqueueRequest).toBeCalledWith(
@@ -53,7 +53,7 @@ describe('PMIC 2100 - Request update commands', () => {
         );
 
         test.each(PMIC_2100_LDOS)('Request update ldoMode index: %p', index => {
-            pmic.ldoModule[index].get.mode();
+            pmic.ldoModule[index].get.mode?.();
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(

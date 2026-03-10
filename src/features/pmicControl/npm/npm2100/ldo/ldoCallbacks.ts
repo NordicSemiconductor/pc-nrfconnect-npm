@@ -25,10 +25,6 @@ import {
     nPM2100GPIOControlPinSelectValues,
     nPM2100LdoModeControl,
     nPM2100LdoModeControlValues,
-    nPM2100LDOSoftStart,
-    nPM2100LDOSoftStartValues,
-    nPM2100SoftStart,
-    nPM2100SoftStartValues,
 } from '../types';
 
 export default (
@@ -148,20 +144,12 @@ export default (
         // Softstart LDO
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex(
-                    'npm2100 ldosw softstart LDO',
-                    true,
-                    undefined,
-                    toValueRegexString(nPM2100LDOSoftStartValues),
-                ),
+                toRegex('npm2100 ldosw softstart LDO', true),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            ldoSoftStart: selectFromTypeValues(
-                                parseColonBasedAnswer(res),
-                                nPM2100LDOSoftStartValues,
-                            ) as nPM2100LDOSoftStart,
+                            softStartCurrentLDOMode: parseToNumber(res),
                         },
                         0,
                     );
@@ -173,20 +161,12 @@ export default (
         // Softstart loadsw
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex(
-                    'npm2100 ldosw softstart LOADSW',
-                    true,
-                    undefined,
-                    toValueRegexString(nPM2100SoftStartValues),
-                ),
+                toRegex('npm2100 ldosw softstart LOADSW', true),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            softStart: selectFromTypeValues(
-                                parseColonBasedAnswer(res),
-                                nPM2100SoftStartValues,
-                            ) as nPM2100SoftStart,
+                            softStartCurrentLoadSwitchMode: parseToNumber(res),
                         },
                         0,
                     );
@@ -227,7 +207,7 @@ export default (
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            ocpEnabled: parseOnOff(res),
+                            overcurrentProtection: parseOnOff(res),
                         },
                         0,
                     );
@@ -244,7 +224,7 @@ export default (
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            rampEnabled: parseOnOff(res),
+                            ramp: parseOnOff(res),
                         },
                         0,
                     );
@@ -261,7 +241,7 @@ export default (
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            haltEnabled: parseOnOff(res),
+                            halt: parseOnOff(res),
                         },
                         0,
                     );
