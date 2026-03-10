@@ -13,7 +13,7 @@ import {
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { GPIOValues, Ldo, SoftStart } from '../../types';
+import { GPIOValues, Ldo } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -73,21 +73,23 @@ export default (
             ),
         );
 
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npmx ldsw soft_start enable', true, index, '(0|1)'),
-                res => {
-                    eventEmitter.emitPartialEvent<Ldo>(
-                        'onLdoUpdate',
-                        {
-                            softStartEnabled: parseToBoolean(res),
-                        },
-                        index,
-                    );
-                },
-                noop,
-            ),
-        );
+        // Disable callback for soft start enable as it will be always enabled by FW,
+        // and the register setting can not be configured by a shell command.
+        // cleanupCallbacks.push(
+        //     shellParser.registerCommandCallback(
+        //         toRegex('npmx ldsw soft_start enable', true, index, '(0|1)'),
+        //         res => {
+        //             eventEmitter.emitPartialEvent<Ldo>(
+        //                 'onLdoUpdate',
+        //                 {
+        //                     softStart: parseToBoolean(res),
+        //                 },
+        //                 index,
+        //             );
+        //         },
+        //         noop,
+        //     ),
+        // );
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
@@ -101,7 +103,7 @@ export default (
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            softStart: parseToNumber(res) as SoftStart,
+                            softStartCurrentLoadSwitchMode: parseToNumber(res),
                         },
                         index,
                     );

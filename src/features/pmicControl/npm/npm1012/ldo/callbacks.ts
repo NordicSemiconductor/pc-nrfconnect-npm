@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Nordic Semiconductor ASA
+ * Copyright (c) 2026 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
@@ -12,163 +12,52 @@ import {
     onOffRegex,
     parseColonBasedAnswer,
     parseOnOff,
+    parseToFloat,
     parseToNumber,
-    selectFromTypeValues,
     toRegex,
-    toValueRegexString,
 } from '../../pmicHelpers';
-import { Ldo, LdoMode, LdoModeValues } from '../../types';
-import {
-    nPM2100GPIOControlMode,
-    nPM2100GPIOControlModeValues,
-    nPM2100GPIOControlPinSelect,
-    nPM2100GPIOControlPinSelectValues,
-    nPM2100LdoModeControl,
-    nPM2100LdoModeControlValues,
-} from '../types';
+import { Ldo, LdoModeValues, LdoVOutSelValues } from '../../types';
+import { onOffControlValues } from './types';
 
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
+    index: number,
 ) => {
     const cleanupCallbacks = [];
+
     if (shellParser) {
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm2100 ldosw vout', true, undefined),
+                toRegex(
+                    'npm1012 ldosw activedischarge',
+                    true,
+                    index,
+                    onOffRegex,
+                ),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            voltage: parseToNumber(res) / 1000, // mV to V
+                            activeDischarge: parseOnOff(res),
                         },
-                        0,
+                        index,
                     );
                 },
                 noop,
             ),
         );
 
-        // Enable
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm2100 ldosw enable', true, undefined, onOffRegex),
+                toRegex('npm1012 ldosw enable', true, index, onOffRegex),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
                             enabled: parseOnOff(res),
                         },
-                        0,
-                    );
-                },
-                noop,
-            ),
-        );
-
-        // Mode
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npm2100 ldosw mode',
-                    true,
-                    undefined,
-                    toValueRegexString(LdoModeValues),
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<Ldo>(
-                        'onLdoUpdate',
-                        {
-                            mode: selectFromTypeValues(
-                                parseColonBasedAnswer(res),
-                                LdoModeValues,
-                            ) as LdoMode,
-                        },
-                        0,
-                    );
-                },
-                noop,
-            ),
-        );
-
-        // Modectrl
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npm2100 ldosw modectrl',
-                    true,
-                    undefined,
-                    toValueRegexString(nPM2100LdoModeControlValues),
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<Ldo>(
-                        'onLdoUpdate',
-                        {
-                            modeControl: selectFromTypeValues(
-                                parseColonBasedAnswer(res),
-                                nPM2100LdoModeControlValues,
-                            ) as nPM2100LdoModeControl,
-                        },
-                        0,
-                    );
-                },
-                noop,
-            ),
-        );
-
-        // Pinsel
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex(
-                    'npm2100 ldosw pinsel',
-                    true,
-                    undefined,
-                    toValueRegexString(nPM2100GPIOControlPinSelectValues),
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<Ldo>(
-                        'onLdoUpdate',
-                        {
-                            pinSel: selectFromTypeValues(
-                                parseColonBasedAnswer(res),
-                                nPM2100GPIOControlPinSelectValues,
-                            ) as nPM2100GPIOControlPinSelect,
-                        },
-                        0,
-                    );
-                },
-                noop,
-            ),
-        );
-
-        // Softstart LDO
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npm2100 ldosw softstart LDO', true),
-                res => {
-                    eventEmitter.emitPartialEvent<Ldo>(
-                        'onLdoUpdate',
-                        {
-                            softStartCurrentLDOMode: parseToNumber(res),
-                        },
-                        0,
-                    );
-                },
-                noop,
-            ),
-        );
-
-        // Softstart loadsw
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npm2100 ldosw softstart LOADSW', true),
-                res => {
-                    eventEmitter.emitPartialEvent<Ldo>(
-                        'onLdoUpdate',
-                        {
-                            softStartCurrentLoadSwitchMode: parseToNumber(res),
-                        },
-                        0,
+                        index,
                     );
                 },
                 noop,
@@ -177,73 +66,191 @@ export default (
 
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex(
-                    'npm2100 ldosw pinmode',
-                    true,
-                    undefined,
-                    toValueRegexString(nPM2100GPIOControlModeValues),
-                ),
-                res => {
-                    eventEmitter.emitPartialEvent<Ldo>(
-                        'onLdoUpdate',
-                        {
-                            pinMode: selectFromTypeValues(
-                                parseColonBasedAnswer(res),
-                                nPM2100GPIOControlModeValues,
-                            ) as nPM2100GPIOControlMode,
-                        },
-                        0,
-                    );
-                },
-                noop,
-            ),
-        );
-
-        // OCP - Over Current Protection
-        cleanupCallbacks.push(
-            shellParser.registerCommandCallback(
-                toRegex('npm2100 ldosw ocp', true, undefined, onOffRegex),
+                toRegex('npm1012 ldosw ocp', true, index, onOffRegex),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
                             overcurrentProtection: parseOnOff(res),
                         },
-                        0,
+                        index,
                     );
                 },
                 noop,
             ),
         );
 
-        // LDO Ramping
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm2100 ldosw ldoramp', true, undefined, onOffRegex),
+                toRegex('npm1012 ldosw enablectrl', true, index, '(\\w+)'),
                 res => {
+                    const result = parseColonBasedAnswer(res).toLowerCase();
+
+                    const onOffControl = onOffControlValues.find(
+                        elem => elem.toLowerCase() === result,
+                    );
+
+                    if (onOffControl === undefined) {
+                        return;
+                    }
+
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            ramp: parseOnOff(res),
+                            onOffControl,
                         },
-                        0,
+                        index,
                     );
                 },
                 noop,
             ),
         );
 
-        // LDO Halt Ramping
         cleanupCallbacks.push(
             shellParser.registerCommandCallback(
-                toRegex('npm2100 ldosw ldohalt', true, undefined, onOffRegex),
+                toRegex('npm1012 ldosw mode', true, index, '(\\w+)'),
+                res => {
+                    if (index === 1) {
+                        return; // Disabled for Load Switch 2
+                    }
+
+                    const result = parseColonBasedAnswer(res).toLowerCase();
+
+                    const mode = LdoModeValues.find(
+                        elem => elem.toLowerCase() === result,
+                    );
+                    if (mode === undefined) {
+                        return;
+                    }
+
+                    eventEmitter.emitPartialEvent<Ldo>(
+                        'onLdoUpdate',
+                        {
+                            mode,
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 ldosw softstart', true, index, onOffRegex),
                 res => {
                     eventEmitter.emitPartialEvent<Ldo>(
                         'onLdoUpdate',
                         {
-                            halt: parseOnOff(res),
+                            softStart: parseOnOff(res),
                         },
-                        0,
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 ldosw softstartilim', true, index, '(\\w+)'),
+                res => {
+                    const result = parseToNumber(res);
+
+                    eventEmitter.emitPartialEvent<Ldo>(
+                        'onLdoUpdate',
+                        {
+                            softStartCurrent: Number.isNaN(result) ? 0 : result,
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 ldosw softstarttime', true, index, '(\\w+)'),
+                res => {
+                    const result = parseToFloat(res);
+
+                    eventEmitter.emitPartialEvent<Ldo>(
+                        'onLdoUpdate',
+                        {
+                            softStartTime: Number.isNaN(result) ? 0 : result,
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 ldosw voutsel', true, index, '(\\w+)'),
+                res => {
+                    if (index === 1) {
+                        return; // Disabled for Load Switch 2
+                    }
+
+                    const result = parseColonBasedAnswer(res).toLowerCase();
+
+                    const vOutSel = LdoVOutSelValues.find(
+                        elem => elem.toLowerCase() === result,
+                    );
+
+                    if (vOutSel === undefined) {
+                        return;
+                    }
+
+                    eventEmitter.emitPartialEvent<Ldo>(
+                        'onLdoUpdate',
+                        {
+                            vOutSel,
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 ldosw vout software', true, index),
+                res => {
+                    if (index === 1) {
+                        return; // Disabled for Load Switch 2
+                    }
+
+                    eventEmitter.emitPartialEvent<Ldo>(
+                        'onLdoUpdate',
+                        {
+                            voltage: parseToFloat(res),
+                        },
+                        index,
+                    );
+                },
+                noop,
+            ),
+        );
+
+        cleanupCallbacks.push(
+            shellParser.registerCommandCallback(
+                toRegex('npm1012 ldosw weakpull', true, index, onOffRegex),
+                res => {
+                    if (index === 1) {
+                        return; // Disabled for Load Switch 2
+                    }
+
+                    eventEmitter.emitPartialEvent<Ldo>(
+                        'onLdoUpdate',
+                        {
+                            weakPullDown: parseOnOff(res),
+                        },
+                        index,
                     );
                 },
                 noop,
