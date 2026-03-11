@@ -5,7 +5,11 @@
  */
 
 import { getRange } from '../../../../../utils/helpers';
-import { ModuleParams, UsbCurrentLimiterModule, USBPower } from '../../types';
+import {
+    type ModuleParams,
+    type UsbCurrentLimiterModule,
+    type USBPower,
+} from '../../types';
 import callbacks from './callbacks';
 import { UsbCurrentLimiterGet } from './getters';
 import { UsbCurrentLimiterSet } from './setters';

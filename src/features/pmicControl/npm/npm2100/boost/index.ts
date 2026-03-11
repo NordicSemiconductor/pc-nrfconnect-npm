@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
-import { Boost, BoostModule, ModuleParams } from '../../types';
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
+import { type Boost, type BoostModule, type ModuleParams } from '../../types';
 import boostCallbacks from './callbacks';
 import { BoostGet } from './getters';
 import { BoostSet } from './setters';
@@ -29,7 +30,7 @@ const voltageRange = () =>
         min: 1.8,
         max: 3.3,
         decimals: 1,
-    }) as RangeType;
+    }) as Range;
 
 export default class Module implements BoostModule {
     private _get: BoostGet;
@@ -65,7 +66,7 @@ export default class Module implements BoostModule {
         return this._callbacks;
     }
     get ranges(): {
-        voltage: RangeType;
+        voltage: Range;
     } {
         return {
             voltage: voltageRange(),

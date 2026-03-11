@@ -4,19 +4,19 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import EventEmitter from 'events';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import type EventEmitter from 'events';
 
 import { noop, parseLogData, parseToBoolean, toRegex } from '../pmicHelpers';
 import {
-    BatteryProfiler as BatteryProfilerBase,
-    CCProfile,
-    CCProfilingState,
-    LoggingEvent,
-    ModuleParams,
-    ProfilingEvent,
-    ProfilingEventData,
-    RestingCCProfile,
+    type BatteryProfiler as BatteryProfilerBase,
+    type CCProfile,
+    type CCProfilingState,
+    type LoggingEvent,
+    type ModuleParams,
+    type ProfilingEvent,
+    type ProfilingEventData,
+    type RestingCCProfile,
 } from '../types';
 
 export class BatteryProfiler implements BatteryProfilerBase {

@@ -4,12 +4,18 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
-import { Ldo, LdoExport, LdoModule, ModuleParams } from '../../types';
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
+import {
+    type Ldo,
+    type LdoExport,
+    type LdoModule,
+    type ModuleParams,
+} from '../../types';
 import ldoCallbacks from './callbacks';
 import { LdoGet } from './getters';
 import { LdoSet } from './setters';
-import { SoftStart, SoftStartValues } from './types';
+import { type SoftStart, SoftStartValues } from './types';
 
 const ldoDefaults = (): Ldo => ({
     voltage: getLdoVoltageRange().min,
@@ -38,7 +44,7 @@ const getLdoVoltageRange = () =>
         max: 3.3,
         decimals: 1,
         step: 0.1,
-    }) as RangeType;
+    }) as Range;
 
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
@@ -91,7 +97,7 @@ export default class Module implements LdoModule {
         };
     }
 
-    get ranges(): { voltage: RangeType } {
+    get ranges(): { voltage: Range } {
         return {
             voltage: getLdoVoltageRange(),
         };

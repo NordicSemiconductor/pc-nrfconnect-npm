@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { USBPower, USBPowerExport } from '../../types';
+import { type NpmEventEmitter } from '../../pmicHelpers';
+import { type USBPower, type USBPowerExport } from '../../types';
 import { UsbCurrentLimiterGet } from './getters';
 
 export class UsbCurrentLimiterSet {

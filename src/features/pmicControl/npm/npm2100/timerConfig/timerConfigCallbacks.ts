@@ -4,18 +4,18 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     noop,
-    NpmEventEmitter,
+    type NpmEventEmitter,
     parseColonBasedAnswer,
     parseToFloat,
     selectFromTypeValues,
     toRegex,
     toValueRegexString,
 } from '../../pmicHelpers';
-import { TimerConfig } from '../../types';
+import { type TimerConfig } from '../../types';
 import { npm2100TimerMode } from '../types';
 
 export default (

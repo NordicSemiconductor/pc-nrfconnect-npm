@@ -14,10 +14,10 @@ import type {
 import {
     defaults,
     getState,
-    InternalPanPluginOptions,
-    PanPluginOptions,
+    type InternalPanPluginOptions,
+    type PanPluginOptions,
     removeState,
-    XAxisRange,
+    type XAxisRange,
 } from './state';
 
 const initRange = (chart: Chart) => {

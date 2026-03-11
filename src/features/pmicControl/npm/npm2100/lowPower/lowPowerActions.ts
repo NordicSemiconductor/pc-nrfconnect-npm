@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { PmicDialog } from '../../types';
+import { type PmicDialog } from '../../types';
 
 export class LowPowerActions {
     constructor(

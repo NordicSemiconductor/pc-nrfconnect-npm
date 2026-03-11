@@ -15,11 +15,11 @@ import {
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { ResetReasons } from '../../features/pmicControl/npm/npm2100/reset';
 import {
-    LongPressReset,
-    LongPressResetDebounce,
-    ResetConfig,
-    ResetModule,
-    ResetPinSelection,
+    type LongPressReset,
+    type LongPressResetDebounce,
+    type ResetConfig,
+    type ResetModule,
+    type ResetPinSelection,
 } from '../../features/pmicControl/npm/types';
 
 const card = 'resetControl';

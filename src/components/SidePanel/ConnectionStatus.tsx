@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     getWaitingForDeviceTimeout,
     Group,
-    Step,
+    type Step,
     Stepper,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 

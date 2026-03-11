@@ -10,7 +10,7 @@ import os from 'os';
 import path from 'path';
 import { v4 as uuidV4 } from 'uuid';
 
-import { NpmModel } from './pmicControl/npm/types';
+import { type NpmModel } from './pmicControl/npm/types';
 
 export const generateTempFolder = (): string => {
     const tempFolder = `${os.tmpdir()}/${uuidV4()}`;

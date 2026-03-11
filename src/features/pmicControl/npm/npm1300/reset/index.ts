@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { DropdownItem } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type DropdownItem } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
-    LongPressReset,
-    LongPressResetDebounce,
+    type LongPressReset,
+    type LongPressResetDebounce,
     LongPressResetValues,
-    ModuleParams,
-    ResetConfig,
-    ResetModule,
-    ResetPinSelection,
+    type ModuleParams,
+    type ResetConfig,
+    type ResetModule,
+    type ResetPinSelection,
 } from '../../types';
 import resetCallbacks from './callbacks';
 import { ResetGet } from './getters';

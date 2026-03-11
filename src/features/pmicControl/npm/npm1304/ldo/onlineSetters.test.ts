@@ -6,7 +6,7 @@
 
 import { SoftStartValues } from '../../npm1300/ldo/types';
 import { helpers } from '../../tests/helpers';
-import { PmicDialog } from '../../types';
+import { type PmicDialog } from '../../types';
 import { PMIC_1304_LDOS, setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1304 - Setters Online tests', () => {

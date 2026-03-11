@@ -5,7 +5,7 @@
  */
 
 import { helpers } from '../../tests/helpers';
-import { PmicDialog } from '../../types';
+import { type PmicDialog } from '../../types';
 import { PMIC_1300_LDOS, setupMocksWithShellParser } from '../tests/helpers';
 import { SoftStartValues } from './types';
 

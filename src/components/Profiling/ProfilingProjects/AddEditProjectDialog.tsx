@@ -17,7 +17,7 @@ import { showSaveDialog } from '../../../actions/fileActions';
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import { getNpmDevice } from '../../../features/pmicControl/pmicControlSlice';
 import { readAndUpdateProjectSettings, saveProjectSettings } from '../helpers';
-import { ProfilingProject } from '../types';
+import { type ProfilingProject } from '../types';
 
 import '../profiling.scss';
 

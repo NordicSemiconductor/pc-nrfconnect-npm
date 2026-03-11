@@ -13,8 +13,8 @@ import {
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    OnBoardLoad,
-    OnBoardLoadModule,
+    type OnBoardLoad,
+    type OnBoardLoadModule,
 } from '../../../features/pmicControl/npm/types';
 
 export default ({

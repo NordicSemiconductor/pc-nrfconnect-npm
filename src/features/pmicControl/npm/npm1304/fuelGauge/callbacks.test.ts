@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { BatteryModel, FuelGauge } from '../../types';
+import { type BatteryModel, type FuelGauge } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1304 - Command callbacks', () => {

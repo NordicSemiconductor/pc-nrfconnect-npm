@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import BaseNpmDevice from './basePmicDevice';
+import type BaseNpmDevice from './basePmicDevice';
 import Npm1300 from './npm1300/pmic1300Device';
 import Npm1304 from './npm1304/pmic1304Device';
 import Npm2100 from './npm2100/pmic2100Device';
 import { parseHwVersion } from './pmicHelpers';
-import { PmicDialog } from './types';
+import { type PmicDialog } from './types';
 
 export const getNpmDevice = (
     shellParser: ShellParser,

@@ -11,15 +11,15 @@ import type { ChartJSOrUndefined } from 'react-chartjs-2/dist/types';
 import { useSelector } from 'react-redux';
 import {
     Button,
-    PaneProps,
+    type PaneProps,
     Toggle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     CategoryScale,
     Chart as ChartJS,
-    ChartArea,
-    ChartData,
-    ChartOptions,
+    type ChartArea,
+    type ChartData,
+    type ChartOptions,
     Legend,
     LinearScale,
     LineElement,
@@ -30,7 +30,7 @@ import {
 } from 'chart.js';
 
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
-import { AdcSample } from '../../features/pmicControl/npm/types';
+import { type AdcSample } from '../../features/pmicControl/npm/types';
 import { getNpmDevice } from '../../features/pmicControl/pmicControlSlice';
 import canvasAreaNotifier from '../../utils/chart/canvasAreaNotifier';
 import zoomPanPlugin from '../../utils/chart/chart.zoomPan';

@@ -20,7 +20,7 @@ import {
     isProfileReadyForProcessing,
     readAndUpdateProjectSettings,
 } from '../helpers';
-import { ProfilingProject } from '../types';
+import { type ProfilingProject } from '../types';
 import AddEditProfileDialog from './AddEditProfileDialog';
 
 export default ({

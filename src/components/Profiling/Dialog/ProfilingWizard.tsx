@@ -22,7 +22,7 @@ import { appendFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
 import { closeDevice, openDevice } from '../../../actions/deviceActions';
-import { Profile } from '../../../features/pmicControl/npm/types';
+import { type Profile } from '../../../features/pmicControl/npm/types';
 import {
     getBucks,
     getFuelGaugeEnabled,

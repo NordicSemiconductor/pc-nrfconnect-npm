@@ -4,8 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { RangeType } from '../../../../../utils/helpers';
-import { ModuleParams, OnBoardLoad, OnBoardLoadModule } from '../../types';
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
+
+import {
+    type ModuleParams,
+    type OnBoardLoad,
+    type OnBoardLoadModule,
+} from '../../types';
 import ldoCallbacks from './callbacks';
 import { OnBoardLoadGet } from './getters';
 import { OnBoardLoadSet } from './setters';
@@ -43,7 +48,7 @@ export default class Module implements OnBoardLoadModule {
         return this._callbacks;
     }
 
-    get ranges(): { iLoad: RangeType } {
+    get ranges(): { iLoad: Range } {
         return {
             iLoad: {
                 min: 0,

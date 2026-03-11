@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Step, Stepper } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type Step, Stepper } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { startProcessingCsv } from '../../../features/nrfutillNpm/csvProcessing';
 import {

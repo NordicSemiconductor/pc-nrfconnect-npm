@@ -4,8 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter } from '../../pmicHelpers';
-import { LongPressReset, npm1300ResetConfig, ResetConfig } from '../../types';
+import { type NpmEventEmitter } from '../../pmicHelpers';
+import {
+    type LongPressReset,
+    type npm1300ResetConfig,
+    type ResetConfig,
+} from '../../types';
 import { ResetGet } from './getters';
 
 export class ResetSet {

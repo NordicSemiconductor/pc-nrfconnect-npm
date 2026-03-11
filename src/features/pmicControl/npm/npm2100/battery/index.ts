@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { BatteryModule, ModuleParams } from '../../types';
+import { type BatteryModule, type ModuleParams } from '../../types';
 import batteryCallbacks from './batteryCallbacks';
 import { BatteryGet } from './BatteryGet';
 

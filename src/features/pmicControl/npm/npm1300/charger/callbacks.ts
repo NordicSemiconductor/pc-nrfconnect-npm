@@ -4,17 +4,21 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type ShellParser } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     noop,
-    NpmEventEmitter,
+    type NpmEventEmitter,
     parseLogData,
     parseToBoolean,
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { Charger, NTCThermistor, PmicChargingState } from '../../types';
+import {
+    type Charger,
+    type NTCThermistor,
+    type PmicChargingState,
+} from '../../types';
 import { ITermValues } from './types';
 
 export default (

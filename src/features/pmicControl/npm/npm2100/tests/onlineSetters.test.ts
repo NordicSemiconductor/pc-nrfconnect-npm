@@ -5,7 +5,7 @@
  */
 
 import { helpers } from '../../tests/helpers';
-import { LEDModeValues, PmicDialog } from '../../types';
+import { LEDModeValues, type PmicDialog } from '../../types';
 import { GPIODriveValues, GPIOModeValues, GPIOPullValues } from '../gpio/types';
 import { PMIC_2100_GPIOS, setupMocksWithShellParser } from './helpers';
 

@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
+import { type NpmEventEmitter, parseColonBasedAnswer } from '../../pmicHelpers';
 import {
-    Boost,
-    BoostExport,
-    BoostModeControl,
-    BoostModule,
-    BoostPinMode,
-    BoostPinSelection,
-    BoostVOutSel,
-    PmicDialog,
+    type Boost,
+    type BoostExport,
+    type BoostModeControl,
+    type BoostModule,
+    type BoostPinMode,
+    type BoostPinSelection,
+    type BoostVOutSel,
+    type PmicDialog,
 } from '../../types';
 import { BoostGet } from './getters';
 

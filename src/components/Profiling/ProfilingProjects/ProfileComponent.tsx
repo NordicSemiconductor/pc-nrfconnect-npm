@@ -19,7 +19,7 @@ import { generateParamsFromCSV } from '../../../features/nrfutillNpm/csvProcessi
 import { getProjectProfileProgress } from '../../../features/pmicControl/profilingProjectsSlice.';
 import { readAndUpdateProjectSettings } from '../helpers';
 import TimeComponent from '../TimeComponent';
-import { ProfilingProject } from '../types';
+import { type ProfilingProject } from '../types';
 import ProfileComponentMenu from './ProfileComponentMenu';
 
 import './profilingProjects.scss';
@@ -136,7 +136,7 @@ export default ({
                             </div>
                         )}
                 </div>
-                <div className="d-flex flex-row justify-content-between  align-items-center float-right">
+                <div className="d-flex flex-row justify-content-between align-items-center float-right">
                     <div>
                         <Toggle
                             label="include"

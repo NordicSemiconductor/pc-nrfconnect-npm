@@ -16,14 +16,14 @@ import {
 
 import { DocumentationTooltip } from '../../../features/pmicControl/npm/documentation/documentation';
 import {
-    Buck,
-    BuckMode,
-    BuckModeControl,
+    type Buck,
+    type BuckMode,
+    type BuckModeControl,
     BuckModeControlValues,
-    BuckModule,
-    BuckOnOffControl,
+    type BuckModule,
+    type BuckOnOffControl,
     BuckOnOffControlValues,
-    BuckRetentionControl,
+    type BuckRetentionControl,
     BuckRetentionControlValues,
     GPIOValues,
 } from '../../../features/pmicControl/npm/types';

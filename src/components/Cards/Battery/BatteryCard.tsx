@@ -14,7 +14,7 @@ import {
     getNpmDevice,
 } from '../../../features/pmicControl/pmicControlSlice';
 import Battery, {
-    BatteryProperties as BatteryCardProperties,
+    type BatteryProperties as BatteryCardProperties,
 } from '../../Battery/Battery';
 
 export default ({ disabled }: BatteryCardProperties) => {

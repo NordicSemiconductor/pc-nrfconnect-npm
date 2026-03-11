@@ -8,8 +8,8 @@ import React from 'react';
 import { ExternalLink } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { documentation as nPM1300Documentation } from '../npm1300/documentationPmic1300';
-import { Documentation } from '../types';
-import Npm1304 from './pmic1304Device';
+import { type Documentation } from '../types';
+import type Npm1304 from './pmic1304Device';
 
 export const documentation = (npmDevice: Npm1304): Documentation => {
     const npm1300BaseDoc = nPM1300Documentation(npmDevice);

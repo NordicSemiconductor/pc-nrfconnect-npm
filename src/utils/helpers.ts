@@ -4,12 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-export interface RangeType {
-    min: number;
-    max: number;
-    decimals?: number;
-    step?: number;
-}
+import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 const getDecimalPlaces = (value: number): number => {
     if (!Number.isFinite(value)) return 0;
@@ -27,7 +22,7 @@ const getDecimalPlaces = (value: number): number => {
     return decimalPart ? decimalPart.length : 0;
 };
 
-export const getRange = (ranges: RangeType[]): number[] => {
+export const getRange = (ranges: Range[]): number[] => {
     const out: number[] = [];
 
     ranges.forEach(range => {

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { BatteryModel, FuelGauge } from '../../types';
+import { type BatteryModel, type FuelGauge } from '../../types';
 import {
     GPIODriveValues,
     GPIOMode2100,
