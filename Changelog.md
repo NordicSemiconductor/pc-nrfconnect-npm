@@ -1,10 +1,10 @@
-## Unreleased
+## 2.2.4 - Unreleased
 
-### 2026-02-10
+### Fixed
 
 - nPM2100: Fix setting the timer period value from the UI.
 
-### 2.2.4 - 2025-12-18
+### 2.2.4 - 2025-12-18 - (?)
 
 - nPM2100: When the GPIO mode control is selected, the toggle for Load
   switch/LDO is now correctly enabled.
