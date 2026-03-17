@@ -42,6 +42,10 @@ import type {
     LongPressResetPinSel as LongPressResetPinSel1012,
     PowerDownWait as PowerDownWait1012,
 } from './npm1012/reset/types';
+import type {
+    VBusDpm as VBusDpm1012,
+    VBusILim as VBusILim1012,
+} from './npm1012/sysReg/types';
 import type { Mode as TimerMode1012 } from './npm1012/timerConfig/types';
 import {
     type ITermNpm1300,
@@ -410,6 +414,24 @@ export type POF = {
     enable: boolean;
     polarity: POFPolarity;
     threshold: number;
+};
+
+export type VBusDpm = VBusDpm1012;
+export type VBusILim = VBusILim1012;
+
+export const vBusStatusValues = [
+    'Good',
+    'Overvoltage',
+    'Present',
+    'Undervoltage',
+] as const;
+export type VBusStatus = (typeof vBusStatusValues)[number];
+
+export type SysReg = {
+    vBusDpm: VBusDpm;
+    vBusGood: boolean;
+    vBusILim: VBusILim;
+    vBusPresent: boolean;
 };
 
 export type TimerMode = TimerMode1012 | npm1300TimerMode | npm2100TimerMode;
@@ -1180,6 +1202,26 @@ export interface PofModule {
     defaults: POF;
 }
 
+export interface SysRegModule {
+    callbacks: (() => void)[];
+    defaults: SysReg;
+    get: {
+        all: () => void;
+        vBusDpm: () => void;
+        vBusILim: () => void;
+        vBusStatus: () => void;
+    };
+    set: {
+        all: (config: SysReg) => Promise<void>;
+        vBusDpm: (value: VBusDpm) => Promise<void>;
+        vBusILim: (value: VBusILim) => Promise<void>;
+    };
+    values: {
+        vBusDpm: { label: string; value: VBusDpm }[];
+        vBusILim: { label: string; value: VBusILim }[];
+    };
+}
+
 export type TimerConfigModule = {
     get: {
         all: () => void;
@@ -1366,6 +1408,7 @@ export type LowPowerExport = Omit<
     | 'vbusHibernateWaitingForChargeComplete'
     | 'vbusStandbyWaitingForChargeComplete'
 >;
+export type SysRegExport = Omit<SysReg, ''>;
 
 export interface NpmExportV1 {
     boosts: BoostExport[];
@@ -1398,6 +1441,7 @@ export interface NpmExportV2 {
     onBoardLoad?: OnBoardLoad;
     lowPower?: LowPowerExport;
     reset?: ResetConfig;
+    sysReg?: SysRegExport;
     timerConfig?: TimerConfig;
     fuelGaugeSettings: FuelGaugeExport;
     firmwareVersion: string;
@@ -1524,6 +1568,7 @@ export type NpmPeripherals = {
     BatteryModule?: IModule<BatteryModule>;
     LowPowerModule?: IModule<LowPowerModule>;
     ResetModule?: IModule<ResetModule>;
+    SysRegModule?: IModule<SysRegModule>;
     FuelGaugeModule?: IModule<FuelGaugeModule>;
     OnBoardLoadModule?: IModule<OnBoardLoadModule>;
 };
