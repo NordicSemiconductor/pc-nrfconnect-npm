@@ -36,6 +36,11 @@ import type {
     LEDMode as GPIOLEDDrvLEDMode1012,
 } from './npm1012/gpioleddrv/types';
 import type { OnOffControl as LdoOnOffControl1012 } from './npm1012/ldo/types';
+import type {
+    LongPressResetDebounce as LongPressResetDebounce1012,
+    LongPressResetPinSel as LongPressResetPinSel1012,
+    PowerDownWait as PowerDownWait1012,
+} from './npm1012/reset/types';
 import {
     type ITermNpm1300,
     type VTrickleFast1300,
@@ -47,6 +52,7 @@ import type {
 } from './npm1300/gpio/types';
 import type { SoftStartCurrent as LdoSoftStartCurrent1300 } from './npm1300/ldo/types';
 import type { Mode as LEDMode1300 } from './npm1300/led/types';
+import type { LongPressReset as LongPressReset1300 } from './npm1300/reset/types';
 import { type npm1300TimerMode } from './npm1300/timerConfig/types';
 import { type ITermNpm1304 } from './npm1304/charger/types';
 import type { PowerID2100 } from './npm2100/battery';
@@ -60,8 +66,9 @@ import {
     type nPM2100GPIOControlMode,
     type nPM2100GPIOControlPinSelect,
     type nPM2100LdoModeControl,
-    type npm2100LongPressResetDebounce,
-    type npm2100ResetPinSelection,
+    type npm2100LongPressResetDebounce as LongPressResetDebounce2100,
+    type npm2100ResetPinSelection as LongPressResetPinSel2100,
+    type npm2100ResetReason as ResetReason2100,
     type npm2100TimerMode,
     type SoftStartCurrentLDOMode as LdoSoftStartCurrentLDOMode2100,
     type SoftStartCurrentLoadSwitchMode as LdoSoftStartCurrentLoadSwitchMode2100,
@@ -474,13 +481,6 @@ export enum ChargerJeitaVLabel {
 
 export type TimeToActive = npm1300TimeToActive | npm2100TimeToActive;
 
-export const LongPressResetValues = [
-    'one_button',
-    'disabled',
-    'two_button',
-] as const;
-export type LongPressReset = (typeof LongPressResetValues)[number];
-
 export type LowPowerConfig = npm1300LowPowerConfig | npm2100LowPowerConfig;
 
 export type npm1300LowPowerConfig = {
@@ -493,30 +493,27 @@ export type npm2100LowPowerConfig = {
     powerButtonEnable: boolean;
 };
 
-export const isNpm1300ResetConfig = (
-    config: ResetConfig,
-): config is npm1300ResetConfig => 'longPressReset' in config;
+export type ResetConfig = {
+    longPressResetPinSel: LongPressResetPinSel;
 
-export type ResetConfig = npm1300ResetConfig | npm2100ResetConfig;
-
-export type npm1300ResetConfig = {
-    longPressReset: LongPressReset;
+    longPressResetDebounce?: LongPressResetDebounce;
+    longPressResetEnable?: boolean;
+    powerDownWait?: PowerDownWait;
+    resetReason?: ResetReason;
 };
 
-export type npm2100ResetReason = {
-    reason?: string;
-    bor?: string;
-};
+export type LongPressResetPinSel =
+    | LongPressResetPinSel1012
+    | LongPressResetPinSel1300
+    | LongPressResetPinSel2100;
 
-export type LongPressResetDebounce = npm2100LongPressResetDebounce;
-export type ResetPinSelection = npm2100ResetPinSelection;
+export type LongPressResetDebounce =
+    | LongPressResetDebounce1012
+    | LongPressResetDebounce2100;
 
-export type npm2100ResetConfig = {
-    longPressResetEnable: boolean;
-    longPressResetDebounce: npm2100LongPressResetDebounce;
-    resetPinSelection: npm2100ResetPinSelection;
-    resetReason?: npm2100ResetReason;
-};
+export type PowerDownWait = PowerDownWait1012;
+
+export type ResetReason = ResetReason2100;
 
 export type AdcSample = {
     timestamp: number;
@@ -1256,28 +1253,31 @@ export type LowPowerModule = {
 export type ResetModule = {
     get: {
         all: () => void;
-        longPressReset: () => void;
+        longPressResetPinSel: () => void;
+
+        longPressResetDebounce?: () => void;
+        longPressResetEnable?: () => void;
+        powerDownWait?: () => void;
+        resetReason?: () => void;
     };
     set: {
-        all(reset: ResetConfig): Promise<void>;
+        all: (reset: ResetConfig) => Promise<void>;
+        longPressResetPinSel: (value: LongPressResetPinSel) => Promise<void>;
 
-        // npm1300
-        longPressReset?: (longPressReset: LongPressReset) => Promise<void>;
-
-        // npm2100
-        longPressResetEnable?: (longPressResetEnable: boolean) => Promise<void>;
         longPressResetDebounce?: (
-            longPressResetDebounce: npm2100LongPressResetDebounce,
+            value: LongPressResetDebounce,
         ) => Promise<void>;
-        selectResetPin?: (resetPin: npm2100ResetPinSelection) => Promise<void>;
+        longPressResetEnable?: (value: boolean) => Promise<void>;
+        powerDownWait?: (value: PowerDownWait) => Promise<void>;
     };
     actions: {
         powerCycle?: () => Promise<void>;
     };
     values: {
-        pinSelection: DropdownItem<ResetPinSelection>[];
-        longPressReset: DropdownItem<LongPressReset>[];
-        longPressResetDebounce: DropdownItem<LongPressResetDebounce>[];
+        longPressResetPinSel: DropdownItem<LongPressResetPinSel>[];
+
+        longPressResetDebounce?: DropdownItem<LongPressResetDebounce>[];
+        powerDownWait?: DropdownItem<PowerDownWait>[];
     };
     callbacks: (() => void)[];
     defaults: ResetConfig;
