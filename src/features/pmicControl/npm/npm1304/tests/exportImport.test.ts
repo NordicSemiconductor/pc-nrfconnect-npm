@@ -134,7 +134,7 @@ describe('PMIC 1304 - Apply Config ', () => {
         invPolarity: false,
     };
     const initReset: ResetConfig = {
-        longPressReset: 'two_button',
+        longPressResetPinSel: 'two_button',
     };
 
     const initUSBPower: Omit<USBPower, 'detectStatus'> = {
@@ -281,7 +281,7 @@ describe('PMIC 1304 - Apply Config ', () => {
             invPolarity: true,
         },
         reset: {
-            longPressReset: 'one_button',
+            longPressResetPinSel: 'one_button',
         },
         fuelGaugeSettings: {
             enabled: true,

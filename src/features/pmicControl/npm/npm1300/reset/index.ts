@@ -4,20 +4,15 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { type DropdownItem } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import {
-    type LongPressReset,
-    type LongPressResetDebounce,
-    LongPressResetValues,
     type ModuleParams,
     type ResetConfig,
     type ResetModule,
-    type ResetPinSelection,
 } from '../../types';
 import resetCallbacks from './callbacks';
 import { ResetGet } from './getters';
 import { ResetSet } from './setters';
+import { longPressResetPinSelKeys, longPressResetPinSelValues } from './types';
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
@@ -48,23 +43,17 @@ export default class Module implements ResetModule {
     get actions(): { powerCycle?: () => Promise<void> } {
         return {};
     }
-    get values(): {
-        pinSelection: DropdownItem<ResetPinSelection>[];
-        longPressReset: DropdownItem<LongPressReset>[];
-        longPressResetDebounce: DropdownItem<LongPressResetDebounce>[];
-    } {
+    get values(): ResetModule['values'] {
         return {
-            longPressReset: LongPressResetValues.map(item => ({
-                label: `${item}`.replaceAll('_', ' '),
-                value: `${item}`,
+            longPressResetPinSel: longPressResetPinSelKeys.map((item, i) => ({
+                label: longPressResetPinSelValues[i],
+                value: item,
             })),
-            pinSelection: [],
-            longPressResetDebounce: [],
         };
     }
     get defaults(): ResetConfig {
         return {
-            longPressReset: 'one_button',
+            longPressResetPinSel: 'one_button',
         };
     }
 }

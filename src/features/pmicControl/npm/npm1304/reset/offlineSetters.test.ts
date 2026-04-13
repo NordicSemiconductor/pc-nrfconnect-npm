@@ -15,11 +15,11 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set timer reset longpress ', async () => {
-        await pmic.resetModule?.set.longPressReset?.('disabled');
+        await pmic.resetModule?.set.longPressResetPinSel?.('disabled');
 
         expect(mockOnResetUpdate).toBeCalledTimes(1);
         expect(mockOnResetUpdate).toBeCalledWith({
-            longPressReset: 'disabled',
+            longPressResetPinSel: 'disabled',
         });
     });
 });

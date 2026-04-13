@@ -13,8 +13,8 @@ describe('PMIC 1304 - Request update commands', () => {
         jest.clearAllMocks();
     });
 
-    test('Request update shipLongPressReset', () => {
-        pmic.resetModule?.get.longPressReset();
+    test('Request update shipLongPressResetPinSel', () => {
+        pmic.resetModule?.get.longPressResetPinSel();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

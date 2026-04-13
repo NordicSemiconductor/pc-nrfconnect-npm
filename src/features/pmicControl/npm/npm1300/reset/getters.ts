@@ -15,13 +15,13 @@ export class ResetGet {
 
     all() {
         this.timeToActive();
-        this.longPressReset();
+        this.longPressResetPinSel();
     }
 
     timeToActive() {
         this.sendCommand(`npmx ship config time get`);
     }
-    longPressReset() {
+    longPressResetPinSel() {
         this.sendCommand(`powerup_ship longpress get`);
     }
 }
