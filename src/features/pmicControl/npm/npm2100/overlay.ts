@@ -18,8 +18,8 @@ import {
     type LdoExport,
     type LdoModule,
     type npm2100LowPowerConfig,
-    type npm2100ResetConfig,
     type NpmExportLatest,
+    type ResetConfig,
 } from '../types';
 import { GPIOMode2100 } from './gpio/types';
 import type Npm2100 from './pmic2100Device';
@@ -220,10 +220,13 @@ const generateLDOSW = (
 `;
 
 const generateShipHoldLongPressProperty = (
-    reset: npm2100ResetConfig,
     lowPower: npm2100LowPowerConfig,
+    reset?: ResetConfig,
 ) => {
-    if (reset.longPressResetEnable && reset.resetPinSelection === 'SHPHLD') {
+    if (
+        reset?.longPressResetEnable &&
+        reset.longPressResetPinSel === 'SHPHLD'
+    ) {
         return 'shiphold-longpress = "reset";';
     }
 
@@ -313,8 +316,8 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
 
 
         ${generateShipHoldLongPressProperty(
-            npmConfig.reset as npm2100ResetConfig,
             npmConfig.lowPower as npm2100LowPowerConfig,
+            npmConfig.reset,
         )}
 
 
