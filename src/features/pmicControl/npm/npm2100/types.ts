@@ -82,3 +82,8 @@ export enum npm2100ResetPinSelection {
     'PG/RESET' = 'PGRESET',
     'SHPHLD' = 'SHPHLD',
 }
+
+export type npm2100ResetReason = {
+    reason?: string;
+    bor?: string;
+};
