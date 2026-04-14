@@ -30,6 +30,7 @@ import GpioLedDrvModule from './gpioleddrv';
 import LdoModule, { toLdoExport } from './ldo';
 import LedModule, { toLedExport } from './led';
 import OnBoardLoadModule from './onBoardLoad';
+import ResetModule from './reset';
 import UsbCurrentLimiterModule from './universalSerialBusCurrentLimiter';
 
 export const npm1012FWVersion = '0.3.2+0';
@@ -60,10 +61,11 @@ export default class Npm1012 extends BaseNpmDevice {
                 FuelGaugeModule,
                 UsbCurrentLimiterModule,
                 OnBoardLoadModule,
+                ResetModule,
             },
             1,
             {
-                reset: false,
+                reset: true,
                 charger: true,
                 sensor: false,
             },
