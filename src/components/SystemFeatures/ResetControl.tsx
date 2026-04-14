@@ -15,11 +15,10 @@ import {
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { ResetReasons } from '../../features/pmicControl/npm/npm2100/reset';
 import {
-    type LongPressReset,
     type LongPressResetDebounce,
+    type LongPressResetPinSel,
     type ResetConfig,
     type ResetModule,
-    type ResetPinSelection,
 } from '../../features/pmicControl/npm/types';
 
 const card = 'resetControl';
@@ -36,73 +35,47 @@ export default ({
     <Card
         title={<div className="tw-flex tw-justify-between">Reset control</div>}
     >
-        {'longPressReset' in reset && resetModule.set.longPressReset && (
+        {resetModule.set.longPressResetPinSel && (
             <Dropdown
                 label={
                     <DocumentationTooltip card={card} item="LongPressReset">
                         Long Press Reset
                     </DocumentationTooltip>
                 }
-                items={resetModule.values.longPressReset}
+                items={resetModule.values.longPressResetPinSel}
                 onSelect={item =>
-                    resetModule.set.longPressReset?.(
-                        item.value as LongPressReset,
+                    resetModule.set.longPressResetPinSel?.(
+                        item.value as LongPressResetPinSel,
                     )
                 }
                 selectedItem={
-                    resetModule.values.longPressReset.find(
-                        item => item.value === reset.longPressReset,
-                    ) ?? resetModule.values.longPressReset[0]
+                    resetModule.values.longPressResetPinSel.find(
+                        item => item.value === reset.longPressResetPinSel,
+                    ) ?? resetModule.values.longPressResetPinSel[0]
                 }
                 disabled={disabled}
             />
         )}
 
-        {'resetPinSelection' in reset && resetModule.set.selectResetPin && (
-            <Dropdown
+        {resetModule.set.longPressResetEnable && (
+            <Toggle
                 label={
                     <DocumentationTooltip
                         card={card}
-                        item="LongPressResetSelectPin"
+                        item="LongPressResetEnable"
                     >
-                        Reset Pin Selection
+                        Long Press Reset
                     </DocumentationTooltip>
                 }
-                items={resetModule.values.pinSelection}
-                onSelect={item =>
-                    resetModule.set.selectResetPin?.(
-                        item.value as ResetPinSelection,
-                    )
-                }
-                selectedItem={
-                    resetModule.values.pinSelection.find(
-                        item => item.value === reset.resetPinSelection,
-                    ) ?? resetModule.values.pinSelection[0]
+                isToggled={reset.longPressResetEnable === true}
+                onToggle={value =>
+                    resetModule.set.longPressResetEnable?.(value)
                 }
                 disabled={disabled}
             />
         )}
 
-        {'longPressResetEnable' in reset &&
-            resetModule.set.longPressResetEnable && (
-                <Toggle
-                    label={
-                        <DocumentationTooltip
-                            card={card}
-                            item="LongPressResetEnable"
-                        >
-                            Long Press Reset
-                        </DocumentationTooltip>
-                    }
-                    isToggled={reset.longPressResetEnable === true}
-                    onToggle={value =>
-                        resetModule.set.longPressResetEnable?.(value)
-                    }
-                    disabled={disabled}
-                />
-            )}
-
-        {'longPressResetDebounce' in reset &&
+        {resetModule.values.longPressResetDebounce &&
             resetModule.set.longPressResetDebounce && (
                 <Dropdown
                     label={
@@ -110,7 +83,10 @@ export default ({
                             card={card}
                             item="LongPressResetDebounce"
                         >
-                            Long Press Reset Debounce
+                            <div>
+                                <span>t</span>
+                                <span className="subscript">RESETBUT</span>
+                            </div>
                         </DocumentationTooltip>
                     }
                     items={resetModule.values.longPressResetDebounce}
@@ -124,7 +100,7 @@ export default ({
                             item => item.value === reset.longPressResetDebounce,
                         ) ?? resetModule.values.longPressResetDebounce[0]
                     }
-                    disabled={disabled}
+                    disabled={disabled || reset.longPressResetPinSel === 'OFF'}
                 />
             )}
 
