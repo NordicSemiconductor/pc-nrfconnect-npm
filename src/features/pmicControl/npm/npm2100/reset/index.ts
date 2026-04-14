@@ -4,15 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { type DropdownItem } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
 import {
-    type LongPressReset,
-    type LongPressResetDebounce,
     type ModuleParams,
     type ResetConfig,
     type ResetModule,
-    type ResetPinSelection,
 } from '../../types';
 import {
     npm2100LongPressResetDebounceValues,
@@ -58,32 +53,29 @@ export default class Module implements ResetModule {
     get callbacks() {
         return this._callbacks;
     }
-    get values(): {
-        pinSelection: DropdownItem<ResetPinSelection>[];
-        longPressReset: DropdownItem<LongPressReset>[];
-        longPressResetDebounce: DropdownItem<LongPressResetDebounce>[];
-    } {
+    get values(): ResetModule['values'] {
         return {
-            pinSelection: Object.keys(npm2100ResetPinSelection).map(key => ({
-                label: `${key}`,
-                value: npm2100ResetPinSelection[
-                    key as keyof typeof npm2100ResetPinSelection
-                ],
-            })),
+            longPressResetPinSel: Object.keys(npm2100ResetPinSelection).map(
+                key => ({
+                    label: `${key}`,
+                    value: npm2100ResetPinSelection[
+                        key as keyof typeof npm2100ResetPinSelection
+                    ],
+                }),
+            ),
             longPressResetDebounce: npm2100LongPressResetDebounceValues.map(
                 item => ({
                     label: `${item}`,
                     value: `${item}`,
                 }),
             ),
-            longPressReset: [],
         };
     }
     get defaults(): ResetConfig {
         return {
+            longPressResetPinSel: npm2100ResetPinSelection['PG/RESET'],
             longPressResetEnable: false,
             longPressResetDebounce: '5s',
-            resetPinSelection: npm2100ResetPinSelection['PG/RESET'],
         };
     }
 }
