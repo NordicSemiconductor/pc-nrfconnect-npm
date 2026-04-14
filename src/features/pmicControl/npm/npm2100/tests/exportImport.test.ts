@@ -112,7 +112,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     };
 
     const initReset: ResetConfig = {
-        longPressReset: 'two_button',
+        longPressResetPinSel: 'two_button',
     };
 
     const initUSBPower: Omit<USBPower, 'detectStatus'> = {
@@ -199,7 +199,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             powerButtonEnable: true,
         },
         reset: {
-            longPressReset: 'one_button',
+            longPressResetPinSel: 'one_button',
         },
         fuelGaugeSettings: {
             enabled: true,
