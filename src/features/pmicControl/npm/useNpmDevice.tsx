@@ -865,6 +865,14 @@ export default () => {
                     name: 'System Features',
                     hidden:
                         !(
+                            npmDevice?.lowPowerModule && // npm1012 features
+                            npmDevice.pofModule &&
+                            npmDevice.resetModule &&
+                            npmDevice.sysRegModule &&
+                            npmDevice.timerConfigModule &&
+                            SupportsErrorLogs(npmDevice)
+                        ) &&
+                        !(
                             npmDevice?.lowPowerModule && // npm130x features
                             npmDevice.resetModule &&
                             npmDevice.timerConfigModule &&
