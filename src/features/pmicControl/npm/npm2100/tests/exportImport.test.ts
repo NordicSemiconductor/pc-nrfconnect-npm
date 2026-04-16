@@ -14,7 +14,6 @@ import {
     type LED,
     type LowPowerConfig,
     type npm2100LowPowerConfig,
-    type npm2100TimerConfig,
     npm2100TimeToActive,
     type NpmExportLatest,
     type PartialUpdate,
@@ -315,7 +314,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 timerConfig = {
                     ...timerConfig,
                     ...partialUpdate,
-                } as npm2100TimerConfig;
+                };
             },
         );
 
