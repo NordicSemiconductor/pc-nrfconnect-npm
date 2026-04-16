@@ -20,7 +20,6 @@ import {
     type LED,
     type LowPowerConfig,
     type npm1300LowPowerConfig,
-    type npm1300TimerConfig,
     npm1300TimeToActive,
     type NpmExportLatest,
     type OnBoardLoad,
@@ -418,7 +417,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                 timerConfig = {
                     ...timerConfig,
                     ...partialUpdate,
-                } as npm1300TimerConfig;
+                };
             },
         );
 
