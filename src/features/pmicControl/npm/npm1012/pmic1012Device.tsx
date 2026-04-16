@@ -31,6 +31,7 @@ import LdoModule, { toLdoExport } from './ldo';
 import LedModule, { toLedExport } from './led';
 import OnBoardLoadModule from './onBoardLoad';
 import ResetModule from './reset';
+import TimerConfigModule from './timerConfig';
 import UsbCurrentLimiterModule from './universalSerialBusCurrentLimiter';
 
 export const npm1012FWVersion = '0.3.2+0';
@@ -62,6 +63,7 @@ export default class Npm1012 extends BaseNpmDevice {
                 UsbCurrentLimiterModule,
                 OnBoardLoadModule,
                 ResetModule,
+                TimerConfigModule,
             },
             1,
             {
