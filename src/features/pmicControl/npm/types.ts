@@ -41,6 +41,7 @@ import type {
     LongPressResetPinSel as LongPressResetPinSel1012,
     PowerDownWait as PowerDownWait1012,
 } from './npm1012/reset/types';
+import type { Mode as TimerMode1012 } from './npm1012/timerConfig/types';
 import {
     type ITermNpm1300,
     type VTrickleFast1300,
@@ -408,22 +409,17 @@ export type POF = {
     threshold: number;
 };
 
-export type TimerMode = npm1300TimerMode | npm2100TimerMode;
+export type TimerMode = TimerMode1012 | npm1300TimerMode | npm2100TimerMode;
 
 export const TimerPrescalerValues = ['Slow', 'Fast'] as const;
 export type TimerPrescaler = (typeof TimerPrescalerValues)[number];
 
-export type TimerConfig = npm1300TimerConfig | npm2100TimerConfig;
+export type TimerConfig = {
+    mode: TimerMode;
+    period: number;
 
-export type npm1300TimerConfig = {
-    mode: npm1300TimerMode;
-    prescaler: TimerPrescaler;
-    period: number;
-};
-export type npm2100TimerConfig = {
-    mode: npm2100TimerMode;
-    enabled: boolean;
-    period: number;
+    enabled?: boolean;
+    prescaler?: TimerPrescaler;
 };
 
 export enum npm1300TimeToActive {
@@ -1196,16 +1192,18 @@ export type TimerConfigModule = {
     get: {
         all: () => void;
         mode: () => void;
-        prescaler?: () => void;
-        enabled?: () => void;
         period: () => void;
+
+        enabled?: () => void;
+        prescaler?: () => void;
     };
     set: {
         all(timerConfig: TimerConfig): Promise<void>;
         mode(mode: TimerMode): Promise<void>;
-        prescaler?(prescaler: TimerPrescaler): Promise<void>;
-        enabled?(enabled: boolean): Promise<void>;
         period(period: number): Promise<void>;
+
+        enabled?(enabled: boolean): Promise<void>;
+        prescaler?(prescaler: TimerPrescaler): Promise<void>;
     };
     values: {
         mode: { label: string; value: TimerMode }[];
