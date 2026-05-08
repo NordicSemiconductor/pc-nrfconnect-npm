@@ -29,6 +29,7 @@ import FuelGaugeModule from './fuelGauge';
 import GpioLedDrvModule from './gpioleddrv';
 import LdoModule, { toLdoExport } from './ldo';
 import LedModule, { toLedExport } from './led';
+import LowPowerModule from './lowPower';
 import OnBoardLoadModule from './onBoardLoad';
 import ResetModule from './reset';
 import TimerConfigModule from './timerConfig';
@@ -64,6 +65,7 @@ export default class Npm1012 extends BaseNpmDevice {
                 OnBoardLoadModule,
                 ResetModule,
                 TimerConfigModule,
+                LowPowerModule,
             },
             1,
             {
