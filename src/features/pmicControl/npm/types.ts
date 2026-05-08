@@ -36,6 +36,7 @@ import type {
     LEDMode as GPIOLEDDrvLEDMode1012,
 } from './npm1012/gpioleddrv/types';
 import type { OnOffControl as LdoOnOffControl1012 } from './npm1012/ldo/types';
+import type { TimeToActive as TimeToActive1012 } from './npm1012/lowPower/types';
 import type {
     LongPressResetDebounce as LongPressResetDebounce1012,
     LongPressResetPinSel as LongPressResetPinSel1012,
@@ -53,7 +54,8 @@ import type {
 } from './npm1300/gpio/types';
 import type { SoftStartCurrent as LdoSoftStartCurrent1300 } from './npm1300/ldo/types';
 import type { Mode as LEDMode1300 } from './npm1300/led/types';
-import type { LongPressReset as LongPressReset1300 } from './npm1300/reset/types';
+import type { TimeToActive as TimeToActive1300 } from './npm1300/lowPower/types';
+import type { LongPressResetPinSel as LongPressResetPinSel1300 } from './npm1300/reset/types';
 import { type npm1300TimerMode } from './npm1300/timerConfig/types';
 import { type ITermNpm1304 } from './npm1304/charger/types';
 import type { PowerID2100 } from './npm2100/battery';
@@ -63,6 +65,7 @@ import type {
     GPIOPull2100,
     GPIOState2100,
 } from './npm2100/gpio/types';
+import { type TimeToActive as TimeToActive2100 } from './npm2100/lowPower/types';
 import {
     type nPM2100GPIOControlMode,
     type nPM2100GPIOControlPinSelect,
@@ -422,29 +425,6 @@ export type TimerConfig = {
     prescaler?: TimerPrescaler;
 };
 
-export enum npm1300TimeToActive {
-    '16ms' = '16',
-    '32ms' = '32',
-    '64ms' = '64',
-    '96ms' = '96',
-    '304ms' = '304',
-    '608ms' = '608',
-    '1008ms' = '1008',
-    '3008ms' = '3008',
-}
-
-export enum npm2100TimeToActive {
-    'DISABLE' = 'OFF',
-    '10ms' = '10',
-    '30ms' = '30',
-    '60ms' = '60',
-    '100ms' = '100',
-    '300ms' = '300',
-    '600ms' = '600',
-    '1s' = '1000',
-    '3s' = '3000',
-}
-
 export enum ChargerJeitaILabel {
     coldIOff,
 
@@ -475,18 +455,30 @@ export enum ChargerJeitaVLabel {
     hotVNA,
 }
 
-export type TimeToActive = npm1300TimeToActive | npm2100TimeToActive;
+export type TimeToActive =
+    | TimeToActive1012
+    | TimeToActive1300
+    | TimeToActive2100;
 
-export type LowPowerConfig = npm1300LowPowerConfig | npm2100LowPowerConfig;
+export type OperatingMode =
+    | 'active'
+    | 'ship'
+    | 'vbatHibernate'
+    | 'vbusHibernate'
+    | 'vbusStandby1'
+    | 'vbusStandby2';
 
-export type npm1300LowPowerConfig = {
-    timeToActive: npm1300TimeToActive;
-    invPolarity: boolean;
-};
+export type LowPowerConfig = {
+    timeToActive: TimeToActive;
 
-export type npm2100LowPowerConfig = {
-    timeToActive: npm2100TimeToActive;
-    powerButtonEnable: boolean;
+    hibernateWakeupByButton?: boolean;
+    invPolarity?: boolean;
+    operatingMode?: OperatingMode;
+    powerButtonEnable?: boolean;
+    vbusHibernateWait?: boolean;
+    vbusHibernateWaitingForChargeComplete?: boolean;
+    vbusStandbyWait?: boolean;
+    vbusStandbyWaitingForChargeComplete?: boolean;
 };
 
 export type ResetConfig = {
@@ -1226,20 +1218,40 @@ export type BatteryModule = {
 };
 
 export type LowPowerModule = {
+    actions: {
+        enterBreakToWake?: () => void;
+        enterHibernatePtMode?: () => void;
+        enterShipHibernateMode?: () => Promise<void>;
+        enterShipMode?: () => Promise<void>;
+        enterVbusHibernateMode?: (
+            waitForChargeComplete?: boolean,
+        ) => Promise<void>;
+        enterVbusStandby1Mode?: (
+            waitForChargeComplete?: boolean,
+        ) => Promise<void>;
+        enterVbusStandby2Mode?: (
+            waitForChargeComplete?: boolean,
+        ) => Promise<void>;
+        exitVbusStandby1Mode?: () => Promise<void>;
+        exitVbusStandby2Mode?: () => Promise<void>;
+    };
     get: {
         all: () => void;
         timeToActive: () => void;
+
+        hibernateWakeupByButton?: () => void;
+        vbusHibernateWait?: () => void;
+        vbusStandbyWait?: () => void;
+        vbusStatus?: () => void;
     };
     set: {
-        all(lowPower: LowPowerConfig): Promise<void>;
-        timeToActive(timeToActive: TimeToActive): Promise<void>;
-        powerButtonEnable?(powerButtonEnable: boolean): Promise<void>;
-    };
-    actions: {
-        enterShipMode?(): void;
-        enterShipHibernateMode?(): void;
-        enterHibernatePtMode?(): void;
-        enterBreakToWake?(): Promise<void>;
+        all: (lowPower: LowPowerConfig) => Promise<void>;
+        timeToActive: (timeToActive: TimeToActive) => Promise<void>;
+
+        hibernateWakeupByButton?: (value: boolean) => Promise<void>;
+        powerButtonEnable?: (powerButtonEnable: boolean) => Promise<void>;
+        vbusHibernateWait?: (value: boolean) => Promise<void>;
+        vbusStandbyWait?: (value: boolean) => Promise<void>;
     };
     values: {
         timeToActive: { label: string; value: TimeToActive }[];
@@ -1348,6 +1360,12 @@ export type GPIOExport = Omit<
 export type GPIOLEDDrvExport = Omit<GPIOLEDDrv, ''>;
 export type USBPowerExport = Omit<USBPower, 'detectStatus'>;
 export type LedExport = Omit<LED, 'cardLabel'>;
+export type LowPowerExport = Omit<
+    LowPowerConfig,
+    | 'operatingMode'
+    | 'vbusHibernateWaitingForChargeComplete'
+    | 'vbusStandbyWaitingForChargeComplete'
+>;
 
 export interface NpmExportV1 {
     boosts: BoostExport[];
@@ -1378,7 +1396,7 @@ export interface NpmExportV2 {
     leds?: LedExport[];
     pof?: POF;
     onBoardLoad?: OnBoardLoad;
-    lowPower?: LowPowerConfig;
+    lowPower?: LowPowerExport;
     reset?: ResetConfig;
     timerConfig?: TimerConfig;
     fuelGaugeSettings: FuelGaugeExport;
