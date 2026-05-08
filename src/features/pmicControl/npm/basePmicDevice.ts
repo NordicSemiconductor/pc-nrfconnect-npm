@@ -45,9 +45,9 @@ import {
     type LED,
     type LedModule,
     type LoggingEvent,
+    type LowPowerConfig,
     type LowPowerModule,
     type ModuleParams,
-    type npm1300LowPowerConfig,
     type NpmExportLatest,
     type NpmExportV2,
     type NpmModel,
@@ -794,12 +794,9 @@ export default abstract class BaseNpmDevice {
         )(handler);
     }
     onLowPowerUpdate(
-        handler: (
-            payload: Partial<npm1300LowPowerConfig>,
-            error: string,
-        ) => void,
+        handler: (payload: Partial<LowPowerConfig>, error: string) => void,
     ) {
-        return this.setupHandler<Partial<npm1300LowPowerConfig>, true>(
+        return this.setupHandler<Partial<LowPowerConfig>, true>(
             'onLowPowerUpdate',
         )(handler);
     }
