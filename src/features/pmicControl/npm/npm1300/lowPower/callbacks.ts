@@ -13,17 +13,14 @@ import {
     toRegex,
     toValueRegex,
 } from '../../pmicHelpers';
-import { type npm1300LowPowerConfig, npm1300TimeToActive } from '../../types';
+import { type LowPowerConfig, type TimeToActive } from '../../types';
+import { timeToActiveValues } from './types';
 
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
-
-    const npm1300TimeToActiveValues = Object.keys(npm1300TimeToActive).map(
-        key => npm1300TimeToActive[key as keyof typeof npm1300TimeToActive],
-    );
 
     if (shellParser) {
         cleanupCallbacks.push(
@@ -32,15 +29,15 @@ export default (
                     'npmx ship config time',
                     true,
                     undefined,
-                    toValueRegex(npm1300TimeToActiveValues),
+                    toValueRegex(timeToActiveValues),
                 ),
                 res => {
-                    eventEmitter.emitPartialEvent<npm1300LowPowerConfig>(
+                    eventEmitter.emitPartialEvent<LowPowerConfig>(
                         'onLowPowerUpdate',
                         {
                             timeToActive: parseColonBasedAnswer(
                                 res,
-                            ) as npm1300TimeToActive,
+                            ) as TimeToActive,
                         },
                     );
                 },

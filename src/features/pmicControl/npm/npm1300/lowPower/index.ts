@@ -8,13 +8,12 @@ import {
     type LowPowerConfig,
     type LowPowerModule,
     type ModuleParams,
-    npm1300TimeToActive,
-    type TimeToActive,
 } from '../../types';
 import { LowPowerActions } from './actions';
 import shipModeCallbacks from './callbacks';
 import { LowPowerGet } from './getters';
 import { LowPowerSet } from './setters';
+import { TimeToActive, timeToActiveKeys, timeToActiveValues } from './types';
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
@@ -55,17 +54,15 @@ export default class Module implements LowPowerModule {
     }
     get defaults(): LowPowerConfig {
         return {
-            timeToActive: npm1300TimeToActive['96ms'],
             invPolarity: true,
+            timeToActive: TimeToActive['96ms'],
         };
     }
-    get values(): { timeToActive: { label: string; value: TimeToActive }[] } {
+    get values(): LowPowerModule['values'] {
         return {
-            timeToActive: Object.keys(npm1300TimeToActive).map(key => ({
+            timeToActive: timeToActiveKeys.map((key, i) => ({
                 label: `${key}`,
-                value: npm1300TimeToActive[
-                    key as keyof typeof npm1300TimeToActive
-                ],
+                value: timeToActiveValues[i],
             })),
         };
     }

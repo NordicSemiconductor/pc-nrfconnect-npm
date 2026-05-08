@@ -5,8 +5,9 @@
  */
 
 import { helpers } from '../../tests/helpers';
-import { npm1300TimeToActive, type PmicDialog } from '../../types';
+import { type PmicDialog } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
+import { TimeToActive } from './types';
 
 describe('PMIC 1300 - Setters Online tests', () => {
     const {
@@ -25,9 +26,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set ship config time %p', async () => {
-            await pmic.lowPowerModule?.set.timeToActive(
-                npm1300TimeToActive['16ms'],
-            );
+            await pmic.lowPowerModule?.set.timeToActive(TimeToActive['16ms']);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -56,9 +55,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.lowPowerModule?.set.timeToActive(
-                    npm1300TimeToActive['16ms'],
-                ),
+                pmic.lowPowerModule?.set.timeToActive(TimeToActive['16ms']),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

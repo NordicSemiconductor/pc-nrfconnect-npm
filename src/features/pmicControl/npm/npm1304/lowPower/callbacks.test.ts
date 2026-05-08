@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { npm1300TimeToActive } from '../../types';
+import {
+    timeToActiveKeys,
+    timeToActiveValues,
+} from '../../npm1300/lowPower/types';
 import { setupMocksWithShellParser } from '../tests/helpers';
 
 describe('PMIC 1304 - Command callbacks', () => {
@@ -16,12 +19,9 @@ describe('PMIC 1304 - Command callbacks', () => {
     });
 
     test.each(
-        Object.keys(npm1300TimeToActive)
-            .map(key => {
-                const value =
-                    npm1300TimeToActive[
-                        key as keyof typeof npm1300TimeToActive
-                    ];
+        timeToActiveKeys
+            .map((key, i) => {
+                const value = timeToActiveValues[i];
                 return [
                     { append: `get`, expected: key },
                     { append: `set ${value}`, expected: key },
