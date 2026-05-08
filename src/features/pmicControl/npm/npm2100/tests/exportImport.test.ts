@@ -13,8 +13,6 @@ import {
     type Ldo,
     type LED,
     type LowPowerConfig,
-    type npm2100LowPowerConfig,
-    npm2100TimeToActive,
     type NpmExportLatest,
     type PartialUpdate,
     type PmicDialog,
@@ -25,6 +23,7 @@ import {
 } from '../../types';
 import { GPIOMode2100, GPIOPull2100, GPIOState2100 } from '../gpio/types';
 import { toLdoExport } from '../ldo';
+import { TimeToActive } from '../lowPower/types';
 import { npm2100FWVersion } from '../pmic2100Device';
 import { npm2100TimerMode } from '../types';
 import { setupMocksBase } from './helpers';
@@ -105,8 +104,8 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         period: 0,
     };
 
-    const initLowPower: npm2100LowPowerConfig = {
-        timeToActive: npm2100TimeToActive['100ms'],
+    const initLowPower: LowPowerConfig = {
+        timeToActive: TimeToActive['100ms'],
         powerButtonEnable: true,
     };
 
@@ -194,7 +193,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             period: 10,
         },
         lowPower: {
-            timeToActive: npm2100TimeToActive['30ms'],
+            timeToActive: TimeToActive['30ms'],
             powerButtonEnable: true,
         },
         reset: {
@@ -225,7 +224,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
-    let ship: npm2100LowPowerConfig = { ...initLowPower };
+    let ship: LowPowerConfig = { ...initLowPower };
     let reset: ResetConfig = { ...initReset };
     let timerConfig = { ...initTimerConfig };
     let usbPower = { ...initUSBPower };
@@ -296,7 +295,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 ship = {
                     ...ship,
                     ...partialUpdate,
-                } as npm2100LowPowerConfig;
+                } as LowPowerConfig;
             },
         );
 
