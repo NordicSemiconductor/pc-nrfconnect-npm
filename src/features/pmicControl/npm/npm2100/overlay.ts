@@ -17,7 +17,7 @@ import {
     type GPIOPull,
     type LdoExport,
     type LdoModule,
-    type npm2100LowPowerConfig,
+    type LowPowerConfig,
     type NpmExportLatest,
     type ResetConfig,
 } from '../types';
@@ -220,7 +220,7 @@ const generateLDOSW = (
 `;
 
 const generateShipHoldLongPressProperty = (
-    lowPower: npm2100LowPowerConfig,
+    lowPower: LowPowerConfig,
     reset?: ResetConfig,
 ) => {
     if (
@@ -316,7 +316,7 @@ export default (npmConfig: NpmExportLatest, npmDevice: Npm2100) => {
 
 
         ${generateShipHoldLongPressProperty(
-            npmConfig.lowPower as npm2100LowPowerConfig,
+            npmConfig.lowPower as LowPowerConfig,
             npmConfig.reset,
         )}
 
