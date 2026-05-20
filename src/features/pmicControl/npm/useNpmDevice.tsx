@@ -57,6 +57,7 @@ import {
     setResetConfig,
     setStoredBatterModel,
     setSupportedVersion,
+    setSysRegConfig,
     setTimerConfig,
     setUsbPower,
     updateBoost,
@@ -72,6 +73,7 @@ import {
     updatePmicChargingState,
     updatePOFs,
     updateResetConfig,
+    updateSysRegConfig,
     updateTimerConfig,
     updateUsbPower,
 } from '../pmicControlSlice';
@@ -316,6 +318,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onResetUpdate(payload => {
                     dispatch(updateResetConfig(payload));
+                }),
+            );
+
+            releaseAll.push(
+                npmDevice.onSysRegUpdate(payload => {
+                    dispatch(updateSysRegConfig(payload));
                 }),
             );
 
@@ -688,6 +696,7 @@ export default () => {
             dispatch(setUsbPower(npmDevice.usbCurrentLimiterModule?.defaults));
             dispatch(setTimerConfig(npmDevice.timerConfigModule?.defaults));
             dispatch(setResetConfig(npmDevice.resetModule?.defaults));
+            dispatch(setSysRegConfig(npmDevice.sysRegModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());
