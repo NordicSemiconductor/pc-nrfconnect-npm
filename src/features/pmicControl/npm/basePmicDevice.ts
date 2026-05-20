@@ -65,6 +65,8 @@ import {
     type ResetConfig,
     type ResetModule,
     type SupportedErrorLogs,
+    type SysReg,
+    type SysRegModule,
     type TimerConfig,
     type TimerConfigModule,
     type UsbCurrentLimiterModule,
@@ -229,6 +231,18 @@ export default abstract class BaseNpmDevice {
             this.releaseAll.push(...resetModule.callbacks);
         }
         this.#resetModule = resetModule;
+    }
+
+    #sysRegModule?: SysRegModule;
+    get sysRegModule() {
+        return this.#sysRegModule;
+    }
+
+    protected set sysRegModule(sysRegModule: SysRegModule | undefined) {
+        if (sysRegModule) {
+            this.releaseAll.push(...sysRegModule.callbacks);
+        }
+        this.#sysRegModule = sysRegModule;
     }
 
     #timerConfigModule?: TimerConfigModule;
@@ -417,6 +431,12 @@ export default abstract class BaseNpmDevice {
             });
         }
 
+        if (this.peripherals.SysRegModule) {
+            this.#sysRegModule = new this.peripherals.SysRegModule({
+                ...args,
+            });
+        }
+
         if (this.peripherals.TimerConfigModule) {
             this.#timerConfigModule = new this.peripherals.TimerConfigModule({
                 ...args,
@@ -590,6 +610,7 @@ export default abstract class BaseNpmDevice {
         this.timerConfigModule?.get.all();
         this.lowPowerModule?.get.all();
         this.resetModule?.get.all();
+        this.sysRegModule?.get.all();
         this.fuelGaugeModule?.get.all();
     }
 
@@ -804,6 +825,11 @@ export default abstract class BaseNpmDevice {
         handler: (payload: Partial<ResetConfig>, error: string) => void,
     ) {
         return this.setupHandler<Partial<ResetConfig>, true>('onResetUpdate')(
+            handler,
+        );
+    }
+    onSysRegUpdate(handler: (payload: Partial<SysReg>, error: string) => void) {
+        return this.setupHandler<Partial<SysReg>, true>('onSysRegUpdate')(
             handler,
         );
     }
@@ -1058,6 +1084,12 @@ export default abstract class BaseNpmDevice {
                     if (config.reset) {
                         await this.resetModule?.set
                             .all(config.reset)
+                            .catch(() => {});
+                    }
+
+                    if (config.sysReg) {
+                        await this.sysRegModule?.set
+                            .all(config.sysReg)
                             .catch(() => {});
                     }
 
