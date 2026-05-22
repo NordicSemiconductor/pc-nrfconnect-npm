@@ -32,8 +32,8 @@ import LedModule, { toLedExport } from './led';
 import LowPowerModule from './lowPower';
 import OnBoardLoadModule from './onBoardLoad';
 import ResetModule from './reset';
+import SysRegModule from './sysReg';
 import TimerConfigModule from './timerConfig';
-import UsbCurrentLimiterModule from './universalSerialBusCurrentLimiter';
 
 export const npm1012FWVersion = '0.3.2+0';
 
@@ -50,22 +50,19 @@ export default class Npm1012 extends BaseNpmDevice {
             new NpmEventEmitter(),
             {
                 bucks: { Module: BuckModule, count: 1 },
-                ldos: { Module: LdoModule, count: 2 },
                 gpioLedDrvs: { Module: GpioLedDrvModule, count: 3 },
-                ChargerModule,
+                ldos: { Module: LdoModule, count: 2 },
+                leds: { Module: LedModule, count: 1 },
                 maxEnergyExtraction: true,
                 noOfBatterySlots: 3,
-                leds: {
-                    Module: LedModule,
-                    count: 1,
-                },
                 BatteryProfiler,
+                ChargerModule,
                 FuelGaugeModule,
-                UsbCurrentLimiterModule,
+                LowPowerModule,
                 OnBoardLoadModule,
                 ResetModule,
+                SysRegModule,
                 TimerConfigModule,
-                LowPowerModule,
             },
             1,
             {
