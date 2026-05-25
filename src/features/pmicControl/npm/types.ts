@@ -411,9 +411,11 @@ export const POFPolarityValues = ['Active low', 'Active high'] as const;
 export type POFPolarity = (typeof POFPolarityValues)[number];
 
 export type POF = {
-    enable: boolean;
-    polarity: POFPolarity;
-    threshold: number;
+    enabled?: boolean;
+    polarity?: POFPolarity;
+    resetThreshold: number;
+    warnActive?: boolean;
+    warnThreshold?: number;
 };
 
 export type VBusDpm = VBusDpm1012;
@@ -1183,23 +1185,32 @@ export interface LedModule {
 }
 
 export interface PofModule {
+    callbacks: (() => void)[];
+    defaults: POF;
     get: {
         all: () => void;
-        enable: () => void;
-        polarity: () => void;
-        threshold: () => void;
+        resetThreshold: () => void;
+
+        enabled?: () => void;
+        polarity?: () => void;
+        status?: () => void;
+        warnThreshold?: () => void;
     };
     set: {
-        all(pof: POF): Promise<void>;
-        enabled(enable: boolean): Promise<void>;
-        threshold(threshold: number): Promise<void>;
-        polarity(polarity: POFPolarity): Promise<void>;
+        all: (value: POF) => Promise<void>;
+        resetThreshold: (value: number) => Promise<void>;
+
+        enabled?: (value: boolean) => Promise<void>;
+        polarity?: (value: POFPolarity) => Promise<void>;
+        warnThreshold?: (value: number) => Promise<void>;
     };
-    callbacks: (() => void)[];
     ranges: {
-        threshold: Range;
+        resetThreshold: Range;
+        warnThreshold?: Range;
     };
-    defaults: POF;
+    values: {
+        polarity?: { label: string; value: POFPolarity }[];
+    };
 }
 
 export interface SysRegModule {
