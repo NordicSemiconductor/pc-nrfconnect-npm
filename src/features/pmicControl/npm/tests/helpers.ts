@@ -25,6 +25,7 @@ import {
     type PmicDialog,
     type POF,
     type ResetConfig,
+    type SysReg,
     type TimerConfig,
     type USBPower,
 } from '../types';
@@ -81,6 +82,8 @@ export const setupMocksBase = (
         (_partialUpdate: Partial<ResetConfig>) => {},
     );
 
+    const mockOnSysRegUpdate = jest.fn((_partialUpdate: Partial<SysReg>) => {});
+
     const mockOnUsbPower = jest.fn((_partialUpdate: Partial<USBPower>) => {});
 
     const mockOnErrorLogs = jest.fn((_msg: Partial<ErrorLogs>) => {});
@@ -104,6 +107,7 @@ export const setupMocksBase = (
     pmic.onTimerConfigUpdate(mockOnTimerConfigUpdate);
     pmic.onLowPowerUpdate(mockOnLowPowerUpdate);
     pmic.onResetUpdate(mockOnResetUpdate);
+    pmic.onSysRegUpdate(mockOnSysRegUpdate);
     pmic.onChargingStatusUpdate(mockOnChargingStatusUpdate);
     pmic.onFuelGaugeUpdate(mockOnFuelGaugeUpdate);
     pmic.onLdoUpdate(mockOnLdoUpdate);
@@ -133,6 +137,7 @@ export const setupMocksBase = (
         mockOnTimerConfigUpdate,
         mockOnLowPowerUpdate,
         mockOnResetUpdate,
+        mockOnSysRegUpdate,
         mockOnLoggingEvent,
         mockOnPmicStateChange,
         mockOnReboot,
