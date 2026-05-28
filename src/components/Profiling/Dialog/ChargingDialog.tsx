@@ -123,7 +123,21 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         onClick={async () => {
                             dispatch(setProfilingStage('Resting'));
                             try {
-                                await npmDevice?.pofModule?.set.threshold(2.6);
+                                const deviceType = npmDevice?.deviceType;
+                                if (deviceType !== undefined) {
+                                    if (deviceType === 'npm1012') {
+                                        await npmDevice?.pofModule?.set.resetThreshold(
+                                            2.55,
+                                        );
+                                    } else if (
+                                        deviceType === 'npm1300' ||
+                                        deviceType === 'npm1304'
+                                    ) {
+                                        await npmDevice?.pofModule?.set.resetThreshold(
+                                            2.6,
+                                        );
+                                    }
+                                }
                                 npmDevice?.setAutoRebootDevice(false);
                                 await npmDevice?.chargerModule?.set.enabled(
                                     false,
