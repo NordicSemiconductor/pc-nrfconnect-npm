@@ -17,6 +17,7 @@ import {
 } from '../pmicHelpers';
 import {
     type AdcSample,
+    type ErrorLogs,
     type FuelGauge,
     type LoggingEvent,
     type OnBoardLoad,
@@ -70,7 +71,7 @@ export default class Npm1012 extends BaseNpmDevice {
             {
                 reset: true,
                 charger: true,
-                sensor: false,
+                sensor: true,
             },
         );
 
@@ -119,7 +120,27 @@ export default class Npm1012 extends BaseNpmDevice {
     }
 
     private processModulePmic({ message }: LoggingEvent) {
-        switch (message) {
+        const resetOrError = message.split(': ');
+        const resetOrErrorMessage = resetOrError[0];
+        const resetOrErrorValues = resetOrError[1]?.split(',') ?? [];
+
+        switch (resetOrErrorMessage) {
+            case 'Charger error':
+                this.eventEmitter.emit('onErrorLogs', {
+                    chargerError: resetOrErrorValues,
+                } satisfies ErrorLogs);
+                break;
+            case 'Error sensor state':
+                this.eventEmitter.emit('onErrorLogs', {
+                    sensorError: resetOrErrorValues,
+                } satisfies ErrorLogs);
+                break;
+            case 'Reset reason':
+                this.eventEmitter.emit('onErrorLogs', {
+                    resetCause: resetOrErrorValues,
+                } satisfies ErrorLogs);
+                break;
+
             case 'No response from PMIC.':
                 if (this.pmicState !== 'pmic-disconnected') {
                     this.pmicState = 'pmic-disconnected';
@@ -128,7 +149,6 @@ export default class Npm1012 extends BaseNpmDevice {
                 break;
             case 'PMIC available. Application can be restarted.':
                 if (this.pmicState === 'pmic-pending-rebooting') return;
-
                 if (this.autoReboot) {
                     this.kernelReset();
                     this.pmicState = 'pmic-pending-rebooting';
