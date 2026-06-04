@@ -93,8 +93,8 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     };
 
     const initPOF: POF = {
-        enable: true,
-        threshold: 2.8,
+        enabled: true,
+        resetThreshold: 2.8,
         polarity: 'Active high',
     };
 
@@ -183,8 +183,8 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             },
         ],
         pof: {
-            enable: false,
-            threshold: 2.4,
+            enabled: false,
+            resetThreshold: 2.4,
             polarity: 'Active low',
         },
         timerConfig: {
