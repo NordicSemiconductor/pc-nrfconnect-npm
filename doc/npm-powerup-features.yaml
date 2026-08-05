@@ -239,7 +239,7 @@ shared_features:
 supported_devices:
   - device: nPM 1300 EK
     pca: PCA10152
-    verification_version:
+    verification_version: 2.2.4
     support:
       enter_hibernate_pt_mode: unsupported
       enter_break_to_wake_mode: unsupported
