@@ -1,0 +1,431 @@
+app:
+  id: npm-powerup
+  name: nPM PowerUP
+  repo: pc-nrfconnect-npm
+
+statuses: [full, unsupported, not_applicable]
+
+general_app_features:
+  - id: select_device
+    name: Select device
+    description: Select a connected PMIC Evaluation Kit to connect to it
+  - id: select_virtual_device_offline_mode
+    name: Select virtual device (offline mode)
+    description: Select a virtual device to explore PMIC configuration options without connected hardware
+  - id: check_program_controller_firmware
+    name: Check/program controller firmware
+    description: Check the nPM Controller firmware on selection and prompt to program required firmware
+  - id: export_configuration
+    name: Export configuration
+    description: Export the PMIC configuration to an .overlay or JSON file
+  - id: load_configuration
+    name: Load configuration
+    description: Load a PMIC configuration from a JSON file and update all settings
+  - id: open_serial_terminal
+    name: Open Serial Terminal
+    description: Open the Serial Terminal app in a separate window
+  - id: reset_device
+    name: Reset device
+    description: Reset the PMIC and nPM Controller, restoring the default configuration
+  - id: record_events
+    name: Record events
+    description: Record terminal log events to CSV files in a selected directory
+  - id: configure_reporting_rate
+    name: Configure reporting rate
+    description: Configure the data reporting rate affecting graph and battery status frequency
+  - id: display_connection_status
+    name: Display connection status
+    description: Show the connection status to the selected device
+  - id: charger_control_and_monitoring
+    name: Charger control and monitoring
+    description: Control and monitor the PMIC charging settings and status
+  - id: estimate_time_to_full_time_to_empty
+    name: "Estimate time-to-full / time-to-empty"
+    description: "Provide charge/discharge time estimates using built-in battery models"
+  - id: display_state_of_charge_soc
+    name: Display State of Charge (SOC)
+    description: Display the battery State of Charge percentage
+  - id: enable_disable_voltage_regulators
+    name: Enable/disable voltage regulators
+    description: Enable or disable specific regulators (BUCK, LDO, Boost)
+  - id: set_regulator_output_retention_voltage
+    name: Set regulator output/retention voltage
+    description: Set the output and retention voltage for each regulator and monitor status
+  - id: configure_ldo_load_switch_mode
+    name: Configure LDO / Load Switch mode
+    description: Choose LDO or Load Switch mode and set output voltage (VOUTLDO)
+  - id: configure_ldo_active_discharge_on_off_control
+    name: "Configure LDO active discharge / on-off control"
+    description: Configure Active Discharge and On/Off Control options for a Load Switch/LDO
+  - id: configure_ldo_soft_start
+    name: Configure LDO Soft Start
+    description: Set the soft start current limit for the LDO output ramp
+  - id: read_pmic_hardware_revision
+    name: Read PMIC hardware revision
+    description: "Read the PMIC revision on connection to enable/disable revision-dependent controls"
+  - id: configure_gpio_and_led_pins
+    name: Configure GPIO and LED pins
+    description: Configure the GPIO and LED pins on the PMIC device
+  - id: configure_shphld_debounce_time
+    name: Configure SHPHLD debounce time
+    description: "Set the SHPHLD_DEB_HIB debounce period for low power wake-up"
+  - id: configure_reset_pin_selection
+    name: Configure reset pin selection
+    description: Select the reset pin (e.g. PG/RESET)
+  - id: toggle_long_press_reset
+    name: Toggle Long Press Reset
+    description: Enable or disable long press reset
+  - id: configure_long_press_reset_debounce
+    name: Configure Long Press Reset debounce
+    description: Set the long press reset debounce time
+  - id: configure_vbus_input_current_limiter
+    name: Configure Vbus input current limiter
+    description: "Configure the Vbus input current limiter (device-dependent)"
+  - id: graph_real_time_monitoring
+    name: "Graph real-time monitoring"
+    description: Monitor voltage, current, temperature, internal resistance, and SOC over time
+  - id: toggle_live_monitoring
+    name: Toggle live monitoring
+    description: "Enable or disable real-time graph monitoring via the Live toggle"
+  - id: graph_mouse_over_details
+    name: "Graph mouse-over details"
+    description: Display the graphs details on hover
+  - id: enable_fuel_gauge
+    name: Enable fuel gauge
+    description: Enable fuel gauge evaluation for the active battery model
+  - id: select_active_battery_model
+    name: Select active battery model
+    description: Select the battery model used for fuel gauge evaluation
+  - id: add_new_active_battery_model
+    name: Add new active battery model
+    description: "Add a vendor-profiled or custom battery model as the active model"
+  - id: load_custom_battery_model_to_soc
+    name: Load custom battery model to SoC
+    description: Load a generated JSON battery model to the host SoC of the EK
+  - id: configure_battery_health_tracking
+    name: Configure battery health tracking
+    description: Configure battery health options including battery replacement detection and quick convergence
+  - id: enter_ship_mode
+    name: Enter Ship Mode
+    description: Activate Ship Mode to isolate the battery and minimize quiescent current
+  - id: enter_hibernate_mode
+    name: Enter Hibernate Mode
+    description: "Activate Hibernate Mode to isolate the battery, with optional wake-up timer"
+  - id: restart_application
+    name: Restart application
+    description: Restart the app via a keyboard shortcut (Ctrl+R / Command+R)
+
+device_specific_features:
+  - id: enter_hibernate_pt_mode
+    name: Enter Hibernate PT Mode
+    description: "Enter Hibernate pass-through mode (nPM2100) with BOOST in pass-through and Load Switch/LDO disabled"
+  - id: enter_break_to_wake_mode
+    name: "Enter Break-to-wake Mode"
+    description: "Enter Break-to-wake mode (nPM2100) where disconnecting the SHPHLD-GND wire wakes the device"
+  - id: toggle_power_off_button
+    name: Toggle Power Off Button
+    description: Enable or disable the Power Off Button (nPM2100)
+  - id: power_cycle
+    name: Power Cycle
+    description: Reset the device and perform a power cycle
+  - id: select_power_source
+    name: Select power source
+    description: Select Battery or USB power source for nPM2100
+  - id: auto_detect_battery_type
+    name: "Auto-detect battery type"
+    description: Automatically detect the connected battery type (nPM2100 Battery mode)
+  - id: configure_power_failure
+    name: Configure power failure
+    description: "Configure Power Failure (device-dependent)"
+  - id: save_overwrite_battery_health_profile
+    name: Save/overwrite battery health profile
+    description: Save the fuel gauge battery health state or overwrite it with a saved state
+  - id: profile_battery
+    name: Profile battery
+    description: Create a custom battery profile and collect measurement data across temperatures
+  - id: auto_process_profiling_measurement_data
+    name: "Auto-process profiling measurement data"
+    description: Automatically process measurement data into a battery model file per temperature
+  - id: auto_merge_temperature_profiles
+    name: "Auto-merge temperature profiles"
+    description: Automatically merge individual temperature models into a final battery model
+  - id: save_battery_model_json_inc
+    name: Save battery model (JSON/INC)
+    description: Save the generated battery model as JSON and/or INC files
+  - id: reload_projects
+    name: Reload projects
+    description: Refresh the list of custom projects and profiles
+  - id: add_existing_project
+    name: Add existing project
+    description: Add a custom project from a JSON file
+  - id: create_new_project
+    name: Create new project
+    description: Create a new custom project template without collecting data
+  - id: edit_project
+    name: Edit project
+    description: Edit custom project settings
+  - id: remove_project
+    name: Remove project
+    description: Remove a custom project including all its profiles
+  - id: open_project_folder
+    name: Open project folder
+    description: Open the project directory in File Explorer
+  - id: add_profile_to_project
+    name: Add profile to project
+    description: Add a battery profile with a temperature and CSV data file to a project
+  - id: edit_profile
+    name: Edit profile
+    description: Edit an individual battery profile
+  - id: remove_profile
+    name: Remove profile
+    description: Remove an individual battery profile
+  - id: use_bundled_pre_profiled_battery_model
+    name: "Use bundled pre-profiled battery model"
+    description: "Access battery models pre-profiled by Nordic Semiconductor"
+  - id: write_bundled_model_to_controller
+    name: Write bundled model to controller
+    description: Write a bundled battery model to a controller battery model slot
+  - id: save_bundled_model_to_file
+    name: Save bundled model to file
+    description: Save a bundled battery model to a JSON or INC file
+  - id: import_csv_data_file
+    name: Import CSV data file
+    description: Import a CSV data file for a temperature profile into a project
+  - id: include_exclude_profile_temperatures
+    name: Include/exclude profile temperatures
+    description: Toggle which temperature profiles are included in processing
+  - id: process_included_temperature_data
+    name: Process included temperature data
+    description: Merge and process only the included temperature profiles into a battery model
+  - id: process_single_profile_data
+    name: Process single profile data
+    description: Process the data for a single temperature profile
+  - id: write_battery_model_to_controller_project
+    name: Write battery model to controller (project)
+    description: "Write a project's battery model to the nPM Controller on the EK"
+  - id: write_single_profile_battery_model
+    name: Write single profile battery model
+    description: "Write a single profile's battery model to the nPM Controller"
+
+shared_features:
+  - id: restore_defaults
+    name: Restore defaults
+    description: "Restore all app's settings to default"
+  - id: give_feedback
+    name: Give Feedback
+    description: Send a feedback message
+  - id: open_documentation
+    name: Open Documentation
+    description: Open external documentation page
+  - id: verbose_logging
+    name: Verbose Logging
+    description: Turn on verbose logging and restart the app
+  - id: create_system_report
+    name: Create system report
+    description: Generate a txt document with detailed report
+  - id: show_log
+    name: Show Log
+    description: Toggle log window
+  - id: autoscroll_log
+    name: Autoscroll log
+    description: Toggle log window autoscroll
+  - id: open_log_file
+    name: Open log file
+    description: Open the current log file in a text editor
+  - id: clear_log
+    name: Clear Log
+    description: Clear the log window
+
+supported_devices:
+  - device: nPM 1300 EK
+    pca: PCA10152
+    verification_version:
+    support:
+      enter_hibernate_pt_mode: unsupported
+      enter_break_to_wake_mode: unsupported
+      toggle_power_off_button: unsupported
+      power_cycle: unsupported
+      select_power_source: unsupported
+      auto_detect_battery_type: unsupported
+      configure_power_failure: full
+      save_overwrite_battery_health_profile: full
+      profile_battery: full
+      auto_process_profiling_measurement_data: full
+      auto_merge_temperature_profiles: full
+      save_battery_model_json_inc: full
+      reload_projects: full
+      add_existing_project: full
+      create_new_project: full
+      edit_project: full
+      remove_project: full
+      open_project_folder: full
+      add_profile_to_project: full
+      edit_profile: full
+      remove_profile: full
+      use_bundled_pre_profiled_battery_model: full
+      write_bundled_model_to_controller: full
+      save_bundled_model_to_file: full
+      import_csv_data_file: full
+      include_exclude_profile_temperatures: full
+      process_included_temperature_data: full
+      process_single_profile_data: full
+      write_battery_model_to_controller_project: full
+      write_single_profile_battery_model: full
+
+  - device: nPM 1304 EK
+    pca: PCA10195
+    verification_version:
+    support:
+      enter_hibernate_pt_mode: unsupported
+      enter_break_to_wake_mode: unsupported
+      toggle_power_off_button: unsupported
+      power_cycle: unsupported
+      select_power_source: unsupported
+      auto_detect_battery_type: unsupported
+      configure_power_failure: full
+      save_overwrite_battery_health_profile: full
+      profile_battery: full
+      auto_process_profiling_measurement_data: full
+      auto_merge_temperature_profiles: full
+      save_battery_model_json_inc: full
+      reload_projects: full
+      add_existing_project: full
+      create_new_project: full
+      edit_project: full
+      remove_project: full
+      open_project_folder: full
+      add_profile_to_project: full
+      edit_profile: full
+      remove_profile: full
+      use_bundled_pre_profiled_battery_model: full
+      write_bundled_model_to_controller: full
+      save_bundled_model_to_file: full
+      import_csv_data_file: full
+      include_exclude_profile_temperatures: full
+      process_included_temperature_data: full
+      process_single_profile_data: full
+      write_battery_model_to_controller_project: full
+      write_single_profile_battery_model: full
+
+  - device: nPM 2100 EK
+    pca: PCA10170
+    verification_version:
+    support:
+      enter_hibernate_pt_mode: full
+      enter_break_to_wake_mode: full
+      toggle_power_off_button: full
+      power_cycle: full
+      select_power_source: full
+      auto_detect_battery_type: full
+      configure_power_failure: unsupported
+      save_overwrite_battery_health_profile: unsupported
+      profile_battery: unsupported
+      auto_process_profiling_measurement_data: unsupported
+      auto_merge_temperature_profiles: unsupported
+      save_battery_model_json_inc: unsupported
+      reload_projects: unsupported
+      add_existing_project: unsupported
+      create_new_project: unsupported
+      edit_project: unsupported
+      remove_project: unsupported
+      open_project_folder: unsupported
+      add_profile_to_project: unsupported
+      edit_profile: unsupported
+      remove_profile: unsupported
+      use_bundled_pre_profiled_battery_model: unsupported
+      write_bundled_model_to_controller: unsupported
+      save_bundled_model_to_file: unsupported
+      import_csv_data_file: unsupported
+      include_exclude_profile_temperatures: unsupported
+      process_included_temperature_data: unsupported
+      process_single_profile_data: unsupported
+      write_battery_model_to_controller_project: unsupported
+      write_single_profile_battery_model: unsupported
+
+unsupported_devices:
+  - device: "Nordic Thingy:52"
+    pca: PCA20020
+
+  - device: "Nordic Thingy:53"
+    pca: PCA20053
+
+  - device: "Nordic Thingy:91"
+    pca: PCA20035
+
+  - device: "Nordic Thingy:91 X"
+    pca: PCA20049
+
+  - device: nRF51 DK
+    pca: PCA10028
+
+  - device: nRF51 Dongle
+    pca: PCA10031
+
+  - device: nRF52 DK
+    pca: PCA10040
+
+  - device: nRF52833 DK
+    pca: PCA10100
+
+  - device: nRF52840 DK
+    pca: PCA10056
+
+  - device: nRF52840 Dongle
+    pca: PCA10059
+
+  - device: nRF5340 Audio DK
+    pca: PCA10121
+
+  - device: nRF5340 DK
+    pca: PCA10095
+
+  - device: nRF54H20 DK
+    pca: PCA10175
+
+  - device: nRF54L15 DK
+    pca: PCA10156
+
+  - device: nRF54LC10 DK
+    pca: PCA10226
+
+  - device: nRF54LM20 DK
+    pca: PCA10184
+
+  - device: nRF54LM20 Dongle
+    pca: PCA10208
+
+  - device: nRF54LS05 DK
+    pca: PCA10214
+
+  - device: nRF54LV10 DK
+    pca: PCA10188
+
+  - device: nRF7002 DK
+    pca: PCA10143
+
+  - device: nRF9131 EK
+    pca: PCA10165
+
+  - device: nRF9151 DK
+    pca: PCA10171
+
+  - device: nRF9151 SMA DK
+    pca: PCA10201
+
+  - device: nRF9160 DK
+    pca: PCA10090
+
+  - device: nRF9161 DK
+    pca: PCA10153
+
+  - device: nRF9251 DK
+    pca: PCA10218
+
+  - device: nRF93M1 DK
+    pca: PCA10232
+
+  - device: nRF93M1 DK
+    pca: PCA10237
+
+  - device: PPK2
+    pca: PCA63100
