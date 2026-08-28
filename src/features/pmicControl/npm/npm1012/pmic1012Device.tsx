@@ -30,7 +30,7 @@ import FuelGaugeModule from './fuelGauge';
 import GpioLedDrvModule from './gpioleddrv';
 import LdoModule, { toLdoExport } from './ldo';
 import LedModule, { toLedExport } from './led';
-import LowPowerModule from './lowPower';
+import LowPowerModule, { toLowPowerExport } from './lowPower';
 import OnBoardLoadModule from './onBoardLoad';
 import PofModule from './pof';
 import ResetModule from './reset';
@@ -236,19 +236,19 @@ export default class Npm1012 extends BaseNpmDevice {
                 enabled: currentState.fuelGaugeSettings.enabled,
                 chargingSamplingRate:
                     currentState.fuelGaugeSettings.chargingSamplingRate,
-                discardPosiiveDeltaZ:
-                    currentState.fuelGaugeSettings.discardPosiiveDeltaZ,
             },
             gpioLedDrvs: [...currentState.gpioleddrvs],
             gpios: [...currentState.gpios],
             ldos: [...currentState.ldos.map(toLdoExport)],
             leds: [...currentState.leds.map(toLedExport)],
-            lowPower: currentState.lowPower,
-            reset: currentState.reset,
-            timerConfig: currentState.timerConfig,
-            usbPower: currentState.usbPower
-                ? { currentLimiter: currentState.usbPower.currentLimiter }
+            lowPower: currentState.lowPower
+                ? toLowPowerExport(currentState.lowPower)
                 : undefined,
+            onBoardLoad: currentState.onBoardLoad,
+            pof: currentState.pof,
+            reset: currentState.reset,
+            sysReg: currentState.sysReg,
+            timerConfig: currentState.timerConfig,
             fileFormatVersion: 2 as const,
         };
     }
