@@ -509,6 +509,7 @@ export type ResetConfig = {
     longPressResetPinSel: LongPressResetPinSel;
 
     longPressResetDebounce?: LongPressResetDebounce;
+    longPressResetDebounceSelDisabled?: boolean;
     longPressResetEnable?: boolean;
     powerDownWait?: PowerDownWait;
     resetReason?: ResetReason;
@@ -1419,6 +1420,10 @@ export type LowPowerExport = Omit<
     | 'vbusHibernateWaitingForChargeComplete'
     | 'vbusStandbyWaitingForChargeComplete'
 >;
+export type ResetExport = Omit<
+    ResetConfig,
+    'longPressResetDebounceSelDisabled'
+>;
 export type SysRegExport = Omit<SysReg, ''>;
 
 export interface NpmExportV1 {
@@ -1451,7 +1456,7 @@ export interface NpmExportV2 {
     pof?: POF;
     onBoardLoad?: OnBoardLoad;
     lowPower?: LowPowerExport;
-    reset?: ResetConfig;
+    reset?: ResetExport;
     sysReg?: SysRegExport;
     timerConfig?: TimerConfig;
     fuelGaugeSettings: FuelGaugeExport;
