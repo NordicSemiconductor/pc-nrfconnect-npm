@@ -71,15 +71,13 @@ export default class Module implements TimerConfigModule {
     }
 
     getPrescalerMultiplier(timerConfig: TimerConfig) {
-        if (timerConfig.prescaler === undefined) {
-            return 16;
-        }
-
         switch (timerConfig.prescaler) {
             case 'Slow':
                 return 16;
             case 'Fast':
                 return 2;
+            default:
+                return 16;
         }
     }
 }
