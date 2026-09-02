@@ -76,9 +76,12 @@ export default (
                 '(\\w+)',
             ),
             res => {
-                const result = parseColonBasedAnswer(res);
+                const result = parseColonBasedAnswer(
+                    res,
+                ) as LongPressResetPinSel;
                 eventEmitter.emitPartialEvent<ResetConfig>('onResetUpdate', {
-                    longPressResetPinSel: result as LongPressResetPinSel,
+                    longPressResetDebounceSelDisabled: result === 'OFF',
+                    longPressResetPinSel: result,
                 });
             },
             noop,

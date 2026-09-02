@@ -60,6 +60,7 @@ export default class Module implements ResetModule {
         return {
             longPressResetPinSel: 'OFF',
             longPressResetDebounce: '3s',
+            longPressResetDebounceSelDisabled: true,
             longPressResetEnable: true,
             powerDownWait: '350ms',
         };

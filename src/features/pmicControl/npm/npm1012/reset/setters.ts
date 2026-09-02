@@ -104,6 +104,7 @@ export class ResetSet {
                 this.eventEmitter.emitPartialEvent<ResetConfig>(
                     'onResetUpdate',
                     {
+                        longPressResetDebounceSelDisabled: value === 'OFF',
                         longPressResetPinSel: value,
                     },
                 );
