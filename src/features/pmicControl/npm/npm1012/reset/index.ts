@@ -7,6 +7,7 @@
 import {
     type ModuleParams,
     type ResetConfig,
+    type ResetExport,
     type ResetModule,
 } from '../../types';
 import resetCallbacks from './callbacks';
@@ -20,6 +21,13 @@ import {
     powerDownWaitKeys,
     powerDownWaitValues,
 } from './types';
+
+export const toResetExport = (config: ResetConfig): ResetExport => ({
+    longPressResetPinSel: config.longPressResetPinSel,
+    longPressResetDebounce: config.longPressResetDebounce,
+    longPressResetEnable: config.longPressResetEnable,
+    powerDownWait: config.powerDownWait,
+});
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-underscore-dangle */
