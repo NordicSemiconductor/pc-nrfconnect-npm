@@ -33,7 +33,7 @@ import LedModule, { toLedExport } from './led';
 import LowPowerModule, { toLowPowerExport } from './lowPower';
 import OnBoardLoadModule from './onBoardLoad';
 import PofModule from './pof';
-import ResetModule from './reset';
+import ResetModule, { toResetExport } from './reset';
 import SysRegModule from './sysReg';
 import TimerConfigModule from './timerConfig';
 
@@ -246,7 +246,9 @@ export default class Npm1012 extends BaseNpmDevice {
                 : undefined,
             onBoardLoad: currentState.onBoardLoad,
             pof: currentState.pof,
-            reset: currentState.reset,
+            reset: currentState.reset
+                ? toResetExport(currentState.reset)
+                : undefined,
             sysReg: currentState.sysReg,
             timerConfig: currentState.timerConfig,
             fileFormatVersion: 2 as const,
