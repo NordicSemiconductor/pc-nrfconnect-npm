@@ -873,30 +873,14 @@ export default () => {
                 setPaneHidden({
                     name: 'System Features',
                     hidden:
-                        !(
-                            npmDevice?.lowPowerModule && // npm1012 features
-                            npmDevice.pofModule &&
-                            npmDevice.resetModule &&
-                            npmDevice.sysRegModule &&
-                            npmDevice.timerConfigModule &&
-                            SupportsErrorLogs(npmDevice)
-                        ) &&
-                        !(
-                            npmDevice?.lowPowerModule && // npm130x features
-                            npmDevice.resetModule &&
-                            npmDevice.timerConfigModule &&
-                            npmDevice.pofModule &&
-                            npmDevice.usbCurrentLimiterModule &&
-                            SupportsErrorLogs(npmDevice)
-                        ) &&
-                        !(
-                            npmDevice?.lowPowerModule && // npm2100 features
-                            npmDevice.resetModule &&
-                            npmDevice.timerConfigModule &&
+                        !npmDevice ||
+                        (!npmDevice.lowPowerModule &&
                             !npmDevice.pofModule &&
+                            !npmDevice.resetModule &&
+                            !npmDevice.sysRegModule &&
+                            !npmDevice.timerConfigModule &&
                             !npmDevice.usbCurrentLimiterModule &&
-                            !SupportsErrorLogs(npmDevice)
-                        ),
+                            !SupportsErrorLogs(npmDevice)),
                 }),
             );
             dispatch(
