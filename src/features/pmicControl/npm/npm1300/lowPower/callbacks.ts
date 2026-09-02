@@ -13,8 +13,8 @@ import {
     toRegex,
     toValueRegex,
 } from '../../pmicHelpers';
-import { type LowPowerConfig, type TimeToActive } from '../../types';
-import { timeToActiveValues } from './types';
+import { type LowPowerConfig } from '../../types';
+import { type TimeToActive, timeToActiveValues } from './types';
 
 export default (
     shellParser: ShellParser | undefined,

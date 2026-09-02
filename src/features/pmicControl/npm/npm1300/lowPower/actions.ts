@@ -18,15 +18,11 @@ export class LowPowerActions {
     ) {}
 
     enterShipMode() {
-        return new Promise<void>(resolve => {
-            this.sendCommand(`npmx ship mode ship`);
-            resolve();
-        });
+        this.sendCommand(`npmx ship mode ship`);
+        return Promise.resolve();
     }
     enterShipHibernateMode() {
-        return new Promise<void>(resolve => {
-            this.sendCommand(`npmx ship mode hibernate`);
-            resolve();
-        });
+        this.sendCommand(`npmx ship mode hibernate`);
+        return Promise.resolve();
     }
 }
