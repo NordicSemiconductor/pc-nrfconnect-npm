@@ -98,7 +98,9 @@ export default ({
                         item => item.value === reset.longPressResetDebounce,
                     ) ?? resetModule.values.longPressResetDebounce[0]
                 }
-                disabled={disabled || reset.longPressResetPinSel === 'OFF'}
+                disabled={
+                    disabled || reset.longPressResetDebounceSelDisabled === true
+                }
             />
         )}
 
