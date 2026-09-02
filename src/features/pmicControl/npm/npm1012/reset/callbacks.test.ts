@@ -75,6 +75,7 @@ describe('PMIC 1012 - Command callbacks', () => {
 
         expect(mockOnResetUpdate).toBeCalledTimes(1);
         expect(mockOnResetUpdate).toBeCalledWith({
+            longPressResetDebounceSelDisabled: false,
             longPressResetPinSel: value,
         });
     });
