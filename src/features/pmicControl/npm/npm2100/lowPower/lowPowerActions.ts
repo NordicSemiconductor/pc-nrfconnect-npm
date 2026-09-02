@@ -17,18 +17,12 @@ export class LowPowerActions {
     ) {}
 
     enterShipMode() {
-        return new Promise<void>(resolve => {
-            this.sendCommand(`npm2100 low_power_control ship_mode set ENABLE`);
-            resolve();
-        });
+        this.sendCommand(`npm2100 low_power_control ship_mode set ENABLE`);
+        return Promise.resolve();
     }
     enterShipHibernateMode() {
-        return new Promise<void>(resolve => {
-            this.sendCommand(
-                `npm2100 low_power_control hibernate_mode set ENABLE`,
-            );
-            resolve();
-        });
+        this.sendCommand(`npm2100 low_power_control hibernate_mode set ENABLE`);
+        return Promise.resolve();
     }
 
     enterHibernatePtMode() {
