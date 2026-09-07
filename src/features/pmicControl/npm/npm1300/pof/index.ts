@@ -54,7 +54,7 @@ export default class Module implements PofModule {
         return {
             enabled: true,
             resetThreshold: 2.8,
-            polarity: 'Active high',
+            polarity: 'Active High',
         };
     }
     get values(): PofModule['values'] {
