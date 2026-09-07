@@ -22,10 +22,10 @@ describe('PMIC 1300 - Setters Offline tests', () => {
     });
 
     test('Set set pof polarity ', async () => {
-        await pmic.pofModule?.set.polarity?.('Active low');
+        await pmic.pofModule?.set.polarity?.('Active Low');
 
         expect(mockOnPOFUpdate).toBeCalledTimes(1);
-        expect(mockOnPOFUpdate).toBeCalledWith({ polarity: 'Active low' });
+        expect(mockOnPOFUpdate).toBeCalledWith({ polarity: 'Active Low' });
     });
 });
 
