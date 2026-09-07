@@ -407,7 +407,7 @@ export type GPIOLEDDrv = {
     state: GPIOLEDDrvState;
 };
 
-export const POFPolarityValues = ['Active low', 'Active high'] as const;
+export const POFPolarityValues = ['Active Low', 'Active High'] as const;
 export type POFPolarity = (typeof POFPolarityValues)[number];
 
 export type POF = {
