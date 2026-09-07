@@ -5,9 +5,9 @@
  */
 
 export const longPressResetPinSelKV = [
+    ['one_button', 'One Button (SHPHLD)'],
+    ['two_button', 'Two Buttons (SHPHLD and GPIO0)'],
     ['disabled', 'Disabled'],
-    ['one_button', 'One button (SHPHLD)'],
-    ['two_button', 'Two buttons (SHPHLD and GPIO0)'],
 ] as const;
 export const longPressResetPinSelKeys = longPressResetPinSelKV.map(kv => kv[0]);
 export const longPressResetPinSelValues = longPressResetPinSelKV.map(
