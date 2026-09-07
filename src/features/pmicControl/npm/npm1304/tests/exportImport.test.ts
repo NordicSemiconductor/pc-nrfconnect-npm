@@ -118,7 +118,7 @@ describe('PMIC 1304 - Apply Config ', () => {
     const initPOF: POF = {
         enabled: true,
         resetThreshold: 2.8,
-        polarity: 'Active high',
+        polarity: 'Active High',
     };
 
     const initTimerConfig: TimerConfig = {
@@ -267,7 +267,7 @@ describe('PMIC 1304 - Apply Config ', () => {
         pof: {
             enabled: false,
             resetThreshold: 2.4,
-            polarity: 'Active low',
+            polarity: 'Active Low',
         },
         timerConfig: {
             mode: npm1300TimerMode['General purpose'],
