@@ -34,7 +34,7 @@ export default ({
     disabled: boolean;
 }) => (
     <Card
-        title={<div className="tw-flex tw-justify-between">Reset control</div>}
+        title={<div className="tw-flex tw-justify-between">Reset Control</div>}
     >
         <Dropdown
             label={

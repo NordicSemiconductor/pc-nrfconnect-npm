@@ -45,7 +45,7 @@ export default ({
         <Card
             title={
                 <div className="tw-flex tw-justify-between tw-gap-1">
-                    Low Power control
+                    Low Power Control
                 </div>
             }
         >
@@ -96,7 +96,7 @@ export default ({
                             card={card}
                             item="HibernateWakeupByButton"
                         >
-                            Enable Hibernate wakeup by button
+                            Enable Hibernate Wakeup By Button
                         </DocumentationTooltip>
                     }
                     isToggled={lowPower.hibernateWakeupByButton}
@@ -264,7 +264,7 @@ export default ({
                             }}
                             disabled={disabled}
                         >
-                            Enter Hibernate PT Mode
+                            Enter Hibernate Pass-Through Mode
                         </Button>
                     </DocumentationTooltip>
                 )}
