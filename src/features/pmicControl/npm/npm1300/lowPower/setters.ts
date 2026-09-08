@@ -5,10 +5,7 @@
  */
 
 import { type NpmEventEmitter } from '../../pmicHelpers';
-import {
-    type npm1300LowPowerConfig,
-    type npm1300TimeToActive,
-} from '../../types';
+import { type LowPowerConfig, type TimeToActive } from '../../types';
 import { LowPowerGet } from './getters';
 
 export class LowPowerSet {
@@ -26,14 +23,14 @@ export class LowPowerSet {
         this.get = new LowPowerGet(sendCommand);
     }
 
-    async all(shipMode: npm1300LowPowerConfig) {
+    async all(shipMode: LowPowerConfig) {
         await Promise.allSettled([this.timeToActive(shipMode.timeToActive)]);
     }
 
-    timeToActive(timeToActive: npm1300TimeToActive) {
+    timeToActive(timeToActive: TimeToActive) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<npm1300LowPowerConfig>(
+                this.eventEmitter.emitPartialEvent<LowPowerConfig>(
                     'onLowPowerUpdate',
                     {
                         timeToActive,

@@ -18,6 +18,7 @@ import {
     getPOF,
     getReset,
     getShip,
+    getSysReg,
     getTimerConfig,
     getUsbPower,
 } from '../../features/pmicControl/pmicControlSlice';
@@ -26,6 +27,7 @@ import ErrorStatuses from './ErrorStatuses';
 import LowPower from './LowPower';
 import PowerFailure from './PowerFailure';
 import ResetControl from './ResetControl';
+import SysReg from './SysReg';
 import Timer from './Timer';
 import VBus from './VBus';
 
@@ -37,6 +39,7 @@ export default ({ active }: PaneProps) => {
     const reset = useSelector(getReset);
     const usbPower = useSelector(getUsbPower);
     const timerConfig = useSelector(getTimerConfig);
+    const sysReg = useSelector(getSysReg);
     const pmicState = useSelector(getPmicState);
 
     return active ? (
@@ -67,6 +70,13 @@ export default ({ active }: PaneProps) => {
                     pofModule={npmDevice.pofModule}
                     pof={pof}
                     disabled={disabled}
+                />
+            )}
+            {npmDevice?.sysRegModule && sysReg && (
+                <SysReg
+                    config={sysReg}
+                    disabled={disabled}
+                    module={npmDevice.sysRegModule}
                 />
             )}
             {npmDevice?.usbCurrentLimiterModule && usbPower && (

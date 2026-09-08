@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { type Range } from '@nordicsemiconductor/pc-nrfconnect-shared';
-
-import { type ModuleParams, type POF, type PofModule } from '../../types';
+import {
+    type ModuleParams,
+    type POF,
+    type PofModule,
+    POFPolarityValues,
+} from '../../types';
 import pofCallbacks from './callbacks';
 import { PofGet } from './getters';
 import { PofSet } from './setter';
@@ -37,9 +40,9 @@ export default class Module implements PofModule {
     get callbacks() {
         return this._callbacks;
     }
-    get ranges(): { threshold: Range } {
+    get ranges(): PofModule['ranges'] {
         return {
-            threshold: {
+            resetThreshold: {
                 min: 2.6,
                 max: 3.5,
                 decimals: 1,
@@ -49,9 +52,17 @@ export default class Module implements PofModule {
     }
     get defaults(): POF {
         return {
-            enable: true,
-            threshold: 2.8,
-            polarity: 'Active high',
+            enabled: true,
+            resetThreshold: 2.8,
+            polarity: 'Active High',
+        };
+    }
+    get values(): PofModule['values'] {
+        return {
+            polarity: POFPolarityValues.map(item => ({
+                label: item,
+                value: item,
+            })),
         };
     }
 }

@@ -15,7 +15,7 @@ import {
     toRegex,
     toValueRegexString,
 } from '../../pmicHelpers';
-import { type npm2100ResetReason, type ResetConfig } from '../../types';
+import { type ResetConfig, type ResetReason } from '../../types';
 import {
     type npm2100LongPressResetDebounce,
     npm2100LongPressResetDebounceValues,
@@ -71,7 +71,7 @@ export default (
                     eventEmitter.emitPartialEvent<ResetConfig>(
                         'onResetUpdate',
                         {
-                            resetPinSelection: selectFromTypeValues(
+                            longPressResetPinSel: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
                                 Object.values(npm2100ResetPinSelection),
                             ) as npm2100ResetPinSelection,
@@ -124,7 +124,7 @@ export default (
 
                     // Valid message
                     if (matches?.groups) {
-                        const resetReason: npm2100ResetReason = {
+                        const resetReason: ResetReason = {
                             reason: matches?.groups.reason,
                             bor: matches?.groups.bor,
                         };

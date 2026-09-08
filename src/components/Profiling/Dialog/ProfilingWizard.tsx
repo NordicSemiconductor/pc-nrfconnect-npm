@@ -29,8 +29,8 @@ import {
     getLdos,
     getNpmDevice,
     getPmicState,
-    getUsbPower,
     isBatteryConnected,
+    isUsbConnected,
     setBatteryConnected,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
@@ -84,9 +84,7 @@ export default () => {
     const profilingStage = useSelector(getProfilingStage);
     const profile = useSelector(getProfile);
     const batteryConnected = useSelector(isBatteryConnected);
-    const usbPower = useSelector(getUsbPower);
-    const usbPowered =
-        usbPower && usbPower.detectStatus !== 'No USB connection';
+    const usbConnected = useSelector(isUsbConnected);
     const ldos = useSelector(getLdos);
     const bucks = useSelector(getBucks);
     const fuelGauge = useSelector(getFuelGaugeEnabled);
@@ -237,7 +235,7 @@ export default () => {
             !initializing &&
             (profilingStage === 'Resting' || profilingStage === 'Profiling')
         ) {
-            if (usbPowered) {
+            if (usbConnected) {
                 npmDevice?.setAutoRebootDevice(true);
                 npmDevice?.batteryProfiler?.stopProfiling();
                 dispatch(
@@ -306,7 +304,7 @@ export default () => {
         npmDevice,
         pmicState,
         profilingStage,
-        usbPowered,
+        usbConnected,
     ]);
 
     useEffect(() => {

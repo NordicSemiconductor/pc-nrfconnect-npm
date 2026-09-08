@@ -21,8 +21,8 @@ import {
     getLdos,
     getNpmDevice,
     getPmicState,
-    getUsbPower,
     isBatteryConnected,
+    isUsbConnected,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
@@ -40,9 +40,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
     const profile = useSelector(getProfile);
     const charger = useSelector(getCharger);
     const pmicConnectionState = useSelector(getPmicState);
-    const usbPower = useSelector(getUsbPower);
-    const usbPowered =
-        usbPower && usbPower.detectStatus !== 'No USB connection';
+    const usbConnected = useSelector(isUsbConnected);
     const batteryConnected = useSelector(isBatteryConnected);
     const waitingForDevice = useSelector(getWaitingForDeviceTimeout);
     const profileIndex = useSelector(getProfileIndex);
@@ -64,7 +62,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     <DialogButton
                         disabled={
                             pmicConnectionState !== 'pmic-connected' ||
-                            !usbPowered // Do not add !batteryConnected as battery might be to low that it is not detected
+                            !usbConnected // Do not add !batteryConnected as battery might be to low that it is not detected
                         }
                         variant="primary"
                         onClick={async () => {
@@ -206,7 +204,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                 )}
                 {pmicConnectionState === 'pmic-connected' && (
                     <>
-                        {!usbPowered && (
+                        {!usbConnected && (
                             <Alert label="Action required: " variant="warning">
                                 You must connect <strong>USB PMIC</strong> to
                                 continue

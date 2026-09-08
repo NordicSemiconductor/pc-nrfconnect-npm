@@ -373,9 +373,9 @@ export const documentation: Documentation = {
     gpio0: gpioDoc(),
     gpio1: gpioDoc(),
     resetControl: {
-        LongPressResetSelectPin: [
+        LongPressResetPinSel: [
             {
-                title: 'Reset Pin Selection',
+                title: 'Long Press Reset',
                 content: [
                     <p key="p1">
                         Configure the pin to be used for reset control.
@@ -392,7 +392,7 @@ export const documentation: Documentation = {
         ],
         LongPressResetEnable: [
             {
-                title: 'Long Press Reset',
+                title: 'Long Press Reset Enable',
                 content: [
                     <p key="p1">
                         Configure whether to enable or disable Long Press Reset.

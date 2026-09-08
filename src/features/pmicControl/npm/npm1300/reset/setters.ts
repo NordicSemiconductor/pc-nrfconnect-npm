@@ -5,11 +5,7 @@
  */
 
 import { type NpmEventEmitter } from '../../pmicHelpers';
-import {
-    type LongPressReset,
-    type npm1300ResetConfig,
-    type ResetConfig,
-} from '../../types';
+import { type LongPressResetPinSel, type ResetConfig } from '../../types';
 import { ResetGet } from './getters';
 
 export class ResetSet {
@@ -27,28 +23,28 @@ export class ResetSet {
         this.get = new ResetGet(sendCommand);
     }
 
-    async all(shipMode: npm1300ResetConfig) {
+    async all(shipMode: ResetConfig) {
         await Promise.allSettled([
-            this.longPressReset(shipMode.longPressReset),
+            this.longPressResetPinSel(shipMode.longPressResetPinSel),
         ]);
     }
 
-    longPressReset(longPressReset: LongPressReset) {
+    longPressResetPinSel(longPressResetPinSel: LongPressResetPinSel) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<ResetConfig>(
                     'onResetUpdate',
                     {
-                        longPressReset,
+                        longPressResetPinSel,
                     },
                 );
                 resolve();
             } else {
                 this.sendCommand(
-                    `powerup_ship longpress set ${longPressReset}`,
+                    `powerup_ship longpress set ${longPressResetPinSel}`,
                     () => resolve(),
                     () => {
-                        this.get.longPressReset();
+                        this.get.longPressResetPinSel();
                         reject();
                     },
                 );

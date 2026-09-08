@@ -13,8 +13,20 @@ describe('PMIC 1012 - Request update commands', () => {
         jest.clearAllMocks();
     });
 
-    test('Request update vBusinCurrentLimiter', () => {
-        pmic.usbCurrentLimiterModule?.get.vBusInCurrentLimiter();
+    test('Request update vBusDpm', () => {
+        pmic.sysRegModule?.get.vBusDpm();
+
+        expect(mockEnqueueRequest).toBeCalledTimes(1);
+        expect(mockEnqueueRequest).toBeCalledWith(
+            'npm1012 sysreg vbusdpm get',
+            expect.anything(),
+            undefined,
+            true,
+        );
+    });
+
+    test('Request update vBusILim', () => {
+        pmic.sysRegModule?.get.vBusILim();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(
@@ -25,8 +37,8 @@ describe('PMIC 1012 - Request update commands', () => {
         );
     });
 
-    test('Request update usbPowered', () => {
-        pmic.usbCurrentLimiterModule?.get.usbPowered();
+    test('Request update vBusStatus', () => {
+        pmic.sysRegModule?.get.vBusStatus();
 
         expect(mockEnqueueRequest).toBeCalledTimes(1);
         expect(mockEnqueueRequest).toBeCalledWith(

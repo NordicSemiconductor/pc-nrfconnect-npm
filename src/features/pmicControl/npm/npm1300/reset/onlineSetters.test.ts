@@ -21,7 +21,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set ship reset longpress two_button', async () => {
-            await pmic.resetModule?.set.longPressReset?.('two_button');
+            await pmic.resetModule?.set.longPressResetPinSel?.('two_button');
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -44,13 +44,13 @@ describe('PMIC 1300 - Setters Online tests', () => {
             );
         });
 
-        test('Set setShipLongPressReset - Fail immediately - index: %p', async () => {
+        test('Set setShipLongPressResetPinSel - Fail immediately - index: %p', async () => {
             mockDialogHandler.mockImplementationOnce((dialog: PmicDialog) => {
                 dialog.onConfirm();
             });
 
             await expect(
-                pmic.resetModule?.set.longPressReset?.('one_button'),
+                pmic.resetModule?.set.longPressResetPinSel?.('one_button'),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

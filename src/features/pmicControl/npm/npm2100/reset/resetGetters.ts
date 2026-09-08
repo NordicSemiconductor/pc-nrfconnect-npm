@@ -14,23 +14,24 @@ export class ResetGet {
     ) {}
 
     all() {
-        this.pinSelection();
-        this.longPressReset();
         this.longPressResetDebounce();
+        this.longPressResetEnable();
+        this.longPressResetPinSel();
         this.resetReason();
-    }
-
-    pinSelection() {
-        this.sendCommand(`npm2100 reset_ctrl pin_selection get`);
-    }
-
-    longPressReset() {
-        this.sendCommand(`npm2100 reset_ctrl long_press_reset get`);
     }
 
     longPressResetDebounce() {
         this.sendCommand(`npm2100 reset_ctrl long_press_reset_debounce get`);
     }
+
+    longPressResetEnable() {
+        this.sendCommand(`npm2100 reset_ctrl long_press_reset get`);
+    }
+
+    longPressResetPinSel() {
+        this.sendCommand(`npm2100 reset_ctrl pin_selection get`);
+    }
+
     resetReason() {
         this.sendCommand(`npm2100 reset_ctrl reset_reason get`);
     }

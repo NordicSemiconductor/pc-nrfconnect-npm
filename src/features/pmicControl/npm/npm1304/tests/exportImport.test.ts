@@ -7,6 +7,7 @@
 import { toBuckExport } from '../../npm1300/buck';
 import { GPIOMode1300, GPIOPull1300 } from '../../npm1300/gpio/types';
 import { toLdoExport } from '../../npm1300/ldo';
+import { TimeToActive } from '../../npm1300/lowPower/types';
 import { npm1300TimerMode } from '../../npm1300/timerConfig/types';
 import {
     type Buck,
@@ -19,9 +20,6 @@ import {
     type Ldo,
     type LED,
     type LowPowerConfig,
-    type npm1300LowPowerConfig,
-    type npm1300TimerConfig,
-    npm1300TimeToActive,
     type NpmExportLatest,
     type OnBoardLoad,
     type PartialUpdate,
@@ -118,9 +116,9 @@ describe('PMIC 1304 - Apply Config ', () => {
     };
 
     const initPOF: POF = {
-        enable: true,
-        threshold: 2.8,
-        polarity: 'Active high',
+        enabled: true,
+        resetThreshold: 2.8,
+        polarity: 'Active High',
     };
 
     const initTimerConfig: TimerConfig = {
@@ -129,12 +127,12 @@ describe('PMIC 1304 - Apply Config ', () => {
         period: 0,
     };
 
-    const initShip: npm1300LowPowerConfig = {
-        timeToActive: npm1300TimeToActive['96ms'],
+    const initShip: LowPowerConfig = {
+        timeToActive: TimeToActive['96ms'],
         invPolarity: false,
     };
     const initReset: ResetConfig = {
-        longPressReset: 'two_button',
+        longPressResetPinSel: 'two_button',
     };
 
     const initUSBPower: Omit<USBPower, 'detectStatus'> = {
@@ -267,9 +265,9 @@ describe('PMIC 1304 - Apply Config ', () => {
             },
         ],
         pof: {
-            enable: false,
-            threshold: 2.4,
-            polarity: 'Active low',
+            enabled: false,
+            resetThreshold: 2.4,
+            polarity: 'Active Low',
         },
         timerConfig: {
             mode: npm1300TimerMode['General purpose'],
@@ -277,11 +275,11 @@ describe('PMIC 1304 - Apply Config ', () => {
             period: 10,
         },
         lowPower: {
-            timeToActive: npm1300TimeToActive['16ms'],
+            timeToActive: TimeToActive['16ms'],
             invPolarity: true,
         },
         reset: {
-            longPressReset: 'one_button',
+            longPressResetPinSel: 'one_button',
         },
         fuelGaugeSettings: {
             enabled: true,
@@ -310,7 +308,7 @@ describe('PMIC 1304 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
-    let ship: npm1300LowPowerConfig = { ...initShip };
+    let ship: LowPowerConfig = { ...initShip };
     let reset: ResetConfig = { ...initReset };
     let timerConfig = { ...initTimerConfig };
     let usbPower = { ...initUSBPower };
@@ -400,7 +398,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                 ship = {
                     ...ship,
                     ...partialUpdate,
-                } as npm1300LowPowerConfig;
+                } as LowPowerConfig;
             },
         );
 
@@ -418,7 +416,7 @@ describe('PMIC 1304 - Apply Config ', () => {
                 timerConfig = {
                     ...timerConfig,
                     ...partialUpdate,
-                } as npm1300TimerConfig;
+                };
             },
         );
 

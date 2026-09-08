@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { LongPressResetValues } from '../../types';
 import { setupMocksWithShellParser } from '../tests/helpers';
+import { longPressResetPinSelValues } from './types';
 
 describe('PMIC 1300 - Command callbacks', () => {
     const {
@@ -19,7 +19,7 @@ describe('PMIC 1300 - Command callbacks', () => {
     });
 
     test.each(
-        LongPressResetValues.map(value => [
+        longPressResetPinSelValues.map(value => [
             { append: `get`, value },
             { append: `set ${value}`, value },
         ]),
@@ -32,7 +32,7 @@ describe('PMIC 1300 - Command callbacks', () => {
 
         expect(mockOnResetUpdate).toBeCalledTimes(1);
         expect(mockOnResetUpdate).toBeCalledWith({
-            longPressReset: value,
+            longPressResetPinSel: value,
         });
     });
 });

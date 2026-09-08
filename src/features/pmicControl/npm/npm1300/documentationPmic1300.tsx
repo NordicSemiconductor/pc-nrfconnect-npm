@@ -625,7 +625,7 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
             ],
         },
         resetControl: {
-            LongPressReset: [
+            LongPressResetPinSel: [
                 {
                     title: 'Long Press Reset',
                     content: [
@@ -640,10 +640,10 @@ export const documentation = (npmDevice: Npm1300 | Npm1304): Documentation => {
                         </p>,
                         <p key="p3">
                             After power-up, this feature is by default set to
-                            &quot;one button&quot;.
+                            &quot;One Button&quot;.
                         </p>,
                         <p key="p4">
-                            When &quot;two buttons&quot; is selected, both
+                            When &quot;Two Buttons&quot; is selected, both
                             SHPHLD and GPIO0 must be pressed simultaneously to
                             trigger a reset.
                         </p>,

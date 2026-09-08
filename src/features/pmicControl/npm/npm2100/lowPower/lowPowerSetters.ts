@@ -5,10 +5,7 @@
  */
 
 import { type NpmEventEmitter } from '../../pmicHelpers';
-import {
-    type npm2100LowPowerConfig,
-    type npm2100TimeToActive,
-} from '../../types';
+import { type LowPowerConfig, type TimeToActive } from '../../types';
 import { LowPowerGet } from './lowPowerGetters';
 
 export class LowPowerSet {
@@ -26,17 +23,20 @@ export class LowPowerSet {
         this.get = new LowPowerGet(sendCommand);
     }
 
-    async all(lowPower: npm2100LowPowerConfig) {
-        await Promise.allSettled([
-            this.timeToActive(lowPower.timeToActive),
-            this.powerButtonEnable(lowPower.powerButtonEnable),
-        ]);
+    async all(lowPower: LowPowerConfig) {
+        const promises = [this.timeToActive(lowPower.timeToActive)];
+
+        if (lowPower.powerButtonEnable !== undefined) {
+            promises.push(this.powerButtonEnable(lowPower.powerButtonEnable));
+        }
+
+        await Promise.allSettled(promises);
     }
 
     powerButtonEnable(powerButtonEnable: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<npm2100LowPowerConfig>(
+                this.eventEmitter.emitPartialEvent<LowPowerConfig>(
                     'onLowPowerUpdate',
                     {
                         powerButtonEnable,
@@ -58,10 +58,10 @@ export class LowPowerSet {
         });
     }
 
-    timeToActive(timeToActive: npm2100TimeToActive) {
+    timeToActive(timeToActive: TimeToActive) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<npm2100LowPowerConfig>(
+                this.eventEmitter.emitPartialEvent<LowPowerConfig>(
                     'onLowPowerUpdate',
                     {
                         timeToActive,

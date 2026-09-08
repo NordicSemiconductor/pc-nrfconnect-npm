@@ -21,7 +21,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test.each([true, false])('Set pof enable %p', async enable => {
-            await pmic.pofModule?.set.enabled(enable);
+            await pmic.pofModule?.set.enabled?.(enable);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -36,7 +36,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         });
 
         test('Set pof threshold', async () => {
-            await pmic.pofModule?.set.threshold(3);
+            await pmic.pofModule?.set.resetThreshold(3);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -53,7 +53,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
         test.each(
             POFPolarityValues.map((polarity, index) => ({ polarity, index })),
         )('Set pof polarity %p', async ({ polarity, index }) => {
-            await pmic.pofModule?.set.polarity(polarity);
+            await pmic.pofModule?.set.polarity?.(polarity);
 
             expect(mockEnqueueRequest).toBeCalledTimes(1);
             expect(mockEnqueueRequest).toBeCalledWith(
@@ -86,7 +86,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.pofModule?.set.enabled(enable),
+                    pmic.pofModule?.set.enabled?.(enable),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -123,7 +123,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
                 );
 
                 await expect(
-                    pmic.pofModule?.set.polarity(polarity),
+                    pmic.pofModule?.set.polarity?.(polarity),
                 ).rejects.toBeUndefined();
 
                 expect(mockEnqueueRequest).toBeCalledTimes(2);
@@ -154,7 +154,7 @@ describe('PMIC 1300 - Setters Online tests', () => {
             });
 
             await expect(
-                pmic.pofModule?.set.threshold(2.7),
+                pmic.pofModule?.set.resetThreshold(2.7),
             ).rejects.toBeUndefined();
 
             expect(mockEnqueueRequest).toBeCalledTimes(2);

@@ -87,7 +87,7 @@ export default ({
                 </div>
             }
         >
-            {'enabled' in timerConfig && timerConfigModule.set.enabled && (
+            {timerConfig.enabled !== undefined && (
                 <Toggle
                     label={
                         <DocumentationTooltip card={card} item="TimeState">
@@ -118,7 +118,7 @@ export default ({
                 disabled={disabled}
             />
 
-            {'prescaler' in timerConfig && timerConfigModule.set.prescaler && (
+            {timerConfig.prescaler !== undefined && (
                 <Dropdown
                     label={
                         <DocumentationTooltip card={card} item="TimePrescaler">

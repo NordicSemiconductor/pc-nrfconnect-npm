@@ -11,7 +11,6 @@ import {
     type Charger,
     type ChargerModule,
     GPIOValues,
-    isNpm1300ResetConfig,
     type LdoExport,
     type LdoModule,
     type LedExport,
@@ -223,10 +222,10 @@ const generateLEDs = (
 };
 
 const longPressReset = (npmConfig: NpmExportLatest) => {
-    if (!npmConfig.reset || !isNpm1300ResetConfig(npmConfig.reset)) {
-        throw new Error('Invalid reset config for nPM1300');
+    if (!npmConfig.reset) {
+        throw new Error('No reset config found for nPM1300');
     }
-    return `long-press-reset = "${npmConfig.reset.longPressReset.replaceAll('_', '-')}";`;
+    return `long-press-reset = "${npmConfig.reset.longPressResetPinSel.replaceAll('_', '-')}";`;
 };
 
 const pmicIntPin = (npmConfig: NpmExportLatest) => {

@@ -6,7 +6,6 @@
 
 import { type NpmEventEmitter } from '../../pmicHelpers';
 import {
-    type npm1300TimerConfig,
     type TimerConfig,
     type TimerMode,
     type TimerPrescaler,
@@ -29,12 +28,14 @@ export class TimerConfigSet {
         this.get = new TimerConfigGet(sendCommand);
     }
 
-    async all(timerConfig: npm1300TimerConfig) {
-        await Promise.allSettled([
-            this.mode(timerConfig.mode),
-            this.prescaler(timerConfig.prescaler),
-            this.period(timerConfig.period),
-        ]);
+    async all(config: TimerConfig) {
+        const promises = [this.mode(config.mode), this.period(config.period)];
+
+        if (config.prescaler !== undefined) {
+            promises.push(this.prescaler(config.prescaler));
+        }
+
+        await Promise.allSettled(promises);
     }
 
     mode(mode: TimerMode) {
