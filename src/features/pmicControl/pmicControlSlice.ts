@@ -455,6 +455,14 @@ export const getDialog = (state: RootState) =>
     state.app.pmicControl.dialog.length > 0
         ? state.app.pmicControl.dialog[0]
         : undefined;
+export const isUsbConnected = (state: RootState): boolean => {
+    const { sysReg, usbPower } = state.app.pmicControl;
+
+    return !!(
+        (usbPower && usbPower.detectStatus !== 'No USB connection') ||
+        (sysReg && sysReg.vBusPresent === true)
+    );
+};
 
 export const getEventRecording = (state: RootState) =>
     state.app.pmicControl.eventRecordingPath !== undefined &&
