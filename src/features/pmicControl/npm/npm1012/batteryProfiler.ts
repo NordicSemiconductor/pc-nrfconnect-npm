@@ -102,17 +102,24 @@ export class BatteryProfiler extends nPM1300BatteryProfiler {
             },
             {
                 tLoad: 420000, // 7 Min
-                tRest: 2400000, // 40Min
+                tRest: 2700000, // 45Min
                 iLoad: capacity / 6 / 1000, // A
                 iRest: 0,
-                vCutoff: vLowerCutOff + 0.65 * vRange,
+                vCutoff: Math.max(vLowerCutOff + 0.65 * vRange, 3.9),
             },
             {
                 tLoad: 300000, // 5Min
-                tRest: 2400000, // 40Min
+                tRest: 2700000, // 45Min
                 iLoad: capacity / 6 / 1000, // A
                 iRest: 0,
-                vCutoff: vLowerCutOff + 0.4 * vRange,
+                vCutoff: Math.max(vLowerCutOff + 0.4 * vRange, 3.55),
+            },
+            {
+                tLoad: 600000, // 10Min
+                tRest: 2700000, // 45Min
+                iLoad: capacity / 12 / 1000, // A
+                iRest: 0,
+                vCutoff: vLowerCutOff + 0.2,
             },
             {
                 tLoad: 300000, // 5Min

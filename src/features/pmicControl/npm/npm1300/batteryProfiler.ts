@@ -315,23 +315,30 @@ export class BatteryProfiler implements BatteryProfilerBase {
                 cycles: 300, // 5Min
             },
             {
+                tLoad: 420000, // 7 Min
+                tRest: 2700000, // 45Min
+                iLoad: capacity / 6 / 1000, // A
+                iRest: 0,
+                vCutoff: Math.max(vLowerCutOff + 0.65 * vRange, 3.9),
+            },
+            {
+                tLoad: 300000, // 5Min
+                tRest: 2700000, // 45Min
+                iLoad: capacity / 6 / 1000, // A
+                iRest: 0,
+                vCutoff: Math.max(vLowerCutOff + 0.4 * vRange, 3.55),
+            },
+            {
                 tLoad: 600000, // 10Min
-                tRest: 2400000, // 40Min // 1304 1hr
-                iLoad: capacity / 5 / 1000, // A // 1304 apacity / 6 / 1000
+                tRest: 2700000, // 45Min
+                iLoad: capacity / 12 / 1000, // A
                 iRest: 0,
-                vCutoff: vLowerCutOff + 0.65 * vRange,
+                vCutoff: vLowerCutOff + 0.2,
             },
             {
                 tLoad: 300000, // 5Min
-                tRest: 1800000, // 30Min // 1304 45min
-                iLoad: capacity / 5 / 1000, // A  // 1304 apacity / 6 / 1000
-                iRest: 0,
-                vCutoff: vLowerCutOff + 0.4 * vRange,
-            },
-            {
-                tLoad: 300000, // 5Min
-                tRest: 1800000, // 30Min // 1304 45min
-                iLoad: capacity / 10 / 1000, // A  // 1304 apacity / 12 / 1000
+                tRest: 2700000, // 45Min
+                iLoad: capacity / 12 / 1000, // A
                 iRest: 0,
             },
         ];
