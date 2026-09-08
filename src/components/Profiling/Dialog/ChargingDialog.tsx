@@ -21,8 +21,8 @@ import {
     getLatestAdcSample,
     getNpmDevice,
     getPmicChargingState,
-    getUsbPower,
     isBatteryConnected,
+    isUsbConnected,
 } from '../../../features/pmicControl/pmicControlSlice';
 import {
     closeProfiling,
@@ -42,9 +42,7 @@ import StepperProgress from './StepperProgress';
 
 export default ({ isVisible }: { isVisible: boolean }) => {
     const npmDevice = useSelector(getNpmDevice);
-    const usbPower = useSelector(getUsbPower);
-    const usbPowered =
-        usbPower && usbPower.detectStatus !== 'No USB connection';
+    const usbConnected = useSelector(isUsbConnected);
     const charger = useSelector(getCharger);
     const pmicChargingState = useSelector(getPmicChargingState);
     const batteryConnected = useSelector(isBatteryConnected);
@@ -77,7 +75,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
             state: 'active',
         };
     } else if (!batteryFull) {
-        const charging = usbPowered && batteryConnected && charger?.enabled;
+        const charging = usbConnected && batteryConnected && charger?.enabled;
         if (charging && !pmicChargingState.dieTempHigh) {
             stepOverride = {
                 caption: `Charging ${
@@ -118,7 +116,7 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                     <DialogButton
                         variant="primary"
                         disabled={
-                            !batteryFull || usbPowered || !batteryConnected
+                            !batteryFull || usbConnected || !batteryConnected
                         }
                         onClick={async () => {
                             dispatch(setProfilingStage('Resting'));
@@ -180,18 +178,18 @@ export default ({ isVisible }: { isVisible: boolean }) => {
                         connected.
                     </Alert>
                 )}
-                {!batteryFull && !usbPowered && (
+                {!batteryFull && !usbConnected && (
                     <Alert label="Action required: " variant="warning">
                         You must connect <strong>USB PMIC</strong> to continue
                     </Alert>
                 )}
-                {batteryFull && usbPowered && (
+                {batteryFull && usbConnected && (
                     <Alert label="Action required: " variant="warning">
                         You must disconnect <strong>USB PMIC</strong> to
                         continue
                     </Alert>
                 )}
-                {batteryFull && !usbPowered && (
+                {batteryFull && !usbConnected && (
                     <Alert label="Action required: " variant="warning">
                         Click continue
                     </Alert>
