@@ -16,17 +16,14 @@ import {
     toRegex,
     toValueRegex,
 } from '../../pmicHelpers';
-import { type npm2100LowPowerConfig, npm2100TimeToActive } from '../../types';
+import { type LowPowerConfig, type TimeToActive } from '../../types';
+import { timeToActiveValues } from './types';
 
 export default (
     shellParser: ShellParser | undefined,
     eventEmitter: NpmEventEmitter,
 ) => {
     const cleanupCallbacks = [];
-
-    const npm2100TimeToActiveValues = Object.keys(npm2100TimeToActive).map(
-        key => npm2100TimeToActive[key as keyof typeof npm2100TimeToActive],
-    );
 
     if (shellParser) {
         cleanupCallbacks.push(
@@ -35,16 +32,16 @@ export default (
                     'npm2100 low_power_control hibernate_debounce',
                     true,
                     undefined,
-                    toValueRegex(npm2100TimeToActiveValues),
+                    toValueRegex(timeToActiveValues),
                 ),
                 res => {
-                    eventEmitter.emitPartialEvent<npm2100LowPowerConfig>(
+                    eventEmitter.emitPartialEvent<LowPowerConfig>(
                         'onLowPowerUpdate',
                         {
                             timeToActive: selectFromTypeValues(
                                 parseColonBasedAnswer(res),
-                                npm2100TimeToActiveValues,
-                            ) as npm2100TimeToActive,
+                                timeToActiveValues,
+                            ) as TimeToActive,
                         },
                     );
                 },
@@ -62,7 +59,7 @@ export default (
                     onOffRegex,
                 ),
                 res => {
-                    eventEmitter.emitPartialEvent<npm2100LowPowerConfig>(
+                    eventEmitter.emitPartialEvent<LowPowerConfig>(
                         'onLowPowerUpdate',
                         {
                             powerButtonEnable: parseOnOff(res),

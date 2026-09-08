@@ -18,9 +18,11 @@ export class LowPowerActions {
 
     enterShipMode() {
         this.sendCommand(`npm2100 low_power_control ship_mode set ENABLE`);
+        return Promise.resolve();
     }
     enterShipHibernateMode() {
         this.sendCommand(`npm2100 low_power_control hibernate_mode set ENABLE`);
+        return Promise.resolve();
     }
 
     enterHibernatePtMode() {

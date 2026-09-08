@@ -47,8 +47,8 @@ export default ({
                         item="VBusInputCurrentLimiter"
                     >
                         <>
-                            V<span className="subscript">BUS</span> input
-                            current limiter
+                            V<span className="subscript">BUS</span> Input
+                            Current Limiter
                         </>
                     </DocumentationTooltip>
                 </div>

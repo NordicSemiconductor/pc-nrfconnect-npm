@@ -15,11 +15,11 @@ import {
 import { DocumentationTooltip } from '../../features/pmicControl/npm/documentation/documentation';
 import { ResetReasons } from '../../features/pmicControl/npm/npm2100/reset';
 import {
-    type LongPressReset,
     type LongPressResetDebounce,
+    type LongPressResetPinSel,
+    type PowerDownWait,
     type ResetConfig,
     type ResetModule,
-    type ResetPinSelection,
 } from '../../features/pmicControl/npm/types';
 
 const card = 'resetControl';
@@ -34,99 +34,98 @@ export default ({
     disabled: boolean;
 }) => (
     <Card
-        title={<div className="tw-flex tw-justify-between">Reset control</div>}
+        title={<div className="tw-flex tw-justify-between">Reset Control</div>}
     >
-        {'longPressReset' in reset && resetModule.set.longPressReset && (
-            <Dropdown
+        <Dropdown
+            label={
+                <DocumentationTooltip card={card} item="LongPressResetPinSel">
+                    Long Press Reset
+                </DocumentationTooltip>
+            }
+            items={resetModule.values.longPressResetPinSel}
+            onSelect={item =>
+                resetModule.set.longPressResetPinSel?.(
+                    item.value as LongPressResetPinSel,
+                )
+            }
+            selectedItem={
+                resetModule.values.longPressResetPinSel.find(
+                    item => item.value === reset.longPressResetPinSel,
+                ) ?? resetModule.values.longPressResetPinSel[0]
+            }
+            disabled={disabled}
+        />
+
+        {reset.longPressResetEnable !== undefined && (
+            <Toggle
                 label={
-                    <DocumentationTooltip card={card} item="LongPressReset">
-                        Long Press Reset
+                    <DocumentationTooltip
+                        card={card}
+                        item="LongPressResetEnable"
+                    >
+                        Enable Long Press Reset
                     </DocumentationTooltip>
                 }
-                items={resetModule.values.longPressReset}
-                onSelect={item =>
-                    resetModule.set.longPressReset?.(
-                        item.value as LongPressReset,
-                    )
-                }
-                selectedItem={
-                    resetModule.values.longPressReset.find(
-                        item => item.value === reset.longPressReset,
-                    ) ?? resetModule.values.longPressReset[0]
+                isToggled={reset.longPressResetEnable === true}
+                onToggle={value =>
+                    resetModule.set.longPressResetEnable?.(value)
                 }
                 disabled={disabled}
             />
         )}
 
-        {'resetPinSelection' in reset && resetModule.set.selectResetPin && (
+        {resetModule.values.longPressResetDebounce && (
             <Dropdown
                 label={
                     <DocumentationTooltip
                         card={card}
-                        item="LongPressResetSelectPin"
+                        item="LongPressResetDebounce"
                     >
-                        Reset Pin Selection
+                        <div>
+                            <span>t</span>
+                            <span className="subscript">RESETBUT</span>
+                        </div>
                     </DocumentationTooltip>
                 }
-                items={resetModule.values.pinSelection}
+                items={resetModule.values.longPressResetDebounce}
                 onSelect={item =>
-                    resetModule.set.selectResetPin?.(
-                        item.value as ResetPinSelection,
+                    resetModule.set.longPressResetDebounce?.(
+                        item.value as LongPressResetDebounce,
                     )
                 }
                 selectedItem={
-                    resetModule.values.pinSelection.find(
-                        item => item.value === reset.resetPinSelection,
-                    ) ?? resetModule.values.pinSelection[0]
+                    resetModule.values.longPressResetDebounce.find(
+                        item => item.value === reset.longPressResetDebounce,
+                    ) ?? resetModule.values.longPressResetDebounce[0]
+                }
+                disabled={
+                    disabled || reset.longPressResetDebounceSelDisabled === true
+                }
+            />
+        )}
+
+        {resetModule.values.powerDownWait && (
+            <Dropdown
+                label={
+                    <DocumentationTooltip card={card} item="PowerDownWait">
+                        <div>
+                            <span>t</span>
+                            <span className="subscript">PWRDN</span>
+                        </div>
+                    </DocumentationTooltip>
+                }
+                items={resetModule.values.powerDownWait}
+                onSelect={item =>
+                    resetModule.set.powerDownWait?.(item.value as PowerDownWait)
+                }
+                selectedItem={
+                    resetModule.values.powerDownWait.find(
+                        item => item.value === reset.powerDownWait,
+                    ) ?? resetModule.values.powerDownWait[0]
                 }
                 disabled={disabled}
             />
         )}
-
-        {'longPressResetEnable' in reset &&
-            resetModule.set.longPressResetEnable && (
-                <Toggle
-                    label={
-                        <DocumentationTooltip
-                            card={card}
-                            item="LongPressResetEnable"
-                        >
-                            Long Press Reset
-                        </DocumentationTooltip>
-                    }
-                    isToggled={reset.longPressResetEnable === true}
-                    onToggle={value =>
-                        resetModule.set.longPressResetEnable?.(value)
-                    }
-                    disabled={disabled}
-                />
-            )}
-
-        {'longPressResetDebounce' in reset &&
-            resetModule.set.longPressResetDebounce && (
-                <Dropdown
-                    label={
-                        <DocumentationTooltip
-                            card={card}
-                            item="LongPressResetDebounce"
-                        >
-                            Long Press Reset Debounce
-                        </DocumentationTooltip>
-                    }
-                    items={resetModule.values.longPressResetDebounce}
-                    onSelect={item =>
-                        resetModule.set.longPressResetDebounce?.(
-                            item.value as LongPressResetDebounce,
-                        )
-                    }
-                    selectedItem={
-                        resetModule.values.longPressResetDebounce.find(
-                            item => item.value === reset.longPressResetDebounce,
-                        ) ?? resetModule.values.longPressResetDebounce[0]
-                    }
-                    disabled={disabled}
-                />
-            )}
 
         {resetModule.actions.powerCycle && (
             <DocumentationTooltip card={card} item="PowerCycle">
@@ -143,14 +142,14 @@ export default ({
             </DocumentationTooltip>
         )}
 
-        {'resetReason' in reset && reset.resetReason?.reason && (
+        {reset.resetReason !== undefined && (
             <div className="tw-flex tw-flex-row tw-justify-between tw-border-0 tw-border-b tw-border-solid">
                 <DocumentationTooltip card={card} item="ResetCause">
                     <span>Reset Cause</span>
                 </DocumentationTooltip>
                 <span>
-                    {ResetReasons.get(reset.resetReason?.reason || 'Unknown') ||
-                        reset.resetReason?.reason}
+                    {ResetReasons.get(reset.resetReason.reason || 'Unknown') ||
+                        reset.resetReason.reason}
                 </span>
             </div>
         )}

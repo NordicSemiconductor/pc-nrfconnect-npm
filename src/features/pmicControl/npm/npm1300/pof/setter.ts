@@ -24,25 +24,31 @@ export class PofSet {
     }
 
     async all(pof: POF) {
-        await Promise.allSettled([
-            this.enabled(pof.enable),
-            this.polarity(pof.polarity),
-            this.threshold(pof.threshold),
-        ]);
+        const promises = [this.resetThreshold(pof.resetThreshold)];
+
+        if (pof.enabled !== undefined) {
+            promises.push(this.enabled(pof.enabled));
+        }
+        if (pof.polarity !== undefined) {
+            promises.push(this.polarity(pof.polarity));
+        }
+
+        await Promise.allSettled(promises);
     }
-    enabled(enable: boolean) {
+
+    enabled(enabled: boolean) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                    enable,
+                    enabled,
                 });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx pof status set ${enable ? '1' : '0'}`,
+                    `npmx pof status set ${enabled ? '1' : '0'}`,
                     () => resolve(),
                     () => {
-                        this.get.enable();
+                        this.get.enabled();
                         reject();
                     },
                 );
@@ -50,19 +56,19 @@ export class PofSet {
         });
     }
 
-    threshold(threshold: number) {
+    resetThreshold(resetThreshold: number) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                    threshold,
+                    resetThreshold,
                 });
                 resolve();
             } else {
                 this.sendCommand(
-                    `npmx pof threshold set ${threshold * 1000}`, // V to mV
+                    `npmx pof threshold set ${resetThreshold * 1000}`, // V to mV
                     () => resolve(),
                     () => {
-                        this.get.threshold();
+                        this.get.resetThreshold();
                         reject();
                     },
                 );

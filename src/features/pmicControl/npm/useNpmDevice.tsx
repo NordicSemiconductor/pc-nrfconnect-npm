@@ -57,6 +57,7 @@ import {
     setResetConfig,
     setStoredBatterModel,
     setSupportedVersion,
+    setSysRegConfig,
     setTimerConfig,
     setUsbPower,
     updateBoost,
@@ -72,6 +73,7 @@ import {
     updatePmicChargingState,
     updatePOFs,
     updateResetConfig,
+    updateSysRegConfig,
     updateTimerConfig,
     updateUsbPower,
 } from '../pmicControlSlice';
@@ -316,6 +318,12 @@ export default () => {
             releaseAll.push(
                 npmDevice.onResetUpdate(payload => {
                     dispatch(updateResetConfig(payload));
+                }),
+            );
+
+            releaseAll.push(
+                npmDevice.onSysRegUpdate(payload => {
+                    dispatch(updateSysRegConfig(payload));
                 }),
             );
 
@@ -688,6 +696,7 @@ export default () => {
             dispatch(setUsbPower(npmDevice.usbCurrentLimiterModule?.defaults));
             dispatch(setTimerConfig(npmDevice.timerConfigModule?.defaults));
             dispatch(setResetConfig(npmDevice.resetModule?.defaults));
+            dispatch(setSysRegConfig(npmDevice.sysRegModule?.defaults));
 
             return () => {
                 releaseAll.forEach(release => release());
@@ -864,22 +873,14 @@ export default () => {
                 setPaneHidden({
                     name: 'System Features',
                     hidden:
-                        !(
-                            npmDevice?.lowPowerModule && // npm130x features
-                            npmDevice.resetModule &&
-                            npmDevice.timerConfigModule &&
-                            npmDevice.pofModule &&
-                            npmDevice.usbCurrentLimiterModule &&
-                            SupportsErrorLogs(npmDevice)
-                        ) &&
-                        !(
-                            npmDevice?.lowPowerModule && // npm2100 features
-                            npmDevice.resetModule &&
-                            npmDevice.timerConfigModule &&
+                        !npmDevice ||
+                        (!npmDevice.lowPowerModule &&
                             !npmDevice.pofModule &&
+                            !npmDevice.resetModule &&
+                            !npmDevice.sysRegModule &&
+                            !npmDevice.timerConfigModule &&
                             !npmDevice.usbCurrentLimiterModule &&
-                            !SupportsErrorLogs(npmDevice)
-                        ),
+                            !SupportsErrorLogs(npmDevice)),
                 }),
             );
             dispatch(

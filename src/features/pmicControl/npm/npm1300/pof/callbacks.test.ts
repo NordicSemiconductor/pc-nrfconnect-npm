@@ -16,27 +16,27 @@ describe('PMIC 1300 - Command callbacks', () => {
 
     test.each(
         [true, false]
-            .map(enable => [
+            .map(enabled => [
                 {
                     append: `get`,
-                    enable,
+                    enabled,
                 },
                 {
-                    append: `set ${enable ? '1' : '0'}`,
-                    enable,
+                    append: `set ${enabled ? '1' : '0'}`,
+                    enabled,
                 },
             ])
             .flat(),
-    )('npmx pof status %p', ({ append, enable }) => {
+    )('npmx pof status %p', ({ append, enabled }) => {
         const command = `npmx pof status ${append}`;
         const callback =
             eventHandlers.mockRegisterCommandCallbackHandler(command);
 
-        callback?.onSuccess(`Value: ${enable ? '1' : '0'}.`, command);
+        callback?.onSuccess(`Value: ${enabled ? '1' : '0'}.`, command);
 
         expect(mockOnPOFUpdate).toBeCalledTimes(1);
         expect(mockOnPOFUpdate).toBeCalledWith({
-            enable,
+            enabled,
         });
     });
 
@@ -75,7 +75,7 @@ describe('PMIC 1300 - Command callbacks', () => {
 
         expect(mockOnPOFUpdate).toBeCalledTimes(1);
         expect(mockOnPOFUpdate).toBeCalledWith({
-            threshold: 2.8,
+            resetThreshold: 2.8,
         });
     });
 });

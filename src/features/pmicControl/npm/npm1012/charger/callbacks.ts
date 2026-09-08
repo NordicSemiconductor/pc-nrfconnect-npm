@@ -17,7 +17,11 @@ import {
     parseToNumber,
     toRegex,
 } from '../../pmicHelpers';
-import { type Charger, type PmicChargingState } from '../../types';
+import {
+    type Charger,
+    type LowPowerConfig,
+    type PmicChargingState,
+} from '../../types';
 import { advancedChargingProfileOnUpdate } from './helpers';
 
 export default (
@@ -63,6 +67,16 @@ export default (
                     'onChargingStatusUpdate',
                     chargingState,
                 );
+
+                if (chargingState.batteryFull) {
+                    eventEmitter.emitPartialEvent<LowPowerConfig>(
+                        'onLowPowerUpdate',
+                        {
+                            vbusHibernateWaitingForChargeComplete: false,
+                            vbusStandbyWaitingForChargeComplete: false,
+                        },
+                    );
+                }
             });
         }),
     );

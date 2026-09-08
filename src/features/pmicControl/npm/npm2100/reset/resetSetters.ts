@@ -5,11 +5,11 @@
  */
 
 import { type NpmEventEmitter } from '../../pmicHelpers';
-import { type npm2100ResetConfig, type ResetConfig } from '../../types';
 import {
-    type npm2100LongPressResetDebounce,
-    type npm2100ResetPinSelection,
-} from '../types';
+    type LongPressResetDebounce,
+    type LongPressResetPinSel,
+    type ResetConfig,
+} from '../../types';
 import { ResetGet } from './resetGetters';
 
 export class ResetSet {
@@ -27,10 +27,46 @@ export class ResetSet {
         this.get = new ResetGet(sendCommand);
     }
 
-    async all(shipMode: npm2100ResetConfig) {
-        await Promise.allSettled([
-            this.longPressResetEnable(shipMode.longPressResetEnable),
-        ]);
+    async all(config: ResetConfig) {
+        const promises = [
+            this.longPressResetPinSel(config.longPressResetPinSel),
+        ];
+
+        if (config.longPressResetDebounce !== undefined) {
+            promises.push(
+                this.longPressResetDebounce(config.longPressResetDebounce),
+            );
+        }
+        if (config.longPressResetEnable !== undefined) {
+            promises.push(
+                this.longPressResetEnable(config.longPressResetEnable),
+            );
+        }
+
+        await Promise.allSettled(promises);
+    }
+
+    longPressResetPinSel(longPressResetPinSel: LongPressResetPinSel) {
+        return new Promise<void>((resolve, reject) => {
+            if (this.offlineMode) {
+                this.eventEmitter.emitPartialEvent<ResetConfig>(
+                    'onResetUpdate',
+                    {
+                        longPressResetPinSel,
+                    },
+                );
+                resolve();
+            } else {
+                this.sendCommand(
+                    `npm2100 reset_ctrl pin_selection set ${longPressResetPinSel}`,
+                    () => resolve(),
+                    () => {
+                        this.get.longPressResetPinSel();
+                        reject();
+                    },
+                );
+            }
+        });
     }
 
     longPressResetEnable(longPressResetEnable: boolean) {
@@ -50,7 +86,7 @@ export class ResetSet {
                     }`,
                     () => resolve(),
                     () => {
-                        this.get.longPressReset();
+                        this.get.longPressResetEnable();
                         reject();
                     },
                 );
@@ -58,32 +94,7 @@ export class ResetSet {
         });
     }
 
-    selectResetPin(resetPinSelection: npm2100ResetPinSelection) {
-        return new Promise<void>((resolve, reject) => {
-            if (this.offlineMode) {
-                this.eventEmitter.emitPartialEvent<ResetConfig>(
-                    'onResetUpdate',
-                    {
-                        resetPinSelection,
-                    },
-                );
-                resolve();
-            } else {
-                this.sendCommand(
-                    `npm2100 reset_ctrl pin_selection set ${resetPinSelection}`,
-                    () => resolve(),
-                    () => {
-                        this.get.pinSelection();
-                        reject();
-                    },
-                );
-            }
-        });
-    }
-
-    longPressResetDebounce(
-        longPressResetDebounce: npm2100LongPressResetDebounce,
-    ) {
+    longPressResetDebounce(longPressResetDebounce: LongPressResetDebounce) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<ResetConfig>(

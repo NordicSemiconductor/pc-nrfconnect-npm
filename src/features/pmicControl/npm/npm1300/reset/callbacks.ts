@@ -12,7 +12,7 @@ import {
     parseColonBasedAnswer,
     toRegex,
 } from '../../pmicHelpers';
-import { type LongPressReset, type ResetConfig } from '../../types';
+import { type LongPressResetPinSel, type ResetConfig } from '../../types';
 
 export default (
     shellParser: ShellParser | undefined,
@@ -29,7 +29,8 @@ export default (
                     eventEmitter.emitPartialEvent<ResetConfig>(
                         'onResetUpdate',
                         {
-                            longPressReset: result as LongPressReset,
+                            longPressResetPinSel:
+                                result as LongPressResetPinSel,
                         },
                     );
                 },

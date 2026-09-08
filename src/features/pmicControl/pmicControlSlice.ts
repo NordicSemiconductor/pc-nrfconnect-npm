@@ -29,6 +29,7 @@ import type {
     POF,
     PowerID,
     ResetConfig,
+    SysReg,
     TimerConfig,
     USBPower,
 } from './npm/types';
@@ -46,6 +47,7 @@ interface pmicControlState {
     pof?: POF;
     lowPower?: LowPowerConfig;
     reset?: ResetConfig;
+    sysReg?: SysReg;
     timerConfig?: TimerConfig;
     latestAdcSample?: AdcSample;
     pmicState: PmicState;
@@ -281,6 +283,21 @@ const pmicControlSlice = createSlice({
                 };
             }
         },
+        setSysRegConfig(state, action: PayloadAction<SysReg | undefined>) {
+            state.sysReg = action.payload;
+        },
+        updateSysRegConfig(
+            state,
+            action: PayloadAction<Partial<SysReg | undefined>>,
+        ) {
+            if (state.npmDevice?.sysRegModule) {
+                state.sysReg = {
+                    ...state.npmDevice.sysRegModule.defaults,
+                    ...state.sysReg,
+                    ...action.payload,
+                };
+            }
+        },
         setBatteryConnected(state, action: PayloadAction<boolean>) {
             state.batteryConnected = action.payload;
         },
@@ -382,6 +399,7 @@ export const getLEDs = (state: RootState) => state.app.pmicControl.leds;
 export const getPOF = (state: RootState) => state.app.pmicControl.pof;
 export const getShip = (state: RootState) => state.app.pmicControl.lowPower;
 export const getReset = (state: RootState) => state.app.pmicControl.reset;
+export const getSysReg = (state: RootState) => state.app.pmicControl.sysReg;
 export const getTimerConfig = (state: RootState) =>
     state.app.pmicControl.timerConfig;
 export const isReceivingBatteryVoltageAboveThreshold = (state: RootState) =>
@@ -437,6 +455,14 @@ export const getDialog = (state: RootState) =>
     state.app.pmicControl.dialog.length > 0
         ? state.app.pmicControl.dialog[0]
         : undefined;
+export const isUsbConnected = (state: RootState): boolean => {
+    const { sysReg, usbPower } = state.app.pmicControl;
+
+    return !!(
+        (usbPower && usbPower.detectStatus !== 'No USB connection') ||
+        (sysReg && sysReg.vBusPresent === true)
+    );
+};
 
 export const getEventRecording = (state: RootState) =>
     state.app.pmicControl.eventRecordingPath !== undefined &&
@@ -482,6 +508,8 @@ export const {
     updateLowPowerConfig,
     setResetConfig,
     updateResetConfig,
+    setSysRegConfig,
+    updateSysRegConfig,
     setBatteryConnected,
     setBatteryAddonBoardId,
     setPowerId,

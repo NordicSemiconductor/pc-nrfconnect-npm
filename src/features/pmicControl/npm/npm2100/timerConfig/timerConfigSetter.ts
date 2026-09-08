@@ -5,8 +5,7 @@
  */
 
 import { type NpmEventEmitter } from '../../pmicHelpers';
-import { type npm2100TimerConfig, type TimerConfig } from '../../types';
-import { type npm2100TimerMode } from '../types';
+import { type TimerConfig, type TimerMode } from '../../types';
 import { TimerConfigGet } from './timerConfigGetter';
 
 export class TimerConfigSet {
@@ -24,15 +23,17 @@ export class TimerConfigSet {
         this.get = new TimerConfigGet(sendCommand);
     }
 
-    async all(timerConfig: npm2100TimerConfig) {
-        await Promise.allSettled([
-            this.mode(timerConfig.mode as npm2100TimerMode),
-            this.enabled(timerConfig.enabled),
-            this.period(timerConfig.period),
-        ]);
+    async all(config: TimerConfig) {
+        const promises = [this.mode(config.mode), this.period(config.period)];
+
+        if (config.enabled !== undefined) {
+            promises.push(this.enabled(config.enabled));
+        }
+
+        await Promise.allSettled(promises);
     }
 
-    mode(mode: npm2100TimerMode) {
+    mode(mode: TimerMode) {
         return new Promise<void>((resolve, reject) => {
             if (this.offlineMode) {
                 this.eventEmitter.emitPartialEvent<TimerConfig>(

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-export class UsbCurrentLimiterGet {
+export class PofGet {
     constructor(
         private sendCommand: (
             command: string,
@@ -14,15 +14,20 @@ export class UsbCurrentLimiterGet {
     ) {}
 
     all() {
-        this.vBusInCurrentLimiter();
-        this.usbPowered();
+        this.resetThreshold();
+        this.status();
+        this.warnThreshold();
     }
 
-    vBusInCurrentLimiter() {
-        this.sendCommand('npm1012 sysreg vbusilim get');
+    resetThreshold() {
+        this.sendCommand('npm1012 reset_ctrl pof reset_threshold get');
     }
 
-    usbPowered() {
-        this.sendCommand('npm1012 sysreg vbus_status get');
+    status() {
+        this.sendCommand('npm1012 reset_ctrl pof status get');
+    }
+
+    warnThreshold() {
+        this.sendCommand('npm1012 reset_ctrl pof warn_threshold get');
     }
 }

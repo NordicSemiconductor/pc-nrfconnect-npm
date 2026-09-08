@@ -13,9 +13,6 @@ import {
     type Ldo,
     type LED,
     type LowPowerConfig,
-    type npm2100LowPowerConfig,
-    type npm2100TimerConfig,
-    npm2100TimeToActive,
     type NpmExportLatest,
     type PartialUpdate,
     type PmicDialog,
@@ -26,6 +23,7 @@ import {
 } from '../../types';
 import { GPIOMode2100, GPIOPull2100, GPIOState2100 } from '../gpio/types';
 import { toLdoExport } from '../ldo';
+import { TimeToActive } from '../lowPower/types';
 import { npm2100FWVersion } from '../pmic2100Device';
 import { npm2100TimerMode } from '../types';
 import { setupMocksBase } from './helpers';
@@ -95,9 +93,9 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     };
 
     const initPOF: POF = {
-        enable: true,
-        threshold: 2.8,
-        polarity: 'Active high',
+        enabled: true,
+        resetThreshold: 2.8,
+        polarity: 'Active High',
     };
 
     const initTimerConfig: TimerConfig = {
@@ -106,13 +104,13 @@ test.skip('PMIC 2100 - Apply Config ', () => {
         period: 0,
     };
 
-    const initLowPower: npm2100LowPowerConfig = {
-        timeToActive: npm2100TimeToActive['100ms'],
+    const initLowPower: LowPowerConfig = {
+        timeToActive: TimeToActive['100ms'],
         powerButtonEnable: true,
     };
 
     const initReset: ResetConfig = {
-        longPressReset: 'two_button',
+        longPressResetPinSel: 'two_button',
     };
 
     const initUSBPower: Omit<USBPower, 'detectStatus'> = {
@@ -185,9 +183,9 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             },
         ],
         pof: {
-            enable: false,
-            threshold: 2.4,
-            polarity: 'Active low',
+            enabled: false,
+            resetThreshold: 2.4,
+            polarity: 'Active Low',
         },
         timerConfig: {
             enabled: false,
@@ -195,11 +193,11 @@ test.skip('PMIC 2100 - Apply Config ', () => {
             period: 10,
         },
         lowPower: {
-            timeToActive: npm2100TimeToActive['30ms'],
+            timeToActive: TimeToActive['30ms'],
             powerButtonEnable: true,
         },
         reset: {
-            longPressReset: 'one_button',
+            longPressResetPinSel: 'one_button',
         },
         fuelGaugeSettings: {
             enabled: true,
@@ -226,7 +224,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
     let gpios: GPIO[] = [];
     let leds: LED[] = [];
     let pof: POF = { ...initPOF };
-    let ship: npm2100LowPowerConfig = { ...initLowPower };
+    let ship: LowPowerConfig = { ...initLowPower };
     let reset: ResetConfig = { ...initReset };
     let timerConfig = { ...initTimerConfig };
     let usbPower = { ...initUSBPower };
@@ -297,7 +295,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 ship = {
                     ...ship,
                     ...partialUpdate,
-                } as npm2100LowPowerConfig;
+                } as LowPowerConfig;
             },
         );
 
@@ -315,7 +313,7 @@ test.skip('PMIC 2100 - Apply Config ', () => {
                 timerConfig = {
                     ...timerConfig,
                     ...partialUpdate,
-                } as npm2100TimerConfig;
+                };
             },
         );
 

@@ -17,6 +17,7 @@ import {
 } from '../pmicHelpers';
 import {
     type AdcSample,
+    type ErrorLogs,
     type FuelGauge,
     type LoggingEvent,
     type OnBoardLoad,
@@ -29,10 +30,14 @@ import FuelGaugeModule from './fuelGauge';
 import GpioLedDrvModule from './gpioleddrv';
 import LdoModule, { toLdoExport } from './ldo';
 import LedModule, { toLedExport } from './led';
+import LowPowerModule, { toLowPowerExport } from './lowPower';
 import OnBoardLoadModule from './onBoardLoad';
-import UsbCurrentLimiterModule from './universalSerialBusCurrentLimiter';
+import PofModule from './pof';
+import ResetModule, { toResetExport } from './reset';
+import SysRegModule from './sysReg';
+import TimerConfigModule from './timerConfig';
 
-export const npm1012FWVersion = '0.3.2+0';
+export const npm1012FWVersion = '0.3.3+0';
 
 export default class Npm1012 extends BaseNpmDevice {
     constructor(
@@ -47,25 +52,26 @@ export default class Npm1012 extends BaseNpmDevice {
             new NpmEventEmitter(),
             {
                 bucks: { Module: BuckModule, count: 1 },
-                ldos: { Module: LdoModule, count: 2 },
                 gpioLedDrvs: { Module: GpioLedDrvModule, count: 3 },
-                ChargerModule,
+                ldos: { Module: LdoModule, count: 2 },
+                leds: { Module: LedModule, count: 1 },
                 maxEnergyExtraction: true,
                 noOfBatterySlots: 3,
-                leds: {
-                    Module: LedModule,
-                    count: 1,
-                },
                 BatteryProfiler,
+                ChargerModule,
                 FuelGaugeModule,
-                UsbCurrentLimiterModule,
+                LowPowerModule,
                 OnBoardLoadModule,
+                PofModule,
+                ResetModule,
+                SysRegModule,
+                TimerConfigModule,
             },
             1,
             {
-                reset: false,
+                reset: true,
                 charger: true,
-                sensor: false,
+                sensor: true,
             },
         );
 
@@ -114,7 +120,27 @@ export default class Npm1012 extends BaseNpmDevice {
     }
 
     private processModulePmic({ message }: LoggingEvent) {
-        switch (message) {
+        const resetOrError = message.split(': ');
+        const resetOrErrorMessage = resetOrError[0];
+        const resetOrErrorValues = resetOrError[1]?.split(',') ?? [];
+
+        switch (resetOrErrorMessage) {
+            case 'Charger error':
+                this.eventEmitter.emit('onErrorLogs', {
+                    chargerError: resetOrErrorValues,
+                } satisfies ErrorLogs);
+                break;
+            case 'Error sensor state':
+                this.eventEmitter.emit('onErrorLogs', {
+                    sensorError: resetOrErrorValues,
+                } satisfies ErrorLogs);
+                break;
+            case 'Reset reason':
+                this.eventEmitter.emit('onErrorLogs', {
+                    resetCause: resetOrErrorValues,
+                } satisfies ErrorLogs);
+                break;
+
             case 'No response from PMIC.':
                 if (this.pmicState !== 'pmic-disconnected') {
                     this.pmicState = 'pmic-disconnected';
@@ -123,7 +149,6 @@ export default class Npm1012 extends BaseNpmDevice {
                 break;
             case 'PMIC available. Application can be restarted.':
                 if (this.pmicState === 'pmic-pending-rebooting') return;
-
                 if (this.autoReboot) {
                     this.kernelReset();
                     this.pmicState = 'pmic-pending-rebooting';
@@ -211,19 +236,21 @@ export default class Npm1012 extends BaseNpmDevice {
                 enabled: currentState.fuelGaugeSettings.enabled,
                 chargingSamplingRate:
                     currentState.fuelGaugeSettings.chargingSamplingRate,
-                discardPosiiveDeltaZ:
-                    currentState.fuelGaugeSettings.discardPosiiveDeltaZ,
             },
             gpioLedDrvs: [...currentState.gpioleddrvs],
             gpios: [...currentState.gpios],
             ldos: [...currentState.ldos.map(toLdoExport)],
             leds: [...currentState.leds.map(toLedExport)],
-            lowPower: currentState.lowPower,
-            reset: currentState.reset,
-            timerConfig: currentState.timerConfig,
-            usbPower: currentState.usbPower
-                ? { currentLimiter: currentState.usbPower.currentLimiter }
+            lowPower: currentState.lowPower
+                ? toLowPowerExport(currentState.lowPower)
                 : undefined,
+            onBoardLoad: currentState.onBoardLoad,
+            pof: currentState.pof,
+            reset: currentState.reset
+                ? toResetExport(currentState.reset)
+                : undefined,
+            sysReg: currentState.sysReg,
+            timerConfig: currentState.timerConfig,
             fileFormatVersion: 2 as const,
         };
     }

@@ -14,18 +14,18 @@ export class PofGet {
     ) {}
 
     all() {
-        this.enable();
+        this.enabled();
         this.polarity();
-        this.threshold();
+        this.resetThreshold();
     }
 
-    enable() {
+    enabled() {
         this.sendCommand(`npmx pof status get`);
     }
     polarity() {
         this.sendCommand(`npmx pof polarity get`);
     }
-    threshold() {
+    resetThreshold() {
         this.sendCommand(`npmx pof threshold get`);
     }
 }

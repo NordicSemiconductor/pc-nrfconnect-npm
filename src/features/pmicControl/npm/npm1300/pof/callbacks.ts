@@ -27,7 +27,7 @@ export default (
                 toRegex('npmx pof status', true, undefined, '(0|1)'),
                 res => {
                     eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                        enable: parseToBoolean(res),
+                        enabled: parseToBoolean(res),
                     });
                 },
                 noop,
@@ -51,7 +51,7 @@ export default (
                 toRegex('npmx pof threshold', true),
                 res => {
                     eventEmitter.emitPartialEvent<POF>('onPOFUpdate', {
-                        threshold: parseToNumber(res) / 1000, // mV to V
+                        resetThreshold: parseToNumber(res) / 1000, // mV to V
                     });
                 },
                 noop,
